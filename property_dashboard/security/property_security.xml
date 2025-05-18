@@ -1,0 +1,22 @@
+<!-- property_monitor/security/property_security.xml -->
+<odoo>
+    <record id="access_property_property" model="ir.model.access">
+        <field name="name">Property Property Access</field>
+        <field name="model_id" ref="model_property_property"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="access_property_type" model="ir.model.access">
+        <field name="name">Property Type Access</field>
+        <field name="model_id" ref="model_property_type"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>

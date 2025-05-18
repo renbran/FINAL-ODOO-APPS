@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Property Type Form View -->
+        <record id="view_property_type_form" model="ir.ui.view">
+            <field name="name">property.type.form</field>
+            <field name="model">property.type</field>
+            <field name="arch" type="xml">
+                <form string="Property Type">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="active"/>
+                            <field name="default_price_per_sqft"/>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                            <page string="Properties">
+                                <field name="property_ids">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="state"/>
+                                        <field name="property_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Property Type Tree View -->
+        <record id="view_property_type_tree" model="ir.ui.view">
+            <field name="name">property.type.tree</field>
+            <field name="model">property.type</field>
+            <field name="arch" type="xml">
+                <tree string="Property Types">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="property_count"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Property Property Form View Extension -->
+        <record id="property_property_type_extension" model="ir.ui.view">
+            <field name="name">property.property.form.type_extension</field>
+            <field name="model">property.property</field>
+            <field name="inherit_id" ref="view_property_form"/>
+            <field name="arch" type="xml">
+                <field name="property_type" position="replace">
+                    <field name="type_id"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

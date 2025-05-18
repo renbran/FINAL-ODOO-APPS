@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Actions -->
+        <record id="action_property_type" model="ir.actions.act_window">
+            <field name="name">Property Types</field>
+            <field name="res_model">property.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_property_property" model="ir.actions.act_window">
+            <field name="name">Properties</field>
+            <field name="res_model">property.property</field>
+            <field name="view_mode">kanban,tree,form</field>
+        </record>
+
+        <record id="action_property_sale" model="ir.actions.act_window">
+            <field name="name">Property Sales</field>
+            <field name="res_model">property.sale</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_broker_commission_invoice" model="ir.actions.act_window">
+            <field name="name">Broker Commissions</field>
+            <field name="res_model">broker.commission.invoice</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_property_dashboard" model="ir.actions.act_window">
+            <field name="name">Property Dashboard</field>
+            <field name="res_model">property.dashboard</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <!-- Menu Structure -->
+        <menuitem id="menu_property_management_root" name="Property Management" sequence="10"/>
+        
+        <menuitem id="menu_property_configuration" name="Configuration" parent="menu_property_management_root" sequence="10"/>
+        <menuitem id="menu_property_type" name="Property Types" parent="menu_property_configuration" 
+                  action="action_property_type" sequence="10"/>
+        
+        <menuitem id="menu_property_operations" name="Operations" parent="menu_property_management_root" sequence="20"/>
+        <menuitem id="menu_property_properties" name="Properties" parent="menu_property_operations" 
+                  action="action_property_property" sequence="10"/>
+        <menuitem id="menu_property_sales" name="Property Sales" parent="menu_property_operations" 
+                  action="action_property_sale" sequence="20"/>
+        
+        <menuitem id="menu_property_reports" name="Reports" parent="menu_property_management_root" sequence="30"/>
+        <menuitem id="menu_property_dashboard" name="Dashboard" parent="menu_property_reports" 
+                  action="action_property_dashboard" sequence="10"/>
+        
+        <menuitem id="menu_property_commission" name="Commissions" parent="menu_property_management_root" sequence="40"/>
+        <menuitem id="menu_broker_commissions" name="Broker Commissions" parent="menu_property_commission" 
+                  action="action_broker_commission_invoice" sequence="10"/>
+    </data>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button 
+                        name="action_force_post" 
+                        string="Force Post" 
+                        type="object" 
+                        modifiers="draft" 
+                        class="oe_highlight" 
+                        options="{'invisible': [('commission_posted', '=', True)]}"
+                    />
+                </xpath>
+
+                <xpath expr="//sheet" position="inside">
+                    <group name="commission_details_group" string="Commission Details">
+                        <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
+                        <field name="description" readonly="1" string="Commission Description"/>
+                        <field name="commission_posted" readonly="1" string="Commission Posted"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

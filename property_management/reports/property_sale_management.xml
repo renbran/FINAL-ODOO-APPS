@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Property Sale Report Template -->
+    <template id="property_sale_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h3 align="center">Property Sale Report</h3>
+                    <div>
+                        <strong>Sale Reference:</strong>
+                        <span t-esc="data['SaleReference']"/>
+                        <br/>
+                        <strong>Sale Date:</strong>
+                        <span t-esc="data['StartDate']"/>
+                        <br/>
+                        <strong>Customer Name:</strong>
+                        <span t-esc="data['CustomerName']"/>
+                        <br/>
+                        <strong>Customer Address:</strong>
+                        <span t-esc="data['CustomerAddress']"/>
+                        <br/>
+                        <strong>Customer Contact:</strong>
+                        <span t-esc="data['CustomerContact']"/>
+                        <br/>
+                    </div>
+                    <br/>
+                    <div>
+                        <h4>Property Information</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Property Name</th>
+                                    <th>Sale Price</th>
+                                    <th>Down Payment</th>
+                                    <th>Remaining Balance</th>
+                                    <th>DLD Fee</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="center">
+                                        <span t-esc="data['PropertyName']"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="data['SalePrice']"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="data['DownPayment']"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="data['RemainingBalance']"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="data['DLD_Fee']"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br/>
+                    <div>
+                        <h4>Installment Payment Schedule</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>SI.No</th>
+                                    <th>Installment Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="i" t-value="1"/>
+                                <tr t-foreach="docs" t-as="line">
+                                    <td align="center">
+                                        <span t-esc="i"/>
+                                        <t t-set="i" t-value="i+1"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="line['collection_date']"/>
+                                    </td>
+                                    <td align="center">
+                                        <span t-esc="line['capital_repayment']"/>
+                                    </td>
+                                    <td align="center"
+                                        t-att-style="'color: ' + ('green' if line['collection_status'] == 'paid' else ('sienna' if line['collection_status'] == 'invoiced' else 'red'))">
+                                        <span t-esc="{'unpaid': 'Unpaid', 'invoiced': 'Invoiced', 'paid': 'Paid'} [line['collection_status']]"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,128 @@
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
+class ExternalCommission(models.Model):
+    _name = 'external.commission'
+    _description = 'External Commission'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    # Main Fields
+    name = fields.Char(string='Reference', default=lambda self: _('New'))
+    sale_order_id = fields.Many2one('sale.order', string='Sale Order', required=True)
+    partner_id = fields.Many2one('res.partner', string='External Partner', required=True, domain=[('is_external_agent', '=', True)])
+    date = fields.Date(string='Date', default=fields.Date.today)
+    
+    # Source Values
+    sale_value = fields.Float(
+        string='Gross Sales Value',
+        related='sale_order_id.sale_value',
+        readonly=True
+    )
+    amount_untaxed = fields.Float(
+        string='Untaxed Amount',
+        related='sale_order_id.amount_untaxed',
+        readonly=True
+    )
+    
+    # Calculation Type Options
+    CALCULATION_TYPES = [
+        ('sales_value', 'Percentage of Sales Value'),
+        ('untaxed', 'Percentage of Total Untaxed'),
+        ('fixed', 'Fixed Amount'),
+    ]
+    
+    # Commission Details
+    calculation_type = fields.Selection(
+        CALCULATION_TYPES,
+        string='Calculation Type',
+        default='sales_value',
+        required=True
+    )
+    percentage = fields.Float(string='Percentage')
+    fixed_amount = fields.Float(string='Fixed Amount')
+    commission_amount = fields.Float(
+        string='Commission Amount',
+        compute='_compute_commission_amount',
+        store=True
+    )
+    
+    # Status
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('confirmed', 'Confirmed'),
+        ('paid', 'Paid'),
+        ('canceled', 'Canceled'),
+    ], string='Status', default='draft', tracking=True)
+    
+    # Payment Info
+    payment_date = fields.Date(string='Payment Date')
+    payment_reference = fields.Char(string='Payment Reference')
+    
+    # Constraints and Computations
+    @api.depends('calculation_type', 'percentage', 'fixed_amount', 'sale_value', 'amount_untaxed')
+    def _compute_commission_amount(self):
+        for record in self:
+            if record.calculation_type == 'sales_value':
+                record.commission_amount = record.sale_value * (record.percentage / 100)
+            elif record.calculation_type == 'untaxed':
+                record.commission_amount = record.amount_untaxed * (record.percentage / 100)
+            else:
+                record.commission_amount = record.fixed_amount
+    
+    @api.constrains('calculation_type', 'percentage', 'fixed_amount', 'amount_untaxed')
+    def _check_commission_allocation(self):
+        for record in self:
+            if record.calculation_type == 'sales_value':
+                allocated = record.sale_value * (record.percentage / 100)
+            elif record.calculation_type == 'untaxed':
+                allocated = record.amount_untaxed * (record.percentage / 100)
+            else:
+                allocated = record.fixed_amount
+            
+            if allocated > record.amount_untaxed:
+                raise ValidationError(_(
+                    "Commission allocation (%.2f) cannot exceed the untaxed amount (%.2f)!"
+                ) % (allocated, record.amount_untaxed))
+    
+    @api.onchange('calculation_type', 'percentage', 'fixed_amount')
+    def _onchange_commission_values(self):
+        if not self.amount_untaxed:
+            return
+        
+        if self.calculation_type == 'sales_value':
+            allocated = self.sale_value * (self.percentage / 100)
+        elif self.calculation_type == 'untaxed':
+            allocated = self.amount_untaxed * (self.percentage / 100)
+        else:
+            allocated = self.fixed_amount
+        
+        remaining = self.amount_untaxed - allocated
+        
+        if remaining < 0:
+            return {
+                'warning': {
+                    'title': _("Allocation Error"),
+                    'message': _("This allocation would exceed the available amount!")
+                }
+            }
+        elif remaining < (0.1 * self.amount_untaxed):
+            return {
+                'warning': {
+                    'title': _("Allocation Warning"),
+                    'message': _("You're using %.0f%% of the available amount (%.2f remaining)") % 
+                             ((allocated/self.amount_untaxed)*100, remaining)
+                }
+            }
+    
+    # Action Methods
+    def action_confirm(self):
+        self.write({'state': 'confirmed'})
+    
+    def action_pay(self):
+        self.write({'state': 'paid', 'payment_date': fields.Date.today()})
+    
+    def action_cancel(self):
+        self.write({'state': 'canceled'})
+    
+    def action_draft(self):
+        self.write({'state': 'draft'})

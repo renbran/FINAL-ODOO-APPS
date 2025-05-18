@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Property Sale Form View -->
+        <record id="view_property_sale_form" model="ir.ui.view">
+            <field name="name">property.sale.form</field>
+            <field name="model">property.sale</field>
+            <field name="arch" type="xml">
+                <form string="Property Sale">
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="property_id"/>
+                            <field name="start_date"/>
+                            <field name="sale_date"/>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Financials">
+                                <group>
+                                    <field name="property_value"/>
+                                    <field name="total_selling_price"/>
+                                    <field name="down_payment"/>
+                                    <field name="remaining_balance"/>
+                                </group>
+                            </page>
+                            
+                            <page string="Installments">
+                                <field name="property_sale_line_ids">
+                                    <tree>
+                                        <field name="serial_number"/>
+                                        <field name="line_type"/>
+                                        <field name="capital_repayment"/>
+                                        <field name="collection_date"/>
+                                        <field name="collection_status"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Property Sale Tree View -->
+        <record id="view_property_sale_tree" model="ir.ui.view">
+            <field name="name">property.sale.tree</field>
+            <field name="model">property.sale</field>
+            <field name="arch" type="xml">
+                <tree string="Property Sales">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="property_id"/>
+                    <field name="state" widget="badge"/>
+                    <field name="total_selling_price"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Broker Commission Button Extension -->
+        <record id="view_property_sale_form_commission_button" model="ir.ui.view">
+            <field name="name">property.sale.form.commission_button</field>
+            <field name="model">property.sale</field>
+            <field name="inherit_id" ref="view_property_sale_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@string='Broker Information']" position="replace">
+                    <group string="Broker Information" options="{'invisible': [('seller_id', '=', False)]}">
+                        <field name="broker_commission_percentage"/>
+                        <button name="action_generate_broker_invoice" 
+                                string="Create Broker Invoice" 
+                                type="object" 
+                                class="oe_highlight"
+                                options="{'invisible': [('state', '!=', 'confirm')]}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
