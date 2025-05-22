@@ -31,7 +31,7 @@ class PropertySale(models.Model):
     dld_fee = fields.Float(string='DLD Fee', compute='_compute_dld_fee', store=True, digits=(16, 2))
     admin_fee = fields.Float(string='Admin Fee', default=1.0, digits=(16, 2))
     remaining_balance = fields.Float(string='Remaining Balance', compute='_compute_remaining_balance', store=True, digits=(16, 2))
-    no_of_installments = fields.Integer(string='No. of Installments', default=1)
+    no_of_installments = fields.Integer(string='No. of Installments', default=12)
     amount_per_installment = fields.Float(string='Amount Per Installment', compute='_compute_amount_per_installment', store=True, digits=(16, 2))
     
     partner_id = fields.Many2one('res.partner', string='Customer', required=True)
@@ -49,6 +49,13 @@ class PropertySale(models.Model):
     broker_commission_total_amount = fields.Monetary(string="Broker Commission Total Amount", compute='_compute_broker_commission_total_amount', store=True, currency_field='currency_id')
     broker_commission_invoice_ids = fields.One2many('broker.commission.invoice', 'property_sale_id', string="Broker Commission Invoices")
     broker_commission_count = fields.Integer(string="Commission Count", compute='_compute_broker_commission_count')
+
+    payment_option = fields.Selection([
+        ('monthly', 'Monthly'),
+        ('quarterly', 'Quarterly'),
+        ('half_yearly', 'Half Yearly'),
+        ('annually', 'Annually')
+    ], string='Payment Option', default='monthly', required=True)
 
     @api.depends('property_id')
     def _compute_property_value(self):
@@ -75,10 +82,20 @@ class PropertySale(models.Model):
         for record in self:
             record.remaining_balance = record.total_selling_price - record.down_payment - record.dld_fee - record.admin_fee
 
-    @api.depends('remaining_balance', 'no_of_installments')
+    @api.depends('remaining_balance', 'no_of_installments', 'payment_option')
     def _compute_amount_per_installment(self):
         for record in self:
-            record.amount_per_installment = (record.remaining_balance / record.no_of_installments) if record.no_of_installments > 0 else 0.0
+            if record.no_of_installments > 0:
+                if record.payment_option == 'monthly':
+                    record.amount_per_installment = record.remaining_balance / record.no_of_installments
+                elif record.payment_option == 'quarterly':
+                    record.amount_per_installment = record.remaining_balance / (record.no_of_installments / 3)
+                elif record.payment_option == 'half_yearly':
+                    record.amount_per_installment = record.remaining_balance / (record.no_of_installments / 6)
+                elif record.payment_option == 'annually':
+                    record.amount_per_installment = record.remaining_balance / (record.no_of_installments / 12)
+            else:
+                record.amount_per_installment = 0.0
 
     @api.depends('broker_commission_percentage', 'property_value')
     def _compute_broker_commission_total_amount(self):
@@ -296,8 +313,4 @@ class PropertySaleLine(models.Model):
     invoice_id = fields.Many2one('account.move', string='Invoice')
     currency_id = fields.Many2one(related='property_sale_id.currency_id', store=True, readonly=True)
 
-    @api.constrains('capital_repayment', 'remaining_capital')
-    def _check_amounts(self):
-        for record in self:
-            if record.capital_repayment < 0 or record.remaining_capital < 0:
-                raise ValidationError(_("Amounts cannot be negative."))
+
