@@ -1,6 +1,6 @@
+# pylint: disable=import-error
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
-from datetime import timedelta
 
 
 class PropertyOffer(models.Model):
