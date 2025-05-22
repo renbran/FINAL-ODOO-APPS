@@ -36,12 +36,6 @@
                             <field name="invoice_ids" readonly="1" string="Invoices" widget="many2many_tags"/>
                             <field name="commission_processed" readonly="1" string="Commissions Processed" invisible="1"/>
                         </group>
-                        <!-- Add this inside your form view, preferably near the commission sections -->
-                        <div class="alert alert-info" options="{'invisible': [('amount_untaxed', '&lt;=', 0)]}">
-                            <strong>Available for Commission:</strong>
-                            <field name="amount_untaxed" readonly="1"/> 
-                            (<field name="company_share" readonly="1"/> will remain for company)
-                        </div>
                     </group>
                     
                     <notebook>

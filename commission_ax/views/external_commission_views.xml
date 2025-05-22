@@ -1,93 +1,108 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_external_commission_form" model="ir.ui.view">
-        <field name="name">external.commission.form</field>
-        <field name="model">external.commission</field>
-        <field name="arch" type="xml">
-            <form>
-                <header>
-                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
-                    <button name="action_pay" string="Mark as Paid" type="object" states="confirmed"/>
-                    <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
-                    <button name="action_draft" string="Set to Draft" type="object" states="canceled"/>
-                    <field name="state" widget="statusbar"/>
-                </header>
-                <sheet>
-                    <group>
-                        <field name="name" readonly="1"/>
-                        <field name="sale_order_id"/>
-                        <field name="partner_id"/>
-                        <field name="date"/>
-                    </group>
-                    
-                    <notebook>
-                        <page string="Commission Details">
+    <data>
+        <!-- Form View -->
+        <record id="view_external_commission_form" model="ir.ui.view">
+            <field name="name">external.commission.form</field>
+            <field name="model">external.commission</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
+                        <button name="action_pay" string="Mark as Paid" type="object" class="oe_highlight" states="confirmed"/>
+                        <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
+                        <button name="action_draft" string="Set to Draft" type="object" states="canceled"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="sale_order_id"/>
+                                <field name="partner_id"/>
+                                <field name="date"/>
+                            </group>
                             <group>
                                 <field name="calculation_type"/>
-                                <field name="percentage" options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                                <field name="fixed_amount" options="{'invisible': [('calculation_type', '!=', 'fixed')]}"/>
+                                <field name="percentage" attrs="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
+                                <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '=', 'percentage')]}"/>
                                 <field name="commission_amount" readonly="1"/>
                             </group>
-                            
-                            <group string="Source Values">
-                                <field name="sale_value" readonly="1"/>
-                                <field name="amount_untaxed" readonly="1"/>
-                            </group>
-                        </page>
-                        
-                        <page string="Payment" options="{'invisible': [('state', '!=', 'paid')]}">
-                            <field name="payment_date"/>
-                            <field name="payment_reference"/>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
+                        </group>
+                        <notebook>
+                            <page string="Source Values">
+                                <group>
+                                    <field name="sale_value" readonly="1"/>
+                                    <field name="amount_untaxed" readonly="1"/>
+                                </group>
+                            </page>
+                            <page string="Payment" attrs="{'invisible': [('state', '!=', 'paid')]}">
+                                <group>
+                                    <field name="payment_date"/>
+                                    <field name="payment_reference"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
 
-    <record id="view_external_commission_tree" model="ir.ui.view">
-        <field name="name">external.commission.tree</field>
-        <field name="model">external.commission</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="sale_order_id"/>
-                <field name="partner_id"/>
-                <field name="date"/>
-                <field name="calculation_type"/>
-                <field name="commission_amount"/>
-                <field name="state" widget="badge"/>
-            </tree>
-        </field>
-    </record>
+        <!-- Tree View -->
+        <record id="view_external_commission_tree" model="ir.ui.view">
+            <field name="name">external.commission.tree</field>
+            <field name="model">external.commission</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="partner_id"/>
+                    <field name="date"/>
+                    <field name="calculation_type"/>
+                    <field name="commission_amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
 
-    <record id="view_external_commission_search" model="ir.ui.view">
-        <field name="name">external.commission.search</field>
-        <field name="model">external.commission</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="sale_order_id"/>
-                <field name="partner_id"/>
-                <filter name="state" string="Status" domain="[]" context="{'group_by':'state'}"/>
-                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
-                <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
-                <filter name="paid" string="Paid" domain="[('state','=','paid')]"/>
-                <filter name="date" string="Date" date="date"/>
-            </search>
-        </field>
-    </record>
+        <!-- Search View -->
+        <record id="view_external_commission_search" model="ir.ui.view">
+            <field name="name">external.commission.search</field>
+            <field name="model">external.commission</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="partner_id"/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Partner" name="partner" context="{'group_by': 'partner_id'}"/>
+                        <filter string="Status" name="state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 
-    <!-- Action -->
-    <record id="action_external_commission" model="ir.actions.act_window">
-        <field name="name">External Commissions</field>
-        <field name="res_model">external.commission</field>
-        <field name="view_mode">tree,form</field>
-    </record>
+        <!-- Action -->
+        <record id="action_external_commission" model="ir.actions.act_window">
+            <field name="name">External Commissions</field>
+            <field name="res_model">external.commission</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
-    <!-- Menu Items -->
-    <menuitem id="menu_external_commission_root" name="External Commissions" 
-              parent="sales_team.menu_sales" sequence="30"/>
-    <menuitem id="menu_external_commission" name="All External Commissions" 
-              parent="menu_external_commission_root" action="action_external_commission"/>
+        <!-- Menu Items -->
+        <menuitem id="menu_external_commission_root" name="External Commissions" 
+                  parent="sale.sale_menu_root" sequence="21"/>
+        <menuitem id="menu_external_commission" name="External Commissions" 
+                  parent="menu_external_commission_root" action="action_external_commission" sequence="10"/>
+    </data>
 </odoo>

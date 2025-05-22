@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_internal_commission_form" model="ir.ui.view">
+        <field name="name">internal.commission.form</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
+                    <button name="action_pay" string="Mark as Paid" type="object" class="oe_highlight" states="confirmed"/>
+                    <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" states="canceled"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_order_id"/>
+                            <field name="employee_id"/>
+                            <field name="department_id"/>
+                            <field name="position"/>
+                        </group>
+                        <group>
+                            <field name="sale_value"/>
+                            <field name="amount_untaxed"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="percentage"/>
+                            <field name="commission_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payment Information" attrs="{'invisible': [('state', '!=', 'paid')]}">
+                            <group>
+                                <field name="payment_date"/>
+                                <field name="payment_reference"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_internal_commission_tree" model="ir.ui.view">
+        <field name="name">internal.commission.tree</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="employee_id"/>
+                <field name="position"/>
+                <field name="sale_value"/>
+                <field name="percentage"/>
+                <field name="commission_amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_internal_commission_search" model="ir.ui.view">
+        <field name="name">internal.commission.search</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="employee_id"/>
+                <field name="position"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Canceled" name="canceled" domain="[('state', '=', 'canceled')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Position" name="position" context="{'group_by': 'position'}"/>
+                    <filter string="Status" name="state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_internal_commission" model="ir.actions.act_window">
+        <field name="name">Internal Commissions</field>
+        <field name="res_model">internal.commission</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_internal_commission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first internal commission!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_internal_commission_root" name="Internal Commissions" 
+              parent="sale.sale_menu_root" sequence="20"/>
+    <menuitem id="menu_internal_commission" name="Internal Commissions" 
+              parent="menu_internal_commission_root" action="action_internal_commission" sequence="10"/>
+</odoo>
