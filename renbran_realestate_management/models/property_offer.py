@@ -11,14 +11,15 @@ class PropertyOffer(models.Model):
     
     name = fields.Char(string="Offer Reference", required=True, copy=False,
                       readonly=True, default=lambda self: _('New'))
-    
-    # Offer details
     property_id = fields.Many2one('property.property', string="Property", required=True, 
                                  domain="[('state', '=', 'available')]", tracking=True)
+    property_price = fields.Monetary(related='property_id.property_price', string="Property Price", currency_field='currency_id')
+    currency_id = fields.Many2one(related='property_id.currency_id', string="Currency", readonly=True)
+
+    # Offer details
     partner_id = fields.Many2one('res.partner', string="Customer", required=True, tracking=True)
     
     price = fields.Float(string="Offered Price", required=True, tracking=True)
-    property_price = fields.Float(related='property_id.property_price', string="Property Price")
     price_difference = fields.Float(string="Difference", compute='_compute_price_difference', store=True)
     price_difference_percent = fields.Float(string="Difference (%)", compute='_compute_price_difference', store=True)
     
