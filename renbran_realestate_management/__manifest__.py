@@ -29,7 +29,7 @@
     ],
     'data': [
         # Security
-        'security/property_management_security.xml',
+        'security/property_security.xml',
         'security/ir.model.access.csv',
         
         # Data files
