@@ -30,7 +30,9 @@
         'views/internal_commission_views.xml',
         'views/broker_commission_views.xml',
         'views/account_move_views.xml',
-        'views/res_partner_views.xml'
+        'views/res_partner_views.xml',
+        'reports/property_sale_offer_report.xml',  # Add this line
+        'reports/property_sale_report.xml',
         # Removed reference to non-existent rental_views.xml
     ],
     'assets': {
