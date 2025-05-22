@@ -107,6 +107,7 @@
                                     <field name="property_image" widget="image" options="{'no_create': True}"/>
                                     <field name="floor_plan" widget="image" options="{'no_create': True}"/>
                                 </group>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>
