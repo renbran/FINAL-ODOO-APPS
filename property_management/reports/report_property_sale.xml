@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="property_sale_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Property Sale Report</h2>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Sale Name:</strong> <span t-esc="data['SaleName']"/>
+                            <br/>
+                            <strong>Sale Reference:</strong> <span t-esc="data['SaleReference']"/>
+                            <br/>
+                            <strong>Customer Name:</strong> <span t-esc="data['CustomerName']"/>
+                            <br/>
+                            <strong>Customer Address:</strong> <span t-esc="data['CustomerAddress']"/>
+                            <br/>
+                            <span t-esc="data['CustomerAddress2']"/>
+                            <br/>
+                            <strong>Customer Contact:</strong> <span t-esc="data['CustomerContact']"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>Property Name:</strong> <span t-esc="data['PropertyName']"/>
+                            <br/>
+                            <strong>Sale Price:</strong> <span t-esc="data['SalePrice']"/>
+                            <br/>
+                            <strong>Down Payment:</strong> <span t-esc="data['DownPayment']"/>
+                            <br/>
+                            <strong>Remaining Balance:</strong> <span t-esc="data['RemainingBalance']"/>
+                            <br/>
+                            <strong>DLD Fee:</strong> <span t-esc="data['DLD_Fee']"/>
+                            <br/>
+                            <strong>Number of Installments:</strong> <span t-esc="data['NoOfInstallments']"/>
+                            <br/>
+                            <strong>Amount Per Installment:</strong> <span t-esc="data['AmountPerInstallment']"/>
+                            <br/>
+                            <strong>Start Date:</strong> <span t-esc="data['StartDate']"/>
+                        </div>
+                    </div>
+                    <h3>Installment Details</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Collection Date</th>
+                                <th>Capital Repayment</th>
+                                <th>Remaining Capital</th>
+                                <th>Collection Status</th>
+                                <th>Line Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="line">
+                                <tr>
+                                    <td><span t-esc="line['serial_number']"/></td>
+                                    <td><span t-esc="line['collection_date']"/></td>
+                                    <td><span t-esc="line['capital_repayment']"/></td>
+                                    <td><span t-esc="line['remaining_capital']"/></td>
+                                    <td><span t-esc="line['collection_status']"/></td>
+                                    <td><span t-esc="line['line_type']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
