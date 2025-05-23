@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 class ExternalCommission(models.Model):
     _name = 'external.commission'
@@ -7,7 +7,7 @@ class ExternalCommission(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     # Main Fields
-    name = fields.Char(string='Reference', default=lambda self: _('New'))
+    name = fields.Char(string='Reference', default=lambda self: _('New'), readonly=True)
     sale_order_id = fields.Many2one('sale.order', string='Sale Order', required=True)
     partner_id = fields.Many2one('res.partner', string='External Partner', required=True, domain=[('is_external_agent', '=', True)])
     date = fields.Date(string='Date', default=fields.Date.today)
@@ -58,6 +58,14 @@ class ExternalCommission(models.Model):
     payment_date = fields.Date(string='Payment Date')
     payment_reference = fields.Char(string='Payment Reference')
     
+    # New Fields
+    notes = fields.Text(string='Notes')
+    commission_status = fields.Selection([
+        ('under', 'Under Allocated'),
+        ('over', 'Over Allocated'),
+        ('full', 'Fully Allocated')
+    ], string='Commission Status', compute='_compute_commission_status', store=True)
+
     # Constraints and Computations
     @api.depends('calculation_type', 'percentage', 'fixed_amount', 'sale_value', 'amount_untaxed')
     def _compute_commission_amount(self):
@@ -68,6 +76,16 @@ class ExternalCommission(models.Model):
                 record.commission_amount = record.amount_untaxed * (record.percentage / 100)
             else:
                 record.commission_amount = record.fixed_amount
+
+    @api.depends('commission_amount', 'amount_untaxed')
+    def _compute_commission_status(self):
+        for record in self:
+            if record.commission_amount < record.amount_untaxed:
+                record.commission_status = 'under'
+            elif record.commission_amount > record.amount_untaxed:
+                record.commission_status = 'over'
+            else:
+                record.commission_status = 'full'
     
     @api.constrains('calculation_type', 'percentage', 'fixed_amount', 'amount_untaxed')
     def _check_commission_allocation(self):
@@ -114,15 +132,34 @@ class ExternalCommission(models.Model):
                 }
             }
     
+    # Sequence Generation
+    @api.model
+    def create(self, vals):
+        if vals.get('name', _('New')) == _('New'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('external.commission') or _('New')
+        return super(ExternalCommission, self).create(vals)
+
     # Action Methods
     def action_confirm(self):
-        self.write({'state': 'confirmed'})
-    
+        for record in self:
+            if record.state != 'draft':
+                raise UserError(_("Only draft commissions can be confirmed."))
+            record.write({'state': 'confirmed'})
+
     def action_pay(self):
-        self.write({'state': 'paid', 'payment_date': fields.Date.today()})
-    
+        for record in self:
+            if record.state != 'confirmed':
+                raise UserError(_("Only confirmed commissions can be paid."))
+            record.write({'state': 'paid', 'payment_date': fields.Date.today()})
+
     def action_cancel(self):
-        self.write({'state': 'canceled'})
-    
+        for record in self:
+            if record.state in ['paid']:
+                raise UserError(_("Paid commissions cannot be cancelled."))
+            record.write({'state': 'canceled'})
+
     def action_draft(self):
-        self.write({'state': 'draft'})
+        for record in self:
+            if record.state != 'canceled':
+                raise UserError(_("Only canceled commissions can be reset to draft."))
+            record.write({'state': 'draft'})

@@ -27,8 +27,12 @@
                             <group>
                                 <field name="calculation_type"/>
                                 <field name="percentage" attrs="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                                <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '=', 'percentage')]}"/>
+                                <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fixed')]}"/>
                                 <field name="commission_amount" readonly="1"/>
+                                <field name="commission_status" widget="badge" 
+                                       decoration-success="commission_status == 'full'"
+                                       decoration-warning="commission_status == 'under'"
+                                       decoration-danger="commission_status == 'over'"/>
                             </group>
                         </group>
                         <notebook>
@@ -43,6 +47,9 @@
                                     <field name="payment_date"/>
                                     <field name="payment_reference"/>
                                 </group>
+                            </page>
+                            <page string="Notes">
+                                <field name="notes"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -67,8 +74,50 @@
                     <field name="date"/>
                     <field name="calculation_type"/>
                     <field name="commission_amount"/>
+                    <field name="commission_status"/>
                     <field name="state"/>
                 </tree>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_external_commission_kanban" model="ir.ui.view">
+            <field name="name">external.commission.kanban</field>
+            <field name="model">external.commission</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="commission_amount"/>
+                    <field name="state"/>
+                    <field name="commission_status"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="o_kanban_tags_section">
+                                        <span class="oe_kanban_list_many2one">
+                                            <field name="partner_id"/>
+                                        </span>
+                                    </div>
+                                    <ul>
+                                        <li>Amount: <field name="commission_amount"/></li>
+                                        <li>Status: <field name="state"/></li>
+                                    </ul>
+                                    <div class="o_kanban_footer">
+                                        <span t-attf-class="badge badge-#{{'success' if record.commission_status == 'full' else 'warning' if record.commission_status == 'under' else 'danger'}} float-right">
+                                            <field name="commission_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
             </field>
         </record>
 
@@ -84,9 +133,11 @@
                     <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                     <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
                     <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                    <filter string="Canceled" name="canceled" domain="[('state', '=', 'canceled')]"/>
                     <group expand="0" string="Group By">
                         <filter string="Partner" name="partner" context="{'group_by': 'partner_id'}"/>
                         <filter string="Status" name="state" context="{'group_by': 'state'}"/>
+                        <filter string="Commission Status" name="commission_status" context="{'group_by': 'commission_status'}"/>
                     </group>
                 </search>
             </field>
@@ -96,7 +147,7 @@
         <record id="action_external_commission" model="ir.actions.act_window">
             <field name="name">External Commissions</field>
             <field name="res_model">external.commission</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">kanban,tree,form</field>
         </record>
 
         <!-- Menu Items -->
