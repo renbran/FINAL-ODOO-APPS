@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_sale_offer_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+            <div class="page">
+                <h2>Property Sale Offer</h2>
+                <div class="row mt32 mb32">
+                    <div class="col-6">
+                        <strong>Offer Reference:</strong> <span t-field="doc.name"/>
+                        <br/>
+                        <strong>Customer:</strong> <span t-field="doc.partner_id"/>
+                        <br/>
+                        <strong>Offer Date:</strong> <span t-field="doc.offer_date"/>
+                        <br/>
+                        <strong>Expiration Date:</strong> <span t-field="doc.expiration_date"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Property:</strong> <span t-field="doc.property_id.name"/>
+                        <br/>
+                        <strong>Property Reference:</strong> <span t-field="doc.property_id.property_reference"/>
+                        <br/>
+                        <strong>Offer Price:</strong> <span t-field="doc.offer_price"/>
+                        <br/>
+                        <strong>Status:</strong> <span t-field="doc.state"/>
+                    </div>
+                </div>
+                <div class="row mt32">
+                    <div class="col-12">
+                        <h3>Property Details</h3>
+                        <p><strong>Description:</strong> <span t-field="doc.property_id.description"/></p>
+                        <p><strong>Address:</strong> <span t-field="doc.property_id.address"/></p>
+                        <p><strong>Total Sqft:</strong> <span t-field="doc.property_id.total_sqft"/></p>
+                    </div>
+                </div>
+                <div class="row mt32">
+                    <div class="col-12">
+                        <p>This offer is valid until <span t-field="doc.expiration_date"/>. Please contact us for any queries or to accept this offer.</p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_sale_offer">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="property_sale_management.report_sale_offer_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_sale_offer" model="ir.actions.report">
+        <field name="name">Sale Offer</field>
+        <field name="model">property.sale.offer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">property_sale_management.report_sale_offer</field>
+        <field name="report_file">property_sale_management.report_sale_offer</field>
+        <field name="print_report_name">'Sale Offer - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_property_sale_offer"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_property_property_user,property.property user,model_property_property,base.group_user,1,1,1,0
+access_property_property_manager,property.property manager,model_property_property,base.group_system,1,1,1,1
+access_property_sale_user,property.sale user,model_property_sale,base.group_user,1,1,1,0
+access_property_sale_manager,property.sale manager,model_property_sale,base.group_system,1,1,1,1
+access_internal_commission_user,internal.commission user,model_internal_commission,base.group_user,1,1,1,0
+access_internal_commission_manager,internal.commission manager,model_internal_commission,base.group_system,1,1,1,1
+access_broker_commission_user,broker.commission.invoice user,model_broker_commission_invoice,base.group_user,1,1,1,0
+access_broker_commission_manager,broker.commission.invoice manager,model_broker_commission_invoice,base.group_system,1,1,1,1
