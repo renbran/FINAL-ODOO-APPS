@@ -20,6 +20,7 @@
         'mail',
         'account',
         'contacts',
+        'purchase',
         'sale_management',
     ],
     'data': [
