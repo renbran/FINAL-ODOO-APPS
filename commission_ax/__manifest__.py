@@ -13,6 +13,7 @@
     'category': 'Sales',
     'author': 'RENBRAN',
     'depends': [
+        'base',
         'sale', 
         'purchase', 
         'account'
