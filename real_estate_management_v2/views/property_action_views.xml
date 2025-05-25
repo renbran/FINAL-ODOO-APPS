@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Property Actions -->
+    <record id="action_property_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a new property
+        </field>
+    </record>
+
+    <record id="action_property_offer" model="ir.actions.act_window">
+        <field name="name">Property Offers</field>
+        <field name="res_model">property.offer</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_property_sale" model="ir.actions.act_window">
+        <field name="name">Property Sales</field>
+        <field name="res_model">property.sale</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Commission Actions -->
+    <record id="action_broker_commission" model="ir.actions.act_window">
+        <field name="name">Broker Commissions</field>
+        <field name="res_model">broker.commission</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_internal_commission" model="ir.actions.act_window">
+        <field name="name">Internal Commissions</field>
+        <field name="res_model">internal.commission</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Configuration Actions -->
+    <record id="action_property_settings" model="ir.actions.act_window">
+        <field name="name">Real Estate Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'real_estate_management_v2'}</field>
+    </record>
+
+    <!-- Tree View Actions -->
+    <record id="action_property_property_tree" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_property"/>
+        <field name="view_id" ref="view_property_tree"/>
+        <field name="view_mode">tree</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="action_property_offer_tree" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_offer"/>
+        <field name="view_id" ref="view_property_offer_tree"/>
+        <field name="view_mode">tree</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="action_property_sale_tree" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_sale"/>
+        <field name="view_id" ref="view_property_sale_tree"/>
+        <field name="view_mode">tree</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="action_broker_commission_tree" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_broker_commission"/>
+        <field name="view_id" ref="view_broker_commission_tree"/>
+        <field name="view_mode">tree</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="action_internal_commission_tree" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_internal_commission"/>
+        <field name="view_id" ref="view_internal_commission_tree"/>
+        <field name="view_mode">tree</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <!-- Form View Actions -->
+    <record id="action_property_property_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_property"/>
+        <field name="view_id" ref="view_property_form"/>
+        <field name="view_mode">form</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="action_property_offer_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_offer"/>
+        <field name="view_id" ref="view_property_offer_form"/>
+        <field name="view_mode">form</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="action_property_sale_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_property_sale"/>
+        <field name="view_id" ref="view_property_sale_form"/>
+        <field name="view_mode">form</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="action_broker_commission_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_broker_commission"/>
+        <field name="view_id" ref="view_broker_commission_form"/>
+        <field name="view_mode">form</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="action_internal_commission_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_internal_commission"/>
+        <field name="view_id" ref="view_internal_commission_form"/>
+        <field name="view_mode">form</field>
+        <field name="sequence">2</field>
+    </record>
+</odoo>

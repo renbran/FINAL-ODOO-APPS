@@ -30,57 +30,33 @@
               action="action_property_sale"
               sequence="30"/>
     
+    <!-- Commissions Menu -->
+    <menuitem id="menu_real_estate_commissions"
+              name="Commissions"
+              parent="menu_real_estate_root"
+              sequence="20"/>
+    
+    <menuitem id="menu_broker_commission"
+              name="Broker Commissions"
+              parent="menu_real_estate_commissions"
+              action="action_broker_commission"
+              sequence="10"/>
+    
+    <menuitem id="menu_internal_commission"
+              name="Internal Commissions"
+              parent="menu_real_estate_commissions"
+              action="action_internal_commission"
+              sequence="20"/>
+    
     <!-- Configuration Menu -->
     <menuitem id="menu_real_estate_configuration"
               name="Configuration"
               parent="menu_real_estate_root"
               sequence="100"/>
     
-    <menuitem id="menu_property_type"
-              name="Property Types"
+    <menuitem id="menu_property_settings"
+              name="Settings"
               parent="menu_real_estate_configuration"
-              action="action_property_type"
-              sequence="10"/>
-    
-    <menuitem id="menu_property_project"
-              name="Projects"
-              parent="menu_real_estate_configuration"
-              action="action_property_project"
-              sequence="20"/>
-    
-    <menuitem id="menu_property_tag"
-              name="Tags"
-              parent="menu_real_estate_configuration"
-              action="action_property_tag"
-              sequence="30"/>
-    
-    <!-- Reporting Menu -->
-    <menuitem id="menu_real_estate_reporting"
-              name="Reporting"
-              parent="menu_real_estate_root"
-              sequence="50"/>
-    
-    <menuitem id="menu_property_analysis"
-              name="Property Analysis"
-              parent="menu_real_estate_reporting"
-              action="action_property_analysis_report"
-              sequence="10"/>
-    
-    <menuitem id="menu_sales_analysis"
-              name="Sales Analysis"
-              parent="menu_real_estate_reporting"
-              action="action_property_sales_analysis_report"
-              sequence="20"/>
-    
-    <!-- Commission Menu -->
-    <menuitem id="menu_real_estate_commission"
-              name="Commissions"
-              parent="menu_real_estate_root"
-              sequence="40"/>
-    
-    <menuitem id="menu_internal_commission"
-              name="Internal Commissions"
-              parent="menu_real_estate_commission"
-              action="action_internal_commission"
+              action="action_property_settings"
               sequence="10"/>
 </odoo>

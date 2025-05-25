@@ -1,11 +1,11 @@
 <odoo>
-    <record id="view_internal_commission_tree" model="ir.ui.view">
-        <field name="name">internal.commission.tree</field>
-        <field name="model">internal.commission</field>
+    <record id="view_broker_commission_tree" model="ir.ui.view">
+        <field name="name">broker.commission.tree</field>
+        <field name="model">broker.commission</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="user_id"/>
+                <field name="broker_id"/>
                 <field name="property_id"/>
                 <field name="commission_amount"/>
                 <field name="state"/>
@@ -13,18 +13,18 @@
         </field>
     </record>
 
-    <record id="view_internal_commission_form" model="ir.ui.view">
-        <field name="name">internal.commission.form</field>
-        <field name="model">internal.commission</field>
+    <record id="view_broker_commission_form" model="ir.ui.view">
+        <field name="name">broker.commission.form</field>
+        <field name="model">broker.commission</field>
         <field name="arch" type="xml">
             <form>
                 <header>
                     <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                    <button name="action_mark_as_paid" string="Mark as Paid" type="object" attrs="{'invisible': [('state', '!=', 'confirmed')]}"/>
+                    <button name="action_pay" string="Mark as Paid" type="object" attrs="{'invisible': [('state', '!=', 'confirmed')]}"/>
                     <button name="action_cancel" string="Cancel" type="object" attrs="{'invisible': [('state', 'in', ['paid', 'cancelled'])]}"/>
                     <button name="action_draft" string="Reset to Draft" type="object" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                    <button name="action_generate_report" string="Generate Report" type="object"/>
-                    <button name="action_send_by_email" string="Send by Email" type="object"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object" attrs="{'invisible': [('state', '!=', 'confirmed'), ('invoice_id', '!=', False)]}"/>
+                    <button name="action_view_invoice" string="View Invoice" type="object" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -33,8 +33,7 @@
                             <field name="name" readonly="1"/>
                             <field name="property_sale_id"/>
                             <field name="property_id"/>
-                            <field name="user_id"/>
-                            <field name="partner_id"/>
+                            <field name="broker_id"/>
                             <field name="state" invisible="1"/>
                         </group>
                         <group>
@@ -42,7 +41,6 @@
                             <field name="commission_percentage" attrs="{'invisible': [('commission_type', '!=', 'percentage')]}"/>
                             <field name="fixed_amount" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
                             <field name="commission_amount"/>
-                            <field name="property_value"/>
                             <field name="sale_price"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
@@ -53,6 +51,9 @@
                             <field name="payment_date" attrs="{'readonly': [('state', '!=', 'paid')]}"/>
                             <field name="payment_method_id"/>
                             <field name="payment_reference"/>
+                        </group>
+                        <group>
+                            <field name="invoice_id" widget="statusbar" attrs="{'readonly': True}"/>
                         </group>
                     </group>
                     

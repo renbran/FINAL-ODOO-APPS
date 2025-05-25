@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_property_report_wizard_form" model="ir.ui.view">
+        <field name="name">property.report.wizard.form</field>
+        <field name="model">property.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Property Report">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="property_id" domain="[('state','=','sold')]"/>
+                            <field name="report_type" widget="radio"/>
+                            <field name="include_financial" attrs="{'invisible': [('report_type','!=','detailed')]}"/>
+                            <field name="include_commission" attrs="{'invisible': [('report_type','!=','detailed')]}"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                    
+                    <footer>
+                        <button name="action_generate_report" string="Generate Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_property_report_wizard" model="ir.actions.act_window">
+        <field name="name">Property Report Wizard</field>
+        <field name="res_model">property.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_property_id': active_id}</field>
+    </record>
