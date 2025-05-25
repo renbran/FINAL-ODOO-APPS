@@ -8,7 +8,7 @@ class BrokerCommission(models.Model):
     _order = 'create_date desc'
     
     name = fields.Char(string='Reference', readonly=True, default=lambda self: _('New'))
-    property_sale_id = fields.Many2one('property.sale', string='Property Sale', required=True, ondelete='restrict', tracking=True)
+    sale_id = fields.Many2one('property.sale', string='Property Sale', required=True, ondelete='restrict', tracking=True)
     property_id = fields.Many2one('property.property', string='Property', related='property_sale_id.property_id', store=True, readonly=True)
     broker_id = fields.Many2one('res.partner', string='Broker', required=True, domain=[('is_broker', '=', True)], tracking=True)
     

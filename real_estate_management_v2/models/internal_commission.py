@@ -9,7 +9,7 @@ class InternalCommission(models.Model):
     _order = 'create_date desc'
     
     name = fields.Char(string='Reference', readonly=True, default=lambda self: _('New'))
-    property_sale_id = fields.Many2one('property.sale', string='Property Sale', required=True, ondelete='restrict')
+    sale_id = fields.Many2one('property.sale', string='Property Sale', required=True, ondelete='restrict')
     property_id = fields.Many2one('property.property', string='Property', related='property_sale_id.property_id', store=True)
     user_id = fields.Many2one('res.users', string='Salesperson', required=True, tracking=True)
     partner_id = fields.Many2one('res.partner', string='Customer', related='property_sale_id.partner_id', store=True)
