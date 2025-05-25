@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_property_sale_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                <h2>
+                    <span t-field="doc.name"/>
+                </h2>
+                <div class="row mt32 mb32">
+                    <div class="col-6">
+                        <strong>Customer:</strong>
+                        <p t-field="doc.partner_id"/>
+                        <strong>Property:</strong>
+                        <p t-field="doc.property_id"/>
+                        <strong>Sale Date:</strong>
+                        <p t-field="doc.sale_date"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Salesperson:</strong>
+                        <p t-field="doc.user_id"/>
+                        <strong>Payment Option:</strong>
+                        <p t-field="doc.payment_option"/>
+                        <strong>Status:</strong>
+                        <p t-field="doc.state"/>
+                    </div>
+                </div>
+
+                <h4>Financial Details</h4>
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Property Listed Price:</strong></td>
+                        <td class="text-right">
+                            <span t-field="doc.property_value" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sale Price:</strong></td>
+                        <td class="text-right">
+                            <span t-field="doc.sale_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>DLD Fee:</strong></td>
+                        <td class="text-right">
+                            <span t-field="doc.dld_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Admin Fee:</strong></td>
+                        <td class="text-right">
+                            <span t-field="doc.admin_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                    </tr>
+                    <tr class="border-top">
+                        <td><strong>Total Amount:</strong></td>
+                        <td class="text-right">
+                            <strong><span t-field="doc.total_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></strong>
+                        </td>
+                    </tr>
+                </table>
+
+                <h4>Payment Schedule</h4>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Due Date</th>
+                            <th class="text-right">Amount</th>
+                            <th>Status</th>
+                            <th>Payment Date</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.payment_line_ids" t-as="line">
+                            <td><span t-field="line.name"/></td>
+                            <td><span t-field="line.due_date"/></td>
+                            <td class="text-right">
+                                <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                            </td>
+                            <td>
+                                <span t-if="line.state == 'paid'" class="badge badge-success">Paid</span>
+                                <span t-elif="line.state == 'overdue'" class="badge badge-danger">Overdue</span>
+                                <span t-else="" class="badge badge-info">Pending</span>
+                            </td>
+                            <td><span t-field="line.payment_date"/></td>
+                            <td><span t-field="line.payment_reference"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div t-if="doc.notes" class="mt32">
+                    <h4>Notes</h4>
+                    <p t-field="doc.notes"/>
+                </div>
+                
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_property_sale">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="real_estate_management_v2.report_property_sale_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_property_sale" model="ir.actions.report">
+        <field name="name">Property Sale</field>
+        <field name="model">property.sale</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">real_estate_management_v2.report_property_sale</field>
+        <field name="report_file">real_estate_management_v2.report_property_sale</field>
+        <field name="binding_model_id" ref="model_property_sale"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

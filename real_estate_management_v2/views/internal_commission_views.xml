@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_internal_commission_tree" model="ir.ui.view">
+        <field name="name">internal.commission.tree</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <tree string="Internal Commissions" decoration-info="state == 'draft'" decoration-success="state == 'paid'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="property_id"/>
+                <field name="partner_id"/>
+                <field name="commission_amount" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="payment_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Form View -->
+    <record id="view_internal_commission_form" model="ir.ui.view">
+        <field name="name">internal.commission.form</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <form string="Internal Commission">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
+                    <button name="action_mark_as_paid" string="Mark as Paid" type="object" class="oe_highlight" states="confirmed"/>
+                    <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" states="cancelled"/>
+                    <button name="action_generate_report" string="Generate Report" type="object" class="btn-secondary"/>
+                    <button name="action_send_by_email" string="Send by Email" type="object" class="btn-secondary" states="confirmed,paid"/>
+                    <button name="action_create_expense" string="Create Expense" type="object" class="btn-secondary" states="confirmed,paid"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_property_sale" type="object" class="oe_stat_button" icon="fa-home">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Property Sale</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_sale_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="property_id" readonly="1"/>
+                            <field name="user_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="partner_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="commission_type" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="commission_percentage" attrs="{'invisible': [('commission_type', '!=', 'percentage')], 'readonly': [('state', '!=', 'draft')], 'required': [('commission_type', '=', 'percentage')]}"/>
+                            <field name="fixed_amount" attrs="{'invisible': [('commission_type', '!=', 'fixed')], 'readonly': [('state', '!=', 'draft')], 'required': [('commission_type', '=', 'fixed')]}"/>
+                            <field name="commission_amount" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Financial Details">
+                        <group>
+                            <field name="property_value"/>
+                            <field name="sale_price"/>
+                        </group>
+                        <group>
+                            <field name="payment_date" attrs="{'readonly': [('state', '=', 'paid')], 'required': [('state', '=', 'paid')]}"/>
+                            <field name="payment_method_id" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                            <field name="payment_reference" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Search View -->
+    <record id="view_internal_commission_search" model="ir.ui.view">
+        <field name="name">internal.commission.search</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <search string="Search Internal Commissions">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="property_id"/>
+                <field name="partner_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="My Commissions" name="my_commissions" domain="[('user_id', '=', uid)]"/>
+                <filter string="Unpaid" name="unpaid" domain="[('state', 'in', ['draft', 'confirmed'])]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Salesperson" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Property" name="group_by_property" context="{'group_by': 'property_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Payment Date" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action -->
+    <record id="action_internal_commission" model="ir.actions.act_window">
+        <field name="name">Internal Commissions</field>
+        <field name="res_model">internal.commission</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_internal_commission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first internal commission!
+            </p>
+            <p>
+                Track and manage commissions for your internal sales team.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu Item -->
+    <menuitem id="menu_internal_commission"
+              name="Internal Commissions"
+              parent="real_estate_management_v2.menu_real_estate_root"
+              action="action_internal_commission"
+              sequence="30"/>
+</odoo>

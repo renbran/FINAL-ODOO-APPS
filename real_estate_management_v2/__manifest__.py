@@ -1,0 +1,26 @@
+{
+    'name': 'Real Estate Management V2',
+    'version': '17.0.1.0.0',
+    'category': 'Real Estate',
+    'summary': 'Manage real estate properties, offers, and sales',
+    'author': 'Your Company',
+    'website': 'https://www.yourcompany.com',
+    'license': 'LGPL-3',
+    'depends': ['base', 'mail', 'account'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/property_views.xml',
+        'views/property_offer_views.xml',
+        'views/property_sale_views.xml',
+        'views/broker_commission_views.xml',
+        'views/internal_commission_views.xml',
+        'wizards/property_report_wizard_views.xml',
+        'data/ir_sequence_data.xml',
+    ],
+    'demo': [
+        'demo/property_demo.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

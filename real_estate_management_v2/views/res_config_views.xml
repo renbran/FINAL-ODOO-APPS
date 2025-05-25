@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.real.estate</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="70"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Real Estate" string="Real Estate" data-key="real_estate_management_v2">
+                    <h2>Commission Settings</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="auto_create_commission"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="auto_create_commission"/>
+                                <div class="text-muted">
+                                    Automatically create internal commission when a property sale is confirmed
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Default Commission Percentage</span>
+                                <div class="text-muted">
+                                    Default percentage for internal commissions
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="default_commission_percentage" class="o_light_label" widget="percentage"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Accounting Settings</h2>
+                    <div class="row mt16 o_settings_container" id="real_estate_accounting">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Commission Expense Account</span>
+                                <div class="text-muted">
+                                    Default expense account for internal commissions
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="commission_expense_account_id" options="{'no_create': True}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="action_real_estate_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'real_estate_management_v2'}</field>
+    </record>
+    
+    <menuitem id="menu_real_estate_settings"
+              name="Settings"
+              parent="menu_real_estate_configuration"
+              action="action_real_estate_config_settings"
+              sequence="100"/>
+</odoo>
