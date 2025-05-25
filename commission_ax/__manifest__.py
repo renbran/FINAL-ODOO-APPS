@@ -13,15 +13,12 @@
     'category': 'Sales',
     'author': 'RENBRAN',
     'depends': [
-        'base',
         'sale', 
         'purchase', 
         'account'
     ],
     'data': [
         'views/sale_order.xml',
-        'views/external_commission_views.xml',
-        'views/internal_commission_views.xml',
         'views/purchase_order.xml',
         'data/purchase_order_cron.xml',  # Add the cron job XML
         'security/ir.model.access.csv',  # Recommended to add access rights

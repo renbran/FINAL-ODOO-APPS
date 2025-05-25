@@ -1,71 +1,197 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 
 class PropertySale(models.Model):
     _name = 'property.sale'
     _description = 'Property Sale'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'sale_date desc'
 
     # ========== Fields Definition ==========
-    name = fields.Char(string='Sale Reference', default='New', readonly=True)
+    name = fields.Char(
+        string='Sale Reference', 
+        default='New', 
+        readonly=True,
+        tracking=True
+    )
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirm', 'Confirmed'),
         ('invoiced', 'Invoiced'),
         ('cancelled', 'Cancelled')
-    ], string='Status', default='draft', tracking=True)
+    ], string='Status', 
+       default='draft', 
+       tracking=True
+    )
+    
+    # Offer Information (now the main link to property)
+    offer_id = fields.Many2one(
+        'property.sale.offer',
+        string='Related Offer',
+        required=True,
+        ondelete='restrict',
+        tracking=True,
+        domain="[('state', '=', 'accepted')]"
+    )
+    
+    # Property information via related fields
+    property_id = fields.Many2one(
+        'property.property',
+        string='Property',
+        related='offer_id.property_id',
+        store=True,
+        readonly=True
+    )
     
     # Customer Information
-    partner_id = fields.Many2one('res.partner', string='Customer', required=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', 
-                                default=lambda self: self.env.company.currency_id)
-    start_date = fields.Date(string='Start Date', required=True)
-    sale_date = fields.Date(string='Sale Date', default=fields.Date.today)
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Customer',
+        related='offer_id.partner_id',
+        store=True,
+        readonly=True
+    )
     
-    # Property Information
-    property_id = fields.Many2one('property.property', string='Property', required=True)
-    seller_id = fields.Many2one('res.partner', string='Broker/Seller', 
-                               domain=[('is_company','=',True)])
+    currency_id = fields.Many2one(
+        'res.currency', 
+        string='Currency',
+        related='offer_id.currency_id',
+        readonly=True
+    )
+    
+    start_date = fields.Date(
+        string='Start Date', 
+        required=True,
+        default=fields.Date.today,
+        tracking=True
+    )
+    
+    sale_date = fields.Date(
+        string='Sale Date', 
+        default=fields.Date.today,
+        tracking=True
+    )
+    
+    # Seller Information
+    seller_id = fields.Many2one(
+        'res.partner', 
+        string='Broker/Seller',
+        domain=[('is_company','=',True)],
+        tracking=True
+    )
+    
+    # Payment Plan Configuration
+    payment_plan = fields.Selection([
+        ('monthly', 'Monthly'),
+        ('quarterly', 'Quarterly'),
+        ('semi_annual', 'Semi-Annual'),
+        ('annual', 'Annual')
+    ], string='Payment Plan',
+       default='monthly',
+       required=True,
+       tracking=True
+    )
     
     # Financial Fields
-    property_value = fields.Monetary(string='Property Value', compute='_compute_property_value', 
-                                   store=True, currency_field='currency_id')
-    total_selling_price = fields.Monetary(string='Total Selling Price', compute='_compute_total_selling_price',
-                                        store=True, currency_field='currency_id')
-    down_payment_percentage = fields.Float(string='Down Payment (%)', default=20.0)
-    down_payment = fields.Monetary(string='Down Payment', compute='_compute_down_payment',
-                                 store=True, currency_field='currency_id')
-    dld_fee = fields.Monetary(string='DLD Fee', compute='_compute_dld_fee',
-                            store=True, currency_field='currency_id')
-    admin_fee = fields.Monetary(string='Admin Fee', default=1.0, currency_field='currency_id')
-    remaining_balance = fields.Monetary(string='Remaining Balance', compute='_compute_remaining_balance',
-                                      store=True, currency_field='currency_id')
+    property_value = fields.Monetary(
+        string='Property Value',
+        related='offer_id.offer_price',
+        readonly=True,
+        currency_field='currency_id'
+    )
     
-    # Payment Plan
-    no_of_installments = fields.Integer(string='No. of Installments', default=1)
-    amount_per_installment = fields.Monetary(string='Amount Per Installment', 
-                                           compute='_compute_amount_per_installment',
-                                           store=True, currency_field='currency_id')
-    payment_progress = fields.Float(string='Payment Progress %', compute='_compute_payment_progress',
-                                  store=True, group_operator="avg")
+    total_selling_price = fields.Monetary(
+        string='Total Selling Price', 
+        compute='_compute_total_selling_price',
+        store=True, 
+        currency_field='currency_id'
+    )
+    
+    down_payment_percentage = fields.Float(
+        string='Down Payment (%)', 
+        default=20.0,
+        tracking=True
+    )
+    
+    down_payment = fields.Monetary(
+        string='Down Payment', 
+        compute='_compute_down_payment',
+        store=True, 
+        currency_field='currency_id'
+    )
+    
+    dld_fee = fields.Monetary(
+        string='DLD Fee', 
+        compute='_compute_dld_fee',
+        store=True, 
+        currency_field='currency_id'
+    )
+    
+    admin_fee = fields.Monetary(
+        string='Admin Fee', 
+        default=1.0, 
+        currency_field='currency_id',
+        tracking=True
+    )
+    
+    remaining_balance = fields.Monetary(
+        string='Remaining Balance', 
+        compute='_compute_remaining_balance',
+        store=True, 
+        currency_field='currency_id'
+    )
+    
+    no_of_installments = fields.Integer(
+        string='No. of Installments', 
+        default=1,
+        tracking=True
+    )
+    
+    amount_per_installment = fields.Monetary(
+        string='Amount Per Installment', 
+        compute='_compute_amount_per_installment',
+        store=True, 
+        currency_field='currency_id'
+    )
+    
+    payment_progress = fields.Float(
+        string='Payment Progress %', 
+        compute='_compute_payment_progress',
+        store=True, 
+        group_operator="avg"
+    )
     
     # Broker Commission
-    broker_commission_id = fields.Many2one('broker.commission.invoice', string='Broker Commission')
-    broker_commission_percentage = fields.Float(string='Broker Commission %', digits=(5,2), default=5.0)
-    broker_commission_invoice_ids = fields.One2many('broker.commission.invoice', 'property_sale_id',
-                                                  string='Broker Commission Invoices')
+    broker_commission_percentage = fields.Float(
+        string='Broker Commission %', 
+        digits=(5,2), 
+        default=5.0,
+        tracking=True
+    )
+    
+    broker_commission_invoice_ids = fields.One2many(
+        'broker.commission.invoice', 
+        'property_sale_id',
+        string='Broker Commission Invoices'
+    )
     
     # Installment Lines
-    property_sale_line_ids = fields.One2many('property.sale.line', 'property_sale_id',
-                                           string='Installment Lines')
+    property_sale_line_ids = fields.One2many(
+        'property.sale.line', 
+        'property_sale_id',
+        string='Installment Lines'
+    )
+
+    # ========== Constraints ==========
+    _sql_constraints = [
+        ('positive_installments', 'CHECK(no_of_installments > 0)', 'Number of installments must be positive.'),
+        ('valid_down_payment', 'CHECK(down_payment_percentage > 0 AND down_payment_percentage <= 100)', 
+         'Down payment must be between 0-100%.'),
+    ]
 
     # ========== Compute Methods ==========
-    @api.depends('property_id')
-    def _compute_property_value(self):
-        for record in self:
-            record.property_value = record.property_id.property_price if record.property_id else 0.0
-
     @api.depends('property_value', 'dld_fee', 'admin_fee')
     def _compute_total_selling_price(self):
         for record in self:
@@ -114,108 +240,22 @@ class PropertySale(models.Model):
             if record.state != 'draft':
                 raise UserError(_('Only draft sales can be confirmed.'))
             
-            # Create installment lines
+            # Create installment lines based on payment plan
             record._create_emi_lines()
             
-            # Update property status
+            # Update property status through the offer
+            record.offer_id.write({
+                'state': 'accepted',
+                'property_sale_id': record.id
+            })
+            
             record.property_id.write({
                 'state': 'sold',
                 'partner_id': record.partner_id.id
             })
-        def action_create_broker_commission(self):
-            for sale in self:
-                if not sale.broker_commission_id:
-                    commission = self.env['broker.commission.invoice'].create({
-                        'property_sale_id': sale.id,
-                        'broker_id': sale.seller_id.id,
-                        'commission_percentage': sale.broker_commission_percentage,
-                        'commission_amount': sale.total_selling_price * (sale.broker_commission_percentage / 100),
-                    })
-                    sale.broker_commission_id = commission.id
-                else:
-                    raise UserError(_("Broker commission already exists for this sale."))
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Broker Commission',
-            'res_model': 'broker.commission.invoice',
-            'res_id': commission.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-    def action_view_invoices(self):
-        """View all invoices related to this sale"""
-        self.ensure_one()
-        invoice_ids = self.property_sale_line_ids.mapped('invoice_id')
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Sale Invoices',
-            'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', invoice_ids.ids)],
-            'context': {'create': False},
-        }
-
-    def action_generate_all_invoices(self):
-        """Generate invoices for all unpaid installments"""
-        self.ensure_one()
-        unpaid_lines = self.property_sale_line_ids.filtered(
-            lambda l: l.collection_status == 'unpaid' and not l.invoice_id
-        )
-        
-        if not unpaid_lines:
-            raise UserError(_('No unpaid installments found for invoicing.'))
-        
-        # Group lines by due date and create invoices
-        invoices = self.env['account.move']
-        # Fix: Use dictionary grouping instead of .groupby method
-        lines_by_date = {}
-        for line in unpaid_lines:
-            if line.collection_date not in lines_by_date:
-                lines_by_date[line.collection_date] = self.env['property.sale.line']
-            lines_by_date[line.collection_date] |= line
-        
-        for due_date, lines in lines_by_date.items():
-            invoice_lines = [(0, 0, {
-                'name': f"{line.line_type} - Installment {line.serial_number}",
-                'quantity': 1,
-                'price_unit': line.capital_repayment,
-                'account_id': self.property_id.revenue_account_id.id,
-            }) for line in lines]
             
-            invoice = self.env['account.move'].create({
-                'move_type': 'out_invoice',
-                'partner_id': self.partner_id.id,
-                'invoice_date': fields.Date.context_today(self),
-                'invoice_date_due': due_date,
-                'invoice_line_ids': invoice_lines,
-                'property_order_id': self.id,
-            })
-            
-            lines.write({'invoice_id': invoice.id})
-            invoices += invoice
-        
-        # Update state if all lines are invoiced
-        if all(line.invoice_id for line in self.property_sale_line_ids):
-            self.state = 'invoiced'
-        
-        # Show created invoices
-        if len(invoices) == 1:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'account.move',
-                'res_id': invoices.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-        else:
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Generated Invoices',
-                'res_model': 'account.move',
-                'view_mode': 'tree,form',
-                'domain': [('id', 'in', invoices.ids)],
-            }
+            record.state = 'confirm'
+        return True
 
     def action_cancel(self):
         """Cancel the property sale"""
@@ -246,19 +286,15 @@ class PropertySale(models.Model):
                 'invoice_id': False
             })
             
+            # Reset offer state
+            record.offer_id.write({'state': 'rejected'})
+            
             record.state = 'cancelled'
+        return True
 
-    def action_draft(self):
-        """Reset sale to draft"""
-        self.ensure_one()
-        if self.state == 'cancelled':
-            self.state = 'draft'
-        else:
-            raise UserError(_('Only cancelled sales can be reset to draft.'))
-
-    # ========== Private Methods ==========
+    # ========== Payment Plan Methods ==========
     def _create_emi_lines(self):
-        """Create installment lines for the payment plan"""
+        """Create installment lines based on selected payment plan"""
         self.ensure_one()
         if not self.start_date:
             raise UserError(_('Start date is required to create payment schedule.'))
@@ -296,7 +332,7 @@ class PropertySale(models.Model):
             'line_type': 'admin_fee'
         })
 
-        # Create EMI lines
+        # Create EMI lines based on payment plan
         for i in range(1, self.no_of_installments + 1):
             due_date = self._calculate_due_date(self.start_date, i)
             self.env['property.sale.line'].create({
@@ -309,11 +345,25 @@ class PropertySale(models.Model):
             })
 
     def _calculate_due_date(self, start_date, installment_number):
-        """Calculate due date for installment"""
+        """Calculate due date based on payment plan"""
         try:
-            due_date = start_date + relativedelta(months=installment_number)
-            if due_date.month != (start_date + relativedelta(months=installment_number)).month:
-                due_date = (start_date + relativedelta(months=installment_number)).replace(day=1) - relativedelta(days=1)
+            if self.payment_plan == 'monthly':
+                delta = relativedelta(months=installment_number)
+            elif self.payment_plan == 'quarterly':
+                delta = relativedelta(months=installment_number*3)
+            elif self.payment_plan == 'semi_annual':
+                delta = relativedelta(months=installment_number*6)
+            elif self.payment_plan == 'annual':
+                delta = relativedelta(years=installment_number)
+            else:
+                delta = relativedelta(months=installment_number)  # Default to monthly
+            
+            due_date = start_date + delta
+            
+            # Handle end-of-month dates
+            if start_date.day > 28 and due_date.month != (start_date + delta).month:
+                due_date = (start_date + delta).replace(day=1) - relativedelta(days=1)
+            
             return due_date
         except Exception as e:
             raise UserError(_('Error calculating due date: %s') % str(e))
@@ -329,25 +379,18 @@ class PropertySale(models.Model):
         """Handle state changes and property updates"""
         res = super().write(vals)
         
-        if 'state' in vals or 'partner_id' in vals:
+        if 'state' in vals:
             for record in self:
-                if record.property_id:
-                    if vals.get('state') == 'confirm' and record.property_id.state != 'sold':
+                if vals['state'] == 'confirm':
+                    if not record.property_sale_line_ids:
+                        record._create_emi_lines()
+                elif vals['state'] == 'cancelled':
+                    # Reset property status if this was the active sale
+                    if record.property_id.active_sale_id.id == record.id:
                         record.property_id.write({
-                            'state': 'sold',
-                            'partner_id': record.partner_id.id
+                            'state': 'available',
+                            'partner_id': False
                         })
-                    elif vals.get('state') == 'cancelled' and record.property_id.state == 'sold':
-                        # Only reset if this was the active sale
-                        if not self.search([
-                            ('property_id', '=', record.property_id.id),
-                            ('state', '=', 'confirm'),
-                            ('id', '!=', record.id)
-                        ]):
-                            record.property_id.write({
-                                'state': 'available',
-                                'partner_id': False
-                            })
         return res
 
 
@@ -356,23 +399,53 @@ class PropertySaleLine(models.Model):
     _description = 'Property Sale Installment Line'
     _order = 'collection_date, serial_number'
 
-    property_sale_id = fields.Many2one('property.sale', string='Property Sale', required=True, ondelete='cascade')
+    property_sale_id = fields.Many2one(
+        'property.sale', 
+        string='Property Sale', 
+        required=True, 
+        ondelete='cascade'
+    )
+    
     serial_number = fields.Integer(string='Installment #')
+    
     line_type = fields.Selection([
         ('downpayment', 'Down Payment'),
         ('dld_fee', 'DLD Fee'),
         ('admin_fee', 'Admin Fee'),
         ('emi', 'EMI')
     ], string='Type', required=True)
-    capital_repayment = fields.Monetary(string='Amount', currency_field='currency_id')
-    remaining_capital = fields.Monetary(string='Remaining', currency_field='currency_id')
-    collection_date = fields.Date(string='Due Date', required=True)
+    
+    capital_repayment = fields.Monetary(
+        string='Amount', 
+        currency_field='currency_id'
+    )
+    
+    remaining_capital = fields.Monetary(
+        string='Remaining', 
+        currency_field='currency_id'
+    )
+    
+    collection_date = fields.Date(
+        string='Due Date', 
+        required=True
+    )
+    
     collection_status = fields.Selection([
         ('unpaid', 'Unpaid'),
         ('paid', 'Paid')
-    ], string='Status', default='unpaid')
-    invoice_id = fields.Many2one('account.move', string='Invoice')
-    currency_id = fields.Many2one(related='property_sale_id.currency_id', store=True)
+    ], string='Status', 
+       default='unpaid'
+    )
+    
+    invoice_id = fields.Many2one(
+        'account.move', 
+        string='Invoice'
+    )
+    
+    currency_id = fields.Many2one(
+        related='property_sale_id.currency_id', 
+        store=True
+    )
 
     def write(self, vals):
         """Update payment progress when status changes"""

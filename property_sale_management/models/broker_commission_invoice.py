@@ -88,6 +88,14 @@ class BrokerCommissionInvoice(models.Model):
                     rec.state = 'paid'
             else:
                 rec.payment_state = 'partial'
+
+    @api.depends('payment_state')
+    def _update_state_based_on_payment(self):
+            for record in self:
+                if record.payment_state == 'paid':
+                    record.state = 'paid'
+                elif record.payment_state == 'partial':
+                    record.state = 'invoiced'   
     
     @api.depends('vendor_bill_ids.amount_total', 'vendor_bill_ids.amount_residual', 
                 'internal_commission_ids.is_billed', 'internal_commission_ids')

@@ -39,6 +39,7 @@ class Property(models.Model):
     property_sale_ids = fields.One2many('property.sale', 'property_id', string="Related Sales")
     sale_count = fields.Integer(string="Sale Count", compute="_compute_sale_count")
     
+    offer_ids = fields.One2many('property.sale.offer', 'property_id', string='Offers')
     # New payment tracking fields
     payment_progress = fields.Float(string="Payment Progress (%)", compute="_compute_payment_progress", store=True)
     total_invoiced = fields.Monetary(compute='_compute_payment_details')

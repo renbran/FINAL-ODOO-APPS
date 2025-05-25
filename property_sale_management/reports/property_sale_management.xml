@@ -1,59 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <template id="property_sale_report_template">
-        <t t-call="web.html_container">
+<!-- Enhanced Property Sale Ledger Report -->
+<template id="report_property_sale_ledger">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
             <t t-call="web.external_layout">
                 <div class="page">
-                    <h2>Property Sale Report</h2>
-                    <div class="row mt-4">
+                    <h2>Property Sale Ledger - <span t-field="o.name"/></h2>
+                    
+                    <!-- Client and Property Summary -->
+                    <div class="row mt32 mb32">
                         <div class="col-6">
-                            <strong>Sale Reference:</strong> <span t-field="doc.name"/>
-                            <br/>
-                            <strong>Customer:</strong> <span t-field="doc.partner_id"/>
-                            <br/>
-                            <strong>Property:</strong> <span t-field="doc.property_id"/>
-                            <br/>
-                            <strong>Sale Price:</strong> <span t-field="doc.sale_price"/>
-                            <br/>
-                            <strong>Down Payment:</strong> <span t-field="doc.down_payment"/>
+                            <strong>Client:</strong> <span t-field="o.partner_id"/><br/>
+                            <strong>Client ID:</strong> <span t-field="o.partner_id.ref"/><br/>
+                            <strong>Contact:</strong> <span t-field="o.partner_id.phone"/>
                         </div>
                         <div class="col-6">
-                            <strong>Remaining Balance:</strong> <span t-field="doc.remaining_balance"/>
-                            <br/>
-                            <strong>DLD Fee:</strong> <span t-field="doc.dld_fee"/>
-                            <br/>
-                            <strong>Number of Installments:</strong> <span t-field="doc.no_of_installments"/>
-                            <br/>
-                            <strong>Amount per Installment:</strong> <span t-field="doc.amount_per_installment"/>
-                            <br/>
-                            <strong>Start Date:</strong> <span t-field="doc.start_date"/>
+                            <strong>Property:</strong> <span t-field="o.property_id"/><br/>
+                            <strong>Reference:</strong> <span t-field="o.property_id.property_reference"/><br/>
+                            <strong>Sale Date:</strong> <span t-field="o.sale_date"/>
                         </div>
                     </div>
-                    <h3 class="mt-4">Installment Schedule</h3>
+
+                    <!-- Financial Summary -->
+                    <h3>Financial Summary</h3>
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Total Property Value:</strong></td>
+                            <td class="text-right">
+                                <span t-field="o.property_value" t-options='{"widget": "monetary"}'/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Amount Paid:</strong></td>
+                            <td class="text-right">
+                                <span t-field="o.amount_paid" t-options='{"widget": "monetary"}'/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Balance Due:</strong></td>
+                            <td class="text-right">
+                                <span t-field="o.remaining_balance" t-options='{"widget": "monetary"}'/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Detailed Ledger -->
+                    <h3>Payment Ledger</h3>
                     <table class="table table-sm">
                         <thead>
                             <tr>
-                                <th>Serial Number</th>
-                                <th>Collection Date</th>
-                                <th>Capital Repayment</th>
-                                <th>Remaining Capital</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Reference</th>
+                                <th>Amount</th>
+                                <th>Balance</th>
                                 <th>Status</th>
-                                <th>Type</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="doc.sale_line_ids" t-as="line">
-                                <td><span t-field="line.serial_number"/></td>
-                                <td><span t-field="line.collection_date"/></td>
-                                <td><span t-field="line.capital_repayment"/></td>
-                                <td><span t-field="line.remaining_capital"/></td>
-                                <td><span t-field="line.collection_status"/></td>
-                                <td><span t-field="line.line_type"/></td>
-                            </tr>
+                            <t t-foreach="o.property_sale_line_ids" t-as="line">
+                                <tr>
+                                    <td><span t-field="line.collection_date"/></td>
+                                    <td><span t-field="line.line_type"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="text-right">
+                                        <span t-field="line.capital_repayment" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="line.remaining_capital" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                    <td><span t-field="line.collection_status"/></td>
+                                </tr>
+                            </t>
                         </tbody>
                     </table>
+                    
+                    <!-- Payment Progress and Notes -->
+                    <div class="row mt32">
+                        <div class="col-6">
+                            <strong>Payment Progress:</strong>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     t-att-style="'width: %s%%' % o.payment_progress" 
+                                     t-att-aria-valuenow="o.payment_progress">
+                                    <t t-esc="o.payment_progress"/>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <strong>Notes:</strong>
+                            <p>Please make payments by the due date to avoid late fees.</p>
+                        </div>
+                    </div>
                 </div>
             </t>
         </t>
-    </template>
-</odoo>
+    </t>
+</template>

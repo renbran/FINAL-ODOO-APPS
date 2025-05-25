@@ -83,6 +83,12 @@ class InternalCommission(models.Model):
                                  (record.percentage / 100))
             else:
                 record.amount = 0.0
+    def write(self, vals):
+        res = super(InternalCommission, self).write(vals)
+        if 'amount' in vals or 'percentage' in vals:
+            self.broker_commission_id._compute_allocation()
+        return res
+
 
     @api.depends('partner_id', 'position', 'broker_commission_id.name')
     def _compute_display_name(self):
