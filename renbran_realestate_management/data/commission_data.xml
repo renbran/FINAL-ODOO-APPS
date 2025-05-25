@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Commission Types -->
+        <record id="commission_type_fixed" model="commission.type">
+            <field name="name">Fixed Commission</field>
+            <field name="code">fixed</field>
+        </record>
+
+        <record id="commission_type_percentage" model="commission.type">
+            <field name="name">Percentage Commission</field>
+            <field name="code">percentage</field>
+        </record>
+
+        <!-- Commission Rules -->
+        <record id="commission_rule_standard" model="commission.rule">
+            <field name="name">Standard Commission</field>
+            <field name="commission_type_id" ref="commission_type_percentage"/>
+            <field name="rate">2.5</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="commission_rule_premium" model="commission.rule">
+            <field name="name">Premium Commission</field>
+            <field name="commission_type_id" ref="commission_type_percentage"/>
+            <field name="rate">3.5</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Broker Commission Levels -->
+        <record id="broker_commission_level_basic" model="broker.commission.level">
+            <field name="name">Basic Level</field>
+            <field name="commission_rule_id" ref="commission_rule_standard"/>
+        </record>
+
+        <record id="broker_commission_level_advanced" model="broker.commission.level">
+            <field name="name">Advanced Level</field>
+            <field name="commission_rule_id" ref="commission_rule_premium"/>
+        </record>
+
+        <!-- Internal Commission Levels -->
+        <record id="internal_commission_level_junior" model="internal.commission.level">
+            <field name="name">Junior Sales</field>
+            <field name="commission_rule_id" ref="commission_rule_standard"/>
+        </record>
+
+        <record id="internal_commission_level_senior" model="internal.commission.level">
+            <field name="name">Senior Sales</field>
+            <field name="commission_rule_id" ref="commission_rule_premium"/>
+        </record>
+    </data>
+</odoo>
