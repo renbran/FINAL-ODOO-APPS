@@ -6,7 +6,7 @@
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
     'license': 'LGPL-3',
-    'depends': ['base', 'mail', 'account'],
+    'depends': ['base', 'mail', 'account', 'web'],
     'data': [
         # Security
         'security/ir.model.access.csv',
@@ -34,6 +34,10 @@
     'assets': {
         'web.assets_backend': [
             'real_estate_management_v2/static/src/scss/property.scss',
+            'real_estate_management_v2/static/src/js/property.js',
+        ],
+        'web.assets_qweb': [
+            'real_estate_management_v2/static/src/xml/**/*',
         ],
     },
     'installable': True,
