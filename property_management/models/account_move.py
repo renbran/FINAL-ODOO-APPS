@@ -78,3 +78,17 @@ class AccountMove(models.Model):
                 'target': 'current',
             }
         return {}
+    
+    def action_view_property_offer(self):
+        self.ensure_one()
+        if self.property_offer_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Property Offer'),
+                'res_model': 'property.sale.offer',
+                'res_id': self.property_offer_id.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+        return {}
+    
