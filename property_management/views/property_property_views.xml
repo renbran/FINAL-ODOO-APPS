@@ -17,7 +17,6 @@
             <field name="model">property.property</field>
             <field name="arch" type="xml">
                 <tree string="Properties">
-                    <field name="field_id"/>
                     <field name="property_reference"/>
                     <field name="name"/>
                     <field name="project_name"/>

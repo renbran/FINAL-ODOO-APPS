@@ -282,6 +282,13 @@ class PropertySaleOffer(models.Model):
         self.write({'state': 'accepted'})
         self._create_property_sale()
         return True
+    
+    def action_reject(self):
+        self.ensure_one()
+        if self.state not in ('draft', 'sent'):
+            raise UserError(_("Only draft or sent offers can be rejected."))
+        self.write({'state': 'rejected'})
+        return True
 
     def _validate_acceptance(self):
         """Ensure no other accepted offers exist for this property"""
