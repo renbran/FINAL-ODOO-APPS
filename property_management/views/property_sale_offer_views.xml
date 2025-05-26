@@ -27,9 +27,12 @@
             <field name="arch" type="xml">
                 <form string="Property Sale Offer">
                     <header>
-                        <button name="action_send_offer" string="Send Offer" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                        <button name="action_accept" string="Accept Offer" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ('draft', 'sent'))]}"/>
-                        <button name="action_reject" string="Reject Offer" type="object" attrs="{'invisible': [('state', 'in', ('accepted', 'rejected'))]}"/>
+                        <button name="action_send_offer" string="Send Offer" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                        <button name="action_accept" string="Accept Offer" type="object" class="oe_highlight"
+                            invisible="not (state == 'draft' or state == 'sent')"/>
+                        <button name="action_reject" string="Reject Offer" type="object"
+                            invisible="state == 'accepted' or state == 'rejected'"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,sent,accepted,rejected"/>
                     </header>
                     <sheet>
@@ -58,7 +61,7 @@
                                 <field name="price_difference_percent" widget="percentage"/>
                                 <field name="days_to_expire"/>
                                 <field name="is_expired"/>
-                                <field name="property_sale_id" attrs="{'invisible': [('property_sale_id', '=', False)]}"/>
+                                <field name="property_sale_id" invisible="property_sale_id == False"/>
                             </group>
                         </group>
                         <notebook>
