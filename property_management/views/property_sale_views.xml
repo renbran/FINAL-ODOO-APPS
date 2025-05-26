@@ -10,7 +10,7 @@
                     <field name="name"/>
                     <field name="partner_id"/>
                     <field name="property_id"/>
-                    <field name="state"/>
+                    <field name="state" widget="statusbar"/>
                     <field name="sale_price"/>
                     <field name="sale_date"/>
                 </tree>
@@ -24,9 +24,9 @@
             <field name="arch" type="xml">
                 <form string="Property Sale">
                     <header>
-                        <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"/>
-                        <button name="action_cancel" string="Cancel" type="object" class="oe_highlight"/>
-                        <button name="action_draft" string="Reset to Draft" type="object"/>
+                        <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" options="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_cancel" string="Cancel" type="object" class="oe_highlight" options="{'invisible': [('state', 'not in', ['confirmed', 'draft'])]}"/>
+                        <button name="action_draft" string="Reset to Draft" type="object" options="{'invisible': [('state', '!=', 'cancelled')]}"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     
@@ -36,7 +36,8 @@
                                 <field name="name"/>
                                 <field name="partner_id"/>
                                 <field name="property_id"/>
-                                <field name="property_offer_id"/>
+                                <!-- Corrected field name -->
+                                <field name="property_sale_offer_id"/>
                                 <field name="seller_name"/>
                             </group>
                             <group>
@@ -70,7 +71,7 @@
                                 <group>
                                     <field name="broker_commission_percentage"/>
                                     <field name="broker_commission_total_amount"/>
-                                    <field name="broker_commission_count"/>
+                                    <field name="broker_commission_count" widget="statinfo"/>
                                 </group>
                                 <div class="oe_button_box" name="button_box">
                                     <button name="action_generate_broker_commission_invoice" 
@@ -78,6 +79,7 @@
                                             string="Generate Commission" 
                                             class="oe_stat_button"
                                             icon="fa-money"/>
+                                    <!-- Updated context for proper filtering -->
                                     <button name="action_view_broker_commissions" 
                                             type="object" 
                                             string="Commissions" 
@@ -102,12 +104,14 @@
                                         <field name="capital_repayment"/>
                                         <field name="collection_date"/>
                                         <field name="collection_status"/>
-                                        <field name="invoice_id"/>
+                                        <field name="invoice_id" widget="many2one_button"/>
+                                        <!-- Added visibility condition -->
                                         <button name="action_generate_invoice" 
                                                 type="object" 
                                                 string="Create Invoice" 
                                                 class="oe_stat_button"
-                                                icon="fa-file-text-o"/>
+                                                icon="fa-file-text-o"
+                                                options="{'invisible': [('invoice_id', '!=', False)]}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -115,9 +119,9 @@
                     </sheet>
                     
                     <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
                     </div>
                 </form>
             </field>
@@ -141,6 +145,7 @@
                 <search>
                     <field name="partner_id"/>
                     <field name="property_id"/>
+                    <field name="property_sale_offer_id"/>  <!-- Added offer field -->
                     <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
                     <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
                     <filter string="Cancelled" name="cancelled" domain="[('state','=','cancelled')]"/>
