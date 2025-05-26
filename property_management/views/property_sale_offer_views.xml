@@ -27,12 +27,9 @@
             <field name="arch" type="xml">
                 <form string="Property Sale Offer">
                     <header>
-                        <button name="action_send_offer" string="Send Offer" type="object" class="oe_highlight"
-                            invisible="state != 'draft'"/>
-                        <button name="action_accept" string="Accept Offer" type="object" class="oe_highlight"
-                            invisible="not (state == 'draft' or state == 'sent')"/>
-                        <button name="action_reject" string="Reject Offer" type="object"
-                            invisible="state == 'accepted' or state == 'rejected'"/>
+                        <button name="action_send_offer" string="Send Offer" type="object" class="oe_highlight" modifiers="draft"/>
+                        <button name="action_accept" string="Accept Offer" type="object" class="oe_highlight" modifiers="draft,sent"/>
+                        <button name="action_reject" string="Reject Offer" type="object" modifiers="draft,sent"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,sent,accepted,rejected"/>
                     </header>
                     <sheet>

@@ -141,7 +141,7 @@ class PropertySaleOffer(models.Model):
         string='Price Difference (%)',
         compute='_compute_price_difference',
         store=True,
-        digits='(5, 2)'
+        digits=(5, 2)
     )
     
     days_to_expire = fields.Integer(
