@@ -27,7 +27,7 @@
                         <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"/>
                         <button name="action_cancel" string="Cancel" type="object" class="oe_highlight"/>
                         <button name="action_draft" string="Reset to Draft" type="object"/>
-                        <field name="state"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
                     
                     <sheet>
@@ -36,7 +36,7 @@
                                 <field name="name"/>
                                 <field name="partner_id"/>
                                 <field name="property_id"/>
-                                <field name="property_sale_offer_id"/>
+                                <field name="property_offer_id"/>
                                 <field name="seller_name"/>
                             </group>
                             <group>
@@ -44,7 +44,7 @@
                                 <field name="start_date"/>
                                 <field name="payment_option"/>
                                 <field name="no_of_installments"/>
-                                <field name="payment_progress"/>
+                                <field name="payment_progress" widget="progressbar"/>
                             </group>
                         </group>
 
@@ -129,7 +129,7 @@
             <field name="res_model">property.sale</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">Create your first property sale!
+                <p class="o_view_nocontent_smiling_face">Create your first property sale!</p>
             </field>
         </record>
 
