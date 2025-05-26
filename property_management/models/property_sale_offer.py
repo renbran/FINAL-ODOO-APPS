@@ -284,12 +284,13 @@ class PropertySaleOffer(models.Model):
         return True
     
     def action_reject(self):
+        """Reject the property offer"""
         self.ensure_one()
-        if self.state not in ('draft', 'sent'):
-            raise UserError(_("Only draft or sent offers can be rejected."))
+        if self.state in ['accepted', 'rejected']:
+            raise UserError(_("Cannot reject an offer in %s state") % self.state)
         self.write({'state': 'rejected'})
         return True
-
+    
     def _validate_acceptance(self):
         """Ensure no other accepted offers exist for this property"""
         existing_accepted = self.search([

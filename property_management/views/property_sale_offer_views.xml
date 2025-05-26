@@ -6,7 +6,7 @@
             <field name="name">property.sale.offer.tree</field>
             <field name="model">property.sale.offer</field>
             <field name="arch" type="xml">
-                <tree string="Property Sale Offers" decoration-info="state == 'draft'" decoration-muted="state == 'rejected'" decoration-success="state == 'accepted'">
+                <tree string="Property Sale Offers" decoration-info="state='draft'" decoration-muted="state='rejected'" decoration-success="state='accepted'">
                     <field name="name"/>
                     <field name="property_id"/>
                     <field name="partner_id"/>
