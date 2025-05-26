@@ -8,7 +8,7 @@ class BrokerCommissionInvoice(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     property_sale_id = fields.Many2one('property.sale', string="Property Sale", required=True)
-    property_offer_id = fields.Many2one('property.sale.offer', string="Property Offer")
+    property_sale_offer_id = fields.Many2one('property.sale.offer', string="Property Offer")
     seller_id = fields.Many2one('res.partner', string="Seller/Broker", required=True, domain=[('is_company', '=', True)])
     commission_percentage = fields.Float(string="Commission Percentage", digits=(5, 2))
     commission_amount = fields.Monetary(string="Commission Amount", currency_field='currency_id')
@@ -110,8 +110,8 @@ class BrokerCommissionInvoice(models.Model):
         }
 
         # If this commission is related to an offer, link it
-        if self.property_offer_id:
-            invoice_vals['property_offer_id'] = self.property_offer_id.id
+        if self.property_sale_offer_id:
+            invoice_vals['property_sale_offer_id'] = self.property_sale_offer_id.id
 
         invoice = self.env['account.move'].create(invoice_vals)
         self.write({
@@ -156,14 +156,14 @@ class BrokerCommissionInvoice(models.Model):
     def action_view_property_offer(self):
         """View related property offer"""
         self.ensure_one()
-        if not self.property_offer_id:
+        if not self.property_sale_offer_id:
             raise UserError(_("No property offer linked to this commission."))
             
         return {
             'type': 'ir.actions.act_window',
             'name': _('Property Offer'),
             'res_model': 'property.sale.offer',
-            'res_id': self.property_offer_id.id,
+            'res_id': self.property_sale_offer_id.id,
             'view_mode': 'form',
             'target': 'current',
         }

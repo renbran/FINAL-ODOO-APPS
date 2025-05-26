@@ -79,13 +79,26 @@
                                 (<span t-field="doc.broker_commission_percentage"/>%)
                             </td>
                         </tr>
+                        <tr class="border-black o_total">
+                            <td><strong>Total Offer Amount</strong></td>
+                            <td class="text-right">
+                                <span t-field="doc.total_offer_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-                <div class="row mt32 mb32" t-if="doc.notes">
+                <div class="row mt32 mb32">
                     <div class="col-12">
-                        <strong>Notes:</strong>
-                        <p t-field="doc.notes"/>
+                        <strong>Payment Terms:</strong>
+                        <p t-field="doc.payment_terms"/>
+                    </div>
+                </div>
+
+                <div class="row mt32 mb32">
+                    <div class="col-12">
+                        <strong>Terms &amp; Conditions:</strong>
+                        <p t-field="doc.terms_conditions"/>
                     </div>
                 </div>
 
@@ -106,15 +119,9 @@
         <field name="name">Property Offer</field>
         <field name="model">property.sale.offer</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name"><?xml version="1.0" encoding="utf-8"?>
-        <odoo>
-            <record id="action_report_property_offer" model="ir.actions.report">
-                <field name="name">Property Offer</field>
-                <field name="model">property.sale.offer</field>
-                <field name="report_type">qweb-pdf</field>
-                <field name="report_name">property_management.report_property_offer</field>
-                <field name="report_file">property_management.report_property_offer</field>
-                <field name="binding_model_id" ref="model_property_sale_offer"/>
-                <field name="binding_type">report</field>
-            </record>
-        </odoo>
+        <field name="report_name">property_management.report_property_offer</field>
+        <field name="report_file">property_management.report_property_offer</field>
+        <field name="binding_model_id" ref="model_property_sale_offer"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

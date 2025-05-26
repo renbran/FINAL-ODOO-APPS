@@ -66,7 +66,7 @@ class PropertySaleOffer(models.Model):
     expiration_date = fields.Date(
         string='Expiration Date',
         required=True,
-        default=lambda self: (datetime.now() + timedelta(days=14)).date(),
+        default=lambda: (datetime.now() + timedelta(days=14)).date(),
         tracking=True
     )
     
@@ -194,7 +194,7 @@ class PropertySaleOffer(models.Model):
     
     broker_commission_ids = fields.One2many(
         'broker.commission.invoice', 
-        'property_offer_id', 
+        'property_sale_offer_id', 
         string="Broker Commission Invoices",
         readonly=True
     )
@@ -234,47 +234,11 @@ class PropertySaleOffer(models.Model):
     @api.constrains('offer_price', 'property_id')
     def _check_offer_price(self):
         for offer in self:
-            if offer.property_id and offer.offer_price <= 0:
-                raise ValidationError(_("Offer price must be greater than zero."))
-            if offer.property_id and offer.offer_price > (offer.property_id.property_price * 2):
-                raise ValidationError(_("Offer price cannot be more than double the property price."))
-
-    # ========== Compute Methods ==========
-    @api.depends('offer_price', 'property_id.property_price')
-    def _compute_price_difference(self):
-        for offer in self:
-            if offer.property_id and offer.property_id.property_price > 0:
-                offer.price_difference = offer.offer_price - offer.property_id.property_price
-                offer.price_difference_percent = (
-                    (offer.offer_price - offer.property_id.property_price) / 
-                    offer.property_id.property_price * 100
+            if offer.offer_price < offer.property_id.property_price:
+                raise ValidationError(
+                    _('Offer price must be greater than or equal to the property price.')
                 )
-            else:
-                offer.price_difference = 0
-                offer.price_difference_percent = 0
 
-    @api.depends('expiration_date')
-    def _compute_days_to_expire(self):
-        today = fields.Date.today()
-        for offer in self:
-            if offer.expiration_date:
-                delta = offer.expiration_date - today
-                offer.days_to_expire = delta.days
-                offer.is_expired = delta.days < 0
-            else:
-                offer.days_to_expire = 0
-                offer.is_expired = False
-
-    @api.depends('offer_price', 'down_payment', 'dld_fee', 'admin_fee')
-    def _compute_total_offer_amount(self):
-        for offer in self:
-            offer.total_offer_amount = offer.offer_price + offer.down_payment + offer.dld_fee + offer.admin_fee
-            
-    @api.depends('broker_commission_percentage', 'offer_price')
-    def _compute_broker_commission_amount(self):
-        for offer in self:
-            offer.broker_commission_amount = (offer.broker_commission_percentage / 100) * offer.offer_price
-    
     @api.depends('broker_commission_ids')
     def _compute_broker_commission_count(self):
         for offer in self:
@@ -298,11 +262,9 @@ class PropertySaleOffer(models.Model):
         if self.state != 'draft':
             raise UserError(_("Only draft offers can be sent."))
         
-        # Generate and send the report
-        report_action = self.env.ref('property_sale_management.action_report_sale_offer').report_action(self)
+        self.env.ref('property_sale_management.action_report_sale_offer').report_action(self)
         self.write({'state': 'sent'})
         
-        # Return both the report action and a notification
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'property.sale.offer',
@@ -321,87 +283,16 @@ class PropertySaleOffer(models.Model):
         self._create_property_sale()
         return True
 
-    def action_reject(self):
-        self.ensure_one()
-        if self.state == 'accepted':
-            raise UserError(_("Cannot reject an already accepted offer."))
-        self.write({'state': 'rejected'})
-        return True
+    def _validate_acceptance(self):
+        """Ensure no other accepted offers exist for this property"""
+        existing_accepted = self.search([
+            ('property_id', '=', self.property_id.id),
+            ('state', '=', 'accepted'),
+            ('id', '!=', self.id)
+        ])
+        if existing_accepted:
+            raise UserError(_("Another offer for this property is already accepted."))
 
-    def action_reset_to_draft(self):
-        self.ensure_one()
-        if self.state != 'rejected':
-            raise UserError(_("Only rejected offers can be reset to draft."))
-        self.write({'state': 'draft'})
-
-     # ========== Smart Button and Views ==========
-    def action_view_property(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Property',
-            'res_model': 'property.property',
-            'res_id': self.property_id.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-
-    def action_view_sale(self):
-        self.ensure_one()
-        if not self.property_sale_id:
-            raise UserError(_("No sale created from this offer yet."))
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Property Sale',
-            'res_model': 'property.sale',
-            'res_id': self.property_sale_id.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-        
-    def action_generate_broker_commission(self):
-        """Generate a broker commission invoice from the offer"""
-        self.ensure_one()
-        if not self.seller_id:
-            raise UserError(_("Please select a broker/seller first."))
-        
-        if not self.property_sale_id:
-            raise UserError(_("A property sale must be created first."))
-        
-        commission = self.env['broker.commission.invoice'].create({
-            'property_sale_id': self.property_sale_id.id,
-            'property_offer_id': self.id,
-            'seller_id': self.seller_id.id,
-            'commission_percentage': self.broker_commission_percentage,
-            'commission_amount': self.broker_commission_amount,
-        })
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Broker Commission'),
-            'res_model': 'broker.commission.invoice',
-            'res_id': commission.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-    
-    def action_view_broker_commissions(self):
-        """View broker commissions related to this offer"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Broker Commissions'),
-            'res_model': 'broker.commission.invoice',
-            'domain': [('property_offer_id', '=', self.id)],
-            'view_mode': 'tree,form',
-            'target': 'current',
-            'context': {'default_property_offer_id': self.id, 
-                       'default_property_sale_id': self.property_sale_id.id,
-                       'default_seller_id': self.seller_id.id,
-                       'default_commission_percentage': self.broker_commission_percentage,
-                       'default_commission_amount': self.broker_commission_amount},
-        }
-        
     def _create_property_sale(self):
         """Create a property sale from the accepted offer"""
         sale = self.env['property.sale'].create({
@@ -414,18 +305,23 @@ class PropertySaleOffer(models.Model):
             'down_payment': self.down_payment,
             'dld_fee': self.dld_fee,
             'admin_fee': self.admin_fee,
-            # Add broker information to the sale
+            'property_sale_offer_id': self.id,
             'seller_name': self.seller_id.id if self.seller_id else False,
             'broker_commission_percentage': self.broker_commission_percentage,
         })
         
-        # Link the offer to the sale
         self.property_sale_id = sale.id
-        
-        # Update property state
-        self.property_id.write({
-            'state': 'reserved',
-            'partner_id': self.partner_id.id
-        })
-        
+        self.property_id.write({'state': 'reserved', 'partner_id': self.partner_id.id})
         return sale
+
+    def action_view_broker_commissions(self):
+        """View broker commissions related to this offer"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Broker Commissions'),
+            'res_model': 'broker.commission.invoice',
+            'domain': [('property_sale_offer_id', '=', self.id)],
+            'view_mode': 'tree,form',
+            'target': 'current',
+        }

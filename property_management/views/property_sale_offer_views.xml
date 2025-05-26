@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_property_sale_offer_tree" model="ir.ui.view">
+            <field name="name">property.sale.offer.tree</field>
+            <field name="model">property.sale.offer</field>
+            <field name="arch" type="xml">
+                <tree string="Property Sale Offers" decoration-info="state == 'draft'" decoration-muted="state == 'rejected'" decoration-success="state == 'accepted'">
+                    <field name="name"/>
+                    <field name="property_id"/>
+                    <field name="partner_id"/>
+                    <field name="offer_price"/>
+                    <field name="offer_date"/>
+                    <field name="expiration_date"/>
+                    <field name="state"/>
+                    <field name="days_to_expire"/>
+                    <field name="is_expired" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_property_sale_offer_form" model="ir.ui.view">
+            <field name="name">property.sale.offer.form</field>
+            <field name="model">property.sale.offer</field>
+            <field name="arch" type="xml">
+                <form string="Property Sale Offer">
+                    <header>
+                        <button name="action_send_offer" string="Send Offer" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_accept" string="Accept Offer" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ('draft', 'sent'))]}"/>
+                        <button name="action_reject" string="Reject Offer" type="object" attrs="{'invisible': [('state', 'in', ('accepted', 'rejected'))]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,accepted,rejected"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_broker_commissions" type="object" class="oe_stat_button" icon="fa-money">
+                                <field name="broker_commission_count" widget="statinfo" string="Commissions"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="property_id" options="{'no_create': True}"/>
+                                <field name="partner_id" options="{'no_create': True}"/>
+                                <field name="offer_price"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="offer_date"/>
+                                <field name="expiration_date"/>
+                            </group>
+                            <group>
+                                <field name="property_price"/>
+                                <field name="price_difference"/>
+                                <field name="price_difference_percent" widget="percentage"/>
+                                <field name="days_to_expire"/>
+                                <field name="is_expired"/>
+                                <field name="property_sale_id" attrs="{'invisible': [('property_sale_id', '=', False)]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Financial Details">
+                                <group>
+                                    <group>
+                                        <field name="down_payment"/>
+                                        <field name="dld_fee"/>
+                                        <field name="admin_fee"/>
+                                    </group>
+                                    <group>
+                                        <field name="total_offer_amount" widget="monetary"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Broker Information">
+                                <group>
+                                    <field name="seller_id" options="{'no_create': True}"/>
+                                    <field name="broker_commission_percentage"/>
+                                    <field name="broker_commission_amount" widget="monetary"/>
+                                </group>
+                                <field name="broker_commission_ids" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="commission_amount"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Terms">
+                                <group>
+                                    <field name="payment_terms" widget="html"/>
+                                    <field name="terms_conditions" widget="html"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_property_sale_offer_search" model="ir.ui.view">
+            <field name="name">property.sale.offer.search</field>
+            <field name="model">property.sale.offer</field>
+            <field name="arch" type="xml">
+                <search string="Search Property Sale Offers">
+                    <field name="name"/>
+                    <field name="property_id"/>
+                    <field name="partner_id"/>
+                    <field name="offer_price"/>
+                    <field name="state"/>
+                    <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                    <filter string="Sent" name="sent" domain="[('state','=','sent')]"/>
+                    <filter string="Accepted" name="accepted" domain="[('state','=','accepted')]"/>
+                    <filter string="Rejected" name="rejected" domain="[('state','=','rejected')]"/>
+                    <filter string="Not Expired" name="not_expired" domain="[('is_expired','=',False)]"/>
+                    <separator/>
+                    <filter string="My Offers" name="my_offers" domain="[('create_uid','=',uid)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Property" name="group_by_property" context="{'group_by':'property_id'}"/>
+                        <filter string="Customer" name="group_by_partner" context="{'group_by':'partner_id'}"/>
+                        <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                        <filter string="Offer Date" name="group_by_offer_date" context="{'group_by':'offer_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_property_sale_offer" model="ir.actions.act_window">
+            <field name="name">Property Sale Offers</field>
+            <field name="res_model">property.sale.offer</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_property_sale_offer_search"/>
+            <field name="context">{'search_default_not_expired': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new property sale offer
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

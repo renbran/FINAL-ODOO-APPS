@@ -44,7 +44,7 @@ class Property(models.Model):
     remaining_amount = fields.Monetary(string="Remaining Amount", compute="_compute_payment_details", store=True)
     active_sale_id = fields.Many2one('property.sale', string="Active Sale", compute="_compute_active_sale")
     
-    # Existing fields
+    # Existing structural fields
     field_id = fields.Integer(string="ID")
     property_reference = fields.Char(string="Property Reference")
     status = fields.Char(string="Status", compute="_compute_status", store=True)
@@ -89,7 +89,7 @@ class Property(models.Model):
     def _compute_active_sale(self):
         """Compute the active sale for this property."""
         for record in self:
-            active_sales = record.property_sale_ids.filtered(lambda s: s.state in ['confirm', 'invoiced'])
+            active_sales = record.property_sale_ids.filtered(lambda s: s.state in ['confirmed', 'invoiced'])
             record.active_sale_id = active_sales[0] if active_sales else False
     
     @api.depends('active_sale_id', 'active_sale_id.property_sale_line_ids', 

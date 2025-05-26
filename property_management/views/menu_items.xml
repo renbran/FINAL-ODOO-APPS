@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main menu item -->
+        <menuitem id="menu_property_management_root"
+                  name="Property Management"
+                  web_icon="property_management,static/description/icon.png"
+                  sequence="10"/>
+
+        <!-- Properties submenu -->
+        <menuitem id="menu_property_management_properties"
+                  name="Properties"
+                  parent="menu_property_management_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_property_management_property_list"
+                  name="Property List"
+                  parent="menu_property_management_properties"
+                  action="action_property"
+                  sequence="10"/>
+
+        <!-- Sales submenu -->
+        <menuitem id="menu_property_management_sales"
+                  name="Sales"
+                  parent="menu_property_management_root"
+                  sequence="20"/>
+
+        <menuitem id="menu_property_management_sale_list"
+                  name="Property Sales"
+                  parent="menu_property_management_sales"
+                  action="action_property_sale"
+                  sequence="10"/>
+
+        <menuitem id="menu_property_management_offer_list"
+                  name="Sale Offers"
+                  parent="menu_property_management_sales"
+                  action="action_property_sale_offer"
+                  sequence="20"/>
+
+        <!-- Commissions submenu -->
+        <menuitem id="menu_property_management_commissions"
+                  name="Commissions"
+                  parent="menu_property_management_root"
+                  sequence="30"/>
+
+        <menuitem id="menu_property_management_commission_list"
+                  name="Broker Commissions"
+                  parent="menu_property_management_commissions"
+                  action="action_broker_commission_invoice"
+                  sequence="10"/>
+
+        <!-- Configuration submenu -->
+        <menuitem id="menu_property_management_configuration"
+                  name="Configuration"
+                  parent="menu_property_management_root"
+                  sequence="100"/>
+
+        <!-- Add configuration menu items here as needed -->
+    </data>
+</odoo>

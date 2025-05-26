@@ -6,12 +6,12 @@ class AccountMove(models.Model):
     property_order_id = fields.Many2one('property.sale', string="Property Sale Order")
     property_rental_id = fields.Many2one('property.rental', string="Rental Order")
     broker_commission_id = fields.Many2one('broker.commission.invoice', string="Broker Commission")
-    property_offer_id = fields.Many2one('property.sale.offer', string="Property Offer", 
-                                       related='broker_commission_id.property_offer_id', store=True, readonly=True)
+    property_sale_offer_id = fields.Many2one('property.sale.offer', string="Property Offer", 
+                                       related='broker_commission_id.property_sale_offer_id', store=True, readonly=True)
     
     @api.model
     def create(self, vals):
-        """Override create to set property_offer_id if broker_commission_id is set"""
+        """Override create to set property_sale_offer_id if broker_commission_id is set"""
         res = super(AccountMove, self).create(vals)
         
         # If this is a broker commission invoice, update related fields

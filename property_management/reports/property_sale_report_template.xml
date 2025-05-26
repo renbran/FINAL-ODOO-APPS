@@ -1,113 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- PDF report action for Property Sale -->
-    <record id="action_report_property_sale" model="ir.actions.report">
-        <field name="name">Property Sale Report</field>
-        <field name="model">property.sale</field>
+    <!-- PDF report action for Property Offer -->
+    <record id="action_report_property_offer" model="ir.actions.report">
+        <field name="name">Property Offer Report</field>
+        <field name="model">property.sale.offer</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">property_sale_management.property_sale_report_template</field>
-        <field name="report_file">property_sale_management.property_sale_report_template</field>
-        <field name="binding_model_id" ref="model_property_sale"/>
+        <field name="report_name">property_sale_management.property_offer_report_template</field>
+        <field name="report_file">property_sale_management.property_offer_report_template</field>
+        <field name="binding_model_id" ref="model_property_sale_offer"/>
         <field name="binding_type">report</field>
     </record>
-    <template id="property_sale_report_template">
+
+    <template id="property_offer_report_template">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <div class="page">
                     <!-- Header Section -->
                     <div class="row mb-4">
                         <div class="col-6">
-                            <h2><t t-esc="data['SaleName']"/></h2>
-                            <p>Reference: <t t-esc="data['SaleReference']"/></p>
+                            <h2>Property Offer</h2>
+                            <p>Reference: <span t-field="doc.name"/></p>
                         </div>
                         <div class="col-6 text-right">
                             <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
                         </div>
                     </div>
 
-                    <!-- Customer Information -->
+                    <!-- Offer Information -->
                     <div class="row mb-4">
                         <div class="col-6">
                             <strong>Customer:</strong>
                             <address>
-                                <t t-esc="data['CustomerName']"/><br/>
-                                <t t-esc="data['CustomerAddress']"/><br/>
-                                <t t-esc="data['CustomerAddress2']"/><br/>
-                                <t t-if="data['CustomerContact']">
-                                    Phone: <t t-esc="data['CustomerContact']"/>
+                                <span t-field="doc.partner_id.name"/><br/>
+                                <span t-field="doc.partner_id.street"/><br/>
+                                <span t-field="doc.partner_id.city"/>, <span t-field="doc.partner_id.state_id.name"/> <span t-field="doc.partner_id.zip"/><br/>
+                                <span t-field="doc.partner_id.country_id.name"/><br/>
+                                <t t-if="doc.partner_id.phone">
+                                    Phone: <span t-field="doc.partner_id.phone"/>
                                 </t>
                             </address>
                         </div>
                         <div class="col-6">
                             <strong>Property:</strong>
-                            <p><t t-esc="data['PropertyName']"/></p>
+                            <p><span t-field="doc.property_id.name"/></p>
+                            <strong>Offer Date:</strong>
+                            <p><span t-field="doc.offer_date"/></p>
+                            <strong>Expiration Date:</strong>
+                            <p><span t-field="doc.expiration_date"/></p>
+                            <strong>Status:</strong>
+                            <p><span t-field="doc.state"/></p>
                         </div>
                     </div>
 
-                    <!-- Sale Details -->
+                    <!-- Offer Details -->
                     <div class="row mb-4">
                         <div class="col-12">
                             <table class="table table-sm">
                                 <tr>
-                                    <th>Sale Price</th>
-                                    <td><t t-esc="data['SalePrice']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
+                                    <th>Property List Price</th>
+                                    <td><span t-field="doc.property_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <th>Offer Price</th>
+                                    <td><span t-field="doc.offer_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <th>Price Difference</th>
+                                    <td>
+                                        <span t-field="doc.price_difference" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        (<span t-field="doc.price_difference_percent"/>%)
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Down Payment</th>
-                                    <td><t t-esc="data['DownPayment']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
-                                </tr>
-                                <tr>
-                                    <th>Remaining Balance</th>
-                                    <td><t t-esc="data['RemainingBalance']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
+                                    <td><span t-field="doc.down_payment" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                                 </tr>
                                 <tr>
                                     <th>DLD Fee</th>
-                                    <td><t t-esc="data['DLD_Fee']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
+                                    <td><span t-field="doc.dld_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                                 </tr>
                                 <tr>
-                                    <th>Number of Installments</th>
-                                    <td><t t-esc="data['NoOfInstallments']"/></td>
+                                    <th>Admin Fee</th>
+                                    <td><span t-field="doc.admin_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                                 </tr>
                                 <tr>
-                                    <th>Amount Per Installment</th>
-                                    <td><t t-esc="data['AmountPerInstallment']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
+                                    <th>Broker Commission</th>
+                                    <td>
+                                        <span t-field="doc.broker_commission_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        (<span t-field="doc.broker_commission_percentage"/>%)
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <th>Start Date</th>
-                                    <td><t t-esc="data['StartDate']"/></td>
+                                <tr class="border-black o_total">
+                                    <th><strong>Total Offer Amount</strong></th>
+                                    <td><strong><span t-field="doc.total_offer_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></strong></td>
                                 </tr>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Payment Schedule -->
+                    <!-- Payment Terms -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <strong>Payment Terms:</strong>
+                            <p t-field="doc.payment_terms"/>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
                     <div class="row">
                         <div class="col-12">
-                            <h4>Payment Schedule</h4>
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Serial No.</th>
-                                        <th>Collection Date</th>
-                                        <th>Capital Repayment</th>
-                                        <th>Remaining Capital</th>
-                                        <th>Collection Status</th>
-                                        <th>Line Type</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="docs" t-as="line">
-                                        <tr>
-                                            <td><t t-esc="line['serial_number']"/></td>
-                                            <td><t t-esc="line['collection_date']"/></td>
-                                            <td><t t-esc="line['capital_repayment']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
-                                            <td><t t-esc="line['remaining_capital']" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
-                                            <td><t t-esc="line['collection_status']"/></td>
-                                            <td><t t-esc="line['line_type']"/></td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
+                            <strong>Terms &amp; Conditions:</strong>
+                            <p t-field="doc.terms_conditions"/>
                         </div>
                     </div>
                 </div>

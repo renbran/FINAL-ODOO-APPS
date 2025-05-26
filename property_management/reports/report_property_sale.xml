@@ -1,69 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="property_sale_report_template">
-        <t t-call="web.html_container">
-            <t t-call="web.external_layout">
-                <div class="page">
-                    <h2>Property Sale Report</h2>
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Sale Name:</strong> <span t-esc="data['SaleName']"/>
-                            <br/>
-                            <strong>Sale Reference:</strong> <span t-esc="data['SaleReference']"/>
-                            <br/>
-                            <strong>Customer Name:</strong> <span t-esc="data['CustomerName']"/>
-                            <br/>
-                            <strong>Customer Address:</strong> <span t-esc="data['CustomerAddress']"/>
-                            <br/>
-                            <span t-esc="data['CustomerAddress2']"/>
-                            <br/>
-                            <strong>Customer Contact:</strong> <span t-esc="data['CustomerContact']"/>
-                        </div>
-                        <div class="col-6">
-                            <strong>Property Name:</strong> <span t-esc="data['PropertyName']"/>
-                            <br/>
-                            <strong>Sale Price:</strong> <span t-esc="data['SalePrice']"/>
-                            <br/>
-                            <strong>Down Payment:</strong> <span t-esc="data['DownPayment']"/>
-                            <br/>
-                            <strong>Remaining Balance:</strong> <span t-esc="data['RemainingBalance']"/>
-                            <br/>
-                            <strong>DLD Fee:</strong> <span t-esc="data['DLD_Fee']"/>
-                            <br/>
-                            <strong>Number of Installments:</strong> <span t-esc="data['NoOfInstallments']"/>
-                            <br/>
-                            <strong>Amount Per Installment:</strong> <span t-esc="data['AmountPerInstallment']"/>
-                            <br/>
-                            <strong>Start Date:</strong> <span t-esc="data['StartDate']"/>
-                        </div>
+    <template id="report_property_sale_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+            <div class="page">
+                <h2>Property Sale Report</h2>
+                <div class="row mt32 mb32">
+                    <div class="col-6">
+                        <strong>Sale Name:</strong> <span t-field="doc.name"/><br/>
+                        <strong>Sale Reference:</strong> <span t-field="doc.name"/><br/>
+                        <strong>Customer Name:</strong> <span t-field="doc.partner_id.name"/><br/>
+                        <strong>Customer Address:</strong> <span t-field="doc.partner_id.contact_address"/><br/>
+                        <strong>Customer Contact:</strong> <span t-field="doc.partner_id.phone"/>
                     </div>
-                    <h3>Installment Details</h3>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Serial Number</th>
-                                <th>Collection Date</th>
-                                <th>Capital Repayment</th>
-                                <th>Remaining Capital</th>
-                                <th>Collection Status</th>
-                                <th>Line Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="docs" t-as="line">
-                                <tr>
-                                    <td><span t-esc="line['serial_number']"/></td>
-                                    <td><span t-esc="line['collection_date']"/></td>
-                                    <td><span t-esc="line['capital_repayment']"/></td>
-                                    <td><span t-esc="line['remaining_capital']"/></td>
-                                    <td><span t-esc="line['collection_status']"/></td>
-                                    <td><span t-esc="line['line_type']"/></td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                    <div class="col-6">
+                        <strong>Property Name:</strong> <span t-field="doc.property_id.name"/><br/>
+                        <strong>Sale Price:</strong> <span t-field="doc.property_value" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                        <strong>Down Payment:</strong> <span t-field="doc.down_payment" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                        <strong>Remaining Balance:</strong> <span t-field="doc.remaining_balance" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                        <strong>DLD Fee:</strong> <span t-field="doc.dld_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                        <strong>Number of Installments:</strong> <span t-field="doc.no_of_installments"/><br/>
+                        <strong>Amount Per Installment:</strong> <span t-field="doc.amount_per_installment" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                        <strong>Start Date:</strong> <span t-field="doc.start_date"/>
+                    </div>
                 </div>
+                <h3>Installment Details</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th>
+                            <th>Collection Date</th>
+                            <th>Capital Repayment</th>
+                            <th>Remaining Capital</th>
+                            <th>Collection Status</th>
+                            <th>Line Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.installment_ids" t-as="line">
+                            <tr>
+                                <td><span t-field="line.name"/></td>
+                                <td><span t-field="line.date"/></td>
+                                <td><span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                <td><span t-field="line.remaining_balance" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                <td><span t-field="line.state"/></td>
+                                <td><span t-field="line.line_type"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_property_sale">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="property_management.report_property_sale_document" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
     </template>
+
+    <record id="action_report_property_sale" model="ir.actions.report">
+        <field name="name">Property Sale Report</field>
+        <field name="model">property.sale</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">property_management.report_property_sale</field>
+        <field name="report_file">property_management.report_property_sale</field>
+        <field name="binding_model_id" ref="model_property_sale"/>
+        <field name="binding_type">report</field>
+    </record>
 </odoo>
