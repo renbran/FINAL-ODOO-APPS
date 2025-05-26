@@ -16,10 +16,14 @@
         'security/ir.model.access.csv',
         'views/property_sale_views.xml',
         'views/property_property_views.xml',
+        'views/property_sale_offer_views.xml',
         'views/account_move_views.xml',
-        'views/broker_commission.xml',  # Add the new broker commission views
+        'views/broker_commission_views.xml',  # Add the new broker commission views
         'reports/property_sale_management.xml',
-        'reports/property_sale_report_template.xml',
+        'reports/report_property_sale.xml',
+        'reports/report_property_sale_offer.xml',
+        'reports/property_sale_report_templates.xml',
+        'reports/action_report.xml',
     ],
     'application': True,
     'installable': True,
