@@ -66,7 +66,7 @@ class PropertySaleOffer(models.Model):
     expiration_date = fields.Date(
         string='Expiration Date',
         required=True,
-        default=lambda: (datetime.now() + timedelta(days=14)).date(),
+        default=lambda self: (datetime.now() + timedelta(days=14)).date(),
         tracking=True
     )
     
