@@ -31,7 +31,9 @@
                     <field name="sale_rent"/>
                     <field name="status"/>
                     <field name="payment_progress" widget="progressbar"/>
-                    <field name="state" invisible="1"/>
+                    <field name="state">
+                        <attribute name="invisible">1</attribute>
+                    </field>
                 </tree>
             </field>
         </record>
@@ -42,14 +44,15 @@
             <field name="arch" type="xml">
                 <form string="Property">
                     <header>
-                        <button name="action_create_sale" string="Create Sale" type="object" 
-                                class="oe_highlight" options="{'invisible': [('state', '=', 'sold')]}"/>
+                        <button name="action_create_sale" string="Create Sale" type="object" class="oe_highlight">
+                            <attribute name="invisible">state == 'sold'</attribute>
+                        </button>
                         <field name="state" widget="statusbar" statusbar_visible="available,reserved,booked,sold"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button name="action_view_sales" type="object" class="oe_stat_button" icon="fa-money"
-                                    options="{'invisible': [('sale_count', '=', 0)]}">
+                            <button name="action_view_sales" type="object" class="oe_stat_button" icon="fa-money">
+                                <attribute name="invisible">sale_count == 0</attribute>
                                 <field name="sale_count" widget="statinfo" string="Sales"/>
                             </button>
                         </div>
@@ -57,10 +60,11 @@
                             <h1>
                                 <field name="name" placeholder="Property Name"/>
                             </h1>
-                            <div options="{'invisible': [('payment_progress', '=', 0)]}" class="mt-2">
+                            <div class="mt-2">
+                                <attribute name="invisible">payment_progress == 0</attribute>
                                 <label for="payment_progress" string="Payment Progress"/>
                                 <field name="payment_progress" widget="progressbar" 
-                                       options="{'title': 'Payment Progress', 'editable': false}"/>
+                                       options='{"title": "Payment Progress", "editable": false}'/>
                             </div>
                         </div>
                         <group>
@@ -77,18 +81,19 @@
                                 <field name="total_sqft"/>
                                 <field name="price_per_sqft"/>
                                 <field name="total_sale_value"/>
-                                <field name="property_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="currency_id" options="{'no_create': True}"/>
+                                <field name="property_price" widget="monetary" options='{"currency_field": "currency_id"}'/>
+                                <field name="currency_id" options='{"no_create": true}'/>
                                 <field name="sale_rent"/>
-                                <field name="revenue_account_id" options="{'no_create': True}"/>
+                                <field name="revenue_account_id" options='{"no_create": true}'/>
                             </group>
                         </group>
-                        <group string="Payment Details" options="{'invisible': [('state', '!=', 'sold')]}">
+                        <group string="Payment Details">
+                            <attribute name="invisible">state != 'sold'</attribute>
                             <group>
                                 <field name="partner_id" string="Customer"/>
-                                <field name="total_invoiced" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="total_paid" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="remaining_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="total_invoiced" widget="monetary" options='{"currency_field": "currency_id"}'/>
+                                <field name="total_paid" widget="monetary" options='{"currency_field": "currency_id"}'/>
+                                <field name="remaining_amount" widget="monetary" options='{"currency_field": "currency_id"}'/>
                             </group>
                             <group>
                                 <field name="active_sale_id" readonly="1"/>
@@ -103,8 +108,8 @@
                             </page>
                             <page string="Images">
                                 <group>
-                                    <field name="property_image" widget="image" options="{'no_create': True}"/>
-                                    <field name="floor_plan" widget="image" options="{'no_create': True}"/>
+                                    <field name="property_image" widget="image" options='{"no_create": true}'/>
+                                    <field name="floor_plan" widget="image" options='{"no_create": true}'/>
                                 </group>
                             </page>
                         </notebook>
