@@ -9,7 +9,7 @@
                 <field name="property_order_id" readonly="1" options="{'invisible': [('property_order_id', '=', False)]}"/>
                 <field name="property_rental_id" readonly="1" options="{'invisible': [('property_rental_id', '=', False)]}"/>
                 <field name="broker_commission_id" readonly="1" options="{'invisible': [('broker_commission_id', '=', False)]}"/>
-                <field name="property_offer_id" readonly="1" options="{'invisible': [('property_offer_id', '=', False)]}"/>
+                <field name="property_sale_offer_id" readonly="1" invisible="not property_sale_offer_id"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_property_sale" type="object" class="oe_stat_button" icon="fa-home"
@@ -19,7 +19,7 @@
                     </div>
                 </button>
                 <button name="action_view_property_offer" type="object" class="oe_stat_button" icon="fa-handshake-o"
-                        options="{'invisible': [('property_offer_id', '=', False)]}">
+                        options="{'invisible': [('property_sale_offer_id', '=', False)]}">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Property Offer</span>
                     </div>

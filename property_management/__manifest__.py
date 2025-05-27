@@ -22,7 +22,7 @@
         'reports/property_sale_management.xml',
         'reports/report_property_sale.xml',
         'reports/report_property_sale_offer.xml',
-        'reports/property_sale_report_templates.xml',
+        'reports/property_sale_report_template.xml',
         'reports/action_report.xml',
     ],
     'application': True,
