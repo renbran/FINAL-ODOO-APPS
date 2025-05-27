@@ -27,11 +27,12 @@
         'reports/action_report.xml',
     ],
     'assets': {
-    'web.assets_backend': [
-        'property_management/static/src/js/property_management.js',
-        'property_management/static/src/scss/property_management.scss',
-    ],
-},
+        'web.assets_backend': [
+            'property_management/static/src/js/property_status_widget.js',
+            'property_management/static/src/scss/property_management.scss',
+            'property_management/static/src/xml/property_status_widget.xml',
+        ],
+    },
     'application': True,
     'installable': True,
     'license': 'LGPL-3',

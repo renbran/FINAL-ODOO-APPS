@@ -1,10 +1,10 @@
-/* Custom styling for property management */
-.property-management {
-    .oe_button_box {
-        .oe_stat_button {
+/* Custom styling for property management in Odoo 17 */
+.o_property_management {
+    .o_button_box {
+        .o_stat_button {
             .o_stat_info {
                 .o_stat_value {
-                    color: lch(44.9% 86.27 37.88);
+                    color: lch(44.9% 86.27 37.88); // Custom orange color
                 }
             }
         }
@@ -13,9 +13,23 @@
     .payment-progress-bar {
         .o_progressbar {
             height: 20px;
+            margin: 8px 0;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+            
             .o_progressbar_progress {
-                background-color: #000202;
+                background-color: #000202; // Dark progress bar
+                border-radius: 4px;
+                transition: width 0.3s ease;
             }
         }
+    }
+    
+    // Status widget styling
+    .o_field_property_status {
+        .text-success { color: #28a745; } // Available
+        .text-warning { color: #ffc107; } // Reserved
+        .text-danger { color: #dc3545; }  // Sold
+        .fw-bold { font-weight: bold; }
     }
 }
