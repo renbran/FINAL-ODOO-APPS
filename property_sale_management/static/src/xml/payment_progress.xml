@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="property_sale_management.PaymentProgress" owl="1">
+        <div class="o_payment_progress progress" role="progressbar">
+            <div class="o_payment_progress_bar progress-bar" 
+                 t-att-style="{'width': progressPercentage + '%'}"
+                 t-att-aria-valuenow="progressPercentage"
+                 t-att-aria-valuemin="0"
+                 t-att-aria-valuemax="max">
+                <span class="o_payment_progress_text">
+                    <t t-esc="formattedValue"/>
+                </span>
+            </div>
+        </div>
+    </t>
+</templates>

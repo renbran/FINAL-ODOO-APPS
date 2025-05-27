@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="property_sale_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Property Sale Report</h2>
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <strong>Sale Reference:</strong> <span t-field="doc.name"/>
+                            <br/>
+                            <strong>Customer:</strong> <span t-field="doc.partner_id"/>
+                            <br/>
+                            <strong>Property:</strong> <span t-field="doc.property_id"/>
+                            <br/>
+                            <strong>Sale Price:</strong> <span t-field="doc.sale_price"/>
+                            <br/>
+                            <strong>Down Payment:</strong> <span t-field="doc.down_payment"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>Remaining Balance:</strong> <span t-field="doc.remaining_balance"/>
+                            <br/>
+                            <strong>DLD Fee:</strong> <span t-field="doc.dld_fee"/>
+                            <br/>
+                            <strong>Number of Installments:</strong> <span t-field="doc.no_of_installments"/>
+                            <br/>
+                            <strong>Amount per Installment:</strong> <span t-field="doc.amount_per_installment"/>
+                            <br/>
+                            <strong>Start Date:</strong> <span t-field="doc.start_date"/>
+                        </div>
+                    </div>
+                    <h3 class="mt-4">Installment Schedule</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Collection Date</th>
+                                <th>Capital Repayment</th>
+                                <th>Remaining Capital</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.sale_line_ids" t-as="line">
+                                <td><span t-field="line.serial_number"/></td>
+                                <td><span t-field="line.collection_date"/></td>
+                                <td><span t-field="line.capital_repayment"/></td>
+                                <td><span t-field="line.remaining_capital"/></td>
+                                <td><span t-field="line.collection_status"/></td>
+                                <td><span t-field="line.line_type"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
