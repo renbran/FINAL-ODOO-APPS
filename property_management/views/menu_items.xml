@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Main menu item -->
+        <!-- Root menu for Property Management -->
         <menuitem id="menu_property_management_root"
                   name="Property Sale Management"
                   web_icon="property_management,static/description/icon.png"
@@ -31,7 +31,8 @@
                   action="action_property_sale"
                   sequence="10"/>
 
-        <!-- Offers Menu -->
+        <!-- Offers Menu: This section is responsible for managing property sale offers, 
+             including listing and handling offers made on properties. -->
         <menuitem id="menu_property_management_offers"
                   name="Offers"
                   parent="menu_property_management_root"
@@ -42,23 +43,5 @@
                   parent="menu_property_management_offers"
                   action="action_property_sale_offer"
                   sequence="10"/>
-
-        <!-- Reports Menu -->
-        <menuitem id="menu_property_management_reports"
-                  name="Reports"
-                  parent="menu_property_management_root"
-                  sequence="50"/>
-
-        <menuitem id="menu_property_sale_report"
-                  name="Sale Report"
-                  parent="menu_property_management_reports"
-                  action="action_property_sale_report"
-                  sequence="10"/>
-
-        <menuitem id="menu_property_sale_offer_report"
-                  name="Sale Offer Report"
-                  parent="menu_property_management_reports"
-                  action="action_property_sale_offer_report"
-                  sequence="20"/>
     </data>
 </odoo>
