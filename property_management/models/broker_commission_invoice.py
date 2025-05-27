@@ -7,29 +7,38 @@ class BrokerCommissionInvoice(models.Model):
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    property_sale_id = fields.Many2one('property.sale', string="Property Sale", required=True)
-    property_sale_offer_id = fields.Many2one('property.sale.offer', string="Property Offer")
-    seller_id = fields.Many2one('res.partner', string="Seller/Broker", required=True, domain=[('is_company', '=', True)])
-    commission_percentage = fields.Float(string="Commission Percentage", digits=(5, 2))
-    commission_amount = fields.Monetary(string="Commission Amount", currency_field='currency_id')
-    currency_id = fields.Many2one(related='property_sale_id.currency_id', string="Currency", readonly=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
-    
-    # One2many field for invoices
-    invoice_ids = fields.One2many('account.move', 'broker_commission_id', string="Invoices", readonly=True)
-
+    property_sale_id = fields.Many2one(
+        'property.sale', string="Property Sale", required=True, tracking=True)
+    property_sale_offer_id = fields.Many2one(
+        'property.sale.offer', string="Property Offer")
+    seller_id = fields.Many2one(
+        'res.partner', string="Seller/Broker", required=True, domain=[('is_company', '=', True)], tracking=True)
+    commission_percentage = fields.Float(
+        string="Commission Percentage", digits=(5, 2))
+    commission_amount = fields.Monetary(
+        string="Commission Amount", currency_field='currency_id')
+    currency_id = fields.Many2one(
+        related='property_sale_id.currency_id', string="Currency", readonly=True, store=True)
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.company, readonly=True)
+    invoice_ids = fields.One2many(
+        'account.move', 'broker_commission_id', string="Invoices", readonly=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('invoiced', 'Invoiced'),
         ('cancelled', 'Cancelled')
     ], string="State", default='draft', tracking=True)
-
-    display_name = fields.Char(string="Reference", compute='_compute_display_name', store=True)
-    total_invoiced = fields.Monetary(string="Invoiced Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
-    total_paid = fields.Monetary(string="Paid Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
-    invoice_count = fields.Integer(string="Invoice Count", compute='_compute_invoice_count')
-    payment_progress = fields.Float(string="Payment Progress (%)", compute="_compute_payment_info", store=True)
+    display_name = fields.Char(
+        string="Reference", compute='_compute_display_name', store=True)
+    total_invoiced = fields.Monetary(
+        string="Invoiced Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
+    total_paid = fields.Monetary(
+        string="Paid Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
+    invoice_count = fields.Integer(
+        string="Invoice Count", compute='_compute_invoice_count', store=True)
+    payment_progress = fields.Float(
+        string="Payment Progress (%)", compute="_compute_payment_info", store=True)
     payment_state = fields.Selection([
         ('not_invoiced', 'Not Invoiced'),
         ('not_paid', 'Not Paid'),
@@ -49,27 +58,24 @@ class BrokerCommissionInvoice(models.Model):
     def _compute_payment_info(self):
         for record in self:
             invoices = record.invoice_ids.filtered(lambda i: i.state == 'posted')
+            total_invoiced = sum(invoices.mapped('amount_total'))
+            total_paid = total_invoiced - sum(invoices.mapped('amount_residual'))
+            record.total_invoiced = total_invoiced
+            record.total_paid = total_paid
+            record.payment_progress = (total_paid / total_invoiced * 100) if total_invoiced else 0
             if not invoices:
-                record.total_invoiced = 0
-                record.total_paid = 0
-                record.payment_progress = 0
                 record.payment_state = 'not_invoiced'
+            elif total_paid == 0:
+                record.payment_state = 'not_paid'
+            elif total_paid < total_invoiced:
+                record.payment_state = 'partial'
             else:
-                record.total_invoiced = sum(invoices.mapped('amount_total'))
-                record.total_paid = sum(invoices.mapped('amount_total')) - sum(invoices.mapped('amount_residual'))
-                
-                if record.total_invoiced > 0:
-                    record.payment_progress = (record.total_paid / record.total_invoiced) * 100
-                else:
-                    record.payment_progress = 0
-                
-                # Determine payment state
-                if record.total_paid == 0:
-                    record.payment_state = 'not_paid'
-                elif record.total_paid < record.total_invoiced:
-                    record.payment_state = 'partial'
-                else:
-                    record.payment_state = 'paid'
+                record.payment_state = 'paid'
+
+    @api.depends('invoice_ids')
+    def _compute_invoice_count(self):
+        for record in self:
+            record.invoice_count = len(record.invoice_ids)
 
     def action_confirm(self):
         for record in self:
@@ -109,8 +115,6 @@ class BrokerCommissionInvoice(models.Model):
             'broker_commission_id': self.id,
             'property_order_id': self.property_sale_id.id,
         }
-
-        # If this commission is related to an offer, link it
         if self.property_sale_offer_id:
             invoice_vals['property_sale_offer_id'] = self.property_sale_offer_id.id
 
@@ -128,11 +132,6 @@ class BrokerCommissionInvoice(models.Model):
             'target': 'current',
         }
 
-    @api.depends('invoice_ids')
-    def _compute_invoice_count(self):
-        for record in self:
-            record.invoice_count = len(record.invoice_ids)
-
     def action_view_invoices(self):
         self.ensure_one()
         return {
@@ -144,9 +143,8 @@ class BrokerCommissionInvoice(models.Model):
             'context': {'create': False},
             'target': 'current',
         }
-        
+
     def action_view_property_sale(self):
-        """View related property sale"""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -156,13 +154,11 @@ class BrokerCommissionInvoice(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
-        
+
     def action_view_property_offer(self):
-        """View related property offer"""
         self.ensure_one()
         if not self.property_sale_offer_id:
             raise UserError(_("No property offer linked to this commission."))
-            
         return {
             'type': 'ir.actions.act_window',
             'name': _('Property Offer'),
