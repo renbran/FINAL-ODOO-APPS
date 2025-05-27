@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="property_management.PropertyStatusWidget" owl="1">
-        <span t-attf-class="o_field_property_status {{statusClass}} fw-bold">
-            <t t-esc="props.value"/>
-        </span>
+        <t t-if="props.value">
+            <span t-attf-class="o_field_property_status {{statusClass}} fw-bold">
+                <t t-esc="props.value"/>
+            </span>
+        </t>
+        <t t-else="">
+            <span class="text-muted">N/A</span>
+        </t>
     </t>
 </templates>

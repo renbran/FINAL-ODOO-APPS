@@ -5,14 +5,16 @@ import { CharField } from "@web/views/fields/char/char_field";
 
 export class PropertyStatusWidget extends CharField {
     static template = "property_management.PropertyStatusWidget";
-    
+
     setup() {
         super.setup();
     }
 
     get statusClass() {
-        if (!this.props.value) return "";
-        const status = this.props.value.toLowerCase();
+        const value = this.props.value;
+        if (typeof value !== 'string') return "";  // Defensive check
+
+        const status = value.toLowerCase();
         const classes = {
             "available": "text-success",
             "reserved": "text-warning",
