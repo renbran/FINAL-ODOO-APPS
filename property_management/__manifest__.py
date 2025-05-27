@@ -14,7 +14,7 @@
     'depends': ['base', 'mail', 'account'],
     'data': [
         'security/ir.model.access.csv',
-        'views/menu_views.xml',
+        'views/menu_items.xml',
         'views/property_sale_views.xml',
         'views/property_property_views.xml',
         'views/property_sale_offer_views.xml',
