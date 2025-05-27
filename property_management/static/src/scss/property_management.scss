@@ -1,0 +1,21 @@
+/* Custom styling for property management */
+.property-management {
+    .oe_button_box {
+        .oe_stat_button {
+            .o_stat_info {
+                .o_stat_value {
+                    color: #875A7B;
+                }
+            }
+        }
+    }
+    
+    .payment-progress-bar {
+        .o_progressbar {
+            height: 20px;
+            .o_progressbar_progress {
+                background-color: #21B799;
+            }
+        }
+    }
+}
