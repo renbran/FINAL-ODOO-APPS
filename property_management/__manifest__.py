@@ -24,6 +24,7 @@
         'reports/report_property_sale_offer.xml',
         'reports/property_sale_report_template.xml',
         'reports/action_report.xml',
+        'views/action_menu.xml',
         'views/menu_items.xml',
     ],
     'assets': {
