@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- Report Action -->
-        <record id="action_report_property_detail" model="ir.actions.report">
-            <field name="name">Property Detail Report</field>
-            <field name="model">estate.property</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">odoo_real_estate.property_detail_report_template</field>
-            <field name="report_file">odoo_real_estate.property_detail_report_template</field>
-            <field name="binding_model_id" ref="model_estate_property"/>
-            <field name="binding_type">report</field>
-            <field name="paperformat_id" ref="base.paperformat_euro"/>
-        </record>
-    </data>
+    <record id="action_report_property_detail" model="ir.actions.report">
+        <field name="name">Property Detail Report</field>
+        <field name="model">property.sale.offer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">property_sale_management.property_offer_report_template</field>
+        <field name="report_file">property_sale_management.property_offer_report_template</field>
+        <field name="binding_model_id" ref="model_property_sale_offer"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
 </odoo>
