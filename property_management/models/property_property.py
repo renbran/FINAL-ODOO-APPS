@@ -71,7 +71,7 @@ class PropertyProperty(models.Model):
 
     status = fields.Char(
         string="Status Display", 
-        compute="_compute_status", 
+        compute='_compute_status', 
         store=True
     )
 
@@ -83,28 +83,28 @@ class PropertyProperty(models.Model):
     )
     total_invoiced = fields.Monetary(
         string="Total Invoiced", 
-        compute="_compute_payment_details", 
+        compute='_compute_payment_details', 
         store=True
     )
     total_paid = fields.Monetary(
         string="Total Received", 
-        compute="_compute_payment_details", 
+        compute='_compute_payment_details', 
         store=True
     )
     remaining_amount = fields.Monetary(
         string="Pending Amount", 
-        compute="_compute_payment_details", 
+        compute='_compute_payment_details', 
         store=True
     )
 
     # Smart Counters
     offer_count = fields.Integer(
         string="Offers Count", 
-        compute="_compute_offer_count"
+        compute='_compute_offer_count'
     )
     sale_count = fields.Integer(
         string="Sales Count", 
-        compute="_compute_sale_count"
+        compute='_compute_sale_count'
     )
 
     # Accounting
@@ -116,18 +116,18 @@ class PropertyProperty(models.Model):
             ('account_type', '=', 'income'),
             ('name', 'ilike', 'sales')
         ], limit=1),
-        context="{'no_create': True}"
+        context={'no_create': True}
     )
     
     # Project Information
     project_name = fields.Char(
         string="Project Name", 
-        default="Sky Hills Astra"
+        default='Sky Hills Astra'
     )
     active_sale_id = fields.Many2one(
         'property.sale', 
         string="Active Sale", 
-        compute="_compute_active_sale"
+        compute='compute_active_sale'
     )
     broker_commission_count = fields.Integer(
     string="Commission Count", 

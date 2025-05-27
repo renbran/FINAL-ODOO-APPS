@@ -25,6 +25,12 @@
         'reports/property_sale_report_template.xml',
         'reports/action_report.xml',
     ],
+    'assets': {
+    'web.assets_backend': [
+        'property_management/static/src/js/property_management.js',
+        'property_management/static/src/scss/property_management.scss',
+    ],
+},
     'application': True,
     'installable': True,
     'license': 'LGPL-3',
