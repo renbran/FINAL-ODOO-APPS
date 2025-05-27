@@ -78,6 +78,12 @@ class PropertySale(models.Model):
         for record in self:
             record.dld_fee = 0.04 * record.property_value
 
+    @api.constrains('broker_commission_percentage', 'seller_name')
+    def _check_broker_commission(self):
+        for sale in self:
+            if sale.broker_commission_percentage > 0 and not sale.seller_name:
+                raise ValidationError(_("Seller/Broker must be set when commission percentage is greater than 0"))
+
     @api.depends('total_selling_price', 'down_payment', 'dld_fee', 'admin_fee')
     def _compute_remaining_balance(self):
         for record in self:

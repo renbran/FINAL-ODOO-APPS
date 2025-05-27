@@ -28,6 +28,7 @@ class BrokerCommissionInvoice(models.Model):
     display_name = fields.Char(string="Reference", compute='_compute_display_name', store=True)
     total_invoiced = fields.Monetary(string="Invoiced Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
     total_paid = fields.Monetary(string="Paid Amount", compute="_compute_payment_info", store=True, currency_field='currency_id')
+    invoice_count = fields.Integer(string="Invoice Count", compute='_compute_invoice_count')
     payment_progress = fields.Float(string="Payment Progress (%)", compute="_compute_payment_info", store=True)
     payment_state = fields.Selection([
         ('not_invoiced', 'Not Invoiced'),
@@ -127,17 +128,20 @@ class BrokerCommissionInvoice(models.Model):
             'target': 'current',
         }
 
+    @api.depends('invoice_ids')
+    def _compute_invoice_count(self):
+        for record in self:
+            record.invoice_count = len(record.invoice_ids)
+
     def action_view_invoices(self):
         self.ensure_one()
-        if not self.invoice_ids:
-            raise UserError(_("No invoices found for this commission."))
-            
         return {
             'type': 'ir.actions.act_window',
             'name': _('Invoices'),
             'res_model': 'account.move',
             'view_mode': 'tree,form',
             'domain': [('id', 'in', self.invoice_ids.ids)],
+            'context': {'create': False},
             'target': 'current',
         }
         

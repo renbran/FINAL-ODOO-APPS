@@ -321,6 +321,27 @@ class PropertySaleOffer(models.Model):
         self.property_sale_id = sale.id
         self.property_id.write({'state': 'reserved', 'partner_id': self.partner_id.id})
         return sale
+    
+    def action_generate_broker_commission(self):
+        self.ensure_one()
+        if not self.seller_id:
+            raise UserError(_("Please specify a seller/broker before generating a commission."))
+        
+        commission = self.env['broker.commission.invoice'].create({
+            'property_sale_offer_id': self.id,
+            'property_sale_id': self.property_sale_id.id if self.property_sale_id else False,
+            'seller_id': self.seller_id.id,
+            'commission_percentage': self.broker_commission_percentage,
+            'commission_amount': self.broker_commission_amount,
+        })
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'broker.commission.invoice',
+            'res_id': commission.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def action_view_broker_commissions(self):
         """View broker commissions related to this offer"""

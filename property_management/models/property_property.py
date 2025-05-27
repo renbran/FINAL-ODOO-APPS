@@ -127,6 +127,10 @@ class PropertyProperty(models.Model):
         string="Active Sale", 
         compute="_compute_active_sale"
     )
+    broker_commission_count = fields.Integer(
+    string="Commission Count", 
+    compute='_compute_broker_commission_count'
+    )
 
     # Computed Methods
     @api.depends('total_sqft', 'property_price')
@@ -138,6 +142,13 @@ class PropertyProperty(models.Model):
     def _compute_total_sale_value(self):
         for prop in self:
             prop.total_sale_value = prop.total_sqft * prop.price_per_sqft
+    def _compute_broker_commission_count(self):
+        for prop in self:
+            prop.broker_commission_count = len(
+                self.env['broker.commission.invoice'].search([
+                    ('property_sale_id.property_id', '=', prop.id)
+                ])
+            )
 
     @api.depends('state')
     def _compute_status(self):
