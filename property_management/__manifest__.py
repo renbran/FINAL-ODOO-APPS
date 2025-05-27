@@ -19,7 +19,6 @@
         'views/property_sale_offer_views.xml',
         'views/broker_commission_views.xml',
         'reports/property_sale_management.xml',
-        'reports/property_report_template.xml',
         'reports/report_property_sale.xml',
         'reports/report_property_sale_offer.xml',
         'reports/action_report.xml',
