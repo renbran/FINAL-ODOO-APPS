@@ -111,12 +111,14 @@ class PropertyProperty(models.Model):
     revenue_account_id = fields.Many2one(
         'account.account',
         string="Revenue Account",
-        required=True,
+        domain=[('account_type', '=', 'income')],
         default=lambda self: self.env['account.account'].search([
-            ('name', '=', 'Sales Account')
-        ], limit=1)
+            ('account_type', '=', 'income'),
+            ('name', 'ilike', 'sales')
+        ], limit=1),
+        context="{'no_create': True}"
     )
-
+    
     # Project Information
     project_name = fields.Char(
         string="Project Name", 
