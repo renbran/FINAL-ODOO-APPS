@@ -4,7 +4,7 @@
         .oe_stat_button {
             .o_stat_info {
                 .o_stat_value {
-                    color: #875A7B;
+                    color: lch(44.9% 86.27 37.88);
                 }
             }
         }
@@ -14,7 +14,7 @@
         .o_progressbar {
             height: 20px;
             .o_progressbar_progress {
-                background-color: #21B799;
+                background-color: #000202;
             }
         }
     }
