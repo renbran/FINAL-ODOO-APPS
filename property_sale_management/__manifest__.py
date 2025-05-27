@@ -20,26 +20,25 @@
         'mail',
         'account',
         'contacts',
+        'purchase',
         'sale_management',
     ],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
-        'views/menu_items.xml',
         'views/property_property_views.xml',
+        'views/property_sale_offer_views.xml',
         'views/property_sale_views.xml',
         'views/internal_commission_views.xml',
         'views/broker_commission_views.xml',
         'views/internal_commission_purchase_views.xml',
         'views/account_move_views.xml',
         'views/res_partner_views.xml',
+        'views/property_offer_views.xml',  # Add this line
         'reports/property_sale_report.xml',
         'reports/property_offer_report.xml',
         'reports/property_report.xml',
         'reports/property_sale_management.xml',
-    ],
-    'demo': [
-        'demo/property_demo.xml',
     ],
     'assets': {
         'web.assets_backend': [

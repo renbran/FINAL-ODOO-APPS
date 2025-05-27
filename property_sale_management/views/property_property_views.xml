@@ -1,357 +1,222 @@
-Certainly! I'll modify the `Property` model and provide the updated full code for both the model and its related view. Here's the enhanced version:
-
-**File: d:\RUNNING APPS\ready production\property_sale_management\models\property_property.py**
-
-```python
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
-from dateutil.relativedelta import relativedelta
-
-class Property(models.Model):
-    _name = 'property.property'
-    _description = 'Property Details'
-    _order = 'name'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-
-    name = fields.Char(string="Property Name", required=True, tracking=True)
-    property_image = fields.Image("Property Image")
-    floor_plan = fields.Image("Floor Plan")
-    interior_image = fields.Image("Interior View")
-    amenities_image = fields.Image("Amenities")
-    
-    partner_id = fields.Many2one('res.partner', string="Partner", tracking=True)
-    property_price = fields.Monetary(string="Property Price", required=True, default=0.0, tracking=True)
-    revenue_account_id = fields.Many2one('account.account', string="Revenue Account", required=True, 
-                                        default=lambda self: self.env['account.account'].search([('name', '=', 'Sales Account')], limit=1))
-    expense_account_id = fields.Many2one('account.account', string="Expense Account", required=True, 
-                                        default=lambda self: self.env['account.account'].search([('name', '=', 'Expense Account')], limit=1))
-
-    address = fields.Text(string="Address")
-    sale_rent = fields.Selection([
-        ('for_sale', 'For Sale'),
-        ('for_rent', 'For Rent'),
-    ], string="Sale or Rent", required=True, tracking=True)
-    state = fields.Selection([
-        ('available', 'Available'),
-        ('reserved', 'Reserved'),
-        ('booked', 'Booked'),
-        ('sold', 'Sold')
-    ], string="State", default='available', required=True, tracking=True)
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id)
-    description = fields.Text(string="Description")
-    
-    property_sale_ids = fields.One2many('property.sale', 'property_id', string="Related Sales")
-    sale_count = fields.Integer(string="Sale Count", compute="_compute_sale_count")
-    
-    payment_progress = fields.Float(string="Payment Progress (%)", compute="_compute_payment_progress", store=True)
-    total_invoiced = fields.Monetary(compute='_compute_payment_details', store=True)
-    total_paid = fields.Monetary(string="Total Paid", compute="_compute_payment_details", store=True)
-    remaining_amount = fields.Monetary(string="Remaining Amount", compute="_compute_payment_details", store=True)
-    active_sale_id = fields.Many2one('property.sale', string="Active Sale", compute="_compute_active_sale", store=True)
-    
-    field_id = fields.Integer(string="ID")
-    property_reference = fields.Char(string="Property Reference", tracking=True)
-    status = fields.Char(string="Status", compute="_compute_status", store=True)
-    tower = fields.Char(string="Tower")
-    level = fields.Char(string="Level")
-    project_name = fields.Char(string="Project Name", default="Sky Hills Astra")
-    unit_no = fields.Char(string="Unit No")
-    unit_view = fields.Char(string="Unit View")
-    total_sqft = fields.Float(string="Total Sqft")
-    price_per_sqft = fields.Float(string="Price / Sqft")
-    total_sale_value = fields.Float(string="Total Sale Value", compute="_compute_total_sale_value", store=True, default=0.0)
-    property_type = fields.Char(string="Type")
-    
-    @api.depends('state')
-    def _compute_status(self):
-        for record in self:
-            record.status = dict(record._fields['state'].selection).get(record.state, 'Unknown')
-    
-    @api.depends('total_sqft', 'price_per_sqft')
-    def _compute_total_sale_value(self):
-        for record in self:
-            record.total_sale_value = record.total_sqft * record.price_per_sqft
-    
-    @api.depends('property_sale_ids')
-    def _compute_sale_count(self):
-        for record in self:
-            record.sale_count = len(record.property_sale_ids)
-    
-    @api.depends('property_sale_ids.state')
-    def _compute_active_sale(self):
-        for record in self:
-            active_sales = record.property_sale_ids.filtered(lambda s: s.state in ['confirm', 'invoiced'])
-            record.active_sale_id = active_sales[-1] if active_sales else False
-    
-    @api.depends('active_sale_id', 'active_sale_id.property_sale_line_ids.collection_status', 'property_sale_ids.state')
-    def _compute_payment_progress(self):
-        for record in self:
-            if record.active_sale_id:
-                all_lines = record.active_sale_id.property_sale_line_ids
-                if all_lines:
-                    total_amount = sum(all_lines.mapped('capital_repayment'))
-                    paid_amount = sum(all_lines.filtered(lambda l: l.collection_status == 'paid').mapped('capital_repayment'))
-                    record.payment_progress = (paid_amount / total_amount) * 100 if total_amount else 0.0
-                else:
-                    record.payment_progress = 0.0
-            else:
-                record.payment_progress = 0.0
-    
-    @api.depends('active_sale_id', 'active_sale_id.property_sale_line_ids.collection_status', 'property_sale_ids.state')
-    def _compute_payment_details(self):
-        for prop in self:
-            if prop.active_sale_id:
-                all_lines = prop.active_sale_id.property_sale_line_ids
-                paid_lines = all_lines.filtered(lambda l: l.collection_status == 'paid')
-                paid_amount = sum(paid_lines.mapped('capital_repayment'))
-                total_amount = sum(all_lines.mapped('capital_repayment'))
-                
-                prop.total_invoiced = total_amount
-                prop.total_paid = paid_amount
-                prop.remaining_amount = prop.active_sale_id.total_selling_price - paid_amount
-            else:
-                prop.total_invoiced = 0.0
-                prop.total_paid = 0.0
-                prop.remaining_amount = 0.0
-    
-    @api.model
-    def create(self, vals):
-        if not vals.get('property_reference'):
-            vals['property_reference'] = self.env['ir.sequence'].next_by_code('property.property.reference') or 'New'
-        return super(Property, self).create(vals)
-    
-    def write(self, vals):
-        res = super(Property, self).write(vals)
-        if 'state' in vals and vals['state'] == 'sold':
-            property_sale = self.env['property.sale'].search([('property_id', '=', self.id), ('state', '=', 'confirm')], limit=1)
-            if property_sale and property_sale.partner_id:
-                self.write({'partner_id': property_sale.partner_id.id})
-        return res
-    
-    def action_create_sale(self):
-        self.ensure_one()
-        sale = self.env['property.sale'].create({
-            'name': f"{self.name} - Sale",
-            'property_id': self.id,
-            'partner_id': self.partner_id.id if self.partner_id else False,
-            'start_date': fields.Date.today(),
-            'state': 'draft'
-        })
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Property Sale',
-            'res_model': 'property.sale',
-            'view_mode': 'form',
-            'res_id': sale.id,
-            'target': 'current',
-        }
-
-    def action_view_sales(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Property Sales',
-            'res_model': 'property.sale',
-            'view_mode': 'tree,form',
-            'domain': [('property_id', '=', self.id)],
-            'context': {'default_property_id': self.id},
-        }
-
-    def action_view_related_properties(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Related Properties',
-            'res_model': 'property.property',
-            'view_mode': 'tree,form,kanban',
-            'domain': [('project_name', '=', self.project_name), ('id', '!=', self.id)],
-            'context': {'search_default_group_by_project': 1},
-        }
-
-    @api.constrains('total_sqft', 'price_per_sqft')
-    def _check_positive_values(self):
-        for record in self:
-            if record.total_sqft < 0 or record.price_per_sqft < 0:
-                raise UserError(_("Total Sqft and Price per Sqft must be positive values."))
-```
-
-Now, let's create a view for this model:
-
-**File: d:\RUNNING APPS\ready production\property_sale_management\views\property_views.xml**
-
-```xml
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Main Property Form View -->
     <record id="view_property_form" model="ir.ui.view">
         <field name="name">property.property.form</field>
         <field name="model">property.property</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Property" class="property-form">
+                <!-- =========================== -->
+                <!-- Header: status & actions -->
+                <!-- =========================== -->
                 <header>
-                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
-                    <button name="action_create_sale" string="Create Sale" type="object" class="oe_highlight" options="{'invisible': [('state', 'in', ['sold', 'booked'])]}"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="available,reserved,booked,sold"
+                           statusbar_colors='{"available":"green","reserved":"blue","booked":"orange","sold":"red"}'/>
+
+                    <button name="action_generate_payment_schedule"
+                            string="Generate Payment Schedule"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="offer_date == False"
+                            groups="property_management.group_property_manager"/>
+
+                    <button name="action_create_sale"
+                            string="Create Sale"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'available'"
+                            groups="property_management.group_property_sales"/>
+
+                    <button name="action_view_sales"
+                            string="View Sales"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="sale_count == 0"/>
+
+                    <button name="action_print_offer"
+                            string="Print Offer"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-print"
+                            invisible="offer_date == False"/>
                 </header>
+
+                <!-- =========================== -->
+                <!-- Sheet Content -->
+                <!-- =========================== -->
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_sales" type="object" class="oe_stat_button" icon="fa-usd">
-                            <field name="sale_count" widget="statinfo" string="Sales"/>
-                        </button>
-                    </div>
-                    <field name="property_image" widget="image" class="oe_avatar"/>
+                    <!-- Title Section -->
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Property Name"/>
+                            <field name="name" placeholder="Property Name" class="oe_inline"/>
                         </h1>
+                        <div class="oe_kanban_global_click" invisible="payment_progress == 0">
+                            <field name="payment_progress" 
+                                   widget="progressbar" 
+                                   options="{'title': 'Payment Progress', 'editable': false}"/>
+                        </div>
                     </div>
+
+                    <!-- Key Information Group -->
                     <group>
-                        <group>
+                        <group string="Basic Information">
                             <field name="property_reference"/>
-                            <field name="partner_id"/>
-                            <field name="property_price"/>
-                            <field name="currency_id" options="{'no_create': True}"/>
-                            <field name="sale_rent"/>
-                            <field name="status"/>
-                        </group>
-                        <group>
                             <field name="project_name"/>
                             <field name="tower"/>
                             <field name="level"/>
                             <field name="unit_no"/>
-                            <field name="unit_view"/>
+                        </group>
+                        <group string="Pricing">
                             <field name="total_sqft"/>
                             <field name="price_per_sqft"/>
-                            <field name="total_sale_value"/>
+                            <field name="property_price"/>
+                            <field name="currency_id" options="{'no_create': True}"/>
+                            <field name="sale_rent"/>
                         </group>
                     </group>
+
+                    <!-- Notebook Tabs -->
                     <notebook>
-                        <page string="Description">
-                            <field name="description"/>
-                        </page>
-                        <page string="Images">
+                        <!-- Images &amp; Description Tab -->
+                        <page string="Media" name="media_tab">
                             <group>
-                                <field name="floor_plan" widget="image"/>
-                                <field name="interior_image" widget="image"/>
-                                <field name="amenities_image" widget="image"/>
+                                <group string="Images" col="2">
+                                    <field name="property_image" widget="image" 
+                                           options="{'preview_image': 'image_medium', 'zoom': true}"/>
+                                    <field name="floor_plan" widget="image" 
+                                           options="{'preview_image': 'image_medium', 'zoom': true}"/>
+                                </group>
+                                <group string="Description">
+                                    <field name="description" nolabel="1"/>
+                                </group>
                             </group>
                         </page>
-                        <page string="Payment Details" options="{'invisible': [('active_sale_id', '=', False)]}">
+
+                        <!-- Financial Details Tab -->
+                        <page string="Financials" name="financial_tab">
                             <group>
-                                <field name="active_sale_id"/>
-                                <field name="payment_progress" widget="progressbar"/>
-                                <field name="total_invoiced"/>
-                                <field name="total_paid"/>
-                                <field name="remaining_amount"/>
+                                <group string="Offer Details">
+                                    <field name="offer_date"/>
+                                    <field name="booking_amount" readonly="1"/>
+                                    <field name="dld_fee" readonly="1"/>
+                                    <field name="admin_fee"/>
+                                    <field name="total_with_fees" readonly="1"/>
+                                </group>
+                                <group string="Unit Details">
+                                    <field name="unit_view"/>
+                                    <field name="status" readonly="1"/>
+                                </group>
                             </group>
                         </page>
-                        <page string="Other Information">
-                            <group>
-                                <field name="revenue_account_id"/>
-                                <field name="expense_account_id"/>
-                                <field name="address"/>
-                            </group>
+
+                        <!-- Payment Schedule Tab -->
+                        <page string="Payments" name="payments_tab" invisible="not payment_schedule_ids">
+                            <field name="payment_schedule_ids" 
+                                   mode="tree,kanban" 
+                                   nolabel="1"
+                                   context="{'default_currency_id': currency_id}">
+                                <tree editable="bottom" decoration-info="due_date &gt; current_date" 
+                                      decoration-danger="due_date &lt; current_date and state != 'paid'">
+                                    <field name="installment_no" widget="handle"/>
+                                    <field name="due_date"/>
+                                    <field name="percentage"/>
+                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="state" widget="statusbar"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                                <kanban>
+                                    <field name="installment_no"/>
+                                    <field name="due_date"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_content">
+                                                <div>
+                                                    <strong>Installment: <field name="installment_no"/></strong>
+                                                </div>
+                                                <div>
+                                                    Due: <field name="due_date"/>
+                                                </div>
+                                                <div>
+                                                    Amount: <field name="amount"/>
+                                                </div>
+                                                <div>
+                                                    Status: <field name="state"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+
+                        <!-- Sales Tab -->
+                        <page string="Sales" name="sales_tab">
+                            <field name="property_sale_ids" 
+                                   mode="tree,form" 
+                                   nolabel="1"
+                                   context="{'default_property_id': id}">
+                                <tree>
+                                    <field name="sale_date"/>
+                                    <field name="customer_id"/>
+                                    <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
+
+                <!-- Chatter -->
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_follower_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="activity_ids" widget="kanban_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
             </form>
         </field>
     </record>
 
-    <record id="view_property_tree" model="ir.ui.view">
-        <field name="name">property.property.tree</field>
-        <field name="model">property.property</field>
+    <!-- Payment Schedule Tree View -->
+    <record id="view_property_payment_schedule_tree" model="ir.ui.view">
+        <field name="name">property.payment.schedule.tree</field>
+        <field name="model">property.payment.schedule</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="property_reference"/>
-                <field name="project_name"/>
-                <field name="unit_no"/>
-                <field name="property_price"/>
-                <field name="state"/>
-                <field name="payment_progress" widget="progressbar"/>
+            <tree string="Payment Schedule" decoration-info="due_date &gt; current_date" 
+                  decoration-danger="due_date &lt; current_date and state != 'paid'">
+                <field name="installment_no" widget="handle"/>
+                <field name="due_date"/>
+                <field name="percentage"/>
+                <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="state" widget="statusbar"/>
+                <field name="currency_id"/>
             </tree>
         </field>
     </record>
 
-    <record id="view_property_search" model="ir.ui.view">
-        <field name="name">property.property.search</field>
-        <field name="model">property.property</field>
+    <!-- Payment Schedule Form View -->
+    <record id="view_property_payment_schedule_form" model="ir.ui.view">
+        <field name="name">property.payment.schedule.form</field>
+        <field name="model">property.payment.schedule</field>
         <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="property_reference"/>
-                <field name="project_name"/>
-                <field name="partner_id"/>
-                <filter string="Available" name="available" domain="[('state', '=', 'available')]"/>
-                <filter string="Sold" name="sold" domain="[('state', '=', 'sold')]"/>
-                <group expand="0" string="Group By">
-                    <filter string="State" name="group_by_state" context="{'group_by': 'state'}"/>
-                    <filter string="Project" name="group_by_project" context="{'group_by': 'project_name'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
-
-    <record id="action_property" model="ir.actions.act_window">
-        <field name="name">Properties</field>
-        <field name="res_model">property.property</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="search_view_id" ref="view_property_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first property!
-            </p>
-        </field>
-    </record>
-
-    <menuitem id="menu_property"
-              name="Properties"
-              action="action_property"
-              parent="menu_property_management"
-              sequence="10"/>
-
-    <record id="view_property_kanban" model="ir.ui.view">
-        <field name="name">property.property.kanban</field>
-        <field name="model">property.property</field>
-        <field name="arch" type="xml">
-            <kanban>
-                <field name="id"/>
-                <field name="name"/>
-                <field name="property_reference"/>
-                <field name="property_price"/>
-                <field name="state"/>
-                <field name="payment_progress"/>
-                <field name="property_image"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_property_kanban">
-                            <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image: url(#{kanban_image('property.property', 'property_image', record.id.raw_value)})"/>
-                            <div class="oe_kanban_details">
-                                <strong class="o_kanban_record_title">
-                                    <field name="name"/>
-                                </strong>
-                                <div>
-                                    <field name="property_reference"/>
-                                </div>
-                                <div>
-                                    Price: <field name="property_price" widget="monetary"/>
-                                </div>
-                                <div>
-                                    Status: <field name="state"/>
-                                </div>
-                                <div t-if="record.payment_progress.raw_value > 0">
-                                    Payment Progress:
-                                    <field name="payment_progress" widget="progressbar"/>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
+            <form string="Payment Schedule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="installment_no"/>
+                            <field name="due_date"/>
+                            <field name="percentage"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="currency_id"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

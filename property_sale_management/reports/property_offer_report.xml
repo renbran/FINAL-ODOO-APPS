@@ -4,38 +4,178 @@
         <t t-call="web.external_layout">
             <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
             <div class="page">
-                <h2>Property Sale Offer</h2>
-                <div class="row mt32 mb32">
+                <!-- Header Section -->
+                <div class="row mb-4" style="border-bottom: 1px solid #eee; padding-bottom: 20px;">
                     <div class="col-6">
-                        <strong>Offer Reference:</strong> <span t-field="doc.name"/>
-                        <br/>
-                        <strong>Customer:</strong> <span t-field="doc.partner_id"/>
-                        <br/>
-                        <strong>Offer Date:</strong> <span t-field="doc.offer_date"/>
-                        <br/>
-                        <strong>Expiration Date:</strong> <span t-field="doc.expiration_date"/>
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 80px;"/>
+                        <h1 t-if="not company.logo" style="color: #2c3e50;">Property Sale Offer</h1>
                     </div>
-                    <div class="col-6">
-                        <strong>Property:</strong> <span t-field="doc.property_id.name"/>
-                        <br/>
-                        <strong>Property Reference:</strong> <span t-field="doc.property_id.property_reference"/>
-                        <br/>
-                        <strong>Offer Price:</strong> <span t-field="doc.offer_price"/>
-                        <br/>
-                        <strong>Status:</strong> <span t-field="doc.state"/>
+                    <div class="col-6 text-right">
+                        <h3 style="color: #2c3e50; margin-bottom: 5px;">Offer #<span t-field="doc.name"/></h3>
+                        <span style="color: #7f8c8d;">Date: <span t-field="doc.offer_date"/></span><br/>
+                        <span style="color: #7f8c8d;">Valid Until: <span t-field="doc.expiration_date"/></span>
                     </div>
                 </div>
-                <div class="row mt32">
-                    <div class="col-12">
-                        <h3>Property Details</h3>
-                        <p><strong>Description:</strong> <span t-field="doc.property_id.description"/></p>
-                        <p><strong>Address:</strong> <span t-field="doc.property_id.address"/></p>
-                        <p><strong>Total Sqft:</strong> <span t-field="doc.property_id.total_sqft"/></p>
+
+                <!-- Client Information -->
+                <div class="row mt-4" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <div class="col-6">
+                        <h4 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Client Information</h4>
+                        <strong>Name:</strong> <span t-field="doc.partner_id"/><br/>
+                        <strong>Email:</strong> <span t-field="doc.partner_id.email"/><br/>
+                        <strong>Phone:</strong> <span t-field="doc.partner_id.phone"/><br/>
+                        <t t-if="doc.partner_id.street">
+                            <strong>Address:</strong> <span t-field="doc.partner_id.street"/>
+                            <span t-field="doc.partner_id.street2"/><br/>
+                            <span t-field="doc.partner_id.city"/>
+                            <t t-if="doc.partner_id.state_id">, <span t-field="doc.partner_id.state_id"/></t>
+                            <span t-field="doc.partner_id.zip"/>
+                        </t>
+                    </div>
+                    
+                    <!-- Property Information (with safety checks) -->
+                    <div class="col-6">
+                        <h4 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Property Information</h4>
+                        <t t-if="doc.property_id">
+                            <strong>Property:</strong> <span t-field="doc.property_id.name"/><br/>
+                            <t t-if="doc.property_id.property_reference">
+                                <strong>Reference:</strong> <span t-field="doc.property_id.property_reference"/><br/>
+                            </t>
+                            <t t-if="doc.property_id.project_name">
+                                <strong>Project:</strong> <span t-field="doc.property_id.project_name"/><br/>
+                            </t>
+                            <t t-if="doc.property_id.unit_no">
+                                <strong>Unit No:</strong> <span t-field="doc.property_id.unit_no"/><br/>
+                            </t>
+                            <t t-if="doc.property_id.total_sqft">
+                                <strong>Size:</strong> <span t-field="doc.property_id.total_sqft"/> sqft
+                            </t>
+                        </t>
+                        <t t-if="not doc.property_id">
+                            <p>No property information available</p>
+                        </t>
                     </div>
                 </div>
-                <div class="row mt32">
+
+                <!-- Offer Details -->
+                <div class="row mt-4">
                     <div class="col-12">
-                        <p>This offer is valid until <span t-field="doc.expiration_date"/>. Please contact us for any queries or to accept this offer.</p>
+                        <h3 style="color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Offer Details</h3>
+                        <table class="table" style="width: 100%;">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Offer Price</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.offer_price" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="hasattr(doc, 'down_payment') and doc.down_payment > 0">
+                                    <td>Down Payment Required</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.down_payment" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="hasattr(doc, 'dld_fee') and doc.dld_fee > 0">
+                                    <td>DLD Registration Fee</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.dld_fee" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="hasattr(doc, 'admin_fee') and doc.admin_fee > 0">
+                                    <td>Administration Fee</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.admin_fee" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight: bold; border-top: 2px solid #333;">
+                                    <td>Total Amount</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.total_offer_amount" t-options='{"widget": "monetary"}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Payment Terms -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h3 style="color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Payment Terms</h3>
+                        <div t-raw="doc.payment_terms" t-if="hasattr(doc, 'payment_terms') and doc.payment_terms"/>
+                        <div t-if="not hasattr(doc, 'payment_terms') or not doc.payment_terms">
+                            <p>The total amount must be paid by <span t-field="doc.expiration_date"/>. Payment can be made via bank transfer or certified check.</p>
+                            <p t-if="hasattr(doc, 'down_payment') and doc.down_payment > 0">
+                                A down payment of <span t-field="doc.down_payment" t-options='{"widget": "monetary"}'/> is required to secure this offer.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Images (with safety checks) -->
+                <div class="row mt-4" t-if="doc.property_id and (doc.property_id.property_image or doc.property_id.floor_plan or doc.property_id.interior_image)">
+                    <div class="col-12">
+                        <h3 style="color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Property Images</h3>
+                        <div class="row">
+                            <div class="col-4" t-if="doc.property_id.property_image">
+                                <strong>Property Image</strong><br/>
+                                <img t-att-src="image_data_uri(doc.property_id.property_image)" style="max-width: 100%; max-height: 200px;"/>
+                            </div>
+                            <div class="col-4" t-if="doc.property_id.floor_plan">
+                                <strong>Floor Plan</strong><br/>
+                                <img t-att-src="image_data_uri(doc.property_id.floor_plan)" style="max-width: 100%; max-height: 200px;"/>
+                            </div>
+                            <div class="col-4" t-if="doc.property_id.interior_image">
+                                <strong>Interior View</strong><br/>
+                                <img t-att-src="image_data_uri(doc.property_id.interior_image)" style="max-width: 100%; max-height: 200px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h3 style="color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Terms & Conditions</h3>
+                        <div t-raw="doc.terms_conditions" t-if="hasattr(doc, 'terms_conditions') and doc.terms_conditions"/>
+                        <div t-if="not hasattr(doc, 'terms_conditions') or not doc.terms_conditions">
+                            <ol style="padding-left: 20px;">
+                                <li>This offer is valid until <span t-field="doc.expiration_date"/>.</li>
+                                <li>The property will remain on the market until a signed agreement and deposit are received.</li>
+                                <li>Prices are subject to change without notice.</li>
+                                <li>All measurements are approximate.</li>
+                                <li>The buyer is responsible for all applicable government fees and taxes.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signature Section -->
+                <div class="row mt-4" style="margin-top: 50px;">
+                    <div class="col-6">
+                        <div style="border-top: 1px solid #333; width: 80%; padding-top: 10px;">
+                            <strong>Seller's Signature</strong><br/>
+                            <span t-field="company.name"/>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div style="border-top: 1px solid #333; width: 80%; padding-top: 10px;">
+                            <strong>Buyer's Signature</strong><br/>
+                            <span t-field="doc.partner_id.name"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="row mt-4" style="margin-top: 30px; font-size: 0.8em; color: #7f8c8d;">
+                    <div class="col-12 text-center">
+                        <p>Thank you for your interest in our property. Please contact us at <span t-field="company.email"/> or <span t-field="company.phone"/> for any questions.</p>
                     </div>
                 </div>
             </div>
