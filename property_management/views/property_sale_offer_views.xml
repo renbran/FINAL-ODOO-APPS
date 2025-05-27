@@ -85,7 +85,6 @@
                                 </group>
                                 <field name="broker_commission_ids" readonly="1">
                                     <tree>
-                                        <field name="name"/>
                                         <field name="commission_amount"/>
                                         <field name="state"/>
                                     </tree>
