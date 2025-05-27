@@ -6,26 +6,26 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='payment_reference']" position="after">
-                <field name="property_order_id" readonly="1" options="{'invisible': [('property_order_id', '=', False)]}"/>
-                <field name="property_rental_id" readonly="1" options="{'invisible': [('property_rental_id', '=', False)]}"/>
-                <field name="broker_commission_id" readonly="1" options="{'invisible': [('broker_commission_id', '=', False)]}"/>
+                <field name="property_order_id" readonly="1" invisible="not property_order_id"/>
+                <field name="property_rental_id" readonly="1" invisible="not property_rental_id"/>
+                <field name="broker_commission_id" readonly="1" invisible="not broker_commission_id"/>
                 <field name="property_sale_offer_id" readonly="1" invisible="not property_sale_offer_id"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_property_sale" type="object" class="oe_stat_button" icon="fa-home"
-                        options="{'invisible': [('property_order_id', '=', False)]}">
+                        invisible="not property_order_id">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Property Sale</span>
                     </div>
                 </button>
                 <button name="action_view_property_offer" type="object" class="oe_stat_button" icon="fa-handshake-o"
-                        options="{'invisible': [('property_sale_offer_id', '=', False)]}">
+                        invisible="not property_sale_offer_id">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Property Offer</span>
                     </div>
                 </button>
                 <button name="action_view_broker_commission" type="object" class="oe_stat_button" icon="fa-money"
-                        options="{'invisible': [('broker_commission_id', '=', False)]}">
+                        invisible="not broker_commission_id">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Broker Commission</span>
                     </div>
