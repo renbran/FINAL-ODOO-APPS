@@ -17,7 +17,7 @@
             <field name="model">property.property</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="property_reference"/>
+                    <field name="property_reference" widget="custom_property_reference"/>
                     <field name="name"/>
                     <field name="project_name"/>
                     <field name="tower"/>
@@ -29,7 +29,7 @@
                     <field name="property_image" widget="image"/>
                     <field name="floor_plan" widget="image"/>
                     <field name="sale_rent"/>
-                    <field name="status"/>
+                    <field name="status" widget="property_status"/>
                     <field name="payment_progress" widget="progressbar"/>
                 </tree>
             </field>
