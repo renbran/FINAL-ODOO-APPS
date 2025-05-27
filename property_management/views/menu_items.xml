@@ -3,11 +3,11 @@
     <data>
         <!-- Main menu item -->
         <menuitem id="menu_property_management_root"
-                  name="Property Management"
+                  name="Property Sale Management"
                   web_icon="property_management,static/description/icon.png"
                   sequence="10"/>
 
-        <!-- Properties submenu -->
+        <!-- Properties Menu -->
         <menuitem id="menu_property_management_properties"
                   name="Properties"
                   parent="menu_property_management_root"
@@ -16,45 +16,61 @@
         <menuitem id="menu_property_management_property_list"
                   name="Property List"
                   parent="menu_property_management_properties"
-                  action="action_property"
+                  action="action_property_property"
                   sequence="10"/>
 
-        <!-- Sales submenu -->
+        <!-- Sales Menu -->
         <menuitem id="menu_property_management_sales"
                   name="Sales"
                   parent="menu_property_management_root"
                   sequence="20"/>
 
         <menuitem id="menu_property_management_sale_list"
-                  name="Property Sales"
+                  name="Sale List"
                   parent="menu_property_management_sales"
                   action="action_property_sale"
                   sequence="10"/>
 
-        <menuitem id="menu_property_management_offer_list"
-                  name="Sale Offers"
-                  parent="menu_property_management_sales"
-                  action="action_property_sale_offer"
-                  sequence="20"/>
-
-        <!-- Commissions submenu -->
-        <menuitem id="menu_property_management_commissions"
-                  name="Commissions"
+        <!-- Offers Menu -->
+        <menuitem id="menu_property_management_offers"
+                  name="Offers"
                   parent="menu_property_management_root"
                   sequence="30"/>
 
-        <menuitem id="menu_property_management_commission_list"
-                  name="Broker Commissions"
-                  parent="menu_property_management_commissions"
-                  action="action_broker_commission_invoice"
+        <menuitem id="menu_property_management_offer_list"
+                  name="Offer List"
+                  parent="menu_property_management_offers"
+                  action="action_property_sale_offer"
                   sequence="10"/>
 
-        <!-- Configuration submenu -->
-        <menuitem id="menu_property_management_configuration"
-                  name="Configuration"
+        <!-- Broker Commissions Menu -->
+        <menuitem id="menu_property_management_broker_commissions"
+                  name="Broker Commissions"
                   parent="menu_property_management_root"
-                  sequence="100"/>
+                  sequence="40"/>
 
-        <!-- Add configuration menu items here as needed -->
+        <menuitem id="menu_property_management_broker_commission_list"
+                  name="Commission List"
+                  parent="menu_property_management_broker_commissions"
+                  action="action_broker_commission"
+                  sequence="10"/>
+
+        <!-- Reports Menu -->
+        <menuitem id="menu_property_management_reports"
+                  name="Reports"
+                  parent="menu_property_management_root"
+                  sequence="50"/>
+
+        <menuitem id="menu_property_sale_report"
+                  name="Sale Report"
+                  parent="menu_property_management_reports"
+                  action="action_property_sale_report"
+                  sequence="10"/>
+
+        <menuitem id="menu_property_sale_offer_report"
+                  name="Sale Offer Report"
+                  parent="menu_property_management_reports"
+                  action="action_property_sale_offer_report"
+                  sequence="20"/>
     </data>
 </odoo>
