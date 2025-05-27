@@ -14,7 +14,6 @@
     'depends': ['base', 'mail', 'account'],
     'data': [
         'security/ir.model.access.csv',
-        'views/menu_items.xml',
         'views/property_sale_views.xml',
         'views/property_property_views.xml',
         'views/property_sale_offer_views.xml',
@@ -25,6 +24,7 @@
         'reports/report_property_sale_offer.xml',
         'reports/property_sale_report_template.xml',
         'reports/action_report.xml',
+        'views/menu_items.xml',
     ],
     'assets': {
         'web.assets_backend': [
