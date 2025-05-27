@@ -18,8 +18,6 @@
         'views/property_sale_views.xml',
         'views/property_sale_offer_views.xml',
         'views/broker_commission_views.xml',
-        'views/account_move_views.xml',
-        'views/report_views.xml',
         'reports/property_sale_management.xml',
         'reports/property_report_template.xml',
         'reports/report_property_sale.xml',
