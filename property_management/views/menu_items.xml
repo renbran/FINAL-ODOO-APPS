@@ -43,18 +43,6 @@
                   action="action_property_sale_offer"
                   sequence="10"/>
 
-        <!-- Broker Commissions Menu -->
-        <menuitem id="menu_property_management_broker_commissions"
-                  name="Broker Commissions"
-                  parent="menu_property_management_root"
-                  sequence="40"/>
-
-        <menuitem id="menu_property_management_broker_commission_list"
-                  name="Commission List"
-                  parent="menu_property_management_broker_commissions"
-                  action="action_broker_commission"
-                  sequence="10"/>
-
         <!-- Reports Menu -->
         <menuitem id="menu_property_management_reports"
                   name="Reports"
