@@ -1,4 +1,4 @@
-odoo.define('property_customization', function(require) {
+odoo.define('property_sale_management', function(require) {
     "use strict";
 
     var FormController = require('web.FormController');
