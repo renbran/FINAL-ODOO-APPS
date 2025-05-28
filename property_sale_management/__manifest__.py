@@ -44,11 +44,6 @@
         'web.assets_backend': [
             'property_sale_management/static/src/scss/property_sale_management.scss',
             'property_sale_management/static/src/js/payment_progress.js',
-            'property_sale_management/static/src/js/property_form_controller.js',
-            'property_sale_management/static/src/js/property_kanban_controller.js',
-            'property_sale_management/static/src/js/property_list_controller.js',
-            'property_sale_management/static/src/js/index.js',
-            'property_sale_management/static/src/js/monetary_field_patch.js',
         ],
         'web.assets_qweb': [
             'property_sale_management/static/src/xml/**/*',

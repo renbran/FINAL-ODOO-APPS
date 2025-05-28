@@ -1,12 +1,27 @@
-odoo.define('property_sale_management', function(require) {
+odoo.define('property_customization', [
+    'web.FormController',
+    'web.FormView',
+    'web.view_registry',
+    'web.core',
+    'web.field_registry',
+    'web.KanbanController',
+    'web.KanbanView',
+    'web.ListController',
+    'web.ListView'
+], function(
+    FormController,
+    FormView,
+    viewRegistry,
+    core,
+    FieldRegistry,
+    KanbanController,
+    KanbanView,
+    ListController,
+    ListView
+) {
     "use strict";
 
-    var FormController = require('web.FormController');
-    var FormView = require('web.FormView');
-    var viewRegistry = require('web.view_registry');
-    var core = require('web.core');
     var _t = core._t;
-    var FieldRegistry = require('web.field_registry');
 
     var PropertyFormController = FormController.extend({
         renderButtons: function($node) {
@@ -30,8 +45,8 @@ odoo.define('property_sale_management', function(require) {
         }),
     });
 
-    var PropertyKanbanController = require('web.KanbanController').extend({
-        custom_events: _.extend({}, require('web.KanbanController').prototype.custom_events, {
+    var PropertyKanbanController = KanbanController.extend({
+        custom_events: _.extend({}, KanbanController.prototype.custom_events, {
             'open_property_form': '_onOpenPropertyForm',
         }),
         _onOpenPropertyForm: function(ev) {
@@ -46,14 +61,14 @@ odoo.define('property_sale_management', function(require) {
         },
     });
 
-    var PropertyKanbanView = require('web.KanbanView').extend({
-        config: _.extend({}, require('web.KanbanView').prototype.config, {
+    var PropertyKanbanView = KanbanView.extend({
+        config: _.extend({}, KanbanView.prototype.config, {
             Controller: PropertyKanbanController,
         }),
     });
 
-    var PropertyListController = require('web.ListController').extend({
-        custom_events: _.extend({}, require('web.ListController').prototype.custom_events, {
+    var PropertyListController = ListController.extend({
+        custom_events: _.extend({}, ListController.prototype.custom_events, {
             'open_property_sale': '_onOpenPropertySale',
         }),
         _onOpenPropertySale: function(ev) {
@@ -68,8 +83,8 @@ odoo.define('property_sale_management', function(require) {
         },
     });
 
-    var PropertyListView = require('web.ListView').extend({
-        config: _.extend({}, require('web.ListView').prototype.config, {
+    var PropertyListView = ListView.extend({
+        config: _.extend({}, ListView.prototype.config, {
             Controller: PropertyListController,
         }),
     });
