@@ -5,4 +5,4 @@ from . import internal_commission
 from . import internal_commission_purchase
 from . import account_move
 from . import res_partner
-from . import property_sale_offer
+from . import property_offer
