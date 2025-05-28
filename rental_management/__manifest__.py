@@ -102,7 +102,10 @@
         "views/menus.xml",
     ],
     "assets": {
-        "web.assets_backend": [
+            "web.assets_backend": [
+            "rental_management/static/lib/amcharts5/index.js",
+            "rental_management/static/lib/amcharts5/xy.js",
+            "rental_management/static/lib/amcharts5/themes/Animated.js",
             "rental_management/static/src/css/style.css",
             "rental_management/static/src/css/lib/image-uploader.min.css",
             "rental_management/static/src/js/lib/image-uploader.min.js",
