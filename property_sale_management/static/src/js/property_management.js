@@ -1,88 +1,120 @@
-/** @odoo-module **/
+odoo.define('property_customization', function(require) {
+    "use strict";
 
-import { FormController, FormView } from "@web/views/form/form_view";
-import { KanbanController, KanbanView, KanbanRecord } from "@web/views/kanban/kanban_view";
-import { ListController, ListView } from "@web/views/list/list_view";
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+    var FormController = require('web.FormController');
+    var FormView = require('web.FormView');
+    var viewRegistry = require('web.view_registry');
+    var core = require('web.core');
+    var _t = core._t;
+    var FieldRegistry = require('web.field_registry');
 
-// Property Form Controller
-class PropertyFormController extends FormController {
-    setup() {
-        super.setup();
-        this.notification = useService("notification");
-    }
+    var PropertyFormController = FormController.extend({
+        renderButtons: function($node) {
+            this._super.apply(this, arguments);
+            if (this.$buttons) {
+                // Your button rendering logic
+            }
+        },
+        _onCustomAction: function() {
+            return this.displayNotification({
+                title: _t("Success"),
+                message: _t("Action completed successfully"),
+                type: 'success',
+            });
+        },
+    });
 
-    onCustomAction() {
-        this.notification.add(this.env._t("Success"), {
-            message: this.env._t("Action completed successfully"),
-            type: 'success',
-        });
-    }
-}
+    var PropertyFormView = FormView.extend({
+        config: _.extend({}, FormView.prototype.config, {
+            Controller: PropertyFormController,
+        }),
+    });
 
-registry.category("views").add("property_form", {
-    Controller: PropertyFormController,
-    View: FormView,
-});
+    var PropertyKanbanController = require('web.KanbanController').extend({
+        custom_events: _.extend({}, require('web.KanbanController').prototype.custom_events, {
+            'open_property_form': '_onOpenPropertyForm',
+        }),
+        _onOpenPropertyForm: function(ev) {
+            ev.stopPropagation();
+            return this.do_action({
+                type: 'ir.actions.act_window',
+                res_model: 'property.property',
+                views: [[false, 'form']],
+                res_id: ev.data.res_id,
+                target: 'new',
+            });
+        },
+    });
 
-// Property Kanban Components
-class PropertyKanbanRecord extends KanbanRecord {
-    static template = "web.KanbanRecord";
-    
-    onClick(ev) {
-        if (this.props.record.resModel === 'property.property') {
-            this.trigger('open-property-form', { resId: this.props.record.resId });
-        } else {
-            super.onClick(ev);
-        }
-    }
-}
+    var PropertyKanbanView = require('web.KanbanView').extend({
+        config: _.extend({}, require('web.KanbanView').prototype.config, {
+            Controller: PropertyKanbanController,
+        }),
+    });
 
-class PropertyKanbanController extends KanbanController {
-    setup() {
-        super.setup();
-        this.action = useService("action");
-        this.env.bus.addEventListener('open-property-form', this.onOpenPropertyForm);
-    }
+    var PropertyListController = require('web.ListController').extend({
+        custom_events: _.extend({}, require('web.ListController').prototype.custom_events, {
+            'open_property_sale': '_onOpenPropertySale',
+        }),
+        _onOpenPropertySale: function(ev) {
+            ev.stopPropagation();
+            return this.do_action({
+                type: 'ir.actions.act_window',
+                res_model: 'property.sale',
+                views: [[false, 'form']],
+                res_id: ev.data.res_id,
+                target: 'new',
+            });
+        },
+    });
 
-    onOpenPropertyForm = (ev) => {
-        this.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'property.property',
-            views: [[false, 'form']],
-            res_id: ev.detail.resId,
-            target: 'current',
-        });
-    }
-}
+    var PropertyListView = require('web.ListView').extend({
+        config: _.extend({}, require('web.ListView').prototype.config, {
+            Controller: PropertyListController,
+        }),
+    });
 
-registry.category("views").add("property_kanban", {
-    Controller: PropertyKanbanController,
-    View: KanbanView,
-    Record: PropertyKanbanRecord,
-});
+    var PaymentProgressWidget = FieldRegistry.get('float').extend({
+        className: 'o_field_payment_progress',
+        init: function() {
+            this._super.apply(this, arguments);
+            this.nodeOptions = this.nodeOptions || {};
+        },
+        _renderReadonly: function() {
+            try {
+                var value = this.value || 0;
+                var max = this.nodeOptions.max || 100;
+                var progress = Math.min(Math.max(0, value), max);
+                this.$el.empty().append(
+                    $('<div>').addClass('progress').append(
+                        $('<div>')
+                            .addClass('progress-bar')
+                            .css('width', progress + '%')
+                            .attr('aria-valuenow', progress)
+                            .attr('aria-valuemin', 0)
+                            .attr('aria-valuemax', max)
+                            .text(progress + '%')
+                    )
+                );
+            } catch (error) {
+                console.error("Error rendering PaymentProgressWidget:", error);
+                this.$el.text(_t("Error displaying progress"));
+            }
+        },
+    });
 
-// Property List Components
-class PropertyListController extends ListController {
-    setup() {
-        super.setup();
-        this.action = useService("action");
-        this.env.bus.addEventListener('open-property-sale', this.onOpenPropertySale);
-    }
+    viewRegistry.add('property_form', PropertyFormView);
+    viewRegistry.add('property_kanban', PropertyKanbanView);
+    viewRegistry.add('property_list', PropertyListView);
+    FieldRegistry.add('payment_progress', PaymentProgressWidget);
 
-    onOpenPropertySale = (ev) => {
-        this.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'property.sale',
-            views: [[false, 'form']],
-            res_id: ev.detail.resId,
-            target: 'current',
-        });
-    }
-}
-
-registry.category("views").add("property_list", {
-    Controller: PropertyListController,
-    View: ListView,
+    return {
+        PropertyFormController: PropertyFormController,
+        PropertyFormView: PropertyFormView,
+        PropertyKanbanController: PropertyKanbanController,
+        PropertyKanbanView: PropertyKanbanView,
+        PropertyListController: PropertyListController,
+        PropertyListView: PropertyListView,
+        PaymentProgressWidget: PaymentProgressWidget,
+    };
 });
