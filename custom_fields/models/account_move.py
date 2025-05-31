@@ -43,20 +43,37 @@ class AccountMove(models.Model):
         domain="[('product_tmpl_id', '=', project)]",
     )
 
-    @api.model
-    def create(self, vals):
-        if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
+                sale_order = self.env['sale.order'].search([
+                    ('name', '=', vals.get('invoice_origin'))
+                ], limit=1)
+                if sale_order:
+                    vals.update({
+                        'booking_date': sale_order.booking_date,
+                        'developer_commission': sale_order.developer_commission,
+                        'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
+                        'deal_id': sale_order.deal_id,
+                        'project': sale_order.project_id.id if sale_order.project_id else False,
+                        'sale_value': sale_order.sale_value,
+                        'unit': sale_order.unit_id.id if sale_order.unit_id else False,
+                    })
+        return super().create(vals_list)
+    
+    @api.onchange('invoice_origin')
+    def _onchange_invoice_origin(self):
+        """Update fields when invoice_origin changes manually"""
+        if self.move_type in ['out_invoice', 'out_refund'] and self.invoice_origin:
             sale_order = self.env['sale.order'].search([
-                ('name', '=', vals.get('invoice_origin'))
+                ('name', '=', self.invoice_origin)
             ], limit=1)
             if sale_order:
-                vals.update({
-                    'booking_date': sale_order.booking_date,
-                    'developer_commission': sale_order.developer_commission,
-                    'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
-                    'deal_id': sale_order.deal_id,
-                    'project': sale_order.project_id.id if sale_order.project_id else False,
-                    'sale_value': sale_order.sale_value,
-                    'unit': sale_order.unit_id.id if sale_order.unit_id else False,
-                })
-        return super(AccountMove, self).create(vals)
+                self.booking_date = sale_order.booking_date
+                self.developer_commission = sale_order.developer_commission
+                self.buyer = sale_order.buyer_id
+                self.deal_id = sale_order.deal_id
+                self.project = sale_order.project_id
+                self.sale_value = sale_order.sale_value
+                self.unit = sale_order.unit_id
