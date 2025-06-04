@@ -1,184 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- External Commission Views -->
-    <record id="view_external_commission_tree" model="ir.ui.view">
-        <field name="name">sale.order.external.commission.tree</field>
-        <field name="model">sale.order.external.commission</field>
-        <field name="arch" type="xml">
-            <tree string="External Commissions" editable="bottom">
-                <field name="sequence" widget="handle"/>
-                <field name="commission_type"/>
-                <field name="partner_id"/>
-                <field name="calculation_type"/>
-                <field name="rate" string="Rate (%)" options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                <field name="amount"/>
-                <field name="currency_id" invisible="1"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_external_commission_form" model="ir.ui.view">
-        <field name="name">sale.order.external.commission.form</field>
-        <field name="model">sale.order.external.commission</field>
-        <field name="arch" type="xml">
-            <form string="External Commission">
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="commission_type"/>
-                            <field name="partner_id"/>
-                            <field name="calculation_type"/>
-                        </group>
-                        <group>
-                            <field name="rate" string="Rate (%)" 
-                                   options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                            <field name="amount" options="{'readonly': [('calculation_type', '!=', 'fixed')]}"/>
-                            <field name="currency_id" invisible="1"/>
-                        </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- Internal Commission Views -->
-    <record id="view_internal_commission_tree" model="ir.ui.view">
-        <field name="name">sale.order.internal.commission.tree</field>
-        <field name="model">sale.order.internal.commission</field>
-        <field name="arch" type="xml">
-            <tree string="Internal Commissions" editable="bottom">
-                <field name="sequence" widget="handle"/>
-                <field name="role"/>
-                <field name="partner_id"/>
-                <field name="calculation_type"/>
-                <field name="rate" string="Rate (%)" options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                <field name="amount"/>
-                <field name="currency_id" invisible="1"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_internal_commission_form" model="ir.ui.view">
-        <field name="name">sale.order.internal.commission.form</field>
-        <field name="model">sale.order.internal.commission</field>
-        <field name="arch" type="xml">
-            <form string="Internal Commission">
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="role"/>
-                            <field name="partner_id"/>
-                            <field name="calculation_type"/>
-                        </group>
-                        <group>
-                            <field name="rate" string="Rate (%)" 
-                                   options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                            <field name="amount" options="{'readonly': [('calculation_type', '!=', 'fixed')]}"/>
-                            <field name="currency_id" invisible="1"/>
-                        </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- Sale Order Form View Modification -->
     <record id="view_order_form_commission" model="ir.ui.view">
         <field name="name">sale.order.form.commission</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='client_order_ref']" position="after">
-                <field name="commission_status" widget="statusbar" statusbar_visible="not_started,pending_payment,in_progress,completed"/>
-            </xpath>
-
-            <div name="button_box" position="inside">
-                <button name="action_view_purchase_orders" type="object" class="oe_stat_button" i   ="fa-shopping-cart"
-                        options="{'invisible': [('purchase_order_count', '=', 0)]}">
-                    <field name="purchase_order_count" widget="statinfo" string="Commission POs"/>
-                </button>
-            </div>
-
             <xpath expr="//notebook" position="inside">
                 <page string="Commissions" name="commissions">
                     <group>
-                        <group string="Commission Summary" name="commission_summary">
-                            <field name="total_external_commission" widget="monetary"/>
-                            <field name="remaining_for_internal" widget="monetary"/>
-                            <field name="total_internal_commission" widget="monetary"/>
-                            <field name="company_net_share" widget="monetary"/>
+                        <group string="External Commissions" name="external_commissions">
+                            <field name="broker_agency_name"/>
+                            <field name="broker_agency_commission_type"/>
+                            <field name="broker_agency_rate"/>
+                            <field name="broker_agency_total"/>
+                            
+                            <field name="referral_name"/>
+                            <field name="referral_commission_type"/>
+                            <field name="referral_rate"/>
+                            <field name="referral_total"/>
                         </group>
-                        <group string="Commission Actions" name="commission_actions">
-                            <button name="action_process_commissions" 
-                                    string="Process Commissions" 
-                                    type="object" 
-                                    class="btn-primary"
-                                    options="{'invisible': [('commission_processed', '=', True)]}"/>
-                            <button name="action_recalculate_commissions" 
-                                    string="Recalculate" 
-                                    type="object" 
-                                    class="btn-secondary"/>
+                        <group string="External Commissions (cont.)" name="external_commissions_cont">
+                            <field name="cashback_name"/>
+                            <field name="cashback_commission_type"/>
+                            <field name="cashback_rate"/>
+                            <field name="cashback_total"/>
+                            
+                            <field name="other_name"/>
+                            <field name="other_commission_type"/>
+                            <field name="other_rate"/>
+                            <field name="other_total"/>
                         </group>
                     </group>
-
-                    <notebook>
-                        <page string="External Commissions" name="external_commissions">
-                            <field name="external_commission_line_ids" context="{'default_order_id': id}">
-                                <tree editable="bottom">
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="commission_type"/>
-                                    <field name="partner_id"/>
-                                    <field name="calculation_type"/>
-                                    <field name="rate" string="Rate (%)" options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                                    <field name="amount" sum="Total"/>
-                                    <field name="currency_id" invisible="1"/>
-                                </tree>
-                            </field>
-                        </page>
-                        <page string="Internal Commissions" name="internal_commissions">
-                            <field name="internal_commission_line_ids" context="{'default_order_id': id}">
-                                <tree editable="bottom">
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="role"/>
-                                    <field name="partner_id"/>
-                                    <field name="calculation_type"/>
-                                    <field name="rate" string="Rate (%)" options="{'invisible': [('calculation_type', '=', 'fixed')]}"/>
-                                    <field name="amount" sum="Total"/>
-                                    <field name="currency_id" invisible="1"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
+                    <group>
+                        <group string="Internal Commissions" name="internal_commissions">
+                            <field name="agent1_name"/>
+                            <field name="agent1_commission_type"/>
+                            <field name="agent1_rate"/>
+                            <field name="agent1_total"/>
+                            
+                            <field name="agent2_name"/>
+                            <field name="agent2_commission_type"/>
+                            <field name="agent2_rate"/>
+                            <field name="agent2_total"/>
+                        </group>
+                        <group string="Internal Commissions (cont.)" name="internal_commissions_cont">
+                            <field name="manager_name"/>
+                            <field name="manager_commission_type"/>
+                            <field name="manager_rate"/>
+                            <field name="manager_total"/>
+                            
+                            <field name="director_name"/>
+                            <field name="director_commission_type"/>
+                            <field name="director_rate"/>
+                            <field name="director_total"/>
+                        </group>
+                    </group>
+                    <group string="Commission Type Options" name="commission_type_options">
+                        <field name="commission_type" widget="radio"/>
+                    </group>
                 </page>
             </xpath>
         </field>
     </record>
-
-    <!-- Actions and Menu Items -->
-    <record id="action_external_commission" model="ir.actions.act_window">
-        <field name="name">External Commissions</field>
-        <field name="res_model">sale.order.external.commission</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <record id="action_internal_commission" model="ir.actions.act_window">
-        <field name="name">Internal Commissions</field>
-        <field name="res_model">sale.order.internal.commission</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <menuitem id="menu_commission_root" name="Commissions" parent="sale.sale_menu_root" sequence="6"/>
-    <menuitem id="menu_external_commission" name="External Commissions" parent="menu_commission_root" action="action_external_commission" sequence="1"/>
-    <menuitem id="menu_internal_commission" name="Internal Commissions" parent="menu_commission_root" action="action_internal_commission" sequence="2"/>
-
-    <!-- Commission Dashboard -->
-    <record id="action_commission_dashboard" model="ir.actions.act_window">
-        <field name="name">Commission Dashboard</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('commission_status', '!=', 'not_started')]</field>
-        <field name="context">{'group_by': 'commission_status'}</field>
-    </record>
-
-    <menuitem id="menu_commission_dashboard" name="Commission Dashboard" parent="menu_commission_root" action="action_commission_dashboard" sequence="0"/>
 </odoo>
