@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form View -->
     <record id="view_internal_commission_form" model="ir.ui.view">
@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
-                    <button name="action_pay" string="Mark as Paid" type="object" class="oe_highlight" states="confirmed"/>
+                    <button name="action_confirm" string="Confirm" type="object" states="draft" class="oe_highlight"/>
+                    <button name="action_pay" string="Mark as Paid" type="object" states="confirmed" class="oe_highlight"/>
                     <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
                     <button name="action_reset_to_draft" string="Reset to Draft" type="object" states="canceled"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
@@ -22,20 +22,49 @@
                     <group>
                         <group>
                             <field name="sale_order_id"/>
-                            <field name="employee_id"/>
-                            <field name="department_id"/>
-                            <field name="position"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="sale_value"/>
+                            <field name="commission_type"/>
                         </group>
                         <group>
-                            <field name="sale_value"/>
-                            <field name="amount_untaxed"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="percentage"/>
-                            <field name="commission_amount"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="create_date"/>
+                            <field name="create_uid"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Payment Information" attrs="{'invisible': [('state', '!=', 'paid')]}">
+                        <page string="Commissions">
+                            <group>
+                                <group string="Agent 1">
+                                    <field name="agent1_id"/>
+                                    <field name="agent1_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="agent1_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="agent1_commission"/>
+                                </group>
+                                <group string="Agent 2">
+                                    <field name="agent2_id"/>
+                                    <field name="agent2_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="agent2_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="agent2_commission"/>
+                                </group>
+                                <group string="Manager">
+                                    <field name="manager_id"/>
+                                    <field name="manager_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="manager_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="manager_commission"/>
+                                </group>
+                                <group string="Director">
+                                    <field name="director_id"/>
+                                    <field name="director_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="director_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="director_commission"/>
+                                </group>
+                            </group>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_commission" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Payment Information">
                             <group>
                                 <field name="payment_date"/>
                                 <field name="payment_reference"/>
@@ -63,12 +92,11 @@
             <tree>
                 <field name="name"/>
                 <field name="sale_order_id"/>
-                <field name="employee_id"/>
-                <field name="position"/>
                 <field name="sale_value"/>
-                <field name="percentage"/>
-                <field name="commission_amount"/>
+                <field name="commission_type"/>
+                <field name="total_commission"/>
                 <field name="state"/>
+                <field name="create_date"/>
             </tree>
         </field>
     </record>
@@ -81,16 +109,18 @@
             <search>
                 <field name="name"/>
                 <field name="sale_order_id"/>
-                <field name="employee_id"/>
-                <field name="position"/>
+                <field name="agent1_id"/>
+                <field name="agent2_id"/>
+                <field name="manager_id"/>
+                <field name="director_id"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
                 <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
                 <filter string="Canceled" name="canceled" domain="[('state', '=', 'canceled')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
-                    <filter string="Position" name="position" context="{'group_by': 'position'}"/>
-                    <filter string="Status" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Commission Type" name="group_by_commission_type" context="{'group_by': 'commission_type'}"/>
+                    <filter string="Sale Order" name="group_by_sale_order" context="{'group_by': 'sale_order_id'}"/>
                 </group>
             </search>
         </field>
@@ -109,9 +139,10 @@
         </field>
     </record>
 
-    <!-- Menu Items -->
-    <menuitem id="menu_internal_commission_root" name="Internal Commissions" 
-              parent="sale.sale_menu_root" sequence="20"/>
-    <menuitem id="menu_internal_commission" name="Internal Commissions" 
-              parent="menu_internal_commission_root" action="action_internal_commission" sequence="10"/>
+    <!-- Menu Item -->
+    <menuitem id="menu_internal_commission"
+              name="Internal Commissions"
+              action="action_internal_commission"
+              parent="sale.sale_menu_root"
+              sequence="20"/>
 </odoo>

@@ -6,47 +6,52 @@ class ExternalCommission(models.Model):
     _description = 'External Commission'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    # Main Fields
-    name = fields.Char(string='Reference', default=lambda self: _('New'), readonly=True)
-    sale_order_id = fields.Many2one('sale.order', string='Sale Order', required=True)
-    partner_id = fields.Many2one('res.partner', string='External Partner', required=True, domain=[('is_external_agent', '=', True)])
-    date = fields.Date(string='Date', default=fields.Date.today)
+    name = fields.Char(string='Reference', default=lambda self: _('New'), readonly=True, tracking=True)
+    sale_order_id = fields.Many2one('sale.order', string='Sale Order', required=True, tracking=True)
+    date = fields.Date(string='Date', default=fields.Date.today, tracking=True)
     
     # Source Values
-    sale_value = fields.Float(
-        string='Gross Sales Value',
-        related='sale_order_id.sale_value',
-        readonly=True
-    )
-    amount_untaxed = fields.Float(
-        string='Untaxed Amount',
-        related='sale_order_id.amount_untaxed',
-        readonly=True
-    )
-    
-    # Calculation Type Options
-    CALCULATION_TYPES = [
-        ('sales_value', 'Percentage of Sales Value'),
-        ('untaxed', 'Percentage of Total Untaxed'),
+    sale_value = fields.Monetary(string='Gross Sales Value', related='sale_order_id.amount_total', readonly=True, currency_field='currency_id')
+    amount_untaxed = fields.Monetary(string='Untaxed Amount', related='sale_order_id.amount_untaxed', readonly=True, currency_field='currency_id')
+    currency_id = fields.Many2one('res.currency', related='sale_order_id.currency_id', readonly=True, store=True)
+
+    # Commission Type Options
+    COMMISSION_TYPES = [
+        ('sale_value', 'As per Sale Value Percentage'),
+        ('gross_commission', 'As per Gross Commission Percentage'),
         ('fixed', 'Fixed Amount'),
     ]
+
+    # Broker/Agency Fields
+    broker_agency_id = fields.Many2one('res.partner', string='Broker/Agency Name', domain=[('is_broker_agency', '=', True)])
+    broker_agency_commission_type = fields.Selection(COMMISSION_TYPES, string='Broker/Agency Commission Type')
+    broker_agency_rate = fields.Float(string='Broker/Agency Rate (%)', digits=(5, 2))
+    broker_agency_fixed = fields.Monetary(string='Broker/Agency Fixed Amount', currency_field='currency_id')
+    broker_agency_total = fields.Monetary(string='Broker/Agency Total', compute='_compute_commission_amounts', store=True, currency_field='currency_id')
+
+    # Cashback Fields
+    cashback_id = fields.Many2one('res.partner', string='Cashback Name', domain=[('is_cashback_partner', '=', True)])
+    cashback_commission_type = fields.Selection(COMMISSION_TYPES, string='Cashback Commission Type')
+    cashback_rate = fields.Float(string='Cashback Rate (%)', digits=(5, 2))
+    cashback_fixed = fields.Monetary(string='Cashback Fixed Amount', currency_field='currency_id')
+    cashback_total = fields.Monetary(string='Cashback Total', compute='_compute_commission_amounts', store=True, currency_field='currency_id')
+
+    # Referral Fields
+    referral_id = fields.Many2one('res.partner', string='Referral Name', domain=[('is_referral_partner', '=', True)])
+    referral_commission_type = fields.Selection(COMMISSION_TYPES, string='Referral Commission Type')
+    referral_rate = fields.Float(string='Referral Rate (%)', digits=(5, 2))
+    referral_fixed = fields.Monetary(string='Referral Fixed Amount', currency_field='currency_id')
+    referral_total = fields.Monetary(string='Referral Total', compute='_compute_commission_amounts', store=True, currency_field='currency_id')
+
+    # Other Fields
+    other_id = fields.Many2one('res.partner', string='Other Name')
+    other_commission_type = fields.Selection(COMMISSION_TYPES, string='Other Commission Type')
+    other_rate = fields.Float(string='Other Rate (%)', digits=(5, 2))
+    other_fixed = fields.Monetary(string='Other Fixed Amount', currency_field='currency_id')
+    other_total = fields.Monetary(string='Other Total', compute='_compute_commission_amounts', store=True, currency_field='currency_id')
+
+    total_commission = fields.Monetary(string='Total Commission', compute='_compute_total_commission', store=True, currency_field='currency_id')
     
-    # Commission Details
-    calculation_type = fields.Selection(
-        CALCULATION_TYPES,
-        string='Calculation Type',
-        default='sales_value',
-        required=True
-    )
-    percentage = fields.Float(string='Percentage')
-    fixed_amount = fields.Float(string='Fixed Amount')
-    commission_amount = fields.Float(
-        string='Commission Amount',
-        compute='_compute_commission_amount',
-        store=True
-    )
-    
-    # Status
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
@@ -54,92 +59,58 @@ class ExternalCommission(models.Model):
         ('canceled', 'Canceled'),
     ], string='Status', default='draft', tracking=True)
     
-    # Payment Info
-    payment_date = fields.Date(string='Payment Date')
-    payment_reference = fields.Char(string='Payment Reference')
-    
-    # New Fields
-    notes = fields.Text(string='Notes')
-    commission_status = fields.Selection([
-        ('under', 'Under Allocated'),
-        ('over', 'Over Allocated'),
-        ('full', 'Fully Allocated')
-    ], string='Commission Status', compute='_compute_commission_status', store=True)
+    payment_date = fields.Date(string='Payment Date', tracking=True)
+    payment_reference = fields.Char(string='Payment Reference', tracking=True)
+    notes = fields.Text(string='Notes', tracking=True)
 
-    # Constraints and Computations
-    @api.depends('calculation_type', 'percentage', 'fixed_amount', 'sale_value', 'amount_untaxed')
-    def _compute_commission_amount(self):
+    @api.depends('sale_value', 'amount_untaxed',
+                 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_fixed',
+                 'cashback_commission_type', 'cashback_rate', 'cashback_fixed',
+                 'referral_commission_type', 'referral_rate', 'referral_fixed',
+                 'other_commission_type', 'other_rate', 'other_fixed')
+    def _compute_commission_amounts(self):
         for record in self:
-            if record.calculation_type == 'sales_value':
-                record.commission_amount = record.sale_value * (record.percentage / 100)
-            elif record.calculation_type == 'untaxed':
-                record.commission_amount = record.amount_untaxed * (record.percentage / 100)
-            else:
-                record.commission_amount = record.fixed_amount
+            record.broker_agency_total = record._calculate_commission(
+                record.broker_agency_commission_type, record.broker_agency_rate, record.broker_agency_fixed)
+            record.cashback_total = record._calculate_commission(
+                record.cashback_commission_type, record.cashback_rate, record.cashback_fixed)
+            record.referral_total = record._calculate_commission(
+                record.referral_commission_type, record.referral_rate, record.referral_fixed)
+            record.other_total = record._calculate_commission(
+                record.other_commission_type, record.other_rate, record.other_fixed)
 
-    @api.depends('commission_amount', 'amount_untaxed')
-    def _compute_commission_status(self):
+    def _calculate_commission(self, commission_type, rate, fixed_amount):
+        if commission_type == 'sale_value':
+            return self.sale_value * (rate / 100)
+        elif commission_type == 'gross_commission':
+            return self.amount_untaxed * (rate / 100)
+        elif commission_type == 'fixed':
+            return fixed_amount
+        return 0
+
+    @api.depends('broker_agency_total', 'cashback_total', 'referral_total', 'other_total')
+    def _compute_total_commission(self):
         for record in self:
-            if record.commission_amount < record.amount_untaxed:
-                record.commission_status = 'under'
-            elif record.commission_amount > record.amount_untaxed:
-                record.commission_status = 'over'
-            else:
-                record.commission_status = 'full'
-    
-    @api.constrains('calculation_type', 'percentage', 'fixed_amount', 'amount_untaxed')
+            record.total_commission = sum([
+                record.broker_agency_total,
+                record.cashback_total,
+                record.referral_total,
+                record.other_total
+            ])
+
+    @api.constrains('total_commission', 'amount_untaxed')
     def _check_commission_allocation(self):
         for record in self:
-            if record.calculation_type == 'sales_value':
-                allocated = record.sale_value * (record.percentage / 100)
-            elif record.calculation_type == 'untaxed':
-                allocated = record.amount_untaxed * (record.percentage / 100)
-            else:
-                allocated = record.fixed_amount
-            
-            if allocated > record.amount_untaxed:
-                raise ValidationError(_(
-                    "Commission allocation (%.2f) cannot exceed the untaxed amount (%.2f)!"
-                ) % (allocated, record.amount_untaxed))
-    
-    @api.onchange('calculation_type', 'percentage', 'fixed_amount')
-    def _onchange_commission_values(self):
-        if not self.amount_untaxed:
-            return
-        
-        if self.calculation_type == 'sales_value':
-            allocated = self.sale_value * (self.percentage / 100)
-        elif self.calculation_type == 'untaxed':
-            allocated = self.amount_untaxed * (self.percentage / 100)
-        else:
-            allocated = self.fixed_amount
-        
-        remaining = self.amount_untaxed - allocated
-        
-        if remaining < 0:
-            return {
-                'warning': {
-                    'title': _("Allocation Error"),
-                    'message': _("This allocation would exceed the available amount!")
-                }
-            }
-        elif remaining < (0.1 * self.amount_untaxed):
-            return {
-                'warning': {
-                    'title': _("Allocation Warning"),
-                    'message': _("You're using %.0f%% of the available amount (%.2f remaining)") % 
-                             ((allocated/self.amount_untaxed)*100, remaining)
-                }
-            }
-    
-    # Sequence Generation
+            if record.total_commission > record.amount_untaxed:
+                raise ValidationError(_("Total commission (%.2f) cannot exceed the untaxed amount (%.2f)!") 
+                                      % (record.total_commission, record.amount_untaxed))
+
     @api.model
     def create(self, vals):
         if vals.get('name', _('New')) == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('external.commission') or _('New')
         return super(ExternalCommission, self).create(vals)
 
-    # Action Methods
     def action_confirm(self):
         for record in self:
             if record.state != 'draft':
