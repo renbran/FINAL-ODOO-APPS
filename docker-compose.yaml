@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+version: '3.1'
+>>>>>>> 28b8df81 (INIT)
 services:
   db:
     image: postgres:16
