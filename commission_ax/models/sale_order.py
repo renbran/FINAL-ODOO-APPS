@@ -1,3 +1,5 @@
+from odoo import models, fields, api
+
 class SaleOrderExternalCommission(models.Model):
     _name = 'sale.order.external.commission'
     _description = 'External Commission Line'
