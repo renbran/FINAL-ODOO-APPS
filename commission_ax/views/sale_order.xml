@@ -1,64 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_order_form_commission" model="ir.ui.view">
-        <field name="name">sale.order.form.commission</field>
+    <record id="view_order_form_inherit_commission" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.commission</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
-                <page string="Commissions" name="commissions">
-                    <group>
-                        <group string="External Commissions" name="external_commissions">
-                            <field name="broker_agency_name"/>
-                            <field name="broker_agency_commission_type"/>
-                            <field name="broker_agency_rate"/>
-                            <field name="broker_agency_total"/>
-                            
-                            <field name="referral_name"/>
-                            <field name="referral_commission_type"/>
-                            <field name="referral_rate"/>
-                            <field name="referral_total"/>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Commissions">
+                        <group string="External Commissions">
+                            <group>
+                                <field name="broker_agency_name"/>
+                                <field name="broker_agency_commission_type"/>
+                                <field name="broker_agency_rate"/>
+                                <field name="broker_agency_total"/>
+                            </group>
+                            <group>
+                                <field name="referral_name"/>
+                                <field name="referral_commission_type"/>
+                                <field name="referral_rate"/>
+                                <field name="referral_total"/>
+                            </group>
+                            <group>
+                                <field name="cashback_name"/>
+                                <field name="cashback_commission_type"/>
+                                <field name="cashback_rate"/>
+                                <field name="cashback_total"/>
+                            </group>
+                            <group>
+                                <field name="other_name"/>
+                                <field name="other_commission_type"/>
+                                <field name="other_rate"/>
+                                <field name="other_total"/>
+                            </group>
                         </group>
-                        <group string="External Commissions (cont.)" name="external_commissions_cont">
-                            <field name="cashback_name"/>
-                            <field name="cashback_commission_type"/>
-                            <field name="cashback_rate"/>
-                            <field name="cashback_total"/>
-                            
-                            <field name="other_name"/>
-                            <field name="other_commission_type"/>
-                            <field name="other_rate"/>
-                            <field name="other_total"/>
+                        <group string="Internal Commissions">
+                            <group>
+                                <field name="agent1_name"/>
+                                <field name="agent1_commission_type"/>
+                                <field name="agent1_rate"/>
+                                <field name="agent1_total"/>
+                            </group>
+                            <group>
+                                <field name="agent2_name"/>
+                                <field name="agent2_commission_type"/>
+                                <field name="agent2_rate"/>
+                                <field name="agent2_total"/>
+                            </group>
+                            <group>
+                                <field name="manager_name"/>
+                                <field name="manager_commission_type"/>
+                                <field name="manager_rate"/>
+                                <field name="manager_total"/>
+                            </group>
+                            <group>
+                                <field name="director_name"/>
+                                <field name="director_commission_type"/>
+                                <field name="director_rate"/>
+                                <field name="director_total"/>
+                            </group>
                         </group>
-                    </group>
-                    <group>
-                        <group string="Internal Commissions" name="internal_commissions">
-                            <field name="agent1_name"/>
-                            <field name="agent1_commission_type"/>
-                            <field name="agent1_rate"/>
-                            <field name="agent1_total"/>
-                            
-                            <field name="agent2_name"/>
-                            <field name="agent2_commission_type"/>
-                            <field name="agent2_rate"/>
-                            <field name="agent2_total"/>
-                        </group>
-                        <group string="Internal Commissions (cont.)" name="internal_commissions_cont">
-                            <field name="manager_name"/>
-                            <field name="manager_commission_type"/>
-                            <field name="manager_rate"/>
-                            <field name="manager_total"/>
-                            
-                            <field name="director_name"/>
-                            <field name="director_commission_type"/>
-                            <field name="director_rate"/>
-                            <field name="director_total"/>
-                        </group>
-                    </group>
-                    <group string="Commission Type Options" name="commission_type_options">
-                        <field name="commission_type" widget="radio"/>
-                    </group>
-                </page>
+                    </page>
+                </notebook>
             </xpath>
         </field>
     </record>

@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="view_purchase_order_form_inherit" model="ir.ui.view">
-            <field name="name">purchase.order.form.inherit</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <button 
-                        name="action_force_post" 
-                        string="Force Post" 
-                        type="object" 
-                        modifiers="draft" 
-                        class="oe_highlight" 
-                        options="{'invisible': [('commission_posted', '=', True)]}"
-                    />
-                </xpath>
+    <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Force Post button in header -->
+            <xpath expr="//header" position="inside">
+                <button 
+                    name="action_force_post" 
+                    string="Force Post" 
+                    type="object" 
+                    class="oe_highlight" 
+                    invisible="commission_posted"
+                    states="draft"
+                />
+            </xpath>
 
-                <xpath expr="//sheet" position="inside">
-                    <group name="commission_details_group" string="Commission Details">
-                        <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
-                        <field name="description" readonly="1" string="Commission Description"/>
-                        <field name="commission_posted" readonly="1" string="Commission Posted"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
-    </data>
+            <!-- Add Commission Details in a new notebook page -->
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Commission Details" name="commission_details">
+                        <group string="Commission Information">
+                            <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
+                            <field name="description" readonly="1" string="Commission Description"/>
+                            <field name="commission_posted" readonly="1" string="Commission Posted"/>
+                            
+                            <!-- Optional: Add commission amount fields if they exist -->
+                            <group string="Commission Amounts" invisible="not origin_so_id">
+                                <field name="commission_amount" readonly="1"/>
+                                <field name="commission_percentage" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Optional: Add commission fields to tree view -->
+    <record id="view_purchase_order_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.commission</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="origin_so_id" optional="show"/>
+                <field name="commission_posted" optional="show"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
