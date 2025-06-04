@@ -5,18 +5,16 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add Force Post button in header -->
             <xpath expr="//header" position="inside">
                 <button 
                     name="action_force_post" 
                     string="Force Post" 
                     type="object" 
-                    class="oe_highlight" 
+                    class="btn-primary" 
                     invisible="commission_posted"
                 />
             </xpath>
 
-            <!-- Add Commission Details in a new notebook page -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Commission Details" name="commission_details">
@@ -24,12 +22,6 @@
                             <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
                             <field name="description" readonly="1" string="Commission Description"/>
                             <field name="commission_posted" readonly="1" string="Commission Posted"/>
-                            
-                            <!-- Optional: Add commission amount fields if they exist -->
-                            <group string="Commission Amounts" invisible="not origin_so_id or not origin_so_id">
-                                <field name="commission_amount" readonly="1"/>
-                                <field name="commission_percentage" readonly="1"/>
-                            </group>
                         </group>
                     </page>
                 </notebook>
