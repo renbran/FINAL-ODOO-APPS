@@ -3,7 +3,6 @@ from odoo import models, fields
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # The field names in the model must match the view exactly
     booking_date = fields.Date(
         string='Booking Date',
         tracking=True,
@@ -44,4 +43,11 @@ class SaleOrder(models.Model):
         string='Unit',
         tracking=True,
         domain="[('product_tmpl_id', '=', project_id)]",
+    )
+
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        required=True,
+        default=lambda self: self.env.company.currency_id,
     )

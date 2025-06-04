@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Form View -->
     <record id="view_order_form_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.deal.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Changed to a more specific location -->
             <xpath expr="//group[@name='sale_header']" position="after">
                 <group string="Deal Information">
                     <group>
@@ -20,6 +20,66 @@
                         <field name="unit_id"/>
                     </group>
                 </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_order_tree_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.tree.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="booking_date" optional="show"/>
+                <field name="developer_commission" optional="show"/>
+                <field name="buyer_id" optional="show"/>
+                <field name="deal_id" optional="show"/>
+                <field name="project_id" optional="show"/>
+                <field name="sale_value" optional="show"/>
+                <field name="unit_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_order_kanban_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.kanban.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="booking_date"/>
+                <field name="developer_commission"/>
+                <field name="buyer_id"/>
+                <field name="deal_id"/>
+                <field name="project_id"/>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                <div><t t-esc="record.booking_date.value"/></div>
+                <div><t t-esc="record.developer_commission.value"/></div>
+                <div><t t-esc="record.buyer_id.value"/></div>
+                <div><t t-esc="record.deal_id.value"/></div>
+                <div><t t-esc="record.project_id.value"/></div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_order_filter_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.select.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id"/>
+                <field name="deal_id"/>
+                <field name="project_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='status']" position="after">
+                <filter string="Buyer" name="buyer" context="{'group_by':'buyer_id'}"/>
+                <filter string="Deal" name="deal" context="{'group_by':'deal_id'}"/>
+                <filter string="Project" name="project" context="{'group_by':'project_id'}"/>
             </xpath>
         </field>
     </record>
