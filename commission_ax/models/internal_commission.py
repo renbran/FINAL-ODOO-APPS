@@ -54,7 +54,7 @@ class InternalCommission(models.Model):
     payment_date = fields.Date(string='Payment Date', tracking=True)
     payment_reference = fields.Char(string='Payment Reference', tracking=True)
     notes = fields.Text(string='Notes', tracking=True)
-    
+    commission_ids = fields.One2many('internal.commission', 'sale_order_id', string='Commissions')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     create_date = fields.Datetime(string='Creation Date', readonly=True, default=fields.Datetime.now)
     create_uid = fields.Many2one('res.users', string='Created by', readonly=True, default=lambda self: self.env.user)
