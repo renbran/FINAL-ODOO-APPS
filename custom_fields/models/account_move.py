@@ -5,35 +5,41 @@ class AccountMove(models.Model):
 
     booking_date = fields.Date(
         string='Booking Date',
-        tracking=False,
+        tracking=True,
+        help="The date when the booking was made."
     )
     
     developer_commission = fields.Float(
         string='Broker Commission',
         tracking=True,
+        help="Commission amount for the broker."
     )
     
     buyer = fields.Many2one(
         'res.partner',
         string='Buyer Name',
         tracking=True,
+        help="The buyer associated with this invoice."
     )
     
     deal_id = fields.Integer(
         string='Deal ID',
         tracking=True,
+        help="Unique identifier for the deal."
     )
     
     project = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
+        help="The project associated with this invoice."
     )
     
     sale_value = fields.Monetary(
         string='Sale Value',
         tracking=True,
         currency_field='currency_id',
+        help="The total sale value of the invoice."
     )
     
     unit = fields.Many2one(
@@ -41,6 +47,7 @@ class AccountMove(models.Model):
         string='Unit',
         tracking=True,
         domain="[('product_tmpl_id', '=', project)]",
+        help="The specific unit associated with this invoice."
     )
 
     @api.model_create_multi

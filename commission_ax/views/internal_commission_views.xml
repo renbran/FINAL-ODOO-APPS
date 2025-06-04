@@ -1,117 +1,262 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Form View -->
-    <record id="view_internal_commission_form" model="ir.ui.view">
-        <field name="name">internal.commission.form</field>
-        <field name="model">internal.commission</field>
-        <field name="arch" type="xml">
-            <form>
-                <header>
-                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" states="draft"/>
-                    <button name="action_pay" string="Mark as Paid" type="object" class="oe_highlight" states="confirmed"/>
-                    <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
-                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" states="canceled"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
-                </header>
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" readonly="1"/>
-                        </h1>
-                    </div>
-                    <group>
+    <data>
+        <!-- Form View -->
+        <record id="view_internal_commission_form" model="ir.ui.view">
+            <field name="name">internal.commission.form</field>
+            <field name="model">internal.commission</field>
+            <field name="arch" type="xml">
+                <form string="Internal Commission">
+                    <header>
+                        <button name="action_confirm" string="Confirm" type="object" 
+                                invisible="state != 'draft'" class="oe_highlight"/>
+                        <button name="action_pay" string="Mark as Paid" type="object" 
+                                invisible="state != 'confirmed'" class="oe_highlight"/>
+                        <button name="action_cancel" string="Cancel" type="object" 
+                                invisible="state not in ['draft', 'confirmed']"/>
+                        <button name="action_reset_to_draft" string="Reset to Draft" type="object" 
+                                invisible="state != 'canceled'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
                         <group>
-                            <field name="sale_order_id"/>
-                            <field name="employee_id"/>
-                            <field name="department_id"/>
-                            <field name="position"/>
-                        </group>
-                        <group>
-                            <field name="sale_value"/>
-                            <field name="amount_untaxed"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="percentage"/>
-                            <field name="commission_amount"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Payment Information" attrs="{'invisible': [('state', '!=', 'paid')]}">
                             <group>
-                                <field name="payment_date"/>
-                                <field name="payment_reference"/>
+                                <field name="sale_order_id" options="{'no_create': True}"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="sale_value" widget="monetary"/>
+                                <field name="commission_type"/>
                             </group>
-                        </page>
-                        <page string="Notes">
-                            <field name="notes"/>
-                        </page>
-                    </notebook>
-                </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-                </div>
-            </form>
-        </field>
-    </record>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="create_date" readonly="1"/>
+                                <field name="create_uid" readonly="1"/>
+                                <field name="total_commission" widget="monetary" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Commission Distribution">
+                                <group>
+                                    <group string="Sales Agents">
+                                        <label for="agent1_id" string="Agent 1"/>
+                                        <div class="o_row">
+                                            <field name="agent1_id" class="oe_inline"/>
+                                        </div>
+                                        <field name="agent1_rate" 
+                                               invisible="commission_type == 'fixed'"
+                                               string="Agent 1 Rate (%)"/>
+                                        <field name="agent1_fixed" 
+                                               invisible="commission_type != 'fixed'"
+                                               string="Agent 1 Fixed Amount" widget="monetary"/>
+                                        <field name="agent1_commission" widget="monetary" readonly="1" string="Agent 1 Total"/>
+                                        
+                                        <separator/>
+                                        
+                                        <label for="agent2_id" string="Agent 2"/>
+                                        <div class="o_row">
+                                            <field name="agent2_id" class="oe_inline"/>
+                                        </div>
+                                        <field name="agent2_rate" 
+                                               invisible="commission_type == 'fixed'"
+                                               string="Agent 2 Rate (%)"/>
+                                        <field name="agent2_fixed" 
+                                               invisible="commission_type != 'fixed'"
+                                               string="Agent 2 Fixed Amount" widget="monetary"/>
+                                        <field name="agent2_commission" widget="monetary" readonly="1" string="Agent 2 Total"/>
+                                    </group>
+                                    
+                                    <group string="Management">
+                                        <label for="manager_id" string="Manager"/>
+                                        <div class="o_row">
+                                            <field name="manager_id" class="oe_inline"/>
+                                        </div>
+                                        <field name="manager_rate" 
+                                               invisible="commission_type == 'fixed'"
+                                               string="Manager Rate (%)"/>
+                                        <field name="manager_fixed" 
+                                               invisible="commission_type != 'fixed'"
+                                               string="Manager Fixed Amount" widget="monetary"/>
+                                        <field name="manager_commission" widget="monetary" readonly="1" string="Manager Total"/>
+                                        
+                                        <separator/>
+                                        
+                                        <label for="director_id" string="Director"/>
+                                        <div class="o_row">
+                                            <field name="director_id" class="oe_inline"/>
+                                        </div>
+                                        <field name="director_rate" 
+                                               invisible="commission_type == 'fixed'"
+                                               string="Director Rate (%)"/>
+                                        <field name="director_fixed" 
+                                               invisible="commission_type != 'fixed'"
+                                               string="Director Fixed Amount" widget="monetary"/>
+                                        <field name="director_commission" widget="monetary" readonly="1" string="Director Total"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Payment Information">
+                                <group>
+                                    <field name="payment_date"/>
+                                    <field name="payment_reference"/>
+                                </group>
+                            </page>
+                            <page string="Notes">
+                                <field name="notes" nolabel="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
 
-    <!-- Tree View -->
-    <record id="view_internal_commission_tree" model="ir.ui.view">
-        <field name="name">internal.commission.tree</field>
-        <field name="model">internal.commission</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="sale_order_id"/>
-                <field name="employee_id"/>
-                <field name="position"/>
-                <field name="sale_value"/>
-                <field name="percentage"/>
-                <field name="commission_amount"/>
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
+        <!-- Tree View -->
+        <record id="view_internal_commission_tree" model="ir.ui.view">
+            <field name="name">internal.commission.tree</field>
+            <field name="model">internal.commission</field>
+            <field name="arch" type="xml">
+                <tree string="Internal Commissions"
+                      decoration-info="state == 'draft'" 
+                      decoration-muted="state == 'canceled'" 
+                      decoration-success="state == 'paid'">
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="sale_value" widget="monetary"/>
+                    <field name="commission_type"/>
+                    <field name="total_commission" widget="monetary"/>
+                    <field name="state" widget="badge" 
+                           decoration-info="state == 'draft'"
+                           decoration-warning="state == 'confirmed'"
+                           decoration-success="state == 'paid'"
+                           decoration-danger="state == 'canceled'"/>
+                    <field name="create_date"/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
 
-    <!-- Search View -->
-    <record id="view_internal_commission_search" model="ir.ui.view">
-        <field name="name">internal.commission.search</field>
-        <field name="model">internal.commission</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="sale_order_id"/>
-                <field name="employee_id"/>
-                <field name="position"/>
-                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
-                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
-                <filter string="Canceled" name="canceled" domain="[('state', '=', 'canceled')]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
-                    <filter string="Position" name="position" context="{'group_by': 'position'}"/>
-                    <filter string="Status" name="state" context="{'group_by': 'state'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
+        <!-- Search View -->
+        <record id="view_internal_commission_search" model="ir.ui.view">
+            <field name="name">internal.commission.search</field>
+            <field name="model">internal.commission</field>
+            <field name="arch" type="xml">
+                <search string="Search Internal Commissions">
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="agent1_id"/>
+                    <field name="agent2_id"/>
+                    <field name="manager_id"/>
+                    <field name="director_id"/>
+                    <separator/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                    <filter string="Canceled" name="canceled" domain="[('state', '=', 'canceled')]"/>
+                    <separator/>
+                    <filter string="My Commissions" name="my_commissions" 
+                            domain="['|','|','|',('agent1_id.user_id','=',uid),('agent2_id.user_id','=',uid),('manager_id.user_id','=',uid),('director_id.user_id','=',uid)]"/>
+                    <filter string="This Month" name="this_month" 
+                            domain="[('create_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                     ('create_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                        <filter string="Commission Type" name="group_by_commission_type" context="{'group_by': 'commission_type'}"/>
+                        <filter string="Sale Order" name="group_by_sale_order" context="{'group_by': 'sale_order_id'}"/>
+                        <filter string="Agent 1" name="group_by_agent1" context="{'group_by': 'agent1_id'}"/>
+                        <filter string="Manager" name="group_by_manager" context="{'group_by': 'manager_id'}"/>
+                        <filter string="Creation Date" name="group_by_create_date" context="{'group_by': 'create_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 
-    <!-- Action -->
-    <record id="action_internal_commission" model="ir.actions.act_window">
-        <field name="name">Internal Commissions</field>
-        <field name="res_model">internal.commission</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="view_internal_commission_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first internal commission!
-            </p>
-        </field>
-    </record>
+        <!-- Kanban View -->
+        <record id="view_internal_commission_kanban" model="ir.ui.view">
+            <field name="name">internal.commission.kanban</field>
+            <field name="model">internal.commission</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column">
+                    <field name="state"/>
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="total_commission"/>
+                    <field name="currency_id"/>
+                    <field name="create_date"/>
+                    <field name="agent1_id"/>
+                    <field name="manager_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                        </div>
+                                        <span class="badge badge-pill" 
+                                              t-attf-class="badge-#{record.state.raw_value == 'draft' ? 'info' : record.state.raw_value == 'confirmed' ? 'warning' : record.state.raw_value == 'paid' ? 'success' : 'danger'}">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="sale_order_id"/>
+                                        <div class="text-muted" t-if="record.agent1_id.raw_value">
+                                            <i class="fa fa-user"/> <field name="agent1_id"/>
+                                        </div>
+                                        <div class="text-muted" t-if="record.manager_id.raw_value">
+                                            <i class="fa fa-users"/> <field name="manager_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <strong>
+                                                <field name="total_commission" widget="monetary"/>
+                                            </strong>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="create_date" widget="date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
 
-    <!-- Menu Items -->
-    <menuitem id="menu_internal_commission_root" name="Internal Commissions" 
-              parent="sale.sale_menu_root" sequence="20"/>
-    <menuitem id="menu_internal_commission" name="Internal Commissions" 
-              parent="menu_internal_commission_root" action="action_internal_commission" sequence="10"/>
+        <!-- Action -->
+        <record id="action_internal_commission" model="ir.actions.act_window">
+            <field name="name">Internal Commissions</field>
+            <field name="res_model">internal.commission</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="search_view_id" ref="view_internal_commission_search"/>
+            <field name="context">{'search_default_draft': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first internal commission!
+                </p>
+                <p>
+                    Track and manage commissions for internal staff including agents, managers, and directors.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_internal_commission"
+                  name="Internal Commissions"
+                  action="action_internal_commission"
+                  parent="sale.sale_menu_root"
+                  sequence="21"/>
+    </data>
 </odoo>
