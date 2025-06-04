@@ -12,15 +12,28 @@ class ExternalCommission(models.Model):
     partner_id = fields.Many2one('res.partner', string='External Partner', required=True, domain=[('is_external_agent', '=', True)])
     date = fields.Date(string='Date', default=fields.Date.today)
     
-    # Source Values
-    sale_value = fields.Float(
-        string='Gross Sales Value',
-        related='sale_order_id.sale_value',
+    # FIXED: Currency field to support Monetary fields
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        related='sale_order_id.currency_id',
+        store=True,
         readonly=True
     )
-    amount_untaxed = fields.Float(
+    
+    # FIXED: Source Values - Changed from Float to Monetary
+    sale_value = fields.Monetary(
+        string='Gross Sales Value',
+        currency_field='currency_id',
+        related='sale_order_id.sale_value',
+        store=True,
+        readonly=True
+    )
+    amount_untaxed = fields.Monetary(
         string='Untaxed Amount',
+        currency_field='currency_id',
         related='sale_order_id.amount_untaxed',
+        store=True,
         readonly=True
     )
     
@@ -38,10 +51,19 @@ class ExternalCommission(models.Model):
         default='sales_value',
         required=True
     )
-    percentage = fields.Float(string='Percentage')
-    fixed_amount = fields.Float(string='Fixed Amount')
-    commission_amount = fields.Float(
+    percentage = fields.Float(
+        string='Percentage',
+        digits=(5, 2)
+    )
+    # FIXED: Changed from Float to Monetary
+    fixed_amount = fields.Monetary(
+        string='Fixed Amount',
+        currency_field='currency_id'
+    )
+    # FIXED: Changed from Float to Monetary
+    commission_amount = fields.Monetary(
         string='Commission Amount',
+        currency_field='currency_id',
         compute='_compute_commission_amount',
         store=True
     )
@@ -71,16 +93,18 @@ class ExternalCommission(models.Model):
     def _compute_commission_amount(self):
         for record in self:
             if record.calculation_type == 'sales_value':
-                record.commission_amount = record.sale_value * (record.percentage / 100)
+                record.commission_amount = record.sale_value * (record.percentage / 100) if record.sale_value and record.percentage else 0.0
             elif record.calculation_type == 'untaxed':
-                record.commission_amount = record.amount_untaxed * (record.percentage / 100)
+                record.commission_amount = record.amount_untaxed * (record.percentage / 100) if record.amount_untaxed and record.percentage else 0.0
             else:
-                record.commission_amount = record.fixed_amount
+                record.commission_amount = record.fixed_amount or 0.0
 
     @api.depends('commission_amount', 'amount_untaxed')
     def _compute_commission_status(self):
         for record in self:
-            if record.commission_amount < record.amount_untaxed:
+            if not record.amount_untaxed:
+                record.commission_status = 'under'
+            elif record.commission_amount < record.amount_untaxed:
                 record.commission_status = 'under'
             elif record.commission_amount > record.amount_untaxed:
                 record.commission_status = 'over'
@@ -90,12 +114,16 @@ class ExternalCommission(models.Model):
     @api.constrains('calculation_type', 'percentage', 'fixed_amount', 'amount_untaxed')
     def _check_commission_allocation(self):
         for record in self:
+            if not record.amount_untaxed:
+                continue
+                
+            allocated = 0.0
             if record.calculation_type == 'sales_value':
-                allocated = record.sale_value * (record.percentage / 100)
+                allocated = (record.sale_value or 0.0) * (record.percentage / 100) if record.percentage else 0.0
             elif record.calculation_type == 'untaxed':
-                allocated = record.amount_untaxed * (record.percentage / 100)
+                allocated = (record.amount_untaxed or 0.0) * (record.percentage / 100) if record.percentage else 0.0
             else:
-                allocated = record.fixed_amount
+                allocated = record.fixed_amount or 0.0
             
             if allocated > record.amount_untaxed:
                 raise ValidationError(_(
@@ -107,12 +135,13 @@ class ExternalCommission(models.Model):
         if not self.amount_untaxed:
             return
         
+        allocated = 0.0
         if self.calculation_type == 'sales_value':
-            allocated = self.sale_value * (self.percentage / 100)
+            allocated = (self.sale_value or 0.0) * (self.percentage / 100) if self.percentage else 0.0
         elif self.calculation_type == 'untaxed':
-            allocated = self.amount_untaxed * (self.percentage / 100)
+            allocated = (self.amount_untaxed or 0.0) * (self.percentage / 100) if self.percentage else 0.0
         else:
-            allocated = self.fixed_amount
+            allocated = self.fixed_amount or 0.0
         
         remaining = self.amount_untaxed - allocated
         
@@ -132,11 +161,24 @@ class ExternalCommission(models.Model):
                 }
             }
     
+    @api.onchange('sale_order_id')
+    def _onchange_sale_order_id(self):
+        """Update currency when sale order changes"""
+        if self.sale_order_id:
+            self.currency_id = self.sale_order_id.currency_id
+    
     # Sequence Generation
     @api.model
     def create(self, vals):
         if vals.get('name', _('New')) == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('external.commission') or _('New')
+        
+        # Ensure currency is set
+        if vals.get('sale_order_id') and not vals.get('currency_id'):
+            sale_order = self.env['sale.order'].browse(vals['sale_order_id'])
+            if sale_order.currency_id:
+                vals['currency_id'] = sale_order.currency_id.id
+        
         return super(ExternalCommission, self).create(vals)
 
     # Action Methods
