@@ -3,79 +3,49 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # External Commission Fields
-    broker_agency_name = fields.Char(string="Broker/Agency Name")
-    broker_agency_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Broker/Agency Commission Type")
-    broker_agency_rate = fields.Float(string="Broker/Agency Rate (%)")
-    broker_agency_total = fields.Monetary(string="Broker/Agency Total", compute='_compute_commission_totals', store=True)
+    # Add all missing commission total fields
+    director_total = fields.Monetary(
+        string="Director Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    manager_total = fields.Monetary(
+        string="Manager Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    agent1_total = fields.Monetary(
+        string="Agent 1 Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    agent2_total = fields.Monetary(
+        string="Agent 2 Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    broker_agency_total = fields.Monetary(
+        string="Broker/Agency Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    referral_total = fields.Monetary(
+        string="Referral Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    cashback_total = fields.Monetary(
+        string="Cashback Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
+    other_total = fields.Monetary(
+        string="Other Total", 
+        compute='_compute_commission_totals', 
+        store=True
+    )
 
-    referral_name = fields.Char(string="Referral Name")
-    referral_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Referral Commission Type")
-    referral_rate = fields.Float(string="Referral Rate (%)")
-    referral_total = fields.Monetary(string="Referral Total", compute='_compute_commission_totals', store=True)
-
-    cashback_name = fields.Char(string="Cashback Name")
-    cashback_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Cashback Commission Type")
-    cashback_rate = fields.Float(string="Cashback Rate (%)")
-    cashback_total = fields.Monetary(string="Cashback Total", compute='_compute_commission_totals', store=True)
-
-    other_name = fields.Char(string="Other Name")
-    other_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Other Commission Type")
-    other_rate = fields.Float(string="Other Rate (%)")
-    other_total = fields.Monetary(string="Other Total", compute='_compute_commission_totals', store=True)
-
-    # Internal Commission Fields
-    agent1_name = fields.Char(string="Agent 1 Name")
-    agent1_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Agent 1 Commission Type")
-    agent1_rate = fields.Float(string="Agent 1 Rate (%)")
-    agent1_total = fields.Monetary(string="Agent 1 Total", compute='_compute_commission_totals', store=True)
-
-    agent2_name = fields.Char(string="Agent 2 Name")
-    agent2_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Agent 2 Commission Type")
-    agent2_rate = fields.Float(string="Agent 2 Rate (%)")
-    agent2_total = fields.Monetary(string="Agent 2 Total", compute='_compute_commission_totals', store=True)
-
-    manager_name = fields.Char(string="Manager Name")
-    manager_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Manager Commission Type")
-    manager_rate = fields.Float(string="Manager Rate (%)")
-    manager_total = fields.Monetary(string="Manager Total", compute='_compute_commission_totals', store=True)
-
-    director_name = fields.Char(string="Director Name")
-    director_commission_type = fields.Selection([
-        ('sale_value', 'As per Sale Value Percentage'),
-        ('gross_commission', 'As per Gross Commission Percentage'),
-        ('fixed', 'Fixed Amount')
-    ], string="Director Commission Type")
-    director_rate = fields.Float(string="Director Rate (%)")
-    
+    # Add the missing purchase_order_count field
     purchase_order_count = fields.Integer(
         string='Purchase Count',
         compute='_compute_purchase_order_count',
@@ -119,15 +89,3 @@ class SaleOrder(models.Model):
         elif commission_type == 'fixed':
             return rate
         return 0.0
-
-    def _get_commission_fields(self):
-        return [
-            ('broker_agency', 'Broker/Agency'),
-            ('referral', 'Referral'),
-            ('cashback', 'Cashback'),
-            ('other', 'Other'),
-            ('agent1', 'Agent 1'),
-            ('agent2', 'Agent 2'),
-            ('manager', 'Manager'),
-            ('director', 'Director'),
-        ]
