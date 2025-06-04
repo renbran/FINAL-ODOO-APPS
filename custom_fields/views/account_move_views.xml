@@ -1,87 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-    <!-- Form View -->
-    <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="attributes">
-                <attribute name="options">{'always_reload': True}</attribute>
-            </xpath>
-            
-            <!-- Add a new group for property-related fields after the invoice lines -->
-            <xpath expr="//group[@name='invoice_info_group']" position="after">
-                <group name="deal_information" string="Deal Information" 
-                       options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}">
-                    <group>
-                        <field name="buyer_id"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the account move form view -->
+        <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.custom.fields</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <!-- Add a new group to the invoice form view -->
+                <xpath expr="//field[@name='invoice_origin']" position="after">
+                    <group name="custom_invoice_info_group" string="Custom Invoice Information">
                         <field name="booking_date"/>
+                        <field name="developer_commission"/>
+                        <field name="buyer"/>
                         <field name="deal_id"/>
-                        <field name="project_id"/>
-                    </group>
-                    <group>
-                        <field name="unit_id"/>
+                        <field name="project"/>
                         <field name="sale_value"/>
-                        <field name="developer_commission" widget="percentage"/>
+                        <field name="unit"/>
                     </group>
-                </group>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- List View -->
-    <record id="view_move_tree_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.tree.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_invoice_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='payment_state']" position="after">
-                <field name="buyer_id" optional="show"/>
-                <field name="deal_id" optional="show"/>
-                <field name="project_id" optional="show"/>
-                <field name="unit_id" optional="hide"/>
-                <field name="sale_value" optional="hide"/>
-                <field name="developer_commission" optional="hide"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Kanban View -->
-    <record id="view_account_move_kanban_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.kanban.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_move_kanban"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='amount_total']" position="after">
-                <field name="buyer_id"/>
-                <field name="deal_id"/>
-                <field name="project_id"/>
-            </xpath>
-            <xpath expr="//div[contains(@class, 'oe_kanban_bottom_left')]" position="inside">
-                <div><t t-esc="record.buyer_id.value"/></div>
-                <div><t t-esc="record.deal_id.value"/></div>
-                <div><t t-esc="record.project_id.value"/></div>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Search View -->
-    <record id="view_account_invoice_filter_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.select.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id"/>
-                <field name="deal_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-            </xpath>
-            <xpath expr="//filter[@name='status']" position="after">
-                <filter string="Buyer" name="buyer" context="{'group_by':'buyer_id'}"/>
-                <filter string="Deal" name="deal" context="{'group_by':'deal_id'}"/>
-                <filter string="Project" name="project" context="{'group_by':'project_id'}"/>
-            </xpath>
-        </field>
-    </record>
-</record>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
