@@ -5,6 +5,12 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- First handle the purchase_order_count field -->
+            <xpath expr="//field[@name='purchase_order_count']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <!-- Then add your commission section -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Commissions">
@@ -12,25 +18,25 @@
                             <group>
                                 <field name="broker_agency_name"/>
                                 <field name="broker_agency_commission_type"/>
-                                <field name="broker_agency_rate"/>
+                                <field name="broker_agency_rate" invisible="broker_agency_commission_type == 'fixed'"/>
                                 <field name="broker_agency_total"/>
                             </group>
                             <group>
                                 <field name="referral_name"/>
                                 <field name="referral_commission_type"/>
-                                <field name="referral_rate"/>
+                                <field name="referral_rate" invisible="referral_commission_type == 'fixed'"/>
                                 <field name="referral_total"/>
                             </group>
                             <group>
                                 <field name="cashback_name"/>
                                 <field name="cashback_commission_type"/>
-                                <field name="cashback_rate"/>
+                                <field name="cashback_rate" invisible="cashback_commission_type == 'fixed'"/>
                                 <field name="cashback_total"/>
                             </group>
                             <group>
                                 <field name="other_name"/>
                                 <field name="other_commission_type"/>
-                                <field name="other_rate"/>
+                                <field name="other_rate" invisible="other_commission_type == 'fixed'"/>
                                 <field name="other_total"/>
                             </group>
                         </group>
@@ -38,25 +44,25 @@
                             <group>
                                 <field name="agent1_name"/>
                                 <field name="agent1_commission_type"/>
-                                <field name="agent1_rate"/>
+                                <field name="agent1_rate" invisible="agent1_commission_type == 'fixed'"/>
                                 <field name="agent1_total"/>
                             </group>
                             <group>
                                 <field name="agent2_name"/>
                                 <field name="agent2_commission_type"/>
-                                <field name="agent2_rate"/>
+                                <field name="agent2_rate" invisible="agent2_commission_type == 'fixed'"/>
                                 <field name="agent2_total"/>
                             </group>
                             <group>
                                 <field name="manager_name"/>
                                 <field name="manager_commission_type"/>
-                                <field name="manager_rate"/>
+                                <field name="manager_rate" invisible="manager_commission_type == 'fixed'"/>
                                 <field name="manager_total"/>
                             </group>
                             <group>
                                 <field name="director_name"/>
                                 <field name="director_commission_type"/>
-                                <field name="director_rate"/>
+                                <field name="director_rate" invisible="director_commission_type == 'fixed'"/>
                                 <field name="director_total"/>
                             </group>
                         </group>

@@ -75,7 +75,20 @@ class SaleOrder(models.Model):
         ('fixed', 'Fixed Amount')
     ], string="Director Commission Type")
     director_rate = fields.Float(string="Director Rate (%)")
-    director_total = fields.Monetary(string="Director Total", compute='_compute_commission_totals', store=True)
+    
+    purchase_order_count = fields.Integer(
+        string='Purchase Count',
+        compute='_compute_purchase_order_count',
+        store=False,
+        help="Count of purchase orders linked to this sale order"
+    )
+
+    def _compute_purchase_order_count(self):
+        """Compute the number of purchase orders linked to this sale order"""
+        for order in self:
+            order.purchase_order_count = self.env['purchase.order'].search_count([
+                ('origin', '=', order.name)
+            ])
 
     @api.depends('amount_total', 'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_rate',
                  'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate',
