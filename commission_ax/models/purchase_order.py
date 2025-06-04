@@ -24,9 +24,7 @@ class PurchaseOrder(models.Model):
         """Post the purchase order when the receipt is recorded or paid."""
         self.ensure_one()
         if not self.commission_posted and self.origin_so_id:
-            # Check if the picking is done (completed)
             if picking.state == 'done':
-                # Check if the picking has associated account moves (payments)
                 account_moves = picking.account_move_ids.filtered(
                     lambda move: move.state in ['posted']
                 )
@@ -36,17 +34,14 @@ class PurchaseOrder(models.Model):
                         if self.state in ['draft', 'sent']:
                             self.button_confirm()
                         self.commission_posted = True
-                        _logger.info(f"Commission posted for PO {self.name}")
+                        _logger.info("Commission posted for PO %s", self.name)
                     except Exception as e:
-                        _logger.error(f"Error posting commission for PO {self.name}: {str(e)}")
-                        # Don't raise the error to avoid blocking other operations
-                        pass
+                        _logger.error("Error posting commission for PO %s: %s", self.name, str(e))
 
     def action_view_picking(self):
-        """Override the action_view_picking method to post the purchase order on receipt."""
-        res = super(PurchaseOrder, self).action_view_picking()
+        res = super().action_view_picking()
         for order in self:
-            if order.origin_so_id:  # Only process commission-related POs
+            if order.origin_so_id:
                 for picking in order.picking_ids:
                     order._post_purchase_order_on_receipt(picking)
         return res
@@ -59,7 +54,7 @@ class PurchaseOrder(models.Model):
                     if order.state in ['draft', 'sent']:
                         order.button_confirm()
                     order.commission_posted = True
-                    _logger.info(f"Manually posted commission for PO {order.name}")
+                    _logger.info("Manually posted commission for PO %s", order.name)
                 except Exception as e:
                     raise UserError(_("Error posting commission: %s") % str(e))
         return {
@@ -74,12 +69,7 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def _check_commission_purchase_orders(self):
-        """
-        Scheduled action to check and post commission purchase orders 
-        when their receipts are paid or in payment.
-        This method is designed to be called by a cron job.
-        """
-        # Find commission purchase orders not yet posted
+        """Scheduled action to check and post commission purchase orders."""
         unposted_commission_pos = self.search([
             ('commission_posted', '=', False),
             ('origin_so_id', '!=', False)
@@ -95,34 +85,8 @@ class PurchaseOrder(models.Model):
                             processed_count += 1
                             break
             except Exception as e:
-                _logger.error(f"Error in scheduled commission check for PO {purchase_order.name}: {str(e)}")
+                _logger.error("Error in scheduled commission check for PO %s: %s", purchase_order.name, str(e))
                 continue
         
-        _logger.info(f"Processed {processed_count} commission purchase orders in scheduled job")
+        _logger.info("Processed %s commission purchase orders in scheduled job", processed_count)
         return processed_count
-
-    def write(self, vals):
-        """Override write to handle commission posting logic"""
-        result = super(PurchaseOrder, self).write(vals)
-        
-        # If state changes to purchase or done, check commission posting
-        if 'state' in vals and vals['state'] in ['purchase', 'done']:
-            for order in self:
-                if order.origin_so_id and not order.commission_posted:
-                    # Check if any picking is done
-                    done_pickings = order.picking_ids.filtered(lambda p: p.state == 'done')
-                    if done_pickings:
-                        order.commission_posted = True
-        
-        return result
-
-    @api.model
-    def create(self, vals):
-        """Override create to handle commission-related purchase orders"""
-        result = super(PurchaseOrder, self).create(vals)
-        
-        # Log creation of commission-related PO
-        if result.origin_so_id:
-            _logger.info(f"Created commission purchase order {result.name} for SO {result.origin_so_id.name}")
-        
-        return result
