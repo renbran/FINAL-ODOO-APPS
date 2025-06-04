@@ -37,26 +37,26 @@
                             <group>
                                 <group string="Agent 1">
                                     <field name="agent1_id"/>
-                                    <field name="agent1_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
-                                    <field name="agent1_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="agent1_rate" options="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="agent1_fixed" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
                                     <field name="agent1_commission"/>
                                 </group>
                                 <group string="Agent 2">
                                     <field name="agent2_id"/>
-                                    <field name="agent2_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
-                                    <field name="agent2_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="agent2_rate" options="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="agent2_fixed" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
                                     <field name="agent2_commission"/>
                                 </group>
                                 <group string="Manager">
                                     <field name="manager_id"/>
-                                    <field name="manager_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
-                                    <field name="manager_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="manager_rate" options="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="manager_fixed" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
                                     <field name="manager_commission"/>
                                 </group>
                                 <group string="Director">
                                     <field name="director_id"/>
-                                    <field name="director_rate" attrs="{'invisible': [('commission_type', '=', 'fixed')]}"/>
-                                    <field name="director_fixed" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                                    <field name="director_rate" options="{'invisible': [('commission_type', '=', 'fixed')]}"/>
+                                    <field name="director_fixed" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
                                     <field name="director_commission"/>
                                 </group>
                             </group>

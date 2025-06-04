@@ -8,10 +8,10 @@
             <field name="arch" type="xml">
                 <form string="External Commission">
                     <header>
-                        <button name="action_confirm" string="Confirm" type="object" states="draft" class="oe_highlight"/>
-                        <button name="action_pay" string="Pay" type="object" states="confirmed" class="oe_highlight"/>
-                        <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed"/>
-                        <button name="action_draft" string="Reset to Draft" type="object" states="canceled"/>
+                        <button name="action_confirm" string="Confirm" type="object" modifiers="draft" class="oe_highlight"/>
+                        <button name="action_pay" string="Pay" type="object" modifiers="confirmed" class="oe_highlight"/>
+                        <button name="action_cancel" string="Cancel" type="object" modifiers="draft,confirmed"/>
+                        <button name="action_draft" string="Reset to Draft" type="object" modifiers="canceled"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
                     </header>
                     <sheet>
@@ -37,8 +37,8 @@
                                 <group>
                                     <field name="broker_agency_id"/>
                                     <field name="broker_agency_commission_type"/>
-                                    <field name="broker_agency_rate" attrs="{'invisible': [('broker_agency_commission_type', '=', 'fixed')]}"/>
-                                    <field name="broker_agency_fixed" attrs="{'invisible': [('broker_agency_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="broker_agency_rate" options="{'invisible': [('broker_agency_commission_type', '=', 'fixed')]}"/>
+                                    <field name="broker_agency_fixed" options="{'invisible': [('broker_agency_commission_type', '!=', 'fixed')]}"/>
                                     <field name="broker_agency_total"/>
                                 </group>
                             </page>
@@ -46,8 +46,8 @@
                                 <group>
                                     <field name="cashback_id"/>
                                     <field name="cashback_commission_type"/>
-                                    <field name="cashback_rate" attrs="{'invisible': [('cashback_commission_type', '=', 'fixed')]}"/>
-                                    <field name="cashback_fixed" attrs="{'invisible': [('cashback_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="cashback_rate" options="{'invisible': [('cashback_commission_type', '=', 'fixed')]}"/>
+                                    <field name="cashback_fixed" options="{'invisible': [('cashback_commission_type', '!=', 'fixed')]}"/>
                                     <field name="cashback_total"/>
                                 </group>
                             </page>
@@ -55,8 +55,8 @@
                                 <group>
                                     <field name="referral_id"/>
                                     <field name="referral_commission_type"/>
-                                    <field name="referral_rate" attrs="{'invisible': [('referral_commission_type', '=', 'fixed')]}"/>
-                                    <field name="referral_fixed" attrs="{'invisible': [('referral_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="referral_rate" options="{'invisible': [('referral_commission_type', '=', 'fixed')]}"/>
+                                    <field name="referral_fixed" options="{'invisible': [('referral_commission_type', '!=', 'fixed')]}"/>
                                     <field name="referral_total"/>
                                 </group>
                             </page>
@@ -64,8 +64,8 @@
                                 <group>
                                     <field name="other_id"/>
                                     <field name="other_commission_type"/>
-                                    <field name="other_rate" attrs="{'invisible': [('other_commission_type', '=', 'fixed')]}"/>
-                                    <field name="other_fixed" attrs="{'invisible': [('other_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="other_rate" options="{'invisible': [('other_commission_type', '=', 'fixed')]}"/>
+                                    <field name="other_fixed" options="{'invisible': [('other_commission_type', '!=', 'fixed')]}"/>
                                     <field name="other_total"/>
                                 </group>
                             </page>
