@@ -1,8 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="view_order_form_commission" model="ir.ui.view">
         <field name="name">sale.order.form.commission</field>
-    <record id="view_sale_order_commission_form" model="ir.ui.view">
-        <field name="name">sale.order.commission.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
@@ -31,40 +30,6 @@
                             <field name="other_rate"/>
                             <field name="other_total"/>
                         </group>
-            <xpath expr="//sheet" position="inside">
-                <group string="Commissions" col="2">
-                    
-                    <!-- ========== External Commissions Column ========== -->
-                    <group string="External Commission" col="2">
-                        <label string="Broker/Agency Name"/>
-                        <label string="Cashback Name"/>
-                        <field name="external_commission_broker_id"/>
-                        <field name="external_commission_cashback_id"/>
-                        
-                        <field name="external_commission_broker_type"/>
-                        <field name="external_commission_cashback_type"/>
-                        
-                        <field name="external_commission_broker_rate"/>
-                        <field name="external_commission_cashback_rate"/>
-                        
-                        <field name="external_commission_broker_total" readonly="1"/>
-                        <field name="external_commission_cashback_total" readonly="1"/>
-
-                        <separator string="" colspan="2"/>
-
-                        <label string="Referral Name"/>
-                        <label string="Other Name"/>
-                        <field name="external_commission_referral_id"/>
-                        <field name="external_commission_other_id"/>
-
-                        <field name="external_commission_referral_type"/>
-                        <field name="external_commission_other_type"/>
-
-                        <field name="external_commission_referral_rate"/>
-                        <field name="external_commission_other_rate"/>
-
-                        <field name="external_commission_referral_total" readonly="1"/>
-                        <field name="external_commission_other_total" readonly="1"/>
                     </group>
                     <group>
                         <group string="Internal Commissions" name="internal_commissions">
@@ -94,40 +59,6 @@
                         <field name="commission_type" widget="radio"/>
                     </group>
                 </page>
-
-                    <!-- ========== Internal Commissions Column ========== -->
-                    <group string="Internal Commission" col="2">
-                        <label string="Agent 1 Name"/>
-                        <label string="Manager Name"/>
-                        <field name="internal_commission_agent1_id"/>
-                        <field name="internal_commission_manager_id"/>
-
-                        <field name="internal_commission_agent1_type"/>
-                        <field name="internal_commission_manager_type"/>
-
-                        <field name="internal_commission_agent1_rate"/>
-                        <field name="internal_commission_manager_rate"/>
-
-                        <field name="internal_commission_agent1_total" readonly="1"/>
-                        <field name="internal_commission_manager_total" readonly="1"/>
-
-                        <separator string="" colspan="2"/>
-
-                        <label string="Agent 2 Name"/>
-                        <label string="Director Name"/>
-                        <field name="internal_commission_agent2_id"/>
-                        <field name="internal_commission_director_id"/>
-
-                        <field name="internal_commission_agent2_type"/>
-                        <field name="internal_commission_director_type"/>
-
-                        <field name="internal_commission_agent2_rate"/>
-                        <field name="internal_commission_director_rate"/>
-
-                        <field name="internal_commission_agent2_total" readonly="1"/>
-                        <field name="internal_commission_director_total" readonly="1"/>
-                    </group>
-                </group>
             </xpath>
         </field>
     </record>
