@@ -1,4 +1,8 @@
-from odoo import api, fields, models
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -12,6 +16,7 @@ class AccountMove(models.Model):
     developer_commission = fields.Float(
         string='Broker Commission',
         tracking=True,
+        digits='Account',
         help="Commission amount for the broker."
     )
     
@@ -19,12 +24,14 @@ class AccountMove(models.Model):
         'res.partner',
         string='Buyer Name',
         tracking=True,
+        domain=[('customer_rank', '>', 0)],
         help="The buyer associated with this invoice."
     )
     
     deal_id = fields.Integer(
         string='Deal ID',
         tracking=True,
+        index=True,
         help="Unique identifier for the deal."
     )
     
@@ -32,6 +39,7 @@ class AccountMove(models.Model):
         'product.template',
         string='Project Name',
         tracking=True,
+        domain=[('can_be_expensed', '=', False)],
         help="The project associated with this invoice."
     )
     
@@ -52,35 +60,53 @@ class AccountMove(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Handle creation with sale order data"""
         for vals in vals_list:
-            if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
-                sale_order = self.env['sale.order'].search([
-                    ('name', '=', vals.get('invoice_origin'))
-                ], limit=1)
-                if sale_order:
-                    vals.update({
-                        'booking_date': sale_order.booking_date,
-                        'developer_commission': sale_order.developer_commission,
-                        'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
-                        'deal_id': sale_order.deal_id,
-                        'project': sale_order.project_id.id if sale_order.project_id else False,
-                        'sale_value': sale_order.sale_value,
-                        'unit': sale_order.unit_id.id if sale_order.unit_id else False,
-                    })
+            try:
+                if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
+                    sale_order = self.env['sale.order'].search([
+                        ('name', '=', vals.get('invoice_origin'))
+                    ], limit=1)
+                    if sale_order:
+                        vals.update({
+                            'booking_date': sale_order.booking_date,
+                            'developer_commission': sale_order.developer_commission,
+                            'buyer': sale_order.buyer_id.id,
+                            'deal_id': sale_order.deal_id,
+                            'project': sale_order.project_id.id,
+                            'sale_value': sale_order.sale_value,
+                            'unit': sale_order.unit_id.id,
+                        })
+            except Exception as e:
+                _logger.error(f"Error updating invoice from sale order: {e}")
+                continue
         return super().create(vals_list)
     
     @api.onchange('invoice_origin')
     def _onchange_invoice_origin(self):
-        """Update fields when invoice_origin changes manually"""
-        if self.move_type in ['out_invoice', 'out_refund'] and self.invoice_origin:
-            sale_order = self.env['sale.order'].search([
-                ('name', '=', self.invoice_origin)
-            ], limit=1)
-            if sale_order:
-                self.booking_date = sale_order.booking_date
-                self.developer_commission = sale_order.developer_commission
-                self.buyer = sale_order.buyer_id
-                self.deal_id = sale_order.deal_id
-                self.project = sale_order.project_id
-                self.sale_value = sale_order.sale_value
-                self.unit = sale_order.unit_id
+        """Update fields when invoice_origin changes"""
+        if not self.invoice_origin or self.move_type not in ['out_invoice', 'out_refund']:
+            return
+            
+        sale_order = self.env['sale.order'].search([
+            ('name', '=', self.invoice_origin)
+        ], limit=1)
+        
+        if not sale_order:
+            return
+            
+        self.update({
+            'booking_date': sale_order.booking_date,
+            'developer_commission': sale_order.developer_commission,
+            'buyer': sale_order.buyer_id,
+            'deal_id': sale_order.deal_id,
+            'project': sale_order.project_id,
+            'sale_value': sale_order.sale_value,
+            'unit': sale_order.unit_id,
+        })
+
+    @api.constrains('developer_commission')
+    def _check_developer_commission(self):
+        for invoice in self:
+            if invoice.developer_commission < 0:
+                raise ValidationError(_("Commission cannot be negative."))
