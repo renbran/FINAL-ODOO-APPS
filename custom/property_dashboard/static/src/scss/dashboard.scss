@@ -1,0 +1,37 @@
+/* property_monitor/static/src/scss/property_dashboard.scss */
+.board {
+    .row {
+        margin-bottom: 10px;
+    }
+
+    .dgregated {
+        .board-box {
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    }
+
+    .graph-view {
+        height: 500px !important;
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    .btn {
+        border-radius: 6px;
+        padding: 8px 16px;
+    }
+
+    .dashboard-title {
+        color: #333;
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+}
