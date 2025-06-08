@@ -502,15 +502,15 @@ class SaleOrder(models.Model):
         store=False
     )
 
-    @api.depends('external_calculation_type')
+    @api.depends('external_commission_type')
     def _compute_show_external_percentage(self):
         for rec in self:
-            rec.show_external_percentage = rec.external_calculation_type != 'fixed'
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
 
-    @api.depends('external_calculation_type')
+    @api.depends('external_commission_type')
     def _compute_show_external_fixed_amount(self):
         for rec in self:
-            rec.show_external_fixed_amount = rec.external_calculation_type == 'fixed'
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
 
     @api.depends('internal_commission_type')
     def _compute_show_agent1_rate(self):
