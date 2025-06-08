@@ -286,10 +286,11 @@ class SaleOrder(models.Model):
 
     # Agent 1 Commission
     agent1_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Agent 1',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Agent 1 for internal commission."
     )
     
     agent1_rate = fields.Float(
@@ -314,10 +315,11 @@ class SaleOrder(models.Model):
 
     # Agent 2 Commission
     agent2_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Agent 2',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Agent 2 for internal commission."
     )
     
     agent2_rate = fields.Float(
@@ -342,10 +344,11 @@ class SaleOrder(models.Model):
 
     # Manager Commission
     manager_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Manager',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Manager for internal commission."
     )
     
     manager_rate = fields.Float(
@@ -370,10 +373,11 @@ class SaleOrder(models.Model):
 
     # Director Commission
     director_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Director',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Director for internal commission."
     )
     
     director_rate = fields.Float(
