@@ -439,6 +439,101 @@ class SaleOrder(models.Model):
     )
 
     # ===========================================
+    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
+    # ===========================================
+    
+    show_external_percentage = fields.Boolean(
+        compute='_compute_show_external_percentage',
+        store=False
+    )
+    show_external_fixed_amount = fields.Boolean(
+        compute='_compute_show_external_fixed_amount',
+        store=False
+    )
+    show_agent1_rate = fields.Boolean(
+        compute='_compute_show_agent1_rate',
+        store=False
+    )
+    show_agent1_fixed = fields.Boolean(
+        compute='_compute_show_agent1_fixed',
+        store=False
+    )
+    show_agent2_rate = fields.Boolean(
+        compute='_compute_show_agent2_rate',
+        store=False
+    )
+    show_agent2_fixed = fields.Boolean(
+        compute='_compute_show_agent2_fixed',
+        store=False
+    )
+    show_manager_rate = fields.Boolean(
+        compute='_compute_show_manager_rate',
+        store=False
+    )
+    show_manager_fixed = fields.Boolean(
+        compute='_compute_show_manager_fixed',
+        store=False
+    )
+    show_director_rate = fields.Boolean(
+        compute='_compute_show_director_rate',
+        store=False
+    )
+    show_director_fixed = fields.Boolean(
+        compute='_compute_show_director_fixed',
+        store=False
+    )
+
+    @api.depends('external_calculation_type')
+    def _compute_show_external_percentage(self):
+        for rec in self:
+            rec.show_external_percentage = rec.external_calculation_type != 'fixed'
+
+    @api.depends('external_calculation_type')
+    def _compute_show_external_fixed_amount(self):
+        for rec in self:
+            rec.show_external_fixed_amount = rec.external_calculation_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_rate(self):
+        for rec in self:
+            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_fixed(self):
+        for rec in self:
+            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_rate(self):
+        for rec in self:
+            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_fixed(self):
+        for rec in self:
+            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_rate(self):
+        for rec in self:
+            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_fixed(self):
+        for rec in self:
+            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_rate(self):
+        for rec in self:
+            rec.show_director_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_fixed(self):
+        for rec in self:
+            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
+
+    # ===========================================
     # CONSTRAINTS
     # ===========================================
     
