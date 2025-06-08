@@ -153,25 +153,4 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Search View Extension -->
-    <record id="view_order_search_commission" model="ir.ui.view">
-        <field name="name">sale.order.search.commission</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_orders']" position="after">
-                <filter name="commission_status" string="Commission Status" help="Commission Status">
-                    <field name="commission_status"/>
-                    <separator/>
-                    <filter string="Draft" domain="[('commission_status','=','draft')]"/>
-                    <filter string="Calculated" domain="[('commission_status','=','calculated')]"/>
-                    <filter string="Confirmed" domain="[('commission_status','=','confirmed')]"/>
-                    <filter string="Paid" domain="[('commission_status','=','paid')]"/>
-                </filter>
-                <filter name="deal_id" string="Deal ID"/>
-                <filter name="project_id" string="Project Name"/>
-            </xpath>
-        </field>
-    </record>
 </odoo>
