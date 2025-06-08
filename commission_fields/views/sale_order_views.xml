@@ -121,6 +121,22 @@
                 <button name="action_pay_commission" string="Mark as Paid" type="object" class="btn-primary" attrs="{'invisible': [('commission_status', '!=', 'confirmed')]}"/>
                 <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary" attrs="{'invisible': [('commission_status', 'in', ['draft', 'paid'])]}"/>
             </xpath>
+
+            <!-- Invisible fields for commission calculation -->
+            <xpath expr="//sheet" position="inside">
+                <group string="Commission Computation" attrs="{'invisible': [('commission_status', '!=', 'draft')]}">
+                    <field name="show_external_percentage" invisible="1"/>
+                    <field name="show_external_fixed_amount" invisible="1"/>
+                    <field name="show_agent1_rate" invisible="1"/>
+                    <field name="show_agent1_fixed" invisible="1"/>
+                    <field name="show_agent2_rate" invisible="1"/>
+                    <field name="show_agent2_fixed" invisible="1"/>
+                    <field name="show_manager_rate" invisible="1"/>
+                    <field name="show_manager_fixed" invisible="1"/>
+                    <field name="show_director_rate" invisible="1"/>
+                    <field name="show_director_fixed" invisible="1"/>
+                </group>
+            </xpath>
         </field>
     </record>
 
