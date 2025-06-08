@@ -41,7 +41,7 @@
                             <group>
                                 <group string="External Partner">
                                     <field name="external_partner_id"/>
-                                    <field name="external_calculation_type"/>
+                                    <field name="external_commission_type"/>
                                     <field name="external_percentage" invisible="not show_external_percentage"/>
                                     <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
                                     <field name="external_commission_amount" readonly="1"/>
