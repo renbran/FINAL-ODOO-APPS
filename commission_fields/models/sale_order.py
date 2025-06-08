@@ -7,6 +7,13 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+# --- Standardized Commission Type Selection ---
+COMMISSION_TYPE_SELECTION = [
+    ('unit_price', 'Unit Price'),
+    ('untaxed', 'Untaxed Total'),
+    ('fixed', 'Fixed Amount')
+]
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -121,11 +128,13 @@ class SaleOrder(models.Model):
         help="External partner/agent for commission"
     )
     
-    external_calculation_type = fields.Selection([
-        ('sales_value', 'Percentage of Sales Value'),
-        ('untaxed', 'Percentage of Total Untaxed'),
-        ('fixed', 'Fixed Amount'),
-    ], string='External Calculation Type', default='sales_value', tracking=True)
+    external_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string='External Commission Type',
+        default='unit_price',
+        tracking=True,
+        help="How to compute the external partner's commission."
+    )
     
     external_percentage = fields.Float(
         string='External Commission %',
@@ -154,11 +163,13 @@ class SaleOrder(models.Model):
         help="Name of the broker or agency"
     )
     
-    broker_agency_commission_type = fields.Selection([
-        ('sale_value', 'Sale Value'),
-        ('gross_commission', 'Gross Commission'),
-        ('fixed', 'Fixed Amount')
-    ], string="Broker/Agency Commission Type", tracking=True)
+    broker_agency_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string="Broker/Agency Commission Type",
+        default='unit_price',
+        tracking=True,
+        help="How to compute the broker/agency commission."
+    )
     
     broker_agency_rate = fields.Float(
         string="Broker/Agency Rate",
@@ -181,11 +192,13 @@ class SaleOrder(models.Model):
         help="Name of the referral source"
     )
     
-    referral_commission_type = fields.Selection([
-        ('sale_value', 'Sale Value'),
-        ('gross_commission', 'Gross Commission'),
-        ('fixed', 'Fixed Amount')
-    ], string="Referral Commission Type", tracking=True)
+    referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string="Referral Commission Type",
+        default='unit_price',
+        tracking=True,
+        help="How to compute the referral commission."
+    )
     
     referral_rate = fields.Float(
         string="Referral Rate",
@@ -208,11 +221,13 @@ class SaleOrder(models.Model):
         help="Cashback recipient name"
     )
     
-    cashback_commission_type = fields.Selection([
-        ('sale_value', 'Sale Value'),
-        ('gross_commission', 'Gross Commission'),
-        ('fixed', 'Fixed Amount')
-    ], string="Cashback Commission Type", tracking=True)
+    cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string="Cashback Commission Type",
+        default='unit_price',
+        tracking=True,
+        help="How to compute the cashback commission."
+    )
     
     cashback_rate = fields.Float(
         string="Cashback Rate",
@@ -235,11 +250,13 @@ class SaleOrder(models.Model):
         help="Other external commission recipient"
     )
     
-    other_external_commission_type = fields.Selection([
-        ('sale_value', 'Sale Value'),
-        ('gross_commission', 'Gross Commission'),
-        ('fixed', 'Fixed Amount')
-    ], string="Other External Commission Type", tracking=True)
+    other_external_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string="Other External Commission Type",
+        default='unit_price',
+        tracking=True,
+        help="How to compute the other external commission."
+    )
     
     other_external_rate = fields.Float(
         string="Other External Rate",
@@ -259,11 +276,13 @@ class SaleOrder(models.Model):
     # INTERNAL COMMISSION FIELDS
     # ===========================================
     
-    internal_commission_type = fields.Selection([
-        ('sale_percentage', 'Percentage of Sale Value'),
-        ('total_percentage', 'Percentage of Total Sale Order'),
-        ('fixed', 'Fixed Amount')
-    ], string='Internal Commission Type', default='sale_percentage', tracking=True)
+    internal_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION,
+        string='Internal Commission Type',
+        default='unit_price',
+        tracking=True,
+        help="How to compute the internal commission for agents/managers/directors."
+    )
 
     # Agent 1 Commission
     agent1_id = fields.Many2one(
@@ -555,23 +574,15 @@ class SaleOrder(models.Model):
             if not record.sale_value:
                 record.sale_value = record.amount_untaxed or record.amount_total or 0.0
 
-    @api.depends('external_calculation_type', 'external_percentage', 'external_fixed_amount', 'sale_value', 'amount_untaxed')
+    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
     def _compute_external_commission(self):
         """Calculate external commission based on type and parameters"""
         for record in self:
-            if record.external_calculation_type == 'sales_value':
-                base_amount = record.sale_value or 0.0
-                record.external_commission_amount = base_amount * (record.external_percentage / 100) if record.external_percentage else 0.0
-            elif record.external_calculation_type == 'untaxed':
-                base_amount = record.amount_untaxed or 0.0
-                record.external_commission_amount = base_amount * (record.external_percentage / 100) if record.external_percentage else 0.0
-            else:  # fixed
-                record.external_commission_amount = record.external_fixed_amount or 0.0
+            record.external_commission_amount = record._compute_commission_amount(
+                record.external_commission_type, record.external_percentage, record.external_fixed_amount
+            )
 
-    @api.depends('sale_value', 'amount_total', 'developer_commission',
-                 'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_external_rate',
-                 'broker_agency_commission_type', 'referral_commission_type', 
-                 'cashback_commission_type', 'other_external_commission_type')
+    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total')
     def _compute_commission_totals(self):
         """Calculate all external commission totals"""
         for order in self:
@@ -588,41 +599,23 @@ class SaleOrder(models.Model):
                 order.other_external_commission_type, order.other_external_rate
             )
 
-    @api.depends('sale_value', 'amount_total', 'internal_commission_type', 
-                 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed',
-                 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
+    @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
     def _compute_internal_commissions(self):
         """Calculate internal commission amounts"""
         for record in self:
-            base_amount = record.sale_value or record.amount_total or 0.0
-            
-            if record.internal_commission_type == 'sale_percentage':
-                # Individual percentage calculations
-                record.agent1_commission = base_amount * (record.agent1_rate / 100) if record.agent1_rate else 0.0
-                record.agent2_commission = base_amount * (record.agent2_rate / 100) if record.agent2_rate else 0.0
-                record.manager_commission = base_amount * (record.manager_rate / 100) if record.manager_rate else 0.0
-                record.director_commission = base_amount * (record.director_rate / 100) if record.director_rate else 0.0
-                
-            elif record.internal_commission_type == 'total_percentage':
-                # Proportional distribution
-                total_rate = sum([
-                    record.agent1_rate or 0,
-                    record.agent2_rate or 0,
-                    record.manager_rate or 0,
-                    record.director_rate or 0
-                ])
-                
-                if total_rate > 0:
-                    total_commission = base_amount * (total_rate / 100)
-                    record.agent1_commission = total_commission * ((record.agent1_rate or 0) / total_rate)
-                    record.agent2_commission = total_commission * ((record.agent2_rate or 0) / total_rate)
-                    record.manager_commission = total_commission * ((record.manager_rate or 0) / total_rate)
-                    record.director_commission = total_commission * ((record.director_rate or 0) / total_rate)
-                else:
-                    record.agent1_commission = record.agent2_commission = 0.0
-                    record.manager_commission = record.director_commission = 0.0
-                    
-            else:  # fixed amounts
+            if record.internal_commission_type == 'unit_price':
+                base = sum(line.price_unit for line in record.order_line)
+                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
+                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
+                record.manager_commission = (base * (record.manager_rate or 0) / 100)
+                record.director_commission = (base * (record.director_rate or 0) / 100)
+            elif record.internal_commission_type == 'untaxed':
+                base = record.amount_untaxed or 0.0
+                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
+                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
+                record.manager_commission = (base * (record.manager_rate or 0) / 100)
+                record.director_commission = (base * (record.director_rate or 0) / 100)
+            elif record.internal_commission_type == 'fixed':
                 record.agent1_commission = record.agent1_fixed or 0.0
                 record.agent2_commission = record.agent2_fixed or 0.0
                 record.manager_commission = record.manager_fixed or 0.0
@@ -692,21 +685,17 @@ class SaleOrder(models.Model):
     # HELPER METHODS
     # ===========================================
     
-    def _compute_commission_amount(self, commission_type, rate):
+    def _compute_commission_amount(self, commission_type, rate, fixed_amount=0.0):
         """Calculate commission amount based on type and rate"""
         self.ensure_one()
-        if not rate:
-            return 0.0
-        
-        base_amount = self.sale_value or self.amount_total or 0.0
-        gross_commission = self.developer_commission or base_amount
-        
-        if commission_type == 'sale_value':
-            return float_round((base_amount * rate) / 100, precision_digits=2)
-        elif commission_type == 'gross_commission':
-            return float_round((gross_commission * rate) / 100, precision_digits=2)
+        if commission_type == 'unit_price':
+            base = sum(line.price_unit for line in self.order_line)
+            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
+        elif commission_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
         elif commission_type == 'fixed':
-            return rate
+            return fixed_amount or 0.0
         return 0.0
 
     def _generate_commission_sequence(self):
