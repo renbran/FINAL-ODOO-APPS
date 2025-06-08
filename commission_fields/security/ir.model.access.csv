@@ -1,3 +1,1 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_commission_analysis_user,access.commission.analysis.user,model_commission_analysis,base.group_user,1,1,1,1
-access_sale_commission_user,access.sale.commission.user,model_sale_commission,base.group_user,1,1,1,1
