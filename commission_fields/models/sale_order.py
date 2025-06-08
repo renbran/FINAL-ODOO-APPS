@@ -115,9 +115,8 @@ class SaleOrder(models.Model):
     
     # External Partner Commission
     external_partner_id = fields.Many2one(
-        'res.partner', 
+        'res.partner',
         string='External Partner',
-        domain="[('is_external_agent', '=', True)]",
         tracking=True,
         help="External partner/agent for commission"
     )
