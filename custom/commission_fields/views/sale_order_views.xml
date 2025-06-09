@@ -41,7 +41,7 @@
                             <group>
                                 <group string="External Partner">
                                     <field name="external_partner_id"/>
-                                    <field name="external_calculation_type"/>
+                                    <field name="external_commission_type"/>
                                     <field name="external_percentage" invisible="not show_external_percentage"/>
                                     <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
                                     <field name="external_commission_amount" readonly="1"/>
@@ -120,6 +120,13 @@
                 <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary"/>
                 <button name="action_pay_commission" string="Mark as Paid" type="object" class="btn-primary"/>
                 <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary"/>
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="action_create_commission_purchase_order"
+                        type="object"
+                        string="Create Commission Purchase Order"
+                        icon="fa-shopping-cart"/>
             </xpath>
 
             <!-- Invisible fields for commission calculation -->
