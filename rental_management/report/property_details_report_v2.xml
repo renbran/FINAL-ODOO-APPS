@@ -532,7 +532,7 @@
                                 </p>
                             </t>
                             <p style="color: #666; font-size: 0.9rem; margin-top: 15px;">
-                                This brochure was generated on <span t-esc="(doc.create_date or doc.write_date or '')[:10]"/>
+                                This brochure was generated on <span t-esc="(doc.create_date or doc.write_date).strftime('%Y-%m-%d') if (doc.create_date or doc.write_date) else ''"/>
                             </p>
                         </div>
                     </div>
