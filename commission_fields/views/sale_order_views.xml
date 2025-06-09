@@ -189,7 +189,6 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="replace">
                 <tree string="Sales Orders">
-                    <field name="sale_order_type_id" string="Sales Type"/>
                     <field name="deal_id" string="Deal ID"/>
                     <field name="booking_date" string="Booking Date"/>
                     <field name="partner_id" string="Customer"/>

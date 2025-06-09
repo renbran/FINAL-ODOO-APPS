@@ -7,9 +7,26 @@ class AccountMove(models.Model):
     deal_id = fields.Many2one('sale.order', string='Deal ID', readonly=True, copy=False, help="Related Sale Order Deal ID")
     booking_date = fields.Date(string='Booking Date', readonly=True, copy=False, help="Related Sale Order Booking Date")
     buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=True, copy=False, help="Related Sale Order Buyer")
-    project_id = fields.Many2one('your.project.model', string='Project', readonly=True, copy=False, help="Related Sale Order Project")
-    unit_id = fields.Many2one('your.unit.model', string='Unit', readonly=True, copy=False, help="Related Sale Order Unit")
-    sale_value = fields.Monetary(string='Sale Value', readonly=True, copy=False, help="Related Sale Order Sale Value")
+    project_id = fields.Many2one(
+        'product.template',
+        string='Project',
+        readonly=True,
+        copy=False,
+        help="Related Sale Order Project"
+    )
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        readonly=True,
+        copy=False,
+        help="Related Sale Order Unit"
+    )
+    sale_value = fields.Monetary(
+        string='Sale Value',
+        readonly=True,
+        copy=False,
+        help="Related Sale Order Sale Value"
+    )
 
     @api.model
     def create(self, vals):

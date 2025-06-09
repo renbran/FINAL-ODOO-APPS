@@ -61,6 +61,14 @@ class SaleOrder(models.Model):
         index=True
     )
     
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
+        help="The specific unit associated with this sale order"
+    )
+
     sale_value = fields.Monetary(
         string='Sale Value',
         tracking=True,
@@ -71,14 +79,6 @@ class SaleOrder(models.Model):
         readonly=False
     )
     
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
-        help="The specific unit associated with this sale order"
-    )
-
     # ===========================================
     # COMMISSION STATUS AND CONTROL
     # ===========================================
