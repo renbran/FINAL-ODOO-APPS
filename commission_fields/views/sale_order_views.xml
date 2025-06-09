@@ -199,7 +199,7 @@
                     <field name="developer_commission" string="Broker Commission"/>
                     <field name="agent1_commission" string="Agent 1"/>
                     <field name="grand_total_commission" string="Total"/>
-                    <field name="invoiced_amount" string="Total Invoiced"/>
+                    <!-- <field name="invoiced_amount" string="Total Invoiced"/> -->
                     <field name="state" string="Order Status"/>
                     <field name="invoice_status" string="Invoice Status"/>
                     <field name="payment_state" string="Payment Status"/>
