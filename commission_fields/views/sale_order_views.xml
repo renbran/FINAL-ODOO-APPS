@@ -122,6 +122,14 @@
                 <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary"/>
             </xpath>
 
+            <xpath expr="//header" position="inside">
+                <button name="action_create_commission_purchase_order"
+                        type="object"
+                        string="Create Commission Purchase Order"
+                        icon="fa-shopping-cart"
+                        attrs="{'invisible': [('commission_status', 'not in', ['confirmed','paid'])]}"/>
+            </xpath>
+
             <!-- Invisible fields for commission calculation -->
             <xpath expr="//sheet" position="inside">
                 <group string="Commission Computation">
