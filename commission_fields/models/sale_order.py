@@ -897,7 +897,7 @@ class SaleOrder(models.Model):
                 if order.state not in ['draft', 'sent'] and order.commission_status in ['confirmed', 'paid']:
                     raise UserError(_("Cannot modify commission details after order confirmation when commission is confirmed or paid!"))
         
-        return super(SaleOrder, self).write(vals)
+        return super().write(vals)  # FIX: use super() instead of super(SaleOrder, self)
 
     def copy(self, default=None):
         """Handle copying of commission-related fields"""
