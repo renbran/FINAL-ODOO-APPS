@@ -170,6 +170,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="deal_id"/>
+                <field name="booking_date"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="sale_value"/>
                 <field name="commission_status"/>
                 <field name="grand_total_commission"/>
             </xpath>
