@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add default account field to purchase order form -->
+    <record id="view_purchase_order_form_commission_default_account" model="ir.ui.view">
+        <field name="name">purchase.order.form.commission.default.account</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="default_account_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add account field to purchase order line tree view -->
+    <record id="view_purchase_order_line_tree_commission_account" model="ir.ui.view">
+        <field name="name">purchase.order.line.tree.commission.account</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="account_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
