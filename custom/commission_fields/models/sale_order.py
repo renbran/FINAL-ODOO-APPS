@@ -286,10 +286,11 @@ class SaleOrder(models.Model):
 
     # Agent 1 Commission
     agent1_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Agent 1',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Agent 1 for internal commission."
     )
     
     agent1_rate = fields.Float(
@@ -314,10 +315,11 @@ class SaleOrder(models.Model):
 
     # Agent 2 Commission
     agent2_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Agent 2',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Agent 2 for internal commission."
     )
     
     agent2_rate = fields.Float(
@@ -342,10 +344,11 @@ class SaleOrder(models.Model):
 
     # Manager Commission
     manager_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Manager',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Manager for internal commission."
     )
     
     manager_rate = fields.Float(
@@ -370,10 +373,11 @@ class SaleOrder(models.Model):
 
     # Director Commission
     director_id = fields.Many2one(
-        'hr.employee', 
+        'res.partner',
         string='Director',
         tracking=True,
-        domain="[('active', '=', True)]"
+        domain="[]",
+        help="Select any partner as Director for internal commission."
     )
     
     director_rate = fields.Float(
@@ -502,15 +506,15 @@ class SaleOrder(models.Model):
         store=False
     )
 
-    @api.depends('external_calculation_type')
+    @api.depends('external_commission_type')
     def _compute_show_external_percentage(self):
         for rec in self:
-            rec.show_external_percentage = rec.external_calculation_type != 'fixed'
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
 
-    @api.depends('external_calculation_type')
+    @api.depends('external_commission_type')
     def _compute_show_external_fixed_amount(self):
         for rec in self:
-            rec.show_external_fixed_amount = rec.external_calculation_type == 'fixed'
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
 
     @api.depends('internal_commission_type')
     def _compute_show_agent1_rate(self):
@@ -796,6 +800,49 @@ class SaleOrder(models.Model):
         
         return action
 
+    def action_create_commission_purchase_order(self):
+        """Create a purchase order for the commission amount after invoice is processed."""
+        PurchaseOrder = self.env['purchase.order']
+        PurchaseOrderLine = self.env['purchase.order.line']
+        created_pos = []
+        for order in self:
+            # Only allow if commission is confirmed/paid and invoice is processed
+            if order.commission_status not in ['confirmed', 'paid']:
+                raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
+            if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
+                raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
+            # Choose the partner for the PO (example: external partner, can be extended)
+            partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
+            if not partner:
+                raise UserError(_('No commission partner selected for purchase order.'))
+            # Commission amount (sum of all commission fields, or customize as needed)
+            commission_amount = order.grand_total_commission
+            if commission_amount <= 0:
+                raise UserError(_('Commission amount must be greater than zero.'))
+            # Create PO
+            po_vals = {
+                'partner_id': partner.id,
+                'origin': order.name,
+                'commission_sale_order_id': order.id,
+                'order_line': [(0, 0, {
+                    'name': _('Commission for Sale Order %s') % order.name,
+                    'product_qty': 1,
+                    'product_uom': order.env.ref('uom.product_uom_unit').id,
+                    'price_unit': commission_amount,
+                    'date_planned': fields.Date.today(),
+                    'product_id': False,  # You can set a commission product if you have one
+                })],
+            }
+            po = PurchaseOrder.create(po_vals)
+            created_pos.append(po.id)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'res_id': created_pos[0] if len(created_pos) == 1 else False,
+            'domain': [('id', 'in', created_pos)],
+        }
+
     # ===========================================
     # ONCHANGE METHODS
     # ===========================================
@@ -850,7 +897,7 @@ class SaleOrder(models.Model):
                 if order.state not in ['draft', 'sent'] and order.commission_status in ['confirmed', 'paid']:
                     raise UserError(_("Cannot modify commission details after order confirmation when commission is confirmed or paid!"))
         
-        return super(SaleOrder, self).write(vals)
+        return super().write(vals)  # FIX: use super() instead of super(SaleOrder, self)
 
     def copy(self, default=None):
         """Handle copying of commission-related fields"""
@@ -921,4 +968,57 @@ class SaleOrder(models.Model):
             'status': self.commission_status,
             'variance': self.commission_variance,
             'percentage': self.commission_percentage
+        }
+
+# Patch purchase.order to add a link to sale.order
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+    commission_sale_order_id = fields.Many2one('sale.order', string='Commission Sale Order', index=True, help='The sale order that generated this commission purchase order.')
+
+# Add a One2many on sale.order for navigation
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+    commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
+
+    def action_create_commission_purchase_order(self):
+        """Create a purchase order for the commission amount after invoice is processed."""
+        PurchaseOrder = self.env['purchase.order']
+        PurchaseOrderLine = self.env['purchase.order.line']
+        created_pos = []
+        for order in self:
+            # Only allow if commission is confirmed/paid and invoice is processed
+            if order.commission_status not in ['confirmed', 'paid']:
+                raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
+            if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
+                raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
+            # Choose the partner for the PO (example: external partner, can be extended)
+            partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
+            if not partner:
+                raise UserError(_('No commission partner selected for purchase order.'))
+            # Commission amount (sum of all commission fields, or customize as needed)
+            commission_amount = order.grand_total_commission
+            if commission_amount <= 0:
+                raise UserError(_('Commission amount must be greater than zero.'))
+            # Create PO
+            po_vals = {
+                'partner_id': partner.id,
+                'origin': order.name,
+                'commission_sale_order_id': order.id,
+                'order_line': [(0, 0, {
+                    'name': _('Commission for Sale Order %s') % order.name,
+                    'product_qty': 1,
+                    'product_uom': order.env.ref('uom.product_uom_unit').id,
+                    'price_unit': commission_amount,
+                    'date_planned': fields.Date.today(),
+                    'product_id': False,  # You can set a commission product if you have one
+                })],
+            }
+            po = PurchaseOrder.create(po_vals)
+            created_pos.append(po.id)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'res_id': created_pos[0] if len(created_pos) == 1 else False,
+            'domain': [('id', 'in', created_pos)],
         }
