@@ -202,7 +202,7 @@
                     <!-- <field name="invoiced_amount" string="Total Invoiced"/> -->
                     <field name="state" string="Order Status"/>
                     <field name="invoice_status" string="Invoice Status"/>
-                    <field name="payment_state" string="Payment Status"/>
+                    <!-- <field name="payment_state" string="Payment Status"/> -->
                 </tree>
             </xpath>
         </field>
