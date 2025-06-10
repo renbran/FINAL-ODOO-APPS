@@ -18,6 +18,7 @@
         'data/commission_data.xml',
         'views/sale_order_views.xml',
         'views/menu_items.xml',
+        'views/account_move_views.xml',
     ],
     'demo': [],
     'installable': True,
