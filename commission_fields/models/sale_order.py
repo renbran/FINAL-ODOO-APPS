@@ -801,6 +801,18 @@ class SaleOrder(models.Model):
         
         return action
 
+    def action_view_commission_invoices(self):
+        """View all invoices related to this sale order's commission"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Commission Invoices'),
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('deal_id', '=', self.id)],
+            'context': {'default_deal_id': self.id},
+        }
+
     def action_create_commission_purchase_order(self):
         """Create purchase orders for all commission recipients with non-zero commission amounts."""
         PurchaseOrder = self.env['purchase.order']

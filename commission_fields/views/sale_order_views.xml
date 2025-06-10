@@ -159,6 +159,16 @@
                     </page>
                 </notebook>
             </xpath>
+
+            <!-- Smart button for Commission Invoices -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_commission_invoices"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-money"
+                        string="Commission Invoices"
+                        attrs="{'invisible': [('id', '=', False)]}"/>
+            </xpath>
         </field>
     </record>
 
