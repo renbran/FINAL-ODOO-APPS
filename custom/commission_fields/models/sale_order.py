@@ -61,6 +61,14 @@ class SaleOrder(models.Model):
         index=True
     )
     
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
+        help="The specific unit associated with this sale order"
+    )
+
     sale_value = fields.Monetary(
         string='Sale Value',
         tracking=True,
@@ -71,14 +79,6 @@ class SaleOrder(models.Model):
         readonly=False
     )
     
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
-        help="The specific unit associated with this sale order"
-    )
-
     # ===========================================
     # COMMISSION STATUS AND CONTROL
     # ===========================================
@@ -651,11 +651,12 @@ class SaleOrder(models.Model):
             # Grand total
             record.grand_total_commission = record.total_internal_commission + record.total_external_commission
 
-    @api.depends('grand_total_commission', 'amount_untaxed', 'sale_value')
+    @api.depends('grand_total_commission', 'amount_total', 'sale_value')
     def _compute_allocation_status(self):
-        """Determine commission allocation status and calculate variance"""
+        """Determine commission allocation status and calculate variance based on total sale order amount"""
         for record in self:
-            base_amount = record.sale_value or record.amount_untaxed or 0.0
+            # Use amount_total as the base for commission allocation, not unit price or untaxed
+            base_amount = record.amount_total or 0.0
             commission_total = record.grand_total_commission or 0.0
             
             # Calculate variance
