@@ -13,6 +13,20 @@
                 <field name="unit_id"/>
                 <field name="sale_value"/>
             </xpath>
+            <xpath expr="//sheet/notebook" position="before">
+                <notebook>
+                    <page string="Deal Information" name="deal_information">
+                        <group>
+                            <field name="deal_id" string="Deal ID"/>
+                            <field name="booking_date"/>
+                            <field name="buyer_id"/>
+                            <field name="project_id" string="Project Name"/>
+                            <field name="unit_id"/>
+                            <field name="sale_value"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
         </field>
     </record>
 
