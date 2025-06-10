@@ -653,10 +653,10 @@ class SaleOrder(models.Model):
 
     @api.depends('grand_total_commission', 'amount_total', 'sale_value')
     def _compute_allocation_status(self):
-        """Determine commission allocation status and calculate variance based on total sale order amount"""
+        """Determine commission allocation status and calculate variance based on untaxed amount (excluding tax)"""
         for record in self:
-            # Use amount_total as the base for commission allocation, not unit price or untaxed
-            base_amount = record.amount_total or 0.0
+            # Use amount_untaxed as the base for commission allocation, not amount_total (which includes tax)
+            base_amount = record.amount_untaxed or 0.0
             commission_total = record.grand_total_commission or 0.0
             
             # Calculate variance
@@ -801,11 +801,22 @@ class SaleOrder(models.Model):
         
         return action
 
+    def action_view_commission_invoices(self):
+        """View all invoices related to this sale order's commission"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Commission Invoices'),
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('deal_id', '=', self.id)],
+            'context': {'default_deal_id': self.id},
+        }
+
     def action_create_commission_purchase_order(self):
-        """Create a purchase order for the commission amount after invoice is processed."""
+        """Create purchase orders for all commission recipients with non-zero commission amounts."""
         PurchaseOrder = self.env['purchase.order']
         created_pos = []
-        # Get or create a commission product
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
         if not commission_product:
             commission_product = self.env['product.product'].create({
@@ -819,27 +830,102 @@ class SaleOrder(models.Model):
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
-            if not partner:
-                raise UserError(_('No commission partner selected for purchase order.'))
-            commission_amount = order.grand_total_commission
-            if commission_amount <= 0:
-                raise UserError(_('Commission amount must be greater than zero.'))
-            po_vals = {
-                'partner_id': partner.id,
-                'origin': order.name,
-                'commission_sale_order_id': order.id,
-                'order_line': [(0, 0, {
-                    'name': _('Commission for Sale Order %s') % order.name,
-                    'product_qty': 1,
-                    'product_uom': commission_product.uom_id.id,
-                    'price_unit': commission_amount,
-                    'date_planned': fields.Date.today(),
-                    'product_id': commission_product.id,
-                })],
-            }
-            po = PurchaseOrder.create(po_vals)
-            created_pos.append(po.id)
+
+            # Prepare all commission recipients and amounts
+            commission_lines = []
+            # Internal
+            if order.agent1_id and order.agent1_commission > 0:
+                commission_lines.append({
+                    'partner': order.agent1_id,
+                    'name': _('Agent 1 Commission for Sale Order %s') % order.name,
+                    'amount': order.agent1_commission
+                })
+            if order.agent2_id and order.agent2_commission > 0:
+                commission_lines.append({
+                    'partner': order.agent2_id,
+                    'name': _('Agent 2 Commission for Sale Order %s') % order.name,
+                    'amount': order.agent2_commission
+                })
+            if order.manager_id and order.manager_commission > 0:
+                commission_lines.append({
+                    'partner': order.manager_id,
+                    'name': _('Manager Commission for Sale Order %s') % order.name,
+                    'amount': order.manager_commission
+                })
+            if order.director_id and order.director_commission > 0:
+                commission_lines.append({
+                    'partner': order.director_id,
+                    'name': _('Director Commission for Sale Order %s') % order.name,
+                    'amount': order.director_commission
+                })
+            # External
+            if order.external_partner_id and order.external_commission_amount > 0:
+                commission_lines.append({
+                    'partner': order.external_partner_id,
+                    'name': _('External Partner Commission for Sale Order %s') % order.name,
+                    'amount': order.external_commission_amount
+                })
+            if order.broker_agency_name and order.broker_agency_total > 0:
+                broker_partner = order.broker_agency_partner_id if hasattr(order, 'broker_agency_partner_id') and order.broker_agency_partner_id else False
+                commission_lines.append({
+                    'partner': broker_partner or order.partner_id,  # fallback to order partner
+                    'name': _('Broker/Agency Commission for Sale Order %s (%s)') % (order.name, order.broker_agency_name),
+                    'amount': order.broker_agency_total
+                })
+            if order.referral_name and order.referral_total > 0:
+                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+                commission_lines.append({
+                    'partner': referral_partner or order.partner_id,
+                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'amount': order.referral_total
+                })
+            if order.cashback_name and order.cashback_total > 0:
+                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+                commission_lines.append({
+                    'partner': cashback_partner or order.partner_id,
+                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'amount': order.cashback_total
+                })
+            if order.other_external_name and order.other_external_total > 0:
+                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+                commission_lines.append({
+                    'partner': other_partner or order.partner_id,
+                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'amount': order.other_external_total
+                })
+
+            if not commission_lines:
+                raise UserError(_('No commission recipients with non-zero commission found.'))
+
+            # Group lines by partner (one PO per partner)
+            partner_map = {}
+            for line in commission_lines:
+                partner = line['partner']
+                if not partner:
+                    continue
+                if partner not in partner_map:
+                    partner_map[partner] = []
+                partner_map[partner].append(line)
+
+            for partner, lines in partner_map.items():
+                po_lines = []
+                for l in lines:
+                    po_lines.append((0, 0, {
+                        'name': l['name'],
+                        'product_qty': 1,
+                        'product_uom': commission_product.uom_id.id,
+                        'price_unit': l['amount'],
+                        'date_planned': fields.Date.today(),
+                        'product_id': commission_product.id,
+                    }))
+                po_vals = {
+                    'partner_id': partner.id,
+                    'origin': order.name,
+                    'commission_sale_order_id': order.id,
+                    'order_line': po_lines,
+                }
+                po = PurchaseOrder.create(po_vals)
+                created_pos.append(po.id)
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.order',
@@ -986,10 +1072,9 @@ class SaleOrder(models.Model):
     commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
 
     def action_create_commission_purchase_order(self):
-        """Create a purchase order for the commission amount after invoice is processed."""
+        """Create purchase orders for all commission recipients with non-zero commission amounts."""
         PurchaseOrder = self.env['purchase.order']
         created_pos = []
-        # Get or create a commission product
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
         if not commission_product:
             commission_product = self.env['product.product'].create({
@@ -1003,27 +1088,102 @@ class SaleOrder(models.Model):
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
-            if not partner:
-                raise UserError(_('No commission partner selected for purchase order.'))
-            commission_amount = order.grand_total_commission
-            if commission_amount <= 0:
-                raise UserError(_('Commission amount must be greater than zero.'))
-            po_vals = {
-                'partner_id': partner.id,
-                'origin': order.name,
-                'commission_sale_order_id': order.id,
-                'order_line': [(0, 0, {
-                    'name': _('Commission for Sale Order %s') % order.name,
-                    'product_qty': 1,
-                    'product_uom': commission_product.uom_id.id,
-                    'price_unit': commission_amount,
-                    'date_planned': fields.Date.today(),
-                    'product_id': commission_product.id,
-                })],
-            }
-            po = PurchaseOrder.create(po_vals)
-            created_pos.append(po.id)
+
+            # Prepare all commission recipients and amounts
+            commission_lines = []
+            # Internal
+            if order.agent1_id and order.agent1_commission > 0:
+                commission_lines.append({
+                    'partner': order.agent1_id,
+                    'name': _('Agent 1 Commission for Sale Order %s') % order.name,
+                    'amount': order.agent1_commission
+                })
+            if order.agent2_id and order.agent2_commission > 0:
+                commission_lines.append({
+                    'partner': order.agent2_id,
+                    'name': _('Agent 2 Commission for Sale Order %s') % order.name,
+                    'amount': order.agent2_commission
+                })
+            if order.manager_id and order.manager_commission > 0:
+                commission_lines.append({
+                    'partner': order.manager_id,
+                    'name': _('Manager Commission for Sale Order %s') % order.name,
+                    'amount': order.manager_commission
+                })
+            if order.director_id and order.director_commission > 0:
+                commission_lines.append({
+                    'partner': order.director_id,
+                    'name': _('Director Commission for Sale Order %s') % order.name,
+                    'amount': order.director_commission
+                })
+            # External
+            if order.external_partner_id and order.external_commission_amount > 0:
+                commission_lines.append({
+                    'partner': order.external_partner_id,
+                    'name': _('External Partner Commission for Sale Order %s') % order.name,
+                    'amount': order.external_commission_amount
+                })
+            if order.broker_agency_name and order.broker_agency_total > 0:
+                broker_partner = order.broker_agency_partner_id if hasattr(order, 'broker_agency_partner_id') and order.broker_agency_partner_id else False
+                commission_lines.append({
+                    'partner': broker_partner or order.partner_id,  # fallback to order partner
+                    'name': _('Broker/Agency Commission for Sale Order %s (%s)') % (order.name, order.broker_agency_name),
+                    'amount': order.broker_agency_total
+                })
+            if order.referral_name and order.referral_total > 0:
+                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+                commission_lines.append({
+                    'partner': referral_partner or order.partner_id,
+                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'amount': order.referral_total
+                })
+            if order.cashback_name and order.cashback_total > 0:
+                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+                commission_lines.append({
+                    'partner': cashback_partner or order.partner_id,
+                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'amount': order.cashback_total
+                })
+            if order.other_external_name and order.other_external_total > 0:
+                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+                commission_lines.append({
+                    'partner': other_partner or order.partner_id,
+                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'amount': order.other_external_total
+                })
+
+            if not commission_lines:
+                raise UserError(_('No commission recipients with non-zero commission found.'))
+
+            # Group lines by partner (one PO per partner)
+            partner_map = {}
+            for line in commission_lines:
+                partner = line['partner']
+                if not partner:
+                    continue
+                if partner not in partner_map:
+                    partner_map[partner] = []
+                partner_map[partner].append(line)
+
+            for partner, lines in partner_map.items():
+                po_lines = []
+                for l in lines:
+                    po_lines.append((0, 0, {
+                        'name': l['name'],
+                        'product_qty': 1,
+                        'product_uom': commission_product.uom_id.id,
+                        'price_unit': l['amount'],
+                        'date_planned': fields.Date.today(),
+                        'product_id': commission_product.id,
+                    }))
+                po_vals = {
+                    'partner_id': partner.id,
+                    'origin': order.name,
+                    'commission_sale_order_id': order.id,
+                    'order_line': po_lines,
+                }
+                po = PurchaseOrder.create(po_vals)
+                created_pos.append(po.id)
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.order',
