@@ -971,7 +971,8 @@ class SaleOrder(models.Model):
             if order.commission_status == 'draft' and order.grand_total_commission > 0:
                 raise UserError(_("Please calculate commissions before confirming the order!"))
         
-        return super(SaleOrder, self).action_confirm()
+        # Corrected super() usage to avoid recursion
+        return super().action_confirm()
 
     def write(self, vals):
         """Prevent modifications to certain fields after confirmation"""
