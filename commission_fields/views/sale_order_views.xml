@@ -168,6 +168,15 @@
                         icon="fa-money"
                         string="Commission Invoices"/>
             </xpath>
+
+            <!-- Smart button for Commission Purchase Orders -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_related_purchase_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-shopping-cart"
+                        string="Commission Purchase Orders"/>
+            </xpath>
         </field>
     </record>
 

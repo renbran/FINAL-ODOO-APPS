@@ -653,10 +653,10 @@ class SaleOrder(models.Model):
 
     @api.depends('grand_total_commission', 'amount_total', 'sale_value')
     def _compute_allocation_status(self):
-        """Determine commission allocation status and calculate variance based on total sale order amount"""
+        """Determine commission allocation status and calculate variance based on untaxed amount (excluding tax)"""
         for record in self:
-            # Use amount_total as the base for commission allocation, not unit price or untaxed
-            base_amount = record.amount_total or 0.0
+            # Use amount_untaxed as the base for commission allocation, not amount_total (which includes tax)
+            base_amount = record.amount_untaxed or 0.0
             commission_total = record.grand_total_commission or 0.0
             
             # Calculate variance
