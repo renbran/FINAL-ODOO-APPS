@@ -804,23 +804,27 @@ class SaleOrder(models.Model):
     def action_create_commission_purchase_order(self):
         """Create a purchase order for the commission amount after invoice is processed."""
         PurchaseOrder = self.env['purchase.order']
-        PurchaseOrderLine = self.env['purchase.order.line']
         created_pos = []
+        # Get or create a commission product
+        commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
+        if not commission_product:
+            commission_product = self.env['product.product'].create({
+                'name': 'Commission Fee',
+                'type': 'service',
+                'purchase_ok': True,
+                'sale_ok': False,
+            })
         for order in self:
-            # Only allow if commission is confirmed/paid and invoice is processed
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            # Choose the partner for the PO (example: external partner, can be extended)
             partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
             if not partner:
                 raise UserError(_('No commission partner selected for purchase order.'))
-            # Commission amount (sum of all commission fields, or customize as needed)
             commission_amount = order.grand_total_commission
             if commission_amount <= 0:
                 raise UserError(_('Commission amount must be greater than zero.'))
-            # Create PO
             po_vals = {
                 'partner_id': partner.id,
                 'origin': order.name,
@@ -828,10 +832,10 @@ class SaleOrder(models.Model):
                 'order_line': [(0, 0, {
                     'name': _('Commission for Sale Order %s') % order.name,
                     'product_qty': 1,
-                    'product_uom': order.env.ref('uom.product_uom_unit').id,
+                    'product_uom': commission_product.uom_id.id,
                     'price_unit': commission_amount,
                     'date_planned': fields.Date.today(),
-                    'product_id': False,  # You can set a commission product if you have one
+                    'product_id': commission_product.id,
                 })],
             }
             po = PurchaseOrder.create(po_vals)
@@ -984,23 +988,27 @@ class SaleOrder(models.Model):
     def action_create_commission_purchase_order(self):
         """Create a purchase order for the commission amount after invoice is processed."""
         PurchaseOrder = self.env['purchase.order']
-        PurchaseOrderLine = self.env['purchase.order.line']
         created_pos = []
+        # Get or create a commission product
+        commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
+        if not commission_product:
+            commission_product = self.env['product.product'].create({
+                'name': 'Commission Fee',
+                'type': 'service',
+                'purchase_ok': True,
+                'sale_ok': False,
+            })
         for order in self:
-            # Only allow if commission is confirmed/paid and invoice is processed
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            # Choose the partner for the PO (example: external partner, can be extended)
             partner = order.external_partner_id or order.agent1_id or order.agent2_id or order.manager_id or order.director_id
             if not partner:
                 raise UserError(_('No commission partner selected for purchase order.'))
-            # Commission amount (sum of all commission fields, or customize as needed)
             commission_amount = order.grand_total_commission
             if commission_amount <= 0:
                 raise UserError(_('Commission amount must be greater than zero.'))
-            # Create PO
             po_vals = {
                 'partner_id': partner.id,
                 'origin': order.name,
@@ -1008,10 +1016,10 @@ class SaleOrder(models.Model):
                 'order_line': [(0, 0, {
                     'name': _('Commission for Sale Order %s') % order.name,
                     'product_qty': 1,
-                    'product_uom': order.env.ref('uom.product_uom_unit').id,
+                    'product_uom': commission_product.uom_id.id,
                     'price_unit': commission_amount,
                     'date_planned': fields.Date.today(),
-                    'product_id': False,  # You can set a commission product if you have one
+                    'product_id': commission_product.id,
                 })],
             }
             po = PurchaseOrder.create(po_vals)
