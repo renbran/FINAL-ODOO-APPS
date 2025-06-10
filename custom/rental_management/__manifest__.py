@@ -89,7 +89,7 @@
         "views/property_crm_lead_inherit_view.xml",
         # Report views
         "report/tenancy_details_report_template.xml",
-        "report/property_details_report.xml",
+        "report/property_details_report_v2.xml",
         "report/property_sold_report.xml",
         "report/invoice_report_inherit.xml",
         # Mail Template
