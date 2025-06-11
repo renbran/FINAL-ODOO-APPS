@@ -1,0 +1,118 @@
+<odoo>
+    <template id="report_payment_receipt_document" inherit_id="account.report_payment_receipt_document">
+        <xpath expr="//div[@class='page']" position="replace">
+            <div class="page" style="padding: 0; background: #fff; font-family: Arial, sans-serif;">
+                <!-- Header Bar -->
+                <div style="background: #7c162e; height: 16px; width: 100%;"></div>
+                <!-- Company/Partner Details -->
+                <div style="padding: 24px 32px 8px 32px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="width: 50%;">
+                            <div style="font-weight: bold; letter-spacing: 1px;">OUR COMPANY DETAILS</div>
+                            <div style="font-size: 13px; margin-top: 4px;">
+                                <t t-esc="o.company_id.name"/><br/>
+                                <t t-esc="o.company_id.street"/><br/>
+                                <t t-if="o.company_id.street2"><t t-esc="o.company_id.street2"/><br/></t>
+                                <t t-esc="o.company_id.city"/>
+                                <t t-if="o.company_id.state_id">, <t t-esc="o.company_id.state_id.name"/></t><br/>
+                                <t t-esc="o.company_id.country_id.name"/><br/>
+                                VAT: <t t-esc="o.company_id.vat"/>
+                            </div>
+                        </div>
+                        <div style="width: 50%; text-align: right;">
+                            <div style="font-weight: bold; letter-spacing: 1px;">PARTNER DETAILS</div>
+                            <div style="font-size: 13px; margin-top: 4px;">
+                                <t t-esc="o.partner_id.name"/><br/>
+                                <t t-esc="o.partner_id.street"/><br/>
+                                <t t-if="o.partner_id.street2"><t t-esc="o.partner_id.street2"/><br/></t>
+                                <t t-esc="o.partner_id.city"/>
+                                <t t-if="o.partner_id.state_id">, <t t-esc="o.partner_id.state_id.name"/></t><br/>
+                                <t t-esc="o.partner_id.country_id.name"/><br/>
+                                VAT: <t t-esc="o.partner_id.vat"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Title and Dates -->
+                <div style="text-align: center; margin: 16px 0 8px 0;">
+                    <h2 style="color: #7c162e; font-weight: bold; letter-spacing: 2px; margin-bottom: 0;">PAYMENT RECEIPT</h2>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0 32px; font-size: 13px;">
+                    <div>Receipt Date: <span t-field="o.date"/></div>
+                    <div>Reference: <span t-field="o.name"/></div>
+                </div>
+                <!-- QR Code -->
+                <div style="text-align: right; padding: 0 32px 0 0; margin-top: 8px;">
+                    <img t-if="o.qr_code" t-att-src="'data:image/png;base64,%s' % o.qr_code.decode()" style="width: 90px; height: 90px; border-radius: 8px; border: 1px solid #eee;"/>
+                    <div style="font-size: 10px; color: #888;">Scan to verify</div>
+                </div>
+                <!-- Payment Details Table -->
+                <div style="padding: 0 32px; margin-top: 16px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #7c162e; color: #fff;">
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Customer</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Payment Method</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Amount</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Memo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="o.partner_id"/></td>
+                                <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="o.payment_method_id.name"/></td>
+                                <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="o.ref"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Invoices Table -->
+                <div style="padding: 0 32px; margin-top: 24px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #7c162e; color: #fff;">
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Invoice Date</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Invoice Number</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e;">Reference</th>
+                                <th style="padding: 6px; border: 1px solid #7c162e; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="invoices" t-value="o.reconciled_invoice_ids or o.reconciled_bill_ids"/>
+                            <t t-foreach="invoices" t-as="inv">
+                                <tr>
+                                    <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="inv.invoice_date"/></td>
+                                    <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="inv.name"/></td>
+                                    <td style="padding: 6px; border: 1px solid #7c162e;"><span t-field="inv.ref"/></td>
+                                    <td style="padding: 6px; border: 1px solid #7c162e; text-align: right;"><span t-field="inv.amount_total"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Payment Instructions -->
+                <div style="margin: 32px 32px 0 32px;">
+                    <div style="background: #7c162e; color: #fff; padding: 8px 16px; font-weight: bold; font-size: 15px;">Payment Instructions</div>
+                    <div style="border: 1px solid #7c162e; border-top: none; padding: 16px; font-size: 13px;">
+                        Please pay to this Account Details in Cheque or Bank Transfer<br/><br/>
+                        <table style="width: 100%; font-size: 13px;">
+                            <tr><td style="font-weight: bold; width: 160px;">Bank Name</td><td><t t-esc="o.company_id.bank_ids and o.company_id.bank_ids[0].bank_id.name or ''"/></td></tr>
+                            <tr><td style="font-weight: bold;">Account Name</td><td><t t-esc="o.company_id.name"/></td></tr>
+                            <tr><td style="font-weight: bold;">Account No.</td><td><t t-esc="o.company_id.bank_ids and o.company_id.bank_ids[0].acc_number or ''"/></td></tr>
+                            <tr><td style="font-weight: bold;">IBAN</td><td><t t-esc="o.company_id.bank_ids and o.company_id.bank_ids[0].sanitized_acc_number or ''"/></td></tr>
+                            <tr><td style="font-weight: bold;">Branch</td><td><t t-esc="o.company_id.bank_ids and o.company_id.bank_ids[0].bank_id.bic or ''"/></td></tr>
+                        </table>
+                        <div style="font-size: 11px; color: #7c162e; margin-top: 8px;">
+                            Please include your reference number when making the payment
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div style="text-align: center; color: #888; font-size: 11px; margin-top: 24px;">
+                    This is an automated document. No signature or stamp required.
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
