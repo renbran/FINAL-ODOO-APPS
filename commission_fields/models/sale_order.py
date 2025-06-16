@@ -1192,3 +1192,12 @@ class SaleOrder(models.Model):
             'res_id': created_pos[0] if len(created_pos) == 1 else False,
             'domain': [('id', 'in', created_pos)],
         }
+
+    # ===========================================
+    # HELPER METHODS
+    # ===========================================
+
+    @api.model
+    def search_by_deal_id(self, deal_id_str):
+        """Search sale.order by deal_id string."""
+        return self.search([('deal_id', '=', deal_id_str)])
