@@ -39,7 +39,6 @@ class SaleOrder(models.Model):
         'res.partner',
         string='Buyer',
         tracking=True,
-        domain="[('is_company', '=', False), ('customer_rank', '>', 0)]",
         help="The buyer associated with this sale order",
         index=True
     )
