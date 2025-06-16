@@ -72,14 +72,16 @@ class SaleOrder(models.Model):
         string='Project',
         tracking=True,
         help="The project associated with this sale order",
-        index=True
+        index=True,
+        ondelete='set null'
     )
     
     unit_id = fields.Many2one(
         'sale.order.unit',
         string='Unit',
         tracking=True,
-        help="The specific unit associated with this sale order"
+        help="The specific unit associated with this sale order",
+        ondelete='set null'
     )
 
     sale_value = fields.Monetary(
