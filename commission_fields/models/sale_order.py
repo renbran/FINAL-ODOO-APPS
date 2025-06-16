@@ -686,10 +686,11 @@ class SaleOrder(models.Model):
     # ===========================================
     
     def _compute_commission_amount(self, commission_type, rate, fixed_amount=0.0):
-        """Calculate commission amount based on type and rate"""
+        """Calculate commission amount based on type and rate. Uses price_subtotal for accuracy."""
         self.ensure_one()
         if commission_type == 'unit_price':
-            base = sum(line.price_unit for line in self.order_line)
+            # Use price_subtotal for each line (handles qty, discount, taxes)
+            base = sum(line.price_subtotal for line in self.order_line)
             return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
         elif commission_type == 'untaxed':
             base = self.amount_untaxed or 0.0
@@ -773,11 +774,15 @@ class SaleOrder(models.Model):
             order.message_post(body=_("Commission recalculated by %s") % self.env.user.name)
 
     def action_reset_commission(self):
-        """Reset commission to draft state"""
+        """Reset commission to draft state and cancel old commission POs."""
         for order in self:
             if order.commission_status == 'paid':
                 raise UserError(_("Cannot reset paid commissions!"))
-            
+            # Cancel and remove old commission POs
+            for po in order.commission_purchase_order_ids:
+                if po.state not in ['cancel', 'done']:
+                    po.button_cancel()
+                po.unlink()
             order.commission_status = 'draft'
             order.message_post(body=_("Commission reset to draft by %s") % self.env.user.name)
 
@@ -809,7 +814,8 @@ class SaleOrder(models.Model):
         }
 
     def action_create_commission_purchase_order(self):
-        """Create purchase orders for all commission recipients with non-zero commission amounts."""
+        """Create purchase orders for all commission recipients with non-zero commission amounts.
+        Removes/cancels old commission POs before creating new ones for accuracy and to avoid duplicates."""
         PurchaseOrder = self.env['purchase.order']
         created_pos = []
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
@@ -821,11 +827,15 @@ class SaleOrder(models.Model):
                 'sale_ok': False,
             })
         for order in self:
+            # Remove/cancel old commission POs
+            for po in order.commission_purchase_order_ids:
+                if po.state not in ['cancel', 'done']:
+                    po.button_cancel()
+                po.unlink()
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-
             # Prepare all commission recipients and amounts
             commission_lines = []
             # Internal
@@ -875,10 +885,8 @@ class SaleOrder(models.Model):
                     'partner': order.other_external_partner_id,
                     'amount': order.other_external_total
                 })
-
             if not commission_lines:
                 raise UserError(_('No commission recipients with non-zero commission found.'))
-
             # Group lines by partner (one PO per partner)
             partner_map = {}
             for line in commission_lines:
@@ -888,7 +896,6 @@ class SaleOrder(models.Model):
                 if partner not in partner_map:
                     partner_map[partner] = []
                 partner_map[partner].append(line)
-
             for partner, lines in partner_map.items():
                 po_lines = []
                 for l in lines:
@@ -1055,7 +1062,8 @@ class SaleOrder(models.Model):
     commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
 
     def action_create_commission_purchase_order(self):
-        """Create purchase orders for all commission recipients with non-zero commission amounts."""
+        """Create purchase orders for all commission recipients with non-zero commission amounts.
+        Removes/cancels old commission POs before creating new ones for accuracy and to avoid duplicates."""
         PurchaseOrder = self.env['purchase.order']
         created_pos = []
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
@@ -1067,11 +1075,15 @@ class SaleOrder(models.Model):
                 'sale_ok': False,
             })
         for order in self:
+            # Remove/cancel old commission POs
+            for po in order.commission_purchase_order_ids:
+                if po.state not in ['cancel', 'done']:
+                    po.button_cancel()
+                po.unlink()
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
             if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
                 raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-
             # Prepare all commission recipients and amounts
             commission_lines = []
             # Internal
@@ -1121,10 +1133,8 @@ class SaleOrder(models.Model):
                     'partner': order.other_external_partner_id,
                     'amount': order.other_external_total
                 })
-
             if not commission_lines:
                 raise UserError(_('No commission recipients with non-zero commission found.'))
-
             # Group lines by partner (one PO per partner)
             partner_map = {}
             for line in commission_lines:
@@ -1134,7 +1144,6 @@ class SaleOrder(models.Model):
                 if partner not in partner_map:
                     partner_map[partner] = []
                 partner_map[partner].append(line)
-
             for partner, lines in partner_map.items():
                 po_lines = []
                 for l in lines:
