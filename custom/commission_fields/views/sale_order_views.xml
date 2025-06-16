@@ -57,15 +57,15 @@
                                 <group string="Referral">
                                     <field name="referral_name"/>
                                     <field name="referral_commission_type"/>
-                                    <field name="referral_rate" attrs="{'invisible': [('referral_commission_type', '=', 'fixed')]}"/>
-                                    <field name="referral_fixed_amount" attrs="{'invisible': [('referral_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="referral_rate" visibility="referral_commission_type != 'fixed'"/>
+                                    <field name="referral_fixed_amount" visibility="referral_commission_type == 'fixed'"/>
                                     <field name="referral_total" readonly="1"/>
                                 </group>
                                 <group string="Cashback">
                                     <field name="cashback_name"/>
                                     <field name="cashback_commission_type"/>
-                                    <field name="cashback_rate" attrs="{'invisible': [('cashback_commission_type', '=', 'fixed')]}"/>
-                                    <field name="cashback_fixed_amount" attrs="{'invisible': [('cashback_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="cashback_rate" visibility="cashback_commission_type != 'fixed'"/>
+                                    <field name="cashback_fixed_amount" visibility="cashback_commission_type == 'fixed'"/>
                                     <field name="cashback_total" readonly="1"/>
                                 </group>
                             </group>
@@ -73,8 +73,8 @@
                                 <group string="Other External">
                                     <field name="other_external_name"/>
                                     <field name="other_external_commission_type"/>
-                                    <field name="other_external_rate" attrs="{'invisible': [('other_external_commission_type', '=', 'fixed')]}"/>
-                                    <field name="other_external_fixed_amount" attrs="{'invisible': [('other_external_commission_type', '!=', 'fixed')]}"/>
+                                    <field name="other_external_rate" visibility="other_external_commission_type != 'fixed'"/>
+                                    <field name="other_external_fixed_amount" visibility="other_external_commission_type == 'fixed'"/>
                                     <field name="other_external_total" readonly="1"/>
                                 </group>
                             </group>
