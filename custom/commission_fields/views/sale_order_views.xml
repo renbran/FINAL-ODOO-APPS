@@ -10,8 +10,8 @@
                 <field name="deal_id" string="Deal ID"/>
                 <field name="booking_date"/>
                 <field name="buyer_id"/>
-                <field name="project_id" string="Project Name" options="{'no_create': True}"/>
-                <field name="unit_id" options="{'no_create': True}"/>
+                <field name="project_id" string="Project Name"/>
+                <field name="unit_id" string="Unit"/>
                 <field name="sale_value"/>
             </xpath>
 
@@ -140,8 +140,8 @@
                             <field name="deal_id" string="Deal ID"/>
                             <field name="booking_date"/>
                             <field name="buyer_id"/>
-                            <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>
-                            <field name="unit_id" options="{'no_create': True}"/>
+                            <field name="project_id" string="Project Name"/>
+                            <field name="unit_id" string="Unit"/>
                             <field name="sale_value"/>
                         </group>
                     </page>

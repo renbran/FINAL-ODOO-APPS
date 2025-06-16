@@ -8,14 +8,14 @@ class AccountMove(models.Model):
     booking_date = fields.Date(string='Booking Date', readonly=False, copy=False, help="Related Sale Order Booking Date")
     buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=False, copy=False, help="Related Sale Order Buyer")
     project_id = fields.Many2one(
-        'product.template',
+        'sale.order.project',
         string='Project',
         readonly=False,
         copy=False,
         help="Related Sale Order Project"
     )
     unit_id = fields.Many2one(
-        'product.product',
+        'sale.order.unit',
         string='Unit',
         readonly=False,
         copy=False,
@@ -27,24 +27,10 @@ class AccountMove(models.Model):
         copy=False,
         help="Related Sale Order Sale Value"
     )
-    # Add a Char field for deal_id search convenience
-    deal_id_char = fields.Char(string='Deal ID (String)', compute='_compute_deal_id_char', store=True, index=True, help="Deal string for search/filter")
-    # Deprecated: Dummy field to avoid database errors if old deal_id column exists in DB
-    # deal_id = fields.Char(string='[DEPRECATED] Deal ID (legacy)', readonly=True, help="Legacy field. Safe to remove column from DB when possible.")
-
-    @api.depends('deal_id_str')
-    def _compute_deal_id_char(self):
-        for rec in self:
-            rec.deal_id_char = rec.deal_id_str or False
-
-    @api.model
-    def search_by_deal_id(self, deal_id_str):
-        """Search account.move by deal string (deal_id from sale.order)"""
-        return self.search([('deal_id_char', '=', deal_id_str)])
 
     @api.model
     def create(self, vals):
-        # Set deal_id_str on invoice to the deal_id string from sale.order
+        # Set deal_id_str and related fields on invoice to the values from sale.order
         if vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
             if sale_order:
