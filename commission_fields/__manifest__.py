@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Commission Management',
-    'version': '1.0',
+    'version': '17.0',
     'summary': 'Comprehensive commission management for sales',
     'description': """
         This module provides advanced commission management capabilities
