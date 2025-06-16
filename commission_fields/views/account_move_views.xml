@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_origin']" position="after">
-                <field name="deal_id_str" string="Deal ID"/>
+                <field name="deal_id"/>
                 <field name="booking_date"/>
                 <field name="buyer_id"/>
                 <field name="project_id"/>
@@ -17,7 +17,7 @@
                 <notebook>
                     <page string="Deal Information" name="deal_information">
                         <group>
-                            <field name="deal_id_str" string="Deal ID"/>
+                            <field name="deal_id" string="Deal ID"/>
                             <field name="booking_date"/>
                             <field name="buyer_id"/>
                             <field name="project_id" string="Project Name"/>
@@ -38,7 +38,7 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="replace">
                 <tree string="Account Moves">
-                    <field name="deal_id_str" string="Deal ID"/>
+                    <field name="deal_id" string="Deal ID"/>
                     <field name="booking_date" string="Booking Date"/>
                     <field name="partner_id" string="Customer"/>
                     <field name="buyer_id" string="Buyer Name"/>

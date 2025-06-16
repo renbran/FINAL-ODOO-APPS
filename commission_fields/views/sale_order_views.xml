@@ -9,9 +9,9 @@
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="deal_id" string="Deal ID"/>
                 <field name="booking_date"/>
-                <field name="buyer_id"/>
-                <field name="project_id" string="Project Name"/>
-                <field name="unit_id" string="Unit"/>
+                <field name="buyer_id" options="{'no_create': True}"/>
+                <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>
+                <field name="unit_id" options="{'no_create': True}"/>
                 <field name="sale_value"/>
             </xpath>
 
@@ -39,27 +39,39 @@
                     <notebook>
                         <page string="External Commission">
                             <group>
+                                <group string="External Partner">
+                                    <field name="external_partner_id"/>
+                                    <field name="external_commission_type"/>
+                                    <field name="external_percentage" invisible="not show_external_percentage"/>
+                                    <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
+                                    <field name="external_commission_amount" readonly="1"/>
+                                </group>
+                                <group string="Broker/Agency">
+                                    <field name="broker_agency_name"/>
+                                    <field name="broker_agency_commission_type"/>
+                                    <field name="broker_agency_rate"/>
+                                    <field name="broker_agency_total" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
                                 <group string="Referral">
-                                    <field name="referral_partner_id"/>
+                                    <field name="referral_name"/>
                                     <field name="referral_commission_type"/>
-                                    <field name="referral_rate" visibility="referral_commission_type != 'fixed'"/>
-                                    <field name="referral_fixed_amount" visibility="referral_commission_type == 'fixed'"/>
+                                    <field name="referral_rate"/>
                                     <field name="referral_total" readonly="1"/>
                                 </group>
                                 <group string="Cashback">
-                                    <field name="cashback_partner_id"/>
+                                    <field name="cashback_name"/>
                                     <field name="cashback_commission_type"/>
-                                    <field name="cashback_rate" visibility="cashback_commission_type != 'fixed'"/>
-                                    <field name="cashback_fixed_amount" visibility="cashback_commission_type == 'fixed'"/>
+                                    <field name="cashback_rate"/>
                                     <field name="cashback_total" readonly="1"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="Other External">
-                                    <field name="other_external_partner_id"/>
+                                    <field name="other_external_name"/>
                                     <field name="other_external_commission_type"/>
-                                    <field name="other_external_rate" visibility="other_external_commission_type != 'fixed'"/>
-                                    <field name="other_external_fixed_amount" visibility="other_external_commission_type == 'fixed'"/>
+                                    <field name="other_external_rate"/>
                                     <field name="other_external_total" readonly="1"/>
                                 </group>
                             </group>
@@ -120,6 +132,7 @@
             <!-- Invisible fields for commission calculation -->
             <xpath expr="//sheet" position="inside">
                 <group string="Commission Computation">
+                    <field name="show_external_percentage" invisible="1"/>
                     <field name="show_external_fixed_amount" invisible="1"/>
                     <field name="show_agent1_rate" invisible="1"/>
                     <field name="show_agent1_fixed" invisible="1"/>
@@ -138,9 +151,9 @@
                         <group>
                             <field name="deal_id" string="Deal ID"/>
                             <field name="booking_date"/>
-                            <field name="buyer_id"/>
-                            <field name="project_id" string="Project Name"/>
-                            <field name="unit_id" string="Unit"/>
+                            <field name="buyer_id" options="{'no_create': True}"/>
+                            <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>
+                            <field name="unit_id" options="{'no_create': True}"/>
                             <field name="sale_value"/>
                         </group>
                     </page>
