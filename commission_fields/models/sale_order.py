@@ -39,27 +39,23 @@ class SaleOrder(models.Model):
         'res.partner',
         string='Buyer',
         tracking=True,
-        domain="[('is_company', '=', False), ('customer_rank', '>', 0)]",
         help="The buyer associated with this sale order",
         index=True
     )
     
-    deal_id = fields.Many2one('sale.order', string='Deal', help="Reference to this sale order for commission mapping.", copy=False, index=True)
+    deal_id = fields.Float(string='Deal ID', help="Deal ID for commission mapping.", copy=False, index=True)
 
     project_id = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
-        domain="[('detailed_type', '=', 'service'), ('can_be_expensed', '=', False)]",
-        help="The project associated with this sale order",
-        index=True
+        help="The project associated with this sale order"
     )
     
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
         help="The specific unit associated with this sale order"
     )
 

@@ -4,7 +4,7 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id = fields.Many2one('sale.order', string='Deal', readonly=True, copy=False, help="Related Sale Order Deal")
+    deal_id = fields.Float(string='Deal ID', readonly=True, copy=False, help="Related Sale Order Deal ID")
     booking_date = fields.Date(string='Booking Date', readonly=True, copy=False, help="Related Sale Order Booking Date")
     buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=True, copy=False, help="Related Sale Order Buyer")
     project_id = fields.Many2one(
@@ -33,7 +33,7 @@ class AccountMove(models.Model):
         if vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
             if sale_order:
-                vals['deal_id'] = sale_order.id
+                vals['deal_id'] = sale_order.deal_id
                 vals['booking_date'] = sale_order.booking_date
                 vals['buyer_id'] = sale_order.buyer_id.id
                 vals['project_id'] = sale_order.project_id.id
@@ -47,7 +47,7 @@ class AccountMove(models.Model):
                 sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
                 if sale_order:
                     vals.update({
-                        'deal_id': sale_order.id,
+                        'deal_id': sale_order.deal_id,
                         'booking_date': sale_order.booking_date,
                         'buyer_id': sale_order.buyer_id.id,
                         'project_id': sale_order.project_id.id,
