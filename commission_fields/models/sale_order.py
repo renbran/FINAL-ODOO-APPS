@@ -14,6 +14,22 @@ COMMISSION_TYPE_SELECTION = [
     ('fixed', 'Fixed Amount')
 ]
 
+class SaleOrderProject(models.Model):
+    _name = 'sale.order.project'
+    _description = 'Sales Order Project'
+
+    name = fields.Char(string='Project Name', required=True)
+    code = fields.Char(string='Project Code')
+    description = fields.Text(string='Description')
+
+class SaleOrderUnit(models.Model):
+    _name = 'sale.order.unit'
+    _description = 'Sales Order Unit'
+
+    name = fields.Char(string='Unit Name', required=True)
+    code = fields.Char(string='Unit Code')
+    description = fields.Text(string='Description')
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -52,19 +68,17 @@ class SaleOrder(models.Model):
     )
     
     project_id = fields.Many2one(
-        'product.template',
-        string='Project Name',
+        'sale.order.project',
+        string='Project',
         tracking=True,
-        domain="[('detailed_type', '=', 'service'), ('can_be_expensed', '=', False)]",
         help="The project associated with this sale order",
         index=True
     )
     
     unit_id = fields.Many2one(
-        'product.product',
+        'sale.order.unit',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
         help="The specific unit associated with this sale order"
     )
 
@@ -468,7 +482,7 @@ class SaleOrder(models.Model):
                 record.external_commission_type, record.external_percentage, record.external_fixed_amount
             )
 
-    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total')
+    @api.depends('order_line', 'amount_untaxed')
     def _compute_commission_totals(self):
         """Calculate all external commission totals (uniform logic)"""
         for order in self:
@@ -484,33 +498,9 @@ class SaleOrder(models.Model):
             # Other External
             order.other_external_total = order._compute_commission_amount(
                 order.other_external_commission_type, order.other_external_rate, order.other_external_fixed_amount)
-    # ...existing code...
-
-    @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
-    def _compute_internal_commissions(self):
-        """Calculate internal commission amounts"""
-        for record in self:
-            if record.internal_commission_type == 'unit_price':
-                base = sum(line.price_unit for line in record.order_line)
-                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (base * (record.manager_rate or 0) / 100)
-                record.director_commission = (base * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'untaxed':
-                base = record.amount_untaxed or 0.0
-                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (base * (record.manager_rate or 0) / 100)
-                record.director_commission = (base * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'fixed':
-                record.agent1_commission = record.agent1_fixed or 0.0
-                record.agent2_commission = record.agent2_fixed or 0.0
-                record.manager_commission = record.manager_fixed or 0.0
-                record.director_commission = record.director_fixed or 0.0
 
     @api.depends('agent1_commission', 'agent2_commission', 'manager_commission', 'director_commission',
-                 'external_commission_amount', 'broker_agency_total', 'referral_total', 
-                 'cashback_total', 'other_external_total')
+                 'external_total', 'referral_total', 'cashback_total', 'other_external_total')
     def _compute_total_commissions(self):
         """Calculate total commission amounts"""
         for record in self:
@@ -521,16 +511,13 @@ class SaleOrder(models.Model):
                 record.manager_commission or 0.0,
                 record.director_commission or 0.0
             ])
-            
             # External commission total
             record.total_external_commission = sum([
-                record.external_commission_amount or 0.0,
-                record.broker_agency_total or 0.0,
+                record.external_total or 0.0,
                 record.referral_total or 0.0,
                 record.cashback_total or 0.0,
                 record.other_external_total or 0.0
             ])
-            
             # Grand total
             record.grand_total_commission = record.total_internal_commission + record.total_external_commission
 
@@ -699,7 +686,6 @@ class SaleOrder(models.Model):
     def action_create_commission_purchase_order(self):
         """Create purchase orders for all commission recipients with non-zero commission amounts."""
         PurchaseOrder = self.env['purchase.order']
-        created_pos = []
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
         if not commission_product:
             commission_product = self.env['product.product'].create({
@@ -708,6 +694,7 @@ class SaleOrder(models.Model):
                 'purchase_ok': True,
                 'sale_ok': False,
             })
+        created_pos = []
         for order in self:
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
@@ -742,31 +729,28 @@ class SaleOrder(models.Model):
                     'amount': order.director_commission
                 })
             # External
-            if order.external_partner_id and order.external_commission_amount > 0:
+            if order.external_partner_id and order.external_total > 0:
                 commission_lines.append({
                     'partner': order.external_partner_id,
                     'name': _('External Partner Commission for Sale Order %s') % order.name,
-                    'amount': order.external_commission_amount
+                    'amount': order.external_total
                 })
-            if order.referral_name and order.referral_total > 0:
-                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+            if order.referral_partner_id and order.referral_total > 0:
                 commission_lines.append({
-                    'partner': referral_partner or order.partner_id,
-                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'partner': order.referral_partner_id,
+                    'name': _('Referral Commission for Sale Order %s') % order.name,
                     'amount': order.referral_total
                 })
-            if order.cashback_name and order.cashback_total > 0:
-                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+            if order.cashback_partner_id and order.cashback_total > 0:
                 commission_lines.append({
-                    'partner': cashback_partner or order.partner_id,
-                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'partner': order.cashback_partner_id,
+                    'name': _('Cashback Commission for Sale Order %s') % order.name,
                     'amount': order.cashback_total
                 })
-            if order.other_external_name and order.other_external_total > 0:
-                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+            if order.other_external_partner_id and order.other_external_total > 0:
                 commission_lines.append({
-                    'partner': other_partner or order.partner_id,
-                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'partner': order.other_external_partner_id,
+                    'name': _('Other External Commission for Sale Order %s') % order.name,
                     'amount': order.other_external_total
                 })
 
@@ -854,17 +838,14 @@ class SaleOrder(models.Model):
         """Prevent modifications to certain fields after confirmation"""
         protected_fields = [
             'sale_value', 'developer_commission', 'commission_status',
-            'external_commission_amount', 'broker_agency_total',
-            'referral_total', 'cashback_total', 'other_external_total',
+            'external_total', 'referral_total', 'cashback_total', 'other_external_total',
             'agent1_commission', 'agent2_commission', 
             'manager_commission', 'director_commission'
         ]
-        
         if any(field in vals for field in protected_fields):
             for order in self:
                 if order.state not in ['draft', 'sent'] and order.commission_status in ['confirmed', 'paid']:
                     raise UserError(_("Cannot modify commission details after order confirmation when commission is confirmed or paid!"))
-        
         return super().write(vals)  # FIX: use super() instead of super(SaleOrder, self)
 
     def copy(self, default=None):
@@ -972,7 +953,6 @@ class SaleOrder(models.Model):
     def action_create_commission_purchase_order(self):
         """Create purchase orders for all commission recipients with non-zero commission amounts."""
         PurchaseOrder = self.env['purchase.order']
-        created_pos = []
         commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
         if not commission_product:
             commission_product = self.env['product.product'].create({
@@ -981,6 +961,7 @@ class SaleOrder(models.Model):
                 'purchase_ok': True,
                 'sale_ok': False,
             })
+        created_pos = []
         for order in self:
             if order.commission_status not in ['confirmed', 'paid']:
                 raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
@@ -1015,31 +996,28 @@ class SaleOrder(models.Model):
                     'amount': order.director_commission
                 })
             # External
-            if order.external_partner_id and order.external_commission_amount > 0:
+            if order.external_partner_id and order.external_total > 0:
                 commission_lines.append({
                     'partner': order.external_partner_id,
                     'name': _('External Partner Commission for Sale Order %s') % order.name,
-                    'amount': order.external_commission_amount
+                    'amount': order.external_total
                 })
-            if order.referral_name and order.referral_total > 0:
-                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+            if order.referral_partner_id and order.referral_total > 0:
                 commission_lines.append({
-                    'partner': referral_partner or order.partner_id,
-                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'partner': order.referral_partner_id,
+                    'name': _('Referral Commission for Sale Order %s') % order.name,
                     'amount': order.referral_total
                 })
-            if order.cashback_name and order.cashback_total > 0:
-                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+            if order.cashback_partner_id and order.cashback_total > 0:
                 commission_lines.append({
-                    'partner': cashback_partner or order.partner_id,
-                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'partner': order.cashback_partner_id,
+                    'name': _('Cashback Commission for Sale Order %s') % order.name,
                     'amount': order.cashback_total
                 })
-            if order.other_external_name and order.other_external_total > 0:
-                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+            if order.other_external_partner_id and order.other_external_total > 0:
                 commission_lines.append({
-                    'partner': other_partner or order.partner_id,
-                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'partner': order.other_external_partner_id,
+                    'name': _('Other External Commission for Sale Order %s') % order.name,
                     'amount': order.other_external_total
                 })
 
