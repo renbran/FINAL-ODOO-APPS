@@ -14,6 +14,22 @@ COMMISSION_TYPE_SELECTION = [
     ('fixed', 'Fixed Amount')
 ]
 
+class SaleOrderProject(models.Model):
+    _name = 'sale.order.project'
+    _description = 'Sales Order Project'
+
+    name = fields.Char(string='Project Name', required=True)
+    code = fields.Char(string='Project Code')
+    description = fields.Text(string='Description')
+
+class SaleOrderUnit(models.Model):
+    _name = 'sale.order.unit'
+    _description = 'Sales Order Unit'
+
+    name = fields.Char(string='Unit Name', required=True)
+    code = fields.Char(string='Unit Code')
+    description = fields.Text(string='Description')
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -52,19 +68,17 @@ class SaleOrder(models.Model):
     )
     
     project_id = fields.Many2one(
-        'product.template',
-        string='Project Name',
+        'sale.order.project',
+        string='Project',
         tracking=True,
-        domain="[('detailed_type', '=', 'service'), ('can_be_expensed', '=', False)]",
         help="The project associated with this sale order",
         index=True
     )
     
     unit_id = fields.Many2one(
-        'product.product',
+        'sale.order.unit',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
         help="The specific unit associated with this sale order"
     )
 
