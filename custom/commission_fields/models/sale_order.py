@@ -190,7 +190,6 @@ class SaleOrder(models.Model):
         tracking=True,
         help="Name of the referral source"
     )
-    
     referral_commission_type = fields.Selection(
         COMMISSION_TYPE_SELECTION,
         string="Referral Commission Type",
@@ -198,18 +197,21 @@ class SaleOrder(models.Model):
         tracking=True,
         help="How to compute the referral commission."
     )
-    
     referral_rate = fields.Float(
-        string="Referral Rate",
-        tracking=True,
-        digits=(5, 2)
+        string="Referral Commission %",
+        digits=(5, 2),
+        tracking=True
     )
-    
-    referral_total = fields.Monetary(
-        string="Referral Total", 
-        compute='_compute_commission_totals', 
-        store=True,
+    referral_fixed_amount = fields.Monetary(
+        string="Referral Fixed Amount",
         currency_field='currency_id',
+        tracking=True
+    )
+    referral_total = fields.Monetary(
+        string="Referral Commission Amount",
+        currency_field='currency_id',
+        compute='_compute_commission_totals',
+        store=True,
         tracking=True
     )
 
@@ -219,7 +221,6 @@ class SaleOrder(models.Model):
         tracking=True,
         help="Cashback recipient name"
     )
-    
     cashback_commission_type = fields.Selection(
         COMMISSION_TYPE_SELECTION,
         string="Cashback Commission Type",
@@ -227,18 +228,21 @@ class SaleOrder(models.Model):
         tracking=True,
         help="How to compute the cashback commission."
     )
-    
     cashback_rate = fields.Float(
-        string="Cashback Rate",
-        tracking=True,
-        digits=(5, 2)
+        string="Cashback Commission %",
+        digits=(5, 2),
+        tracking=True
     )
-    
-    cashback_total = fields.Monetary(
-        string="Cashback Total", 
-        compute='_compute_commission_totals', 
-        store=True,
+    cashback_fixed_amount = fields.Monetary(
+        string="Cashback Fixed Amount",
         currency_field='currency_id',
+        tracking=True
+    )
+    cashback_total = fields.Monetary(
+        string="Cashback Commission Amount",
+        currency_field='currency_id',
+        compute='_compute_commission_totals',
+        store=True,
         tracking=True
     )
 
@@ -258,16 +262,22 @@ class SaleOrder(models.Model):
     )
     
     other_external_rate = fields.Float(
-        string="Other External Rate",
-        tracking=True,
-        digits=(5, 2)
+        string="Other External Commission %",
+        digits=(5, 2),
+        tracking=True
+    )
+    
+    other_external_fixed_amount = fields.Monetary(
+        string="Other External Fixed Amount",
+        currency_field='currency_id',
+        tracking=True
     )
     
     other_external_total = fields.Monetary(
-        string="Other External Total", 
-        compute='_compute_commission_totals', 
-        store=True,
+        string="Other External Commission Amount",
         currency_field='currency_id',
+        compute='_compute_commission_totals',
+        store=True,
         tracking=True
     )
 
