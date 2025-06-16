@@ -361,10 +361,6 @@ class SaleOrder(models.Model):
     # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
     # ===========================================
     
-    show_external_percentage = fields.Boolean(
-        compute='_compute_show_external_percentage',
-        store=False
-    )
     show_external_fixed_amount = fields.Boolean(
         compute='_compute_show_external_fixed_amount',
         store=False
@@ -401,11 +397,6 @@ class SaleOrder(models.Model):
         compute='_compute_show_director_fixed',
         store=False
     )
-
-    @api.depends('external_commission_type')
-    def _compute_show_external_percentage(self):
-        for rec in self:
-            rec.show_external_percentage = rec.external_commission_type != 'fixed'
 
     @api.depends('external_commission_type')
     def _compute_show_external_fixed_amount(self):
@@ -458,9 +449,6 @@ class SaleOrder(models.Model):
     
     _sql_constraints = [
         ('deal_id_unique', 'UNIQUE(deal_id)', 'Deal ID must be unique across all sale orders!'),
-        ('commission_percentage_positive', 
-         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
-         'External commission percentage must be between 0 and 100!'),
     ]
 
     # ===========================================
@@ -474,12 +462,12 @@ class SaleOrder(models.Model):
             if not record.sale_value:
                 record.sale_value = record.amount_untaxed or record.amount_total or 0.0
 
-    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
+    @api.depends('external_commission_type', 'external_rate', 'external_fixed_amount', 'order_line', 'amount_untaxed')
     def _compute_external_commission(self):
         """Calculate external commission based on type and parameters"""
         for record in self:
             record.external_commission_amount = record._compute_commission_amount(
-                record.external_commission_type, record.external_percentage, record.external_fixed_amount
+                record.external_commission_type, record.external_rate, record.external_fixed_amount
             )
 
     @api.depends('order_line', 'amount_untaxed')
