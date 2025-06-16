@@ -47,11 +47,11 @@
                                     <field name="external_commission_amount" readonly="1"/>
                                 </group>
                                 <group string="Broker/Agency">
-                                    <field name="broker_agency_name"/>
+                                    <field name="broker_agency_partner_id"/>
                                     <field name="broker_agency_commission_type"/>
                                     <field name="broker_agency_rate"/>
                                     <field name="broker_agency_total" readonly="1"/>
-                                    <field name="broker_agency_partner_id"/>
+                                </group>
                                 </group>
                             </group>
                             <group>

@@ -153,13 +153,7 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Broker/Agency Partner",
         tracking=True,
-        help="Select the broker or agency partner.",
-        related_sudo=False,
-    )
-    broker_agency_name = fields.Char(
-        string="Broker/Agency Name",
-        tracking=True,
-        help="Name of the broker or agency"
+        help="Select the broker or agency partner."
     )
     
     broker_agency_commission_type = fields.Selection(
@@ -189,13 +183,7 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Referral Partner",
         tracking=True,
-        help="Select the referral partner.",
-        related_sudo=False,
-    )
-    referral_name = fields.Char(
-        string="Referral Name",
-        tracking=True,
-        help="Name of the referral source"
+        help="Select the referral partner."
     )
     
     referral_commission_type = fields.Selection(
@@ -225,13 +213,7 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Cashback Partner",
         tracking=True,
-        help="Select the cashback recipient partner.",
-        related_sudo=False,
-    )
-    cashback_name = fields.Char(
-        string="Cashback Name",
-        tracking=True,
-        help="Cashback recipient name"
+        help="Select the cashback recipient partner."
     )
     
     cashback_commission_type = fields.Selection(
@@ -261,13 +243,7 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Other External Partner",
         tracking=True,
-        help="Select the other external commission recipient.",
-        related_sudo=False,
-    )
-    other_external_name = fields.Char(
-        string="Other External Name",
-        tracking=True,
-        help="Other external commission recipient"
+        help="Select the other external commission recipient."
     )
     
     other_external_commission_type = fields.Selection(
@@ -856,60 +832,47 @@ class SaleOrder(models.Model):
             if order.agent1_id and order.agent1_commission > 0:
                 commission_lines.append({
                     'partner': order.agent1_id,
-                    'name': _('Agent 1 Commission for Sale Order %s') % order.name,
                     'amount': order.agent1_commission
                 })
             if order.agent2_id and order.agent2_commission > 0:
                 commission_lines.append({
                     'partner': order.agent2_id,
-                    'name': _('Agent 2 Commission for Sale Order %s') % order.name,
                     'amount': order.agent2_commission
                 })
             if order.manager_id and order.manager_commission > 0:
                 commission_lines.append({
                     'partner': order.manager_id,
-                    'name': _('Manager Commission for Sale Order %s') % order.name,
                     'amount': order.manager_commission
                 })
             if order.director_id and order.director_commission > 0:
                 commission_lines.append({
                     'partner': order.director_id,
-                    'name': _('Director Commission for Sale Order %s') % order.name,
                     'amount': order.director_commission
                 })
             # External
             if order.external_partner_id and order.external_commission_amount > 0:
                 commission_lines.append({
                     'partner': order.external_partner_id,
-                    'name': _('External Partner Commission for Sale Order %s') % order.name,
                     'amount': order.external_commission_amount
                 })
-            if order.broker_agency_name and order.broker_agency_total > 0:
-                broker_partner = order.broker_agency_partner_id if hasattr(order, 'broker_agency_partner_id') and order.broker_agency_partner_id else False
+            if order.broker_agency_partner_id and order.broker_agency_total > 0:
                 commission_lines.append({
-                    'partner': broker_partner or order.partner_id,  # fallback to order partner
-                    'name': _('Broker/Agency Commission for Sale Order %s (%s)') % (order.name, order.broker_agency_name),
+                    'partner': order.broker_agency_partner_id,
                     'amount': order.broker_agency_total
                 })
-            if order.referral_name and order.referral_total > 0:
-                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+            if order.referral_partner_id and order.referral_total > 0:
                 commission_lines.append({
-                    'partner': referral_partner or order.partner_id,
-                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'partner': order.referral_partner_id,
                     'amount': order.referral_total
                 })
-            if order.cashback_name and order.cashback_total > 0:
-                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+            if order.cashback_partner_id and order.cashback_total > 0:
                 commission_lines.append({
-                    'partner': cashback_partner or order.partner_id,
-                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'partner': order.cashback_partner_id,
                     'amount': order.cashback_total
                 })
-            if order.other_external_name and order.other_external_total > 0:
-                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+            if order.other_external_partner_id and order.other_external_total > 0:
                 commission_lines.append({
-                    'partner': other_partner or order.partner_id,
-                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'partner': order.other_external_partner_id,
                     'amount': order.other_external_total
                 })
 
@@ -930,7 +893,7 @@ class SaleOrder(models.Model):
                 po_lines = []
                 for l in lines:
                     po_lines.append((0, 0, {
-                        'name': l['name'],
+                        'name': '',
                         'product_qty': 1,
                         'product_uom': commission_product.uom_id.id,
                         'price_unit': l['amount'],
@@ -1058,19 +1021,19 @@ class SaleOrder(models.Model):
                     'amount': self.external_commission_amount
                 },
                 'broker': {
-                    'name': self.broker_agency_name or 'N/A',
+                    'name': self.broker_agency_partner_id.name if self.broker_agency_partner_id else 'N/A',
                     'amount': self.broker_agency_total
                 },
                 'referral': {
-                    'name': self.referral_name or 'N/A',
+                    'name': self.referral_partner_id.name if self.referral_partner_id else 'N/A',
                     'amount': self.referral_total
                 },
                 'cashback': {
-                    'name': self.cashback_name or 'N/A',
+                    'name': self.cashback_partner_id.name if self.cashback_partner_id else 'N/A',
                     'amount': self.cashback_total
                 },
                 'other': {
-                    'name': self.other_external_name or 'N/A',
+                    'name': self.other_external_partner_id.name if self.other_external_partner_id else 'N/A',
                     'amount': self.other_external_total
                 },
                 'total': self.total_external_commission
@@ -1115,60 +1078,47 @@ class SaleOrder(models.Model):
             if order.agent1_id and order.agent1_commission > 0:
                 commission_lines.append({
                     'partner': order.agent1_id,
-                    'name': _('Agent 1 Commission for Sale Order %s') % order.name,
                     'amount': order.agent1_commission
                 })
             if order.agent2_id and order.agent2_commission > 0:
                 commission_lines.append({
                     'partner': order.agent2_id,
-                    'name': _('Agent 2 Commission for Sale Order %s') % order.name,
                     'amount': order.agent2_commission
                 })
             if order.manager_id and order.manager_commission > 0:
                 commission_lines.append({
                     'partner': order.manager_id,
-                    'name': _('Manager Commission for Sale Order %s') % order.name,
                     'amount': order.manager_commission
                 })
             if order.director_id and order.director_commission > 0:
                 commission_lines.append({
                     'partner': order.director_id,
-                    'name': _('Director Commission for Sale Order %s') % order.name,
                     'amount': order.director_commission
                 })
             # External
             if order.external_partner_id and order.external_commission_amount > 0:
                 commission_lines.append({
                     'partner': order.external_partner_id,
-                    'name': _('External Partner Commission for Sale Order %s') % order.name,
                     'amount': order.external_commission_amount
                 })
-            if order.broker_agency_name and order.broker_agency_total > 0:
-                broker_partner = order.broker_agency_partner_id if hasattr(order, 'broker_agency_partner_id') and order.broker_agency_partner_id else False
+            if order.broker_agency_partner_id and order.broker_agency_total > 0:
                 commission_lines.append({
-                    'partner': broker_partner or order.partner_id,  # fallback to order partner
-                    'name': _('Broker/Agency Commission for Sale Order %s (%s)') % (order.name, order.broker_agency_name),
+                    'partner': order.broker_agency_partner_id,
                     'amount': order.broker_agency_total
                 })
-            if order.referral_name and order.referral_total > 0:
-                referral_partner = order.referral_partner_id if hasattr(order, 'referral_partner_id') and order.referral_partner_id else False
+            if order.referral_partner_id and order.referral_total > 0:
                 commission_lines.append({
-                    'partner': referral_partner or order.partner_id,
-                    'name': _('Referral Commission for Sale Order %s (%s)') % (order.name, order.referral_name),
+                    'partner': order.referral_partner_id,
                     'amount': order.referral_total
                 })
-            if order.cashback_name and order.cashback_total > 0:
-                cashback_partner = order.cashback_partner_id if hasattr(order, 'cashback_partner_id') and order.cashback_partner_id else False
+            if order.cashback_partner_id and order.cashback_total > 0:
                 commission_lines.append({
-                    'partner': cashback_partner or order.partner_id,
-                    'name': _('Cashback for Sale Order %s (%s)') % (order.name, order.cashback_name),
+                    'partner': order.cashback_partner_id,
                     'amount': order.cashback_total
                 })
-            if order.other_external_name and order.other_external_total > 0:
-                other_partner = order.other_external_partner_id if hasattr(order, 'other_external_partner_id') and order.other_external_partner_id else False
+            if order.other_external_partner_id and order.other_external_total > 0:
                 commission_lines.append({
-                    'partner': other_partner or order.partner_id,
-                    'name': _('Other External Commission for Sale Order %s (%s)') % (order.name, order.other_external_name),
+                    'partner': order.other_external_partner_id,
                     'amount': order.other_external_total
                 })
 
@@ -1189,7 +1139,7 @@ class SaleOrder(models.Model):
                 po_lines = []
                 for l in lines:
                     po_lines.append((0, 0, {
-                        'name': l['name'],
+                        'name': '',
                         'product_qty': 1,
                         'product_uom': commission_product.uom_id.id,
                         'price_unit': l['amount'],
