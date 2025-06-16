@@ -9,7 +9,7 @@
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="deal_id" string="Deal ID"/>
                 <field name="booking_date"/>
-                <field name="buyer_id" options="{'no_create': True}"/>
+                <field name="buyer_id"/>
                 <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>
                 <field name="unit_id" options="{'no_create': True}"/>
                 <field name="sale_value"/>
@@ -151,7 +151,7 @@
                         <group>
                             <field name="deal_id" string="Deal ID"/>
                             <field name="booking_date"/>
-                            <field name="buyer_id" options="{'no_create': True}"/>
+                            <field name="buyer_id"/>
                             <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>
                             <field name="unit_id" options="{'no_create': True}"/>
                             <field name="sale_value"/>
