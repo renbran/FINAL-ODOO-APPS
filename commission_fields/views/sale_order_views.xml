@@ -52,31 +52,27 @@
                                     <field name="broker_agency_rate"/>
                                     <field name="broker_agency_total" readonly="1"/>
                                 </group>
-                                </group>
                             </group>
                             <group>
                                 <group string="Referral">
-                                    <field name="referral_name"/>
+                                    <field name="referral_partner_id"/>
                                     <field name="referral_commission_type"/>
                                     <field name="referral_rate"/>
                                     <field name="referral_total" readonly="1"/>
-                                    <field name="referral_partner_id"/>
                                 </group>
                                 <group string="Cashback">
-                                    <field name="cashback_name"/>
+                                    <field name="cashback_partner_id"/>
                                     <field name="cashback_commission_type"/>
                                     <field name="cashback_rate"/>
                                     <field name="cashback_total" readonly="1"/>
-                                    <field name="cashback_partner_id"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="Other External">
-                                    <field name="other_external_name"/>
+                                    <field name="other_external_partner_id"/>
                                     <field name="other_external_commission_type"/>
                                     <field name="other_external_rate"/>
                                     <field name="other_external_total" readonly="1"/>
-                                    <field name="other_external_partner_id"/>
                                 </group>
                             </group>
                         </page>
