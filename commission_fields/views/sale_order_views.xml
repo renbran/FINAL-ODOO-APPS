@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='client_order_ref']" position="after">
-                <field name="deal_id" string="Deal ID"/>
+                <field name="deal_id" string="Deal"/>
                 <field name="booking_date"/>
                 <field name="buyer_id" options="{'no_create': True}"/>
                 <field name="project_id" string="Project Name" options="{'no_create': True}" domain="[('detailed_type', '=', 'service')]"/>

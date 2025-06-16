@@ -44,14 +44,8 @@ class SaleOrder(models.Model):
         index=True
     )
     
-    deal_id = fields.Char(
-        string='Deal ID',
-        tracking=True,
-        copy=False,
-        index=True,
-        help="Unique identifier for the deal"
-    )
-    
+    deal_id = fields.Many2one('sale.order', string='Deal', help="Reference to this sale order for commission mapping.", copy=False, index=True)
+
     project_id = fields.Many2one(
         'product.template',
         string='Project Name',

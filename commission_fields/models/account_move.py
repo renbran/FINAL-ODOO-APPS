@@ -4,7 +4,7 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id = fields.Many2one('sale.order', string='Deal ID', readonly=True, copy=False, help="Related Sale Order Deal ID")
+    deal_id = fields.Many2one('sale.order', string='Deal', readonly=True, copy=False, help="Related Sale Order Deal")
     booking_date = fields.Date(string='Booking Date', readonly=True, copy=False, help="Related Sale Order Booking Date")
     buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=True, copy=False, help="Related Sale Order Buyer")
     project_id = fields.Many2one(
