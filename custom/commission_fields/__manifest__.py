@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Commission Management',
-    'version': '1.0',
+    'version': '17.0',
     'summary': 'Comprehensive commission management for sales',
     'description': """
         This module provides advanced commission management capabilities
@@ -17,7 +17,6 @@
         'security/ir.model.access.csv',
         'data/commission_data.xml',
         'views/sale_order_views.xml',
-        'views/project_unit_views.xml',
         'views/menu_items.xml',
         'views/account_move_views.xml',
         'views/purchase_order_views.xml',

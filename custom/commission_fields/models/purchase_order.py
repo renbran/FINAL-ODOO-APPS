@@ -22,7 +22,7 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     account_id = fields.Many2one('account.account', string='Expense Account',
-        help='Account for this purchase line.')
+        help='Account for this purchase line. If not set, will use the default from the purchase order or company.')
 
     @api.model
     def create(self, vals):
