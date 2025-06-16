@@ -147,6 +147,12 @@ class SaleOrder(models.Model):
     )
 
     # Broker/Agency Commission
+    broker_agency_partner_id = fields.Many2one(
+        'res.partner',
+        string="Broker/Agency Partner",
+        tracking=True,
+        help="Select the broker or agency partner."
+    )
     broker_agency_name = fields.Char(
         string="Broker/Agency Name",
         tracking=True,
@@ -176,6 +182,12 @@ class SaleOrder(models.Model):
     )
 
     # Referral Commission
+    referral_partner_id = fields.Many2one(
+        'res.partner',
+        string="Referral Partner",
+        tracking=True,
+        help="Select the referral partner."
+    )
     referral_name = fields.Char(
         string="Referral Name",
         tracking=True,
@@ -205,6 +217,12 @@ class SaleOrder(models.Model):
     )
 
     # Cashback Commission
+    cashback_partner_id = fields.Many2one(
+        'res.partner',
+        string="Cashback Partner",
+        tracking=True,
+        help="Select the cashback recipient partner."
+    )
     cashback_name = fields.Char(
         string="Cashback Name",
         tracking=True,
@@ -234,6 +252,12 @@ class SaleOrder(models.Model):
     )
 
     # Other External Commission
+    other_external_partner_id = fields.Many2one(
+        'res.partner',
+        string="Other External Partner",
+        tracking=True,
+        help="Select the other external commission recipient."
+    )
     other_external_name = fields.Char(
         string="Other External Name",
         tracking=True,
