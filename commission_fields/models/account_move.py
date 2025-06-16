@@ -12,14 +12,18 @@ class AccountMove(models.Model):
         string='Project',
         readonly=True,
         copy=False,
-        help="Related Sale Order Project"
+        help="Related Sale Order Project",
+        ondelete='set null',
+        domain=[],
     )
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         readonly=True,
         copy=False,
-        help="Related Sale Order Unit"
+        help="Related Sale Order Unit",
+        ondelete='set null',
+        domain=[],
     )
     sale_value = fields.Monetary(
         string='Sale Value',

@@ -47,16 +47,18 @@ class SaleOrder(models.Model):
 
     project_id = fields.Many2one(
         'product.template',
-        string='Project Name',
-        tracking=True,
-        help="The project associated with this sale order"
+        string='Project',
+        help="The project associated with this sale order",
+        ondelete='set null',
+        domain=[],
     )
     
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
-        tracking=True,
-        help="The specific unit associated with this sale order"
+        help="The specific unit associated with this sale order",
+        ondelete='set null',
+        domain=[],
     )
 
     sale_value = fields.Monetary(
@@ -151,7 +153,8 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Broker/Agency Partner",
         tracking=True,
-        help="Select the broker or agency partner."
+        help="Select the broker or agency partner.",
+        related_sudo=False,
     )
     broker_agency_name = fields.Char(
         string="Broker/Agency Name",
@@ -186,7 +189,8 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Referral Partner",
         tracking=True,
-        help="Select the referral partner."
+        help="Select the referral partner.",
+        related_sudo=False,
     )
     referral_name = fields.Char(
         string="Referral Name",
@@ -221,7 +225,8 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Cashback Partner",
         tracking=True,
-        help="Select the cashback recipient partner."
+        help="Select the cashback recipient partner.",
+        related_sudo=False,
     )
     cashback_name = fields.Char(
         string="Cashback Name",
@@ -256,7 +261,8 @@ class SaleOrder(models.Model):
         'res.partner',
         string="Other External Partner",
         tracking=True,
-        help="Select the other external commission recipient."
+        help="Select the other external commission recipient.",
+        related_sudo=False,
     )
     other_external_name = fields.Char(
         string="Other External Name",
