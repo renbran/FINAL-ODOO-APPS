@@ -575,7 +575,6 @@ class SaleOrder(models.Model):
     # ===========================================
     
     _sql_constraints = [
-        ('deal_id_unique', 'UNIQUE(deal_id)', 'Deal ID must be unique across all sale orders!'),
         ('commission_percentage_positive', 
          'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
          'External commission percentage must be between 0 and 100!'),
