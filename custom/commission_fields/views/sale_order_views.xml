@@ -51,6 +51,7 @@
                                     <field name="broker_agency_commission_type"/>
                                     <field name="broker_agency_rate"/>
                                     <field name="broker_agency_total" readonly="1"/>
+                                    <field name="broker_agency_partner_id" string="Broker/Agency Contact"/>
                                 </group>
                             </group>
                             <group>
@@ -60,6 +61,7 @@
                                     <field name="referral_rate" visibility="referral_commission_type != 'fixed'"/>
                                     <field name="referral_fixed_amount" visibility="referral_commission_type == 'fixed'"/>
                                     <field name="referral_total" readonly="1"/>
+                                    <field name="referral_partner_id" string="Referral Contact"/>
                                 </group>
                                 <group string="Cashback">
                                     <field name="cashback_name"/>
@@ -67,6 +69,7 @@
                                     <field name="cashback_rate" visibility="cashback_commission_type != 'fixed'"/>
                                     <field name="cashback_fixed_amount" visibility="cashback_commission_type == 'fixed'"/>
                                     <field name="cashback_total" readonly="1"/>
+                                    <field name="cashback_partner_id" string="Cashback Contact"/>
                                 </group>
                             </group>
                             <group>
@@ -76,6 +79,7 @@
                                     <field name="other_external_rate" visibility="other_external_commission_type != 'fixed'"/>
                                     <field name="other_external_fixed_amount" visibility="other_external_commission_type == 'fixed'"/>
                                     <field name="other_external_total" readonly="1"/>
+                                    <field name="other_external_partner_id" string="Other External Contact"/>
                                 </group>
                             </group>
                         </page>
