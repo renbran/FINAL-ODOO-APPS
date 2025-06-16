@@ -30,7 +30,7 @@ class AccountMove(models.Model):
     # Add a Char field for deal_id search convenience
     deal_id_char = fields.Char(string='Deal ID (String)', compute='_compute_deal_id_char', store=True, index=True, help="Deal string for search/filter")
     # Deprecated: Dummy field to avoid database errors if old deal_id column exists in DB
-    deal_id = fields.Char(string='[DEPRECATED] Deal ID (legacy)', readonly=True, help="Legacy field. Safe to remove column from DB when possible.")
+    # deal_id = fields.Char(string='[DEPRECATED] Deal ID (legacy)', readonly=True, help="Legacy field. Safe to remove column from DB when possible.")
 
     @api.depends('deal_id_str')
     def _compute_deal_id_char(self):
