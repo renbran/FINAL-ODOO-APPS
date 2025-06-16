@@ -38,7 +38,7 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="replace">
                 <tree string="Account Moves">
-                    <field name="deal_id" string="Deal ID"/>
+                    <field name="deal_id_str" string="Deal ID"/>
                     <field name="booking_date" string="Booking Date"/>
                     <field name="partner_id" string="Customer"/>
                     <field name="buyer_id" string="Buyer Name"/>
