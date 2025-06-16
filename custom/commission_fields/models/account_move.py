@@ -4,39 +4,40 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id_str = fields.Char(string='Deal ID', readonly=False, copy=False, help="Related Sale Order Deal ID (string)")
-    booking_date = fields.Date(string='Booking Date', readonly=False, copy=False, help="Related Sale Order Booking Date")
-    buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=False, copy=False, help="Related Sale Order Buyer")
+    deal_id = fields.Float(string='Deal ID', readonly=True, copy=False, help="Related Sale Order Deal ID")
+    booking_date = fields.Date(string='Booking Date', readonly=True, copy=False, help="Related Sale Order Booking Date")
+    buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=True, copy=False, help="Related Sale Order Buyer")
     project_id = fields.Many2one(
-        'sale.order.project',
+        'product.template',
         string='Project',
-        readonly=False,
+        readonly=True,
         copy=False,
         help="Related Sale Order Project",
-        ondelete='set null'
+        ondelete='set null',
+        domain=[],
     )
     unit_id = fields.Many2one(
-        'sale.order.unit',
+        'product.product',
         string='Unit',
-        readonly=False,
+        readonly=True,
         copy=False,
         help="Related Sale Order Unit",
-        ondelete='set null'
+        ondelete='set null',
+        domain=[],
     )
     sale_value = fields.Monetary(
         string='Sale Value',
-        readonly=False,
+        readonly=True,
         copy=False,
         help="Related Sale Order Sale Value"
     )
 
     @api.model
     def create(self, vals):
-        # Set deal_id_str and related fields on invoice to the values from sale.order
         if vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
             if sale_order:
-                vals['deal_id_str'] = sale_order.deal_id  # Set as string
+                vals['deal_id'] = sale_order.deal_id
                 vals['booking_date'] = sale_order.booking_date
                 vals['buyer_id'] = sale_order.buyer_id.id
                 vals['project_id'] = sale_order.project_id.id
@@ -46,13 +47,15 @@ class AccountMove(models.Model):
 
     def write(self, vals):
         for move in self:
-            if move.move_type == 'out_invoice' and move.invoice_origin and not any(f in vals for f in ['deal_id_str', 'booking_date', 'buyer_id', 'project_id', 'unit_id', 'sale_value']):
+            if move.invoice_origin and not any(f in vals for f in ['deal_id', 'booking_date', 'buyer_id', 'project_id', 'unit_id', 'sale_value']):
                 sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
                 if sale_order:
-                    vals['deal_id_str'] = sale_order.deal_id  # Set as string
-                    vals['booking_date'] = sale_order.booking_date
-                    vals['buyer_id'] = sale_order.buyer_id.id
-                    vals['project_id'] = sale_order.project_id.id
-                    vals['unit_id'] = sale_order.unit_id.id
-                    vals['sale_value'] = sale_order.sale_value
+                    vals.update({
+                        'deal_id': sale_order.deal_id,
+                        'booking_date': sale_order.booking_date,
+                        'buyer_id': sale_order.buyer_id.id,
+                        'project_id': sale_order.project_id.id,
+                        'unit_id': sale_order.unit_id.id,
+                        'sale_value': sale_order.sale_value,
+                    })
         return super().write(vals)
