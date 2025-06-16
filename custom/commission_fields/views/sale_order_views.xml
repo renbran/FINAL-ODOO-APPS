@@ -120,7 +120,6 @@
             <!-- Invisible fields for commission calculation -->
             <xpath expr="//sheet" position="inside">
                 <group string="Commission Computation">
-                    <field name="show_external_percentage" invisible="1"/>
                     <field name="show_external_fixed_amount" invisible="1"/>
                     <field name="show_agent1_rate" invisible="1"/>
                     <field name="show_agent1_fixed" invisible="1"/>
