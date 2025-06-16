@@ -30,10 +30,11 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
+        # Map deal_id from sale.order to account.move.deal_id using the sale order's deal_id field
         if vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
             if sale_order:
-                vals['deal_id'] = sale_order.id
+                vals['deal_id'] = sale_order.deal_id and sale_order.deal_id.id or sale_order.id
                 vals['booking_date'] = sale_order.booking_date
                 vals['buyer_id'] = sale_order.buyer_id.id
                 vals['project_id'] = sale_order.project_id.id
@@ -47,7 +48,7 @@ class AccountMove(models.Model):
                 sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
                 if sale_order:
                     vals.update({
-                        'deal_id': sale_order.id,
+                        'deal_id': sale_order.deal_id and sale_order.deal_id.id or sale_order.id,
                         'booking_date': sale_order.booking_date,
                         'buyer_id': sale_order.buyer_id.id,
                         'project_id': sale_order.project_id.id,
