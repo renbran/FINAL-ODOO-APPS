@@ -29,6 +29,19 @@ class AccountMove(models.Model):
         help="Related Sale Order Sale Value"
     )
     broker_commission = fields.Float(string='Broker Commission', readonly=True, copy=False, help="Broker commission from related Sale Order")
+    deal_id_display = fields.Char(string='Deal ID (Display)', compute='_compute_deal_id_display', store=False)
+
+    @api.depends('deal_id')
+    def _compute_deal_id_display(self):
+        for rec in self:
+            if rec.deal_id is not None:
+                # Remove trailing zeros and decimal if not needed
+                if float(rec.deal_id).is_integer():
+                    rec.deal_id_display = str(int(rec.deal_id))
+                else:
+                    rec.deal_id_display = str(rec.deal_id).rstrip('0').rstrip('.')
+            else:
+                rec.deal_id_display = ''
 
     @api.model
     def create(self, vals):
