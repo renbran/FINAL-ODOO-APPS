@@ -4,13 +4,12 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id = fields.Float(string='Deal ID', readonly=True, copy=False, help="Related Sale Order Deal ID")
-    booking_date = fields.Date(string='Booking Date', readonly=True, copy=False, help="Related Sale Order Booking Date")
-    buyer_id = fields.Many2one('res.partner', string='Buyer', readonly=True, copy=False, help="Related Sale Order Buyer")
+    deal_id = fields.Float(string='Deal ID', copy=False, help="Related Sale Order Deal ID")
+    booking_date = fields.Date(string='Booking Date', copy=False, help="Related Sale Order Booking Date")
+    buyer_id = fields.Many2one('res.partner', string='Buyer', copy=False, help="Related Sale Order Buyer")
     project_id = fields.Many2one(
         'product.template',
         string='Project',
-        readonly=True,
         copy=False,
         help="Related Sale Order Project",
         ondelete='set null',
@@ -19,7 +18,6 @@ class AccountMove(models.Model):
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
-        readonly=True,
         copy=False,
         help="Related Sale Order Unit",
         ondelete='set null',
@@ -27,7 +25,6 @@ class AccountMove(models.Model):
     )
     sale_value = fields.Monetary(
         string='Sale Value',
-        readonly=True,
         copy=False,
         help="Related Sale Order Sale Value"
     )
