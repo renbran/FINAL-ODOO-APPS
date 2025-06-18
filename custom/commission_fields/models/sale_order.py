@@ -581,9 +581,11 @@ class SaleOrder(models.Model):
                 record.external_commission_type, record.external_percentage, record.external_fixed_amount
             )
 
-    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total')
+    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total',
+                 'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
+                 'other_external_commission_type', 'other_external_rate')
     def _compute_commission_totals(self):
-        """Calculate all external commission totals"""
+        """Calculate all external commission totals independently"""
         for order in self:
             order.broker_agency_total = order._compute_commission_amount(
                 order.broker_agency_commission_type, order.broker_agency_rate
