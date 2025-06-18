@@ -12,7 +12,6 @@
                 <field name="project_id"/>
                 <field name="unit_id"/>
                 <field name="sale_value"/>
-                <field name="broker_commission" string="Broker Commission"/>
             </xpath>
             <xpath expr="//sheet/notebook" position="before">
                 <notebook>
@@ -24,7 +23,6 @@
                             <field name="project_id" string="Project Name"/>
                             <field name="unit_id"/>
                             <field name="sale_value"/>
-                            <field name="broker_commission" string="Broker Commission"/>
                         </group>
                     </page>
                 </notebook>
@@ -47,8 +45,7 @@
                     <field name="project_id" string="Project"/>
                     <field name="unit_id" string="Unit"/>
                     <field name="sale_value" string="Sale Value"/>
-                    <field name="broker_commission" string="Broker Commission"/>
-                    <!-- Add more fields as needed to match sales order tree -->
+                    <!-- Quantity field is not available on account.move, so not added. -->
                     <field name="state" string="Status"/>
                     <field name="move_type" string="Move Type"/>
                 </tree>
