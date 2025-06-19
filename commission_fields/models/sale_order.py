@@ -441,6 +441,13 @@ class SaleOrder(models.Model):
         help="Net commission allocated to the company after external and internal commissions."
     )
 
+    commission_percentage = fields.Float(
+        string='Commission %',
+        compute='_compute_commission_percentage',
+        store=True,
+        help="Commission as a percentage of the untaxed amount."
+    )
+
     # commission_variance field removed, replaced by company_net_commission
     # All logic and help texts updated for clarity and production use
 
@@ -453,185 +460,6 @@ class SaleOrder(models.Model):
     @api.depends('order_line', 'amount_untaxed', 'external_commission_type', 'external_percentage', 'external_fixed_amount',
                  'broker_agency_commission_type', 'broker_agency_rate', 'referral_commission_type', 'referral_rate',
                  'cashback_commission_type', 'cashback_rate', 'other_external_commission_type', 'other_external_rate')
-    def _compute_commission_totals(self):
-        """Calculate all external commission totals independently, always before internal commission allocation."""
-        for order in self:
-            # External commissions
-            order.external_commission_amount = order._compute_commission_amount(
-                order.external_commission_type, order.external_percentage, order.external_fixed_amount
-            )
-            order.broker_agency_total = order._compute_commission_amount(
-                order.broker_agency_commission_type, order.broker_agency_rate
-            )
-            order.referral_total = order._compute_commission_amount(
-                order.referral_commission_type, order.referral_rate
-            )
-            order.cashback_total = order._compute_commission_amount(
-                order.cashback_commission_type, order.cashback_rate
-            )
-            order.other_external_total = order._compute_commission_amount(
-                order.other_external_commission_type, order.other_external_rate
-            )
-            # Sum all external commissions
-            order.total_external_commission = sum([
-                order.external_commission_amount or 0.0,
-                order.broker_agency_total or 0.0,
-                order.referral_total or 0.0,
-                order.cashback_total or 0.0,
-                order.other_external_total or 0.0
-            ])
-            # Internal commissions will be computed after this (by dependency)
-
-    @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed', 'total_external_commission')
-    def _compute_internal_commissions(self):
-        """Calculate internal commission amounts after external commission is computed."""
-        for record in self:
-            # The base for internal allocation is the remaining commission after external
-            base = (record.grand_total_commission or 0.0) - (record.total_external_commission or 0.0)
-            if record.internal_commission_type == 'unit_price':
-                price_unit = record.order_line[0].price_unit if record.order_line else 0.0
-                record.agent1_commission = (price_unit * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (price_unit * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (price_unit * (record.manager_rate or 0) / 100)
-                record.director_commission = (price_unit * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'untaxed':
-                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (base * (record.manager_rate or 0) / 100)
-                record.director_commission = (base * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'fixed':
-                record.agent1_commission = record.agent1_fixed or 0.0
-                record.agent2_commission = record.agent2_fixed or 0.0
-                record.manager_commission = record.manager_fixed or 0.0
-                record.director_commission = record.director_fixed or 0.0
-
-    # ===========================================
-    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
-    # ===========================================
-    
-    show_external_percentage = fields.Boolean(
-        compute='_compute_show_external_percentage',
-        store=False
-    )
-    show_external_fixed_amount = fields.Boolean(
-        compute='_compute_show_external_fixed_amount',
-        store=False
-    )
-    show_agent1_rate = fields.Boolean(
-        compute='_compute_show_agent1_rate',
-        store=False
-    )
-    show_agent1_fixed = fields.Boolean(
-        compute='_compute_show_agent1_fixed',
-        store=False
-    )
-    show_agent2_rate = fields.Boolean(
-        compute='_compute_show_agent2_rate',
-        store=False
-    )
-    show_agent2_fixed = fields.Boolean(
-        compute='_compute_show_agent2_fixed',
-        store=False
-    )
-    show_manager_rate = fields.Boolean(
-        compute='_compute_show_manager_rate',
-        store=False
-    )
-    show_manager_fixed = fields.Boolean(
-        compute='_compute_show_manager_fixed',
-        store=False
-    )
-    show_director_rate = fields.Boolean(
-        compute='_compute_show_director_rate',
-        store=False
-    )
-    show_director_fixed = fields.Boolean(
-        compute='_compute_show_director_fixed',
-        store=False
-    )
-
-    @api.depends('external_commission_type')
-    def _compute_show_external_percentage(self):
-        for rec in self:
-            rec.show_external_percentage = rec.external_commission_type != 'fixed'
-
-    @api.depends('external_commission_type')
-    def _compute_show_external_fixed_amount(self):
-        for rec in self:
-            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_agent1_rate(self):
-        for rec in self:
-            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_agent1_fixed(self):
-        for rec in self:
-            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_agent2_rate(self):
-        for rec in self:
-            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_agent2_fixed(self):
-        for rec in self:
-            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_manager_rate(self):
-        for rec in self:
-            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_manager_fixed(self):
-        for rec in self:
-            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_director_rate(self):
-        for rec in self:
-            rec.show_director_rate = rec.internal_commission_type != 'fixed'
-
-    @api.depends('internal_commission_type')
-    def _compute_show_director_fixed(self):
-        for rec in self:
-            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
-
-    # ===========================================
-    # CONSTRAINTS
-    # ===========================================
-    
-    _sql_constraints = [
-        ('commission_percentage_positive', 
-         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
-         'External commission percentage must be between 0 and 100!'),
-    ]
-
-    # ===========================================
-    # COMPUTE METHODS
-    # ===========================================
-    
-    @api.depends('amount_total', 'amount_untaxed')
-    def _compute_sale_value(self):
-        """Compute sale value based on order totals"""
-        for record in self:
-            if not record.sale_value:
-                record.sale_value = record.amount_untaxed or record.amount_total or 0.0
-
-    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
-    def _compute_external_commission(self):
-        """Calculate external commission based on type and parameters"""
-        for record in self:
-            record.external_commission_amount = record._compute_commission_amount(
-                record.external_commission_type, record.external_percentage, record.external_fixed_amount
-            )
-
-    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total',
-                 'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
-                 'other_external_commission_type', 'other_external_rate')
     def _compute_commission_totals(self):
         """Calculate all external commission totals independently, always before internal commission allocation."""
         for order in self:
