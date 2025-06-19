@@ -1,89 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="account_statement_report_template">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="wizard">
-                <div style="width:100%; display:flex; justify-content:space-between; margin-bottom:20px;">
-                    <div style="width:48%;">
-                        <h3>Partner Details</h3>
-                        <p><strong>Name:</strong> <t t-esc="wizard.partner_id.name"/></p>
-                        <p><strong>Address:</strong> <t t-esc="wizard.partner_id.contact_address"/></p>
-                        <p t-if="wizard.partner_id.vat"><strong>VAT:</strong> <t t-esc="wizard.partner_id.vat"/></p>
-                        <p t-if="wizard.partner_id.phone"><strong>Phone:</strong> <t t-esc="wizard.partner_id.phone"/></p>
-                        <p t-if="wizard.partner_id.email"><strong>Email:</strong> <t t-esc="wizard.partner_id.email"/></p>
-                    </div>
-                    <div style="width:48%; text-align:right;">
-                        <h3>Report Info</h3>
-                        <p><strong>Report generated on:</strong> <t t-esc="formatDateTime(now())"/></p>
-                        <p><strong>Date Range:</strong> <t t-esc="wizard.date_from"/> to <t t-esc="wizard.date_to"/></p>
-                    </div>
-                </div>
-                <div style="text-align:center; margin-bottom:16px;">
-                    <span style="font-size: 2em; font-weight: bold;">Account Statement</span>
-                </div>
-                <table style="width:100%; border-collapse:collapse; border:2px solid #222;">
-                    <thead>
-                        <tr style="background-color:#800020; color:#fff;">
-                            <th style="border:1px solid #222; padding:4px;">Invoice Date</th>
-                            <th style="border:1px solid #222; padding:4px;">Due Date</th>
-                            <th style="border:1px solid #222; padding:4px;">Payment Date</th>
-                            <th style="border:1px solid #222; padding:4px;">Number</th>
-                            <th style="border:1px solid #222; padding:4px;">Reference</th>
-                            <th style="border:1px solid #222; padding:4px;">Debit</th>
-                            <th style="border:1px solid #222; padding:4px;">Credit</th>
-                            <th style="border:1px solid #222; padding:4px;">Running Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-if="wizard.line_ids">
-                            <t t-foreach="sorted(wizard.line_ids, key=lambda l: l.invoice_date or '')" t-as="line">
-                                <tr>
-                                    <td style="border:1px solid #bbb; padding:4px;">
-                                        <t t-esc="line.invoice_date"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px;">
-                                        <t t-esc="line.due_date"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px;">
-                                        <t t-esc="line.payment_date"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px;">
-                                        <t t-esc="line.number"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px;">
-                                        <t t-esc="line.reference"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
-                                        <t t-esc="'%.2f' % line.debit"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
-                                        <t t-esc="'%.2f' % line.credit"/>
-                                    </td>
-                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
-                                        <t t-esc="'%.2f' % line.running_balance"/>
-                                    </td>
-                                </tr>
-                            </t>
-                        </t>
-                        <t t-if="not wizard.line_ids">
-                            <tr>
-                                <td colspan="8" style="text-align:center; color:#888; border:1px solid #bbb;">No data available</td>
-                            </tr>
-                        </t>
-                        <tr style="background-color:#800020; color:#fff; font-weight:bold;">
-                            <td colspan="5" style="border:1px solid #222; text-align:right;">Total</td>
-                            <td style="border:1px solid #222; text-align:right;">
-                                <t t-esc="'%.2f' % wizard.total_debit"/>
-                            </td>
-                            <td style="border:1px solid #222; text-align:right;">
-                                <t t-esc="'%.2f' % wizard.total_credit"/>
-                            </td>
-                            <td style="border:1px solid #222; text-align:right;">
-                                <t t-esc="'%.2f' % wizard.balance"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <data>
+        <template id="account_statement_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <!-- Header -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <h2 class="text-center mb-4">
+                                        <strong>ACCOUNT STATEMENT</strong>
+                                    </h2>
+                                </div>
+                            </div>
+
+                            <!-- Partner Information -->
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h4>Partner Information</h4>
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td><strong>Name:</strong></td>
+                                            <td><span t-field="doc.partner_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="doc.partner_id.contact_address">
+                                            <td><strong>Address:</strong></td>
+                                            <td><span t-field="doc.partner_id.contact_address"/></td>
+                                        </tr>
+                                        <tr t-if="doc.partner_id.vat">
+                                            <td><strong>VAT:</strong></td>
+                                            <td><span t-field="doc.partner_id.vat"/></td>
+                                        </tr>
+                                        <tr t-if="doc.partner_id.phone">
+                                            <td><strong>Phone:</strong></td>
+                                            <td><span t-field="doc.partner_id.phone"/></td>
+                                        </tr>
+                                        <tr t-if="doc.partner_id.email">
+                                            <td><strong>Email:</strong></td>
+                                            <td><span t-field="doc.partner_id.email"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-6">
+                                    <h4>Statement Information</h4>
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td><strong>Statement Date:</strong></td>
+                                            <td><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Period From:</strong></td>
+                                            <td><span t-field="doc.date_from"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Period To:</strong></td>
+                                            <td><span t-field="doc.date_to"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Currency:</strong></td>
+                                            <td><span t-field="doc.currency_id.name"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Statement Lines -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4>Statement Details</h4>
+                                    <table class="table table-sm table-striped">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Invoice Date</th>
+                                                <th>Due Date</th>
+                                                <th>Payment Date</th>
+                                                <th>Number</th>
+                                                <th>Reference</th>
+                                                <th class="text-right">Debit</th>
+                                                <th class="text-right">Credit</th>
+                                                <th class="text-right">Running Balance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="lines" t-value="doc.line_ids.sorted(lambda l: l.invoice_date or datetime.date.today())"/>
+                                            <tr t-foreach="lines" t-as="line">
+                                                <td><span t-field="line.invoice_date"/></td>
+                                                <td><span t-field="line.due_date"/></td>
+                                                <td><span t-field="line.payment_date"/></td>
+                                                <td><span t-field="line.number"/></td>
+                                                <td><span t-field="line.reference"/></td>
+                                                <td class="text-right">
+                                                    <span t-field="line.debit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="line.credit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="line.running_balance" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <t t-if="not lines">
+                                                <tr>
+                                                    <td colspan="8" class="text-center text-muted">
+                                                        <em>No transactions found for the selected period</em>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Summary -->
+                            <div class="row mt-4">
+                                <div class="col-8"></div>
+                                <div class="col-4">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Total Debit:</strong></td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-field="doc.total_debit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total Credit:</strong></td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-field="doc.total_credit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-dark">
+                                            <td><strong>Net Balance:</strong></td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-field="doc.balance" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Footer Note -->
+                            <div class="row mt-5">
+                                <div class="col-12">
+                                    <p class="text-muted small">
+                                        <em>This statement is generated automatically and shows all posted invoices for the selected partner and period. 
+                                        For any discrepancies, please contact our accounting department.</em>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
             </t>
-        </t>
-    </template>
+        </template>
+    </data>
 </odoo>

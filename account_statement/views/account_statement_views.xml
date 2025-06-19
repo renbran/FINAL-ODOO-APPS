@@ -1,27 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_account_statement_tree" model="ir.ui.view">
-        <field name="name">account.statement.tree</field>
-        <field name="model">account.statement</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="date"/>
-            </tree>
-        </field>
-    </record>
-    <record id="view_account_statement_form" model="ir.ui.view">
-        <field name="name">account.statement.form</field>
-        <field name="model">account.statement</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="name"/>
-                        <field name="date"/>
+    <data>
+        <!-- Account Statement Tree View -->
+        <record id="view_account_statement_tree" model="ir.ui.view">
+            <field name="name">account.statement.tree</field>
+            <field name="model">account.statement</field>
+            <field name="arch" type="xml">
+                <tree string="Account Statements">
+                    <field name="name"/>
+                    <field name="date"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Account Statement Form View -->
+        <record id="view_account_statement_form" model="ir.ui.view">
+            <field name="name">account.statement.form</field>
+            <field name="model">account.statement</field>
+            <field name="arch" type="xml">
+                <form string="Account Statement">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Account Statement Search View -->
+        <record id="view_account_statement_search" model="ir.ui.view">
+            <field name="name">account.statement.search</field>
+            <field name="model">account.statement</field>
+            <field name="arch" type="xml">
+                <search string="Search Account Statements">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <filter string="This Month" name="this_month" 
+                            domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%%Y-%%m-01')), ('date', '&lt;=', (context_today()).strftime('%%Y-%%m-%%d'))]"/>
+                    <filter string="This Year" name="this_year" 
+                            domain="[('date', '&gt;=', (context_today()).strftime('%%Y-01-01')), ('date', '&lt;=', (context_today()).strftime('%%Y-12-31'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
                     </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <!-- ...add more views as needed... -->
+                </search>
+            </field>
+        </record>
+
+        <!-- Account Statement Action -->
+        <record id="action_account_statement" model="ir.actions.act_window">
+            <field name="name">Account Statements</field>
+            <field name="res_model">account.statement</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first account statement!
+                </p>
+                <p>
+                    Account statements help you track partner transactions and balances.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem id="menu_account_statement_root"
+                  name="Account Statements"
+                  parent="account.menu_finance"
+                  sequence="100"/>
+
+        <menuitem id="menu_account_statement_wizard"
+                  name="Generate Statement"
+                  parent="menu_account_statement_root"
+                  action="action_account_statement_wizard"
+                  sequence="10"/>
+
+        <menuitem id="menu_account_statement_list"
+                  name="Statements"
+                  parent="menu_account_statement_root"
+                  action="action_account_statement"
+                  sequence="20"/>
+    </data>
 </odoo>

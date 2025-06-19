@@ -1,11 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <report
-        id="account_statement_report_action"
-        model="account.statement.wizard"
-        string="Account Statement Report"
-        report_type="qweb-pdf"
-        name="account_statement.account_statement_report_template"
-        file="account_statement.account_statement_report_template"
-        print_report_name="'Account Statement - %s' % (object.partner_id.name)"
-    />
+    <data>
+        <!-- Report Definition -->
+        <record id="account_statement_report_action" model="ir.actions.report">
+            <field name="name">Account Statement</field>
+            <field name="model">account.statement.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">account_statement.account_statement_template</field>
+            <field name="report_file">account_statement.account_statement_template</field>
+            <field name="binding_model_id" ref="model_account_statement_wizard"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="paperformat_account_statement"/>
+        </record>
+    </data>
 </odoo>
