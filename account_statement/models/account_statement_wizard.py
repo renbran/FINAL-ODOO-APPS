@@ -1,192 +1,178 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-import datetime
+from odoo import models, fields, api
+from datetime import datetime
+import io
+import xlsxwriter
+import base64
+
 
 class AccountStatementWizard(models.TransientModel):
     _name = 'account.statement.wizard'
     _description = 'Account Statement Wizard'
 
     partner_id = fields.Many2one('res.partner', string='Partner', required=True)
-    date_from = fields.Date(string='Start Date', required=True, default=fields.Date.context_today)
-    date_to = fields.Date(string='End Date', required=True, default=fields.Date.context_today)
+    date_from = fields.Date(string='Date From', required=True, 
+                           default=lambda self: fields.Date.today().replace(day=1))
+    date_to = fields.Date(string='Date To', required=True, default=fields.Date.today())
+    currency_id = fields.Many2one('res.currency', string='Currency', 
+                                 default=lambda self: self.env.company.currency_id)
+    total_debit = fields.Monetary(string='Total Debit', currency_field='currency_id', readonly=True)
+    total_credit = fields.Monetary(string='Total Credit', currency_field='currency_id', readonly=True)
+    balance = fields.Monetary(string='Balance', currency_field='currency_id', readonly=True)
+    line_ids = fields.One2many('account.statement.wizard.line', 'wizard_id', string='Statement Lines', readonly=True)
 
-    line_ids = fields.One2many(
-        'account.statement.wizard.line', 'wizard_id',
-        string='Statement Lines', compute='_compute_lines', store=False, readonly=True
-    )
-    total_debit = fields.Monetary(
-        string='Total Debit', compute='_compute_totals', store=False, readonly=True, currency_field='currency_id'
-    )
-    total_credit = fields.Monetary(
-        string='Total Credit', compute='_compute_totals', store=False, readonly=True, currency_field='currency_id'
-    )
-    balance = fields.Monetary(
-        string='Balance', compute='_compute_totals', store=False, readonly=True, currency_field='currency_id'
-    )
-    currency_id = fields.Many2one(
-        'res.currency', compute='_compute_currency', store=False, readonly=True
-    )
+    @api.onchange('partner_id', 'date_from', 'date_to')
+    def _onchange_partner_dates(self):
+        if self.partner_id and self.date_from and self.date_to:
+            self._compute_statement_data()
 
-    @api.constrains('date_from', 'date_to')
-    def _check_dates(self):
-        for record in self:
-            if record.date_from and record.date_to and record.date_from > record.date_to:
-                raise UserError(_('Start date cannot be later than end date.'))
+    def _compute_statement_data(self):
+        """Compute statement data based on partner and date range"""
+        if not self.partner_id:
+            return
 
-    @api.depends('partner_id')
-    def _compute_currency(self):
-        company_currency = self.env.company.currency_id
-        for wizard in self:
-            wizard.currency_id = company_currency
+        # Clear existing lines
+        self.line_ids = [(5, 0, 0)]
+        
+        # Search for account moves
+        moves = self.env['account.move'].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('state', '=', 'posted'),
+            ('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+        ])
 
-    @api.depends('partner_id', 'date_from', 'date_to')
-    def _compute_lines(self):
-        AccountStatementWizardLine = self.env['account.statement.wizard.line']
-        for wizard in self:
-            lines = []
-            if wizard.partner_id and wizard.date_from and wizard.date_to:
-                domain = [
-                    ('partner_id', '=', wizard.partner_id.id),
-                    ('move_id.move_type', 'in', ['out_invoice', 'in_invoice', 'out_refund', 'in_refund']),
-                    ('date', '>=', wizard.date_from),
-                    ('date', '<=', wizard.date_to),
-                    ('move_id.state', '=', 'posted'),
-                    ('account_id.account_type', 'in', ['asset_receivable', 'liability_payable']),
-                ]
-                account_lines = self.env['account.move.line'].search(domain, order='date, id')
-                running_balance = 0.0
-                for line in account_lines:
-                    debit = line.debit or 0.0
-                    credit = line.credit or 0.0
-                    running_balance += debit - credit
-                    payment_date = False
-                    if line.move_id.payment_state == 'paid':
-                        reconciled_lines = line.matched_debit_ids + line.matched_credit_ids
-                        if reconciled_lines:
-                            payment_date = max(reconciled_lines.mapped('create_date')).date()
-                    lines.append((0, 0, {
-                        'invoice_date': line.date,
-                        'due_date': line.move_id.invoice_date_due or line.date_maturity,
-                        'payment_date': payment_date,
-                        'number': line.move_id.name or '',
-                        'reference': line.ref or line.move_id.ref or '',
+        lines_data = []
+        running_balance = 0.0
+        total_debit = 0.0
+        total_credit = 0.0
+
+        for move in moves.sorted('date'):
+            # Get the receivable/payable line
+            for line in move.line_ids:
+                if line.account_id.account_type in ['asset_receivable', 'liability_payable']:
+                    debit = line.debit
+                    credit = line.credit
+                    
+                    total_debit += debit
+                    total_credit += credit
+                    running_balance += (debit - credit)
+                    
+                    lines_data.append({
+                        'invoice_date': move.date,
+                        'due_date': move.invoice_date_due,
+                        'payment_date': move.date if move.payment_state == 'paid' else False,
+                        'number': move.name,
+                        'reference': move.ref or '',
                         'debit': debit,
                         'credit': credit,
                         'running_balance': running_balance,
-                    }))
-            wizard.line_ids = lines
+                    })
+                    break
 
-    @api.depends('line_ids')
-    def _compute_totals(self):
-        for wizard in self:
-            total_debit = sum(line.debit or 0.0 for line in wizard.line_ids)
-            total_credit = sum(line.credit or 0.0 for line in wizard.line_ids)
-            wizard.total_debit = total_debit
-            wizard.total_credit = total_credit
-            wizard.balance = total_debit - total_credit
+        self.line_ids = [(0, 0, line_data) for line_data in lines_data]
+        self.total_debit = total_debit
+        self.total_credit = total_credit
+        self.balance = total_debit - total_credit
 
     def action_generate_pdf(self):
-        self.ensure_one()
-        if not self.partner_id:
-            raise UserError(_('Please select a partner first.'))
-        return self.env.ref('account_statement.account_statement_report_action').report_action(self)
+        """Generate PDF report"""
+        return self.env.ref('account_statement.action_report_account_statement').report_action(self)
 
     def action_generate_excel(self):
-        self.ensure_one()
-        if not self.partner_id:
-            raise UserError(_('Please select a partner first.'))
-        import base64
+        """Generate Excel report"""
         import io
-        try:
-            import xlsxwriter
-        except ImportError:
-            raise UserError(_('Please install xlsxwriter: pip install xlsxwriter'))
-
+        import xlsxwriter
+        import base64
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('Account Statement')
-
-        # Styles
         header_format = workbook.add_format({
-            'bold': True, 'bg_color': '#800020', 'font_color': 'white', 'border': 1, 'align': 'center'
+            'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#D7E4BC'
         })
-        cell_format = workbook.add_format({'border': 1, 'align': 'left'})
-        amount_format = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.00'})
-        title_format = workbook.add_format({'bold': True, 'font_size': 16, 'align': 'center'})
-        date_format = workbook.add_format({'border': 1, 'align': 'left', 'num_format': 'yyyy-mm-dd'})
-
-        worksheet.merge_range('A1:H1', 'Account Statement', title_format)
-        worksheet.set_row(0, 30)
-
-        worksheet.write('A3', 'Partner:', header_format)
-        worksheet.write('B3', self.partner_id.name or '', cell_format)
-        worksheet.write('A4', 'Address:', header_format)
-        worksheet.write('B4', self.partner_id.contact_address or '', cell_format)
-        worksheet.write('A5', 'VAT:', header_format)
-        worksheet.write('B5', self.partner_id.vat or '', cell_format)
-        worksheet.write('A6', 'Phone:', header_format)
-        worksheet.write('B6', self.partner_id.phone or '', cell_format)
-        worksheet.write('A7', 'Email:', header_format)
-        worksheet.write('B7', self.partner_id.email or '', cell_format)
-
-        worksheet.write('F3', 'Report Generated:', header_format)
-        worksheet.write('G3', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), cell_format)
-        worksheet.write('F4', 'Date Range:', header_format)
-        worksheet.write('G4', f"{self.date_from} to {self.date_to}", cell_format)
-
-        headers = [
-            'Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference',
-            'Debit', 'Credit', 'Running Balance'
-        ]
-        worksheet.write_row('A9', headers, header_format)
-
-        row = 9
-        lines = sorted(self.line_ids, key=lambda l: l.invoice_date or fields.Date.today())
-        for line in lines:
-            worksheet.write(row, 0, line.invoice_date or '', date_format)
-            worksheet.write(row, 1, line.due_date or '', date_format)
-            worksheet.write(row, 2, line.payment_date or '', date_format)
-            worksheet.write(row, 3, line.number or '', cell_format)
-            worksheet.write(row, 4, line.reference or '', cell_format)
-            worksheet.write_number(row, 5, line.debit or 0.0, amount_format)
-            worksheet.write_number(row, 6, line.credit or 0.0, amount_format)
-            worksheet.write_number(row, 7, line.running_balance or 0.0, amount_format)
+        subheader_format = workbook.add_format({
+            'bold': True, 'font_size': 12, 'bg_color': '#E8F4FD'
+        })
+        date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+        currency_format = workbook.add_format({'num_format': '#,##0.00'})
+        worksheet.merge_range('A1:H1', f'Account Statement - {self.partner_id.name}', header_format)
+        worksheet.write('A2', 'Period:', subheader_format)
+        worksheet.write('B2', f'{self.date_from} to {self.date_to}')
+        worksheet.write('A4', 'Total Debit:', subheader_format)
+        worksheet.write('B4', self.total_debit, currency_format)
+        worksheet.write('A5', 'Total Credit:', subheader_format)
+        worksheet.write('B5', self.total_credit, currency_format)
+        worksheet.write('A6', 'Balance:', subheader_format)
+        worksheet.write('B6', self.balance, currency_format)
+        headers = ['Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference', 'Debit', 'Credit', 'Running Balance']
+        for col, header in enumerate(headers):
+            worksheet.write(7, col, header, subheader_format)
+        row = 8
+        for line in self.line_ids:
+            worksheet.write(row, 0, line.invoice_date, date_format)
+            worksheet.write(row, 1, line.due_date, date_format)
+            worksheet.write(row, 2, line.payment_date, date_format)
+            worksheet.write(row, 3, line.number)
+            worksheet.write(row, 4, line.reference)
+            worksheet.write(row, 5, line.debit, currency_format)
+            worksheet.write(row, 6, line.credit, currency_format)
+            worksheet.write(row, 7, line.running_balance, currency_format)
             row += 1
-
-        if lines:
-            worksheet.write(row, 4, 'TOTAL', header_format)
-            worksheet.write_number(row, 5, self.total_debit or 0.0, amount_format)
-            worksheet.write_number(row, 6, self.total_credit or 0.0, amount_format)
-            worksheet.write_number(row, 7, self.balance or 0.0, amount_format)
-
-        worksheet.set_column('A:A', 14)
-        worksheet.set_column('B:B', 14)
-        worksheet.set_column('C:C', 14)
-        worksheet.set_column('D:D', 18)
-        worksheet.set_column('E:E', 20)
-        worksheet.set_column('F:H', 16)
-
+        worksheet.set_column('A:C', 12)
+        worksheet.set_column('D:E', 15)
+        worksheet.set_column('F:H', 12)
         workbook.close()
         output.seek(0)
-        file_data = output.read()
-        output.close()
-
-        data = base64.b64encode(file_data)
-        filename = f"Account_Statement_{self.partner_id.name or 'Partner'}_{fields.Date.today()}.xlsx"
-
+        filename = f'Account_Statement_{self.partner_id.name}_{self.date_from}_{self.date_to}.xlsx'
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
-            'datas': data,
+            'datas': base64.b64encode(output.read()),
             'res_model': self._name,
             'res_id': self.id,
-            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         })
-
         return {
             'type': 'ir.actions.act_url',
-            'url': f"/web/content/{attachment.id}?download=true",
-            'target': 'self',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'new',
+        }
+
+    def action_save_statement(self):
+        """Save the statement as a permanent record"""
+        statement = self.env['account.statement'].create({
+            'name': f'Statement - {self.partner_id.name} ({self.date_from} to {self.date_to})',
+            'partner_id': self.partner_id.id,
+            'date': fields.Date.today(),
+            'date_from': self.date_from,
+            'date_to': self.date_to,
+            'currency_id': self.currency_id.id,
+            'total_debit': self.total_debit,
+            'total_credit': self.total_credit,
+            'balance': self.balance,
+        })
+        
+        # Create statement lines
+        for line in self.line_ids:
+            self.env['account.statement.line'].create({
+                'statement_id': statement.id,
+                'invoice_date': line.invoice_date,
+                'due_date': line.due_date,
+                'payment_date': line.payment_date,
+                'number': line.number,
+                'reference': line.reference,
+                'debit': line.debit,
+                'credit': line.credit,
+                'running_balance': line.running_balance,
+            })
+        
+        return {
+            'name': 'Account Statement',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.statement',
+            'res_id': statement.id,
+            'view_mode': 'form',
+            'target': 'current',
         }
 
 
@@ -203,4 +189,4 @@ class AccountStatementWizardLine(models.TransientModel):
     debit = fields.Monetary(string='Debit', currency_field='currency_id')
     credit = fields.Monetary(string='Credit', currency_field='currency_id')
     running_balance = fields.Monetary(string='Running Balance', currency_field='currency_id')
-    currency_id = fields.Many2one('res.currency', related='wizard_id.currency_id', store=False, readonly=True)
+    currency_id = fields.Many2one('res.currency', related='wizard_id.currency_id', store=True)

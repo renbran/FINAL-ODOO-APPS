@@ -8,7 +8,7 @@
         ========================
         This module allows you to generate account statements for partners
         showing all invoices and payments within a date range.
-        
+
         Features:
         - Generate PDF reports
         - Export to Excel
