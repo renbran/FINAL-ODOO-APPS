@@ -6,8 +6,8 @@
             <field name="name">Generate Account Statement</field>
             <field name="res_model">account.statement.wizard</field>
             <field name="view_mode">form</field>
+            <field name="view_id" ref="account_statement.view_account_statement_wizard_form"/>
             <field name="target">new</field>
-            <field name="view_id" ref="view_account_statement_wizard_form"/>
         </record>
 
         <!-- Account Statement Wizard Form View -->
