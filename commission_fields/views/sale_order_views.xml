@@ -33,7 +33,7 @@
                             <field name="total_external_commission" readonly="1"/>
                             <field name="grand_total_commission" readonly="1"/>
                             <field name="commission_allocation_status" readonly="1"/>
-                            <field name="commission_variance" readonly="1"/>
+                            <field name="company_net_commission" string="Company Net Commission" readonly="1"/>
                             <field name="commission_percentage" readonly="1"/>
                         </group>
                     </group>
