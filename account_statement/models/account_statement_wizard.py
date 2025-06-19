@@ -68,6 +68,7 @@ class AccountStatementWizard(models.TransientModel):
                         'credit': credit,
                         'running_balance': running_balance,
                     }))
+            # Always assign a value to wizard.line_ids (even if empty)
             wizard.line_ids = lines
 
     @api.depends('line_ids')
