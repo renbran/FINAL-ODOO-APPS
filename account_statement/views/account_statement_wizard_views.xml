@@ -52,22 +52,5 @@
                 </form>
             </field>
         </record>
-
-        <!-- Account Statement Wizard Action -->
-        <record id="action_account_statement_wizard" model="ir.actions.act_window">
-            <field name="name">Generate Account Statement</field>
-            <field name="res_model">account.statement.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Generate account statements for your partners!
-                </p>
-                <p>
-                    Select a partner and date range to generate a comprehensive account statement
-                    showing all transactions and running balance.
-                </p>
-            </field>
-        </record>
     </data>
 </odoo>
