@@ -218,4 +218,22 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Search View Extension -->
+    <record id="view_order_search_commission" model="ir.ui.view">
+        <field name="name">sale.order.search.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="sales_type" string="Sales Type" domain="[]" context="{'group_by':'sales_type'}"/>
+                <filter name="project_id" string="Project" domain="[]" context="{'group_by':'project_id'}"/>
+                <filter name="booking_date" string="Booking Date" domain="[]" context="{'group_by':'booking_date'}"/>
+                <field name="sales_type"/>
+                <field name="project_id"/>
+                <field name="booking_date"/>
+                <field name="agent1_id" string="Agent 1"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

@@ -52,4 +52,23 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_move_search_commission_deal" model="ir.ui.view">
+        <field name="name">account.move.search.commission.deal</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="sales_type" string="Sales Type" domain="[]" context="{'group_by':'sales_type'}"/>
+                <filter name="project_id" string="Project" domain="[]" context="{'group_by':'project_id'}"/>
+                <filter name="booking_date" string="Booking Date" domain="[]" context="{'group_by':'booking_date'}"/>
+                <field name="sales_type"/>
+                <field name="project_id"/>
+                <field name="booking_date"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="payment_reference" string="Payment Reference"/>
+                <field name="ref" string="Reference"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

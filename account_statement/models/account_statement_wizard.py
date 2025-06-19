@@ -64,8 +64,95 @@ class AccountStatementWizard(models.TransientModel):
         return self.env.ref('account_statement.account_statement_report_action').report_action(self)
 
     def action_generate_excel(self):
-        # Placeholder for Excel export logic
-        pass
+        import base64
+        import io
+        import xlsxwriter
+        self.ensure_one()
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('Account Statement')
+
+        # Styles
+        header_format = workbook.add_format({'bold': True, 'bg_color': '#800020', 'font_color': 'white', 'border': 1, 'align': 'center'})
+        cell_format = workbook.add_format({'border': 1, 'align': 'left'})
+        amount_format = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.00'})
+        title_format = workbook.add_format({'bold': True, 'font_size': 16, 'align': 'center'})
+
+        # Title
+        worksheet.merge_range('A1:H1', 'Account Statement', title_format)
+        worksheet.set_row(0, 30)
+
+        # Partner and report info
+        worksheet.write('A2', 'Partner:', header_format)
+        worksheet.write('B2', self.partner_id.name or '', cell_format)
+        worksheet.write('A3', 'Address:', header_format)
+        worksheet.write('B3', self.partner_id.contact_address or '', cell_format)
+        worksheet.write('A4', 'VAT:', header_format)
+        worksheet.write('B4', self.partner_id.vat or '', cell_format)
+        worksheet.write('A5', 'Phone:', header_format)
+        worksheet.write('B5', self.partner_id.phone or '', cell_format)
+        worksheet.write('A6', 'Email:', header_format)
+        worksheet.write('B6', self.partner_id.email or '', cell_format)
+        worksheet.write('F2', 'Report generated on:', header_format)
+        worksheet.write('G2', fields.Datetime.now(), cell_format)
+        worksheet.write('F3', 'Date Range:', header_format)
+        worksheet.write('G3', f"{self.date_from} to {self.date_to}", cell_format)
+
+        # Table headers
+        headers = [
+            'Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference', 'Debit', 'Credit', 'Running Balance'
+        ]
+        worksheet.write_row('A8', headers, header_format)
+
+        # Data rows
+        row = 8
+        lines = sorted(self.line_ids, key=lambda l: l.invoice_date or fields.Date.today())
+        for line in lines:
+            worksheet.write(row, 0, str(line.invoice_date or ''), cell_format)
+            worksheet.write(row, 1, str(line.due_date or ''), cell_format)
+            worksheet.write(row, 2, str(line.payment_date or ''), cell_format)
+            worksheet.write(row, 3, line.number or '', cell_format)
+            worksheet.write(row, 4, line.reference or '', cell_format)
+            worksheet.write_number(row, 5, line.debit or 0.0, amount_format)
+            worksheet.write_number(row, 6, line.credit or 0.0, amount_format)
+            worksheet.write_number(row, 7, line.running_balance or 0.0, amount_format)
+            row += 1
+
+        # Totals
+        worksheet.write(row, 4, 'Total', header_format)
+        worksheet.write_number(row, 5, self.total_debit or 0.0, amount_format)
+        worksheet.write_number(row, 6, self.total_credit or 0.0, amount_format)
+        worksheet.write_number(row, 7, self.balance or 0.0, amount_format)
+
+        # Set column widths
+        worksheet.set_column('A:A', 14)
+        worksheet.set_column('B:B', 14)
+        worksheet.set_column('C:C', 14)
+        worksheet.set_column('D:D', 18)
+        worksheet.set_column('E:E', 18)
+        worksheet.set_column('F:H', 16)
+
+        workbook.close()
+        output.seek(0)
+        file_data = output.read()
+        output.close()
+        data = base64.b64encode(file_data)
+        filename = f"Account_Statement_{self.partner_id.name or ''}_{fields.Date.today()}.xlsx"
+        # Create a transient model to return the file
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': data,
+            'res_model': self._name,
+            'res_id': self.id,
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        })
+        download_url = f"/web/content/{attachment.id}?download=true"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': download_url,
+            'target': 'self',
+        }
 
 class AccountStatementWizardLine(models.TransientModel):
     _name = 'account.statement.wizard.line'

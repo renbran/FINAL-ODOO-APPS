@@ -34,16 +34,52 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Placeholder for transaction lines -->
-                        <tr>
-                            <td colspan="8" style="text-align:center; color:#888; border:1px solid #bbb;">No data (implement logic)</td>
-                        </tr>
-                        <!-- Summary row -->
+                        <t t-if="wizard.line_ids">
+                            <t t-foreach="sorted(wizard.line_ids, key=lambda l: l.invoice_date or '')" t-as="line">
+                                <tr>
+                                    <td style="border:1px solid #bbb; padding:4px;">
+                                        <t t-esc="line.invoice_date"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px;">
+                                        <t t-esc="line.due_date"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px;">
+                                        <t t-esc="line.payment_date"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px;">
+                                        <t t-esc="line.number"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px;">
+                                        <t t-esc="line.reference"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
+                                        <t t-esc="'%.2f' % line.debit"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
+                                        <t t-esc="'%.2f' % line.credit"/>
+                                    </td>
+                                    <td style="border:1px solid #bbb; padding:4px; text-align:right;">
+                                        <t t-esc="'%.2f' % line.running_balance"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                        <t t-if="not wizard.line_ids">
+                            <tr>
+                                <td colspan="8" style="text-align:center; color:#888; border:1px solid #bbb;">No data available</td>
+                            </tr>
+                        </t>
                         <tr style="background-color:#800020; color:#fff; font-weight:bold;">
                             <td colspan="5" style="border:1px solid #222; text-align:right;">Total</td>
-                            <td style="border:1px solid #222;">0.00</td>
-                            <td style="border:1px solid #222;">0.00</td>
-                            <td style="border:1px solid #222;">0.00</td>
+                            <td style="border:1px solid #222; text-align:right;">
+                                <t t-esc="'%.2f' % wizard.total_debit"/>
+                            </td>
+                            <td style="border:1px solid #222; text-align:right;">
+                                <t t-esc="'%.2f' % wizard.total_credit"/>
+                            </td>
+                            <td style="border:1px solid #222; text-align:right;">
+                                <t t-esc="'%.2f' % wizard.balance"/>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
