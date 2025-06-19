@@ -602,7 +602,107 @@ class SaleOrder(models.Model):
 
     @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
     def _compute_internal_commissions(self):
-        """Calculate internal commission amounts"""
+        """Calculate internal commission amounts using Odoo 17 best practices."""
+        for record in self:
+            if record.internal_commission_type == 'unit_price':
+                base = record.order_line[0].price_unit if record.order_line else 0.0
+                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
+                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
+                record.manager_commission = (base * (record.manager_rate or 0) / 100)
+                record.director_commission = (base * (record.director_rate or 0) / 100)
+            elif record.internal_commission_type == 'untaxed':
+                base = record.amount_untaxed or 0.0
+                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
+                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
+                record.manager_commission = (base * (record.manager_rate or 0) / 100)
+                record.director_commission = (base * (record.director_rate or 0) / 100)
+            elif record.internal_commission_type == 'fixed':
+                record.agent1_commission = record.agent1_fixed or 0.0
+                record.agent2_commission = record.agent2_fixed or 0.0
+                record.manager_commission = record.manager_fixed or 0.0
+                record.director_commission = record.director_fixed or 0.0
+
+    @api.depends('agent1_commission', 'agent2_commission', 'manager_commission', 'director_commission',
+                 'external_commission_amount', 'broker_agency_total', 'referral_total', 
+                 'cashback_total', 'other_external_total')
+    def _compute_total_commissions(self):
+        """Calculate total commission amounts"""
+        for record in self:
+            # Internal commission total
+            record.total_internal_commission = sum([
+                record.agent1_commission or 0.0,
+                record.agent2_commission or 0.0,
+                record.manager_commission or 0.0,
+                record.director_commission or 0.0
+            ])
+            
+            # External commission total
+            record.total_external_commission = sum([
+                record.external_commission_amount or 0.0,
+                record.broker_agency_total or 0.0,
+                record.referral_total or 0.0,
+                record.cashback_total or 0.0,
+                record.other_external_total or 0.0
+            ])
+            
+            # Grand total
+            record.grand_total_commission = record.total_internal_commission + record.total_external_commission
+
+    @api.depends('grand_total_commission', 'amount_total', 'sale_value')
+    def _compute_allocation_status(self):
+        """Determine commission allocation status and calculate variance based on untaxed amount (excluding tax)"""
+        for record in self:
+            # Use amount_untaxed as the base for commission allocation, not amount_total (which includes tax)
+            base_amount = record.amount_untaxed or 0.0
+            commission_total = record.grand_total_commission or 0.0
+            
+            # Calculate variance
+            record.commission_variance = commission_total - base_amount
+            
+            # Calculate percentage
+            if base_amount > 0:
+                record.commission_percentage = (commission_total / base_amount) * 100
+            else:
+                record.commission_percentage = 0.0
+            
+            # Determine status with tolerance
+            tolerance = 0.01  # 1 cent tolerance
+            if float_compare(commission_total, base_amount, precision_digits=2) == 0:
+                record.commission_allocation_status = 'full'
+            elif commission_total < base_amount - tolerance:
+                record.commission_allocation_status = 'under'
+            elif commission_total > base_amount + tolerance:
+                record.commission_allocation_status = 'over'
+            else:
+                record.commission_allocation_status = 'full'
+
+    def _compute_purchase_order_count(self):
+        """Count related purchase orders"""
+        for order in self:
+            order.purchase_order_count = self.env['purchase.order'].search_count([
+                ('origin', '=', order.name)
+            ])
+
+    # ===========================================
+    # HELPER METHODS
+    # ===========================================
+    
+    def _compute_commission_amount(self, commission_type, rate, fixed_amount=0.0):
+        """Calculate commission amount based on type and rate. For 'unit_price', use price_unit of the first order line only."""
+        self.ensure_one()
+        if commission_type == 'unit_price':
+            base = self.order_line[0].price_unit if self.order_line else 0.0
+            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
+        elif commission_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
+        elif commission_type == 'fixed':
+            return fixed_amount or 0.0
+        return 0.0
+
+    @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
+    def _compute_internal_commissions(self):
+        """Calculate internal commission amounts using Odoo 17 best practices."""
         for record in self:
             if record.internal_commission_type == 'unit_price':
                 base = record.order_line[0].price_unit if record.order_line else 0.0
