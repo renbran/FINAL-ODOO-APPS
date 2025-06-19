@@ -8,9 +8,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">account_statement.account_statement_template</field>
             <field name="report_file">account_statement.account_statement_template</field>
-            <field name="binding_model_id" ref="model_account_statement_wizard"/>
             <field name="binding_type">report</field>
-            <field name="paperformat_id" ref="paperformat_account_statement"/>
         </record>
     </data>
 </odoo>

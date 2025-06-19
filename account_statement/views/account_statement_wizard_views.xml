@@ -45,10 +45,8 @@
                         </notebook>
                     </sheet>
                     <footer>
-                        <button name="action_generate_pdf" string="Print PDF" type="object" class="btn-primary" 
-                                attrs="{'invisible': [('partner_id', '=', False)]}"/>
-                        <button name="action_generate_excel" string="Export Excel" type="object" class="btn-secondary"
-                                attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                        <button name="action_generate_pdf" string="Print PDF" type="object" class="btn-primary" invisible="partner_id == False"/>
+                        <button name="action_generate_excel" string="Export Excel" type="object" class="btn-secondary" invisible="partner_id == False"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
