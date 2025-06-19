@@ -68,6 +68,7 @@
             <field name="name">Account Statement Wizard</field>
             <field name="res_model">account.statement.wizard</field>
             <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_statement_wizard_form"/>
             <field name="target">new</field>
         </record>
 

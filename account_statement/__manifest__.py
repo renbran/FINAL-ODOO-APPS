@@ -23,6 +23,7 @@
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
         'views/account_statement_views.xml',
+        'views/account_statement_wizard_views.xml',
         'report/account_statement_report_action.xml',
         'report/account_statement_report_template.xml',
     ],
