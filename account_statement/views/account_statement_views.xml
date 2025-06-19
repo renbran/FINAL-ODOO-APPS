@@ -110,6 +110,15 @@
             </field>
         </record>
 
+        <!-- Account Statement Wizard Action -->
+        <record id="action_account_statement_wizard" model="ir.actions.act_window">
+            <field name="name">Account Statement Wizard</field>
+            <field name="res_model">account.statement.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account_statement.view_account_statement_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
         <!-- Menu Items -->
         <menuitem id="menu_account_statement_root"
                   name="Account Statements"
