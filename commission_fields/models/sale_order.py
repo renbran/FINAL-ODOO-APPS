@@ -605,7 +605,7 @@ class SaleOrder(models.Model):
         """Calculate internal commission amounts"""
         for record in self:
             if record.internal_commission_type == 'unit_price':
-                base = sum(line.price_unit for line in record.order_line)
+                base = record.order_line[0].price_unit if record.order_line else 0.0
                 record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
                 record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
                 record.manager_commission = (base * (record.manager_rate or 0) / 100)
@@ -688,11 +688,10 @@ class SaleOrder(models.Model):
     # ===========================================
     
     def _compute_commission_amount(self, commission_type, rate, fixed_amount=0.0):
-        """Calculate commission amount based on type and rate. Uses price_subtotal for accuracy."""
+        """Calculate commission amount based on type and rate. For 'unit_price', use price_unit of the first order line only."""
         self.ensure_one()
         if commission_type == 'unit_price':
-            # Use price_subtotal for each line (handles qty, discount, taxes)
-            base = sum(line.price_subtotal for line in self.order_line)
+            base = self.order_line[0].price_unit if self.order_line else 0.0
             return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
         elif commission_type == 'untaxed':
             base = self.amount_untaxed or 0.0
