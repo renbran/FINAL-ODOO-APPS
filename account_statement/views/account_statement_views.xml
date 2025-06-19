@@ -115,6 +115,7 @@
             <field name="name">Account Statement Wizard</field>
             <field name="res_model">account.statement.wizard</field>
             <field name="view_mode">form</field>
+            <!-- Use fully qualified external ID for the wizard form view -->
             <field name="view_id" ref="account_statement.view_account_statement_wizard_form"/>
             <field name="target">new</field>
         </record>
