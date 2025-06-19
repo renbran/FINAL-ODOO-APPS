@@ -1,0 +1,53 @@
+<odoo>
+    <template id="account_statement_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <div style="width:100%; display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div style="width:48%;">
+                        <h3>Partner Details</h3>
+                        <p><strong>Name:</strong> <t t-esc="wizard.partner_id.name"/></p>
+                        <p><strong>Address:</strong> <t t-esc="wizard.partner_id.contact_address"/></p>
+                        <p t-if="wizard.partner_id.vat"><strong>VAT:</strong> <t t-esc="wizard.partner_id.vat"/></p>
+                        <p t-if="wizard.partner_id.phone"><strong>Phone:</strong> <t t-esc="wizard.partner_id.phone"/></p>
+                        <p t-if="wizard.partner_id.email"><strong>Email:</strong> <t t-esc="wizard.partner_id.email"/></p>
+                    </div>
+                    <div style="width:48%; text-align:right;">
+                        <h3>Report Info</h3>
+                        <p><strong>Report generated on:</strong> <t t-esc="formatDateTime(now())"/></p>
+                        <p><strong>Date Range:</strong> <t t-esc="wizard.date_from"/> to <t t-esc="wizard.date_to"/></p>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-bottom:16px;">
+                    <span style="font-size: 2em; font-weight: bold;">Account Statement</span>
+                </div>
+                <table style="width:100%; border-collapse:collapse; border:2px solid #222;">
+                    <thead>
+                        <tr style="background-color:#800020; color:#fff;">
+                            <th style="border:1px solid #222; padding:4px;">Invoice Date</th>
+                            <th style="border:1px solid #222; padding:4px;">Due Date</th>
+                            <th style="border:1px solid #222; padding:4px;">Payment Date</th>
+                            <th style="border:1px solid #222; padding:4px;">Number</th>
+                            <th style="border:1px solid #222; padding:4px;">Reference</th>
+                            <th style="border:1px solid #222; padding:4px;">Debit</th>
+                            <th style="border:1px solid #222; padding:4px;">Credit</th>
+                            <th style="border:1px solid #222; padding:4px;">Running Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Placeholder for transaction lines -->
+                        <tr>
+                            <td colspan="8" style="text-align:center; color:#888; border:1px solid #bbb;">No data (implement logic)</td>
+                        </tr>
+                        <!-- Summary row -->
+                        <tr style="background-color:#800020; color:#fff; font-weight:bold;">
+                            <td colspan="5" style="border:1px solid #222; text-align:right;">Total</td>
+                            <td style="border:1px solid #222;">0.00</td>
+                            <td style="border:1px solid #222;">0.00</td>
+                            <td style="border:1px solid #222;">0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+</odoo>
