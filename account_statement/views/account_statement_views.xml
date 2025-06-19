@@ -8,7 +8,14 @@
             <field name="arch" type="xml">
                 <tree string="Account Statements">
                     <field name="name"/>
+                    <field name="partner_id"/>
                     <field name="date"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="total_debit" widget="monetary"/>
+                    <field name="total_credit" widget="monetary"/>
+                    <field name="balance" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -20,10 +27,46 @@
             <field name="arch" type="xml">
                 <form string="Account Statement">
                     <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Statement Name..."/>
+                            </h1>
+                        </div>
                         <group>
-                            <field name="name"/>
-                            <field name="date"/>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="date"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
                         </group>
+                        <group>
+                            <group>
+                                <field name="total_debit" widget="monetary"/>
+                                <field name="total_credit" widget="monetary"/>
+                                <field name="balance" widget="monetary"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Statement Lines" name="lines">
+                                <field name="line_ids" nolabel="1">
+                                    <tree string="Statement Lines">
+                                        <field name="invoice_date"/>
+                                        <field name="due_date"/>
+                                        <field name="payment_date"/>
+                                        <field name="number"/>
+                                        <field name="reference"/>
+                                        <field name="debit" widget="monetary"/>
+                                        <field name="credit" widget="monetary"/>
+                                        <field name="running_balance" widget="monetary"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -36,13 +79,17 @@
             <field name="arch" type="xml">
                 <search string="Search Account Statements">
                     <field name="name"/>
+                    <field name="partner_id"/>
                     <field name="date"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
                     <filter string="This Month" name="this_month" 
                             domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%%Y-%%m-01')), ('date', '&lt;=', (context_today()).strftime('%%Y-%%m-%%d'))]"/>
                     <filter string="This Year" name="this_year" 
                             domain="[('date', '&gt;=', (context_today()).strftime('%%Y-01-01')), ('date', '&lt;=', (context_today()).strftime('%%Y-12-31'))]"/>
                     <group expand="0" string="Group By">
                         <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                        <filter string="Partner" name="group_partner" context="{'group_by': 'partner_id'}"/>
                     </group>
                 </search>
             </field>
@@ -63,31 +110,22 @@
             </field>
         </record>
 
-        <!-- Account Statement Wizard Action -->
-        <record id="action_account_statement_wizard" model="ir.actions.act_window">
-            <field name="name">Account Statement Wizard</field>
-            <field name="res_model">account.statement.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="view_account_statement_wizard_form"/>
-            <field name="target">new</field>
-        </record>
-
         <!-- Menu Items -->
         <menuitem id="menu_account_statement_root"
                   name="Account Statements"
-                  parent="account.menu_finance"
-                  sequence="100"/>
+                  parent="account.menu_finance_reports"
+                  sequence="50"/>
 
         <menuitem id="menu_account_statement_wizard"
                   name="Generate Statement"
                   parent="menu_account_statement_root"
-                  action="action_account_statement_wizard"
+                  action="account_statement.action_account_statement_wizard"
                   sequence="10"/>
 
         <menuitem id="menu_account_statement_list"
                   name="Statements"
                   parent="menu_account_statement_root"
-                  action="action_account_statement"
+                  action="account_statement.action_account_statement"
                   sequence="20"/>
     </data>
 </odoo>

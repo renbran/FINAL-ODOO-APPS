@@ -77,7 +77,8 @@ class AccountStatementWizard(models.TransientModel):
 
     def action_generate_pdf(self):
         """Generate PDF report"""
-        return self.env.ref('account_statement.action_report_account_statement').report_action(self)
+        # Use the correct external ID for the report action as defined in your manifest and XML
+        return self.env.ref('account_statement.action_account_statement_wizard').report_action(self)
 
     def action_generate_excel(self):
         """Generate Excel report"""
