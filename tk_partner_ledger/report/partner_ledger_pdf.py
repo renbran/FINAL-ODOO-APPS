@@ -35,31 +35,37 @@ class PartnerLedgerAbstract(models.AbstractModel):
             combined_data.append({
                 'invoice_name': invoice.name,
                 'invoice_date': invoice.invoice_date,
-                'invoice_amount': invoice.amount_total,
+                'invoice_amount': "{:,.2f}".format(invoice.amount_total),
                 'payment_name': payment.name,
                 'payment_date': payment.date,
-                'payment_amount': payment.amount,
+                'payment_amount': "{:,.2f}".format(payment.amount),
             })
         if len(invoices) > len(payments):
             for invoice in invoices[len(payments):]:
                 combined_data.append({
                     'invoice_name': invoice.name,
                     'invoice_date': invoice.invoice_date,
-                    'invoice_amount': invoice.amount_total,
+                    'invoice_amount': "{:,.2f}".format(invoice.amount_total),
                     'payment_name': '',
                     'payment_date': '',
-                    'payment_amount': 0.0,
+                    'payment_amount': "{:,.2f}".format(0.0),
                 })
         if len(payments) > len(invoices):
             for payment in payments[len(invoices):]:
                 combined_data.append({
                     'invoice_name': '',
                     'invoice_date': '',
-                    'invoice_amount': 0.0,
+                    'invoice_amount': "{:,.2f}".format(0.0),
                     'payment_name': payment.name,
                     'payment_date': payment.date,
-                    'payment_amount': payment.amount,
+                    'payment_amount': "{:,.2f}".format(payment.amount),
                 })
+        # Calculate totals with comma formatting
+        total_invoice = sum(inv.amount_total for inv in invoices)
+        total_payment = sum(pay.amount for pay in payments)
+        total_invoice_str = "{:,.2f}".format(total_invoice)
+        total_payment_str = "{:,.2f}".format(total_payment)
+        total_due_str = "{:,.2f}".format(total_invoice - total_payment)
         return {
             'doc_ids': docids,
             'combined_data': combined_data,
@@ -71,4 +77,7 @@ class PartnerLedgerAbstract(models.AbstractModel):
             'currency': company_currency_symbol,
             'from_date': start_date,
             'to_date': end_date,
+            'total_invoice': total_invoice_str,
+            'total_payment': total_payment_str,
+            'total_due': total_due_str,
         }

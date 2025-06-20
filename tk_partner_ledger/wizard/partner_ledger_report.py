@@ -125,7 +125,7 @@ class PartnerLedgerGenerateReport(models.TransientModel):
             if invoices.partner_id:
                 sheet1.write(row, 0, invoice.name, data_style)
                 sheet1.write(row, 1, invoice.invoice_date.strftime('%d-%m-%Y'), data_style)
-                sheet1.write(row, 2, f"{invoice.amount_total:.2f}", data_style_amount)
+                sheet1.write(row, 2, "{:,.2f}".format(invoice.amount_total), data_style_amount)
                 total_invoice += invoice.amount_total
                 row += 1
 
@@ -134,21 +134,21 @@ class PartnerLedgerGenerateReport(models.TransientModel):
             if payment.partner_id:
                 sheet1.write(payment_row, 3, payment.name, data_style)
                 sheet1.write(payment_row, 4, payment.date.strftime('%d-%m-%Y'), data_style)
-                sheet1.write(payment_row, 5, f"{payment.amount:.2f}", data_style_amount)
+                sheet1.write(payment_row, 5, "{:,.2f}".format(payment.amount), data_style_amount)
                 total_payment += payment.amount
                 payment_row += 1
 
         sheet1.write_merge(row, row, 0, 1, 'Total Invoice Amount',
                            header_style_amount)
-        sheet1.write(row, 2, f"{total_invoice:.2f}", data_style_amount)
+        sheet1.write(row, 2, "{:,.2f}".format(total_invoice), data_style_amount)
 
         sheet1.write_merge(payment_row, payment_row, 3, 4, 'Total Payment Amount',
                            header_style_amount)
-        sheet1.write(payment_row, 5, f"{total_payment:.2f}", data_style_amount)
+        sheet1.write(payment_row, 5, "{:,.2f}".format(total_payment), data_style_amount)
 
         sheet1.write_merge(payment_row + 1, payment_row + 1, 3, 4, 'Amount Due',
                            header_style_amount)
-        sheet1.write(payment_row + 1, 5, f"{total_invoice - total_payment:.2f}", data_style_amount)
+        sheet1.write(payment_row + 1, 5, "{:,.2f}".format(total_invoice - total_payment), data_style_amount)
 
         stream = BytesIO()
         workbook.save(stream)

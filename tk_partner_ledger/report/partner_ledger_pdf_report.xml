@@ -108,8 +108,8 @@
                                         <t t-out="data['invoice_date']"/>
                                     </td>
                                     <td colspan="2" style="padding: 10px;
-                                     text-align: right; border: 1px solid #000;">>
-                                         <t t-out="'{:.2f}'.format(data['invoice_amount'])"/>
+                                     text-align: right; border: 1px solid #000;">
+                                         <t t-out="data['invoice_amount']"/>
                                     </td>
                                     <td colspan="2" style="padding: 10px; border: 1px solid #000;">
                                         <t t-out="data['payment_name']"/>
@@ -118,10 +118,8 @@
                                         <t t-out="data['payment_date']"/>
                                     </td>
                                     <td colspan="2" style="padding: 10px; text-align: right; border: 1px solid #000;">
-                                         <t t-out="'{:.2f}'.format(data['payment_amount'])"/>
+                                         <t t-out="data['payment_amount']"/>
                                     </td>
-                                    <t t-set="total_invoice" t-value="total_invoice + data['invoice_amount']"/>
-                                    <t t-set="total_payment" t-value="total_payment + data['payment_amount']"/>
                                 </tr>
                             </t>
                             <t t-set="total_due" t-value="total_invoice - total_payment"/>
@@ -132,7 +130,7 @@
                                 </td>
                                 <td colspan="2" style="padding: 9px; text-align: right;
                                  border: 1px solid #000;">
-                                    <t t-esc="'{:.2f}'.format(total_invoice)"/>
+                                    <t t-esc="total_invoice"/>
                                 </td>
                                 <td colspan="4" style="padding: 9px; text-align: right;
                                  border: 1px solid #000;">
@@ -140,7 +138,7 @@
                                 </td>
                                 <td colspan="2" style="padding: 9px; text-align: right;
                                  border: 1px solid #000;">
-                                    <t t-esc="'{:.2f}'.format(total_payment)"/>
+                                    <t t-esc="total_payment"/>
                                 </td>
                             </tr>
                             <tr>
@@ -152,7 +150,7 @@
                                 </td>
                                 <td colspan="2" style="padding: 9px; text-align: right;
                                  border: 1px solid #000;">
-                                    <t t-esc="'{:.2f}'.format(total_due)"/>
+                                    <t t-esc="total_due"/>
                                 </td>
                             </tr>
                         </table>
@@ -169,5 +167,7 @@
             <field name="binding_model_id" ref="model_partner_ledger_report"/>
             <field name="binding_type">report</field>
         </record>
+    </data>
+</odoo>
     </data>
 </odoo>
