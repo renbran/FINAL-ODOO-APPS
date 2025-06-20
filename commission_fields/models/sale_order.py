@@ -43,7 +43,9 @@ class SaleOrder(models.Model):
         index=True
     )
     
+    # Change deal_id to Char for display and mapping
     deal_id = fields.Float(string='Deal ID', help="Deal ID for commission mapping.", copy=False, index=True)
+    deal_id_display = fields.Char(string='Deal ID (Display)', compute='_compute_deal_id_display', store=False)
 
     project_id = fields.Many2one(
         'product.template',
@@ -939,6 +941,17 @@ class SaleOrder(models.Model):
             'percentage': self.commission_percentage
         }
 
+    @api.depends('deal_id')
+    def _compute_deal_id_display(self):
+        for rec in self:
+            if rec.deal_id is not None:
+                if float(rec.deal_id).is_integer():
+                    rec.deal_id_display = str(int(rec.deal_id))
+                else:
+                    rec.deal_id_display = ('%f' % rec.deal_id).rstrip('0').rstrip('.')
+            else:
+                rec.deal_id_display = ''
+
 # Patch purchase.order to add a link to sale.order
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -948,113 +961,3 @@ class PurchaseOrder(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
     commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
-
-    def action_create_commission_purchase_order(self):
-        """Create purchase orders for all commission recipients with non-zero commission amounts.
-        Removes/cancels old commission POs before creating new ones for accuracy and to avoid duplicates."""
-        PurchaseOrder = self.env['purchase.order']
-        created_pos = []
-        commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
-        if not commission_product:
-            commission_product = self.env['product.product'].create({
-                'name': 'Commission Fee',
-                'type': 'service',
-                'purchase_ok': True,
-                'sale_ok': False,
-            })
-        for order in self:
-            # Remove/cancel old commission POs
-            for po in order.commission_purchase_order_ids:
-                if po.state not in ['cancel', 'done']:
-                    po.button_cancel()
-                po.unlink()
-            if order.commission_status not in ['confirmed', 'paid']:
-                raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
-            if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
-                raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            # Prepare all commission recipients and amounts
-            commission_lines = []
-            # Internal
-            if order.agent1_id and order.agent1_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent1_id,
-                    'amount': order.agent1_commission
-                })
-            if order.agent2_id and order.agent2_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent2_id,
-                    'amount': order.agent2_commission
-                })
-            if order.manager_id and order.manager_commission > 0:
-                commission_lines.append({
-                    'partner': order.manager_id,
-                    'amount': order.manager_commission
-                })
-            if order.director_id and order.director_commission > 0:
-                commission_lines.append({
-                    'partner': order.director_id,
-                    'amount': order.director_commission
-                })
-            # External
-            if order.external_partner_id and order.external_commission_amount > 0:
-                commission_lines.append({
-                    'partner': order.external_partner_id,
-                    'amount': order.external_commission_amount
-                })
-            if order.broker_agency_partner_id and order.broker_agency_total > 0:
-                commission_lines.append({
-                    'partner': order.broker_agency_partner_id,
-                    'amount': order.broker_agency_total
-                })
-            if order.referral_partner_id and order.referral_total > 0:
-                commission_lines.append({
-                    'partner': order.referral_partner_id,
-                    'amount': order.referral_total
-                })
-            if order.cashback_partner_id and order.cashback_total > 0:
-                commission_lines.append({
-                    'partner': order.cashback_partner_id,
-                    'amount': order.cashback_total
-                })
-            if order.other_external_partner_id and order.other_external_total > 0:
-                commission_lines.append({
-                    'partner': order.other_external_partner_id,
-                    'amount': order.other_external_total
-                })
-            if not commission_lines:
-                raise UserError(_('No commission recipients with non-zero commission found.'))
-            # Group lines by partner (one PO per partner)
-            partner_map = {}
-            for line in commission_lines:
-                partner = line['partner']
-                if not partner:
-                    continue
-                if partner not in partner_map:
-                    partner_map[partner] = []
-                partner_map[partner].append(line)
-            for partner, lines in partner_map.items():
-                po_lines = []
-                for l in lines:
-                    po_lines.append((0, 0, {
-                        'name': '',
-                        'product_qty': 1,
-                        'product_uom': commission_product.uom_id.id,
-                        'price_unit': l['amount'],
-                        'date_planned': fields.Date.today(),
-                        'product_id': commission_product.id,
-                    }))
-                po_vals = {
-                    'partner_id': partner.id,
-                    'origin': order.name,
-                    'commission_sale_order_id': order.id,
-                    'order_line': po_lines,
-                }
-                po = PurchaseOrder.create(po_vals)
-                created_pos.append(po.id)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'purchase.order',
-            'view_mode': 'form',
-            'res_id': created_pos[0] if len(created_pos) == 1 else False,
-            'domain': [('id', 'in', created_pos)],
-        }

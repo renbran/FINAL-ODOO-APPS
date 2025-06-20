@@ -8,10 +8,10 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
                 <field name="deal_id_display" string="Deal ID" readonly="1"/>
-                <field name="booking_date" string="Booking Date"/>
-                <field name="buyer_id" string="Buyer Name"/>
-                <field name="project_id" string="Project"/>
-                <field name="unit_id" string="Unit"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
                 <field name="sale_value" string="Sale Value"/>
             </xpath>
         </field>

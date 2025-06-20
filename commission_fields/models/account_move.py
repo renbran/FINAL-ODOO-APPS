@@ -4,6 +4,7 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    # Change deal_id to Char to match sale.order
     deal_id = fields.Float(string='Deal ID', copy=False, help="Related Sale Order Deal ID")
     booking_date = fields.Date(string='Booking Date', copy=False, help="Related Sale Order Booking Date")
     buyer_id = fields.Many2one('res.partner', string='Buyer', copy=False, help="Related Sale Order Buyer")
@@ -33,13 +34,12 @@ class AccountMove(models.Model):
 
     @api.depends('deal_id')
     def _compute_deal_id_display(self):
-        """Display deal_id as string, removing trailing zeros if integer."""
         for rec in self:
             if rec.deal_id is not None:
                 if float(rec.deal_id).is_integer():
                     rec.deal_id_display = str(int(rec.deal_id))
                 else:
-                    rec.deal_id_display = str(rec.deal_id).rstrip('0').rstrip('.')
+                    rec.deal_id_display = ('%f' % rec.deal_id).rstrip('0').rstrip('.')
             else:
                 rec.deal_id_display = ''
 
@@ -75,4 +75,5 @@ class AccountMove(models.Model):
                         'sale_value': sale_order.sale_value,
                         'broker_commission': sale_order.broker_agency_total,
                     })
+        return super().write(vals)
         return super().write(vals)

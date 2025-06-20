@@ -151,7 +151,7 @@
                 <notebook>
                     <page string="Deal Information" name="deal_information">
                         <group>
-                            <field name="deal_id" string="Deal ID"/>
+                            <field name="deal_id_display" string="Deal ID" readonly="1"/>
                             <field name="booking_date"/>
                             <field name="buyer_id"/>
                             <field name="project_id" string="Project Name"/>
