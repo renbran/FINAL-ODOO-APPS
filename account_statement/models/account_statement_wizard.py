@@ -1,8 +1,12 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError, UserError
 from datetime import datetime
 import io
 import xlsxwriter
 import base64
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class AccountStatementWizard(models.TransientModel):
@@ -20,13 +24,19 @@ class AccountStatementWizard(models.TransientModel):
     balance = fields.Monetary(string='Balance', currency_field='currency_id', readonly=True)
     line_ids = fields.One2many('account.statement.wizard.line', 'wizard_id', string='Statement Lines', readonly=True)
 
+    @api.constrains('date_from', 'date_to')
+    def _check_dates(self):
+        for record in self:
+            if record.date_from and record.date_to and record.date_from > record.date_to:
+                raise ValidationError(_('Start date must be before end date'))
+
     @api.onchange('partner_id', 'date_from', 'date_to')
     def _onchange_partner_dates(self):
         if self.partner_id and self.date_from and self.date_to:
             self._compute_statement_data()
 
     def _compute_statement_data(self):
-        """Compute statement data based on partner and date range"""
+        self.ensure_one()
         if not self.partner_id:
             return
 
@@ -34,13 +44,16 @@ class AccountStatementWizard(models.TransientModel):
         self.line_ids = [(5, 0, 0)]
         
         # Search for account moves
-        moves = self.env['account.move'].search([
-            ('partner_id', '=', self.partner_id.id),
-            ('date', '>=', self.date_from),
-            ('date', '<=', self.date_to),
-            ('state', '=', 'posted'),
-            ('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
-        ])
+        try:
+            moves = self.env['account.move'].search([
+                ('partner_id', '=', self.partner_id.id),
+                ('date', '>=', self.date_from),
+                ('date', '<=', self.date_to),
+                ('state', '=', 'posted'),
+                ('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+            ])
+        except Exception as e:
+            raise ValidationError(_('Error fetching account moves: %s') % str(e))
 
         lines_data = []
         running_balance = 0.0
@@ -81,63 +94,72 @@ class AccountStatementWizard(models.TransientModel):
         return self.env.ref('account_statement.action_account_statement_wizard').report_action(self)
 
     def action_generate_excel(self):
-        """Generate Excel report"""
-        import io
-        import xlsxwriter
-        import base64
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        worksheet = workbook.add_worksheet('Account Statement')
-        header_format = workbook.add_format({
-            'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#D7E4BC'
-        })
-        subheader_format = workbook.add_format({
-            'bold': True, 'font_size': 12, 'bg_color': '#E8F4FD'
-        })
-        date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
-        currency_format = workbook.add_format({'num_format': '#,##0.00'})
-        worksheet.merge_range('A1:H1', f'Account Statement - {self.partner_id.name}', header_format)
-        worksheet.write('A2', 'Period:', subheader_format)
-        worksheet.write('B2', f'{self.date_from} to {self.date_to}')
-        worksheet.write('A4', 'Total Debit:', subheader_format)
-        worksheet.write('B4', self.total_debit, currency_format)
-        worksheet.write('A5', 'Total Credit:', subheader_format)
-        worksheet.write('B5', self.total_credit, currency_format)
-        worksheet.write('A6', 'Balance:', subheader_format)
-        worksheet.write('B6', self.balance, currency_format)
-        headers = ['Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference', 'Debit', 'Credit', 'Running Balance']
-        for col, header in enumerate(headers):
-            worksheet.write(7, col, header, subheader_format)
-        row = 8
-        for line in self.line_ids:
-            worksheet.write(row, 0, line.invoice_date, date_format)
-            worksheet.write(row, 1, line.due_date, date_format)
-            worksheet.write(row, 2, line.payment_date, date_format)
-            worksheet.write(row, 3, line.number)
-            worksheet.write(row, 4, line.reference)
-            worksheet.write(row, 5, line.debit, currency_format)
-            worksheet.write(row, 6, line.credit, currency_format)
-            worksheet.write(row, 7, line.running_balance, currency_format)
-            row += 1
-        worksheet.set_column('A:C', 12)
-        worksheet.set_column('D:E', 15)
-        worksheet.set_column('F:H', 12)
-        workbook.close()
-        output.seek(0)
-        filename = f'Account_Statement_{self.partner_id.name}_{self.date_from}_{self.date_to}.xlsx'
-        attachment = self.env['ir.attachment'].create({
-            'name': filename,
-            'type': 'binary',
-            'datas': base64.b64encode(output.read()),
-            'res_model': self._name,
-            'res_id': self.id,
-            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        })
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=true',
-            'target': 'new',
-        }
+        """Generate Excel report with error handling"""
+        self.ensure_one()
+        try:
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+            worksheet = workbook.add_worksheet('Account Statement')
+            header_format = workbook.add_format({
+                'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#D7E4BC'
+            })
+            subheader_format = workbook.add_format({
+                'bold': True, 'font_size': 12, 'bg_color': '#E8F4FD'
+            })
+            date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+            currency_format = workbook.add_format({'num_format': '#,##0.00'})
+            worksheet.merge_range('A1:H1', f'Account Statement - {self.partner_id.name}', header_format)
+            worksheet.write('A2', 'Period:', subheader_format)
+            worksheet.write('B2', f'{self.date_from} to {self.date_to}')
+            worksheet.write('A4', 'Total Debit:', subheader_format)
+            worksheet.write('B4', self.total_debit, currency_format)
+            worksheet.write('A5', 'Total Credit:', subheader_format)
+            worksheet.write('B5', self.total_credit, currency_format)
+            worksheet.write('A6', 'Balance:', subheader_format)
+            worksheet.write('B6', self.balance, currency_format)
+            headers = ['Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference', 'Debit', 'Credit', 'Running Balance']
+            for col, header in enumerate(headers):
+                worksheet.write(7, col, header, subheader_format)
+            row = 8
+            for line in self.line_ids:
+                worksheet.write(row, 0, line.invoice_date, date_format)
+                worksheet.write(row, 1, line.due_date, date_format)
+                worksheet.write(row, 2, line.payment_date, date_format)
+                worksheet.write(row, 3, line.number)
+                worksheet.write(row, 4, line.reference)
+                worksheet.write(row, 5, line.debit, currency_format)
+                worksheet.write(row, 6, line.credit, currency_format)
+                worksheet.write(row, 7, line.running_balance, currency_format)
+                row += 1
+            worksheet.set_column('A:C', 12)
+            worksheet.set_column('D:E', 15)
+            worksheet.set_column('F:H', 12)
+            workbook.close()
+            output.seek(0)
+            
+            encoded_file = base64.b64encode(output.read())
+            output.close()
+
+            filename = f'Account_Statement_{self.partner_id.name}_{self.date_from}_{self.date_to}.xlsx'
+            
+            attachment = self.env['ir.attachment'].sudo().create({
+                'name': filename,
+                'type': 'binary',
+                'datas': encoded_file,
+                'res_model': self._name,
+                'res_id': self.id,
+                'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            })
+            
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'/web/content/{attachment.id}?download=true',
+                'target': 'new',
+            }
+            
+        except Exception as e:
+            _logger.error("Excel generation error: %s", str(e))
+            raise UserError(_("Error generating Excel file: %s") % str(e))
 
     def action_save_statement(self):
         """Save the statement as a permanent record"""

@@ -18,14 +18,20 @@
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['base', 'account', 'web'],
+    'depends': [
+        'base',
+        'account',
+        'web',
+        'report_xlsx',  # Add for Excel export
+    ],
     'data': [
+        'security/account_statement_security.xml',
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
-        'views/account_statement_wizard_views.xml',
-        'views/account_statement_views.xml',
         'report/account_statement_report_action.xml',
         'report/account_statement_report_template.xml',
+        'views/account_statement_views.xml',
+        'views/account_statement_wizard_views.xml',
     ],
     'installable': True,
     'application': False,
