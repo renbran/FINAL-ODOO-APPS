@@ -4,33 +4,36 @@ from odoo import models, fields, api  # Ensure Odoo is installed and run this co
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    # Change deal_id to Char to match sale.order
-    deal_id = fields.Float(string='Deal ID', copy=False, help="Related Sale Order Deal ID")
-    booking_date = fields.Date(string='Booking Date', copy=False, help="Related Sale Order Booking Date")
-    buyer_id = fields.Many2one('res.partner', string='Buyer', copy=False, help="Related Sale Order Buyer")
+    deal_id = fields.Integer(
+        string='Deal ID',
+        copy=False,
+        index=True
+    )
+    booking_date = fields.Date(
+        string='Booking Date',
+        copy=False
+    )
+    buyer_id = fields.Many2one(
+        'res.partner',
+        string='Buyer',
+        copy=False
+    )
     project_id = fields.Many2one(
         'product.template',
         string='Project',
         copy=False,
-        help="Related Sale Order Project",
-        ondelete='set null',  # Valid Odoo field argument, no change needed if running inside Odoo
-        domain=[],
+        ondelete='restrict'
     )
-    
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         copy=False,
-        help="Related Sale Order Unit",
-        ondelete='set null',
-        domain=[],
+        ondelete='restrict'
     )
-    
     sale_value = fields.Monetary(
         string='Sale Value',
-        copy=False,
         currency_field='currency_id',
-        help="Related Sale Order Sale Value"
+        copy=False
     )
     
     broker_commission = fields.Monetary(
@@ -84,5 +87,4 @@ class AccountMove(models.Model):
                         'sale_value': sale_order.sale_value,
                         'broker_commission': sale_order.broker_agency_total,
                     })
-        return super().write(vals)
         return super().write(vals)

@@ -6,6 +6,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Deal Info Fields -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="deal_id"/>
                 <field name="booking_date"/>
@@ -15,13 +16,14 @@
                 <field name="sale_value"/>
             </xpath>
 
+            <!-- Commission Tab -->
             <xpath expr="//page[@name='other_information']" position="after">
                 <page string="Commission" name="commission">
                     <group>
                         <group string="Commission Status">
                             <field name="commission_status"/>
-                            <field name="commission_payment_date"/>
-                            <field name="commission_reference"/>
+                            <field name="commission_payment_date" invisible="commission_status not in ['confirmed', 'paid']"/>
+                            <field name="commission_reference" invisible="commission_status not in ['confirmed', 'paid']"/>
                         </group>
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
@@ -43,8 +45,8 @@
                                 <group string="External Partner">
                                     <field name="external_partner_id"/>
                                     <field name="external_commission_type"/>
-                                    <field name="external_percentage" invisible="not show_external_percentage"/>
-                                    <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
+                                    <field name="external_percentage" invisible="external_commission_type != 'percentage'"/>
+                                    <field name="external_fixed_amount" invisible="external_commission_type != 'fixed'"/>
                                     <field name="external_commission_amount" readonly="1"/>
                                 </group>
                                 <group string="Broker/Agency">
@@ -52,28 +54,6 @@
                                     <field name="broker_agency_commission_type"/>
                                     <field name="broker_agency_rate"/>
                                     <field name="broker_agency_total" readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="Referral">
-                                    <field name="referral_partner_id"/>
-                                    <field name="referral_commission_type"/>
-                                    <field name="referral_rate"/>
-                                    <field name="referral_total" readonly="1"/>
-                                </group>
-                                <group string="Cashback">
-                                    <field name="cashback_partner_id"/>
-                                    <field name="cashback_commission_type"/>
-                                    <field name="cashback_rate"/>
-                                    <field name="cashback_total" readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="Other External">
-                                    <field name="other_external_partner_id"/>
-                                    <field name="other_external_commission_type"/>
-                                    <field name="other_external_rate"/>
-                                    <field name="other_external_total" readonly="1"/>
                                 </group>
                             </group>
                         </page>
@@ -85,29 +65,15 @@
                             <group>
                                 <group string="Agent 1">
                                     <field name="agent1_id"/>
-                                    <field name="agent1_rate" invisible="not show_agent1_rate"/>
-                                    <field name="agent1_fixed" invisible="not show_agent1_fixed"/>
+                                    <field name="agent1_rate" invisible="internal_commission_type != 'percentage'"/>
+                                    <field name="agent1_fixed" invisible="internal_commission_type != 'fixed'"/>
                                     <field name="agent1_commission" readonly="1"/>
                                 </group>
                                 <group string="Agent 2">
                                     <field name="agent2_id"/>
-                                    <field name="agent2_rate" invisible="not show_agent2_rate"/>
-                                    <field name="agent2_fixed" invisible="not show_agent2_fixed"/>
+                                    <field name="agent2_rate" invisible="internal_commission_type != 'percentage'"/>
+                                    <field name="agent2_fixed" invisible="internal_commission_type != 'fixed'"/>
                                     <field name="agent2_commission" readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="Manager">
-                                    <field name="manager_id"/>
-                                    <field name="manager_rate" invisible="not show_manager_rate"/>
-                                    <field name="manager_fixed" invisible="not show_manager_fixed"/>
-                                    <field name="manager_commission" readonly="1"/>
-                                </group>
-                                <group string="Director">
-                                    <field name="director_id"/>
-                                    <field name="director_rate" invisible="not show_director_rate"/>
-                                    <field name="director_fixed" invisible="not show_director_fixed"/>
-                                    <field name="director_commission" readonly="1"/>
                                 </group>
                             </group>
                         </page>
@@ -115,77 +81,47 @@
                 </page>
             </xpath>
 
-            <!-- Add commission buttons to header -->
+            <!-- Commission Buttons -->
             <xpath expr="//header//button[@name='action_confirm']" position="before">
-                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary"/>
-                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary"/>
-                <button name="action_pay_commission" string="Mark as Paid" type="object" class="btn-primary"/>
-                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary"/>
+                <button name="action_calculate_commission" 
+                        string="Calculate Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="commission_status not in ['draft']"/>
+                <button name="action_confirm_commission" 
+                        string="Confirm Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="commission_status not in ['calculated']"/>
+                <button name="action_pay_commission" 
+                        string="Mark as Paid" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="commission_status not in ['confirmed']"/>
+                <button name="action_reset_commission" 
+                        string="Reset Commission" 
+                        type="object" 
+                        class="btn-secondary"
+                        invisible="commission_status in ['paid']"/>
             </xpath>
 
-            <xpath expr="//header" position="inside">
-                <button name="action_create_commission_purchase_order"
-                        type="object"
-                        string="Create Commission Purchase Order"
-                        icon="fa-shopping-cart"/>
-            </xpath>
-
-            <!-- Invisible fields for commission calculation -->
-            <xpath expr="//sheet" position="inside">
-                <group string="Commission Computation">
-                    <field name="show_external_percentage" invisible="1"/>
-                    <field name="show_external_fixed_amount" invisible="1"/>
-                    <field name="show_agent1_rate" invisible="1"/>
-                    <field name="show_agent1_fixed" invisible="1"/>
-                    <field name="show_agent2_rate" invisible="1"/>
-                    <field name="show_agent2_fixed" invisible="1"/>
-                    <field name="show_manager_rate" invisible="1"/>
-                    <field name="show_manager_fixed" invisible="1"/>
-                    <field name="show_director_rate" invisible="1"/>
-                    <field name="show_director_fixed" invisible="1"/>
-                </group>
-            </xpath>
-
-            <xpath expr="//sheet/notebook" position="before">
-                <notebook>
-                    <page string="Deal Information" name="deal_information">
-                        <group>
-                            <field name="deal_id_display" string="Deal ID" readonly="1"/>
-                            <field name="booking_date"/>
-                            <field name="buyer_id"/>
-                            <field name="project_id" string="Project Name"/>
-                            <field name="unit_id"/>
-                            <field name="sale_value"/>
-                        </group>
-                    </page>
-                </notebook>
-            </xpath>
-
-            <!-- Smart button for Purchase Orders only, with short label -->
+            <!-- Smart Buttons -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button name="action_view_related_purchase_orders"
                         type="object"
                         class="oe_stat_button"
-                        icon="fa-shopping-cart"
-                        string="Purchase Orders"/>
+                        icon="fa-shopping-cart">
+                    <field name="commission_purchase_order_count" widget="statinfo" string="Commission POs"/>
+                </button>
             </xpath>
 
-            <xpath expr="//header" position="inside">
-                <button name="action_create_commission_purchase_order" 
-                        type="object" 
-                        string="Create Commission Purchase Order" 
-                        icon="fa-shopping-cart"/>
-            </xpath>
+            <!-- Commission Alert -->
             <xpath expr="//sheet" position="before">
                 <div class="alert alert-info" role="alert" 
                      style="height: 40px; margin-bottom:0px;" 
-                     options="{'invisible': [('has_due', '=', False)]}">
-                    This Customer's due amount is
+                     invisible="not has_due">
+                    This Customer has due amounts
                 </div>
-            </xpath>
-            <xpath expr="//group" position="inside">
-                <field name="commission_percentage"/>
-                <field name="has_due" invisible="1"/>
             </xpath>
         </field>
     </record>

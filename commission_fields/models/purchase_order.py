@@ -4,22 +4,36 @@ from odoo import models, fields, api
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    default_account_id = fields.Many2one('account.account', string='Default Expense Account',
-        help='Default account to use for purchase order lines if not set on product or category.')
-
-    deal_id = fields.Char(string='Deal ID', copy=False, help="Related Sale Order Deal ID", index=True)
-
-    commission_reference = fields.Char(string='Commission Reference', copy=False, help="Reference number for commission tracking")
-
-    commission_source = fields.Selection([
-        ('internal', 'Internal Commission'),
-        ('external', 'External Commission'),
-        ('broker', 'Broker Commission')
-    ], string='Commission Source', 
-       help="Source of the commission payment"
+    default_account_id = fields.Many2one(
+        'account.account',
+        string='Default Account',
+        domain="[('deprecated', '=', False)]",
+        help='Default expense account for commission lines'
     )
 
-    commission_amount = fields.Monetary(string='Commission Amount', currency_field='currency_id', help="Amount of commission to be paid")
+    deal_id = fields.Integer(
+        string='Deal ID',
+        copy=False,
+        index=True
+    )
+
+    commission_reference = fields.Char(
+        string='Commission Ref',
+        copy=False
+    )
+
+    commission_source = fields.Selection([
+        ('internal', 'Internal'),
+        ('external', 'External'),
+        ('broker', 'Broker')
+    ], string='Source',
+        default='internal'
+    )
+
+    commission_amount = fields.Monetary(
+        string='Commission',
+        currency_field='currency_id'
+    )
 
     commission_payment_status = fields.Selection([
         ('draft', 'Draft'),
@@ -47,9 +61,12 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
-    account_id = fields.Many2one('account.account', string='Expense Account',
-        help='Account for this purchase line. If not set, will use the default from the purchase order or company.')
-
+    account_id = fields.Many2one(
+        'account.account',
+        string='Account',
+        domain="[('deprecated', '=', False)]"
+    )
+    
     @api.model_create_multi
     def create(self, vals_list):
         """Set default account for purchase order line if not set."""
