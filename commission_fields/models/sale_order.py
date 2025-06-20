@@ -445,7 +445,8 @@ class SaleOrder(models.Model):
         string='Commission %',
         compute='_compute_commission_percentage',
         store=True,
-        help="Commission as a percentage of the untaxed amount."
+        digits=(5, 2),
+        help="Commission as a percentage of the sale value"
     )
 
     # commission_variance field removed, replaced by company_net_commission
