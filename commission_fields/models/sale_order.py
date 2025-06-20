@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_compare, float_round
@@ -16,17 +14,17 @@ COMMISSION_TYPE_SELECTION = [
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # UI visibility fields
-    show_external_percentage = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_external_fixed_amount = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_agent1_rate = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_agent1_fixed = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_agent2_rate = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_agent2_fixed = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_manager_rate = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_manager_fixed = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_director_rate = fields.Boolean(compute='_compute_show_commission_fields', store=True)
-    show_director_fixed = fields.Boolean(compute='_compute_show_commission_fields', store=True)
+    # UI visibility fields - remove store=True since these are purely computed
+    show_external_percentage = fields.Boolean(compute='_compute_show_commission_fields')
+    show_external_fixed_amount = fields.Boolean(compute='_compute_show_commission_fields')
+    show_agent1_rate = fields.Boolean(compute='_compute_show_commission_fields')
+    show_agent1_fixed = fields.Boolean(compute='_compute_show_commission_fields')
+    show_agent2_rate = fields.Boolean(compute='_compute_show_commission_fields')
+    show_agent2_fixed = fields.Boolean(compute='_compute_show_commission_fields')
+    show_manager_rate = fields.Boolean(compute='_compute_show_commission_fields')
+    show_manager_fixed = fields.Boolean(compute='_compute_show_commission_fields')
+    show_director_rate = fields.Boolean(compute='_compute_show_commission_fields')
+    show_director_fixed = fields.Boolean(compute='_compute_show_commission_fields')
 
     # Basic deal info
     booking_date = fields.Date(string='Booking Date', tracking=True, help="The date when the booking was made", index=True)
