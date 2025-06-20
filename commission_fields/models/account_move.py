@@ -4,9 +4,26 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id = fields.Float(string='Deal ID', copy=False, help="Related Sale Order Deal ID")
-    booking_date = fields.Date(string='Booking Date', copy=False, help="Related Sale Order Booking Date")
-    buyer_id = fields.Many2one('res.partner', string='Buyer', copy=False, help="Related Sale Order Buyer")
+    deal_id = fields.Char(
+        string='Deal ID',
+        copy=False,
+        help="Related Sale Order Deal ID",
+        index=True
+    )
+    
+    booking_date = fields.Date(
+        string='Booking Date',
+        copy=False,
+        help="Related Sale Order Booking Date"
+    )
+    
+    buyer_id = fields.Many2one(
+        'res.partner',
+        string='Buyer',
+        copy=False,
+        help="Related Sale Order Buyer"
+    )
+    
     project_id = fields.Many2one(
         'product.template',
         string='Project',
@@ -15,6 +32,7 @@ class AccountMove(models.Model):
         ondelete='set null',
         domain=[],
     )
+    
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
@@ -23,13 +41,21 @@ class AccountMove(models.Model):
         ondelete='set null',
         domain=[],
     )
+    
     sale_value = fields.Monetary(
         string='Sale Value',
         copy=False,
+        currency_field='currency_id',
         help="Related Sale Order Sale Value"
     )
-    broker_commission = fields.Float(string='Broker/Agency Commission', readonly=True, copy=False, help="Broker/Agency commission from related Sale Order")
-    deal_id_display = fields.Char(string='Deal ID (Display)', compute='_compute_deal_id_display', store=False)
+    
+    broker_commission = fields.Monetary(
+        string='Broker Commission',
+        readonly=True,
+        copy=False,
+        currency_field='currency_id',
+        help="Broker commission from related Sale Order"
+    )
 
     @api.depends('deal_id')
     def _compute_deal_id_display(self):

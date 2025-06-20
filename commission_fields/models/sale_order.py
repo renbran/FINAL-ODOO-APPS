@@ -28,10 +28,10 @@ class SaleOrder(models.Model):
         index=True
     )
     
-    developer_commission = fields.Float(
+    broker_commission = fields.Monetary(
         string='Broker Commission',
         tracking=True,
-        digits='Account',
+        currency_field='currency_id',
         help="Commission amount for the broker"
     )
     
@@ -43,7 +43,12 @@ class SaleOrder(models.Model):
         index=True
     )
     
-    deal_id = fields.Float(string='Deal ID', help="Deal ID for commission mapping.", copy=False, index=True)
+    deal_id = fields.Char(
+        string='Deal ID', 
+        help="Unique identifier for commission mapping.", 
+        copy=False, 
+        index=True
+    )
 
     project_id = fields.Many2one(
         'product.template',
