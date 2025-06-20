@@ -12,8 +12,3 @@
         </field>
     </record>
 </odoo>
-                <field name="sale_value" string="Sale Value"/>
-            </xpath>
-        </field>
-    </record>
-</odoo>
