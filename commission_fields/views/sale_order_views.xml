@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='client_order_ref']" position="after">
-                <field name="deal_id" string="Deal ID"/>
+                <field name="deal_id"/>
                 <field name="booking_date"/>
                 <field name="buyer_id"/>
                 <field name="project_id"/>
@@ -20,7 +20,6 @@
                     <group>
                         <group string="Commission Status">
                             <field name="commission_status"/>
-                            <field name="commission_sequence" readonly="1"/>
                             <field name="commission_payment_date"/>
                             <field name="commission_reference"/>
                         </group>
@@ -28,12 +27,12 @@
                             <field name="commission_notes" widget="html"/>
                         </group>
                         <group string="Commission Summary">
-                            <field name="developer_commission"/>
+                            <field name="broker_commission"/>
                             <field name="total_internal_commission" readonly="1"/>
                             <field name="total_external_commission" readonly="1"/>
                             <field name="grand_total_commission" readonly="1"/>
                             <field name="commission_allocation_status" readonly="1"/>
-                            <field name="company_net_commission" string="Company Net Commission" readonly="1"/>
+                            <field name="company_net_commission" readonly="1"/>
                             <field name="commission_percentage" readonly="1"/>
                         </group>
                     </group>
@@ -195,62 +194,37 @@
     <record id="view_order_tree_commission" model="ir.ui.view">
         <field name="name">sale.order.tree.commission</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='client_order_ref']" position="after">
+            <field name="name" position="after">
                 <field name="deal_id"/>
-                <field name="booking_date"/>
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="sale_value"/>
                 <field name="commission_status"/>
-                <field name="grand_total_commission"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Custom Tree View to match the required column layout -->
-    <record id="view_order_tree_custom_layout" model="ir.ui.view">
-        <field name="name">sale.order.tree.custom.layout</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="replace">
-                <tree string="Sales Orders">
-                    <field name="deal_id" string="Deal ID"/>
-                    <field name="booking_date" string="Booking Date"/>
-                    <field name="partner_id" string="Customer"/>
-                    <field name="buyer_id" string="Buyer Name"/>
-                    <field name="project_id" string="Project"/>
-                    <field name="unit_id" string="Unit"/>
-                    <field name="sale_value" string="Sale Value"/>
-                    <field name="developer_commission" string="Broker Commission"/>
-                    <field name="agent1_commission" string="Agent 1"/>
-                    <field name="grand_total_commission" string="Total"/>
-                    <!-- <field name="invoiced_amount" string="Total Invoiced"/> -->
-                    <field name="state" string="Order Status"/>
-                    <field name="invoice_status" string="Invoice Status"/>
-                    <!-- <field name="payment_state" string="Payment Status"/> -->
-                </tree>
-            </xpath>
+                <field name="broker_commission" sum="Total Broker Commission"/>
+                <field name="commission_percentage"/>
+            </field>
         </field>
     </record>
 
     <!-- Search View Extension -->
-    <record id="view_order_search_commission" model="ir.ui.view">
-        <field name="name">sale.order.search.commission</field>
+    <record id="view_sales_order_filter_commission" model="ir.ui.view">
+        <field name="name">sale.order.list.select.commission</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <filter name="sales_type" string="Sales Type" domain="[]" context="{'group_by':'sales_type'}"/>
-                <filter name="project_id" string="Project" domain="[]" context="{'group_by':'project_id'}"/>
-                <filter name="booking_date" string="Booking Date" domain="[]" context="{'group_by':'booking_date'}"/>
-                <field name="sales_type"/>
-                <field name="project_id"/>
-                <field name="booking_date"/>
-                <field name="agent1_id" string="Agent 1"/>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="deal_id"/>
+                <field name="commission_reference"/>
+                <field name="buyer_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <separator/>
+                <filter string="Draft Commission" name="draft_commission" domain="[('commission_status','=','draft')]"/>
+                <filter string="Confirmed Commission" name="confirmed_commission" domain="[('commission_status','=','confirmed')]"/>
+                <filter string="Paid Commission" name="paid_commission" domain="[('commission_status','=','paid')]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Commission Status" name="commission_status" context="{'group_by':'commission_status'}"/>
+                <filter string="Payment Date" name="commission_payment_date" context="{'group_by':'commission_payment_date'}"/>
             </xpath>
         </field>
     </record>
