@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api  # Ensure Odoo is installed and run this code inside the Odoo server environment
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -29,7 +29,7 @@ class AccountMove(models.Model):
         string='Project',
         copy=False,
         help="Related Sale Order Project",
-        ondelete='set null',
+        ondelete='set null',  # Valid Odoo field argument, no change needed if running inside Odoo
         domain=[],
     )
     
