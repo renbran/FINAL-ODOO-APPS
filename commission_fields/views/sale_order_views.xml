@@ -170,6 +170,24 @@
                         icon="fa-shopping-cart"
                         string="Purchase Orders"/>
             </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="action_create_commission_purchase_order" 
+                        type="object" 
+                        string="Create Commission Purchase Order" 
+                        icon="fa-shopping-cart"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info" role="alert" 
+                     style="height: 40px; margin-bottom:0px;" 
+                     attrs="{'invisible': [('has_due', '=', False)]}">
+                    This Customer's due amount is
+                </div>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <field name="commission_percentage"/>
+                <field name="has_due" invisible="1"/>
+            </xpath>
         </field>
     </record>
 
