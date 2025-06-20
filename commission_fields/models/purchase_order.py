@@ -7,6 +7,30 @@ class PurchaseOrder(models.Model):
     default_account_id = fields.Many2one('account.account', string='Default Expense Account',
         help='Default account to use for purchase order lines if not set on product or category.')
 
+    deal_id = fields.Char(string='Deal ID', copy=False, help="Related Sale Order Deal ID", index=True)
+
+    commission_reference = fields.Char(string='Commission Reference', copy=False, help="Reference number for commission tracking")
+
+    commission_source = fields.Selection([
+        ('internal', 'Internal Commission'),
+        ('external', 'External Commission'),
+        ('broker', 'Broker Commission')
+    ], string='Commission Source', 
+       help="Source of the commission payment"
+    )
+
+    commission_amount = fields.Monetary(string='Commission Amount', currency_field='currency_id', help="Amount of commission to be paid")
+
+    commission_payment_status = fields.Selection([
+        ('draft', 'Draft'),
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('cancelled', 'Cancelled')
+    ], string='Payment Status',
+       default='draft',
+       help="Status of the commission payment"
+    )
+
     @api.model_create_multi
     def create(self, vals_list):
         """Set default account for purchase order lines if not set."""

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api  # Ensure Odoo is installed and run this code inside the Odoo server environment
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -13,9 +13,10 @@ class AccountMove(models.Model):
         string='Project',
         copy=False,
         help="Related Sale Order Project",
-        ondelete='set null',
+        ondelete='set null',  # Valid Odoo field argument, no change needed if running inside Odoo
         domain=[],
     )
+    
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
@@ -24,13 +25,21 @@ class AccountMove(models.Model):
         ondelete='set null',
         domain=[],
     )
+    
     sale_value = fields.Monetary(
         string='Sale Value',
         copy=False,
+        currency_field='currency_id',
         help="Related Sale Order Sale Value"
     )
-    broker_commission = fields.Float(string='Broker/Agency Commission', readonly=True, copy=False, help="Broker/Agency commission from related Sale Order")
-    deal_id_display = fields.Char(string='Deal ID (Display)', compute='_compute_deal_id_display', store=False)
+    
+    broker_commission = fields.Monetary(
+        string='Broker Commission',
+        readonly=True,
+        copy=False,
+        currency_field='currency_id',
+        help="Broker commission from related Sale Order"
+    )
 
     @api.depends('deal_id')
     def _compute_deal_id_display(self):
