@@ -72,24 +72,20 @@
                                     <table class="table table-sm table-striped">
                                         <thead class="table-dark">
                                             <tr>
-                                                <th>Invoice Date</th>
-                                                <th>Due Date</th>
-                                                <th>Payment Date</th>
-                                                <th>Number</th>
-                                                <th>Reference</th>
+                                                <th>Date</th>
+                                                <th>Account</th>
+                                                <th>Label</th>
                                                 <th class="text-right">Debit</th>
                                                 <th class="text-right">Credit</th>
                                                 <th class="text-right">Running Balance</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <t t-set="lines" t-value="doc.line_ids.sorted(lambda l: l.invoice_date or datetime.date.today())"/>
+                                            <t t-set="lines" t-value="doc.line_ids.sorted(lambda l: l.date or datetime.date.today())"/>
                                             <tr t-foreach="lines" t-as="line">
-                                                <td><span t-field="line.invoice_date"/></td>
-                                                <td><span t-field="line.due_date"/></td>
-                                                <td><span t-field="line.payment_date"/></td>
-                                                <td><span t-field="line.number"/></td>
-                                                <td><span t-field="line.reference"/></td>
+                                                <td><span t-field="line.date"/></td>
+                                                <td><span t-esc="(line.account_code or '') + ' ' + (line.account_name or '')"/></td>
+                                                <td><span t-field="line.label"/></td>
                                                 <td class="text-right">
                                                     <span t-field="line.debit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                                                 </td>
@@ -102,7 +98,7 @@
                                             </tr>
                                             <t t-if="not lines">
                                                 <tr>
-                                                    <td colspan="8" class="text-center text-muted">
+                                                    <td colspan="6" class="text-center text-muted">
                                                         <em>No transactions found for the selected period</em>
                                                     </td>
                                                 </tr>

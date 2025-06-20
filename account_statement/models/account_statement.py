@@ -49,14 +49,13 @@ class AccountStatement(models.Model):
 class AccountStatementLine(models.Model):
     _name = 'account.statement.line'
     _description = 'Account Statement Line'
-    _order = 'invoice_date, id'
+    _order = 'date, id'
 
     statement_id = fields.Many2one('account.statement', string='Statement', ondelete='cascade')
-    invoice_date = fields.Date(string='Invoice Date')
-    due_date = fields.Date(string='Due Date')
-    payment_date = fields.Date(string='Payment Date')
-    number = fields.Char(string='Number')
-    reference = fields.Char(string='Reference')
+    date = fields.Date(string='Date')
+    account_name = fields.Char(string='Account')
+    account_code = fields.Char(string='Account Code')
+    label = fields.Char(string='Label')
     debit = fields.Monetary(string='Debit', currency_field='currency_id')
     credit = fields.Monetary(string='Credit', currency_field='currency_id')
     running_balance = fields.Monetary(string='Running Balance', currency_field='currency_id')

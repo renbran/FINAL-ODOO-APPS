@@ -43,45 +43,37 @@ class AccountStatementWizard(models.TransientModel):
         # Clear existing lines
         self.line_ids = [(5, 0, 0)]
         
-        # Search for account moves
         try:
-            moves = self.env['account.move'].search([
+            # Fetch all posted move lines for the partner in the date range, for all accounts
+            move_lines = self.env['account.move.line'].search([
                 ('partner_id', '=', self.partner_id.id),
                 ('date', '>=', self.date_from),
                 ('date', '<=', self.date_to),
-                ('state', '=', 'posted'),
-                ('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
-            ])
+                ('move_id.state', '=', 'posted'),
+            ], order='date, id')
         except Exception as e:
-            raise ValidationError(_('Error fetching account moves: %s') % str(e))
+            raise ValidationError(_('Error fetching account move lines: %s') % str(e))
 
         lines_data = []
         running_balance = 0.0
         total_debit = 0.0
         total_credit = 0.0
 
-        for move in moves.sorted('date'):
-            # Get the receivable/payable line
-            for line in move.line_ids:
-                if line.account_id.account_type in ['asset_receivable', 'liability_payable']:
-                    debit = line.debit
-                    credit = line.credit
-                    
-                    total_debit += debit
-                    total_credit += credit
-                    running_balance += (debit - credit)
-                    
-                    lines_data.append({
-                        'invoice_date': move.date,
-                        'due_date': move.invoice_date_due,
-                        'payment_date': move.date if move.payment_state == 'paid' else False,
-                        'number': move.name,
-                        'reference': move.ref or '',
-                        'debit': debit,
-                        'credit': credit,
-                        'running_balance': running_balance,
-                    })
-                    break
+        for line in move_lines:
+            debit = line.debit
+            credit = line.credit
+            total_debit += debit
+            total_credit += credit
+            running_balance += (debit - credit)
+            lines_data.append({
+                'date': line.date,
+                'account_name': line.account_id.display_name,
+                'account_code': line.account_id.code,
+                'label': line.name or line.ref or '',
+                'debit': debit,
+                'credit': credit,
+                'running_balance': running_balance,
+            })
 
         self.line_ids = [(0, 0, line_data) for line_data in lines_data]
         self.total_debit = total_debit
@@ -94,7 +86,7 @@ class AccountStatementWizard(models.TransientModel):
         return self.env.ref('account_statement.action_account_statement_wizard').report_action(self)
 
     def action_generate_excel(self):
-        """Generate Excel report with error handling"""
+        """Generate Excel report with all accounts and formatted values"""
         self.ensure_one()
         try:
             output = io.BytesIO()
@@ -112,36 +104,33 @@ class AccountStatementWizard(models.TransientModel):
             worksheet.write('A2', 'Period:', subheader_format)
             worksheet.write('B2', f'{self.date_from} to {self.date_to}')
             worksheet.write('A4', 'Total Debit:', subheader_format)
-            worksheet.write('B4', self.total_debit, currency_format)
+            worksheet.write('B4', "{:,.2f}".format(self.total_debit), currency_format)
             worksheet.write('A5', 'Total Credit:', subheader_format)
-            worksheet.write('B5', self.total_credit, currency_format)
+            worksheet.write('B5', "{:,.2f}".format(self.total_credit), currency_format)
             worksheet.write('A6', 'Balance:', subheader_format)
-            worksheet.write('B6', self.balance, currency_format)
-            headers = ['Invoice Date', 'Due Date', 'Payment Date', 'Number', 'Reference', 'Debit', 'Credit', 'Running Balance']
+            worksheet.write('B6', "{:,.2f}".format(self.balance), currency_format)
+            headers = ['Date', 'Account', 'Label', 'Debit', 'Credit', 'Running Balance']
             for col, header in enumerate(headers):
                 worksheet.write(7, col, header, subheader_format)
             row = 8
             for line in self.line_ids:
-                worksheet.write(row, 0, line.invoice_date, date_format)
-                worksheet.write(row, 1, line.due_date, date_format)
-                worksheet.write(row, 2, line.payment_date, date_format)
-                worksheet.write(row, 3, line.number)
-                worksheet.write(row, 4, line.reference)
-                worksheet.write(row, 5, line.debit, currency_format)
-                worksheet.write(row, 6, line.credit, currency_format)
-                worksheet.write(row, 7, line.running_balance, currency_format)
+                worksheet.write(row, 0, line.date, date_format)
+                worksheet.write(row, 1, f"{line.account_code} {line.account_name}")
+                worksheet.write(row, 2, line.label)
+                worksheet.write(row, 3, "{:,.2f}".format(line.debit), currency_format)
+                worksheet.write(row, 4, "{:,.2f}".format(line.credit), currency_format)
+                worksheet.write(row, 5, "{:,.2f}".format(line.running_balance), currency_format)
                 row += 1
-            worksheet.set_column('A:C', 12)
-            worksheet.set_column('D:E', 15)
-            worksheet.set_column('F:H', 12)
+            worksheet.set_column('A:A', 12)
+            worksheet.set_column('B:B', 30)
+            worksheet.set_column('C:C', 25)
+            worksheet.set_column('D:F', 15)
             workbook.close()
             output.seek(0)
-            
             encoded_file = base64.b64encode(output.read())
             output.close()
 
             filename = f'Account_Statement_{self.partner_id.name}_{self.date_from}_{self.date_to}.xlsx'
-            
             attachment = self.env['ir.attachment'].sudo().create({
                 'name': filename,
                 'type': 'binary',
@@ -150,13 +139,11 @@ class AccountStatementWizard(models.TransientModel):
                 'res_id': self.id,
                 'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             })
-            
             return {
                 'type': 'ir.actions.act_url',
                 'url': f'/web/content/{attachment.id}?download=true',
                 'target': 'new',
             }
-            
         except Exception as e:
             _logger.error("Excel generation error: %s", str(e))
             raise UserError(_("Error generating Excel file: %s") % str(e))
@@ -174,21 +161,20 @@ class AccountStatementWizard(models.TransientModel):
             'total_credit': self.total_credit,
             'balance': self.balance,
         })
-        
-        # Create statement lines
+
+        # Create statement lines (include all fields for full traceability)
         for line in self.line_ids:
             self.env['account.statement.line'].create({
                 'statement_id': statement.id,
-                'invoice_date': line.invoice_date,
-                'due_date': line.due_date,
-                'payment_date': line.payment_date,
-                'number': line.number,
-                'reference': line.reference,
+                'date': line.date,
+                'account_name': line.account_name,
+                'account_code': line.account_code,
+                'label': line.label,
                 'debit': line.debit,
                 'credit': line.credit,
                 'running_balance': line.running_balance,
             })
-        
+
         return {
             'name': 'Account Statement',
             'type': 'ir.actions.act_window',
@@ -204,11 +190,10 @@ class AccountStatementWizardLine(models.TransientModel):
     _description = 'Account Statement Wizard Line'
 
     wizard_id = fields.Many2one('account.statement.wizard', string='Wizard', ondelete='cascade')
-    invoice_date = fields.Date(string='Invoice Date')
-    due_date = fields.Date(string='Due Date')
-    payment_date = fields.Date(string='Payment Date')
-    number = fields.Char(string='Number')
-    reference = fields.Char(string='Reference')
+    date = fields.Date(string='Date')
+    account_name = fields.Char(string='Account')
+    account_code = fields.Char(string='Account Code')
+    label = fields.Char(string='Label')
     debit = fields.Monetary(string='Debit', currency_field='currency_id')
     credit = fields.Monetary(string='Credit', currency_field='currency_id')
     running_balance = fields.Monetary(string='Running Balance', currency_field='currency_id')
