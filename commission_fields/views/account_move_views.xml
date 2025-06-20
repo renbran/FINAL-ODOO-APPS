@@ -61,7 +61,6 @@
             <xpath expr="//search" position="inside">
                 <filter name="project_id" string="Project" domain="[]" context="{'group_by':'project_id'}"/>
                 <filter name="booking_date" string="Booking Date" domain="[]" context="{'group_by':'booking_date'}"/>
-                <!-- Removed problematic fields: project_id, booking_date, partner_id, payment_reference, ref -->
             </xpath>
         </field>
     </record>
