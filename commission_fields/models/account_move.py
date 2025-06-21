@@ -4,7 +4,7 @@ from odoo import models, fields, api  # Ensure Odoo is installed and run this co
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    deal_id = fields.Integer(
+    deal_id = fields.Char(
         string='Deal ID',
         copy=False,
         index=True
@@ -62,7 +62,7 @@ class AccountMove(models.Model):
             if vals.get('invoice_origin'):
                 sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
                 if sale_order:
-                    vals['deal_id'] = sale_order.deal_id
+                    vals['deal_id'] = sale_order.deal_id or ''
                     vals['booking_date'] = sale_order.booking_date
                     vals['buyer_id'] = sale_order.buyer_id.id
                     vals['project_id'] = sale_order.project_id.id
@@ -79,7 +79,7 @@ class AccountMove(models.Model):
                 sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
                 if sale_order:
                     vals.update({
-                        'deal_id': sale_order.deal_id,
+                        'deal_id': sale_order.deal_id or '',
                         'booking_date': sale_order.booking_date,
                         'buyer_id': sale_order.buyer_id.id,
                         'project_id': sale_order.project_id.id,

@@ -11,7 +11,7 @@ class PurchaseOrder(models.Model):
         help='Default expense account for commission lines'
     )
 
-    deal_id = fields.Integer(
+    deal_id = fields.Char(
         string='Deal ID',
         copy=False,
         index=True
