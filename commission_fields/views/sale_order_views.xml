@@ -6,14 +6,16 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Deal Info Fields -->
+            <!-- Deal Info Fields: Place all deal fields together after client_order_ref -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
-                <field name="deal_id"/>
-                <field name="booking_date"/>
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="sale_value"/>
+                <group string="Deal Information">
+                    <field name="deal_id"/>
+                    <field name="booking_date"/>
+                    <field name="buyer_id"/>
+                    <field name="project_id"/>
+                    <field name="unit_id"/>
+                    <field name="sale_value"/>
+                </group>
             </xpath>
 
             <!-- Commission Tab -->

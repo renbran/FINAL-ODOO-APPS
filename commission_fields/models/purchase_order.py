@@ -4,13 +4,7 @@ from odoo import models, fields, api
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    default_account_id = fields.Many2one(
-        'account.account',
-        string='Default Account',
-        domain="[('deprecated', '=', False)]",
-        help='Default expense account for commission lines'
-    )
-
+    # Deal Information Fields (grouped together)
     deal_id = fields.Char(
         string='Deal ID',
         copy=False,
@@ -43,6 +37,13 @@ class PurchaseOrder(models.Model):
     ], string='Payment Status',
        default='draft',
        help="Status of the commission payment"
+    )
+
+    default_account_id = fields.Many2one(
+        'account.account',
+        string='Default Account',
+        domain="[('deprecated', '=', False)]",
+        help='Default expense account for commission lines'
     )
 
     @api.model_create_multi
