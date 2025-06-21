@@ -14,7 +14,7 @@ COMMISSION_TYPE_SELECTION = [
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Deal Information Fields (grouped together)
+    # Deal Information Fields (grouped)
     deal_id = fields.Char(
         string='Deal ID',
         index=True,
@@ -111,8 +111,22 @@ class SaleOrder(models.Model):
     commission_percentage = fields.Float(
         string='Commission %',
         digits=(5, 2),
-        compute='_compute_commission_percentage',
-        store=True
+    )
+    external_percentage = fields.Float(
+        string='External Percentage',
+        digits=(5, 2),
+    )
+    broker_agency_rate = fields.Float(
+        string='Broker/Agency Percentage',
+        digits=(5, 2),
+    )
+    agent1_rate = fields.Float(
+        string='Agent 1 Percentage',
+        digits=(5, 2),
+    )
+    agent2_rate = fields.Float(
+        string='Agent 2 Percentage',
+        digits=(5, 2),
     )
 
     # Computed summary fields

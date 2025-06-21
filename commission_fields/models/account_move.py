@@ -4,7 +4,7 @@ from odoo import models, fields, api  # Ensure Odoo is installed and run this co
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    # Deal Information Fields (grouped together)
+    # Deal Information Fields (grouped)
     deal_id = fields.Char(
         string='Deal ID',
         copy=False,

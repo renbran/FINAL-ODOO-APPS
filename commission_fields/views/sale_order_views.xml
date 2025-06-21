@@ -6,7 +6,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Deal Info Fields: Place all deal fields together after client_order_ref -->
+            <!-- Group all deal info fields together after client_order_ref -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <group string="Deal Information">
                     <field name="deal_id"/>
@@ -37,7 +37,7 @@
                             <field name="grand_total_commission" readonly="1"/>
                             <field name="commission_allocation_status" readonly="1"/>
                             <field name="company_net_commission" readonly="1"/>
-                            <field name="commission_percentage" readonly="1"/>
+                            <field name="commission_percentage"/>
                         </group>
                     </group>
 
@@ -47,7 +47,7 @@
                                 <group string="External Partner">
                                     <field name="external_partner_id"/>
                                     <field name="external_commission_type"/>
-                                    <field name="external_percentage" invisible="external_commission_type != 'percentage'"/>
+                                    <field name="external_percentage"/>
                                     <field name="external_fixed_amount" invisible="external_commission_type != 'fixed'"/>
                                     <field name="external_commission_amount" readonly="1"/>
                                 </group>
