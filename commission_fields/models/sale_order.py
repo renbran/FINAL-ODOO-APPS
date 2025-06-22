@@ -139,6 +139,12 @@ class SaleOrder(models.Model):
     company_net_commission = fields.Monetary(string='Company Net Commission', compute='_compute_company_net_commission', store=True, currency_field='currency_id', help="Net commission allocated to the company after external and internal commissions.")
     # Purchase order link
     commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
+    commission_calculation_ids = fields.One2many(
+        'commission.calculation',
+        'sale_order_id',
+        string='Commission Calculations',
+        help='All commission calculation records related to this sales order.'
+    )
 
     # UI visibility logic
     @api.depends('external_commission_type', 'internal_commission_type', 'agent1_id', 'agent2_id', 'manager_id', 'director_id', 'external_partner_id')
@@ -901,3 +907,14 @@ class PurchaseOrder(models.Model):
             rec.can_confirm_commission = rec.commission_status == 'calculated'
             rec.can_pay_commission = rec.commission_status == 'confirmed'
             rec.can_reset_commission = rec.commission_status != 'paid'
+
+    def action_view_commission_calculations(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Commission Calculations'),
+            'res_model': 'commission.calculation',
+            'view_mode': 'tree,form',
+            'domain': [('sale_order_id', '=', self.id)],
+            'context': {'default_sale_order_id': self.id},
+        }

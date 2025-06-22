@@ -24,7 +24,8 @@
         'hr',
         'account',
         'purchase',
-        'product'
+        'product',
+        'commission_calculation',  # Added dependency for integration
     ],
     'data': [
         'security/commission_security.xml',

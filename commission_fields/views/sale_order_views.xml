@@ -88,6 +88,10 @@
                             <field name="director_commission" readonly="1"/>
                         </group>
                     </group>
+                    <group string="Commission Calculations">
+                        <field name="commission_calculation_ids"/>
+                        <button name="action_view_commission_calculations" type="object" string="View Calculations" class="oe_stat_button" icon="fa-calculator"/>
+                    </group>
                 </page>
             </xpath>
 
