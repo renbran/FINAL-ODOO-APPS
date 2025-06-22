@@ -40,46 +40,54 @@
                             <field name="commission_percentage"/>
                         </group>
                     </group>
-
-                    <notebook>
-                        <page string="External Commission">
-                            <group>
-                                <group string="External Partner">
-                                    <field name="external_partner_id"/>
-                                    <field name="external_commission_type"/>
-                                    <field name="external_percentage"/>
-                                    <field name="external_fixed_amount" invisible="external_commission_type != 'fixed'"/>
-                                    <field name="external_commission_amount" readonly="1"/>
-                                </group>
-                                <group string="Broker/Agency">
-                                    <field name="broker_agency_partner_id"/>
-                                    <field name="broker_agency_commission_type"/>
-                                    <field name="broker_agency_rate"/>
-                                    <field name="broker_agency_total" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-
-                        <page string="Internal Commission">
-                            <group>
-                                <field name="internal_commission_type"/>
-                            </group>
-                            <group>
-                                <group string="Agent 1">
-                                    <field name="agent1_id"/>
-                                    <field name="agent1_rate" invisible="internal_commission_type != 'percentage'"/>
-                                    <field name="agent1_fixed" invisible="internal_commission_type != 'fixed'"/>
-                                    <field name="agent1_commission" readonly="1"/>
-                                </group>
-                                <group string="Agent 2">
-                                    <field name="agent2_id"/>
-                                    <field name="agent2_rate" invisible="internal_commission_type != 'percentage'"/>
-                                    <field name="agent2_fixed" invisible="internal_commission_type != 'fixed'"/>
-                                    <field name="agent2_commission" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook>
+                    <group string="Commission Breakdown">
+                        <group string="External Commission" colspan="2">
+                            <field name="external_partner_id"/>
+                            <field name="external_commission_type"/>
+                            <field name="external_percentage" attrs="{'invisible': [('external_commission_type', '!=', 'unit_price')]}"/>
+                            <field name="external_fixed_amount" attrs="{'invisible': [('external_commission_type', '!=', 'fixed')]}"/>
+                            <field name="external_commission_amount" readonly="1"/>
+                            <field name="broker_agency_partner_id"/>
+                            <field name="broker_agency_commission_type"/>
+                            <field name="broker_agency_rate"/>
+                            <field name="broker_agency_total" readonly="1"/>
+                            <field name="referral_partner_id"/>
+                            <field name="referral_commission_type"/>
+                            <field name="referral_rate"/>
+                            <field name="referral_total" readonly="1"/>
+                            <field name="cashback_partner_id"/>
+                            <field name="cashback_commission_type"/>
+                            <field name="cashback_rate"/>
+                            <field name="cashback_total" readonly="1"/>
+                            <field name="other_external_partner_id"/>
+                            <field name="other_external_commission_type"/>
+                            <field name="other_external_rate"/>
+                            <field name="other_external_total" readonly="1"/>
+                        </group>
+                        <group string="Internal Commission" colspan="2">
+                            <field name="internal_commission_type"/>
+                            <field name="internal_commission_base" readonly="1"/>
+                            <label for="internal_commission_base">
+                                <span class="o_form_label_help">This is the company share (after external commission) used as the base for internal commission calculation.</span>
+                            </label>
+                            <field name="agent1_id"/>
+                            <field name="agent1_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
+                            <field name="agent1_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="agent1_commission" readonly="1"/>
+                            <field name="agent2_id"/>
+                            <field name="agent2_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
+                            <field name="agent2_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="agent2_commission" readonly="1"/>
+                            <field name="manager_id"/>
+                            <field name="manager_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
+                            <field name="manager_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="manager_commission" readonly="1"/>
+                            <field name="director_id"/>
+                            <field name="director_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
+                            <field name="director_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="director_commission" readonly="1"/>
+                        </group>
+                    </group>
                 </page>
             </xpath>
 
@@ -89,22 +97,22 @@
                         string="Calculate Commission" 
                         type="object" 
                         class="btn-primary"
-                        invisible="commission_status not in ['draft']"/>
+                        attrs="{'invisible': [('can_calculate_commission', '=', False)]}"/>
                 <button name="action_confirm_commission" 
                         string="Confirm Commission" 
                         type="object" 
                         class="btn-primary"
-                        invisible="commission_status not in ['calculated']"/>
+                        attrs="{'invisible': [('can_confirm_commission', '=', False)]}"/>
                 <button name="action_pay_commission" 
                         string="Mark as Paid" 
                         type="object" 
                         class="btn-primary"
-                        invisible="commission_status not in ['confirmed']"/>
+                        attrs="{'invisible': [('can_pay_commission', '=', False)]}"/>
                 <button name="action_reset_commission" 
                         string="Reset Commission" 
                         type="object" 
                         class="btn-secondary"
-                        invisible="commission_status in ['paid']"/>
+                        attrs="{'invisible': [('can_reset_commission', '=', False)]}"/>
             </xpath>
 
             <!-- Smart Buttons -->
