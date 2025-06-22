@@ -1,66 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_commission_calculation_form" model="ir.ui.view">
-        <field name="name">commission.calculation.form</field>
-        <field name="model">commission.calculation</field>
+    <record id="view_order_form_commission" model="ir.ui.view">
+        <field name="name">sale.order.form.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <form string="Commission Calculation">
-                <sheet>
+            <xpath expr="//page[@name='other_information']" position="after">
+                <page string="Commission Calculation" name="commission_calculation">
                     <group>
-                        <field name="name"/>
-                        <field name="sale_order_id"/>
-                        <field name="total_untaxed_amount"/>
-                        <field name="total_external"/>
-                        <field name="total_internal"/>
-                        <field name="total_payable"/>
-                        <field name="company_net_commission"/>
-                        <field name="gross_share"/>
-                        <field name="notes"/>
+                        <group string="Summary">
+                            <field name="amount_untaxed" readonly="1"/>
+                            <field name="total_external_commission" readonly="1"/>
+                            <field name="total_internal_commission" readonly="1"/>
+                            <field name="total_payable" readonly="1"/>
+                            <field name="company_net_commission" readonly="1"/>
+                            <field name="remaining_unallocated_amount" readonly="1"/>
+                            <field name="commission_percentage" readonly="1"/>
+                            <field name="commission_allocation_status" readonly="1"/>
+                        </group>
+                        <group string="Workflow">
+                            <field name="commission_status"/>
+                            <field name="commission_payment_date"/>
+                            <field name="commission_reference"/>
+                        </group>
                     </group>
                     <notebook>
-                        <page string="Commission Lines">
-                            <field name="commission_line_ids">
-                                <tree editable="bottom">
-                                    <field name="commission_party_type"/>
-                                    <field name="partner_id" attrs="{'invisible': [('commission_party_type', '!=', 'external')]}"/>
-                                    <field name="employee_id" attrs="{'invisible': [('commission_party_type', '!=', 'internal')]}"/>
-                                    <field name="commission_basis"/>
-                                    <field name="commission_rate"/>
-                                    <field name="commission_amount"/>
-                                    <field name="notes"/>
-                                </tree>
-                                <form string="Commission Line">
-                                    <group>
-                                        <field name="commission_party_type"/>
-                                        <field name="partner_id" attrs="{'invisible': [('commission_party_type', '!=', 'external')]}"/>
-                                        <field name="employee_id" attrs="{'invisible': [('commission_party_type', '!=', 'internal')]}"/>
-                                        <field name="commission_basis"/>
-                                        <field name="commission_rate"/>
-                                        <field name="commission_amount"/>
-                                        <field name="notes"/>
-                                    </group>
-                                </form>
-                            </field>
+                        <page string="External Commission">
+                            <group string="Broker">
+                                <field name="broker_partner_id"/>
+                                <field name="broker_commission_type"/>
+                                <field name="broker_rate" attrs="{'invisible': [('broker_commission_type', '=', 'fixed')]}"/>
+                                <field name="broker_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Referral">
+                                <field name="referral_partner_id"/>
+                                <field name="referral_commission_type"/>
+                                <field name="referral_rate" attrs="{'invisible': [('referral_commission_type', '=', 'fixed')]}"/>
+                                <field name="referral_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Cashback">
+                                <field name="cashback_partner_id"/>
+                                <field name="cashback_commission_type"/>
+                                <field name="cashback_rate" attrs="{'invisible': [('cashback_commission_type', '=', 'fixed')]}"/>
+                                <field name="cashback_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Other">
+                                <field name="other_partner_id"/>
+                                <field name="other_commission_type"/>
+                                <field name="other_rate" attrs="{'invisible': [('other_commission_type', '!=', 'untaxed_total')]}"/>
+                                <field name="other_fixed_amount" attrs="{'invisible': [('other_commission_type', '!=', 'fixed')]}"/>
+                                <field name="other_commission_amount" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Internal Commission">
+                            <field name="internal_commission_type"/>
+                            <field name="internal_commission_base" readonly="1"/>
+                            <group string="Agent 1">
+                                <field name="agent1_id"/>
+                                <field name="agent1_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
+                                <field name="agent1_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="agent1_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Agent 2">
+                                <field name="agent2_id"/>
+                                <field name="agent2_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
+                                <field name="agent2_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="agent2_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Manager">
+                                <field name="manager_id"/>
+                                <field name="manager_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
+                                <field name="manager_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="manager_commission_amount" readonly="1"/>
+                            </group>
+                            <group string="Director">
+                                <field name="director_id"/>
+                                <field name="director_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
+                                <field name="director_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="director_commission_amount" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="commission_notes"/>
                         </page>
                     </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_commission_calculation_tree" model="ir.ui.view">
-        <field name="name">commission.calculation.tree</field>
-        <field name="model">commission.calculation</field>
-        <field name="arch" type="xml">
-            <tree string="Commission Calculations">
-                <field name="name"/>
-                <field name="sale_order_id"/>
-                <field name="total_untaxed_amount"/>
-                <field name="total_external"/>
-                <field name="total_internal"/>
-                <field name="total_payable"/>
-                <field name="company_net_commission"/>
-                <field name="gross_share"/>
-            </tree>
+                </page>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary" attrs="{'invisible': [('can_calculate_commission', '=', False)]}"/>
+                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary" attrs="{'invisible': [('can_confirm_commission', '=', False)]}"/>
+                <button name="action_pay_commission" string="Pay Commission" type="object" class="btn-success" attrs="{'invisible': [('can_pay_commission', '=', False)]}"/>
+                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary" attrs="{'invisible': [('can_reset_commission', '=', False)]}"/>
+            </xpath>
         </field>
     </record>
 </odoo>

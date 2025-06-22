@@ -1,12 +1,16 @@
 Commission Calculation
 ======================
 
-This module replaces the old commission field with custom fields only (no computation). It provides a new model for commission records and refactors the commission logic to be fully manual/customizable.
+This module now provides a full-featured, production-ready commission management system for Odoo 17, including:
 
 Features:
 ---------
 - Custom commission fields (amount, percentage, notes, etc.)
-- No automatic computation
+- Automatic commission calculation, confirmation, payment, and reset workflow
+- Allocation status and commission percentage tracking
+- Internal commission base (company share after external commission)
+- Button actions for all commission workflow steps
+- Odoo 17 best practices and improved security
 - Simple tree and form views
 
 Installation:
@@ -17,4 +21,12 @@ Installation:
 Usage:
 ------
 - Go to Sales > Commission Calculation
-- Add and manage commission records manually
+- Use the Commission tab to manage and track all commission details
+- Use the provided buttons to calculate, confirm, pay, or reset commissions
+- All commission data is visible and tracked for reporting and auditing
+
+Best Practices:
+---------------
+- Always calculate and confirm commissions before confirming the sales order
+- Do not modify commission fields after confirmation unless the commission is reset to draft
+- Use the provided UI actions for all commission-related workflows
