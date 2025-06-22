@@ -44,8 +44,8 @@
                         <group string="External Commission" colspan="2">
                             <field name="external_partner_id"/>
                             <field name="external_commission_type"/>
-                            <field name="external_percentage" attrs="{'invisible': [('external_commission_type', '!=', 'unit_price')]}"/>
-                            <field name="external_fixed_amount" attrs="{'invisible': [('external_commission_type', '!=', 'fixed')]}"/>
+                            <field name="external_percentage" modifiers="{&quot;invisible&quot;: [[&quot;external_commission_type&quot;, &quot;!=&quot;, &quot;unit_price&quot;]]}"/>
+                            <field name="external_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;external_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                             <field name="external_commission_amount" readonly="1"/>
                             <field name="broker_agency_partner_id"/>
                             <field name="broker_agency_commission_type"/>
@@ -71,20 +71,20 @@
                                 <span class="o_form_label_help">This is the company share (after external commission) used as the base for internal commission calculation.</span>
                             </label>
                             <field name="agent1_id"/>
-                            <field name="agent1_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
-                            <field name="agent1_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="agent1_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;unit_price&quot;]]}"/>
+                            <field name="agent1_fixed" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                             <field name="agent1_commission" readonly="1"/>
                             <field name="agent2_id"/>
-                            <field name="agent2_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
-                            <field name="agent2_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="agent2_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;unit_price&quot;]]}"/>
+                            <field name="agent2_fixed" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                             <field name="agent2_commission" readonly="1"/>
                             <field name="manager_id"/>
-                            <field name="manager_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
-                            <field name="manager_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="manager_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;unit_price&quot;]]}"/>
+                            <field name="manager_fixed" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                             <field name="manager_commission" readonly="1"/>
                             <field name="director_id"/>
-                            <field name="director_rate" attrs="{'invisible': [('internal_commission_type', '!=', 'unit_price')]}"/>
-                            <field name="director_fixed" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                            <field name="director_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;unit_price&quot;]]}"/>
+                            <field name="director_fixed" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                             <field name="director_commission" readonly="1"/>
                         </group>
                     </group>
@@ -101,22 +101,22 @@
                         string="Calculate Commission" 
                         type="object" 
                         class="btn-primary"
-                        attrs="{'invisible': [('can_calculate_commission', '=', False)]}"/>
+                        modifiers="{&quot;invisible&quot;: [[&quot;can_calculate_commission&quot;, &quot;=&quot;, false]]}"/>
                 <button name="action_confirm_commission" 
                         string="Confirm Commission" 
                         type="object" 
                         class="btn-primary"
-                        attrs="{'invisible': [('can_confirm_commission', '=', False)]}"/>
+                        modifiers="{&quot;invisible&quot;: [[&quot;can_confirm_commission&quot;, &quot;=&quot;, false]]}"/>
                 <button name="action_pay_commission" 
                         string="Mark as Paid" 
                         type="object" 
                         class="btn-primary"
-                        attrs="{'invisible': [('can_pay_commission', '=', False)]}"/>
+                        modifiers="{&quot;invisible&quot;: [[&quot;can_pay_commission&quot;, &quot;=&quot;, false]]}"/>
                 <button name="action_reset_commission" 
                         string="Reset Commission" 
                         type="object" 
                         class="btn-secondary"
-                        attrs="{'invisible': [('can_reset_commission', '=', False)]}"/>
+                        modifiers="{&quot;invisible&quot;: [[&quot;can_reset_commission&quot;, &quot;=&quot;, false]]}"/>
             </xpath>
 
             <!-- Smart Buttons -->

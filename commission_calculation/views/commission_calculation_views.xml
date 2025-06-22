@@ -29,26 +29,26 @@
                             <group string="Broker">
                                 <field name="broker_partner_id"/>
                                 <field name="broker_commission_type"/>
-                                <field name="broker_rate" attrs="{'invisible': [('broker_commission_type', '=', 'fixed')]}"/>
+                                <field name="broker_rate" modifiers="{&quot;invisible&quot;: [[&quot;broker_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="broker_commission_amount" readonly="1"/>
                             </group>
                             <group string="Referral">
                                 <field name="referral_partner_id"/>
                                 <field name="referral_commission_type"/>
-                                <field name="referral_rate" attrs="{'invisible': [('referral_commission_type', '=', 'fixed')]}"/>
+                                <field name="referral_rate" modifiers="{&quot;invisible&quot;: [[&quot;referral_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="referral_commission_amount" readonly="1"/>
                             </group>
                             <group string="Cashback">
                                 <field name="cashback_partner_id"/>
                                 <field name="cashback_commission_type"/>
-                                <field name="cashback_rate" attrs="{'invisible': [('cashback_commission_type', '=', 'fixed')]}"/>
+                                <field name="cashback_rate" modifiers="{&quot;invisible&quot;: [[&quot;cashback_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="cashback_commission_amount" readonly="1"/>
                             </group>
                             <group string="Other">
                                 <field name="other_partner_id"/>
                                 <field name="other_commission_type"/>
-                                <field name="other_rate" attrs="{'invisible': [('other_commission_type', '!=', 'untaxed_total')]}"/>
-                                <field name="other_fixed_amount" attrs="{'invisible': [('other_commission_type', '!=', 'fixed')]}"/>
+                                <field name="other_rate" modifiers="{&quot;invisible&quot;: [[&quot;other_commission_type&quot;, &quot;!=&quot;, &quot;untaxed_total&quot;]]}"/>
+                                <field name="other_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;other_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="other_commission_amount" readonly="1"/>
                             </group>
                         </page>
@@ -57,26 +57,26 @@
                             <field name="internal_commission_base" readonly="1"/>
                             <group string="Agent 1">
                                 <field name="agent1_id"/>
-                                <field name="agent1_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
-                                <field name="agent1_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="agent1_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
+                                <field name="agent1_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="agent1_commission_amount" readonly="1"/>
                             </group>
                             <group string="Agent 2">
                                 <field name="agent2_id"/>
-                                <field name="agent2_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
-                                <field name="agent2_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="agent2_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
+                                <field name="agent2_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="agent2_commission_amount" readonly="1"/>
                             </group>
                             <group string="Manager">
                                 <field name="manager_id"/>
-                                <field name="manager_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
-                                <field name="manager_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="manager_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
+                                <field name="manager_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="manager_commission_amount" readonly="1"/>
                             </group>
                             <group string="Director">
                                 <field name="director_id"/>
-                                <field name="director_rate" attrs="{'invisible': [('internal_commission_type', '=', 'fixed')]}"/>
-                                <field name="director_fixed_amount" attrs="{'invisible': [('internal_commission_type', '!=', 'fixed')]}"/>
+                                <field name="director_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}"/>
+                                <field name="director_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}"/>
                                 <field name="director_commission_amount" readonly="1"/>
                             </group>
                         </page>
@@ -87,10 +87,10 @@
                 </page>
             </xpath>
             <xpath expr="//header" position="inside">
-                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary" attrs="{'invisible': [('can_calculate_commission', '=', False)]}"/>
-                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary" attrs="{'invisible': [('can_confirm_commission', '=', False)]}"/>
-                <button name="action_pay_commission" string="Pay Commission" type="object" class="btn-success" attrs="{'invisible': [('can_pay_commission', '=', False)]}"/>
-                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary" attrs="{'invisible': [('can_reset_commission', '=', False)]}"/>
+                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary" modifiers="{&quot;invisible&quot;: [[&quot;can_calculate_commission&quot;, &quot;=&quot;, false]]}"/>
+                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary" modifiers="{&quot;invisible&quot;: [[&quot;can_confirm_commission&quot;, &quot;=&quot;, false]]}"/>
+                <button name="action_pay_commission" string="Pay Commission" type="object" class="btn-success" modifiers="{&quot;invisible&quot;: [[&quot;can_pay_commission&quot;, &quot;=&quot;, false]]}"/>
+                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary" modifiers="{&quot;invisible&quot;: [[&quot;can_reset_commission&quot;, &quot;=&quot;, false]]}"/>
             </xpath>
         </field>
     </record>

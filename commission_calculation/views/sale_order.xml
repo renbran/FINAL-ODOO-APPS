@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_commission" model="ir.ui.view">
+        <field name="name">sale.order.form.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add Deal Information Notebook -->
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Deal Information" name="deal_information">
+                        <group string="Basic Information">
+                            <field name="deal_id"/>
+                            <field name="booking_date"/>
+                            <field name="buyer_id"/>
+                            <field name="project_id"/>
+                            <field name="unit_id"/>
+                            <field name="sale_value"/>
+                        </group>
+                        <group string="Additional Details">
+                            <!-- Add any additional deal-related fields here -->
+                        </group>
+                    </page>
+                    
+                    <!-- Commission Calculation Notebook -->
+                    <page string="Commission" name="commission">
+                        <group string="Commission Summary" colspan="2">
+                            <field name="amount_untaxed" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_external_commission" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_internal_commission" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_payable" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="company_net_commission" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="remaining_unallocated_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="commission_percentage" readonly="1" widget="percentage"/>
+                            <field name="commission_allocation_status" readonly="1" help="Shows if all commission amounts are properly allocated."/>
+                        </group>
+                        <notebook>
+                            <page string="External Commission">
+                                <group string="Broker Commission" colspan="2">
+                                    <field name="broker_partner_id" help="Select the broker partner."/>
+                                    <field name="broker_commission_type" help="Choose commission type: fixed or percentage."/>
+                                    <field name="broker_rate" modifiers="{&quot;invisible&quot;: [[&quot;broker_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter the broker commission rate."/>
+                                    <field name="broker_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Referral Commission" colspan="2">
+                                    <field name="referral_partner_id" help="Select the referral partner."/>
+                                    <field name="referral_commission_type" help="Choose commission type: fixed or percentage."/>
+                                    <field name="referral_rate" modifiers="{&quot;invisible&quot;: [[&quot;referral_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter the referral commission rate."/>
+                                    <field name="referral_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Cashback Commission" colspan="2">
+                                    <field name="cashback_partner_id" help="Select the cashback partner."/>
+                                    <field name="cashback_commission_type" help="Choose commission type: fixed or percentage."/>
+                                    <field name="cashback_rate" modifiers="{&quot;invisible&quot;: [[&quot;cashback_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter the cashback commission rate."/>
+                                    <field name="cashback_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Other Commission" colspan="2">
+                                    <field name="other_partner_id" help="Select the other commission partner."/>
+                                    <field name="other_commission_type" help="Choose commission type: untaxed total or fixed."/>
+                                    <field name="other_rate" modifiers="{&quot;invisible&quot;: [[&quot;other_commission_type&quot;, &quot;!=&quot;, &quot;untaxed_total&quot;]]}" help="Enter the other commission rate."/>
+                                    <field name="other_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;other_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}" help="Enter the other fixed commission amount."/>
+                                    <field name="other_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </page>
+                            <page string="Internal Commission">
+                                <field name="internal_commission_type" help="Choose internal commission type."/>
+                                <group string="Agent 1 Commission" colspan="2">
+                                    <field name="agent1_id" help="Select Agent 1."/>
+                                    <field name="agent1_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter Agent 1 commission rate."/>
+                                    <field name="agent1_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}" help="Enter Agent 1 fixed commission amount."/>
+                                    <field name="agent1_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Agent 2 Commission" colspan="2">
+                                    <field name="agent2_id" help="Select Agent 2."/>
+                                    <field name="agent2_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter Agent 2 commission rate."/>
+                                    <field name="agent2_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}" help="Enter Agent 2 fixed commission amount."/>
+                                    <field name="agent2_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Manager Commission" colspan="2">
+                                    <field name="manager_id" help="Select Manager."/>
+                                    <field name="manager_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter Manager commission rate."/>
+                                    <field name="manager_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}" help="Enter Manager fixed commission amount."/>
+                                    <field name="manager_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group string="Director Commission" colspan="2">
+                                    <field name="director_id" help="Select Director."/>
+                                    <field name="director_rate" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;=&quot;, &quot;fixed&quot;]]}" help="Enter Director commission rate."/>
+                                    <field name="director_fixed_amount" modifiers="{&quot;invisible&quot;: [[&quot;internal_commission_type&quot;, &quot;!=&quot;, &quot;fixed&quot;]]}" help="Enter Director fixed commission amount."/>
+                                    <field name="director_commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </page>
+                            <page string="Processing" name="commission_processing">
+                                <group string="Commission Actions" colspan="2">
+                                    <field name="commission_processed" invisible="1"/>
+                                    <button name="action_calculate_commission" 
+                                            string="Calculate Commission" 
+                                            type="object" 
+                                            class="btn-primary"/>
+                                    <button name="action_create_commission_po" 
+                                            string="Create Commission POs"
+                                            type="object" 
+                                            class="btn-primary"
+                                            modifiers="{&quot;invisible&quot;: [[&quot;commission_processed&quot;, &quot;=&quot;, true]]}"/>
+                                    <field name="commission_purchase_order_count" widget="statinfo" string="Commission POs" help="Number of commission purchase orders created."/>
+                                </group>
+                                <group string="Commission Status" colspan="2">
+                                    <field name="commission_status" widget="statusbar" statusbar_visible="draft,confirmed,paid" help="Current commission status."/>
+                                    <field name="commission_payment_date" modifiers="{&quot;invisible&quot;: [[&quot;commission_status&quot;, &quot;not in&quot;, [&quot;confirmed&quot;, &quot;paid&quot;]]]}" help="Date when commission was paid."/>
+                                    <field name="commission_reference" modifiers="{&quot;invisible&quot;: [[&quot;commission_status&quot;, &quot;not in&quot;, [&quot;confirmed&quot;, &quot;paid&quot;]]]}" help="Reference for commission payment."/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </page>
+                </notebook>
+            </xpath>
+            
+            <!-- Add smart button for commission POs -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_related_purchase_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-shopping-cart">
+                    <field name="commission_purchase_order_count" widget="statinfo" string="Commission POs"/>
+                </button>
+            </xpath>
+            
+            <!-- Add commission status to tree view -->
+            <xpath expr="//tree//field[@name='name']" position="after">
+                <field name="commission_status"/>
+                <field name="total_payable" sum="Total Commission Payable"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Add commission filters to search view -->
+    <record id="view_sales_order_filter_commission" model="ir.ui.view">
+        <field name="name">sale.order.search.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <filter string="Unprocessed Commissions" name="unprocessed_commissions" 
+                        domain="[('commission_processed','=',False),('total_payable','>',0)]"/>
+                <filter string="Processed Commissions" name="processed_commissions" 
+                        domain="[('commission_processed','=',True)]"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Commission Status" name="commission_status" context="{'group_by':'commission_status'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
