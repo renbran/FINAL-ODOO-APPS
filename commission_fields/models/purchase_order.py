@@ -81,3 +81,4 @@ class PurchaseOrderLine(models.Model):
 
 # Ensure there are NO commission UI logic or field visibility logic for external_commission_type, show_external_percentage, or _compute_show_commission_fields in this file.
 # This file is clean and does not define or depend on those fields or methods.
+# If you see any @api.depends or compute fields referencing external_commission_type, remove them.
