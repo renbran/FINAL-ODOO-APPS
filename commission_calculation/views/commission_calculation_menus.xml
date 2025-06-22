@@ -1,0 +1,10 @@
+<odoo>
+    <menuitem id="menu_commission_calculation_root" name="Commission Calculation" sequence="10"/>
+    <menuitem id="menu_commission_calculation" name="Commission Calculations" parent="menu_commission_calculation_root" action="action_commission_calculation"/>
+
+    <record id="action_commission_calculation" model="ir.actions.act_window">
+        <field name="name">Commission Calculations</field>
+        <field name="res_model">commission.calculation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

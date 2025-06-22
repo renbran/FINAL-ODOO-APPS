@@ -1,0 +1,66 @@
+<odoo>
+    <record id="view_commission_calculation_form" model="ir.ui.view">
+        <field name="name">commission.calculation.form</field>
+        <field name="model">commission.calculation</field>
+        <field name="arch" type="xml">
+            <form string="Commission Calculation">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sale_order_id"/>
+                        <field name="total_untaxed_amount" readonly="1"/>
+                        <field name="total_external" readonly="1"/>
+                        <field name="total_internal" readonly="1"/>
+                        <field name="total_payable" readonly="1"/>
+                        <field name="company_net_commission" readonly="1"/>
+                        <field name="gross_share" readonly="1"/>
+                        <field name="notes"/>
+                    </group>
+                    <notebook>
+                        <page string="Commission Lines">
+                            <field name="commission_line_ids">
+                                <tree editable="bottom">
+                                    <field name="commission_party_type"/>
+                                    <field name="partner_id" attrs="{'invisible': [('commission_party_type', '!=', 'external')]}"/>
+                                    <field name="employee_id" attrs="{'invisible': [('commission_party_type', '!=', 'internal')]}"/>
+                                    <field name="commission_basis"/>
+                                    <field name="commission_rate"/>
+                                    <field name="commission_amount" readonly="1"/>
+                                    <field name="notes"/>
+                                </tree>
+                                <form string="Commission Line">
+                                    <group>
+                                        <field name="commission_party_type"/>
+                                        <field name="partner_id" attrs="{'invisible': [('commission_party_type', '!=', 'external')]}"/>
+                                        <field name="employee_id" attrs="{'invisible': [('commission_party_type', '!=', 'internal')]}"/>
+                                        <field name="commission_basis"/>
+                                        <field name="commission_rate"/>
+                                        <field name="commission_amount" readonly="1"/>
+                                        <field name="notes"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commission_calculation_tree" model="ir.ui.view">
+        <field name="name">commission.calculation.tree</field>
+        <field name="model">commission.calculation</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Calculations">
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="total_untaxed_amount"/>
+                <field name="total_external"/>
+                <field name="total_internal"/>
+                <field name="total_payable"/>
+                <field name="company_net_commission"/>
+                <field name="gross_share"/>
+            </tree>
+        </field>
+    </record>
+</odoo>
