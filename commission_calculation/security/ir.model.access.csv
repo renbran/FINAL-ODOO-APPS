@@ -1,3 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_commission_calculation,access_commission_calculation,model_commission_calculation,base.group_user,1,1,1,1
-access_commission_calculation_line,access_commission_calculation_line,model_commission_calculation_line,base.group_user,1,1,1,1
+# No custom models in this module; access rights are managed by sale.order and standard models.
