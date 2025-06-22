@@ -9,7 +9,7 @@
             <!-- Group all deal info fields together after client_order_ref -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <group string="Deal Information">
-                    <field name="deal_id"/>
+                    <!-- <field name="deal_id"/> -->
                     <field name="booking_date"/>
                     <field name="buyer_id"/>
                     <field name="project_id"/>
@@ -143,7 +143,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="deal_id"/>
+                <!-- <field name="deal_id"/> -->
                 <field name="commission_status"/>
                 <field name="broker_commission" sum="Total Broker Commission"/>
                 <field name="commission_percentage"/>
@@ -158,7 +158,7 @@
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="deal_id"/>
+                <!-- <field name="deal_id"/> -->
                 <field name="commission_reference"/>
                 <field name="buyer_id"/>
             </xpath>

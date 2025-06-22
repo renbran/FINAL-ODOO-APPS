@@ -376,57 +376,6 @@
                                 </group>
                             </page>
                             <page string="Documents" name="property_documents">
-                                <field name="document_ids">
-                                    <form>
-                                        <group>
-                                            <group>
-                                                <field name="doc_type" required="1"/>
-                                                <field name="file_name" invisible="1"/>
-                                                <field name="document" required="1"
-                                                       filename="file_name"/>
-                                            </group>
-                                            <group>
-                                                <field name="document_date" required="1"/>
-                                            </group>
-                                        </group>
-                                    </form>
-                                    <kanban>
-                                        <field name="id"/>
-                                        <field name="doc_type"/>
-                                        <field name="document"/>
-                                        <field name="document_date"/>
-                                        <templates>
-                                            <t t-name="kanban-box">
-                                                <div class="oe_kanban_global_click border-primary"
-                                                     style="width:500px">
-                                                    <div class="row">
-                                                        <div class="col-8 mb-2">
-                                                            <h5>
-                                                                <strong>
-                                                                    <field name="doc_type"/>
-                                                                </strong>
-                                                            </h5>
-                                                        </div>
-                                                        <div class="col-4 mb-2 text-end">
-                                                            <field name="document_date"
-                                                                   widget="badge"
-                                                                   decoration-info="document_date"/>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <h6>
-                                                                <field name="file_name"
-                                                                       invisible="1"/>
-                                                                <field name="document"
-                                                                       widget="binary"
-                                                                       filename="file_name"/>
-                                                            </h6>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </t>
-                                        </templates>
-                                    </kanban>
-                                </field>
                             </page>
                             <page string="Amenities" name="property_amenities"
                                   invisible="not amenities">
