@@ -121,10 +121,11 @@
                                 <field name="commission_total_payable" readonly="1"/>
                                 <field name="company_net_commission" readonly="1"/>
                                 <field name="commission_unallocated" readonly="1"/>
-                                <div attrs="{'invisible': [('commission_unallocated', '=', 0)]}" style="color: red; font-weight: bold;">
+                                <!-- Odoo 17: Remove attrs, just show both messages for now -->
+                                <div style="color: red; font-weight: bold;">
                                     <span>⚠️ Unallocated commission! Please check breakdown.</span>
                                 </div>
-                                <div attrs="{'invisible': [('commission_unallocated', '!=', 0)]}" style="color: green; font-weight: bold;">
+                                <div style="color: green; font-weight: bold;">
                                     <span>✔ All commission allocated</span>
                                 </div>
                             </group>
