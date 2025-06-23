@@ -1,65 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_osus_bill_document">
-        <t t-call="web.external_layout">
-            <div style="background: transparent; padding: 0;">
-                <!-- Header Section -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <img src="/osus_invoice_report/static/src/img/osus_logo.png" style="height: 60px; margin-top: 10px;"/>
-                    <div style="text-align: right;">
-                        <span style="font-size: 13px; font-weight: bold;">OSUS PROPERTIES</span><br/>
-                        SINGLE TOWER FLOOR 29 OFFICE 02 &amp; 03 BUSINESS BAY<br/>
-                        Building 7 4th floor<br/>
-                        Dubai DU 00000<br/>
-                        United Arab Emirates
+    <data>
+        <!-- OSUS Bill Report Template -->
+        <template id="report_osus_bill_document">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-family: Arial, sans-serif;">
+                    <style>
+                        .osus-bill-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 20px;
+                            padding-bottom: 15px;
+                            border-bottom: 2px solid #b20000;
+                        }
+                        .osus-bill-logo {
+                            width: 45%;
+                        }
+                        .osus-bill-company {
+                            width: 45%;
+                            text-align: right;
+                            font-size: 13px;
+                        }
+                        .osus-bill-title {
+                            color: #b20000;
+                            font-size: 24px;
+                            font-weight: bold;
+                            margin: 20px 0;
+                        }
+                        .osus-bill-client {
+                            text-align: right;
+                            font-size: 14px;
+                            margin-bottom: 15px;
+                            font-weight: bold;
+                        }
+                        .osus-bill-info {
+                            width: 100%;
+                            margin-bottom: 20px;
+                        }
+                        .osus-bill-info td {
+                            padding: 5px 10px;
+                            border: none;
+                            font-size: 13px;
+                        }
+                        .osus-bill-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            border: 2px solid #222;
+                            margin-bottom: 20px;
+                        }
+                        .osus-bill-table th {
+                            background: #fff;
+                            color: #222;
+                            padding: 10px;
+                            text-align: left;
+                            font-weight: bold;
+                            border: 1px solid #222;
+                        }
+                        .osus-bill-table td {
+                            padding: 8px 10px;
+                            border: 1px solid #222;
+                            font-size: 13px;
+                        }
+                        .osus-bill-totals {
+                            float: right;
+                            margin-top: 20px;
+                        }
+                        .osus-bill-totals table {
+                            border-collapse: collapse;
+                        }
+                        .osus-bill-totals td {
+                            padding: 5px 15px;
+                            border: none;
+                            text-align: right;
+                            font-size: 13px;
+                        }
+                        .osus-bill-total-row {
+                            font-weight: bold;
+                            color: #b20000;
+                            font-size: 14px;
+                        }
+                        .osus-bill-payment {
+                            margin-top: 40px;
+                            font-size: 12px;
+                            color: #888;
+                            clear: both;
+                        }
+                    </style>
+                    
+                    <!-- Header Section -->
+                    <div class="osus-bill-header">
+                        <div class="osus-bill-logo">
+                            <!-- Logo placeholder - you can add actual logo path here -->
+                            <div style="width: 120px; height: 60px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd;">
+                                <span style="font-size: 10px; color: #888;">OSUS LOGO</span>
+                            </div>
+                        </div>
+                        <div class="osus-bill-company">
+                            <strong>OSUS PROPERTIES</strong><br/>
+                            SINGLE TOWER FLOOR 29 OFFICE 02 &amp; 03 BUSINESS BAY<br/>
+                            Building 7 4th floor<br/>
+                            Dubai DU 00000<br/>
+                            United Arab Emirates
+                        </div>
+                    </div>
+
+                    <!-- Client Name -->
+                    <div class="osus-bill-client">
+                        <span t-field="o.partner_id.name"/>
+                    </div>
+
+                    <!-- Bill Title -->
+                    <h2 class="osus-bill-title">TAX Invoice INV/<span t-field="o.name"/></h2>
+
+                    <!-- Bill Information -->
+                    <table class="osus-bill-info">
+                        <tr>
+                            <td><strong>Invoice Date:</strong> <span t-field="o.invoice_date"/></td>
+                            <td><strong>Due Date:</strong> <span t-field="o.invoice_date_due"/></td>
+                            <td><strong>Source:</strong> <span t-field="o.invoice_origin"/></td>
+                            <td><strong>Reference:</strong> <span t-field="o.ref"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Main Bill Table -->
+                    <table class="osus-bill-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">DESCRIPTION</th>
+                                <th style="width: 10%;">QUANTITY</th>
+                                <th style="width: 15%;">UNIT PRICE</th>
+                                <th style="width: 10%;">VAT</th>
+                                <th style="width: 15%;">VAT AMOUNT</th>
+                                <th style="width: 15%;">AMOUNT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="line">
+                                <td><span t-field="line.name"/></td>
+                                <td><span t-field="line.quantity"/></td>
+                                <td><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td>
+                                    <span t-if="line.tax_ids">
+                                        <t t-foreach="line.tax_ids" t-as="tax">
+                                            <span t-field="tax.amount"/>%<t t-if="not tax_last">, </t>
+                                        </t>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                                <td><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Totals Section -->
+                    <div class="osus-bill-totals">
+                        <table>
+                            <tr>
+                                <td><strong>Untaxed Amount:</strong></td>
+                                <td><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VAT:</strong></td>
+                                <td><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            </tr>
+                            <tr class="osus-bill-total-row">
+                                <td><strong>Total:</strong></td>
+                                <td><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Payment Communication -->
+                    <div class="osus-bill-payment">
+                        <strong>Payment Communication:</strong> <span t-field="o.ref"/>
                     </div>
                 </div>
-                <hr style="margin: 10px 0;"/>
-                <div style="text-align: right; font-size: 13px; margin-bottom: 10px;">
-                    <span t-esc="o.partner_id.name"/>
-                </div>
-                <h2 style="color: #b20000; margin: 10px 0;">TAX Invoice INV/<span t-esc="o.name"/></h2>
-                <table style="width: 100%; margin-bottom: 10px;">
-                    <tr>
-                        <td><strong>Invoice Date:</strong> <span t-esc="o.invoice_date"/></td>
-                        <td><strong>Due Date:</strong> <span t-esc="o.invoice_date_due"/></td>
-                        <td><strong>Source:</strong> <span t-esc="o.source"/></td>
-                        <td><strong>Reference:</strong> <span t-esc="o.ref"/></td>
-                    </tr>
-                </table>
-                <table class="table table-sm" style="width: 100%; border: 1px solid #222;">
-                    <thead style="background: #fff; color: #222;">
-                        <tr>
-                            <th>DESCRIPTION</th>
-                            <th>QUANTITY</th>
-                            <th>UNIT PRICE</th>
-                            <th>VAT</th>
-                            <th>VAT AMOUNT</th>
-                            <th>AMOUNT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="o.invoice_line_ids" t-as="line">
-                            <td t-esc="line.name"/>
-                            <td t-esc="line.quantity"/>
-                            <td t-esc="line.price_unit"/>
-                            <td t-esc="line.tax_ids[0].amount if line.tax_ids else ''"/>
-                            <td t-esc="line.price_total - line.price_subtotal"/>
-                            <td t-esc="line.price_total"/>
-                        </tr>
-                    </tbody>
-                </table>
-                <div style="margin-top: 10px; text-align: right;">
-                    <table style="float: right;">
-                        <tr><td>Untaxed Amount</td><td t-esc="o.amount_untaxed"/></tr>
-                        <tr><td>VAT</td><td t-esc="o.amount_tax"/></tr>
-                        <tr style="font-weight: bold; color: #b20000;"><td>Total</td><td t-esc="o.amount_total"/></tr>
-                    </table>
-                </div>
-                <div style="margin-top: 20px; font-size: 12px; color: #888;">
-                    Payment Communication: <span t-esc="o.ref"/>
-                </div>
-            </div>
-        </t>
-    </template>
+            </t>
+        </template>
+    </data>
 </odoo>
