@@ -1,4 +1,4 @@
-x{
+{
     'name': 'OSUS Invoice Report',
     'version': '17.0.1.0.0',
     'summary': 'Custom transparent invoice report for OSUS PROPERTIES',
