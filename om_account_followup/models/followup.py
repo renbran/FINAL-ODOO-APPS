@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, logging _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+import logging
 
 
 
@@ -38,11 +39,12 @@ class FollowupLine(models.Model):
         return values
 
     name = fields.Char('Follow-Up Action', required=True)
-    sequence = fields.Integer('Sequence', compute='_compute_sequence',
-                              store=False,
-                              help="Gives the sequence order when displaying a list of follow-up lines.")
-    followup_id = fields.Many2one('followup.followup', 'Follow Ups',
-                                  required=True, ondelete="cascade")
+    sequence = fields.Integer(
+        'Sequence',
+        compute='_compute_sequence',
+        store=False,
+        help="Gives the sequence order when displaying a list of follow-up lines."
+    )
     delay = fields.Integer('Due Days',
                            help="The number of days after the due date of the "
                                 "invoice to wait before sending the reminder. Could be negative if you want "
@@ -69,9 +71,9 @@ Best Regards,
                                         "manual action to be taken for that customer. ")
     manual_action_note = fields.Text('Action To Do')
     manual_action_responsible_id = fields.Many2one('res.users',
-                                                   string='Assign a Responsible', ondelete='set null')
+                                                   string='Assign a Responsible', ondelete='set_null')
     email_template_id = fields.Many2one('mail.template', 'Email Template',
-                                        ondelete='set null')
+                                        ondelete='set_null')
 
     _sql_constraints = [('days_uniq', 'unique(followup_id, delay)',
                          'Days of the follow-up levels must be different')]
