@@ -11,7 +11,7 @@ x{
         'report/report_action.xml',
         'report/bill_report.xml',
         'report/bill_report_action.xml',
-        'osus_invoice_report_view.xml',
+        'views/osus_invoice_report_view.xml',
     ],
     'installable': True,
     'application': False,
