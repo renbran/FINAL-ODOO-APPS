@@ -27,10 +27,9 @@
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
                         </group>
-                        <group string="Commission Summary">
-                            <field name="developer_commission"/>
-                            <field name="total_internal_commission" readonly="1"/>
+                        <group string="Commission Summary (Enhanced)">
                             <field name="total_external_commission" readonly="1"/>
+                            <field name="total_internal_commission" readonly="1"/>
                             <field name="grand_total_commission" readonly="1"/>
                             <field name="commission_allocation_status" readonly="1"/>
                             <field name="commission_variance" readonly="1"/>
@@ -111,6 +110,70 @@
                                     <field name="director_commission" readonly="1"/>
                                 </group>
                             </group>
+                        </page>
+
+                        <!-- FLAT COMMISSION STRUCTURE (NEW) -->
+                        <page string="Flat Commission (New)">
+                            <group string="Commission Summary">
+                                <field name="commission_base"/>
+                                <field name="commission_total_external" readonly="1"/>
+                                <field name="commission_total_internal" readonly="1"/>
+                                <field name="commission_total_payable" readonly="1"/>
+                                <field name="company_net_commission" readonly="1"/>
+                                <field name="commission_unallocated" readonly="1"/>
+                                <div attrs="{'invisible': [('commission_unallocated', '=', 0)]}" style="color: red; font-weight: bold;">
+                                    <span>⚠️ Unallocated commission! Please check breakdown.</span>
+                                </div>
+                                <div attrs="{'invisible': [('commission_unallocated', '!=', 0)]}" style="color: green; font-weight: bold;">
+                                    <span>✔ All commission allocated</span>
+                                </div>
+                            </group>
+                            <notebook>
+                                <page string="🟫 External Commission (Partners)" name="flat_external_commission">
+                                    <group string="Broker Partner (Burgundy)">
+                                        <field name="ext_broker_partner"/>
+                                        <field name="ext_broker_rate"/>
+                                        <field name="ext_broker_amount" readonly="1"/>
+                                    </group>
+                                    <group string="Referral Partner (Burgundy)">
+                                        <field name="ext_referral_partner"/>
+                                        <field name="ext_referral_rate"/>
+                                        <field name="ext_referral_amount" readonly="1"/>
+                                    </group>
+                                    <group string="Cashback Partner (Burgundy)">
+                                        <field name="ext_cashback_partner"/>
+                                        <field name="ext_cashback_rate"/>
+                                        <field name="ext_cashback_amount" readonly="1"/>
+                                    </group>
+                                    <group string="Other Party (Burgundy)">
+                                        <field name="ext_other_partner"/>
+                                        <field name="ext_other_rate"/>
+                                        <field name="ext_other_amount" readonly="1"/>
+                                    </group>
+                                </page>
+                                <page string="🟨 Internal Commission (Employees)" name="flat_internal_commission">
+                                    <group string="👤 Agent 1 (Gold)">
+                                        <field name="int_agent1_employee"/>
+                                        <field name="int_agent1_rate"/>
+                                        <field name="int_agent1_amount" readonly="1"/>
+                                    </group>
+                                    <group string="👤 Agent 2 (Gold)">
+                                        <field name="int_agent2_employee"/>
+                                        <field name="int_agent2_rate"/>
+                                        <field name="int_agent2_amount" readonly="1"/>
+                                    </group>
+                                    <group string="🧑‍💼 Manager (Gold)">
+                                        <field name="int_manager_employee"/>
+                                        <field name="int_manager_rate"/>
+                                        <field name="int_manager_amount" readonly="1"/>
+                                    </group>
+                                    <group string="🧑‍💼 Director (Gold)">
+                                        <field name="int_director_employee"/>
+                                        <field name="int_director_rate"/>
+                                        <field name="int_director_amount" readonly="1"/>
+                                    </group>
+                                </page>
+                            </notebook>
                         </page>
                     </notebook>
                 </page>

@@ -457,6 +457,166 @@ class SaleOrder(models.Model):
         help="Count of purchase orders linked to this sale order"
     )
 
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
+
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    @api.depends(
+        'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_external_rate',
+        'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate',
+        'amount_untaxed', 'amount_total'
+    )
+    def _compute_commission_totals(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = untaxed
+            # External
+            rec.broker_agency_total = (rec.broker_agency_rate or 0) * price_unit / 100
+            rec.referral_total = (rec.referral_rate or 0) * price_unit / 100
+            rec.cashback_total = (rec.cashback_rate or 0) * untaxed / 100
+            rec.other_external_total = (rec.other_external_rate or 0) * price_unit / 100
+            # Internal
+            rec.agent1_commission = (rec.agent1_rate or 0) * base / 100
+            rec.agent2_commission = (rec.agent2_rate or 0) * base / 100
+            rec.manager_commission = (rec.manager_rate or 0) * base / 100
+            rec.director_commission = (rec.director_rate or 0) * base / 100
+            # Totals
+            rec.total_external_commission = rec.broker_agency_total + rec.referral_total + rec.cashback_total + rec.other_external_total
+            rec.total_internal_commission = rec.agent1_commission + rec.agent2_commission + rec.manager_commission + rec.director_commission
+            rec.grand_total_commission = rec.total_external_commission + rec.total_internal_commission
+
+    @api.depends('grand_total_commission', 'amount_untaxed')
+    def _compute_allocation_status(self):
+        for rec in self:
+            base = rec.amount_untaxed or 0.0
+            commission_total = rec.grand_total_commission or 0.0
+            rec.commission_variance = base - commission_total
+            rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            tolerance = 0.01
+            if abs(commission_total - base) <= tolerance:
+                rec.commission_allocation_status = 'full'
+            elif commission_total < base - tolerance:
+                rec.commission_allocation_status = 'under'
+            else:
+                rec.commission_allocation_status = 'over'
+
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
+
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    @api.depends(
+        'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_external_rate',
+        'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate',
+        'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = untaxed
+
+            # External
+            rec.ext_broker_amount = (rec.ext_broker_rate or 0) * price_unit / 100
+            rec.ext_referral_amount = (rec.ext_referral_rate or 0) * price_unit / 100
+            rec.ext_cashback_amount = (rec.ext_cashback_rate or 0) * untaxed / 100
+            rec.ext_other_amount = (rec.ext_other_rate or 0) * price_unit / 100
+
+            # Internal
+            rec.int_agent1_amount = (rec.int_agent1_rate or 0) * base / 100
+            rec.int_agent2_amount = (rec.int_agent2_rate or 0) * base / 100
+            rec.int_manager_amount = (rec.int_manager_rate or 0) * base / 100
+            rec.int_director_amount = (rec.int_director_rate or 0) * base / 100
+
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
     # ===========================================
     # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
     # ===========================================
