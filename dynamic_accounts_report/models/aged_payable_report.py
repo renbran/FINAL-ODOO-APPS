@@ -57,7 +57,10 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                diffrence = (today - val['date_maturity']).days
+                if val['date_maturity']:
+                    diffrence = (today - val['date_maturity']).days
+                else:
+                    diffrence = 0  # or None, or handle as needed
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
@@ -124,7 +127,10 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                diffrence = (today - val['date_maturity']).days
+                if val['date_maturity']:
+                    diffrence = (today - val['date_maturity']).days
+                else:
+                    diffrence = 0  # or None, or handle as needed
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
