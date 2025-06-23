@@ -1,4 +1,4 @@
-{
+x{
     'name': 'OSUS Invoice Report',
     'version': '17.0.1.0.0',
     'summary': 'Custom transparent invoice report for OSUS PROPERTIES',
@@ -11,7 +11,7 @@
         'report/report_action.xml',
         'report/bill_report.xml',
         'report/bill_report_action.xml',
-        'osus_invoice_report_view.xml',
+        'views/osus_invoice_report_view.xml',
     ],
     'installable': True,
     'application': False,
