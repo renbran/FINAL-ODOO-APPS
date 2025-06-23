@@ -57,7 +57,7 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                if val['date_maturity']:
+                if val['date_maturity'] and isinstance(val['date_maturity'], (fields.Date, fields.Datetime, type(fields.Date.today()))):
                     diffrence = (today - val['date_maturity']).days
                 else:
                     diffrence = 0  # or None, or handle as needed
@@ -127,7 +127,7 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                if val['date_maturity']:
+                if val['date_maturity'] and isinstance(val['date_maturity'], (fields.Date, fields.Datetime, type(fields.Date.today()))):
                     diffrence = (today - val['date_maturity']).days
                 else:
                     diffrence = 0  # or None, or handle as needed
