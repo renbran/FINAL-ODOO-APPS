@@ -157,11 +157,7 @@ class SaleOrder(models.Model):
     )
     
     broker_agency_commission_type = fields.Selection(
-        COMMISSION_TYPE_SELECTION,
-        string="Broker/Agency Commission Type",
-        default='unit_price',
-        tracking=True,
-        help="How to compute the broker/agency commission."
+        COMMISSION_TYPE_SELECTION, string='Broker/Agency Calculation Type', default='unit_price'
     )
     
     broker_agency_rate = fields.Float(
@@ -187,11 +183,7 @@ class SaleOrder(models.Model):
     )
     
     referral_commission_type = fields.Selection(
-        COMMISSION_TYPE_SELECTION,
-        string="Referral Commission Type",
-        default='unit_price',
-        tracking=True,
-        help="How to compute the referral commission."
+        COMMISSION_TYPE_SELECTION, string='Referral Calculation Type', default='unit_price'
     )
     
     referral_rate = fields.Float(
@@ -217,11 +209,7 @@ class SaleOrder(models.Model):
     )
     
     cashback_commission_type = fields.Selection(
-        COMMISSION_TYPE_SELECTION,
-        string="Cashback Commission Type",
-        default='unit_price',
-        tracking=True,
-        help="How to compute the cashback commission."
+        COMMISSION_TYPE_SELECTION, string='Cashback Calculation Type', default='unit_price'
     )
     
     cashback_rate = fields.Float(
@@ -247,11 +235,7 @@ class SaleOrder(models.Model):
     )
     
     other_external_commission_type = fields.Selection(
-        COMMISSION_TYPE_SELECTION,
-        string="Other External Commission Type",
-        default='unit_price',
-        tracking=True,
-        help="How to compute the other external commission."
+        COMMISSION_TYPE_SELECTION, string='Other External Calculation Type', default='unit_price'
     )
     
     other_external_rate = fields.Float(
@@ -289,6 +273,10 @@ class SaleOrder(models.Model):
         help="Select any partner as Agent 1 for internal commission."
     )
     
+    agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Calculation Type', default='unit_price'
+    )
+    
     agent1_rate = fields.Float(
         string='Agent 1 Rate (%)', 
         tracking=True, 
@@ -316,6 +304,10 @@ class SaleOrder(models.Model):
         tracking=True,
         domain="[]",
         help="Select any partner as Agent 2 for internal commission."
+    )
+    
+    agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Calculation Type', default='unit_price'
     )
     
     agent2_rate = fields.Float(
@@ -347,6 +339,10 @@ class SaleOrder(models.Model):
         help="Select any partner as Manager for internal commission."
     )
     
+    manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Calculation Type', default='unit_price'
+    )
+    
     manager_rate = fields.Float(
         string='Manager Rate (%)', 
         tracking=True, 
@@ -374,6 +370,10 @@ class SaleOrder(models.Model):
         tracking=True,
         domain="[]",
         help="Select any partner as Director for internal commission."
+    )
+    
+    director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Calculation Type', default='unit_price'
     )
     
     director_rate = fields.Float(
