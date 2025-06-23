@@ -137,21 +137,25 @@
                                 <page string="🟫 External Commission (Partners)" name="flat_external_commission">
                                     <group string="Broker Partner (Burgundy)">
                                         <field name="ext_broker_partner"/>
+                                        <field name="ext_broker_commission_type"/>
                                         <field name="ext_broker_rate"/>
                                         <field name="ext_broker_amount" readonly="1"/>
                                     </group>
                                     <group string="Referral Partner (Burgundy)">
                                         <field name="ext_referral_partner"/>
+                                        <field name="ext_referral_commission_type"/>
                                         <field name="ext_referral_rate"/>
                                         <field name="ext_referral_amount" readonly="1"/>
                                     </group>
                                     <group string="Cashback Partner (Burgundy)">
                                         <field name="ext_cashback_partner"/>
+                                        <field name="ext_cashback_commission_type"/>
                                         <field name="ext_cashback_rate"/>
                                         <field name="ext_cashback_amount" readonly="1"/>
                                     </group>
                                     <group string="Other Party (Burgundy)">
                                         <field name="ext_other_partner"/>
+                                        <field name="ext_other_commission_type"/>
                                         <field name="ext_other_rate"/>
                                         <field name="ext_other_amount" readonly="1"/>
                                     </group>
@@ -159,21 +163,25 @@
                                 <page string="🟨 Internal Commission (Employees)" name="flat_internal_commission">
                                     <group string="👤 Agent 1 (Gold)">
                                         <field name="int_agent1_employee"/>
+                                        <field name="int_agent1_commission_type"/>
                                         <field name="int_agent1_rate"/>
                                         <field name="int_agent1_amount" readonly="1"/>
                                     </group>
                                     <group string="👤 Agent 2 (Gold)">
                                         <field name="int_agent2_employee"/>
+                                        <field name="int_agent2_commission_type"/>
                                         <field name="int_agent2_rate"/>
                                         <field name="int_agent2_amount" readonly="1"/>
                                     </group>
                                     <group string="🧑‍💼 Manager (Gold)">
                                         <field name="int_manager_employee"/>
+                                        <field name="int_manager_commission_type"/>
                                         <field name="int_manager_rate"/>
                                         <field name="int_manager_amount" readonly="1"/>
                                     </group>
                                     <group string="🧑‍💼 Director (Gold)">
                                         <field name="int_director_employee"/>
+                                        <field name="int_director_commission_type"/>
                                         <field name="int_director_rate"/>
                                         <field name="int_director_amount" readonly="1"/>
                                     </group>

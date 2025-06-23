@@ -502,6 +502,69 @@ class SaleOrder(models.Model):
     int_director_rate = fields.Float(string='Director Rate (%)')
     int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
 
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
+    @api.depends(
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = rec.commission_base or untaxed
+            # External
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
+            # Internal
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
+        self.ensure_one()
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
+
     @api.depends(
         'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_external_rate',
         'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate',
@@ -587,35 +650,68 @@ class SaleOrder(models.Model):
     int_director_rate = fields.Float(string='Director Rate (%)')
     int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
 
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
     @api.depends(
-        'broker_agency_rate', 'referral_rate', 'cashback_rate', 'other_external_rate',
-        'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate',
-        'amount_untaxed', 'amount_total'
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
     )
     def _compute_flat_commissions(self):
         for rec in self:
             price_unit = rec.amount_total or 0.0
             untaxed = rec.amount_untaxed or 0.0
-            base = untaxed
-
+            base = rec.commission_base or untaxed
             # External
-            rec.ext_broker_amount = (rec.ext_broker_rate or 0) * price_unit / 100
-            rec.ext_referral_amount = (rec.ext_referral_rate or 0) * price_unit / 100
-            rec.ext_cashback_amount = (rec.ext_cashback_rate or 0) * untaxed / 100
-            rec.ext_other_amount = (rec.ext_other_rate or 0) * price_unit / 100
-
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
             # Internal
-            rec.int_agent1_amount = (rec.int_agent1_rate or 0) * base / 100
-            rec.int_agent2_amount = (rec.int_agent2_rate or 0) * base / 100
-            rec.int_manager_amount = (rec.int_manager_rate or 0) * base / 100
-            rec.int_director_amount = (rec.int_director_rate or 0) * base / 100
-
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
             # Totals
             rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
             rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
             rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
             rec.company_net_commission = base - rec.commission_total_payable
             rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
+        self.ensure_one()
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
 
     # ===========================================
     # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
