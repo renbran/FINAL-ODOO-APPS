@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Placeholder for account.move view. Add your customizations here. -->
+    <record id="view_move_form_osus_invoice" model="ir.ui.view">
+        <field name="name">account.move.form.osus.invoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Example: Add a button for custom invoice report -->
+            <header position="inside">
+                <button name="action_print_osus_invoice" type="object" string="OSUS Invoice" class="btn-primary"/>
+                <button name="action_print_osus_bill" type="object" string="OSUS Bill" class="btn-secondary"/>
+            </header>
+        </field>
+    </record>
+</odoo>

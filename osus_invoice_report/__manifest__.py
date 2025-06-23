@@ -26,12 +26,6 @@
         'reports/bill_report.xml',
         'reports/report_actions.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'osus_invoice_report/static/src/css/report_style.css',
-        ],
-    },
-    'images': ['static/description/icon.png'],
     'installable': True,
     'auto_install': False,
     'application': False,
