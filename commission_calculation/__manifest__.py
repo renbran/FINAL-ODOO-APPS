@@ -1,18 +1,35 @@
 {
-    'name': 'Commission Calculation',
+    'name': 'Advanced Commission Management',
     'version': '17.0.1.0.0',
-    'summary': 'Refactored commission calculation with custom fields only, no computation',
-    'description': 'This module replaces the old commission field with custom fields and removes all computation logic.',
+    'category': 'Sales',
+    'summary': 'Comprehensive commission calculation and processing system',
+    'description': """
+        This module provides:
+        - Advanced commission calculation with external/internal groups
+        - Automatic PO generation for commissions
+        - Deal information tracking
+        - Commission payment processing
+    """,
     'author': 'Your Company',
     'website': 'https://yourcompany.com',
-    'category': 'Sales',
-    'depends': ['base', 'sale'],
+    'depends': [
+        'base',
+        'sale',
+        'purchase',
+        'account',
+        'hr'
+    ],
     'data': [
         'security/ir.model.access.csv',
+        'views/sale_order_views.xml',
+        'views/purchase_order_views.xml',
+        'views/account_move_views.xml',
         'views/commission_calculation_views.xml',
         'views/commission_calculation_menus.xml',
+        'data/commission_product_data.xml',
     ],
+    'demo': [],
     'installable': True,
-    'application': False,
+    'application': True,
     'license': 'LGPL-3',
 }
