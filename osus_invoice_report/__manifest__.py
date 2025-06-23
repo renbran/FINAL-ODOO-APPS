@@ -24,7 +24,7 @@
         'views/account_move_views.xml',
         'reports/invoice_report.xml',
         'reports/bill_report.xml',
-        'reports/report_actions.xml',
+        'reports/report_action.xml',
     ],
     'installable': True,
     'auto_install': False,
