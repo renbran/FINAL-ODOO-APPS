@@ -1,19 +1,39 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'OSUS Invoice Report',
     'version': '17.0.1.0.0',
-    'summary': 'Custom transparent invoice report for OSUS PROPERTIES',
-    'category': 'Accounting',
-    'author': 'OSUS PROPERTIES',
+    'category': 'Accounting/Accounting',
+    'summary': 'Custom Invoice and Bill Reports for OSUS Properties',
+    'description': """
+        Custom Invoice and Bill Reports for OSUS Properties
+        ===================================================
+        
+        This module provides custom invoice and bill report templates for OSUS Properties
+        with proper formatting and branding.
+        
+        Features:
+        - Custom Invoice Report with OSUS branding
+        - Custom Bill Report with OSUS branding
+        - Print buttons in invoice form view
+        - Professional PDF output
+    """,
+    'author': 'OSUS Properties',
     'website': 'https://osusproperties.com',
-    'depends': ['account'],
+    'depends': ['base', 'account'],
     'data': [
-        'report/invoice_report.xml',
-        'report/report_action.xml',
-        'report/bill_report.xml',
-        'report/bill_report_action.xml',
-        'views/osus_invoice_report_view.xml',
+        'views/account_move_views.xml',
+        'reports/invoice_report.xml',
+        'reports/bill_report.xml',
+        'reports/report_actions.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'osus_invoice_report/static/src/css/report_style.css',
+        ],
+    },
+    'images': ['static/description/icon.png'],
     'installable': True,
+    'auto_install': False,
     'application': False,
     'license': 'LGPL-3',
 }
