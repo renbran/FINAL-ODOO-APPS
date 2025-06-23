@@ -7,38 +7,20 @@
         This module provides advanced commission management capabilities
         for sales teams including internal and external commission tracking,
         calculation, and reporting.
-        
-        Features:
-        - Commission tracking for sales orders
-        - Internal and external commission management
-        - Broker commission handling
-        - Commission payment tracking
-        - Advanced reporting
-        - Security groups and access rights
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
     'category': 'Sales',
-    'depends': [
-        'sale_management',
-        'hr',
-        'account',
-        'purchase',
-        'product',
-        'commission_calculation',  # Added dependency for integration
-    ],
+    'depends': ['sale', 'hr', 'account'],
     'data': [
         'security/commission_security.xml',
         'security/ir.model.access.csv',
         'data/commission_data.xml',
-        'views/menu_items.xml',
         'views/sale_order_views.xml',
-        'views/purchase_order_views.xml',
+        'views/menu_items.xml',
         'views/account_move_views.xml',
-        'views/account_move_out_invoice_tree.xml',
-        'views/project_unit_views.xml',
-        'report/commission_report_templates.xml',
-        'report/commission_report_actions.xml'
+        'views/purchase_order_views.xml',
+        'views/account_move_out_invoice_tree.xml'
     ],
     'demo': [],
     'installable': True,
