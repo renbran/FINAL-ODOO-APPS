@@ -20,7 +20,6 @@
         'views/menu_items.xml',
         'views/account_move_views.xml',
         'views/purchase_order_views.xml',
-        'views/account_move_out_invoice_tree.xml'
     ],
     'demo': [],
     'installable': True,
