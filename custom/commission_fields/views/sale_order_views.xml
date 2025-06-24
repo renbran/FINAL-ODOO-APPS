@@ -16,21 +16,25 @@
             </xpath>
 
             <xpath expr="//page[@name='other_information']" position="after">
-                <page string="Commission" name="commission">
-                    <group>
+                <page string="Commission" name="commission">                    <group>
                         <group string="Commission Status">
-                            <field name="commission_status"/>
+                            <field name="commission_status" widget="badge" 
+                                   decoration-info="commission_status == 'draft'" 
+                                   decoration-warning="commission_status == 'calculated'"
+                                   decoration-success="commission_status in ['confirmed', 'paid']"
+                                   decoration-danger="commission_status == 'canceled'"/>
                             <field name="commission_sequence" readonly="1"/>
                             <field name="commission_payment_date"/>
                             <field name="commission_reference"/>
+                            <field name="commission_rejected_by" readonly="1" invisible="commission_status != 'canceled'"/>
+                            <field name="commission_rejected_date" readonly="1" invisible="commission_status != 'canceled'"/>
                         </group>
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
                         </group>
-                        <group string="Commission Summary">
-                            <field name="developer_commission"/>
-                            <field name="total_internal_commission" readonly="1"/>
+                        <group string="Commission Summary (Enhanced)">
                             <field name="total_external_commission" readonly="1"/>
+                            <field name="total_internal_commission" readonly="1"/>
                             <field name="grand_total_commission" readonly="1"/>
                             <field name="commission_allocation_status" readonly="1"/>
                             <field name="commission_variance" readonly="1"/>
@@ -86,12 +90,14 @@
                             <group>
                                 <group string="Agent 1">
                                     <field name="agent1_id"/>
+                                    <field name="agent1_commission_type"/>
                                     <field name="agent1_rate" invisible="not show_agent1_rate"/>
                                     <field name="agent1_fixed" invisible="not show_agent1_fixed"/>
                                     <field name="agent1_commission" readonly="1"/>
                                 </group>
                                 <group string="Agent 2">
                                     <field name="agent2_id"/>
+                                    <field name="agent2_commission_type"/>
                                     <field name="agent2_rate" invisible="not show_agent2_rate"/>
                                     <field name="agent2_fixed" invisible="not show_agent2_fixed"/>
                                     <field name="agent2_commission" readonly="1"/>
@@ -100,16 +106,17 @@
                             <group>
                                 <group string="Manager">
                                     <field name="manager_id"/>
+                                    <field name="manager_commission_type"/>
                                     <field name="manager_rate" invisible="not show_manager_rate"/>
                                     <field name="manager_fixed" invisible="not show_manager_fixed"/>
                                     <field name="manager_commission" readonly="1"/>
                                 </group>
                                 <group string="Director">
                                     <field name="director_id"/>
+                                    <field name="director_commission_type"/>
                                     <field name="director_rate" invisible="not show_director_rate"/>
                                     <field name="director_fixed" invisible="not show_director_fixed"/>
-                                    <field name="director_commission" readonly="1"/>
-                                </group>
+                                    <field name="director_commission" readonly="1"/>                                </group>
                             </group>
                         </page>
                     </notebook>
@@ -118,10 +125,31 @@
 
             <!-- Add commission buttons to header -->
             <xpath expr="//header//button[@name='action_confirm']" position="before">
-                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary"/>
-                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary"/>
-                <button name="action_pay_commission" string="Mark as Paid" type="object" class="btn-primary"/>
-                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary"/>
+                <button name="action_calculate_commission" 
+                        string="Calculate Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not show_calculate_button"/>
+                <button name="action_confirm_commission" 
+                        string="Confirm Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not show_confirm_button"/>
+                <button name="action_pay_commission" 
+                        string="Mark as Paid" 
+                        type="object" 
+                        class="btn-success"
+                        invisible="not show_pay_button"/>
+                <button name="action_reset_commission" 
+                        string="Reset Commission" 
+                        type="object" 
+                        class="btn-secondary"
+                        invisible="not show_reset_button"/>
+                <button name="action_reject_commission" 
+                        string="Reject Commission" 
+                        type="object" 
+                        class="btn-danger"
+                        invisible="not show_reject_button"/>
             </xpath>
 
             <xpath expr="//header" position="inside">
@@ -144,6 +172,13 @@
                     <field name="show_manager_fixed" invisible="1"/>
                     <field name="show_director_rate" invisible="1"/>
                     <field name="show_director_fixed" invisible="1"/>
+                    
+                    <!-- Button visibility fields -->
+                    <field name="show_calculate_button" invisible="1"/>
+                    <field name="show_confirm_button" invisible="1"/>
+                    <field name="show_reset_button" invisible="1"/>
+                    <field name="show_pay_button" invisible="1"/>
+                    <field name="show_reject_button" invisible="1"/>
                 </group>
             </xpath>
 
