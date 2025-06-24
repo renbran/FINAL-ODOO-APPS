@@ -12,6 +12,24 @@
         </field>
     </record>
 
+    <!-- Add commission fields to purchase order form -->
+    <record id="view_purchase_order_form_commission_fields" model="ir.ui.view">
+        <field name="name">purchase.order.form.commission.fields</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_information']" position="inside">
+                <group string="External Commission" name="external_commission_group">
+                    <field name="external_commission_type"/>
+                    <field name="external_percentage" invisible="not show_external_percentage"/>
+                    <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
+                    <field name="show_external_percentage" invisible="1"/>
+                    <field name="show_external_fixed_amount" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Add account field to purchase order line tree view -->
     <record id="view_purchase_order_line_tree_commission_account" model="ir.ui.view">
         <field name="name">purchase.order.line.tree.commission.account</field>
