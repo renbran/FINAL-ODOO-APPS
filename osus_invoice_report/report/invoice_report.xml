@@ -1,252 +1,148 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
-        <!-- OSUS Invoice Report Template -->
-        <template id="report_osus_invoice_document">
-            <t t-call="web.external_layout">
-                <div class="page" style="font-family: Arial, sans-serif;">
-                    <style>
-                        .osus-header {
-                            display: flex;
-                            justify-content: space-between;
-                            margin-bottom: 20px;
-                            padding-bottom: 15px;
-                            border-bottom: 2px solid #b20000;
-                        }
-                        .osus-company-details, .osus-vendor-details {
-                            width: 45%;
-                        }
-                        .osus-title {
-                            text-align: center;
-                            color: #b20000;
-                            font-size: 24px;
-                            font-weight: bold;
-                            margin: 20px 0;
-                        }
-                        .osus-info-table {
-                            width: 100%;
-                            margin-bottom: 20px;
-                        }
-                        .osus-info-table td {
-                            padding: 5px 10px;
-                            border: none;
-                        }
-                        .osus-main-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 20px;
-                        }
-                        .osus-main-table th {
-                            background: #b20000;
-                            color: white;
-                            padding: 10px;
-                            text-align: left;
-                            font-weight: bold;
-                        }
-                        .osus-main-table td {
-                            padding: 8px 10px;
-                            border: 1px solid #ddd;
-                        }
-                        .osus-totals {
-                            float: right;
-                            margin-top: 20px;
-                        }
-                        .osus-totals table {
-                            border-collapse: collapse;
-                        }
-                        .osus-totals td {
-                            padding: 5px 15px;
-                            border: none;
-                            text-align: right;
-                        }
-                        .osus-total-row {
-                            font-weight: bold;
-                            color: #b20000;
-                            font-size: 16px;
-                        }
-                        .osus-payment-section {
-                            margin-top: 40px;
-                            clear: both;
-                        }
-                        .osus-payment-header {
-                            background: #b20000;
-                            color: white;
-                            padding: 8px 15px;
-                            font-weight: bold;
-                            margin-bottom: 0;
-                        }
-                        .osus-payment-content {
-                            border: 2px solid #b20000;
-                            padding: 15px;
-                            margin-top: 0;
-                        }
-                        .osus-bank-table {
-                            width: 100%;
-                            margin-top: 10px;
-                        }
-                        .osus-bank-table td {
-                            padding: 5px;
-                            border: none;
-                        }
-                        .osus-footer {
-                            margin-top: 30px;
-                            font-size: 10px;
-                            color: #888;
-                            text-align: center;
-                            border-top: 1px solid #ddd;
-                            padding-top: 15px;
-                        }
-                        .osus-contact {
-                            color: #b20000;
-                            font-weight: bold;
-                        }
-                    </style>
-                    
-                    <!-- Header Section -->
-                    <div class="osus-header">
-                        <div class="osus-company-details">
-                            <strong>COMPANY DETAILS</strong><br/>
-                            <strong>OSUS PROPERTIES</strong><br/>
-                            SINGLE BUSINESS TOWER FLOOR 29 OFFICE 02 &amp; 03<br/>
-                            BUSINESS BAY<br/>
-                            Dubai 00000<br/>
-                            United Arab Emirates<br/>
-                            <strong>VAT:</strong> 100236589600003
-                        </div>
-                        <div class="osus-vendor-details">
-                            <strong>CLIENT DETAILS</strong><br/>
-                            <strong t-field="o.partner_id.name"/><br/>
-                            <t t-if="o.partner_id.street">
-                                <span t-field="o.partner_id.street"/><br/>
-                            </t>
-                            <t t-if="o.partner_id.street2">
-                                <span t-field="o.partner_id.street2"/><br/>
-                            </t>
-                            <t t-if="o.partner_id.city">
-                                <span t-field="o.partner_id.city"/>
-                            </t>
-                            <t t-if="o.partner_id.state_id">
-                                <span t-field="o.partner_id.state_id.name"/>
-                            </t>
-                            <t t-if="o.partner_id.zip">
-                                <span t-field="o.partner_id.zip"/>
-                            </t><br/>
-                            <t t-if="o.partner_id.country_id">
-                                <span t-field="o.partner_id.country_id.name"/><br/>
-                            </t>
-                            <t t-if="o.partner_id.vat">
-                                <strong>VAT:</strong> <span t-field="o.partner_id.vat"/>
-                            </t>
-                        </div>
-                    </div>
+<t t-name="account.report_invoice_document">
+    <t t-set="o" t-value="o.with_context(lang=lang)"/>
+    <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+    <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Tax Invoice</title>
+            <style>
+                body { font-family: Arial; line-height: 1.4; color: #333; }
+                table { width: 100%; border-collapse: collapse; }
+                th { background-color: #800020; color: white; padding: 8px; text-align: left; }
+                td { padding: 8px; border: 1px solid #ddd; }
+                .text-right { text-align: right; }
+                .text-center { text-align: center; }
+                .total-row { background-color: #800020; color: white; font-weight: bold; }
+                .section-title { font-weight: bold; margin: 15px 0 5px 0; }
+                .payment-table { width: 100%; margin-top: 10px; }
+                .payment-header { background-color: #800020; color: white; padding: 8px; }
+                .footer-note { text-align: center; margin-top: 30px; font-style: italic; color: #555; }
+            </style>
+        </head>
+        <body>
+            <!-- Company and Partner Details -->
+            <table>
+                <tr>
+                    <td style="width: 50%;">
+                        <strong>COMPANY DETAILS</strong><br/>
+                        <t t-out="o.company_id.name"/><br/>
+                        <t t-out="o.company_id.street"/><br/>
+                        <t t-out="o.company_id.city"/> 
+                        <t t-if="o.company_id.zip" t-out="o.company_id.zip"/><br/>
+                        <t t-out="o.company_id.country_id.name"/><br/>
+                        VAT: <t t-out="o.company_id.vat or ''"/>
+                    </td>
+                    <td style="width: 50%; text-align: right;">
+                        <strong>VENDOR DETAILS</strong><br/>
+                        <t t-out="o.partner_id.name"/><br/>
+                        <t t-out="o.partner_id.street"/><br/>
+                        <t t-out="o.partner_id.city"/><br/>
+                        <t t-out="o.partner_id.country_id.name"/><br/>
+                        VAT: <t t-out="o.partner_id.vat or ''"/>
+                    </td>
+                </tr>
+            </table>
 
-                    <!-- Invoice Title -->
-                    <h2 class="osus-title">TAX INVOICE INV/<span t-field="o.name"/></h2>
+            <!-- Invoice Header -->
+            <div style="text-align: center; margin: 15px 0;">
+                <h2>TAX INVOICE <t t-out="o.name or ''"/></h2>
+            </div>
 
-                    <!-- Invoice Information -->
-                    <table class="osus-info-table">
-                        <tr>
-                            <td><strong>Invoice Date:</strong> <span t-field="o.invoice_date"/></td>
-                            <td><strong>Due Date:</strong> <span t-field="o.invoice_date_due"/></td>
-                            <td><strong>Reference:</strong> <span t-field="o.ref"/></td>
-                        </tr>
-                    </table>
+            <!-- Dates -->
+            <table>
+                <tr>
+                    <td><strong>Invoice Date:</strong> <t t-out="format_uk_date(o.invoice_date)"/></td>
+                    <td style="text-align: center;"><strong>Due Date:</strong> <t t-out="format_uk_date(o.invoice_date_due)"/></td>
+                    <td style="text-align: right;"><strong>Booking Date:</strong> <t t-out="format_uk_date(o.booking_date)"/></td>
+                </tr>
+            </table>
 
-                    <!-- Main Invoice Table -->
-                    <table class="osus-main-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 40%;">DESCRIPTION</th>
-                                <th style="width: 10%;">QTY</th>
-                                <th style="width: 15%;">UNIT PRICE</th>
-                                <th style="width: 10%;">VAT %</th>
-                                <th style="width: 15%;">VAT AMOUNT</th>
-                                <th style="width: 15%;">TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="line">
-                                <td><span t-field="line.name"/></td>
-                                <td><span t-field="line.quantity"/></td>
-                                <td><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                <td>
-                                    <span t-if="line.tax_ids">
-                                        <t t-foreach="line.tax_ids" t-as="tax">
-                                            <span t-field="tax.amount"/>%<t t-if="not tax_last">, </t>
-                                        </t>
-                                    </span>
-                                </td>
-                                <td><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                    - <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                <td><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <table style="margin: 15px 0;">
+                <tr>
+                    <th>BUYER</th>
+                    <th>PROJECT</th>
+                    <th>UNIT</th>
+                    <th class="text-right">COMMISSION RATE</th>
+                    <th class="text-right">UNIT PRICE</th>
+                    <th class="text-center">VAT</th>
+                    <th class="text-right">VAT AMOUNT</th>
+                    <th class="text-right">AMOUNT</th>
+                </tr>
+                <tr>
+                    <td><t t-out="o.buyer_id.name or ''"/></td>
+                    <td><t t-out="o.project_id.name or ''"/></td>
+                    <td><t t-out="o.unit_id.name or ''"/></td>
+                    <td class="text-right">
+                        <t t-if="o.invoice_line_ids">
+                            <span t-esc="o.invoice_line_ids[0].quantity * 100" t-options="{'widget': 'float', 'precision': 2}"/>%
+                        </t>
+                        <t t-else="">0%</t>
+                    </td>
+                    <td class="text-right">
+                        <span t-field="o.invoice_line_ids[0].price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" t-if="o.invoice_line_ids"/>
+                        <t t-else=""></t>
+                    </td>
+                    <td class="text-center"></td>
+                    <td class="text-right"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                    <td class="text-right"><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                </tr>
+            </table>
 
-                    <!-- Totals Section -->
-                    <div class="osus-totals">
-                        <table>
-                            <tr>
-                                <td><strong>Subtotal:</strong></td>
-                                <td><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                            </tr>
-                            <tr>
-                                <td><strong>VAT:</strong></td>
-                                <td><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                            </tr>
-                            <tr class="osus-total-row">
-                                <td><strong>TOTAL:</strong></td>
-                                <td><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
-                            </tr>
-                        </table>
-                    </div>
+            <!-- Totals -->
+            <table style="width: 40%; float: right;">
+                <tr>
+                    <td>Untaxed Amount</td>
+                    <td class="text-right"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="text-right"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Total</strong></td>
+                    <td class="text-right"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                </tr>
+            </table>
+            <div style="clear: both;"/>
 
-                    <!-- Amount in Words -->
-                    <div style="margin-top: 60px; clear: both;">
-                        <strong>Amount in Words:</strong><br/>
-                        <em><span t-field="o.currency_id.amount_to_text(o.amount_total)"/></em>
-                    </div>
+            <!-- Amount in Words -->
+            <div style="margin: 10px 0;">
+                <strong>Amount in Words (Total):</strong>
+                <t t-out="o.amount_total_words or ''"/>
+            </div>
 
-                    <!-- Payment Instructions -->
-                    <div class="osus-payment-section">
-                        <div class="osus-payment-header">Payment Instructions</div>
-                        <div class="osus-payment-content">
-                            <strong>Please pay to this Account Details by Cheque or Bank Transfer</strong>
-                            <table class="osus-bank-table">
-                                <tr>
-                                    <td style="width: 25%;"><strong>Bank Name:</strong></td>
-                                    <td>ABU DHABI COMMERCIAL BANK (ADCB)</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Account Name:</strong></td>
-                                    <td>OSUS REAL ESTATE BROKERAGE LLC</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Account No.:</strong></td>
-                                    <td>14041417820001 - AED</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>IBAN:</strong></td>
-                                    <td>AE35003001404141782000</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Branch:</strong></td>
-                                    <td>Business Bay</td>
-                                </tr>
-                            </table>
-                            <br/>
-                            <em><strong>Please include your reference number when making the payment: <span t-field="o.name"/></strong></em>
-                        </div>
-                    </div>
+            <!-- Payment Instructions -->
+            <div style="margin-top: 20px;">
+                <h4>Payment Instructions</h4>
+                <p>Please pay to this Account Details in Cheque or Bank Transfer</p>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="width: 30%;"><strong>Bank Name</strong></td>
+                        <td>ABU DHABI COMMERCIAL BANK (ADCB)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Account Name</strong></td>
+                        <td>OSUS REAL ESTATE BROKERAGE LLC</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Account No.</strong></td>
+                        <td>14041417820001 - AED</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IBAN</strong></td>
+                        <td>AE35003001404141782000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Branch</strong></td>
+                        <td>Business Bay</td>
+                    </tr>
+                </table>
+                <p style="font-style: italic;">Please include your reference number when making the payment</p>
+            </div>
 
-                    <!-- Footer -->
-                    <div class="osus-footer">
-                        This is a computer generated document. No signature or stamp required.<br/>
-                        <span class="osus-contact">☎ +971 55 775 6776 | ✉ info@osusproperties.com</span><br/>
-                        2902 - 2903, Single Tower, Business Bay, Dubai, UAE
-                    </div>
-                </div>
-            </t>
-        </template>
-    </data>
-</odoo>
+            <div style="text-align: center; margin-top: 30px; font-style: italic;">
+                This is a computer generated document. No signature or stamp required.
+            </div>
+        </body>
+    </html>
+</t>
