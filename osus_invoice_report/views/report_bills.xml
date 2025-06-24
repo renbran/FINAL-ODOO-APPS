@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_custom_bill">
-        <t t-name="account.report_bill_document_custom">
-            <t t-set="o" t-value="o.with_context(lang='en_GB')"/>
+        <t t-name="custom_reports.report_custom_bill">
+            <t t-set="o" t-value="doc.with_context(lang='en_GB')"/>
             <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
             
             <div class="container">
@@ -95,13 +95,4 @@
             </div>
         </t>
     </template>
-
-    <report
-        id="action_report_custom_bill"
-        name="custom_reports.report_custom_bill"
-        model="account.move"
-        report_type="qweb-pdf"
-        string="Custom Bill"
-        paperformat="report.paperformat_euro"
-    />
 </odoo>

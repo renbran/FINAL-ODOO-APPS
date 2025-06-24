@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_custom_receipt">
+        <t t-name="custom_reports.report_custom_receipt">
+            <t t-set="o" t-value="doc.with_context(lang='en_GB')"/>
+            <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+            
+            <div class="container">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h4>OSUS PROPERTIES</h4>
+                    <div>Business Bay, Dubai | TRN: <span t-field="o.company_id.vat"/> | Tel: +971 4 123 4567</div>
+                </div>
+
+                <!-- Document Title -->
+                <h2 class="text-center text-decoration-underline mb-4">RECEIPT VOUCHER</h2>
+
+                <!-- Receipt Info -->
+                <table class="table table-bordered mb-4">
+                    <tr>
+                        <td class="fw-bold" style="width: 30%;">Receipt No:</td>
+                        <td><span t-field="o.name"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Date:</td>
+                        <td><span t-out="format_uk_date(o.invoice_date)"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Received from:</td>
+                        <td><span t-field="o.partner_id.name"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">TRN:</td>
+                        <td><span t-field="o.partner_id.vat"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Payment Method:</td>
+                        <td><span t-field="o.payment_ids[0].journal_id.name"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Amount (AED):</td>
+                        <td class="text-end">
+                            <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">For:</td>
+                        <td><span t-field="o.invoice_line_ids[0].name"/></td>
+                    </tr>
+                </table>
+
+                <!-- Amount in Words -->
+                <div class="border border-1 border-dashed p-3 mb-4">
+                    <strong>Amount in Words:</strong> <span t-field="o.amount_total_words"/>
+                </div>
+
+                <!-- Signature and Stamp -->
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <div style="height: 50px;">_________________________</div>
+                        <div>Authorized Signature</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="height: 50px; border: 1px solid #000;"></div>
+                        <div>Company Stamp</div>
+                    </div>
+                </div>
+
+                <div class="text-center small mt-4">
+                    This is a computer generated receipt. No signature required for amounts below AED 10,000.
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

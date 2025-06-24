@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_custom_invoice">
-        <t t-name="account.report_invoice_document_custom">
-            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+        <t t-name="custom_reports.report_custom_invoice">
+            <t t-set="o" t-value="doc.with_context(lang=lang)"/>
             <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
             
             <div class="container">
@@ -70,7 +70,7 @@
                                 </t>
                             </td>
                             <td class="text-end">
-                                <span t-field="o.invoice_line_ids[0].price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                <span t-field="o.invoice_line_ids[0].price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" t-if="o.invoice_line_ids"/>
                             </td>
                             <td class="text-center"></td>
                             <td class="text-end">
@@ -152,13 +152,4 @@
             </div>
         </t>
     </template>
-
-    <report
-        id="action_report_custom_invoice"
-        name="custom_reports.report_custom_invoice"
-        model="account.move"
-        report_type="qweb-pdf"
-        string="Custom Invoice"
-        paperformat="report.paperformat_euro"
-    />
 </odoo>
