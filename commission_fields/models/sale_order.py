@@ -98,7 +98,23 @@ class SaleOrder(models.Model):
     commission_reference = fields.Char(
         string='Commission Reference',
         tracking=True,
+        copy=False,
         help="Reference number for commission payment"
+    )
+    
+    commission_rejected_by = fields.Many2one(
+        'res.users',
+        string='Rejected By',
+        readonly=True,
+        copy=False,
+        help="User who rejected this commission"
+    )
+    
+    commission_rejected_date = fields.Datetime(
+        string='Rejected Date',
+        readonly=True,
+        copy=False,
+        help="Date and time when commission was rejected"
     )
 
     commission_sequence = fields.Char(
@@ -448,15 +464,104 @@ class SaleOrder(models.Model):
         digits=(5, 2),
         help="Total commission as percentage of order value"
     )
-
-    # Existing purchase order count field
-    purchase_order_count = fields.Integer(
-        string='Purchase Count',
-        compute='_compute_purchase_order_count',
-        store=False,
-        help="Count of purchase orders linked to this sale order"
+    
+    # ===========================================
+    # VISIBILITY CONTROL FIELDS
+    # ===========================================
+    
+    show_external_percentage = fields.Boolean(
+        string='Show External Percentage',
+        compute='_compute_visibility_fields',
+        help="Control visibility of external percentage field"
+    )
+    
+    show_external_fixed_amount = fields.Boolean(
+        string='Show External Fixed Amount',
+        compute='_compute_visibility_fields',
+        help="Control visibility of external fixed amount field"  
+    )
+    
+    show_agent1_rate = fields.Boolean(
+        string='Show Agent 1 Rate',
+        compute='_compute_visibility_fields',
+        help="Control visibility of agent 1 rate field"
+    )
+    
+    show_agent1_fixed = fields.Boolean(
+        string='Show Agent 1 Fixed',
+        compute='_compute_visibility_fields',
+        help="Control visibility of agent 1 fixed amount field"
+    )
+    
+    show_agent2_rate = fields.Boolean(
+        string='Show Agent 2 Rate',
+        compute='_compute_visibility_fields',
+        help="Control visibility of agent 2 rate field"
+    )
+    
+    show_agent2_fixed = fields.Boolean(
+        string='Show Agent 2 Fixed',
+        compute='_compute_visibility_fields',
+        help="Control visibility of agent 2 fixed amount field"
+    )
+    
+    show_manager_rate = fields.Boolean(
+        string='Show Manager Rate',
+        compute='_compute_visibility_fields',
+        help="Control visibility of manager rate field"
+    )
+    
+    show_manager_fixed = fields.Boolean(
+        string='Show Manager Fixed',
+        compute='_compute_visibility_fields',
+        help="Control visibility of manager fixed amount field"
+    )
+    
+    show_director_rate = fields.Boolean(
+        string='Show Director Rate',
+        compute='_compute_visibility_fields',
+        help="Control visibility of director rate field"
+    )
+    
+    show_director_fixed = fields.Boolean(
+        string='Show Director Fixed',
+        compute='_compute_visibility_fields',
+        help="Control visibility of director fixed amount field"
     )
 
+    # ===========================================
+    # BUTTON VISIBILITY CONTROL FIELDS
+    # ===========================================
+    
+    show_calculate_button = fields.Boolean(
+        string='Show Calculate Button',
+        compute='_compute_button_visibility',
+        help="Control visibility of calculate commission button"
+    )
+    
+    show_confirm_button = fields.Boolean(
+        string='Show Confirm Button',
+        compute='_compute_button_visibility',
+        help="Control visibility of confirm commission button"
+    )
+    
+    show_reset_button = fields.Boolean(
+        string='Show Reset Button',
+        compute='_compute_button_visibility',
+        help="Control visibility of reset commission button"
+    )
+    
+    show_pay_button = fields.Boolean(
+        string='Show Pay Button',
+        compute='_compute_button_visibility',
+        help="Control visibility of mark as paid button"
+    )
+    
+    show_reject_button = fields.Boolean(
+        string='Show Reject Button',
+        compute='_compute_button_visibility',
+        help="Control visibility of reject button (admin only)"
+    )
     # ===========================================
     # COMPUTE METHODS
     # ===========================================
@@ -553,6 +658,7 @@ class SaleOrder(models.Model):
             commission_total = rec.grand_total_commission or 0.0
             rec.commission_variance = base - commission_total
             rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            
             tolerance = 0.01
             if abs(commission_total - base) <= tolerance:
                 rec.commission_allocation_status = 'full'
@@ -566,6 +672,67 @@ class SaleOrder(models.Model):
         for record in self:
             # This is a placeholder - implement based on your purchase order relationship
             record.purchase_order_count = 0
+    
+    @api.depends('external_commission_type', 'agent1_commission_type', 'agent2_commission_type', 
+                 'manager_commission_type', 'director_commission_type')
+    def _compute_visibility_fields(self):
+        """Compute visibility fields for the UI"""
+        for record in self:
+            # External commission visibility
+            record.show_external_percentage = record.external_commission_type in ['unit_price', 'untaxed']
+            record.show_external_fixed_amount = record.external_commission_type == 'fixed'
+            
+            # Agent 1 visibility
+            record.show_agent1_rate = record.agent1_commission_type in ['unit_price', 'untaxed']
+            record.show_agent1_fixed = record.agent1_commission_type == 'fixed'
+            
+            # Agent 2 visibility
+            record.show_agent2_rate = record.agent2_commission_type in ['unit_price', 'untaxed']
+            record.show_agent2_fixed = record.agent2_commission_type == 'fixed'
+            
+            # Manager visibility
+            record.show_manager_rate = record.manager_commission_type in ['unit_price', 'untaxed']
+            record.show_manager_fixed = record.manager_commission_type == 'fixed'
+            
+            # Director visibility
+            record.show_director_rate = record.director_commission_type in ['unit_price', 'untaxed']
+            record.show_director_fixed = record.director_commission_type == 'fixed'
+    
+    @api.depends('commission_status')
+    def _compute_button_visibility(self):
+        """Compute button visibility based on commission status and user permissions"""
+        for record in self:
+            # Check if user is admin/manager
+            is_admin = self.env.user.has_group('base.group_system') or \
+                      self.env.user.has_group('account.group_account_manager')
+            
+            # Default all buttons to False
+            record.show_calculate_button = False
+            record.show_confirm_button = False
+            record.show_reset_button = False
+            record.show_pay_button = False
+            record.show_reject_button = False
+            
+            # Button visibility based on status
+            if record.commission_status == 'draft':
+                record.show_calculate_button = True
+                record.show_reset_button = True
+                
+            elif record.commission_status == 'calculated':
+                record.show_confirm_button = True
+                record.show_reset_button = True
+                record.show_calculate_button = True  # Allow recalculation
+                
+            elif record.commission_status == 'confirmed':
+                record.show_pay_button = True
+                record.show_reset_button = True
+                if is_admin:
+                    record.show_reject_button = True
+                    
+            elif record.commission_status in ['paid', 'canceled']:
+                record.show_reset_button = True
+                if is_admin:
+                    record.show_reject_button = True
 
     # ===========================================
     # BUSINESS METHODS
@@ -598,7 +765,94 @@ class SaleOrder(models.Model):
                 'sticky': False,
             }
         }
-
+    
+    def action_pay_commission(self):
+        """Mark commission as paid"""
+        for record in self:
+            if record.commission_status in ['calculated', 'confirmed']:
+                record.commission_status = 'paid'
+                record.commission_payment_date = fields.Date.today()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),                'message': _('Commission marked as paid'),
+                'sticky': False,
+            }
+        }
+    
+    def action_reset_commission(self):
+        """Reset commission to draft state"""
+        for record in self:
+            record.commission_status = 'draft'
+            record.commission_payment_date = False
+            record.commission_reference = False
+            record.commission_notes = False
+            record.commission_rejected_by = False
+            record.commission_rejected_date = False
+            # Reset calculated amounts
+            record.total_external_commission = 0.0
+            record.total_internal_commission = 0.0
+            record.grand_total_commission = 0.0
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Commission reset to draft'),
+                'sticky': False,
+            }
+        }
+    
+    def action_create_commission_purchase_order(self):
+        """Create a purchase order for commission payments"""
+        # This is a placeholder - implement based on your business logic
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Info'),
+                'message': _('Commission purchase order creation is not yet implemented'),
+                'sticky': False,
+            }
+        }
+    
+    def action_view_related_purchase_orders(self):
+        """View related purchase orders for commission"""
+        # This is a placeholder - implement based on your business logic
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',            'params': {
+                'title': _('Info'),
+                'message': _('View related purchase orders is not yet implemented'),
+                'sticky': False,
+            }
+        }
+    
+    def action_reject_commission(self):
+        """Reject commission (admin only)"""
+        # Check if user has admin rights
+        if not (self.env.user.has_group('base.group_system') or 
+                self.env.user.has_group('account.group_account_manager')):
+            raise UserError(_('Only administrators can reject commissions.'))
+            
+        for record in self:
+            if record.commission_status in ['confirmed', 'paid']:
+                record.commission_status = 'canceled'
+                record.commission_rejected_by = self.env.user
+                record.commission_rejected_date = fields.Datetime.now()
+                record.commission_notes = (record.commission_notes or '') + \
+                    f"\n--- Rejected by {self.env.user.name} on {fields.Date.today()} ---"
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Commission rejected successfully'),
+                'sticky': False,
+            }
+        }
     # ===========================================
     # CONSTRAINTS
     # ===========================================
