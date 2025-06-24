@@ -54,7 +54,8 @@ class AccountMove(models.Model):
                 vals['project_id'] = sale_order.project_id.id
                 vals['unit_id'] = sale_order.unit_id.id
                 vals['sale_value'] = sale_order.sale_value
-                vals['broker_commission'] = sale_order.developer_commission
+                # Use the calculated broker commission
+                vals['broker_commission'] = sale_order.broker_agency_total
         return super().create(vals)
 
     def write(self, vals):
@@ -69,6 +70,7 @@ class AccountMove(models.Model):
                         'project_id': sale_order.project_id.id,
                         'unit_id': sale_order.unit_id.id,
                         'sale_value': sale_order.sale_value,
-                        'broker_commission': sale_order.developer_commission,
+                        # Use the calculated broker commission
+                        'broker_commission': sale_order.broker_agency_total,
                     })
         return super().write(vals)

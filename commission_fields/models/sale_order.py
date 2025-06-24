@@ -571,24 +571,42 @@ class SaleOrder(models.Model):
         'amount_untaxed', 'amount_total'
     )
     def _compute_commission_totals(self):
-        for rec in self:
-            price_unit = rec.amount_total or 0.0
-            untaxed = rec.amount_untaxed or 0.0
-            base = untaxed
+        """Calculate all commission totals using the correct base for each commission type"""
+        for order in self:
             # External
-            rec.broker_agency_total = (rec.broker_agency_rate or 0) * price_unit / 100
-            rec.referral_total = (rec.referral_rate or 0) * price_unit / 100
-            rec.cashback_total = (rec.cashback_rate or 0) * untaxed / 100
-            rec.other_external_total = (rec.other_external_rate or 0) * price_unit / 100
+            order.broker_agency_total = order._compute_commission_amount(
+                order.broker_agency_commission_type, order.broker_agency_rate
+            )
+            order.referral_total = order._compute_commission_amount(
+                order.referral_commission_type, order.referral_rate
+            )
+            order.cashback_total = order._compute_commission_amount(
+                order.cashback_commission_type, order.cashback_rate
+            )
+            order.other_external_total = order._compute_commission_amount(
+                order.other_external_commission_type, order.other_external_rate
+            )
             # Internal
-            rec.agent1_commission = (rec.agent1_rate or 0) * base / 100
-            rec.agent2_commission = (rec.agent2_rate or 0) * base / 100
-            rec.manager_commission = (rec.manager_rate or 0) * base / 100
-            rec.director_commission = (rec.director_rate or 0) * base / 100
+            order.agent1_commission = order._compute_commission_amount(
+                order.agent1_commission_type, order.agent1_rate, order.agent1_fixed
+            )
+            order.agent2_commission = order._compute_commission_amount(
+                order.agent2_commission_type, order.agent2_rate, order.agent2_fixed
+            )
+            order.manager_commission = order._compute_commission_amount(
+                order.manager_commission_type, order.manager_rate, order.manager_fixed
+            )
+            order.director_commission = order._compute_commission_amount(
+                order.director_commission_type, order.director_rate, order.director_fixed
+            )
             # Totals
-            rec.total_external_commission = rec.broker_agency_total + rec.referral_total + rec.cashback_total + rec.other_external_total
-            rec.total_internal_commission = rec.agent1_commission + rec.agent2_commission + rec.manager_commission + rec.director_commission
-            rec.grand_total_commission = rec.total_external_commission + rec.total_internal_commission
+            order.total_external_commission = (
+                order.broker_agency_total + order.referral_total + order.cashback_total + order.other_external_total
+            )
+            order.total_internal_commission = (
+                order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
+            )
+            order.grand_total_commission = order.total_external_commission + order.total_internal_commission
 
     @api.depends('grand_total_commission', 'amount_untaxed')
     def _compute_allocation_status(self):
@@ -841,8 +859,9 @@ class SaleOrder(models.Model):
                  'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
                  'other_external_commission_type', 'other_external_rate')
     def _compute_commission_totals(self):
-        """Calculate all external commission totals independently"""
+        """Calculate all commission totals using the correct base for each commission type"""
         for order in self:
+            # External
             order.broker_agency_total = order._compute_commission_amount(
                 order.broker_agency_commission_type, order.broker_agency_rate
             )
@@ -855,576 +874,903 @@ class SaleOrder(models.Model):
             order.other_external_total = order._compute_commission_amount(
                 order.other_external_commission_type, order.other_external_rate
             )
+            # Internal
+            order.agent1_commission = order._compute_commission_amount(
+                order.agent1_commission_type, order.agent1_rate, order.agent1_fixed
+            )
+            order.agent2_commission = order._compute_commission_amount(
+                order.agent2_commission_type, order.agent2_rate, order.agent2_fixed
+            )
+            order.manager_commission = order._compute_commission_amount(
+                order.manager_commission_type, order.manager_rate, order.manager_fixed
+            )
+            order.director_commission = order._compute_commission_amount(
+                order.director_commission_type, order.director_rate, order.director_fixed
+            )
+            # Totals
+            order.total_external_commission = (
+                order.broker_agency_total + order.referral_total + order.cashback_total + order.other_external_total
+            )
+            order.total_internal_commission = (
+                order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
+            )
+            order.grand_total_commission = order.total_external_commission + order.total_internal_commission
 
-    @api.depends('order_line', 'amount_untaxed', 'internal_commission_type', 'agent1_rate', 'agent1_fixed', 'agent2_rate', 'agent2_fixed', 'manager_rate', 'manager_fixed', 'director_rate', 'director_fixed')
-    def _compute_internal_commissions(self):
-        """Calculate internal commission amounts"""
-        for record in self:
-            if record.internal_commission_type == 'unit_price':
-                base = sum(line.price_unit for line in record.order_line)
-                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (base * (record.manager_rate or 0) / 100)
-                record.director_commission = (base * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'untaxed':
-                base = record.amount_untaxed or 0.0
-                record.agent1_commission = (base * (record.agent1_rate or 0) / 100)
-                record.agent2_commission = (base * (record.agent2_rate or 0) / 100)
-                record.manager_commission = (base * (record.manager_rate or 0) / 100)
-                record.director_commission = (base * (record.director_rate or 0) / 100)
-            elif record.internal_commission_type == 'fixed':
-                record.agent1_commission = record.agent1_fixed or 0.0
-                record.agent2_commission = record.agent2_fixed or 0.0
-                record.manager_commission = record.manager_fixed or 0.0
-                record.director_commission = record.director_fixed or 0.0
-
-    @api.depends('agent1_commission', 'agent2_commission', 'manager_commission', 'director_commission',
-                 'external_commission_amount', 'broker_agency_total', 'referral_total', 
-                 'cashback_total', 'other_external_total')
-    def _compute_total_commissions(self):
-        """Calculate total commission amounts"""
-        for record in self:
-            # Internal commission total
-            record.total_internal_commission = sum([
-                record.agent1_commission or 0.0,
-                record.agent2_commission or 0.0,
-                record.manager_commission or 0.0,
-                record.director_commission or 0.0
-            ])
-            
-            # External commission total
-            record.total_external_commission = sum([
-                record.external_commission_amount or 0.0,
-                record.broker_agency_total or 0.0,
-                record.referral_total or 0.0,
-                record.cashback_total or 0.0,
-                record.other_external_total or 0.0
-            ])
-            
-            # Grand total
-            record.grand_total_commission = record.total_internal_commission + record.total_external_commission
-
-    @api.depends('grand_total_commission', 'amount_total', 'sale_value')
+    @api.depends('grand_total_commission', 'amount_untaxed')
     def _compute_allocation_status(self):
-        """Determine commission allocation status and calculate variance based on untaxed amount (excluding tax)"""
-        for record in self:
-            # Use amount_untaxed as the base for commission allocation, not amount_total (which includes tax)
-            base_amount = record.amount_untaxed or 0.0
-            commission_total = record.grand_total_commission or 0.0
-            
-            # Calculate variance
-            record.commission_variance = commission_total - base_amount
-            
-            # Calculate percentage
-            if base_amount > 0:
-                record.commission_percentage = (commission_total / base_amount) * 100
+        for rec in self:
+            base = rec.amount_untaxed or 0.0
+            commission_total = rec.grand_total_commission or 0.0
+            rec.commission_variance = base - commission_total
+            rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            tolerance = 0.01
+            if abs(commission_total - base) <= tolerance:
+                rec.commission_allocation_status = 'full'
+            elif commission_total < base - tolerance:
+                rec.commission_allocation_status = 'under'
             else:
-                record.commission_percentage = 0.0
-            
-            # Determine status with tolerance
-            tolerance = 0.01  # 1 cent tolerance
-            if float_compare(commission_total, base_amount, precision_digits=2) == 0:
-                record.commission_allocation_status = 'full'
-            elif commission_total < base_amount - tolerance:
-                record.commission_allocation_status = 'under'
-            elif commission_total > base_amount + tolerance:
-                record.commission_allocation_status = 'over'
-            else:
-                record.commission_allocation_status = 'full'
+                rec.commission_allocation_status = 'over'
 
-    def _compute_purchase_order_count(self):
-        """Count related purchase orders"""
-        for order in self:
-            order.purchase_order_count = self.env['purchase.order'].search_count([
-                ('origin', '=', order.name)
-            ])
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
 
-    # ===========================================
-    # HELPER METHODS
-    # ===========================================
-    
-    def _compute_commission_amount(self, commission_type, rate, fixed_amount=0.0):
-        """Calculate commission amount based on type and rate. Uses price_subtotal for accuracy."""
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
+    @api.depends(
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = rec.commission_base or untaxed
+            # External
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
+            # Internal
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
         self.ensure_one()
-        if commission_type == 'unit_price':
-            # Use price_subtotal for each line (handles qty, discount, taxes)
-            base = sum(line.price_subtotal for line in self.order_line)
-            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
-        elif commission_type == 'untaxed':
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
             base = self.amount_untaxed or 0.0
-            return float_round((base * rate) / 100, precision_digits=2) if rate else 0.0
-        elif commission_type == 'fixed':
-            return fixed_amount or 0.0
-        return 0.0
-
-    def _generate_commission_sequence(self):
-        """Generate commission tracking sequence"""
-        if not self.commission_sequence:
-            sequence = self.env['ir.sequence'].next_by_code('commission.sequence') or '/'
-            self.commission_sequence = sequence
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
 
     # ===========================================
-    # VALIDATION AND CONSTRAINTS
+    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
     # ===========================================
     
-    @api.constrains('developer_commission')
-    def _check_developer_commission(self):
-        """Validate developer commission amount"""
-        for order in self:
-            if order.developer_commission < 0:
-                raise ValidationError(_("Developer commission cannot be negative!"))
-    @api.constrains('agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate')
-    def _check_commission_rates(self):
-        """Validate internal commission rates"""
-        for order in self:
-            if order.internal_commission_type == 'sale_percentage':
-                for rate in [order.agent1_rate, order.agent2_rate, order.manager_rate, order.director_rate]:
-                    if rate and (rate < 0 or rate > 100):
-                        raise ValidationError(_("Commission rates must be between 0 and 100 when using percentage type!"))
-            elif order.internal_commission_type == 'total_percentage':
-                total_rate = sum([
-                    order.agent1_rate or 0,
-                    order.agent2_rate or 0,
-                    order.manager_rate or 0,
-                    order.director_rate or 0
-                ])
-                if total_rate > 100:
-                    raise ValidationError(_("Total commission rate cannot exceed 100% when using total percentage type!"))
+    show_external_percentage = fields.Boolean(
+        compute='_compute_show_external_percentage',
+        store=False
+    )
+    show_external_fixed_amount = fields.Boolean(
+        compute='_compute_show_external_fixed_amount',
+        store=False
+    )
+    show_agent1_rate = fields.Boolean(
+        compute='_compute_show_agent1_rate',
+        store=False
+    )
+    show_agent1_fixed = fields.Boolean(
+        compute='_compute_show_agent1_fixed',
+        store=False
+    )
+    show_agent2_rate = fields.Boolean(
+        compute='_compute_show_agent2_rate',
+        store=False
+    )
+    show_agent2_fixed = fields.Boolean(
+        compute='_compute_show_agent2_fixed',
+        store=False
+    )
+    show_manager_rate = fields.Boolean(
+        compute='_compute_show_manager_rate',
+        store=False
+    )
+    show_manager_fixed = fields.Boolean(
+        compute='_compute_show_manager_fixed',
+        store=False
+    )
+    show_director_rate = fields.Boolean(
+        compute='_compute_show_director_rate',
+        store=False
+    )
+    show_director_fixed = fields.Boolean(
+        compute='_compute_show_director_fixed',
+        store=False
+    )
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_percentage(self):
+        for rec in self:
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_fixed_amount(self):
+        for rec in self:
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_rate(self):
+        for rec in self:
+            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_fixed(self):
+        for rec in self:
+            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_rate(self):
+        for rec in self:
+            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_fixed(self):
+        for rec in self:
+            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_rate(self):
+        for rec in self:
+            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_fixed(self):
+        for rec in self:
+            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_rate(self):
+        for rec in self:
+            rec.show_director_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_fixed(self):
+        for rec in self:
+            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
 
     # ===========================================
-    # ACTION METHODS
+    # CONSTRAINTS
     # ===========================================
+    
+    _sql_constraints = [
+        ('commission_percentage_positive', 
+         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
+         'External commission percentage must be between 0 and 100!'),
+    ]
 
-    def action_confirm_commission(self):
-        """Confirm commission calculations"""
+    # ===========================================
+    # COMPUTE METHODS
+    # ===========================================
+    
+    @api.depends('amount_total', 'amount_untaxed')
+    def _compute_sale_value(self):
+        """Compute sale value based on order totals"""
+        for record in self:
+            if not record.sale_value:
+                record.sale_value = record.amount_untaxed or record.amount_total or 0.0
+
+    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
+    def _compute_external_commission(self):
+        """Calculate external commission based on type and parameters"""
+        for record in self:
+            record.external_commission_amount = record._compute_commission_amount(
+                record.external_commission_type, record.external_percentage, record.external_fixed_amount
+            )
+
+    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total',
+                 'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
+                 'other_external_commission_type', 'other_external_rate')
+    def _compute_commission_totals(self):
+        """Calculate all commission totals using the correct base for each commission type"""
         for order in self:
-            if order.commission_status != 'calculated':
-                raise UserError(_("Commission must be in 'Calculated' state before confirmation!"))
-            
-            if order.commission_allocation_status == 'over':
-                raise UserError(_("Cannot confirm commission with over allocation!"))
-            
-            order._generate_commission_sequence()
-            order.commission_status = 'confirmed'
-            order.message_post(body=_("Commission confirmed by %s") % self.env.user.name)
-
-    def action_pay_commission(self):
-        """Mark commission as paid"""
-        for order in self:
-            if order.commission_status != 'confirmed':
-                raise UserError(_("Commission must be confirmed before marking as paid!"))
-            
-            order.commission_status = 'paid'
-            order.commission_payment_date = fields.Date.today()
-            order.message_post(body=_("Commission marked as paid by %s") % self.env.user.name)
-
-    def action_calculate_commission(self):
-        """Calculate commission amounts"""
-        for order in self:
-            # Recompute all commission fields
-            order._compute_external_commission()
-            order._compute_commission_totals()
-            order._compute_internal_commissions()
-            order._compute_total_commissions()
-            order._compute_allocation_status()
-            
-            order.commission_status = 'calculated'
-            order.message_post(body=_("Commission recalculated by %s") % self.env.user.name)
-
-    def action_reset_commission(self):
-        """Reset commission to draft state and cancel old commission POs."""
-        for order in self:
-            if order.commission_status == 'paid':
-                raise UserError(_("Cannot reset paid commissions!"))
-            # Cancel and remove old commission POs
-            for po in order.commission_purchase_order_ids:
-                if po.state not in ['cancel', 'done']:
-                    po.button_cancel()
-                po.unlink()
-            order.commission_status = 'draft'
-            order.message_post(body=_("Commission reset to draft by %s") % self.env.user.name)
-
-    def action_view_related_purchase_orders(self):
-        """View purchase orders linked to this sale order"""
-        self.ensure_one()
-        action = self.env['ir.actions.actions']._for_xml_id('purchase.purchase_form_action')
-        purchases = self.env['purchase.order'].search([('origin', '=', self.name)])
-        
-        if len(purchases) == 1:
-            action['res_id'] = purchases.id
-            action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
-        else:
-            action['domain'] = [('id', 'in', purchases.ids)]
-            action['context'] = {}
-        
-        return action
-
-    def action_view_commission_invoices(self):
-        """View all invoices related to this sale order's commission"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Commission Invoices'),
-            'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('deal_id', '=', self.id)],
-            'context': {'default_deal_id': self.id},
-        }
-
-    def action_create_commission_purchase_order(self):
-        """Create purchase orders for all commission recipients with non-zero commission amounts.
-        Removes/cancels old commission POs before creating new ones for accuracy and to avoid duplicates."""
-        PurchaseOrder = self.env['purchase.order']
-        created_pos = []
-        commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
-        if not commission_product:
-            commission_product = self.env['product.product'].create({
-                'name': 'Commission Fee',
-                'type': 'service',
-                'purchase_ok': True,
-                'sale_ok': False,
-            })
-        for order in self:
-            # Remove/cancel old commission POs
-            for po in order.commission_purchase_order_ids:
-                if po.state not in ['cancel', 'done']:
-                    po.button_cancel()
-                po.unlink()
-            if order.commission_status not in ['confirmed', 'paid']:
-                raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
-            if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
-                raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            # Prepare all commission recipients and amounts
-            commission_lines = []
-            # Internal
-            if order.agent1_id and order.agent1_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent1_id,
-                    'amount': order.agent1_commission
-                })
-            if order.agent2_id and order.agent2_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent2_id,
-                    'amount': order.agent2_commission
-                })
-            if order.manager_id and order.manager_commission > 0:
-                commission_lines.append({
-                    'partner': order.manager_id,
-                    'amount': order.manager_commission
-                })
-            if order.director_id and order.director_commission > 0:
-                commission_lines.append({
-                    'partner': order.director_id,
-                    'amount': order.director_commission
-                })
             # External
-            if order.external_partner_id and order.external_commission_amount > 0:
-                commission_lines.append({
-                    'partner': order.external_partner_id,
-                    'amount': order.external_commission_amount
-                })
-            if order.broker_agency_partner_id and order.broker_agency_total > 0:
-                commission_lines.append({
-                    'partner': order.broker_agency_partner_id,
-                    'amount': order.broker_agency_total
-                })
-            if order.referral_partner_id and order.referral_total > 0:
-                commission_lines.append({
-                    'partner': order.referral_partner_id,
-                    'amount': order.referral_total
-                })
-            if order.cashback_partner_id and order.cashback_total > 0:
-                commission_lines.append({
-                    'partner': order.cashback_partner_id,
-                    'amount': order.cashback_total
-                })
-            if order.other_external_partner_id and order.other_external_total > 0:
-                commission_lines.append({
-                    'partner': order.other_external_partner_id,
-                    'amount': order.other_external_total
-                })
-            if not commission_lines:
-                raise UserError(_('No commission recipients with non-zero commission found.'))
-            # Group lines by partner (one PO per partner)
-            partner_map = {}
-            for line in commission_lines:
-                partner = line['partner']
-                if not partner:
-                    continue
-                if partner not in partner_map:
-                    partner_map[partner] = []
-                partner_map[partner].append(line)
-            for partner, lines in partner_map.items():
-                po_lines = []
-                for l in lines:
-                    po_lines.append((0, 0, {
-                        'name': '',
-                        'product_qty': 1,
-                        'product_uom': commission_product.uom_id.id,
-                        'price_unit': l['amount'],
-                        'date_planned': fields.Date.today(),
-                        'product_id': commission_product.id,
-                    }))
-                po_vals = {
-                    'partner_id': partner.id,
-                    'origin': order.name,
-                    'commission_sale_order_id': order.id,
-                    'order_line': po_lines,
-                }
-                po = PurchaseOrder.create(po_vals)
-                created_pos.append(po.id)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'purchase.order',
-            'view_mode': 'form',
-            'res_id': created_pos[0] if len(created_pos) == 1 else False,
-            'domain': [('id', 'in', created_pos)],
-        }
-
-    # ===========================================
-    # ONCHANGE METHODS
-    # ===========================================
-
-    @api.onchange('project_id')
-    def _onchange_project_id(self):
-        """Reset unit when project changes"""
-        if self.project_id:
-            return {'domain': {'unit_id': [('product_tmpl_id', '=', self.project_id.id)]}}
-        else:
-            self.unit_id = False
-            return {'domain': {'unit_id': []}}
-
-    @api.onchange('internal_commission_type')
-    def _onchange_internal_commission_type(self):
-        """Reset rates when commission type changes"""
-        if self.internal_commission_type == 'fixed':
-            self.agent1_rate = 0
-            self.agent2_rate = 0
-            self.manager_rate = 0
-            self.director_rate = 0
-        else:
-            self.agent1_fixed = 0
-            self.agent2_fixed = 0
-            self.manager_fixed = 0
-            self.director_fixed = 0
-
-    # ===========================================
-    # OVERRIDES
-    # ===========================================
-
-    def action_confirm(self):
-        """Override confirm to ensure commission validation"""
-        for order in self:
-            if order.commission_status == 'draft' and order.grand_total_commission > 0:
-                raise UserError(_("Please calculate commissions before confirming the order!"))
-        
-        # Corrected super() usage to avoid recursion
-        return super().action_confirm()
-
-    def write(self, vals):
-        """Prevent modifications to certain fields after confirmation"""
-        protected_fields = [
-            'sale_value', 'developer_commission', 'commission_status',
-            'external_commission_amount', 'broker_agency_total',
-            'referral_total', 'cashback_total', 'other_external_total',
-            'agent1_commission', 'agent2_commission', 
-            'manager_commission', 'director_commission'
-        ]
-        
-        if any(field in vals for field in protected_fields):
-            for order in self:
-                if order.state not in ['draft', 'sent'] and order.commission_status in ['confirmed', 'paid']:
-                    raise UserError(_("Cannot modify commission details after order confirmation when commission is confirmed or paid!"))
-        
-        return super().write(vals)  # FIX: use super() instead of super(SaleOrder, self)
-
-    def copy(self, default=None):
-        """Handle copying of commission-related fields"""
-        default = dict(default or {})
-        default.update({
-            'commission_status': 'draft',
-            'commission_sequence': False,
-            'commission_payment_date': False,
-            'commission_reference': False,
-        })
-        return super(SaleOrder, self).copy(default)
-
-    # ===========================================
-    # REPORTING METHODS
-    # ===========================================
-
-    def get_commission_summary(self):
-        """Return commission data for reporting"""
-        self.ensure_one()
-        return {
-            'internal': {
-                'agent1': {
-                    'name': self.agent1_id.name if self.agent1_id else 'N/A',
-                    'rate': self.agent1_rate,
-                    'amount': self.agent1_commission
-                },
-                'agent2': {
-                    'name': self.agent2_id.name if self.agent2_id else 'N/A',
-                    'rate': self.agent2_rate,
-                    'amount': self.agent2_commission
-                },
-                'manager': {
-                    'name': self.manager_id.name if self.manager_id else 'N/A',
-                    'rate': self.manager_rate,
-                    'amount': self.manager_commission
-                },
-                'director': {
-                    'name': self.director_id.name if self.director_id else 'N/A',
-                    'rate': self.director_rate,
-                    'amount': self.director_commission
-                },
-                'total': self.total_internal_commission
-            },
-            'external': {
-                'partner': {
-                    'name': self.external_partner_id.name if self.external_partner_id else 'N/A',
-                    'amount': self.external_commission_amount
-                },
-                'broker': {
-                    'name': self.broker_agency_partner_id.name if self.broker_agency_partner_id else 'N/A',
-                    'amount': self.broker_agency_total
-                },
-                'referral': {
-                    'name': self.referral_partner_id.name if self.referral_partner_id else 'N/A',
-                    'amount': self.referral_total
-                },
-                'cashback': {
-                    'name': self.cashback_partner_id.name if self.cashback_partner_id else 'N/A',
-                    'amount': self.cashback_total
-                },
-                'other': {
-                    'name': self.other_external_partner_id.name if self.other_external_partner_id else 'N/A',
-                    'amount': self.other_external_total
-                },
-                'total': self.total_external_commission
-            },
-            'grand_total': self.grand_total_commission,
-            'status': self.commission_status,
-            'variance': self.commission_variance,
-            'percentage': self.commission_percentage
-        }
-
-# Patch purchase.order to add a link to sale.order
-class PurchaseOrder(models.Model):
-    _inherit = 'purchase.order'
-    commission_sale_order_id = fields.Many2one('sale.order', string='Commission Sale Order', index=True, help='The sale order that generated this commission purchase order.')
-
-# Add a One2many on sale.order for navigation
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-    commission_purchase_order_ids = fields.One2many('purchase.order', 'commission_sale_order_id', string='Commission Purchase Orders')
-
-    def action_create_commission_purchase_order(self):
-        """Create purchase orders for all commission recipients with non-zero commission amounts.
-        Removes/cancels old commission POs before creating new ones for accuracy and to avoid duplicates."""
-        PurchaseOrder = self.env['purchase.order']
-        created_pos = []
-        commission_product = self.env['product.product'].search([('name', '=', 'Commission Fee')], limit=1)
-        if not commission_product:
-            commission_product = self.env['product.product'].create({
-                'name': 'Commission Fee',
-                'type': 'service',
-                'purchase_ok': True,
-                'sale_ok': False,
-            })
-        for order in self:
-            # Remove/cancel old commission POs
-            for po in order.commission_purchase_order_ids:
-                if po.state not in ['cancel', 'done']:
-                    po.button_cancel()
-                po.unlink()
-            if order.commission_status not in ['confirmed', 'paid']:
-                raise UserError(_('Commission must be confirmed or paid before creating a purchase order.'))
-            if not order.invoice_ids or not any(inv.state in ['posted', 'paid'] for inv in order.invoice_ids):
-                raise UserError(_('You must have at least one processed invoice (posted/paid) before creating a commission purchase order.'))
-            # Prepare all commission recipients and amounts
-            commission_lines = []
+            order.broker_agency_total = order._compute_commission_amount(
+                order.broker_agency_commission_type, order.broker_agency_rate
+            )
+            order.referral_total = order._compute_commission_amount(
+                order.referral_commission_type, order.referral_rate
+            )
+            order.cashback_total = order._compute_commission_amount(
+                order.cashback_commission_type, order.cashback_rate
+            )
+            order.other_external_total = order._compute_commission_amount(
+                order.other_external_commission_type, order.other_external_rate
+            )
             # Internal
-            if order.agent1_id and order.agent1_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent1_id,
-                    'amount': order.agent1_commission
-                })
-            if order.agent2_id and order.agent2_commission > 0:
-                commission_lines.append({
-                    'partner': order.agent2_id,
-                    'amount': order.agent2_commission
-                })
-            if order.manager_id and order.manager_commission > 0:
-                commission_lines.append({
-                    'partner': order.manager_id,
-                    'amount': order.manager_commission
-                })
-            if order.director_id and order.director_commission > 0:
-                commission_lines.append({
-                    'partner': order.director_id,
-                    'amount': order.director_commission
-                })
+            order.agent1_commission = order._compute_commission_amount(
+                order.agent1_commission_type, order.agent1_rate, order.agent1_fixed
+            )
+            order.agent2_commission = order._compute_commission_amount(
+                order.agent2_commission_type, order.agent2_rate, order.agent2_fixed
+            )
+            order.manager_commission = order._compute_commission_amount(
+                order.manager_commission_type, order.manager_rate, order.manager_fixed
+            )
+            order.director_commission = order._compute_commission_amount(
+                order.director_commission_type, order.director_rate, order.director_fixed
+            )
+            # Totals
+            order.total_external_commission = (
+                order.broker_agency_total + order.referral_total + order.cashback_total + order.other_external_total
+            )
+            order.total_internal_commission = (
+                order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
+            )
+            order.grand_total_commission = order.total_external_commission + order.total_internal_commission
+
+    @api.depends('grand_total_commission', 'amount_untaxed')
+    def _compute_allocation_status(self):
+        for rec in self:
+            base = rec.amount_untaxed or 0.0
+            commission_total = rec.grand_total_commission or 0.0
+            rec.commission_variance = base - commission_total
+            rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            tolerance = 0.01
+            if abs(commission_total - base) <= tolerance:
+                rec.commission_allocation_status = 'full'
+            elif commission_total < base - tolerance:
+                rec.commission_allocation_status = 'under'
+            else:
+                rec.commission_allocation_status = 'over'
+
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
+
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
+    @api.depends(
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = rec.commission_base or untaxed
             # External
-            if order.external_partner_id and order.external_commission_amount > 0:
-                commission_lines.append({
-                    'partner': order.external_partner_id,
-                    'amount': order.external_commission_amount
-                })
-            if order.broker_agency_partner_id and order.broker_agency_total > 0:
-                commission_lines.append({
-                    'partner': order.broker_agency_partner_id,
-                    'amount': order.broker_agency_total
-                })
-            if order.referral_partner_id and order.referral_total > 0:
-                commission_lines.append({
-                    'partner': order.referral_partner_id,
-                    'amount': order.referral_total
-                })
-            if order.cashback_partner_id and order.cashback_total > 0:
-                commission_lines.append({
-                    'partner': order.cashback_partner_id,
-                    'amount': order.cashback_total
-                })
-            if order.other_external_partner_id and order.other_external_total > 0:
-                commission_lines.append({
-                    'partner': order.other_external_partner_id,
-                    'amount': order.other_external_total
-                })
-            if not commission_lines:
-                raise UserError(_('No commission recipients with non-zero commission found.'))
-            # Group lines by partner (one PO per partner)
-            partner_map = {}
-            for line in commission_lines:
-                partner = line['partner']
-                if not partner:
-                    continue
-                if partner not in partner_map:
-                    partner_map[partner] = []
-                partner_map[partner].append(line)
-            for partner, lines in partner_map.items():
-                po_lines = []
-                for l in lines:
-                    po_lines.append((0, 0, {
-                        'name': '',
-                        'product_qty': 1,
-                        'product_uom': commission_product.uom_id.id,
-                        'price_unit': l['amount'],
-                        'date_planned': fields.Date.today(),
-                        'product_id': commission_product.id,
-                    }))
-                po_vals = {
-                    'partner_id': partner.id,
-                    'origin': order.name,
-                    'commission_sale_order_id': order.id,
-                    'order_line': po_lines,
-                }
-                po = PurchaseOrder.create(po_vals)
-                created_pos.append(po.id)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'purchase.order',
-            'view_mode': 'form',
-            'res_id': created_pos[0] if len(created_pos) == 1 else False,
-            'domain': [('id', 'in', created_pos)],
-        }
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
+            # Internal
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
+        self.ensure_one()
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
+
+    # ===========================================
+    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
+    # ===========================================
+    
+    show_external_percentage = fields.Boolean(
+        compute='_compute_show_external_percentage',
+        store=False
+    )
+    show_external_fixed_amount = fields.Boolean(
+        compute='_compute_show_external_fixed_amount',
+        store=False
+    )
+    show_agent1_rate = fields.Boolean(
+        compute='_compute_show_agent1_rate',
+        store=False
+    )
+    show_agent1_fixed = fields.Boolean(
+        compute='_compute_show_agent1_fixed',
+        store=False
+    )
+    show_agent2_rate = fields.Boolean(
+        compute='_compute_show_agent2_rate',
+        store=False
+    )
+    show_agent2_fixed = fields.Boolean(
+        compute='_compute_show_agent2_fixed',
+        store=False
+    )
+    show_manager_rate = fields.Boolean(
+        compute='_compute_show_manager_rate',
+        store=False
+    )
+    show_manager_fixed = fields.Boolean(
+        compute='_compute_show_manager_fixed',
+        store=False
+    )
+    show_director_rate = fields.Boolean(
+        compute='_compute_show_director_rate',
+        store=False
+    )
+    show_director_fixed = fields.Boolean(
+        compute='_compute_show_director_fixed',
+        store=False
+    )
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_percentage(self):
+        for rec in self:
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_fixed_amount(self):
+        for rec in self:
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_rate(self):
+        for rec in self:
+            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_fixed(self):
+        for rec in self:
+            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_rate(self):
+        for rec in self:
+            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_fixed(self):
+        for rec in self:
+            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_rate(self):
+        for rec in self:
+            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_fixed(self):
+        for rec in self:
+            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_rate(self):
+        for rec in self:
+            rec.show_director_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_fixed(self):
+        for rec in self:
+            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
+
+    # ===========================================
+    # CONSTRAINTS
+    # ===========================================
+    
+    _sql_constraints = [
+        ('commission_percentage_positive', 
+         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
+         'External commission percentage must be between 0 and 100!'),
+    ]
+
+    # ===========================================
+    # COMPUTE METHODS
+    # ===========================================
+    
+    @api.depends('amount_total', 'amount_untaxed')
+    def _compute_sale_value(self):
+        """Compute sale value based on order totals"""
+        for record in self:
+            if not record.sale_value:
+                record.sale_value = record.amount_untaxed or record.amount_total or 0.0
+
+    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
+    def _compute_external_commission(self):
+        """Calculate external commission based on type and parameters"""
+        for record in self:
+            record.external_commission_amount = record._compute_commission_amount(
+                record.external_commission_type, record.external_percentage, record.external_fixed_amount
+            )
+
+    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total',
+                 'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
+                 'other_external_commission_type', 'other_external_rate')
+    def _compute_commission_totals(self):
+        """Calculate all commission totals using the correct base for each commission type"""
+        for order in self:
+            # External
+            order.broker_agency_total = order._compute_commission_amount(
+                order.broker_agency_commission_type, order.broker_agency_rate
+            )
+            order.referral_total = order._compute_commission_amount(
+                order.referral_commission_type, order.referral_rate
+            )
+            order.cashback_total = order._compute_commission_amount(
+                order.cashback_commission_type, order.cashback_rate
+            )
+            order.other_external_total = order._compute_commission_amount(
+                order.other_external_commission_type, order.other_external_rate
+            )
+            # Internal
+            order.agent1_commission = order._compute_commission_amount(
+                order.agent1_commission_type, order.agent1_rate, order.agent1_fixed
+            )
+            order.agent2_commission = order._compute_commission_amount(
+                order.agent2_commission_type, order.agent2_rate, order.agent2_fixed
+            )
+            order.manager_commission = order._compute_commission_amount(
+                order.manager_commission_type, order.manager_rate, order.manager_fixed
+            )
+            order.director_commission = order._compute_commission_amount(
+                order.director_commission_type, order.director_rate, order.director_fixed
+            )
+            # Totals
+            order.total_external_commission = (
+                order.broker_agency_total + order.referral_total + order.cashback_total + order.other_external_total
+            )
+            order.total_internal_commission = (
+                order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
+            )
+            order.grand_total_commission = order.total_external_commission + order.total_internal_commission
+
+    @api.depends('grand_total_commission', 'amount_untaxed')
+    def _compute_allocation_status(self):
+        for rec in self:
+            base = rec.amount_untaxed or 0.0
+            commission_total = rec.grand_total_commission or 0.0
+            rec.commission_variance = base - commission_total
+            rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            tolerance = 0.01
+            if abs(commission_total - base) <= tolerance:
+                rec.commission_allocation_status = 'full'
+            elif commission_total < base - tolerance:
+                rec.commission_allocation_status = 'under'
+            else:
+                rec.commission_allocation_status = 'over'
+
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
+
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
+    @api.depends(
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = rec.commission_base or untaxed
+            # External
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
+            # Internal
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
+        self.ensure_one()
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
+
+    # ===========================================
+    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
+    # ===========================================
+    
+    show_external_percentage = fields.Boolean(
+        compute='_compute_show_external_percentage',
+        store=False
+    )
+    show_external_fixed_amount = fields.Boolean(
+        compute='_compute_show_external_fixed_amount',
+        store=False
+    )
+    show_agent1_rate = fields.Boolean(
+        compute='_compute_show_agent1_rate',
+        store=False
+    )
+    show_agent1_fixed = fields.Boolean(
+        compute='_compute_show_agent1_fixed',
+        store=False
+    )
+    show_agent2_rate = fields.Boolean(
+        compute='_compute_show_agent2_rate',
+        store=False
+    )
+    show_agent2_fixed = fields.Boolean(
+        compute='_compute_show_agent2_fixed',
+        store=False
+    )
+    show_manager_rate = fields.Boolean(
+        compute='_compute_show_manager_rate',
+        store=False
+    )
+    show_manager_fixed = fields.Boolean(
+        compute='_compute_show_manager_fixed',
+        store=False
+    )
+    show_director_rate = fields.Boolean(
+        compute='_compute_show_director_rate',
+        store=False
+    )
+    show_director_fixed = fields.Boolean(
+        compute='_compute_show_director_fixed',
+        store=False
+    )
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_percentage(self):
+        for rec in self:
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_fixed_amount(self):
+        for rec in self:
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_rate(self):
+        for rec in self:
+            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_fixed(self):
+        for rec in self:
+            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_rate(self):
+        for rec in self:
+            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_fixed(self):
+        for rec in self:
+            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_rate(self):
+        for rec in self:
+            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_fixed(self):
+        for rec in self:
+            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_rate(self):
+        for rec in self:
+            rec.show_director_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_fixed(self):
+        for rec in self:
+            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
+
+    # ===========================================
+    # CONSTRAINTS
+    # ===========================================
+    
+    _sql_constraints = [
+        ('commission_percentage_positive', 
+         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
+         'External commission percentage must be between 0 and 100!'),
+    ]
+
+    # ===========================================
+    # COMPUTE METHODS
+    # ===========================================
+    
+    @api.depends('amount_total', 'amount_untaxed')
+    def _compute_sale_value(self):
+        """Compute sale value based on order totals"""
+        for record in self:
+            if not record.sale_value:
+                record.sale_value = record.amount_untaxed or record.amount_total or 0.0
+
+    @api.depends('external_commission_type', 'external_percentage', 'external_fixed_amount', 'order_line', 'amount_untaxed')
+    def _compute_external_commission(self):
+        """Calculate external commission based on type and parameters"""
+        for record in self:
+            record.external_commission_amount = record._compute_commission_amount(
+                record.external_commission_type, record.external_percentage, record.external_fixed_amount
+            )
+
+    @api.depends('order_line', 'amount_untaxed', 'broker_agency_commission_type', 'broker_agency_rate', 'broker_agency_total',
+                 'referral_commission_type', 'referral_rate', 'cashback_commission_type', 'cashback_rate',
+                 'other_external_commission_type', 'other_external_rate')
+    def _compute_commission_totals(self):
+        """Calculate all commission totals using the correct base for each commission type"""
+        for order in self:
+            # External
+            order.broker_agency_total = order._compute_commission_amount(
+                order.broker_agency_commission_type, order.broker_agency_rate
+            )
+            order.referral_total = order._compute_commission_amount(
+                order.referral_commission_type, order.referral_rate
+            )
+            order.cashback_total = order._compute_commission_amount(
+                order.cashback_commission_type, order.cashback_rate
+            )
+            order.other_external_total = order._compute_commission_amount(
+                order.other_external_commission_type, order.other_external_rate
+            )
+            # Internal
+            order.agent1_commission = order._compute_commission_amount(
+                order.agent1_commission_type, order.agent1_rate, order.agent1_fixed
+            )
+            order.agent2_commission = order._compute_commission_amount(
+                order.agent2_commission_type, order.agent2_rate, order.agent2_fixed
+            )
+            order.manager_commission = order._compute_commission_amount(
+                order.manager_commission_type, order.manager_rate, order.manager_fixed
+            )
+            order.director_commission = order._compute_commission_amount(
+                order.director_commission_type, order.director_rate, order.director_fixed
+            )
+            # Totals
+            order.total_external_commission = (
+                order.broker_agency_total + order.referral_total + order.cashback_total + order.other_external_total
+            )
+            order.total_internal_commission = (
+                order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
+            )
+            order.grand_total_commission = order.total_external_commission + order.total_internal_commission
+
+    @api.depends('grand_total_commission', 'amount_untaxed')
+    def _compute_allocation_status(self):
+        for rec in self:
+            base = rec.amount_untaxed or 0.0
+            commission_total = rec.grand_total_commission or 0.0
+            rec.commission_variance = base - commission_total
+            rec.commission_percentage = (commission_total / base * 100) if base else 0.0
+            tolerance = 0.01
+            if abs(commission_total - base) <= tolerance:
+                rec.commission_allocation_status = 'full'
+            elif commission_total < base - tolerance:
+                rec.commission_allocation_status = 'under'
+            else:
+                rec.commission_allocation_status = 'over'
