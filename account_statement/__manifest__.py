@@ -19,15 +19,15 @@
         - Direct access from partner form view
         - Multi-company support
         - State management workflow
-    """,
-    'author': 'Your Company',
+    """,    'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
     'depends': [
         'base',
         'account',
         'contacts',
         'web',
-    ],    'data': [
+    ],
+    'data': [
         'security/account_statement_security.xml',
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
