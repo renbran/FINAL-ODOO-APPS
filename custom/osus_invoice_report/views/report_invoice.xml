@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<<<<<<< HEAD
     <data>
         <!-- Invoice Report Template -->
         <template id="report_custom_invoice_document">
@@ -369,4 +370,167 @@
             </t>
         </template>
     </data>
+=======
+    <template id="report_custom_invoice">
+        <t t-name="account.report_invoice_document_custom">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+            
+            <div class="container">
+                <!-- Company and Partner Details -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <h5>COMPANY DETAILS</h5>
+                        <div t-field="o.company_id.name"/>
+                        <div t-field="o.company_id.street"/>
+                        <div>
+                            <span t-field="o.company_id.city"/>
+                            <span t-field="o.company_id.zip" t-if="o.company_id.zip"/>
+                        </div>
+                        <div t-field="o.company_id.country_id.name"/>
+                        <div>VAT: <span t-field="o.company_id.vat"/></div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <h5>VENDOR DETAILS</h5>
+                        <div t-field="o.partner_id.name"/>
+                        <div t-field="o.partner_id.street"/>
+                        <div t-field="o.partner_id.city"/>
+                        <div t-field="o.partner_id.country_id.name"/>
+                        <div>VAT: <span t-field="o.partner_id.vat"/></div>
+                    </div>
+                </div>
+
+                <!-- Invoice Header -->
+                <h2 class="text-center mb-4">TAX INVOICE <span t-field="o.name"/></h2>
+
+                <!-- Dates -->
+                <div class="row mb-4">
+                    <div class="col-4">
+                        <strong>Invoice Date:</strong> <span t-out="format_uk_date(o.invoice_date)"/>
+                    </div>
+                    <div class="col-4 text-center">
+                        <strong>Due Date:</strong> <span t-out="format_uk_date(o.invoice_date_due)"/>
+                    </div>
+                    <div class="col-4 text-end">
+                        <strong>Booking Date:</strong> <span t-out="format_uk_date(o.booking_date)"/>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <table class="table table-bordered mb-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>BUYER</th>
+                            <th>PROJECT</th>
+                            <th>UNIT</th>
+                            <th class="text-end">COMMISSION RATE</th>
+                            <th class="text-end">UNIT PRICE</th>
+                            <th class="text-center">VAT</th>
+                            <th class="text-end">VAT AMOUNT</th>
+                            <th class="text-end">AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span t-field="o.buyer_id.name"/></td>
+                            <td><span t-field="o.project_id.name"/></td>
+                            <td><span t-field="o.unit_id.name"/></td>
+                            <td class="text-end">
+                                <t t-if="o.invoice_line_ids">
+                                    <span t-esc="o.invoice_line_ids[0].quantity * 100" t-options="{'widget': 'float', 'precision': 2}"/>%
+                                </t>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="o.invoice_line_ids[0].price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </td>
+                            <td class="text-center"></td>
+                            <td class="text-end">
+                                <span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div class="row justify-content-end">
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Untaxed Amount</td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tax</td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr class="table-dark">
+                                <td><strong>Total</strong></td>
+                                <td class="text-end">
+                                    <strong>
+                                        <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Amount in Words -->
+                <div class="mb-4">
+                    <strong>Amount in Words (Total):</strong>
+                    <span t-field="o.amount_total_words"/>
+                </div>
+
+                <!-- Payment Instructions -->
+                <div class="mb-4">
+                    <h4>Payment Instructions</h4>
+                    <p>Please pay to this Account Details in Cheque or Bank Transfer</p>
+                    <table class="table">
+                        <tr>
+                            <td style="width: 30%;"><strong>Bank Name</strong></td>
+                            <td>ABU DHABI COMMERCIAL BANK (ADCB)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Account Name</strong></td>
+                            <td>OSUS REAL ESTATE BROKERAGE LLC</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Account No.</strong></td>
+                            <td>14041417820001 - AED</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IBAN</strong></td>
+                            <td>AE35003001404141782000</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Branch</strong></td>
+                            <td>Business Bay</td>
+                        </tr>
+                    </table>
+                    <p class="fst-italic">Please include your reference number when making the payment</p>
+                </div>
+
+                <div class="text-center fst-italic">
+                    This is a computer generated document. No signature or stamp required.
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <report
+        id="action_report_custom_invoice"
+        name="custom_reports.report_custom_invoice"
+        model="account.move"
+        report_type="qweb-pdf"
+        string="Custom Invoice"
+        paperformat="report.paperformat_euro"
+    />
+>>>>>>> 50419ea8 (QUICK INSTALL)
 </odoo>

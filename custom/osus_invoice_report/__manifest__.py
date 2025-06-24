@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     'name': 'OSUS Invoice Report',
     'version': '17.0.1.0.0',
     'summary': 'Professional UAE Tax Invoice Reports for Real Estate Commission',
@@ -26,6 +27,20 @@
         'views/account_move_views.xml',
         'views/sale_order_views.xml',
         'views/report_invoice.xml',
+=======
+    'name': 'Custom Accounting Reports',
+    'version': '17.0.1.0.0',
+    'summary': 'Custom Invoice, Bill and Receipt Reports',
+    'description': 'UK-formatted documents with UAE receipt standard',
+    'category': 'Accounting/Accounting',
+    'author': 'Your Company',
+    'depends': ['account'],
+    'data': [
+        'views/account_move_views.xml',
+        'views/report_invoice.xml',
+        'views/report_bill.xml',
+        'views/report_receipt.xml',
+>>>>>>> 50419ea8 (QUICK INSTALL)
     ],
     'assets': {
         'web.report_assets_pdf': [
@@ -35,5 +50,8 @@
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
+<<<<<<< HEAD
     'auto_install': False,
+=======
+>>>>>>> 50419ea8 (QUICK INSTALL)
 }
