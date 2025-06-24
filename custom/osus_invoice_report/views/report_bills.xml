@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_custom_bill">
+        <t t-name="account.report_bill_document_custom">
+            <t t-set="o" t-value="o.with_context(lang='en_GB')"/>
+            <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+            
+            <div class="container">
+                <!-- Header -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <h5>OSUS PROPERTIES</h5>
+                        <div>SINGLE TOWER FLOOR 29 OFFICE 02 &amp; 03 BUSINESS BAY</div>
+                        <div>Building 7 4th floor</div>
+                        <div>Dubai DU 00000</div>
+                        <div>United Arab Emirates</div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <h5 t-field="o.partner_id.name"/>
+                    </div>
+                </div>
+
+                <!-- Document Title -->
+                <h2 class="text-center mb-4">ORDER # <span t-field="o.name"/></h2>
+
+                <!-- Document Info -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <strong>Order Date:</strong> <span t-out="format_uk_date(o.invoice_date)"/>
+                    </div>
+                    <div class="col-6 text-end">
+                        <strong>Salesperson:</strong> <span t-field="o.invoice_user_id.name"/>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <table class="table table-bordered mb-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>DESCRIPTION</th>
+                            <th class="text-center">QUANTITY</th>
+                            <th class="text-end">UNIT PRICE</th>
+                            <th class="text-center">TAXES</th>
+                            <th class="text-end">AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.invoice_line_ids" t-as="line">
+                            <td><span t-field="line.name"/></td>
+                            <td class="text-center"><span t-esc="'%.6f Units' % line.quantity"/></td>
+                            <td class="text-end">
+                                <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </td>
+                            <td class="text-center">
+                                <span t-esc="'%d%%' % (line.tax_ids.amount * 100)"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div class="row justify-content-end">
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Untaxed Amount</td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tax <span t-esc="'%d%%' % (o.amount_tax/o.amount_untaxed*100 if o.amount_untaxed else 15)"/></td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr class="table-dark">
+                                <td><strong>Total</strong></td>
+                                <td class="text-end">
+                                    <strong>
+                                        <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="text-center fst-italic mt-4">
+                    Terms &amp; Conditions: 1/terms
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <report
+        id="action_report_custom_bill"
+        name="custom_reports.report_custom_bill"
+        model="account.move"
+        report_type="qweb-pdf"
+        string="Custom Bill"
+        paperformat="report.paperformat_euro"
+    />
+</odoo>

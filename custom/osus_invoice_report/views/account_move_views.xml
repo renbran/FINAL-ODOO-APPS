@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add print buttons to the form view header -->
+    <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.custom.reports</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Add to existing button box -->
+            <xpath expr="//div[hasclass('o_form_button_box')]" position="inside">
+                <button name="action_print_custom_invoice" 
+                        string="Print Invoice"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        t-if="move_type in ('out_invoice', 'out_refund')"/>
+                
+                <button name="action_print_custom_bill" 
+                        string="Print Bill"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        t-if="move_type in ('in_invoice', 'in_refund')"/>
+                
+                <button name="action_print_custom_receipt" 
+                        string="Print Receipt"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add reports to the Print dropdown menu -->
+    <record id="account_move_action_print_custom_invoice" model="ir.actions.act_window">
+        <field name="name">Print Custom Invoice</field>
+        <field name="res_model">account.move</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="report_ref">custom_reports.action_report_custom_invoice</field>
+    </record>
+
+    <record id="account_move_action_print_custom_bill" model="ir.actions.act_window">
+        <field name="name">Print Custom Bill</field>
+        <field name="res_model">account.move</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="report_ref">custom_reports.action_report_custom_bill</field>
+    </record>
+
+    <record id="account_move_action_print_custom_receipt" model="ir.actions.act_window">
+        <field name="name">Print Custom Receipt</field>
+        <field name="res_model">account.move</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="report_ref">custom_reports.action_report_custom_receipt</field>
+    </record>
+</odoo>
