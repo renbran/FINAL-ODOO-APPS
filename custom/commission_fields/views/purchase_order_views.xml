@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Add default account field to purchase order form -->
-    <record id="view_purchase_order_form_commission_default_account" model="ir.ui.view">
-        <field name="name">purchase.order.form.commission.default.account</field>
+    <!-- Add commission fields to purchase order form - Simple and Safe -->
+    <record id="view_purchase_order_form_commission_fields" model="ir.ui.view">
+        <field name="name">purchase.order.form.commission.fields</field>
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add fields after partner_id - this field always exists -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="default_account_id"/>
+                <field name="external_commission_type"/>
+                <field name="external_percentage" invisible="external_commission_type != 'percentage'"/>
+                <field name="external_fixed_amount" invisible="external_commission_type != 'fixed'"/>
+                <field name="show_external_percentage" invisible="1"/>
+                <field name="show_external_fixed_amount" invisible="1"/>
             </xpath>
         </field>
     </record>
@@ -18,8 +24,8 @@
         <field name="model">purchase.order.line</field>
         <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='product_id']" position="after">
-                <field name="account_id"/>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="account_id" optional="hide"/>
             </xpath>
         </field>
     </record>

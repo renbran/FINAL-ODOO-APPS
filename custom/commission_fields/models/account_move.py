@@ -28,6 +28,20 @@ class AccountMove(models.Model):
         copy=False,
         help="Related Sale Order Sale Value"
     )
+    broker_commission = fields.Float(string='Broker Commission', readonly=True, copy=False, help="Broker commission from related Sale Order")
+    deal_id_display = fields.Char(string='Deal ID (Display)', compute='_compute_deal_id_display', store=False)
+
+    @api.depends('deal_id')
+    def _compute_deal_id_display(self):
+        for rec in self:
+            if rec.deal_id is not None:
+                # Remove trailing zeros and decimal if not needed
+                if float(rec.deal_id).is_integer():
+                    rec.deal_id_display = str(int(rec.deal_id))
+                else:
+                    rec.deal_id_display = str(rec.deal_id).rstrip('0').rstrip('.')
+            else:
+                rec.deal_id_display = ''
 
     @api.model
     def create(self, vals):
@@ -40,11 +54,13 @@ class AccountMove(models.Model):
                 vals['project_id'] = sale_order.project_id.id
                 vals['unit_id'] = sale_order.unit_id.id
                 vals['sale_value'] = sale_order.sale_value
+                # Use the calculated broker commission
+                vals['broker_commission'] = sale_order.broker_agency_total
         return super().create(vals)
 
     def write(self, vals):
         for move in self:
-            if move.invoice_origin and not any(f in vals for f in ['deal_id', 'booking_date', 'buyer_id', 'project_id', 'unit_id', 'sale_value']):
+            if move.invoice_origin and not any(f in vals for f in ['deal_id', 'booking_date', 'buyer_id', 'project_id', 'unit_id', 'sale_value', 'broker_commission']):
                 sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
                 if sale_order:
                     vals.update({
@@ -54,5 +70,7 @@ class AccountMove(models.Model):
                         'project_id': sale_order.project_id.id,
                         'unit_id': sale_order.unit_id.id,
                         'sale_value': sale_order.sale_value,
+                        # Use the calculated broker commission
+                        'broker_commission': sale_order.broker_agency_total,
                     })
         return super().write(vals)
