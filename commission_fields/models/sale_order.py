@@ -1706,3 +1706,265 @@ class SaleOrder(models.Model):
                 order.agent1_commission + order.agent2_commission + order.manager_commission + order.director_commission
             )
             order.grand_total_commission = order.total_external_commission + order.total_internal_commission
+
+    # =============================
+    # FLAT COMMISSION STRUCTURE
+    # =============================
+    # Header Fields
+    commission_base = fields.Float(string='Commission Base', help='Manually input or linked to untaxed total')
+    commission_total_external = fields.Float(string='Total External Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_internal = fields.Float(string='Total Internal Commission', compute='_compute_flat_commissions', store=True)
+    commission_total_payable = fields.Float(string='Total Payable Commission', compute='_compute_flat_commissions', store=True)
+    company_net_commission = fields.Float(string='Company Net Commission', compute='_compute_flat_commissions', store=True)
+    commission_unallocated = fields.Float(string='Unallocated Commission', compute='_compute_flat_commissions', store=True)
+
+    # External Commission Fields
+    ext_broker_partner = fields.Many2one('res.partner', string='Broker Partner')
+    ext_broker_rate = fields.Float(string='Broker Rate (%)')
+    ext_broker_amount = fields.Float(string='Broker Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_referral_partner = fields.Many2one('res.partner', string='Referral Partner')
+    ext_referral_rate = fields.Float(string='Referral Rate (%)')
+    ext_referral_amount = fields.Float(string='Referral Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_cashback_partner = fields.Many2one('res.partner', string='Cashback Partner')
+    ext_cashback_rate = fields.Float(string='Cashback Rate (%)')
+    ext_cashback_amount = fields.Float(string='Cashback Amount', compute='_compute_flat_commissions', store=True)
+
+    ext_other_partner = fields.Many2one('res.partner', string='Other Party')
+    ext_other_rate = fields.Float(string='Other Rate (%)')
+    ext_other_amount = fields.Float(string='Other Amount', compute='_compute_flat_commissions', store=True)
+
+    # Internal Commission Fields
+    int_agent1_employee = fields.Many2one('hr.employee', string='Agent 1')
+    int_agent1_rate = fields.Float(string='Agent 1 Rate (%)')
+    int_agent1_amount = fields.Float(string='Agent 1 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_agent2_employee = fields.Many2one('hr.employee', string='Agent 2')
+    int_agent2_rate = fields.Float(string='Agent 2 Rate (%)')
+    int_agent2_amount = fields.Float(string='Agent 2 Amount', compute='_compute_flat_commissions', store=True)
+
+    int_manager_employee = fields.Many2one('hr.employee', string='Manager')
+    int_manager_rate = fields.Float(string='Manager Rate (%)')
+    int_manager_amount = fields.Float(string='Manager Amount', compute='_compute_flat_commissions', store=True)
+
+    int_director_employee = fields.Many2one('hr.employee', string='Director')
+    int_director_rate = fields.Float(string='Director Rate (%)')
+    int_director_amount = fields.Float(string='Director Amount', compute='_compute_flat_commissions', store=True)
+
+    # --- Flat Commission Compute Type Fields (for each role) ---
+    ext_broker_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Broker Compute Type', default='untaxed')
+    ext_referral_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Referral Compute Type', default='untaxed')
+    ext_cashback_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Cashback Compute Type', default='untaxed')
+    ext_other_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Other Party Compute Type', default='untaxed')
+    int_agent1_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 1 Compute Type', default='untaxed')
+    int_agent2_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Agent 2 Compute Type', default='untaxed')
+    int_manager_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Manager Compute Type', default='untaxed')
+    int_director_commission_type = fields.Selection(
+        COMMISSION_TYPE_SELECTION, string='Director Compute Type', default='untaxed')
+
+    @api.depends(
+        'ext_broker_commission_type', 'ext_broker_rate',
+        'ext_referral_commission_type', 'ext_referral_rate',
+        'ext_cashback_commission_type', 'ext_cashback_rate',
+        'ext_other_commission_type', 'ext_other_rate',
+        'int_agent1_commission_type', 'int_agent1_rate',
+        'int_agent2_commission_type', 'int_agent2_rate',
+        'int_manager_commission_type', 'int_manager_rate',
+        'int_director_commission_type', 'int_director_rate',
+        'commission_base', 'amount_untaxed', 'amount_total'
+    )
+    def _compute_flat_commissions(self):
+        for rec in self:
+            price_unit = rec.amount_total or 0.0
+            untaxed = rec.amount_untaxed or 0.0
+            base = rec.commission_base or untaxed
+            # External
+            rec.ext_broker_amount = rec._compute_commission_amount(rec.ext_broker_commission_type, rec.ext_broker_rate)
+            rec.ext_referral_amount = rec._compute_commission_amount(rec.ext_referral_commission_type, rec.ext_referral_rate)
+            rec.ext_cashback_amount = rec._compute_commission_amount(rec.ext_cashback_commission_type, rec.ext_cashback_rate)
+            rec.ext_other_amount = rec._compute_commission_amount(rec.ext_other_commission_type, rec.ext_other_rate)
+            # Internal
+            rec.int_agent1_amount = rec._compute_commission_amount(rec.int_agent1_commission_type, rec.int_agent1_rate)
+            rec.int_agent2_amount = rec._compute_commission_amount(rec.int_agent2_commission_type, rec.int_agent2_rate)
+            rec.int_manager_amount = rec._compute_commission_amount(rec.int_manager_commission_type, rec.int_manager_rate)
+            rec.int_director_amount = rec._compute_commission_amount(rec.int_director_commission_type, rec.int_director_rate)
+            # Totals
+            rec.commission_total_external = rec.ext_broker_amount + rec.ext_referral_amount + rec.ext_cashback_amount + rec.ext_other_amount
+            rec.commission_total_internal = rec.int_agent1_amount + rec.int_agent2_amount + rec.int_manager_amount + rec.int_director_amount
+            rec.commission_total_payable = rec.commission_total_external + rec.commission_total_internal
+            rec.company_net_commission = base - rec.commission_total_payable
+            rec.commission_unallocated = max(0, base - rec.commission_total_payable)
+
+    def _compute_commission_amount(self, compute_type, rate):
+        self.ensure_one()
+        if compute_type == 'unit_price':
+            base = self.amount_total or 0.0
+        elif compute_type == 'untaxed':
+            base = self.amount_untaxed or 0.0
+        elif compute_type == 'fixed':
+            return rate or 0.0
+        else:
+            base = 0.0
+        return (rate or 0.0) * base / 100
+
+    # ===========================================
+    # ACTIONS
+    # ===========================================
+    
+    def action_calculate_commission(self):
+        """Button: Calculate all commissions and update status"""
+        for order in self:
+            order._compute_commission_totals()
+            order._compute_internal_commissions()
+            order._compute_total_commissions()
+            order._compute_allocation_status()
+            order.commission_status = 'calculated'
+            order.message_post(body=_('Commission recalculated by %s' % self.env.user.name))
+
+    def action_confirm_commission(self):
+        """Button: Confirm commission calculations"""
+        for order in self:
+            if order.commission_status != 'calculated':
+                raise UserError(_('Commission must be in "Calculated" state before confirmation!'))
+            order.commission_status = 'confirmed'
+            order.message_post(body=_('Commission confirmed by %s' % self.env.user.name))
+
+    def action_pay_commission(self):
+        """Button: Mark commission as paid"""
+        for order in self:
+            if order.commission_status != 'confirmed':
+                raise UserError(_('Commission must be confirmed before marking as paid!'))
+            order.commission_status = 'paid'
+            order.commission_payment_date = fields.Date.today()
+            order.message_post(body=_('Commission marked as paid by %s' % self.env.user.name))
+
+    def action_reset_commission(self):
+        """Button: Reset commission to draft state"""
+        for order in self:
+            if order.commission_status == 'paid':
+                raise UserError(_('Cannot reset paid commissions!'))
+            order.commission_status = 'draft'
+            order.message_post(body=_('Commission reset to draft by %s' % self.env.user.name))
+
+    def action_create_commission_purchase_order(self):
+        """Button: Create purchase orders for commission recipients (stub)"""
+        # Implement your logic here or call your existing PO creation logic
+        return True
+
+    def action_view_related_purchase_orders(self):
+        """Button: View related purchase orders (stub)"""
+        # Implement your logic here or return an action to open the PO list
+        return True
+
+    # ===========================================
+    # COMPUTED BOOLEAN FIELDS FOR VIEW CONTROL
+    # ===========================================
+    
+    show_external_percentage = fields.Boolean(
+        compute='_compute_show_external_percentage',
+        store=False
+    )
+    show_external_fixed_amount = fields.Boolean(
+        compute='_compute_show_external_fixed_amount',
+        store=False
+    )
+    show_agent1_rate = fields.Boolean(
+        compute='_compute_show_agent1_rate',
+        store=False
+    )
+    show_agent1_fixed = fields.Boolean(
+        compute='_compute_show_agent1_fixed',
+        store=False
+    )
+    show_agent2_rate = fields.Boolean(
+        compute='_compute_show_agent2_rate',
+        store=False
+    )
+    show_agent2_fixed = fields.Boolean(
+        compute='_compute_show_agent2_fixed',
+        store=False
+    )
+    show_manager_rate = fields.Boolean(
+        compute='_compute_show_manager_rate',
+        store=False
+    )
+    show_manager_fixed = fields.Boolean(
+        compute='_compute_show_manager_fixed',
+        store=False
+    )
+    show_director_rate = fields.Boolean(
+        compute='_compute_show_director_rate',
+        store=False
+    )
+    show_director_fixed = fields.Boolean(
+        compute='_compute_show_director_fixed',
+        store=False
+    )
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_percentage(self):
+        for rec in self:
+            rec.show_external_percentage = rec.external_commission_type != 'fixed'
+
+    @api.depends('external_commission_type')
+    def _compute_show_external_fixed_amount(self):
+        for rec in self:
+            rec.show_external_fixed_amount = rec.external_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_rate(self):
+        for rec in self:
+            rec.show_agent1_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent1_fixed(self):
+        for rec in self:
+            rec.show_agent1_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_rate(self):
+        for rec in self:
+            rec.show_agent2_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_agent2_fixed(self):
+        for rec in self:
+            rec.show_agent2_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_rate(self):
+        for rec in self:
+            rec.show_manager_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_manager_fixed(self):
+        for rec in self:
+            rec.show_manager_fixed = rec.internal_commission_type == 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_rate(self):
+        for rec in self:
+            rec.show_director_rate = rec.internal_commission_type != 'fixed'
+
+    @api.depends('internal_commission_type')
+    def _compute_show_director_fixed(self):
+        for rec in self:
+            rec.show_director_fixed = rec.internal_commission_type == 'fixed'
+
+    # ===========================================
+    # CONSTRAINTS
+    # ===========================================
+    
+    _sql_constraints = [
+        ('commission_percentage_positive', 
+         'CHECK(external_percentage >= 0 AND external_percentage <= 100)', 
+         'External commission percentage must be between 0 and 100!'),
+    ]
