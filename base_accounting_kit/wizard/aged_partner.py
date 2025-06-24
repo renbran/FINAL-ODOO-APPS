@@ -49,6 +49,7 @@ class AccountAgedTrialBalance(models.TransientModel):
     period_length = fields.Integer(string='Period Length (days)',
                                    required=True, default=30)
     date_from = fields.Date(default=lambda *a: time.strftime('%Y-%m-%d'))
+    partner_ids = fields.Many2many('res.partner', string='Partners')
 
     def _print_report(self, data):
         res = {}

@@ -22,6 +22,7 @@
 import io
 import json
 import xlsxwriter
+import datetime
 from odoo import api, fields, models
 
 
@@ -57,10 +58,17 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                if val['date_maturity'] and isinstance(val['date_maturity'], (fields.Date, fields.Datetime, type(fields.Date.today()))):
-                    diffrence = (today - val['date_maturity']).days
-                else:
-                    diffrence = 0  # or None, or handle as needed
+                date_maturity = val['date_maturity']
+                diffrence = 0
+                if date_maturity:
+                    if isinstance(date_maturity, str):
+                        try:
+                            date_maturity_dt = datetime.datetime.strptime(date_maturity, '%Y-%m-%d').date()
+                            diffrence = (today - date_maturity_dt).days
+                        except Exception:
+                            diffrence = 0
+                    elif isinstance(date_maturity, datetime.date):
+                        diffrence = (today - date_maturity).days
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
@@ -127,10 +135,17 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                if val['date_maturity'] and isinstance(val['date_maturity'], (fields.Date, fields.Datetime, type(fields.Date.today()))):
-                    diffrence = (today - val['date_maturity']).days
-                else:
-                    diffrence = 0  # or None, or handle as needed
+                date_maturity = val['date_maturity']
+                diffrence = 0
+                if date_maturity:
+                    if isinstance(date_maturity, str):
+                        try:
+                            date_maturity_dt = datetime.datetime.strptime(date_maturity, '%Y-%m-%d').date()
+                            diffrence = (today - date_maturity_dt).days
+                        except Exception:
+                            diffrence = 0
+                    elif isinstance(date_maturity, datetime.date):
+                        diffrence = (today - date_maturity).days
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
