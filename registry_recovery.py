@@ -14,12 +14,21 @@ def create_recovery_instructions():
 # 🚨 ODOO REGISTRY CORRUPTION - RECOVERY GUIDE
 
 ## 🔍 PROBLEM ANALYSIS
-The error `KeyError: 'ir.http'` indicates that the Odoo registry is corrupted. 
+The error `External ID not found in the system: account_statement.view_account_statement_wizard_form` 
+indicates XML duplicate record issues in the account_statement module.
+
 This typically happens when:
-- Module installation fails mid-way
-- Database becomes inconsistent
-- Python import errors during module loading
+- Duplicate action/view IDs exist across multiple XML files
+- Module installation fails due to conflicting records
+- XML references point to non-existent or conflicting records
 - Circular dependencies in custom modules
+
+## ✅ PROBLEM FIXED
+The duplicate records have been removed from account_statement_views.xml:
+- Removed duplicate action_account_statement_wizard
+- Removed duplicate action_account_statement  
+- Removed duplicate menu items that conflict with wizard_views.xml
+- Kept only the Contacts app menu items in account_statement_views.xml
 
 ## 🛠️ RECOVERY STEPS
 
@@ -42,12 +51,50 @@ sudo systemctl start odoo
 sudo service odoo start
 ```
 
-#### Option B: Update Module List
+#### Option B: Update Module List and Reinstall
 ```bash
-# Connect to your Odoo database and run:
-# Go to Apps -> Update Apps List
-# Then try to uninstall/reinstall the problematic module
+# 1. Go to Apps -> Update Apps List
+# 2. Find the account_statement module
+# 3. Uninstall it if currently installed
+# 4. Reinstall it fresh
 ```
+
+### STEP 2: MODULE SPECIFIC FIXES
+
+#### Account Statement Module XML Fixes Applied:
+The following duplicate records were removed from account_statement_views.xml:
+
+1. **Removed Duplicate Actions:**
+   - action_account_statement_wizard (conflicted with wizard_views.xml)
+   - action_account_statement (conflicted with wizard_views.xml)
+
+2. **Cleaned Up Menu Structure:**
+   - Removed duplicate menu_account_statement_root
+   - Removed duplicate menu_account_statement_wizard  
+   - Removed duplicate menu_account_statement_list
+   - Kept only Contacts app specific menu items
+
+3. **File Structure Now:**
+   - wizard_views.xml: Contains all actions and Accounting app menus
+   - account_statement_views.xml: Contains views and Contacts app menus only
+
+#### Manual Database Cleanup (if needed):
+```sql
+-- Clear duplicate ir.model.data entries
+DELETE FROM ir_model_data 
+WHERE module = 'account_statement' 
+AND name IN (
+    'action_account_statement_wizard',
+    'action_account_statement',
+    'menu_account_statement_root',
+    'menu_account_statement_wizard',
+    'menu_account_statement_list'
+) 
+AND id NOT IN (
+    SELECT MIN(id) FROM ir_model_data 
+    WHERE module = 'account_statement' 
+    GROUP BY name
+);
 
 ### STEP 2: DATABASE-LEVEL RECOVERY
 
@@ -73,6 +120,30 @@ AND model NOT IN (
 );
 ```
 
+### STEP 3: DATABASE CLEANUP (if still having issues)
+
+#### Option A: Targeted Cleanup
+```sql
+-- Clear module installation state
+UPDATE ir_module_module 
+SET state = 'uninstalled' 
+WHERE name = 'account_statement' AND state != 'uninstalled';
+
+-- Clear module dependencies
+DELETE FROM ir_module_module_dependency 
+WHERE module_id IN (
+    SELECT id FROM ir_module_module WHERE name = 'account_statement'
+);
+
+-- Clear any problematic model references
+DELETE FROM ir_model 
+WHERE model LIKE '%account.statement%' 
+AND model NOT IN (
+    SELECT model FROM ir_model 
+    WHERE modules LIKE '%base%'
+);
+```
+
 #### Option B: Full Registry Reset
 ```sql
 -- DANGER: This clears ALL custom modules
@@ -82,7 +153,7 @@ SET state = 'uninstalled'
 WHERE state IN ('to install', 'to upgrade', 'to remove');
 ```
 
-### STEP 3: ADVANCED RECOVERY
+### STEP 4: ADVANCED RECOVERY
 
 #### Option A: Manual Module Cleanup
 ```bash

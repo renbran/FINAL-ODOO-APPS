@@ -117,50 +117,8 @@
                         <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                         <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
                     </group>
-                </search>
-            </field>
+                </search>            </field>
         </record>
-
-        <!-- Account Statement Action -->
-        <record id="action_account_statement" model="ir.actions.act_window">
-            <field name="name">Account Statements</field>
-            <field name="res_model">account.statement</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create your first account statement!
-                </p>
-                <p>
-                    Account statements help you track partner transactions and balances.
-                </p>
-            </field>
-        </record>
-
-        <!-- Account Statement Wizard Action -->
-        <record id="action_account_statement_wizard" model="ir.actions.act_window">
-            <field name="name">Account Statement Wizard</field>
-            <field name="res_model">account.statement.wizard</field>
-            <field name="view_mode">form</field>
-            <!-- Fix: Use fully qualified external ID for the view_id reference -->
-            <field name="view_id" ref="account_statement.view_account_statement_wizard_form"/>
-            <field name="target">new</field>
-        </record>        <!-- Menu Items for Accounting App -->
-        <menuitem id="menu_account_statement_root"
-                  name="Account Statements"
-                  parent="account.menu_finance_reports"
-                  sequence="50"/>
-
-        <menuitem id="menu_account_statement_wizard"
-                  name="Generate Statement"
-                  parent="menu_account_statement_root"
-                  action="account_statement.action_account_statement_wizard"
-                  sequence="10"/>
-
-        <menuitem id="menu_account_statement_list"
-                  name="Statements"
-                  parent="menu_account_statement_root"
-                  action="account_statement.action_account_statement"
-                  sequence="20"/>
 
         <!-- Menu Items for Contacts App -->
         <menuitem id="menu_contacts_statement_root"
@@ -171,13 +129,13 @@
         <menuitem id="menu_contacts_statement_wizard"
                   name="Generate Statement"
                   parent="menu_contacts_statement_root"
-                  action="account_statement.action_account_statement_wizard"
+                  action="action_account_statement_wizard"
                   sequence="10"/>
 
         <menuitem id="menu_contacts_statement_list"
                   name="View Statements"
                   parent="menu_contacts_statement_root"
-                  action="account_statement.action_account_statement"
+                  action="action_account_statement"
                   sequence="20"/>
     </data>
 </odoo>
