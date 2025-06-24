@@ -16,13 +16,18 @@
             </xpath>
 
             <xpath expr="//page[@name='other_information']" position="after">
-                <page string="Commission" name="commission">
-                    <group>
+                <page string="Commission" name="commission">                    <group>
                         <group string="Commission Status">
-                            <field name="commission_status"/>
+                            <field name="commission_status" widget="badge" 
+                                   decoration-info="commission_status == 'draft'" 
+                                   decoration-warning="commission_status == 'calculated'"
+                                   decoration-success="commission_status in ['confirmed', 'paid']"
+                                   decoration-danger="commission_status == 'canceled'"/>
                             <field name="commission_sequence" readonly="1"/>
                             <field name="commission_payment_date"/>
                             <field name="commission_reference"/>
+                            <field name="commission_rejected_by" readonly="1" invisible="commission_status != 'canceled'"/>
+                            <field name="commission_rejected_date" readonly="1" invisible="commission_status != 'canceled'"/>
                         </group>
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
@@ -111,82 +116,8 @@
                                     <field name="director_commission_type"/>
                                     <field name="director_rate" invisible="not show_director_rate"/>
                                     <field name="director_fixed" invisible="not show_director_fixed"/>
-                                    <field name="director_commission" readonly="1"/>
-                                </group>
+                                    <field name="director_commission" readonly="1"/>                                </group>
                             </group>
-                        </page>
-
-                        <!-- FLAT COMMISSION STRUCTURE (NEW) -->
-                        <page string="Flat Commission (New)">
-                            <group string="Commission Summary">
-                                <field name="commission_base"/>
-                                <field name="commission_total_external" readonly="1"/>
-                                <field name="commission_total_internal" readonly="1"/>
-                                <field name="commission_total_payable" readonly="1"/>
-                                <field name="company_net_commission" readonly="1"/>
-                                <field name="commission_unallocated" readonly="1"/>
-                                <!-- Odoo 17: Remove attrs, just show both messages for now -->
-                                <div style="color: red; font-weight: bold;">
-                                    <span>⚠️ Unallocated commission! Please check breakdown.</span>
-                                </div>
-                                <div style="color: green; font-weight: bold;">
-                                    <span>✔ All commission allocated</span>
-                                </div>
-                            </group>
-                            <notebook>
-                                <page string="🟫 External Commission (Partners)" name="flat_external_commission">
-                                    <group string="Broker Partner (Burgundy)">
-                                        <field name="ext_broker_partner"/>
-                                        <field name="ext_broker_commission_type"/>
-                                        <field name="ext_broker_rate"/>
-                                        <field name="ext_broker_amount" readonly="1"/>
-                                    </group>
-                                    <group string="Referral Partner (Burgundy)">
-                                        <field name="ext_referral_partner"/>
-                                        <field name="ext_referral_commission_type"/>
-                                        <field name="ext_referral_rate"/>
-                                        <field name="ext_referral_amount" readonly="1"/>
-                                    </group>
-                                    <group string="Cashback Partner (Burgundy)">
-                                        <field name="ext_cashback_partner"/>
-                                        <field name="ext_cashback_commission_type"/>
-                                        <field name="ext_cashback_rate"/>
-                                        <field name="ext_cashback_amount" readonly="1"/>
-                                    </group>
-                                    <group string="Other Party (Burgundy)">
-                                        <field name="ext_other_partner"/>
-                                        <field name="ext_other_commission_type"/>
-                                        <field name="ext_other_rate"/>
-                                        <field name="ext_other_amount" readonly="1"/>
-                                    </group>
-                                </page>
-                                <page string="🟨 Internal Commission (Employees)" name="flat_internal_commission">
-                                    <group string="👤 Agent 1 (Gold)">
-                                        <field name="int_agent1_employee"/>
-                                        <field name="int_agent1_commission_type"/>
-                                        <field name="int_agent1_rate"/>
-                                        <field name="int_agent1_amount" readonly="1"/>
-                                    </group>
-                                    <group string="👤 Agent 2 (Gold)">
-                                        <field name="int_agent2_employee"/>
-                                        <field name="int_agent2_commission_type"/>
-                                        <field name="int_agent2_rate"/>
-                                        <field name="int_agent2_amount" readonly="1"/>
-                                    </group>
-                                    <group string="🧑‍💼 Manager (Gold)">
-                                        <field name="int_manager_employee"/>
-                                        <field name="int_manager_commission_type"/>
-                                        <field name="int_manager_rate"/>
-                                        <field name="int_manager_amount" readonly="1"/>
-                                    </group>
-                                    <group string="🧑‍💼 Director (Gold)">
-                                        <field name="int_director_employee"/>
-                                        <field name="int_director_commission_type"/>
-                                        <field name="int_director_rate"/>
-                                        <field name="int_director_amount" readonly="1"/>
-                                    </group>
-                                </page>
-                            </notebook>
                         </page>
                     </notebook>
                 </page>
@@ -194,10 +125,31 @@
 
             <!-- Add commission buttons to header -->
             <xpath expr="//header//button[@name='action_confirm']" position="before">
-                <button name="action_calculate_commission" string="Calculate Commission" type="object" class="btn-primary"/>
-                <button name="action_confirm_commission" string="Confirm Commission" type="object" class="btn-primary"/>
-                <button name="action_pay_commission" string="Mark as Paid" type="object" class="btn-primary"/>
-                <button name="action_reset_commission" string="Reset Commission" type="object" class="btn-secondary"/>
+                <button name="action_calculate_commission" 
+                        string="Calculate Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not show_calculate_button"/>
+                <button name="action_confirm_commission" 
+                        string="Confirm Commission" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not show_confirm_button"/>
+                <button name="action_pay_commission" 
+                        string="Mark as Paid" 
+                        type="object" 
+                        class="btn-success"
+                        invisible="not show_pay_button"/>
+                <button name="action_reset_commission" 
+                        string="Reset Commission" 
+                        type="object" 
+                        class="btn-secondary"
+                        invisible="not show_reset_button"/>
+                <button name="action_reject_commission" 
+                        string="Reject Commission" 
+                        type="object" 
+                        class="btn-danger"
+                        invisible="not show_reject_button"/>
             </xpath>
 
             <xpath expr="//header" position="inside">
@@ -220,6 +172,13 @@
                     <field name="show_manager_fixed" invisible="1"/>
                     <field name="show_director_rate" invisible="1"/>
                     <field name="show_director_fixed" invisible="1"/>
+                    
+                    <!-- Button visibility fields -->
+                    <field name="show_calculate_button" invisible="1"/>
+                    <field name="show_confirm_button" invisible="1"/>
+                    <field name="show_reset_button" invisible="1"/>
+                    <field name="show_pay_button" invisible="1"/>
+                    <field name="show_reject_button" invisible="1"/>
                 </group>
             </xpath>
 
