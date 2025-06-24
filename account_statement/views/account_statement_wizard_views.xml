@@ -8,9 +8,7 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="account_statement.view_account_statement_wizard_form"/>
             <field name="target">new</field>
-        </record>
-
-        <!-- Account Statement Wizard Form View -->
+        </record>        <!-- Account Statement Wizard Form View -->
         <record id="view_account_statement_wizard_form" model="ir.ui.view">
             <field name="name">account.statement.wizard.form</field>
             <field name="model">account.statement.wizard</field>
@@ -19,15 +17,25 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                <field name="partner_id" placeholder="Select Partner..." options="{'no_create': True}"/>
+                                <field name="partner_id" placeholder="Select Partner..." 
+                                       options="{'no_create': True}" 
+                                       domain="['|', ('customer_rank', '>', 0), ('supplier_rank', '>', 0)]"/>
                             </h1>
                         </div>
                         <group>
-                            <group>
+                            <group string="Date Range">
                                 <field name="date_from"/>
                                 <field name="date_to"/>
                                 <field name="currency_id" invisible="1"/>
                             </group>
+                            <group string="Filters">
+                                <field name="account_type_filter"/>
+                                <field name="show_zero_balance"/>
+                                <field name="excel_available" invisible="1"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Summary" invisible="not partner_id">
                             <group>
                                 <field name="total_debit" widget="monetary"/>
                                 <field name="total_credit" widget="monetary"/>
@@ -35,7 +43,7 @@
                             </group>
                         </group>
                         
-                        <notebook>
+                        <notebook invisible="not partner_id">
                             <page string="Statement Lines" name="lines">
                                 <field name="line_ids" nolabel="1">
                                     <tree string="Statement Lines" create="false" edit="false" delete="false">
@@ -43,8 +51,8 @@
                                         <field name="account_code"/>
                                         <field name="account_name"/>
                                         <field name="label"/>
-                                        <field name="debit" widget="monetary"/>
-                                        <field name="credit" widget="monetary"/>
+                                        <field name="debit" widget="monetary" sum="Total Debit"/>
+                                        <field name="credit" widget="monetary" sum="Total Credit"/>
                                         <field name="running_balance" widget="monetary"/>
                                         <field name="currency_id" invisible="1"/>
                                     </tree>
@@ -53,8 +61,12 @@
                         </notebook>
                     </sheet>
                     <footer>
-                        <button name="action_generate_pdf" string="Print PDF" type="object" class="btn-primary" invisible="partner_id == False"/>
-                        <button name="action_generate_excel" string="Export Excel" type="object" class="btn-secondary" invisible="partner_id == False"/>
+                        <button name="action_generate_pdf" string="Print PDF" type="object" 
+                                class="btn-primary" invisible="not partner_id"/>
+                        <button name="action_generate_excel" string="Export Excel" type="object" 
+                                class="btn-secondary" invisible="not partner_id or not excel_available"/>
+                        <button name="action_save_statement" string="Save Statement" type="object" 
+                                class="btn-secondary" invisible="not partner_id"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

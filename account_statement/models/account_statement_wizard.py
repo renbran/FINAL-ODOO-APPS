@@ -1,12 +1,19 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from datetime import datetime
-import io
-import xlsxwriter
-import base64
 import logging
 
 _logger = logging.getLogger(__name__)
+
+# Try to import Excel dependencies, handle gracefully if not available
+try:
+    import io
+    import xlsxwriter
+    import base64
+    EXCEL_AVAILABLE = True
+except ImportError:
+    EXCEL_AVAILABLE = False
+    _logger.warning("Excel dependencies not available. Excel export will be disabled.")
 
 
 class AccountStatementWizard(models.TransientModel):
@@ -23,6 +30,21 @@ class AccountStatementWizard(models.TransientModel):
     total_credit = fields.Monetary(string='Total Credit', currency_field='currency_id', readonly=True)
     balance = fields.Monetary(string='Balance', currency_field='currency_id', readonly=True)
     line_ids = fields.One2many('account.statement.wizard.line', 'wizard_id', string='Statement Lines', readonly=True)
+    
+    # Add filter options
+    account_type_filter = fields.Selection([
+        ('all', 'All Accounts'),
+        ('receivable', 'Receivable Only'),
+        ('payable', 'Payable Only'),
+    ], string='Account Filter', default='all')
+    
+    show_zero_balance = fields.Boolean(string='Show Zero Balance Lines', default=True)
+    excel_available = fields.Boolean(string='Excel Available', compute='_compute_excel_available')
+
+    @api.depends()
+    def _compute_excel_available(self):
+        for record in self:
+            record.excel_available = EXCEL_AVAILABLE
 
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
@@ -30,7 +52,7 @@ class AccountStatementWizard(models.TransientModel):
             if record.date_from and record.date_to and record.date_from > record.date_to:
                 raise ValidationError(_('Start date must be before end date'))
 
-    @api.onchange('partner_id', 'date_from', 'date_to')
+    @api.onchange('partner_id', 'date_from', 'date_to', 'account_type_filter')
     def _onchange_partner_dates(self):
         if self.partner_id and self.date_from and self.date_to:
             self._compute_statement_data()
@@ -44,13 +66,22 @@ class AccountStatementWizard(models.TransientModel):
         self.line_ids = [(5, 0, 0)]
         
         try:
-            # Fetch all posted move lines for the partner in the date range, for all accounts
-            move_lines = self.env['account.move.line'].search([
+            # Build domain based on account type filter
+            domain = [
                 ('partner_id', '=', self.partner_id.id),
                 ('date', '>=', self.date_from),
                 ('date', '<=', self.date_to),
                 ('move_id.state', '=', 'posted'),
-            ], order='date, id')
+            ]
+            
+            # Add account type filter
+            if self.account_type_filter == 'receivable':
+                domain.append(('account_id.account_type', '=', 'asset_receivable'))
+            elif self.account_type_filter == 'payable':
+                domain.append(('account_id.account_type', '=', 'liability_payable'))
+            
+            # Fetch all posted move lines for the partner in the date range
+            move_lines = self.env['account.move.line'].search(domain, order='date, id')
         except Exception as e:
             raise ValidationError(_('Error fetching account move lines: %s') % str(e))
 
@@ -62,9 +93,15 @@ class AccountStatementWizard(models.TransientModel):
         for line in move_lines:
             debit = line.debit
             credit = line.credit
+            
+            # Skip zero balance lines if option is disabled
+            if not self.show_zero_balance and debit == 0 and credit == 0:
+                continue
+                
             total_debit += debit
             total_credit += credit
             running_balance += (debit - credit)
+            
             lines_data.append({
                 'date': line.date,
                 'account_name': line.account_id.display_name,
@@ -88,10 +125,16 @@ class AccountStatementWizard(models.TransientModel):
     def action_generate_excel(self):
         """Generate Excel report with all accounts and formatted values"""
         self.ensure_one()
+        
+        if not EXCEL_AVAILABLE:
+            raise UserError(_("Excel export is not available. Please install the 'report_xlsx' module and required dependencies."))
+        
         try:
             output = io.BytesIO()
             workbook = xlsxwriter.Workbook(output, {'in_memory': True})
             worksheet = workbook.add_worksheet('Account Statement')
+            
+            # Formats
             header_format = workbook.add_format({
                 'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#D7E4BC'
             })
@@ -100,31 +143,44 @@ class AccountStatementWizard(models.TransientModel):
             })
             date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
             currency_format = workbook.add_format({'num_format': '#,##0.00'})
+            
+            # Headers
             worksheet.merge_range('A1:H1', f'Account Statement - {self.partner_id.name}', header_format)
             worksheet.write('A2', 'Period:', subheader_format)
             worksheet.write('B2', f'{self.date_from} to {self.date_to}')
-            worksheet.write('A4', 'Total Debit:', subheader_format)
-            worksheet.write('B4', "{:,.2f}".format(self.total_debit), currency_format)
-            worksheet.write('A5', 'Total Credit:', subheader_format)
-            worksheet.write('B5', "{:,.2f}".format(self.total_credit), currency_format)
-            worksheet.write('A6', 'Balance:', subheader_format)
-            worksheet.write('B6', "{:,.2f}".format(self.balance), currency_format)
+            worksheet.write('A3', 'Account Filter:', subheader_format)
+            worksheet.write('B3', dict(self._fields['account_type_filter'].selection)[self.account_type_filter])
+            
+            # Summary
+            worksheet.write('A5', 'Total Debit:', subheader_format)
+            worksheet.write('B5', self.total_debit, currency_format)
+            worksheet.write('A6', 'Total Credit:', subheader_format)
+            worksheet.write('B6', self.total_credit, currency_format)
+            worksheet.write('A7', 'Balance:', subheader_format)
+            worksheet.write('B7', self.balance, currency_format)
+            
+            # Column headers
             headers = ['Date', 'Account', 'Label', 'Debit', 'Credit', 'Running Balance']
             for col, header in enumerate(headers):
-                worksheet.write(7, col, header, subheader_format)
-            row = 8
+                worksheet.write(8, col, header, subheader_format)
+            
+            # Data rows
+            row = 9
             for line in self.line_ids:
                 worksheet.write(row, 0, line.date, date_format)
                 worksheet.write(row, 1, f"{line.account_code} {line.account_name}")
                 worksheet.write(row, 2, line.label)
-                worksheet.write(row, 3, "{:,.2f}".format(line.debit), currency_format)
-                worksheet.write(row, 4, "{:,.2f}".format(line.credit), currency_format)
-                worksheet.write(row, 5, "{:,.2f}".format(line.running_balance), currency_format)
+                worksheet.write(row, 3, line.debit, currency_format)
+                worksheet.write(row, 4, line.credit, currency_format)
+                worksheet.write(row, 5, line.running_balance, currency_format)
                 row += 1
+            
+            # Column widths
             worksheet.set_column('A:A', 12)
             worksheet.set_column('B:B', 30)
             worksheet.set_column('C:C', 25)
             worksheet.set_column('D:F', 15)
+            
             workbook.close()
             output.seek(0)
             encoded_file = base64.b64encode(output.read())

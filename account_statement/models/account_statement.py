@@ -5,13 +5,14 @@ class AccountStatement(models.Model):
     _name = 'account.statement'
     _description = 'Account Statement'
     _order = 'date desc, id desc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Statement Name', required=True)
-    date = fields.Date(string='Date', required=True, default=fields.Date.context_today, index=True)
-    partner_id = fields.Many2one('res.partner', string='Partner', required=True, index=True)
-    date_from = fields.Date(string='Date From', required=True, index=True)
-    date_to = fields.Date(string='Date To', required=True, index=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
+    name = fields.Char(string='Statement Name', required=True, tracking=True)
+    date = fields.Date(string='Date', required=True, default=fields.Date.context_today, index=True, tracking=True)
+    partner_id = fields.Many2one('res.partner', string='Partner', required=True, index=True, tracking=True)
+    date_from = fields.Date(string='Date From', required=True, index=True, tracking=True)
+    date_to = fields.Date(string='Date To', required=True, index=True, tracking=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id, tracking=True)
     total_debit = fields.Monetary(string='Total Debit', currency_field='currency_id')
     total_credit = fields.Monetary(string='Total Credit', currency_field='currency_id')
     balance = fields.Monetary(string='Balance', currency_field='currency_id')
@@ -23,9 +24,17 @@ class AccountStatement(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, tracking=True)
 
-    @api.constrains('date_from', 'date_to')
+    # Add user tracking
+    user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user, tracking=True)
+    
+    @api.model
+    def create(self, vals):
+        """Override create to add creation message"""
+        result = super(AccountStatement, self).create(vals)
+        result.message_post(body=_("Account Statement created"))
+        return result    @api.constrains('date_from', 'date_to')
     def _check_dates(self):
         for record in self:
             if record.date_from and record.date_to and record.date_from > record.date_to:
@@ -37,13 +46,19 @@ class AccountStatement(models.Model):
     ]
 
     def action_confirm(self):
+        """Confirm the statement"""
         self.write({'state': 'confirmed'})
+        self.message_post(body=_("Account Statement confirmed"))
 
     def action_cancel(self):
+        """Cancel the statement"""
         self.write({'state': 'cancelled'})
+        self.message_post(body=_("Account Statement cancelled"))
 
     def action_draft(self):
+        """Reset to draft"""
         self.write({'state': 'draft'})
+        self.message_post(body=_("Account Statement reset to draft"))
 
 
 class AccountStatementLine(models.Model):
