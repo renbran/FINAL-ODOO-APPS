@@ -28,7 +28,7 @@ Run the provided SQL script to automatically fix all NULL values:
 
 ```powershell
 # Using PowerShell (Windows)
-.\fix_database.ps1 -DatabaseName "your_odoo_database" -Username "your_db_user"
+.\fix_database.ps1 -DatabaseName "os-us" -Username "root"
 
 # Or run SQL directly in psql/pgAdmin
 psql -U your_user -d your_database -f database_migration_fix.sql
@@ -123,7 +123,7 @@ If you want to make the fields optional instead:
    ```
 3. **Run the fix script**:
    ```powershell
-   .\fix_database.ps1 -DatabaseName "your_odoo_database_name"
+   .\fix_database.ps1 -DatabaseName "os-us" -Username "root"
    ```
 4. **Follow the prompts** and confirm when asked
 5. **Start Odoo** once the script completes successfully

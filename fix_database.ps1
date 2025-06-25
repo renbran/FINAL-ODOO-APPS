@@ -11,7 +11,7 @@
 param(
     [string]$DatabaseName = "",
     [string]$Username = "odoo",
-    [string]$Host = "localhost",
+    [string]$Hostname = "localhost",
     [string]$Port = "5432",
     [switch]$Help
 )
@@ -29,18 +29,19 @@ This script fixes NOT NULL constraint errors in Odoo 17:
 - res_bank.routing_code
 
 USAGE:
-    .\fix_database.ps1 -DatabaseName "your_db_name" -Username "your_user" -Host "localhost" -Port "5432"
+    .\fix_database.ps1 -DatabaseName "your_db_name" -Username "your_user" -Hostname "localhost" -Port "5432"
 
 PARAMETERS:
     -DatabaseName   Your Odoo database name (required)
     -Username       Database username (default: odoo)
-    -Host           Database host (default: localhost)
+    -Hostname       Database host (default: localhost)
     -Port           Database port (default: 5432)
     -Help           Show this help message
 
 EXAMPLES:
     .\fix_database.ps1 -DatabaseName "odoo_17_prod"
-    .\fix_database.ps1 -DatabaseName "odoo_17_prod" -Username "postgres" -Host "192.168.1.100"
+    .\fix_database.ps1 -DatabaseName "os-us" -Username "root"
+    .\fix_database.ps1 -DatabaseName "odoo_17_prod" -Username "postgres" -Hostname "192.168.1.100"
 
 MANUAL ALTERNATIVE:
 If you prefer to run the SQL manually:
@@ -72,13 +73,13 @@ function Test-Prerequisites {
 }
 
 function Test-DatabaseConnection {
-    param([string]$dbname, [string]$user, [string]$host, [string]$port)
+    param([string]$dbname, [string]$user, [string]$hostname, [string]$port)
     
     Write-Host "🔗 Testing database connection..." -ForegroundColor Yellow
     
     try {
         $testQuery = "SELECT version();"
-        $result = psql -h $host -p $port -U $user -d $dbname -t -c $testQuery 2>$null
+        $result = psql -h $hostname -p $port -U $user -d $dbname -t -c $testQuery 2>$null
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ Database connection successful" -ForegroundColor Green
@@ -95,7 +96,7 @@ function Test-DatabaseConnection {
 }
 
 function Invoke-DatabaseFix {
-    param([string]$dbname, [string]$user, [string]$host, [string]$port)
+    param([string]$dbname, [string]$user, [string]$hostname, [string]$port)
     
     $sqlFile = Join-Path $PSScriptRoot "database_migration_fix.sql"
     
@@ -111,7 +112,7 @@ function Invoke-DatabaseFix {
     
     try {
         # Run the SQL script
-        psql -h $host -p $port -U $user -d $dbname -f $sqlFile
+        psql -h $hostname -p $port -U $user -d $dbname -f $sqlFile
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host "🎉 Database migration completed successfully!" -ForegroundColor Green
@@ -180,7 +181,7 @@ if (-not (Test-Prerequisites)) {
 }
 
 # Test database connection
-if (-not (Test-DatabaseConnection -dbname $DatabaseName -user $Username -host $Host -port $Port)) {
+if (-not (Test-DatabaseConnection -dbname $DatabaseName -user $Username -hostname $Hostname -port $Port)) {
     Write-Host "Please check your database credentials and try again" -ForegroundColor Yellow
     exit 1
 }
@@ -196,7 +197,7 @@ if ($confirm -ne "y" -and $confirm -ne "Y" -and $confirm -ne "yes") {
 }
 
 # Run the migration
-if (Invoke-DatabaseFix -dbname $DatabaseName -user $Username -host $Host -port $Port) {
+if (Invoke-DatabaseFix -dbname $DatabaseName -user $Username -hostname $Hostname -port $Port) {
     Show-PostMigrationInstructions
 } else {
     Write-Host "`n❌ Migration failed. Please check the error messages above." -ForegroundColor Red
