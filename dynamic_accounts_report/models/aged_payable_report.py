@@ -24,6 +24,10 @@ import json
 import xlsxwriter
 import datetime
 from odoo import api, fields, models
+from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class AgePayableReport(models.TransientModel):
@@ -44,6 +48,20 @@ class AgePayableReport(models.TransientModel):
             pass
         return 0
 
+    def _get_move_lines(self, partner_id, paid_moves):
+        """Helper method to get move lines for a partner with proper filtering"""
+        move_lines = paid_moves.filtered(lambda r: r.partner_id.id == partner_id.id)
+        return move_lines.read([
+            'name', 'move_name', 'date', 'amount_currency', 'account_id',
+            'date_maturity', 'currency_id', 'credit', 'move_id'
+        ])
+
+    def _safe_get_currency(self, currency_data):
+        """Safely get currency name from currency data"""
+        if currency_data and isinstance(currency_data, (list, tuple)) and len(currency_data) > 1:
+            return currency_data[1]
+        return ''
+
     @api.model
     def view_report(self):
         """
@@ -57,46 +75,49 @@ class AgePayableReport(models.TransientModel):
         """
         partner_total = {}
         move_line_list = {}
-        paid = self.env['account.move.line'].search(
-            [('parent_state', '=', 'posted'),
-             ('account_type', '=', 'liability_payable'),
-             ('reconciled', '=', False)])
-        currency_id = self.env.company.currency_id.symbol
+        paid = self.env['account.move.line'].search([
+            ('parent_state', '=', 'posted'),
+            ('account_type', '=', 'liability_payable'),
+            ('reconciled', '=', False)
+        ])
+        
+        currency = self.env.company.currency_id
         partner_ids = paid.mapped('partner_id')
         today = fields.Date.today()
+
         for partner_id in partner_ids:
-            move_line_ids = paid.filtered(
-                lambda rec: rec.partner_id in partner_id)
-            move_line_data = move_line_ids.read(
-                ['name', 'move_name', 'date', 'amount_currency', 'account_id',
-                 'date_maturity', 'currency_id', 'credit', 'move_id'])
+            move_line_data = self._get_move_lines(partner_id, paid)
+            
+            # Process each move line
             for val in move_line_data:
                 date_maturity = val.get('date_maturity', False)
                 diffrence = self._calculate_date_difference(date_maturity, today)
+                
+                # Calculate aging buckets
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
                 val['diff3'] = val['credit'] if 60 < diffrence <= 90 else 0.0
                 val['diff4'] = val['credit'] if 90 < diffrence <= 120 else 0.0
                 val['diff5'] = val['credit'] if diffrence > 120 else 0.0
+
+            # Store move lines for this partner
             move_line_list[partner_id.name] = move_line_data
+            
+            # Calculate totals for this partner
+            credit_sum = sum(val['credit'] for val in move_line_data)
             partner_total[partner_id.name] = {
-                'credit_sum': sum(val['credit'] for val in move_line_data),
-                'diff0_sum': round(sum(val['diff0'] for val in move_line_data),
-                                   2),
-                'diff1_sum': round(sum(val['diff1'] for val in move_line_data),
-                                   2),
-                'diff2_sum': round(sum(val['diff2'] for val in move_line_data),
-                                   2),
-                'diff3_sum': round(sum(val['diff3'] for val in move_line_data),
-                                   2),
-                'diff4_sum': round(sum(val['diff4'] for val in move_line_data),
-                                   2),
-                'diff5_sum': round(sum(val['diff5'] for val in move_line_data),
-                                   2),
-                'currency_id': currency_id,
+                'credit_sum': credit_sum,
+                'diff0_sum': round(sum(val['diff0'] for val in move_line_data), 2),
+                'diff1_sum': round(sum(val['diff1'] for val in move_line_data), 2),
+                'diff2_sum': round(sum(val['diff2'] for val in move_line_data), 2),
+                'diff3_sum': round(sum(val['diff3'] for val in move_line_data), 2),
+                'diff4_sum': round(sum(val['diff4'] for val in move_line_data), 2),
+                'diff5_sum': round(sum(val['diff5'] for val in move_line_data), 2),
+                'currency_id': currency.id,
                 'partner_id': partner_id.id
             }
+
         move_line_list['partner_totals'] = partner_total
         return move_line_list
 
@@ -170,82 +191,78 @@ class AgePayableReport(models.TransientModel):
 
     @api.model
     def get_xlsx_report(self, data, response, report_name, report_action):
-        """
-        Generate an Excel report based on the provided data.
-        :param data: The data used to generate the report.
-        :type data: str (JSON format)
-        :param response: The response object to write the report to.
-        :type response: object
-        :param report_name: The name of the report.
-        :type report_name: str
-        :return: None
-        """
-        data = json.loads(data)
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        end_date = data['filters']['end_date'] if \
-            data['filters']['end_date'] else ''
-        sheet = workbook.add_worksheet()
-        head = workbook.add_format(
-            {'align': 'center', 'bold': True, 'font_size': '15px'})
-        sub_heading = workbook.add_format(
-            {'align': 'center', 'bold': True, 'font_size': '10px',
-             'border': 1, 'bg_color': '#D3D3D3',
-             'border_color': 'black'})
-        filter_head = workbook.add_format(
-            {'align': 'center', 'bold': True, 'font_size': '10px',
-             'border': 1, 'bg_color': '#D3D3D3',
-             'border_color': 'black'})
-        filter_body = workbook.add_format(
-            {'align': 'center', 'bold': True, 'font_size': '10px'})
-        side_heading_sub = workbook.add_format(
-            {'align': 'left', 'bold': True, 'font_size': '10px',
-             'border': 1,
-             'border_color': 'black'})
-        side_heading_sub.set_indent(1)
-        txt_name = workbook.add_format({'font_size': '10px', 'border': 1})
-        txt_name.set_indent(2)
-        sheet.set_column(0, 0, 30)
-        sheet.set_column(1, 1, 20)
-        sheet.set_column(2, 2, 15)
-        sheet.set_column(3, 3, 15)
-        col = 0
-        sheet.write('A1:b1', report_name, head)
-        sheet.write('B3:b4', 'Date Range', filter_head)
-        sheet.write('B4:b4', 'Partners', filter_head)
-        if end_date:
-            sheet.merge_range('C3:G3', f"{end_date}", filter_body)
-        if data['filters']['partner']:
-            display_names = [partner.get('display_name', 'undefined') for
-                             partner in data['filters']['partner']]
-            display_names_str = ', '.join(display_names)
-            sheet.merge_range('C4:G4', display_names_str, filter_body)
-        if data:
-            if report_action == 'dynamic_accounts_report.action_aged_payable':
-                sheet.write(6, col, ' ', sub_heading)
-                sheet.write(6, col + 1, 'Invoice Date', sub_heading)
-                sheet.write(6, col + 2, 'Amount Currency', sub_heading)
-                sheet.write(6, col + 3, 'Currency', sub_heading)
-                sheet.merge_range(6, col + 4, 6, col + 5, 'Account',
-                                  sub_heading)
-                sheet.merge_range(6, col + 6, 6, col + 7, 'Expected Date',
-                                  sub_heading)
-                sheet.write(6, col + 8, 'At Date', sub_heading)
-                sheet.write(6, col + 9, '1-30', sub_heading)
-                sheet.write(6, col + 10, '31-60', sub_heading)
-                sheet.write(6, col + 11, '61-90', sub_heading)
-                sheet.write(6, col + 12, '91-120', sub_heading)
-                sheet.write(6, col + 13, 'Older', sub_heading)
-                sheet.write(6, col + 14, 'Total', sub_heading)
-                row = 6
-                for move_line in data['move_lines']:
-                    row += 1
-                    sheet.write(row, col, move_line, txt_name)
-                    sheet.write(row, col + 1, ' ', txt_name)
-                    sheet.write(row, col + 2, ' ', txt_name)
-                    sheet.write(row, col + 3, ' ', txt_name)
-                    sheet.merge_range(row, col + 4, row, col + 5, ' ',
-                                      txt_name)
+        """Generate an Excel report based on the provided data."""
+        try:
+            data = json.loads(data)
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+            
+            # Get report filters
+            filters = data.get('filters', {})
+            end_date = filters.get('end_date', '')
+            partners = filters.get('partner', [])
+            
+            # Create worksheet and formats
+            sheet = workbook.add_worksheet()
+            formats = self._get_xlsx_formats(workbook)
+            
+            # Set column widths
+            self._set_column_widths(sheet)
+            
+            # Write headers
+            self._write_report_headers(sheet, formats, report_name, end_date, partners)
+            
+            # Write data
+            if data and report_action == 'dynamic_accounts_report.action_aged_payable':
+                self._write_aged_payable_data(sheet, formats, data)
+            
+            workbook.close()
+            output.seek(0)
+            response.stream.write(output.read())
+            output.close()
+            
+        except Exception as e:
+            _logger.error("Error generating XLSX report: %s", str(e))
+            raise UserError(_("Error generating Excel report. Please try again or contact your administrator."))
+
+    def _get_xlsx_formats(self, workbook):
+        """Create and return dictionary of workbook formats"""
+        return {
+            'head': workbook.add_format({
+                'align': 'center', 
+                'bold': True, 
+                'font_size': '15px'
+            }),
+            'sub_heading': workbook.add_format({
+                'align': 'center', 
+                'bold': True, 
+                'font_size': '10px',
+                'border': 1, 
+                'bg_color': '#D3D3D3',
+                'border_color': 'black'
+            }),
+            'filter_head': workbook.add_format({
+                'align': 'center', 
+                'bold': True, 
+                'font_size': '10px',
+                'border': 1, 
+                'bg_color': '#D3D3D3',
+                'border_color': 'black'
+            }),
+            'txt': workbook.add_format({
+                'font_size': '10px', 
+                'border': 1
+            }).set_indent(2)
+        }
+
+    def _set_column_widths(self, sheet):
+        """Set the column widths for the worksheet"""
+        widths = [30, 20, 15, 15, 20, 20, 15, 15, 15, 15, 15, 15, 15, 15, 15]
+        for i, width in enumerate(widths):
+            sheet.set_column(i, i, width)
+
+    def _write_report_headers(self, sheet, formats, report_name, end_date, partners):
+        """Write report headers and filters"""
                     sheet.merge_range(row, col + 6, row, col + 7, ' ',
                                       txt_name)
                     sheet.write(row, col + 8,
