@@ -21,11 +21,11 @@
 ################################################################################
 import io
 import json
+import logging
 import xlsxwriter
 import datetime
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -263,78 +263,97 @@ class AgePayableReport(models.TransientModel):
 
     def _write_report_headers(self, sheet, formats, report_name, end_date, partners):
         """Write report headers and filters"""
-                    sheet.merge_range(row, col + 6, row, col + 7, ' ',
-                                      txt_name)
-                    sheet.write(row, col + 8,
-                                data['total'][move_line]['diff0_sum'],
-                                txt_name)
-                    sheet.write(row, col + 9,
-                                data['total'][move_line]['diff1_sum'],
-                                txt_name)
-                    sheet.write(row, col + 10,
-                                data['total'][move_line]['diff2_sum'],
-                                txt_name)
-                    sheet.write(row, col + 11,
-                                data['total'][move_line]['diff3_sum'],
-                                txt_name)
-                    sheet.write(row, col + 12,
-                                data['total'][move_line]['diff4_sum'],
-                                txt_name)
-                    sheet.write(row, col + 13,
-                                data['total'][move_line]['diff5_sum'],
-                                txt_name)
-                    sheet.write(row, col + 14,
-                                data['total'][move_line]['credit_sum'],
-                                txt_name)
-                    for rec in data['data'][move_line]:
-                        row += 1
-                        if not rec['name']:
-                            rec['name'] = ' '
-                        sheet.write(row, col, rec['move_name'] + rec['name'],
-                                    txt_name)
-                        sheet.write(row, col + 1, rec['date'],
-                                    txt_name)
-                        sheet.write(row, col + 2, rec['amount_currency'],
-                                    txt_name)
-                        sheet.write(row, col + 3, rec['currency_id'][1],
-                                    txt_name)
-                        sheet.merge_range(row, col + 4, row, col + 5,
-                                          rec['account_id'][1],
-                                          txt_name)
-                        sheet.merge_range(row, col + 6, row, col + 7,
-                                          rec['date_maturity'],
-                                          txt_name)
-                        sheet.write(row, col + 8, rec['diff0'], txt_name)
-                        sheet.write(row, col + 9, rec['diff1'], txt_name)
-                        sheet.write(row, col + 10, rec['diff2'], txt_name)
-                        sheet.write(row, col + 11, rec['diff3'], txt_name)
-                        sheet.write(row, col + 12, rec['diff4'], txt_name)
-                        sheet.write(row, col + 13, rec['diff5'], txt_name)
-                        sheet.write(row, col + 14, ' ', txt_name)
-                sheet.merge_range(row + 1, col, row + 1, col + 7, 'Total',
-                                  filter_head)
-                sheet.write(row + 1, col + 8,
-                            data['grand_total']['diff0_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 9,
-                            data['grand_total']['diff1_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 10,
-                            data['grand_total']['diff2_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 11,
-                            data['grand_total']['diff3_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 12,
-                            data['grand_total']['diff4_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 13,
-                            data['grand_total']['diff5_sum'],
-                            filter_head)
-                sheet.write(row + 1, col + 14,
-                            data['grand_total']['total_credit'],
-                            filter_head)
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
+        sheet.merge_range('A1:B1', report_name, formats['head'])
+        sheet.write('B3', 'Date Range', formats['filter_head'])
+        sheet.write('B4', 'Partners', formats['filter_head'])
+        
+        if end_date:
+            sheet.merge_range('C3:G3', str(end_date), formats['filter_head'])
+            
+        if partners:
+            partner_names = [p.get('display_name', 'undefined') for p in partners]
+            sheet.merge_range('C4:G4', ', '.join(partner_names), formats['filter_head'])
+
+    def _write_aged_payable_data(self, sheet, formats, data):
+        """Write the aged payable report data"""
+        if not data.get('move_lines'):
+            return
+
+        # Write column headers
+        headers = [
+            ' ', 'Invoice Date', 'Amount Currency', 'Currency', 'Account',
+            'Expected Date', 'At Date', '1-30', '31-60', '61-90', '91-120',
+            'Older', 'Total'
+        ]
+        for col, header in enumerate(headers):
+            sheet.write(6, col, header, formats['sub_heading'])
+
+        row = 6
+        for move_line in data['move_lines']:
+            row = self._write_partner_data(sheet, formats, data, move_line, row)
+
+        # Write grand totals
+        self._write_grand_totals(sheet, formats, data, row)
+
+    def _write_partner_data(self, sheet, formats, data, move_line, row):
+        """Write data for a specific partner"""
+        row += 1
+        totals = data['total'].get(move_line, {})
+        
+        # Write partner summary row
+        sheet.write(row, 0, move_line, formats['txt'])
+        for col in range(1, 8):
+            sheet.write(row, col, '', formats['txt'])
+            
+        # Write partner totals
+        diff_fields = ['diff0_sum', 'diff1_sum', 'diff2_sum', 'diff3_sum', 
+                      'diff4_sum', 'diff5_sum', 'credit_sum']
+        for col, field in enumerate(diff_fields, 8):
+            sheet.write(row, col, totals.get(field, 0.0), formats['txt'])
+
+        # Write move lines
+        for rec in data['data'].get(move_line, []):
+            row = self._write_move_line(sheet, formats, rec, row)
+
+        return row
+
+    def _write_move_line(self, sheet, formats, rec, row):
+        """Write a single move line"""
+        row += 1
+        
+        # Safely get values with fallbacks
+        move_name = rec.get('move_name', '')
+        name = rec.get('name', '')
+        date = rec.get('date', '')
+        amount_currency = rec.get('amount_currency', 0.0)
+        currency = self._safe_get_currency(rec.get('currency_id'))
+        account = rec.get('account_id', ['', ''])[1]
+        date_maturity = rec.get('date_maturity', '')
+        
+        # Write move line data
+        sheet.write(row, 0, f"{move_name} {name}".strip(), formats['txt'])
+        sheet.write(row, 1, date, formats['txt'])
+        sheet.write(row, 2, amount_currency, formats['txt'])
+        sheet.write(row, 3, currency, formats['txt'])
+        sheet.merge_range(row, 4, row, 5, account, formats['txt'])
+        sheet.merge_range(row, 6, row, 7, date_maturity, formats['txt'])
+        
+        # Write aging buckets
+        for i, field in enumerate(['diff0', 'diff1', 'diff2', 'diff3', 
+                                 'diff4', 'diff5']):
+            sheet.write(row, 8 + i, rec.get(field, 0.0), formats['txt'])
+            
+        sheet.write(row, 14, '', formats['txt'])
+        return row
+
+    def _write_grand_totals(self, sheet, formats, data, row):
+        """Write the grand totals row"""
+        row += 1
+        sheet.merge_range(row, 0, row, 7, 'Total', formats['filter_head'])
+        
+        diff_fields = ['diff0_sum', 'diff1_sum', 'diff2_sum', 'diff3_sum', 
+                      'diff4_sum', 'diff5_sum']
+        for col, field in enumerate(diff_fields, 8):
+            sheet.write(row, col, data['grand_total'].get(field, 0.0), formats['filter_head'])
+        
+        sheet.write(row, 14, data['grand_total'].get('total_credit', 0.0), formats['filter_head'])
