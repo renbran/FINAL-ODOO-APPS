@@ -14,15 +14,46 @@ class AccountStatementWizard(models.TransientModel):
     
     def action_generate_statement(self):
         """Generate the account statement."""
-        self.ensure_one()
+        self.ensure_one()        # Prepare statement values
         vals = {
+            'name': f"{self.partner_id.name} - {fields.Date.to_string(self.date_from)} to {fields.Date.to_string(self.date_to)}",
             'partner_id': self.partner_id.id,
             'date': fields.Date.today(),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'company_id': self.company_id.id,
         }
+        
+        # Create statement
         statement = self.env['account.statement'].create(vals)
+        
+        # Generate lines from account moves
+        moves = self.env['account.move.line'].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('parent_state', '=', 'posted'),
+            ('account_id.internal_type', 'in', ['receivable', 'payable']),
+            ('company_id', '=', self.company_id.id),
+        ], order='date')
+        
+        # Create statement lines
+        line_vals = []
+        for move in moves:
+            line_vals.append({
+                'statement_id': statement.id,
+                'date': move.date,
+                'name': move.name or move.move_id.name,
+                'move_id': move.move_id.id,
+                'debit': move.debit,
+                'credit': move.credit,
+            })
+        
+        if line_vals:
+            self.env['account.statement.line'].create(line_vals)
+            
+        # Update statement totals
+        statement._compute_totals()
         return {
             'name': 'Account Statement',
             'type': 'ir.actions.act_window',

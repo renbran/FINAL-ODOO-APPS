@@ -47,16 +47,23 @@ class AccountStatement(models.Model):
          'Statement name must be unique per partner and date!')
     ]
 
+    def _compute_totals(self):
+        """Compute statement totals from lines"""
+        for record in self:
+            record.total_debit = sum(record.line_ids.mapped('debit'))
+            record.total_credit = sum(record.line_ids.mapped('credit'))
+            record.balance = record.total_credit - record.total_debit
+            
     def action_confirm(self):
         """Confirm the statement"""
         self.write({'state': 'confirmed'})
         self.message_post(body=_("Account Statement confirmed"))
-
+        
     def action_cancel(self):
         """Cancel the statement"""
         self.write({'state': 'cancelled'})
         self.message_post(body=_("Account Statement cancelled"))
-
+        
     def action_draft(self):
         """Reset to draft"""
         self.write({'state': 'draft'})
