@@ -276,6 +276,8 @@ class AgePayableReport(models.TransientModel):
                                 txt_name)
                     for rec in data['data'][move_line]:
                         row += 1
+                        if not rec['name']:
+                            rec['name'] = ' '
                         sheet.write(row, col, rec['move_name'] + rec['name'],
                                     txt_name)
                         sheet.write(row, col + 1, rec['date'],
