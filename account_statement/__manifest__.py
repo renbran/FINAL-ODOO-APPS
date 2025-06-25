@@ -32,9 +32,8 @@
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
         'report/account_statement_report_action.xml',
-        'report/account_statement_report_template.xml',
-        'views/account_statement_views.xml',
-        'views/account_statement_wizard_views.xml',
+        'report/account_statement_report_template.xml',        'views/account_statement_views.xml',
+        'wizard/account_statement_wizard_views.xml',
         'views/res_partner_views.xml',  # Add partner form integration
     ],
     'installable': True,
