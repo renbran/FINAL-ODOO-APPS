@@ -34,7 +34,9 @@ class AccountStatement(models.Model):
         """Override create to add creation message"""
         result = super(AccountStatement, self).create(vals)
         result.message_post(body=_("Account Statement created"))
-        return result    @api.constrains('date_from', 'date_to')
+        return result
+    
+    @api.constrains('date_from', 'date_to')
     def _check_dates(self):
         for record in self:
             if record.date_from and record.date_to and record.date_from > record.date_to:
