@@ -31,6 +31,19 @@ class AgePayableReport(models.TransientModel):
     _name = 'age.payable.report'
     _description = 'Aged Payable Report'
 
+    def _calculate_date_difference(self, date_maturity, today):
+        """Helper method to calculate date difference handling various date formats"""
+        if not date_maturity:
+            return 0
+        try:
+            if isinstance(date_maturity, str):
+                date_maturity = datetime.datetime.strptime(date_maturity, '%Y-%m-%d').date()
+            if isinstance(date_maturity, datetime.date):
+                return (today - date_maturity).days
+        except (ValueError, TypeError):
+            pass
+        return 0
+
     @api.model
     def view_report(self):
         """
@@ -58,17 +71,8 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                date_maturity = val['date_maturity']
-                diffrence = 0
-                if date_maturity:
-                    if isinstance(date_maturity, str):
-                        try:
-                            date_maturity_dt = datetime.datetime.strptime(date_maturity, '%Y-%m-%d').date()
-                            diffrence = (today - date_maturity_dt).days
-                        except Exception:
-                            diffrence = 0
-                    elif isinstance(date_maturity, datetime.date):
-                        diffrence = (today - date_maturity).days
+                date_maturity = val.get('date_maturity', False)
+                diffrence = self._calculate_date_difference(date_maturity, today)
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
@@ -135,17 +139,8 @@ class AgePayableReport(models.TransientModel):
                 ['name', 'move_name', 'date', 'amount_currency', 'account_id',
                  'date_maturity', 'currency_id', 'credit', 'move_id'])
             for val in move_line_data:
-                date_maturity = val['date_maturity']
-                diffrence = 0
-                if date_maturity:
-                    if isinstance(date_maturity, str):
-                        try:
-                            date_maturity_dt = datetime.datetime.strptime(date_maturity, '%Y-%m-%d').date()
-                            diffrence = (today - date_maturity_dt).days
-                        except Exception:
-                            diffrence = 0
-                    elif isinstance(date_maturity, datetime.date):
-                        diffrence = (today - date_maturity).days
+                date_maturity = val.get('date_maturity', False)
+                diffrence = self._calculate_date_difference(date_maturity, today)
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
