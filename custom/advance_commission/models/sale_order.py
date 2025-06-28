@@ -418,6 +418,59 @@ class SaleOrder(models.Model):
         compute='_compute_button_visibility',
         help="Control visibility of reject button (admin only)"
     )
+
+    # ===========================================
+    # COMMISSION TYPE FIELDS
+    # ===========================================
+    
+    broker_agency_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Broker/Agency Calculation Type', default='unit_price')
+    
+    referral_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Referral Calculation Type', default='unit_price')
+    
+    cashback_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Cashback Calculation Type', default='unit_price')
+    
+    other_external_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Other External Calculation Type', default='unit_price')
+    
+    agent1_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Agent 1 Calculation Type', default='unit_price')
+    
+    agent2_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Agent 2 Calculation Type', default='unit_price')
+    
+    manager_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Manager Calculation Type', default='unit_price')
+    
+    director_commission_type = fields.Selection([
+        ('unit_price', 'Unit Price'),
+        ('untaxed', 'Untaxed Total'),
+        ('fixed', 'Fixed Amount')
+    ], string='Director Calculation Type', default='unit_price')
+
     # ===========================================
     # COMPUTE METHODS
     # ===========================================
@@ -429,60 +482,32 @@ class SaleOrder(models.Model):
             if not record.sale_value:
                 record.sale_value = record.amount_total or 0.0
 
-    # Add commission type for each group
-    broker_agency_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Broker/Agency Calculation Type', default='unit_price')
-    referral_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Referral Calculation Type', default='unit_price')
-    cashback_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Cashback Calculation Type', default='unit_price')
-    other_external_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Other External Calculation Type', default='unit_price')
-    agent1_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Agent 1 Calculation Type', default='unit_price')
-    agent2_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Agent 2 Calculation Type', default='unit_price')
-    manager_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Manager Calculation Type', default='unit_price')
-    director_commission_type = fields.Selection([
-        ('unit_price', 'Unit Price'),
-        ('untaxed', 'Untaxed Total'),
-        ('fixed', 'Fixed Amount')
-    ], string='Director Calculation Type', default='unit_price')
-
     def _get_commission_base(self, commission_type):
+        """Get the base amount for commission calculation based on type"""
         if commission_type == 'unit_price':
             # Sum of price_unit for all order lines
             return sum(self.order_line.mapped('price_unit'))
         elif commission_type == 'untaxed':
             return self.amount_untaxed or 0.0
-        else:
+        else:  # 'fixed' or unknown type
             return 0.0
 
     def _calculate_commission_amount(self, rate_field, amount_field, base_amount, type_field=None):
+        """
+        Helper method to calculate commission amount from rate or amount fields.
+        If amount is provided, use it and calculate rate.
+        If rate is provided, calculate amount.
+        If both are provided, amount takes precedence.
+        
+        Args:
+            rate_field (str): Field name for rate percentage
+            amount_field (str): Field name for amount
+            base_amount (float): Base amount for calculation
+            type_field (str, optional): Field name for commission type
+        """
         self.ensure_one()
         commission_type = getattr(self, type_field) if type_field else 'unit_price'
+        
         if commission_type == 'fixed':
             amount_value = getattr(self, amount_field, 0.0)
             rate_value = (amount_value / base_amount * 100) if base_amount else 0.0
@@ -492,6 +517,7 @@ class SaleOrder(models.Model):
             base = self._get_commission_base(commission_type)
             rate_value = getattr(self, rate_field, 0.0)
             amount_value = getattr(self, amount_field, 0.0)
+            
             if amount_value:
                 calculated_rate = (amount_value / base * 100) if base else 0.0
                 setattr(self, rate_field, calculated_rate)
@@ -566,148 +592,7 @@ class SaleOrder(models.Model):
                 order.commission_allocation_status = 'under'
             else:
                 order.commission_allocation_status = 'over'
-    def _calculate_commission_amount(self, rate_field, amount_field, base_amount):
-        """
-        Helper method to calculate commission amount from rate or amount fields.
-        If amount is provided, use it and calculate rate.
-        If rate is provided, calculate amount.
-        If both are provided, amount takes precedence.
-        """
-        self.ensure_one()
-        rate_value = getattr(self, rate_field, 0.0)
-        amount_value = getattr(self, amount_field, 0.0)
-        if amount_value:
-            # Amount is provided, calculate and update rate
-            calculated_rate = (amount_value / base_amount * 100) if base_amount else 0.0
-            setattr(self, rate_field, calculated_rate)
-            return amount_value
-        elif rate_value:
-            # Rate is provided, calculate amount
-            calculated_amount = (rate_value * base_amount / 100) if base_amount else 0.0
-            setattr(self, amount_field, calculated_amount)
-            return calculated_amount
-        else:
-            # Neither provided
-            setattr(self, amount_field, 0.0)
-            setattr(self, rate_field, 0.0)
-            return 0.0
 
-    # ===========================================
-    # ONCHANGE METHODS FOR AUTOMATIC CALCULATION
-    # ===========================================
-    
-    @api.onchange('broker_agency_rate')
-    def _onchange_broker_agency_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.broker_agency_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.broker_agency_amount = self.broker_agency_rate * base / 100
-    
-    @api.onchange('broker_agency_amount')
-    def _onchange_broker_agency_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.broker_agency_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.broker_agency_rate = (self.broker_agency_amount / base * 100) if base else 0.0
-    
-    @api.onchange('referral_rate')
-    def _onchange_referral_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.referral_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.referral_amount = self.referral_rate * base / 100
-    
-    @api.onchange('referral_amount')
-    def _onchange_referral_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.referral_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.referral_rate = (self.referral_amount / base * 100) if base else 0.0
-    
-    @api.onchange('cashback_rate')
-    def _onchange_cashback_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.cashback_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.cashback_amount = self.cashback_rate * base / 100
-    
-    @api.onchange('cashback_amount')
-    def _onchange_cashback_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.cashback_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.cashback_rate = (self.cashback_amount / base * 100) if base else 0.0
-    
-    @api.onchange('other_external_rate')
-    def _onchange_other_external_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.other_external_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.other_external_amount = self.other_external_rate * base / 100
-    
-    @api.onchange('other_external_amount')
-    def _onchange_other_external_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.other_external_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.other_external_rate = (self.other_external_amount / base * 100) if base else 0.0
-    
-    @api.onchange('agent1_rate')
-    def _onchange_agent1_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.agent1_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.agent1_amount = self.agent1_rate * base / 100
-    
-    @api.onchange('agent1_amount')
-    def _onchange_agent1_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.agent1_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.agent1_rate = (self.agent1_amount / base * 100) if base else 0.0
-    
-    @api.onchange('agent2_rate')
-    def _onchange_agent2_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.agent2_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.agent2_amount = self.agent2_rate * base / 100
-    
-    @api.onchange('agent2_amount')
-    def _onchange_agent2_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.agent2_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.agent2_rate = (self.agent2_amount / base * 100) if base else 0.0
-    
-    @api.onchange('manager_rate')
-    def _onchange_manager_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.manager_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.manager_amount = self.manager_rate * base / 100
-    
-    @api.onchange('manager_amount')
-    def _onchange_manager_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.manager_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.manager_rate = (self.manager_amount / base * 100) if base else 0.0
-    
-    @api.onchange('director_rate')
-    def _onchange_director_rate(self):
-        """Calculate amount when rate is changed"""
-        if self.director_rate and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.director_amount = self.director_rate * base / 100
-    
-    @api.onchange('director_amount')
-    def _onchange_director_amount(self):
-        """Calculate rate when amount is changed"""
-        if self.director_amount and (self.sale_value or self.amount_total):
-            base = self.sale_value or self.amount_total
-            self.director_rate = (self.director_amount / base * 100) if base else 0.0
-    
     @api.depends('commission_status')
     def _compute_button_visibility(self):
         """Compute button visibility based on commission status and user permissions"""
@@ -848,7 +733,8 @@ class SaleOrder(models.Model):
         # This is a placeholder - implement based on your business logic
         return {
             'type': 'ir.actions.client',
-            'tag': 'display_notification',            'params': {
+            'tag': 'display_notification',
+            'params': {
                 'title': _('Info'),
                 'message': _('View related purchase orders is not yet implemented'),
                 'sticky': False,
@@ -874,6 +760,7 @@ class SaleOrder(models.Model):
                 'type': 'warning',
             }
         }
+
     # ===========================================
     # CONSTRAINTS
     # ===========================================
