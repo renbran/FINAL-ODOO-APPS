@@ -61,11 +61,13 @@
                             <group>
                                 <group string="Broker/Agency">
                                     <field name="broker_agency_partner_id"/>
+                                    <field name="broker_agency_commission_type"/>
                                     <field name="broker_agency_rate" widget="percentage"/>
                                     <field name="broker_agency_amount" widget="monetary"/>
                                 </group>
                                 <group string="Referral">
                                     <field name="referral_partner_id"/>
+                                    <field name="referral_commission_type"/>
                                     <field name="referral_rate" widget="percentage"/>
                                     <field name="referral_amount" widget="monetary"/>
                                 </group>
@@ -73,11 +75,13 @@
                             <group>
                                 <group string="Cashback">
                                     <field name="cashback_partner_id"/>
+                                    <field name="cashback_commission_type"/>
                                     <field name="cashback_rate" widget="percentage"/>
                                     <field name="cashback_amount" widget="monetary"/>
                                 </group>
                                 <group string="Other External">
                                     <field name="other_external_partner_id"/>
+                                    <field name="other_external_commission_type"/>
                                     <field name="other_external_rate" widget="percentage"/>
                                     <field name="other_external_amount" widget="monetary"/>
                                 </group>
@@ -88,11 +92,13 @@
                             <group>
                                 <group string="Agent 1">
                                     <field name="agent1_id"/>
+                                    <field name="agent1_commission_type"/>
                                     <field name="agent1_rate" widget="percentage"/>
                                     <field name="agent1_amount" widget="monetary"/>
                                 </group>
                                 <group string="Agent 2">
                                     <field name="agent2_id"/>
+                                    <field name="agent2_commission_type"/>
                                     <field name="agent2_rate" widget="percentage"/>
                                     <field name="agent2_amount" widget="monetary"/>
                                 </group>
@@ -100,11 +106,13 @@
                             <group>
                                 <group string="Manager">
                                     <field name="manager_id"/>
+                                    <field name="manager_commission_type"/>
                                     <field name="manager_rate" widget="percentage"/>
                                     <field name="manager_amount" widget="monetary"/>
                                 </group>
                                 <group string="Director">
                                     <field name="director_id"/>
+                                    <field name="director_commission_type"/>
                                     <field name="director_rate" widget="percentage"/>
                                     <field name="director_amount" widget="monetary"/>
                                 </group>
