@@ -39,6 +39,7 @@ This module provides a complete system for:
         'sale',
         'hr',
         'account',
+        'report_xlsx',
         'base',
         'web'
     ],
