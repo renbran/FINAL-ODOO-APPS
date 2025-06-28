@@ -45,7 +45,7 @@
                 <!-- Add Commission Configuration and Summary -->
                 <xpath expr="//field[@name='payment_term_id']" position="after">
                     <field name="commission_calculation_method" 
-                           help="Choose how commission base amount is calculated"/>
+                           help="Default method for commission calculation. Each party can override this individually."/>
                     <field name="commission_base_amount" readonly="1"
                            help="Calculated base amount used for commission calculations"/>
                 </xpath>
@@ -86,12 +86,17 @@
                         <group name="broker_commission" string="🏢 Broker Commission">
                             <group>
                                 <field name="broker_partner_id" placeholder="Select broker partner..."/>
+                                <field name="broker_commission_type" string="Calculation Method"
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
                                 <field name="broker_rate" widget="percentage" 
-                                       decoration-info="broker_rate &gt; 0"/>
+                                       decoration-info="broker_rate &gt; 0"
+                                       invisible="broker_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="broker_amount" 
-                                       decoration-info="broker_amount &gt; 0"/>
+                                       decoration-info="broker_amount &gt; 0"
+                                       string="Amount" 
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
                             </group>
                         </group>
 
@@ -99,12 +104,17 @@
                         <group name="referrer_commission" string="👥 Referrer Commission">
                             <group>
                                 <field name="referrer_partner_id" placeholder="Select referrer partner..."/>
+                                <field name="referrer_commission_type" string="Calculation Method"
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
                                 <field name="referrer_rate" widget="percentage"
-                                       decoration-info="referrer_rate &gt; 0"/>
+                                       decoration-info="referrer_rate &gt; 0"
+                                       invisible="referrer_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="referrer_amount"
-                                       decoration-info="referrer_amount &gt; 0"/>
+                                       decoration-info="referrer_amount &gt; 0"
+                                       string="Amount"
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
                             </group>
                         </group>
 
@@ -112,8 +122,10 @@
                         <group name="cashback_commission" string="💰 Cashback Commission">
                             <group>
                                 <field name="cashback_partner_id" placeholder="Select cashback recipient..."/>
+                                <field name="cashback_commission_type" string="Calculation Method"/>
                                 <field name="cashback_rate" widget="percentage"
-                                       decoration-info="cashback_rate &gt; 0"/>
+                                       decoration-info="cashback_rate &gt; 0"
+                                       invisible="cashback_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="cashback_amount"
@@ -125,8 +137,10 @@
                         <group name="other_external_commission" string="🔗 Other External Commission">
                             <group>
                                 <field name="other_external_partner_id" placeholder="Select other external partner..."/>
+                                <field name="other_external_commission_type" string="Calculation Method"/>
                                 <field name="other_external_rate" widget="percentage"
-                                       decoration-info="other_external_rate &gt; 0"/>
+                                       decoration-info="other_external_rate &gt; 0"
+                                       invisible="other_external_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="other_external_amount"
@@ -150,8 +164,10 @@
                         <group name="agent1_commission" string="👤 Agent 1 Commission">
                             <group>
                                 <field name="agent1_partner_id" placeholder="Select Agent 1..."/>
+                                <field name="agent1_commission_type" string="Calculation Method"/>
                                 <field name="agent1_rate" widget="percentage"
-                                       decoration-info="agent1_rate &gt; 0"/>
+                                       decoration-info="agent1_rate &gt; 0"
+                                       invisible="agent1_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="agent1_amount"
@@ -163,8 +179,10 @@
                         <group name="agent2_commission" string="👤 Agent 2 Commission">
                             <group>
                                 <field name="agent2_partner_id" placeholder="Select Agent 2..."/>
+                                <field name="agent2_commission_type" string="Calculation Method"/>
                                 <field name="agent2_rate" widget="percentage"
-                                       decoration-info="agent2_rate &gt; 0"/>
+                                       decoration-info="agent2_rate &gt; 0"
+                                       invisible="agent2_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="agent2_amount"
@@ -176,8 +194,10 @@
                         <group name="manager_commission" string="👔 Manager Commission">
                             <group>
                                 <field name="manager_partner_id" placeholder="Select Manager..."/>
+                                <field name="manager_commission_type" string="Calculation Method"/>
                                 <field name="manager_rate" widget="percentage"
-                                       decoration-info="manager_rate &gt; 0"/>
+                                       decoration-info="manager_rate &gt; 0"
+                                       invisible="manager_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="manager_amount"
@@ -189,8 +209,10 @@
                         <group name="director_commission" string="🎯 Director Commission">
                             <group>
                                 <field name="director_partner_id" placeholder="Select Director..."/>
+                                <field name="director_commission_type" string="Calculation Method"/>
                                 <field name="director_rate" widget="percentage"
-                                       decoration-info="director_rate &gt; 0"/>
+                                       decoration-info="director_rate &gt; 0"
+                                       invisible="director_commission_type == 'fixed_amount'"/>
                             </group>
                             <group>
                                 <field name="director_amount"

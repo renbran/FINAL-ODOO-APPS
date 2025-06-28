@@ -11,14 +11,62 @@ class SaleOrder(models.Model):
     # COMMISSION CALCULATION METHODS
     # ===========================================
     
+    # Commission calculation method (global)
     commission_calculation_method = fields.Selection([
-        ('price_unit', 'Price Unit Based'),
-        ('untaxed_total', 'Untaxed Amount Total'),
-        ('fixed_amount', 'Fixed Amount'),
-    ], string='Commission Calculation Method', 
-       default='untaxed_total', 
-       tracking=True,
-       help="Method to calculate commission base amount")
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Default Commission Method', default='untaxed_total',
+       help="Default method for commission calculation")
+    
+    # Individual commission type for each party
+    broker_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Broker Commission Type', default='untaxed_total')
+    
+    referrer_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Referrer Commission Type', default='untaxed_total')
+    
+    cashback_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Cashback Commission Type', default='untaxed_total')
+    
+    other_external_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Other External Commission Type', default='untaxed_total')
+    
+    agent1_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Agent 1 Commission Type', default='untaxed_total')
+    
+    agent2_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Agent 2 Commission Type', default='untaxed_total')
+    
+    manager_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Manager Commission Type', default='untaxed_total')
+    
+    director_commission_type = fields.Selection([
+        ('price_unit', 'Based on Price Unit'),
+        ('untaxed_total', 'Based on Untaxed Total'),
+        ('fixed_amount', 'Fixed Amount')
+    ], string='Director Commission Type', default='untaxed_total')
     
     commission_base_amount = fields.Monetary(
         string='Commission Base Amount',
@@ -331,81 +379,62 @@ class SaleOrder(models.Model):
     @api.depends(
         'commission_base_amount', 'commission_calculation_method',
         # External fields
-        'broker_rate', 'broker_amount', 'referrer_rate', 'referrer_amount',
-        'cashback_rate', 'cashback_amount', 'other_external_rate', 'other_external_amount',
+        'broker_rate', 'broker_amount', 'broker_commission_type',
+        'referrer_rate', 'referrer_amount', 'referrer_commission_type',
+        'cashback_rate', 'cashback_amount', 'cashback_commission_type',
+        'other_external_rate', 'other_external_amount', 'other_external_commission_type',
         # Internal fields  
-        'agent1_rate', 'agent1_amount', 'agent2_rate', 'agent2_amount',
-        'manager_rate', 'manager_amount', 'director_rate', 'director_amount'
+        'agent1_rate', 'agent1_amount', 'agent1_commission_type',
+        'agent2_rate', 'agent2_amount', 'agent2_commission_type',
+        'manager_rate', 'manager_amount', 'manager_commission_type',
+        'director_rate', 'director_amount', 'director_commission_type'
     )
     def _compute_commission_totals(self):
         """Compute all commission totals and company shares"""
         for order in self:
-            # Calculate individual commission amounts based on method
-            base_amount = order.commission_base_amount or order.amount_untaxed
+            # Calculate individual commission amounts based on each party's method
+            base_amount_untaxed = order.amount_untaxed
+            base_amount_price_unit = sum(line.price_unit * line.product_uom_qty for line in order.order_line)
             
-            # External commissions
-            external_amounts = []
-            external_rates = []
+            # Helper function to calculate commission based on individual type
+            def calculate_commission(rate, amount, commission_type):
+                if commission_type == 'fixed_amount':
+                    return amount or 0
+                elif commission_type == 'price_unit':
+                    return (rate / 100.0 * base_amount_price_unit) if rate else (amount or 0)
+                else:  # untaxed_total
+                    return (rate / 100.0 * base_amount_untaxed) if rate else (amount or 0)
             
-            if order.commission_calculation_method == 'fixed_amount':
-                # For fixed amount, use the amount fields directly
-                external_amounts = [
-                    order.broker_amount or 0,
-                    order.referrer_amount or 0, 
-                    order.cashback_amount or 0,
-                    order.other_external_amount or 0
-                ]
-                external_rates = [
-                    order.broker_rate or 0,
-                    order.referrer_rate or 0,
-                    order.cashback_rate or 0, 
-                    order.other_external_rate or 0
-                ]
-            else:
-                # For percentage-based calculations
-                external_amounts = [
-                    (order.broker_rate / 100.0 * base_amount) if order.broker_rate else (order.broker_amount or 0),
-                    (order.referrer_rate / 100.0 * base_amount) if order.referrer_rate else (order.referrer_amount or 0),
-                    (order.cashback_rate / 100.0 * base_amount) if order.cashback_rate else (order.cashback_amount or 0),
-                    (order.other_external_rate / 100.0 * base_amount) if order.other_external_rate else (order.other_external_amount or 0)
-                ]
-                external_rates = [
-                    order.broker_rate or 0,
-                    order.referrer_rate or 0,
-                    order.cashback_rate or 0,
-                    order.other_external_rate or 0
-                ]
-
-            # Internal commissions
-            internal_amounts = []
-            internal_rates = []
+            # External commissions - each with its own calculation type
+            external_amounts = [
+                calculate_commission(order.broker_rate, order.broker_amount, order.broker_commission_type),
+                calculate_commission(order.referrer_rate, order.referrer_amount, order.referrer_commission_type),
+                calculate_commission(order.cashback_rate, order.cashback_amount, order.cashback_commission_type),
+                calculate_commission(order.other_external_rate, order.other_external_amount, order.other_external_commission_type)
+            ]
             
-            if order.commission_calculation_method == 'fixed_amount':
-                internal_amounts = [
-                    order.agent1_amount or 0,
-                    order.agent2_amount or 0,
-                    order.manager_amount or 0,
-                    order.director_amount or 0
-                ]
-                internal_rates = [
-                    order.agent1_rate or 0,
-                    order.agent2_rate or 0,
-                    order.manager_rate or 0,
-                    order.director_rate or 0
-                ]
-            else:
-                internal_amounts = [
-                    (order.agent1_rate / 100.0 * base_amount) if order.agent1_rate else (order.agent1_amount or 0),
-                    (order.agent2_rate / 100.0 * base_amount) if order.agent2_rate else (order.agent2_amount or 0),
-                    (order.manager_rate / 100.0 * base_amount) if order.manager_rate else (order.manager_amount or 0),
-                    (order.director_rate / 100.0 * base_amount) if order.director_rate else (order.director_amount or 0)
-                ]
-                internal_rates = [
-                    order.agent1_rate or 0,
-                    order.agent2_rate or 0,
-                    order.manager_rate or 0,
-                    order.director_rate or 0
-                ]
+            # Internal commissions - each with its own calculation type
+            internal_amounts = [
+                calculate_commission(order.agent1_rate, order.agent1_amount, order.agent1_commission_type),
+                calculate_commission(order.agent2_rate, order.agent2_amount, order.agent2_commission_type),
+                calculate_commission(order.manager_rate, order.manager_amount, order.manager_commission_type),
+                calculate_commission(order.director_rate, order.director_amount, order.director_commission_type)
+            ]
+            
+            # Calculate rates (for fixed amounts, we show the amount as rate for consistency)
+            external_rates = [
+                order.broker_rate if order.broker_commission_type != 'fixed_amount' else 0,
+                order.referrer_rate if order.referrer_commission_type != 'fixed_amount' else 0,
+                order.cashback_rate if order.cashback_commission_type != 'fixed_amount' else 0,
+                order.other_external_rate if order.other_external_commission_type != 'fixed_amount' else 0
+            ]
+            
+            internal_rates = [
+                order.agent1_rate if order.agent1_commission_type != 'fixed_amount' else 0,
+                order.agent2_rate if order.agent2_commission_type != 'fixed_amount' else 0,
+                order.manager_rate if order.manager_commission_type != 'fixed_amount' else 0,
+                order.director_rate if order.director_commission_type != 'fixed_amount' else 0
+            ]
 
             # Update totals
             order.total_external_commission_rate = sum(external_rates)
@@ -417,7 +446,7 @@ class SaleOrder(models.Model):
             order.total_commission_amount = order.total_external_commission_amount + order.total_internal_commission_amount
             
             # Company shares
-            order.company_share = base_amount - order.total_commission_amount
+            order.company_share = base_amount_untaxed - order.total_commission_amount
             order.net_company_share = order.company_share
 
     # ===========================================
@@ -425,90 +454,114 @@ class SaleOrder(models.Model):
     # ===========================================
     
     # External Commission Onchanges
-    @api.onchange('broker_rate', 'commission_base_amount')
+    @api.onchange('broker_rate', 'broker_commission_type')
     def _onchange_broker_rate(self):
-        if self.broker_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.broker_amount = (self.broker_rate / 100.0) * self.commission_base_amount
+        if self.broker_rate and self.broker_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.broker_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.broker_amount = (self.broker_rate / 100.0) * base_amount
 
-    @api.onchange('broker_amount', 'commission_base_amount')
+    @api.onchange('broker_amount', 'broker_commission_type')
     def _onchange_broker_amount(self):
-        if self.broker_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.broker_rate = (self.broker_amount / self.commission_base_amount) * 100.0
+        if self.broker_amount and self.broker_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.broker_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.broker_rate = (self.broker_amount / base_amount) * 100.0
 
-    @api.onchange('referrer_rate', 'commission_base_amount')
+    @api.onchange('referrer_rate', 'referrer_commission_type')
     def _onchange_referrer_rate(self):
-        if self.referrer_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.referrer_amount = (self.referrer_rate / 100.0) * self.commission_base_amount
+        if self.referrer_rate and self.referrer_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.referrer_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.referrer_amount = (self.referrer_rate / 100.0) * base_amount
 
-    @api.onchange('referrer_amount', 'commission_base_amount')
+    @api.onchange('referrer_amount', 'referrer_commission_type')
     def _onchange_referrer_amount(self):
-        if self.referrer_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.referrer_rate = (self.referrer_amount / self.commission_base_amount) * 100.0
+        if self.referrer_amount and self.referrer_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.referrer_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.referrer_rate = (self.referrer_amount / base_amount) * 100.0
 
-    @api.onchange('cashback_rate', 'commission_base_amount')
+    @api.onchange('cashback_rate', 'cashback_commission_type')
     def _onchange_cashback_rate(self):
-        if self.cashback_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.cashback_amount = (self.cashback_rate / 100.0) * self.commission_base_amount
+        if self.cashback_rate and self.cashback_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.cashback_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.cashback_amount = (self.cashback_rate / 100.0) * base_amount
 
-    @api.onchange('cashback_amount', 'commission_base_amount')
+    @api.onchange('cashback_amount', 'cashback_commission_type')
     def _onchange_cashback_amount(self):
-        if self.cashback_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.cashback_rate = (self.cashback_amount / self.commission_base_amount) * 100.0
+        if self.cashback_amount and self.cashback_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.cashback_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.cashback_rate = (self.cashback_amount / base_amount) * 100.0
 
-    @api.onchange('other_external_rate', 'commission_base_amount')
+    @api.onchange('other_external_rate', 'other_external_commission_type')
     def _onchange_other_external_rate(self):
-        if self.other_external_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.other_external_amount = (self.other_external_rate / 100.0) * self.commission_base_amount
+        if self.other_external_rate and self.other_external_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.other_external_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.other_external_amount = (self.other_external_rate / 100.0) * base_amount
 
-    @api.onchange('other_external_amount', 'commission_base_amount')
+    @api.onchange('other_external_amount', 'other_external_commission_type')
     def _onchange_other_external_amount(self):
-        if self.other_external_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.other_external_rate = (self.other_external_amount / self.commission_base_amount) * 100.0
+        if self.other_external_amount and self.other_external_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.other_external_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.other_external_rate = (self.other_external_amount / base_amount) * 100.0
 
     # Internal Commission Onchanges
-    @api.onchange('agent1_rate', 'commission_base_amount')
+    @api.onchange('agent1_rate', 'agent1_commission_type')
     def _onchange_agent1_rate(self):
-        if self.agent1_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.agent1_amount = (self.agent1_rate / 100.0) * self.commission_base_amount
+        if self.agent1_rate and self.agent1_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.agent1_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.agent1_amount = (self.agent1_rate / 100.0) * base_amount
 
-    @api.onchange('agent1_amount', 'commission_base_amount')
+    @api.onchange('agent1_amount', 'agent1_commission_type')
     def _onchange_agent1_amount(self):
-        if self.agent1_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.agent1_rate = (self.agent1_amount / self.commission_base_amount) * 100.0
+        if self.agent1_amount and self.agent1_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.agent1_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.agent1_rate = (self.agent1_amount / base_amount) * 100.0
 
-    @api.onchange('agent2_rate', 'commission_base_amount')
+    @api.onchange('agent2_rate', 'agent2_commission_type')
     def _onchange_agent2_rate(self):
-        if self.agent2_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.agent2_amount = (self.agent2_rate / 100.0) * self.commission_base_amount
+        if self.agent2_rate and self.agent2_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.agent2_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.agent2_amount = (self.agent2_rate / 100.0) * base_amount
 
-    @api.onchange('agent2_amount', 'commission_base_amount')
+    @api.onchange('agent2_amount', 'agent2_commission_type')
     def _onchange_agent2_amount(self):
-        if self.agent2_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.agent2_rate = (self.agent2_amount / self.commission_base_amount) * 100.0
+        if self.agent2_amount and self.agent2_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.agent2_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.agent2_rate = (self.agent2_amount / base_amount) * 100.0
 
-    @api.onchange('manager_rate', 'commission_base_amount')
+    @api.onchange('manager_rate', 'manager_commission_type')
     def _onchange_manager_rate(self):
-        if self.manager_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.manager_amount = (self.manager_rate / 100.0) * self.commission_base_amount
+        if self.manager_rate and self.manager_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.manager_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.manager_amount = (self.manager_rate / 100.0) * base_amount
 
-    @api.onchange('manager_amount', 'commission_base_amount')
+    @api.onchange('manager_amount', 'manager_commission_type')
     def _onchange_manager_amount(self):
-        if self.manager_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.manager_rate = (self.manager_amount / self.commission_base_amount) * 100.0
+        if self.manager_amount and self.manager_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.manager_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.manager_rate = (self.manager_amount / base_amount) * 100.0
 
-    @api.onchange('director_rate', 'commission_base_amount')
+    @api.onchange('director_rate', 'director_commission_type')
     def _onchange_director_rate(self):
-        if self.director_rate and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.director_amount = (self.director_rate / 100.0) * self.commission_base_amount
+        if self.director_rate and self.director_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.director_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            self.director_amount = (self.director_rate / 100.0) * base_amount
 
-    @api.onchange('director_amount', 'commission_base_amount')
+    @api.onchange('director_amount', 'director_commission_type')
     def _onchange_director_amount(self):
-        if self.director_amount and self.commission_base_amount and self.commission_calculation_method != 'fixed_amount':
-            self.director_rate = (self.director_amount / self.commission_base_amount) * 100.0
+        if self.director_amount and self.director_commission_type != 'fixed_amount':
+            base_amount = self.amount_untaxed if self.director_commission_type == 'untaxed_total' else sum(line.price_unit * line.product_uom_qty for line in self.order_line)
+            if base_amount:
+                self.director_rate = (self.director_amount / base_amount) * 100.0
 
     # ===========================================
     # ACTION METHODS
-    # ===========================================
+    # ============================================
     
     def action_calculate_commissions(self):
         """Calculate all commissions based on current settings"""
