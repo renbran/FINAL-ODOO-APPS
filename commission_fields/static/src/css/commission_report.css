@@ -1,0 +1,130 @@
+/* Commission Report Styles */
+
+/* Report Header */
+.commission_report_header {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+}
+
+.commission_report_title {
+    font-size: 24px;
+    color: #212529;
+    margin-bottom: 1rem;
+}
+
+/* Commission Details */
+.commission_details {
+    margin: 2rem 0;
+}
+
+.commission_section {
+    margin-bottom: 2rem;
+}
+
+.commission_section_title {
+    font-size: 18px;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Commission Tables */
+.commission_table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+}
+
+.commission_table th {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.commission_table td {
+    padding: 0.75rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Commission Summary */
+.commission_summary {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    margin-top: 2rem;
+    border-radius: 4px;
+}
+
+.commission_total {
+    font-size: 18px;
+    color: #212529;
+    font-weight: bold;
+}
+
+/* Commission Status Indicators */
+.commission_status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.status_draft {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.status_calculated {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status_confirmed {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status_paid {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status_canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Page Footer */
+.commission_report_footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Print Specific Styles */
+@media print {
+    .commission_report_header {
+        margin-bottom: 1rem;
+    }
+    
+    .commission_table th {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .commission_summary {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .page-break {
+        page-break-before: always;
+    }
+}
