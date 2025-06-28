@@ -9,11 +9,8 @@
             <!-- Add fields after partner_id - this field always exists -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="default_account_id"/>
-                <field name="external_commission_type"/>
-                <field name="external_percentage" invisible="external_commission_type != 'percentage'"/>
-                <field name="external_fixed_amount" invisible="external_commission_type != 'fixed'"/>
-                <field name="show_external_percentage" invisible="1"/>
-                <field name="show_external_fixed_amount" invisible="1"/>
+                <field name="commission_rate" widget="percentage"/>
+                <field name="commission_amount" widget="monetary"/>
             </xpath>
         </field>
     </record>
