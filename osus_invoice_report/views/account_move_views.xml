@@ -11,14 +11,14 @@
                         class="btn-secondary"
                         type="object"
                         groups="account.group_account_invoice"
-                        t-if="move_type in ('out_invoice', 'out_refund')"/>
+                        attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 
                 <button name="action_print_custom_bill" 
                         string="Print Bill"
                         class="btn-secondary"
                         type="object"
                         groups="account.group_account_invoice"
-                        t-if="move_type in ('in_invoice', 'in_refund')"/>
+                        attrs="{'invisible': [('move_type', 'not in', ['in_invoice', 'in_refund'])]}"/>
                 
                 <button name="action_print_custom_receipt" 
                         string="Print Receipt"
