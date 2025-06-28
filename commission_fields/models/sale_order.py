@@ -501,6 +501,9 @@ class SaleOrder(models.Model):
         else:
             calculation_base = self._get_commission_base(commission_type)
         
+        if not calculation_base:
+            return 0.0
+            
         # Get current values
         rate_value = getattr(self, rate_field, 0.0)
         amount_value = getattr(self, amount_field, 0.0)
@@ -508,12 +511,12 @@ class SaleOrder(models.Model):
         # Calculate based on which value is provided
         if amount_value:
             # If amount is provided, calculate rate
-            calculated_rate = (amount_value / calculation_base * 100) if calculation_base else 0.0
+            calculated_rate = (amount_value / calculation_base * 100)
             setattr(self, rate_field, calculated_rate)
             return amount_value
         elif rate_value:
             # If rate is provided, calculate amount
-            calculated_amount = (rate_value * calculation_base / 100) if calculation_base else 0.0
+            calculated_amount = (rate_value * calculation_base / 100)
             setattr(self, amount_field, calculated_amount)
             return calculated_amount
         else:
@@ -583,43 +586,7 @@ class SaleOrder(models.Model):
                 order.commission_allocation_status = 'under'
             else:
                 order.commission_allocation_status = 'over'
-    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, type_field=None):
-        """
-        Helper method to calculate commission amount from rate or amount fields.
-        If amount is provided, use it and calculate rate.
-        If rate is provided, calculate amount.
-        If both are provided, amount takes precedence.
-        
-        :param rate_field: Name of the rate field
-        :param amount_field: Name of the amount field
-        :param base_amount: Base amount for calculations
-        :param type_field: Optional field name for commission type
-        """
-        self.ensure_one()
-        commission_type = getattr(self, type_field) if type_field else 'unit_price'
-        
-        if commission_type == 'fixed':
-            amount_value = getattr(self, amount_field, 0.0)
-            rate_value = (amount_value / base_amount * 100) if base_amount else 0.0
-            setattr(self, rate_field, rate_value)
-            return amount_value
-        else:
-            base = self._get_commission_base(commission_type)
-            rate_value = getattr(self, rate_field, 0.0)
-            amount_value = getattr(self, amount_field, 0.0)
-            
-            if amount_value:
-                calculated_rate = (amount_value / base * 100) if base else 0.0
-                setattr(self, rate_field, calculated_rate)
-                return amount_value
-            elif rate_value:
-                calculated_amount = (rate_value * base / 100) if base else 0.0
-                setattr(self, amount_field, calculated_amount)
-                return calculated_amount
-            else:
-                setattr(self, amount_field, 0.0)
-                setattr(self, rate_field, 0.0)
-                return 0.0
+    # Removed duplicate method - using the one defined above
 
     # ===========================================
     # ONCHANGE METHODS FOR AUTOMATIC CALCULATION
