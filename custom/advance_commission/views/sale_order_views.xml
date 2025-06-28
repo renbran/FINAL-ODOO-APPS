@@ -113,11 +113,31 @@
 
             <!-- Commission buttons -->
             <xpath expr="//header//button[@name='action_confirm']" position="before">
-                <button name="action_calculate_commission" string="Calculate" type="object" class="btn-primary" attrs="{'invisible': [('show_calculate_button', '=', False)]}"/>
-                <button name="action_confirm_commission" string="Confirm" type="object" class="btn-primary" attrs="{'invisible': [('show_confirm_button', '=', False)]}"/>
-                <button name="action_pay_commission" string="Mark Paid" type="object" class="btn-success" attrs="{'invisible': [('show_pay_button', '=', False)]}"/>
-                <button name="action_reset_commission" string="Reset" type="object" class="btn-secondary" attrs="{'invisible': [('show_reset_button', '=', False)]}"/>
-                <button name="action_reject_commission" string="Reject" type="object" class="btn-danger" attrs="{'invisible': [('show_reject_button', '=', False)]}"/>
+                <button name="action_calculate_commission" 
+                        string="Calculate" 
+                        type="object" 
+                        class="btn-primary" 
+                        invisible="not show_calculate_button"/>
+                <button name="action_confirm_commission" 
+                        string="Confirm" 
+                        type="object" 
+                        class="btn-primary" 
+                        invisible="not show_confirm_button"/>
+                <button name="action_pay_commission" 
+                        string="Mark Paid" 
+                        type="object" 
+                        class="btn-success" 
+                        invisible="not show_pay_button"/>
+                <button name="action_reset_commission" 
+                        string="Reset" 
+                        type="object" 
+                        class="btn-secondary" 
+                        invisible="not show_reset_button"/>
+                <button name="action_reject_commission" 
+                        string="Reject" 
+                        type="object" 
+                        class="btn-danger" 
+                        invisible="not show_reject_button"/>
             </xpath>
 
             <!-- Smart buttons -->
