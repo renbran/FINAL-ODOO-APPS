@@ -737,14 +737,26 @@ class SaleOrder(models.Model):
     
     def action_view_related_purchase_orders(self):
         """View related purchase orders for commission"""
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Info'),
-                'message': _('View related purchase orders is not yet implemented'),
-                'sticky': False,
+        self.ensure_one()
+        if not self.env['ir.module.module'].sudo().search([('name', '=', 'purchase'), ('state', '=', 'installed')]):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Module Required'),
+                    'message': _('Please install the Purchase module to use this feature.'),
+                    'sticky': False,
+                    'type': 'warning',
+                }
             }
+            
+        return {
+            'name': _('Related Purchase Orders'),
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'type': 'ir.actions.act_window',
+            'domain': [('origin', '=', self.name)],
+            'context': {'default_origin': self.name}
         }
     
     def action_reject_commission(self):
