@@ -543,38 +543,107 @@ class SaleOrder(models.Model):
     def action_view_purchase_orders(self):
         """Smart button action to view related purchase orders"""
         self.ensure_one()
-        action = self.env.ref('purchase.purchase_rfq').read()[0]
         if len(self.purchase_order_ids) > 1:
-            action['domain'] = [('id', 'in', self.purchase_order_ids.ids)]
+            return {
+                'name': _('Commission Purchase Orders'),
+                'type': 'ir.actions.act_window',
+                'view_mode': 'tree,form',
+                'res_model': 'purchase.order',
+                'domain': [('id', 'in', self.purchase_order_ids.ids)],
+                'target': 'current',
+            }
         elif len(self.purchase_order_ids) == 1:
-            action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
-            action['res_id'] = self.purchase_order_ids.ids[0]
+            return {
+                'name': _('Commission Purchase Order'),
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'purchase.order',
+                'res_id': self.purchase_order_ids.ids[0],
+                'target': 'current',
+            }
         else:
-            action = {'type': 'ir.actions.act_window_close'}
-        return action
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('No Purchase Orders'),
+                    'message': _('No commission purchase orders have been generated yet.'),
+                    'type': 'info',
+                }
+            }
 
-    @api.depends('amount_total', 'consultant_comm_percentage', 'manager_comm_percentage', 'director_comm_percentage')
-    def _compute_commissions(self):
-        """Compute commission amounts and company shares."""
+    def action_confirm(self):
+        """Extend Sale Order Confirmation"""
+        res = super(SaleOrder, self).action_confirm()
+        # Auto-calculate commissions when order is confirmed
+        if self.commission_status == 'draft':
+            self.action_calculate_commissions()
+        return res
+
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    origin_so_id = fields.Many2one('sale.order', string="Source Sale Order", readonly=True)
+    commission_type = fields.Char(string="Commission Type", readonly=True)
+    
+    def action_view_source_sale_order(self):
+        """Action to view the source sale order"""
+        self.ensure_one()
+        if self.origin_so_id:
+            return {
+                'name': _('Source Sale Order'),
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'res_id': self.origin_so_id.id,
+                'target': 'current',
+            }
+        return False
+
+    # ===========================================
+    # VALIDATION AND CONSTRAINTS
+    # ===========================================
+    
+    @api.constrains('total_commission_rate')
+    def _check_total_commission_rate(self):
+        """Validate that total commission rate doesn't exceed 100%"""
         for order in self:
-            # Consultant Commission
-            order.salesperson_commission = (order.consultant_comm_percentage / 100) * order.amount_total
+            if order.total_commission_rate > 100:
+                raise ValidationError(_('Total commission rate cannot exceed 100%. Current total: %.2f%%') % order.total_commission_rate)
+    
+    @api.constrains('broker_rate', 'referrer_rate', 'cashback_rate', 'other_external_rate', 
+                    'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate')
+    def _check_individual_commission_rates(self):
+        """Validate individual commission rates"""
+        for order in self:
+            rates = [
+                order.broker_rate, order.referrer_rate, order.cashback_rate, order.other_external_rate,
+                order.agent1_rate, order.agent2_rate, order.manager_rate, order.director_rate
+            ]
+            for rate in rates:
+                if rate < 0:
+                    raise ValidationError(_('Commission rates cannot be negative.'))
+                if rate > 50:  # Warning for high individual rates
+                    _logger.warning(f'High commission rate detected: {rate}% in order {order.name}')
 
-            # Manager Commission
-            order.manager_commission = (order.manager_comm_percentage / 100) * order.amount_total
+    @api.constrains('broker_amount', 'referrer_amount', 'cashback_amount', 'other_external_amount',
+                    'agent1_amount', 'agent2_amount', 'manager_amount', 'director_amount')
+    def _check_commission_amounts(self):
+        """Validate commission amounts"""
+        for order in self:
+            amounts = [
+                order.broker_amount, order.referrer_amount, order.cashback_amount, order.other_external_amount,
+                order.agent1_amount, order.agent2_amount, order.manager_amount, order.director_amount
+            ]
+            for amount in amounts:
+                if amount < 0:
+                    raise ValidationError(_('Commission amounts cannot be negative.'))
 
-            # Company Share
-            total_commissions = order.salesperson_commission + order.manager_commission
-            order.company_share = order.amount_total - total_commissions
-
-            # Director Commission
-            if not order.director_comm_percentage:
-                order.director_comm_percentage = 3.0  # Default to 3%
-            order.director_commission = (order.director_comm_percentage / 100) * order.company_share
-
-            # Net Company Share
-            order.net_company_share = order.company_share - order.director_commission
-
+    # ===========================================
+    # HELPER METHODS
+    # ===========================================
+    
     def _prepare_purchase_order_vals(self, partner, product, amount, description):
         """Prepare values for auto-creation of Purchase Orders."""
         return {
@@ -698,70 +767,4 @@ class SaleOrder(models.Model):
         """Auto-generate Purchase Orders for commissions - Legacy method for backward compatibility"""
         return self.action_generate_commission_purchase_orders()
 
-    def action_confirm(self):
-        """Extend Sale Order Confirmation"""
-        res = super(SaleOrder, self).action_confirm()
-        # Auto-calculate commissions when order is confirmed
-        if self.commission_status == 'draft':
-            self.action_calculate_commissions()
-        return res
-
-
-class PurchaseOrder(models.Model):
-    _inherit = 'purchase.order'
-
-    origin_so_id = fields.Many2one('sale.order', string="Source Sale Order", readonly=True)
-    commission_type = fields.Char(string="Commission Type", readonly=True)
-    
-    def action_view_source_sale_order(self):
-        """Action to view the source sale order"""
-        self.ensure_one()
-        if self.origin_so_id:
-            return {
-                'name': _('Source Sale Order'),
-                'type': 'ir.actions.act_window',
-                'view_mode': 'form',
-                'res_model': 'sale.order',
-                'res_id': self.origin_so_id.id,
-                'target': 'current',
-            }
-        return False
-
     # ===========================================
-    # VALIDATION AND CONSTRAINTS
-    # ===========================================
-    
-    @api.constrains('total_commission_rate')
-    def _check_total_commission_rate(self):
-        """Validate that total commission rate doesn't exceed 100%"""
-        for order in self:
-            if order.total_commission_rate > 100:
-                raise ValidationError(_('Total commission rate cannot exceed 100%. Current total: %.2f%%') % order.total_commission_rate)
-    
-    @api.constrains('broker_rate', 'referrer_rate', 'cashback_rate', 'other_external_rate', 
-                    'agent1_rate', 'agent2_rate', 'manager_rate', 'director_rate')
-    def _check_individual_commission_rates(self):
-        """Validate individual commission rates"""
-        for order in self:
-            rates = [
-                order.broker_rate, order.referrer_rate, order.cashback_rate, order.other_external_rate,
-                order.agent1_rate, order.agent2_rate, order.manager_rate, order.director_rate
-            ]
-            for rate in rates:
-                if rate < 0:
-                    raise ValidationError(_('Commission rates cannot be negative.'))
-                if rate > 50:  # Warning for high individual rates
-                    _logger.warning(f'High commission rate detected: {rate}% in order {order.name}')
-
-    @api.constrains('broker_amount', 'referrer_amount', 'cashback_amount', 'other_external_amount',
-                    'agent1_amount', 'agent2_amount', 'manager_amount', 'director_amount')
-    def _check_commission_amounts(self):
-        """Validate commission amounts"""
-        for order in self:
-            amounts = [
-                order.broker_amount, order.referrer_amount, order.cashback_amount, order.other_external_amount,
-                order.agent1_amount, order.agent2_amount, order.manager_amount, order.director_amount
-            ]
-            for amount in amounts:
-                if amount < 0:
-                    raise ValidationError(_('Commission amounts cannot be negative.'))

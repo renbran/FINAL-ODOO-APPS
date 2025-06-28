@@ -287,12 +287,5 @@
             }</field>
         </record>
 
-        <!-- Menu Items -->
-        <menuitem id="menu_sale_commission_analysis"
-                  name="Commission Analysis"
-                  parent="sale.sale_menu_root"
-                  action="action_sale_order_commission_analysis"
-                  sequence="50"/>
-
     </data>
 </odoo>
