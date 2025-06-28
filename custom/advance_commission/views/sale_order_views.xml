@@ -6,6 +6,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add basic fields after client order ref -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="deal_id" string="Deal ID"/>
                 <field name="booking_date"/>
@@ -15,14 +16,13 @@
                 <field name="sale_value"/>
             </xpath>
 
+            <!-- Add commission page after other information -->
             <xpath expr="//page[@name='other_information']" position="after">
-                <page string="Commission" name="commission">                    <group>
+                <page string="Commission" name="commission">
+                    <group>
                         <group string="Commission Status">
-                            <field name="commission_status" widget="badge" 
-                                   decoration-info="commission_status == 'draft'" 
-                                   decoration-warning="commission_status == 'calculated'"
-                                   decoration-success="commission_status in ['confirmed', 'paid']"
-                                   decoration-danger="commission_status == 'canceled'"/>
+                            <field name="commission_status" widget="statusbar" 
+                                   options="{'clickable': '1'}"/>
                             <field name="commission_sequence" readonly="1"/>
                             <field name="commission_payment_date"/>
                             <field name="commission_reference"/>
@@ -32,9 +32,9 @@
                         </group>
                     </group>
 
-                    <!-- New Clear Summary Structure -->
+                    <!-- Commission Summary Section -->
                     <group string="Commission Summary">
-                        <group string="Commission Base &amp; Status">
+                        <group string="Base &amp; Status">
                             <field name="gross_commission_base" readonly="1" widget="monetary"/>
                             <field name="commission_allocation_status" readonly="1" widget="badge"
                                    decoration-success="commission_allocation_status == 'full'"
@@ -43,7 +43,7 @@
                             <field name="commission_percentage" readonly="1" widget="percentage"/>
                             <field name="commission_variance" readonly="1" widget="monetary"/>
                         </group>
-                        <group string="Allocation Totals">
+                        <group string="Totals">
                             <field name="total_external_allocation" readonly="1" widget="monetary"/>
                             <field name="total_internal_allocation" readonly="1" widget="monetary"/>
                             <field name="grand_total_commission" readonly="1" widget="monetary"/>
@@ -54,6 +54,7 @@
                         </group>
                     </group>
 
+                    <!-- Commission Details Notebook -->
                     <notebook>
                         <page string="External Commission">
                             <group>
@@ -123,67 +124,59 @@
             <!-- Add commission buttons to header -->
             <xpath expr="//header//button[@name='action_confirm']" position="before">
                 <button name="action_calculate_commission" 
-                        string="Calculate Commission" 
+                        string="Calculate" 
                         type="object" 
                         class="btn-primary"
-                        invisible="not show_calculate_button"/>
+                        attrs="{'invisible': [('show_calculate_button', '=', False)]}"/>
                 <button name="action_confirm_commission" 
-                        string="Confirm Commission" 
+                        string="Confirm" 
                         type="object" 
                         class="btn-primary"
-                        invisible="not show_confirm_button"/>
+                        attrs="{'invisible': [('show_confirm_button', '=', False)]}"/>
                 <button name="action_pay_commission" 
-                        string="Mark as Paid" 
+                        string="Mark Paid" 
                         type="object" 
                         class="btn-success"
-                        invisible="not show_pay_button"/>
+                        attrs="{'invisible': [('show_pay_button', '=', False)]}"/>
                 <button name="action_reset_commission" 
-                        string="Reset Commission" 
+                        string="Reset" 
                         type="object" 
                         class="btn-secondary"
-                        invisible="not show_reset_button"/>
+                        attrs="{'invisible': [('show_reset_button', '=', False)]}"/>
+                <button name="action_reject_commission" 
+                        string="Reject" 
+                        type="object" 
+                        class="btn-danger"
+                        attrs="{'invisible': [('show_reject_button', '=', False)]}"/>
             </xpath>
 
+            <!-- Add purchase order button to header -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_commission_purchase_order"
                         type="object"
-                        string="Create Commission Purchase Order"
+                        string="Create PO"
+                        class="btn-default"
                         icon="fa-shopping-cart"/>
             </xpath>
 
-            <!-- Invisible fields for button visibility -->
-            <xpath expr="//sheet" position="inside">
-                <group string="Commission Computation" invisible="1">
-                    <!-- Button visibility fields -->
-                    <field name="show_calculate_button" invisible="1"/>
-                    <field name="show_confirm_button" invisible="1"/>
-                    <field name="show_reset_button" invisible="1"/>
-                    <field name="show_pay_button" invisible="1"/>
-                </group>
-            </xpath>
-
-            <xpath expr="//sheet/notebook" position="before">
-                <notebook>
-                    <page string="Deal Information" name="deal_information">
-                        <group>
-                            <field name="deal_id" string="Deal ID"/>
-                            <field name="booking_date"/>
-                            <field name="buyer_id"/>
-                            <field name="project_id" string="Project Name"/>
-                            <field name="unit_id"/>
-                            <field name="sale_value"/>
-                        </group>
-                    </page>
-                </notebook>
-            </xpath>
-
-            <!-- Smart button for Purchase Orders only, with short label -->
+            <!-- Smart button for Purchase Orders -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button name="action_view_related_purchase_orders"
                         type="object"
                         class="oe_stat_button"
                         icon="fa-shopping-cart"
-                        string="Purchase Orders"/>
+                        string="POs"/>
+            </xpath>
+
+            <!-- Invisible fields for button visibility -->
+            <xpath expr="//sheet" position="inside">
+                <group string="Commission Computation" invisible="1">
+                    <field name="show_calculate_button" invisible="1"/>
+                    <field name="show_confirm_button" invisible="1"/>
+                    <field name="show_reset_button" invisible="1"/>
+                    <field name="show_pay_button" invisible="1"/>
+                    <field name="show_reject_button" invisible="1"/>
+                </group>
             </xpath>
         </field>
     </record>
@@ -201,38 +194,40 @@
                 <field name="project_id"/>
                 <field name="unit_id"/>
                 <field name="sale_value"/>
-                <field name="commission_status"/>
-                <field name="total_external_allocation"/>
-                <field name="total_internal_allocation"/>
-                <field name="grand_total_commission"/>
-                <field name="total_company_net"/>
+                <field name="commission_status" widget="badge"/>
+                <field name="total_external_allocation" widget="monetary"/>
+                <field name="total_internal_allocation" widget="monetary"/>
+                <field name="grand_total_commission" widget="monetary"/>
+                <field name="total_company_net" widget="monetary"/>
             </xpath>
         </field>
     </record>
 
-    <!-- Custom Tree View to match the required column layout -->
+    <!-- Custom Tree View with optimized layout -->
     <record id="view_order_tree_custom_layout" model="ir.ui.view">
         <field name="name">sale.order.tree.custom.layout</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="priority" eval="20"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="replace">
-                <tree string="Sales Orders">
+                <tree string="Sales Orders" decoration-success="commission_status == 'paid'" 
+                      decoration-warning="commission_status == 'confirmed'"
+                      decoration-danger="commission_status == 'canceled'">
+                    <field name="name" string="Order Reference"/>
                     <field name="deal_id" string="Deal ID"/>
                     <field name="booking_date" string="Booking Date"/>
                     <field name="partner_id" string="Customer"/>
-                    <field name="buyer_id" string="Buyer Name"/>
+                    <field name="buyer_id" string="Buyer"/>
                     <field name="project_id" string="Project"/>
                     <field name="unit_id" string="Unit"/>
-                    <field name="sale_value" string="Sale Value"/>
-                    <field name="developer_commission" string="Broker Commission"/>
-                    <field name="total_external_allocation" string="External Total"/>
-                    <field name="total_internal_allocation" string="Internal Total"/>
-                    <field name="grand_total_commission" string="Total Commission"/>
-                    <field name="total_company_net" string="Company Net"/>
-                    <field name="state" string="Order Status"/>
-                    <field name="invoice_status" string="Invoice Status"/>
-                    <field name="commission_status" string="Commission Status"/>
+                    <field name="sale_value" string="Sale Value" widget="monetary"/>
+                    <field name="total_external_allocation" string="External" widget="monetary"/>
+                    <field name="total_internal_allocation" string="Internal" widget="monetary"/>
+                    <field name="grand_total_commission" string="Total" widget="monetary"/>
+                    <field name="total_company_net" string="Net" widget="monetary"/>
+                    <field name="state" string="Status"/>
+                    <field name="commission_status" string="Commission" widget="badge"/>
                 </tree>
             </xpath>
         </field>
