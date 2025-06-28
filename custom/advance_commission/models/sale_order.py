@@ -121,7 +121,6 @@ class SaleOrder(models.Model):
     # EXTERNAL COMMISSION FIELDS
     # ===========================================
     
-    # Broker/Agency Commission
     broker_agency_partner_id = fields.Many2one(
         'res.partner',
         string="Broker/Agency Partner",
@@ -143,7 +142,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Referral Commission
     referral_partner_id = fields.Many2one(
         'res.partner',
         string="Referral Partner",
@@ -165,7 +163,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Cashback Commission
     cashback_partner_id = fields.Many2one(
         'res.partner',
         string="Cashback Partner",
@@ -187,7 +184,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Other External Commission
     other_external_partner_id = fields.Many2one(
         'res.partner',
         string="Other External Partner",
@@ -213,7 +209,6 @@ class SaleOrder(models.Model):
     # INTERNAL COMMISSION FIELDS
     # ===========================================
     
-    # Agent 1 Commission
     agent1_id = fields.Many2one(
         'res.partner',
         string='Agent 1',
@@ -236,7 +231,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Agent 2 Commission
     agent2_id = fields.Many2one(
         'res.partner',
         string='Agent 2',
@@ -259,7 +253,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Manager Commission
     manager_id = fields.Many2one(
         'res.partner',
         string='Manager',
@@ -282,7 +275,6 @@ class SaleOrder(models.Model):
         help="Fixed commission amount. Will auto-calculate if rate is entered."
     )
 
-    # Director Commission
     director_id = fields.Many2one(
         'res.partner',
         string='Director',
@@ -309,7 +301,6 @@ class SaleOrder(models.Model):
     # COMPUTED SUMMARY FIELDS
     # ===========================================
     
-    # Gross commission base (sale value)
     gross_commission_base = fields.Monetary(
         string='Gross Commission Base',
         compute='_compute_commission_summary',
@@ -319,7 +310,6 @@ class SaleOrder(models.Model):
         help="Base amount for commission calculations (sale value)"
     )
     
-    # External commission totals
     total_external_allocation = fields.Monetary(
         string='Total External Allocation', 
         compute='_compute_commission_summary', 
@@ -329,7 +319,6 @@ class SaleOrder(models.Model):
         help="Total of all external commission allocations"
     )
     
-    # Internal commission totals  
     total_internal_allocation = fields.Monetary(
         string='Total Internal Allocation', 
         compute='_compute_commission_summary', 
@@ -339,7 +328,6 @@ class SaleOrder(models.Model):
         help="Total of all internal commission allocations"
     )
     
-    # Company net amount
     total_company_net = fields.Monetary(
         string='Total Company Net', 
         compute='_compute_commission_summary', 
@@ -349,7 +337,6 @@ class SaleOrder(models.Model):
         help="Company net amount after commission allocations"
     )
     
-    # Summary totals
     grand_total_commission = fields.Monetary(
         string='Grand Total Commission', 
         compute='_compute_commission_summary', 
@@ -359,7 +346,6 @@ class SaleOrder(models.Model):
         help="Total of all commission allocations"
     )
     
-    # Status and allocation information
     commission_allocation_status = fields.Selection([
         ('under', 'Under Allocated'),
         ('full', 'Fully Allocated'),
@@ -485,22 +471,22 @@ class SaleOrder(models.Model):
     def _get_commission_base(self, commission_type):
         """Get the base amount for commission calculation based on type"""
         if commission_type == 'unit_price':
-            # Sum of price_unit for all order lines
             return sum(self.order_line.mapped('price_unit'))
         elif commission_type == 'untaxed':
             return self.amount_untaxed or 0.0
-        else:  # 'fixed' or unknown type
+        else:
             return 0.0
 
-    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, type_field=None):
+    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, commission_type='unit_price'):
         """
-        Helper method to calculate commission amount from rate or amount fields.
-        If amount is provided, use it and calculate rate.
-        If rate is provided, calculate amount.
-        If both are provided, amount takes precedence.
+        Calculate commission amount based on rate or amount fields
+        Args:
+            rate_field (str): Field name for rate percentage
+            amount_field (str): Field name for amount
+            base_amount (float): Base amount for calculation
+            commission_type (str): Type of commission calculation
         """
         self.ensure_one()
-        commission_type = getattr(self, type_field) if type_field else 'unit_price'
         
         if commission_type == 'fixed':
             amount_value = getattr(self, amount_field, 0.0)
@@ -535,21 +521,60 @@ class SaleOrder(models.Model):
                  'manager_rate', 'manager_amount', 'manager_commission_type',
                  'director_rate', 'director_amount', 'director_commission_type')
     def _compute_commission_summary(self):
-        """Compute commission summary values including gross base and allocations"""
+        """Compute commission summary values"""
         for order in self:
-            # Calculate gross commission base first
             order.gross_commission_base = order.sale_value or order.amount_total or 0.0
             base_amount = order.gross_commission_base
 
-            # Calculate individual commission amounts
-            broker_total = order._calculate_commission_amount('broker_agency_rate', 'broker_agency_amount', base_amount, 'broker_agency_commission_type')
-            referral_total = order._calculate_commission_amount('referral_rate', 'referral_amount', base_amount, 'referral_commission_type')
-            cashback_total = order._calculate_commission_amount('cashback_rate', 'cashback_amount', base_amount, 'cashback_commission_type')
-            other_external_total = order._calculate_commission_amount('other_external_rate', 'other_external_amount', base_amount, 'other_external_commission_type')
-            agent1_total = order._calculate_commission_amount('agent1_rate', 'agent1_amount', base_amount, 'agent1_commission_type')
-            agent2_total = order._calculate_commission_amount('agent2_rate', 'agent2_amount', base_amount, 'agent2_commission_type')
-            manager_total = order._calculate_commission_amount('manager_rate', 'manager_amount', base_amount, 'manager_commission_type')
-            director_total = order._calculate_commission_amount('director_rate', 'director_amount', base_amount, 'director_commission_type')
+            # Calculate commissions using the correct parameter passing
+            broker_total = order._calculate_commission_amount(
+                'broker_agency_rate',
+                'broker_agency_amount',
+                base_amount,
+                order.broker_agency_commission_type
+            )
+            referral_total = order._calculate_commission_amount(
+                'referral_rate',
+                'referral_amount',
+                base_amount,
+                order.referral_commission_type
+            )
+            cashback_total = order._calculate_commission_amount(
+                'cashback_rate',
+                'cashback_amount',
+                base_amount,
+                order.cashback_commission_type
+            )
+            other_external_total = order._calculate_commission_amount(
+                'other_external_rate',
+                'other_external_amount',
+                base_amount,
+                order.other_external_commission_type
+            )
+            agent1_total = order._calculate_commission_amount(
+                'agent1_rate',
+                'agent1_amount',
+                base_amount,
+                order.agent1_commission_type
+            )
+            agent2_total = order._calculate_commission_amount(
+                'agent2_rate',
+                'agent2_amount',
+                base_amount,
+                order.agent2_commission_type
+            )
+            manager_total = order._calculate_commission_amount(
+                'manager_rate',
+                'manager_amount',
+                base_amount,
+                order.manager_commission_type
+            )
+            director_total = order._calculate_commission_amount(
+                'director_rate',
+                'director_amount',
+                base_amount,
+                order.director_commission_type
+            )
 
             # Update commission amounts
             order.broker_agency_amount = broker_total
@@ -591,33 +616,27 @@ class SaleOrder(models.Model):
     def _compute_button_visibility(self):
         """Compute button visibility based on commission status and user permissions"""
         for record in self:
-            # Check if user is admin/manager
             is_admin = self.env.user.has_group('base.group_system') or \
                       self.env.user.has_group('account.group_account_manager')
             
-            # Default all buttons to False
             record.show_calculate_button = False
             record.show_confirm_button = False
             record.show_reset_button = False
             record.show_pay_button = False
             record.show_reject_button = False
             
-            # Button visibility based on status
             if record.commission_status == 'draft':
                 record.show_calculate_button = True
                 record.show_reset_button = True
-                
             elif record.commission_status == 'calculated':
                 record.show_confirm_button = True
                 record.show_reset_button = True
-                record.show_calculate_button = True  # Allow recalculation
-                
+                record.show_calculate_button = True
             elif record.commission_status == 'confirmed':
                 record.show_pay_button = True
                 record.show_reset_button = True
                 if is_admin:
                     record.show_reject_button = True
-                    
             elif record.commission_status in ['paid', 'canceled']:
                 record.show_reset_button = True
                 if is_admin:
@@ -630,7 +649,6 @@ class SaleOrder(models.Model):
     def calculate_commission(self):
         """Calculate and update commission values"""
         for record in self:
-            # Trigger the computation of commission summary
             record._compute_commission_summary()
             record.commission_status = 'calculated'
         return True
@@ -688,7 +706,6 @@ class SaleOrder(models.Model):
             record.commission_notes = False
             record.commission_rejected_by = False
             record.commission_rejected_date = False
-            # Reset all commission fields
             for f in [
                 'broker_agency_rate', 'broker_agency_amount',
                 'referral_rate', 'referral_amount',
@@ -711,7 +728,6 @@ class SaleOrder(models.Model):
     
     def action_create_commission_purchase_order(self):
         """Create a purchase order for commission payments"""
-        # This is a placeholder - implement based on your business logic
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -724,7 +740,6 @@ class SaleOrder(models.Model):
     
     def action_view_related_purchase_orders(self):
         """View related purchase orders for commission"""
-        # This is a placeholder - implement based on your business logic
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -736,10 +751,7 @@ class SaleOrder(models.Model):
         }
     
     def action_reject_commission(self):
-        """
-        Reject the commission for this sale order. Sets status to 'canceled', records user and timestamp.
-        Returns a client action to display a notification.
-        """
+        """Reject the commission for this sale order"""
         for order in self:
             order.commission_status = 'canceled'
             order.commission_rejected_by = self.env.user
