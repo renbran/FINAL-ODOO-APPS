@@ -22,16 +22,25 @@ These errors occur because:
 
 ## Solution Options
 
-### Option 1: Automated SQL Script (Recommended)
+### Option 1: Cloud/Server SQL Script (Recommended for Cloudpepper)
 
-Run the provided SQL script to automatically fix all NULL values:
+If your Odoo/PostgreSQL is hosted on a Linux server (like Cloudpepper), use this method:
+
+1. **Upload the SQL script to your server** (e.g., `/var/odoo/os-us/database_migration_fix_cloudpepper.sql`).
+2. **SSH into your server**:
+   ```bash
+   ssh root@139.84.163.11
+   ```
+3. **Run the script using psql**:
+   ```bash
+   psql -h 139.84.163.11 -U root -d os-us -f /var/odoo/os-us/database_migration_fix_cloudpepper.sql
+   ```
+   (Enter your password when prompted)
+
+### Option 1b: Using PowerShell (Windows, if you have direct DB access)
 
 ```powershell
-# Using PowerShell (Windows)
 .\fix_database.ps1 -DatabaseName "os-us" -Username "root"
-
-# Or run SQL directly in psql/pgAdmin
-psql -U your_user -d your_database -f database_migration_fix.sql
 ```
 
 ### Option 2: Manual Database Fix
@@ -40,8 +49,7 @@ If you prefer to run the fixes manually:
 
 #### Step 1: Connect to your PostgreSQL database
 ```bash
-psql -U your_user -d your_database_name
-```
+psql -U postgres -d os-us```
 
 #### Step 2: Fix res_bank.routing_code field
 ```sql
@@ -139,6 +147,19 @@ If you want to make the fields optional instead:
    psql -U your_user -d your_database -f database_migration_fix.sql
    ```
 3. **Start Odoo** once the script completes successfully
+
+### For Linux/Cloudpepper Users:
+
+1. **Upload the PowerShell script to your server** (e.g., `/var/odoo/os-us/fix_database.ps1`).
+2. **SSH into your server**:
+   ```bash
+   ssh root@139.84.163.11
+   ```
+3. **Run the script using PowerShell Core (pwsh)**:
+   ```bash
+   pwsh /var/odoo/os-us/fix_database.ps1 -DatabaseName "os-us" -Username "root"
+   ```
+   (If you do not have PowerShell Core, use the SQL method above.)
 
 ## What the Fix Does
 
