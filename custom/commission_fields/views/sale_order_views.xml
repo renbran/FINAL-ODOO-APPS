@@ -26,8 +26,6 @@
                             <field name="commission_sequence" readonly="1"/>
                             <field name="commission_payment_date"/>
                             <field name="commission_reference"/>
-                            <field name="commission_rejected_by" readonly="1" invisible="commission_status != 'canceled'"/>
-                            <field name="commission_rejected_date" readonly="1" invisible="commission_status != 'canceled'"/>
                         </group>
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
@@ -161,7 +159,6 @@
                     <field name="show_confirm_button" invisible="1"/>
                     <field name="show_reset_button" invisible="1"/>
                     <field name="show_pay_button" invisible="1"/>
-                    <field name="show_reject_button" invisible="1"/>
                 </group>
             </xpath>
 
