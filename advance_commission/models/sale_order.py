@@ -477,39 +477,36 @@ class SaleOrder(models.Model):
         else:
             return 0.0
 
-    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, commission_type):
+    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, commission_type=None, type_field=None):
         """
-        Calculate commission amount based on rate or amount fields
+        Calculate commission amount based on rate and amount fields
         Args:
             rate_field (str): Field name for rate percentage
             amount_field (str): Field name for amount
             base_amount (float): Base amount for calculation
-            commission_type (str): Type of commission calculation
+            commission_type (str, optional): Type of commission calculation
+            type_field (str, optional): Field name for commission type
         """
         self.ensure_one()
         
-        if commission_type == 'fixed':
-            amount_value = getattr(self, amount_field, 0.0)
+        # Determine commission type
+        if commission_type is None and type_field:
+            commission_type = getattr(self, type_field, 'fixed')
+        elif commission_type is None:
+            commission_type = 'fixed'
+
+        rate_value = getattr(self, rate_field, 0.0)
+        
+        if commission_type == 'percentage':
+            amount_value = base_amount * (rate_value / 100)
+        else:  # fixed
+            amount_value = rate_value
             rate_value = (amount_value / base_amount * 100) if base_amount else 0.0
-            setattr(self, rate_field, rate_value)
-            return amount_value
-        else:
-            base = self._get_commission_base(commission_type)
-            rate_value = getattr(self, rate_field, 0.0)
-            amount_value = getattr(self, amount_field, 0.0)
             
-            if amount_value:
-                calculated_rate = (amount_value / base * 100) if base else 0.0
-                setattr(self, rate_field, calculated_rate)
-                return amount_value
-            elif rate_value:
-                calculated_amount = (rate_value * base / 100) if base else 0.0
-                setattr(self, amount_field, calculated_amount)
-                return calculated_amount
-            else:
-                setattr(self, amount_field, 0.0)
-                setattr(self, rate_field, 0.0)
-                return 0.0
+        setattr(self, amount_field, amount_value)
+        setattr(self, rate_field, rate_value)
+        
+        return amount_value
 
     @api.depends('sale_value', 'amount_total', 'amount_untaxed',
                  'broker_agency_rate', 'broker_agency_amount', 'broker_agency_commission_type',
