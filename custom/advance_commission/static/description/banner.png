@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1920" height="1080" viewBox="0 0 508 285.75" version="1.1" id="svg8">
+  <defs id="defs2"/>
+  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2"/>
+  <metadata id="metadata5">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
+    <!-- Background Rectangle -->
+    <rect style="fill:#4a90d9;fill-opacity:1;stroke:none;stroke-width:0.264583" id="rect10" width="508" height="285.75" x="0" y="0"/>
+    
+    <!-- Module Title -->
+    <text xml:space="preserve" style="font-style:normal;font-weight:normal;font-size:25.4px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583" x="50" y="80"><tspan sodipodi:role="line" id="tspan12" x="50" y="80">Sales Commission</tspan><tspan sodipodi:role="line" x="50" y="111.75">Management</tspan></text>
+    
+    <!-- Features List -->
+    <text xml:space="preserve" style="font-style:normal;font-weight:normal;font-size:14.1111px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583" x="50" y="160">
+      <tspan sodipodi:role="line" x="50" y="160">✓ Multiple Commission Types</tspan>
+      <tspan sodipodi:role="line" x="50" y="180">✓ Internal &amp; External Commission</tspan>
+      <tspan sodipodi:role="line" x="50" y="200">✓ Advanced Reporting</tspan>
+      <tspan sodipodi:role="line" x="50" y="220">✓ Flexible Configuration</tspan>
+    </text>
+    
+    <!-- Odoo Version -->
+    <text xml:space="preserve" style="font-style:normal;font-weight:normal;font-size:16.9333px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583" x="380" y="260">Odoo 17.0</text>
+  </g>
+</svg>
