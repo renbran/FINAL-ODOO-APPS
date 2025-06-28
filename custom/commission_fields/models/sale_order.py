@@ -314,6 +314,7 @@ class SaleOrder(models.Model):
         string='Gross Commission Base',
         compute='_compute_commission_summary',
         store=True,
+        readonly=True,
         currency_field='currency_id',
         help="Base amount for commission calculations (sale value)"
     )
@@ -514,9 +515,13 @@ class SaleOrder(models.Model):
                  'manager_rate', 'manager_amount', 'manager_commission_type',
                  'director_rate', 'director_amount', 'director_commission_type')
     def _compute_commission_summary(self):
+        """Compute commission summary values including gross base and allocations"""
         for order in self:
-            base_amount = order.sale_value or order.amount_total or 0.0
-            order.gross_commission_base = base_amount
+            # Calculate gross commission base first
+            order.gross_commission_base = order.sale_value or order.amount_total or 0.0
+            base_amount = order.gross_commission_base
+
+            # Calculate individual commission amounts
             broker_total = order._calculate_commission_amount('broker_agency_rate', 'broker_agency_amount', base_amount, 'broker_agency_commission_type')
             referral_total = order._calculate_commission_amount('referral_rate', 'referral_amount', base_amount, 'referral_commission_type')
             cashback_total = order._calculate_commission_amount('cashback_rate', 'cashback_amount', base_amount, 'cashback_commission_type')
@@ -525,6 +530,8 @@ class SaleOrder(models.Model):
             agent2_total = order._calculate_commission_amount('agent2_rate', 'agent2_amount', base_amount, 'agent2_commission_type')
             manager_total = order._calculate_commission_amount('manager_rate', 'manager_amount', base_amount, 'manager_commission_type')
             director_total = order._calculate_commission_amount('director_rate', 'director_amount', base_amount, 'director_commission_type')
+
+            # Update commission amounts
             order.broker_agency_amount = broker_total
             order.referral_amount = referral_total
             order.cashback_amount = cashback_total
@@ -533,20 +540,26 @@ class SaleOrder(models.Model):
             order.agent2_amount = agent2_total
             order.manager_amount = manager_total
             order.director_amount = director_total
+
+            # Calculate totals
             order.total_external_allocation = broker_total + referral_total + cashback_total + other_external_total
             order.total_internal_allocation = agent1_total + agent2_total + manager_total + director_total
             order.grand_total_commission = order.total_external_allocation + order.total_internal_allocation
-            # Enforce commission cap
+
+            # Calculate company net and variance
             untaxed = order.amount_untaxed or 0.0
             if order.grand_total_commission > untaxed:
                 order.grand_total_commission = untaxed
                 order.total_company_net = 0.0
             else:
                 order.total_company_net = untaxed - order.grand_total_commission
+
+            # Calculate status and percentages
             tolerance = 0.01
             variance = untaxed - order.grand_total_commission
             order.commission_variance = variance
             order.commission_percentage = (order.grand_total_commission / untaxed * 100) if untaxed else 0.0
+
             if abs(variance) <= tolerance:
                 order.commission_allocation_status = 'full'
             elif variance > tolerance:
