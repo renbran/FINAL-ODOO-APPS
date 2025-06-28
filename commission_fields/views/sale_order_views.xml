@@ -144,11 +144,6 @@
                         type="object" 
                         class="btn-secondary"
                         invisible="not show_reset_button"/>
-                <button name="action_reject_commission" 
-                        string="Reject Commission" 
-                        type="object" 
-                        class="btn-danger"
-                        invisible="not show_reject_button"/>
             </xpath>
 
             <xpath expr="//header" position="inside">
