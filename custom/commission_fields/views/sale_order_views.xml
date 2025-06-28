@@ -32,91 +32,90 @@
                         <group string="Commission Notes">
                             <field name="commission_notes" widget="html"/>
                         </group>
-                        <group string="Commission Summary (Enhanced)">
-                            <field name="total_external_commission" readonly="1"/>
-                            <field name="total_internal_commission" readonly="1"/>
-                            <field name="grand_total_commission" readonly="1"/>
-                            <field name="commission_allocation_status" readonly="1"/>
-                            <field name="commission_variance" readonly="1"/>
-                            <field name="commission_percentage" readonly="1"/>
+                    </group>
+
+                    <!-- New Clear Summary Structure -->
+                    <group string="Commission Summary">
+                        <group string="Commission Base & Status">
+                            <field name="gross_commission_base" readonly="1" widget="monetary"/>
+                            <field name="commission_allocation_status" readonly="1" widget="badge"
+                                   decoration-success="commission_allocation_status == 'full'"
+                                   decoration-warning="commission_allocation_status == 'under'"
+                                   decoration-danger="commission_allocation_status == 'over'"/>
+                            <field name="commission_percentage" readonly="1" widget="percentage"/>
+                            <field name="commission_variance" readonly="1" widget="monetary"/>
+                        </group>
+                        <group string="Allocation Totals">
+                            <field name="total_external_allocation" readonly="1" widget="monetary"/>
+                            <field name="total_internal_allocation" readonly="1" widget="monetary"/>
+                            <field name="grand_total_commission" readonly="1" widget="monetary"/>
+                            <field name="total_company_net" readonly="1" widget="monetary" 
+                                   decoration-success="total_company_net > 0"
+                                   decoration-warning="total_company_net == 0"
+                                   decoration-danger="total_company_net < 0"/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="External Commission">
                             <group>
-                                <group string="External Partner">
-                                    <field name="external_partner_id"/>
-                                    <field name="external_commission_type"/>
-                                    <field name="external_percentage" invisible="not show_external_percentage"/>
-                                    <field name="external_fixed_amount" invisible="not show_external_fixed_amount"/>
-                                    <field name="external_commission_amount" readonly="1"/>
-                                </group>
                                 <group string="Broker/Agency">
                                     <field name="broker_agency_partner_id"/>
                                     <field name="broker_agency_commission_type"/>
-                                    <field name="broker_agency_rate"/>
-                                    <field name="broker_agency_total" readonly="1"/>
+                                    <field name="broker_agency_rate" widget="percentage"/>
+                                    <field name="broker_agency_amount" widget="monetary"/>
                                 </group>
-                            </group>
-                            <group>
                                 <group string="Referral">
                                     <field name="referral_partner_id"/>
                                     <field name="referral_commission_type"/>
-                                    <field name="referral_rate"/>
-                                    <field name="referral_total" readonly="1"/>
-                                </group>
-                                <group string="Cashback">
-                                    <field name="cashback_partner_id"/>
-                                    <field name="cashback_commission_type"/>
-                                    <field name="cashback_rate"/>
-                                    <field name="cashback_total" readonly="1"/>
+                                    <field name="referral_rate" widget="percentage"/>
+                                    <field name="referral_amount" widget="monetary"/>
                                 </group>
                             </group>
                             <group>
+                                <group string="Cashback">
+                                    <field name="cashback_partner_id"/>
+                                    <field name="cashback_commission_type"/>
+                                    <field name="cashback_rate" widget="percentage"/>
+                                    <field name="cashback_amount" widget="monetary"/>
+                                </group>
                                 <group string="Other External">
                                     <field name="other_external_partner_id"/>
                                     <field name="other_external_commission_type"/>
-                                    <field name="other_external_rate"/>
-                                    <field name="other_external_total" readonly="1"/>
+                                    <field name="other_external_rate" widget="percentage"/>
+                                    <field name="other_external_amount" widget="monetary"/>
                                 </group>
                             </group>
                         </page>
 
                         <page string="Internal Commission">
                             <group>
-                                <field name="internal_commission_type"/>
-                            </group>
-                            <group>
                                 <group string="Agent 1">
                                     <field name="agent1_id"/>
                                     <field name="agent1_commission_type"/>
-                                    <field name="agent1_rate" invisible="not show_agent1_rate"/>
-                                    <field name="agent1_fixed" invisible="not show_agent1_fixed"/>
-                                    <field name="agent1_commission" readonly="1"/>
+                                    <field name="agent1_rate" widget="percentage"/>
+                                    <field name="agent1_amount" widget="monetary"/>
                                 </group>
                                 <group string="Agent 2">
                                     <field name="agent2_id"/>
                                     <field name="agent2_commission_type"/>
-                                    <field name="agent2_rate" invisible="not show_agent2_rate"/>
-                                    <field name="agent2_fixed" invisible="not show_agent2_fixed"/>
-                                    <field name="agent2_commission" readonly="1"/>
+                                    <field name="agent2_rate" widget="percentage"/>
+                                    <field name="agent2_amount" widget="monetary"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="Manager">
                                     <field name="manager_id"/>
                                     <field name="manager_commission_type"/>
-                                    <field name="manager_rate" invisible="not show_manager_rate"/>
-                                    <field name="manager_fixed" invisible="not show_manager_fixed"/>
-                                    <field name="manager_commission" readonly="1"/>
+                                    <field name="manager_rate" widget="percentage"/>
+                                    <field name="manager_amount" widget="monetary"/>
                                 </group>
                                 <group string="Director">
                                     <field name="director_id"/>
                                     <field name="director_commission_type"/>
-                                    <field name="director_rate" invisible="not show_director_rate"/>
-                                    <field name="director_fixed" invisible="not show_director_fixed"/>
-                                    <field name="director_commission" readonly="1"/>                                </group>
+                                    <field name="director_rate" widget="percentage"/>
+                                    <field name="director_amount" widget="monetary"/>
+                                </group>
                             </group>
                         </page>
                     </notebook>
@@ -159,20 +158,9 @@
                         icon="fa-shopping-cart"/>
             </xpath>
 
-            <!-- Invisible fields for commission calculation -->
+            <!-- Invisible fields for button visibility -->
             <xpath expr="//sheet" position="inside">
-                <group string="Commission Computation">
-                    <field name="show_external_percentage" invisible="1"/>
-                    <field name="show_external_fixed_amount" invisible="1"/>
-                    <field name="show_agent1_rate" invisible="1"/>
-                    <field name="show_agent1_fixed" invisible="1"/>
-                    <field name="show_agent2_rate" invisible="1"/>
-                    <field name="show_agent2_fixed" invisible="1"/>
-                    <field name="show_manager_rate" invisible="1"/>
-                    <field name="show_manager_fixed" invisible="1"/>
-                    <field name="show_director_rate" invisible="1"/>
-                    <field name="show_director_fixed" invisible="1"/>
-                    
+                <group string="Commission Computation" invisible="1">
                     <!-- Button visibility fields -->
                     <field name="show_calculate_button" invisible="1"/>
                     <field name="show_confirm_button" invisible="1"/>
@@ -222,7 +210,10 @@
                 <field name="unit_id"/>
                 <field name="sale_value"/>
                 <field name="commission_status"/>
+                <field name="total_external_allocation"/>
+                <field name="total_internal_allocation"/>
                 <field name="grand_total_commission"/>
+                <field name="total_company_net"/>
             </xpath>
         </field>
     </record>
@@ -243,12 +234,13 @@
                     <field name="unit_id" string="Unit"/>
                     <field name="sale_value" string="Sale Value"/>
                     <field name="developer_commission" string="Broker Commission"/>
-                    <field name="agent1_commission" string="Agent 1"/>
-                    <field name="grand_total_commission" string="Total"/>
-                    <!-- <field name="invoiced_amount" string="Total Invoiced"/> -->
+                    <field name="total_external_allocation" string="External Total"/>
+                    <field name="total_internal_allocation" string="Internal Total"/>
+                    <field name="grand_total_commission" string="Total Commission"/>
+                    <field name="total_company_net" string="Company Net"/>
                     <field name="state" string="Order Status"/>
                     <field name="invoice_status" string="Invoice Status"/>
-                    <!-- <field name="payment_state" string="Payment Status"/> -->
+                    <field name="commission_status" string="Commission Status"/>
                 </tree>
             </xpath>
         </field>
