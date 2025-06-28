@@ -498,12 +498,6 @@ class SaleOrder(models.Model):
         If amount is provided, use it and calculate rate.
         If rate is provided, calculate amount.
         If both are provided, amount takes precedence.
-        
-        Args:
-            rate_field (str): Field name for rate percentage
-            amount_field (str): Field name for amount
-            base_amount (float): Base amount for calculation
-            type_field (str, optional): Field name for commission type
         """
         self.ensure_one()
         commission_type = getattr(self, type_field) if type_field else 'unit_price'
