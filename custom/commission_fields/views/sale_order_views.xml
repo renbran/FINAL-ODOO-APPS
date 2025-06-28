@@ -36,7 +36,7 @@
 
                     <!-- New Clear Summary Structure -->
                     <group string="Commission Summary">
-                        <group string="Commission Base & Status">
+                        <group string="Commission Base &amp; Status">
                             <field name="gross_commission_base" readonly="1" widget="monetary"/>
                             <field name="commission_allocation_status" readonly="1" widget="badge"
                                    decoration-success="commission_allocation_status == 'full'"
@@ -50,9 +50,9 @@
                             <field name="total_internal_allocation" readonly="1" widget="monetary"/>
                             <field name="grand_total_commission" readonly="1" widget="monetary"/>
                             <field name="total_company_net" readonly="1" widget="monetary" 
-                                   decoration-success="total_company_net > 0"
+                                   decoration-success="total_company_net &gt; 0"
                                    decoration-warning="total_company_net == 0"
-                                   decoration-danger="total_company_net < 0"/>
+                                   decoration-danger="total_company_net &lt; 0"/>
                         </group>
                     </group>
 
