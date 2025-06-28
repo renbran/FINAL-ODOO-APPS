@@ -845,12 +845,22 @@ class SaleOrder(models.Model):
     def action_reject_commission(self):
         """
         Reject the commission for this sale order. Sets status to 'canceled', records user and timestamp.
+        Returns a client action to display a notification.
         """
         for order in self:
             order.commission_status = 'canceled'
             order.commission_rejected_by = self.env.user
             order.commission_rejected_date = fields.Datetime.now()
-        return True
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Commission Rejected'),
+                'message': _('Commission has been rejected and marked as canceled'),
+                'sticky': False,
+                'type': 'warning',
+            }
+        }
     # ===========================================
     # CONSTRAINTS
     # ===========================================
