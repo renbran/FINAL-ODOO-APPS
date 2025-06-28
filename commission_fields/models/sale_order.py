@@ -843,29 +843,14 @@ class SaleOrder(models.Model):
         }
     
     def action_reject_commission(self):
-        """Reject commission (admin only)"""
-        # Check if user has admin rights
-        if not (self.env.user.has_group('base.group_system') or 
-                self.env.user.has_group('account.group_account_manager')):
-            raise UserError(_('Only administrators can reject commissions.'))
-            
-        for record in self:
-            if record.commission_status in ['confirmed', 'paid']:
-                record.commission_status = 'canceled'
-                record.commission_rejected_by = self.env.user
-                record.commission_rejected_date = fields.Datetime.now()
-                record.commission_notes = (record.commission_notes or '') + \
-                    f"\n--- Rejected by {self.env.user.name} on {fields.Date.today()} ---"
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('Commission rejected successfully'),
-                'sticky': False,
-            }
-        }
+        """
+        Reject the commission for this sale order. Sets status to 'canceled', records user and timestamp.
+        """
+        for order in self:
+            order.commission_status = 'canceled'
+            order.commission_rejected_by = self.env.user
+            order.commission_rejected_date = fields.Datetime.now()
+        return True
     # ===========================================
     # CONSTRAINTS
     # ===========================================
