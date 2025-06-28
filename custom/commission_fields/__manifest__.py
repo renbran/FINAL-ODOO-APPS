@@ -1,16 +1,40 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Sales Commission Management',
+    'name': 'Advanced Commission Management',
     'version': '17.0.1.0.0',
-    'summary': 'Comprehensive commission management for sales',
+    'summary': 'Complete sales commission management system',
     'description': """
-        This module provides advanced commission management capabilities
-        for sales teams including internal and external commission tracking,
-        calculation, and reporting.
+Advanced Commission Management System
+===================================
+
+A comprehensive solution for managing sales commissions in Odoo.
+
+Key Features:
+------------
+* Multi-level commission structure (Brokers, Agents, Managers, Directors)
+* External and internal commission tracking
+* Flexible commission calculation methods
+* Commission approval workflow
+* Detailed commission reports
+* Commission payment tracking
+* Integration with sales and accounting
+
+This module provides a complete system for:
+-----------------------------------------
+* Setting up commission rules and rates
+* Calculating commissions automatically
+* Managing commission payments
+* Tracking commission history
+* Generating commission reports
+* Managing commission approvals
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'category': 'Sales',
+    'category': 'Sales/Commission',
+    'sequence': 1,
+    'application': True,
+    'installable': True,
+    'auto_install': False,
     'depends': [
         'sale',
         'hr',
@@ -44,9 +68,9 @@
         ],
     },
     'demo': [],
-    'images': ['static/description/banner.png'],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
+    'images': [
+        'static/description/banner.png',
+        'static/description/icon.png'
+    ],
     'license': 'LGPL-3',
 }
