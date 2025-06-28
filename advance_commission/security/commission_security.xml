@@ -11,7 +11,7 @@
         </record>
 
         <!-- Commission Groups -->
-        <record id="group_commission_user" model="res.groups">
+        <record id="group_commission_user" model="res.groups" forcecreate="0">
             <field name="name">Commission User</field>
             <field name="category_id" ref="base.module_category_sales_sales"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
