@@ -477,7 +477,7 @@ class SaleOrder(models.Model):
         else:
             return 0.0
 
-    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, commission_type='unit_price'):
+    def _calculate_commission_amount(self, rate_field, amount_field, base_amount, commission_type):
         """
         Calculate commission amount based on rate or amount fields
         Args:
