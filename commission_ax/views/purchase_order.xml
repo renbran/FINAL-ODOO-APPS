@@ -1,17 +1,44 @@
 <odoo>
     <data>
-        <record id="view_purchase_order_form_inherit" model="ir.ui.view">
-            <field name="name">purchase.order.form.inherit</field>
+        <!-- Enhanced Purchase Order Form View -->
+        <record id="view_purchase_order_form_inherit_enhanced" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit.enhanced</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
-                <sheet position="inside">
-                    <group>
-                        <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
-                        <field name="description" readonly="1" string="Commission Details"/>
-                    </group>
-                </sheet>
+                
+                <!-- Add Smart Button for Source Sale Order -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object" 
+                            name="action_view_source_sale_order" 
+                            class="oe_stat_button" 
+                            icon="fa-usd"
+                            invisible="not origin_so_id">
+                        <span>Source Sale Order</span>
+                    </button>
+                </xpath>
+
+                <!-- Add Commission Information -->
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
+                    <field name="commission_type" readonly="1" string="Commission Type"/>
+                </xpath>
+
             </field>
         </record>
+
+        <!-- Enhanced Purchase Order Tree View -->
+        <record id="view_purchase_order_tree_inherit_enhanced" model="ir.ui.view">
+            <field name="name">purchase.order.tree.inherit.enhanced</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total']" position="after">
+                    <field name="commission_type"/>
+                    <field name="origin_so_id"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
