@@ -36,7 +36,7 @@ class SaleOrder(models.Model):
         index=True
     )
     
-    deal_id = fields.Float(string='Deal ID', help="Deal ID for commission mapping.", copy=False, index=True)
+    deal_id = fields.Char(string='Deal ID', help="Deal ID for commission mapping.", copy=False, index=True)
 
     project_id = fields.Many2one(
         'product.template',
@@ -465,14 +465,13 @@ class SaleOrder(models.Model):
     def _compute_sale_value(self):
         """Compute sale value based on order totals"""
         for record in self:
-            if not record.sale_value:
-                record.sale_value = record.amount_total or 0.0
+            record.sale_value = record.amount_total or 0.0
 
     def _get_commission_base(self, commission_type):
         """Get the base amount for commission calculation based on type"""
         if commission_type == 'unit_price':
             return sum(self.order_line.mapped('price_unit'))
-        elif commission_type == 'untaxed':
+            return sum(line.price_unit * line.product_uom_qty for line in self.order_line)
             return self.amount_untaxed or 0.0
         else:
             return 0.0
@@ -491,7 +490,7 @@ class SaleOrder(models.Model):
         
         # Determine commission type
         if commission_type is None and type_field:
-            commission_type = getattr(self, type_field, 'fixed')
+            commission_type = getattr(self, type_field) if hasattr(self, type_field) else 'fixed'
         elif commission_type is None:
             commission_type = 'fixed'
 
