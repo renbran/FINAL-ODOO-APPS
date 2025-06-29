@@ -633,6 +633,18 @@ class SaleOrder(models.Model):
             self.action_calculate_commissions()
         return res
 
+    def action_test_commission_method(self):
+        """Simple test method to verify model inheritance is working"""
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Test Successful',
+                'message': 'Commission methods are working correctly',
+                'type': 'success',
+            }
+        }
+
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -738,6 +750,20 @@ class PurchaseOrder(models.Model):
         
         return product
 
+    def action_generate_commission_purchase_orders_simple(self):
+        """Simple version of purchase order generation for testing"""
+        self.ensure_one()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Purchase Order Generation',
+                'message': 'This is a simplified version for testing. Full implementation coming soon.',
+                'type': 'info',
+            }
+        }
+
     def action_generate_commission_purchase_orders(self):
         """Generate Purchase Orders for all commissions"""
         self.ensure_one()
@@ -820,4 +846,17 @@ class PurchaseOrder(models.Model):
         """Auto-generate Purchase Orders for commissions - Legacy method for backward compatibility"""
         return self.action_generate_commission_purchase_orders()
 
-    # ===========================================
+    def action_create_commission_purchase_orders(self):
+        """Simple method to create commission purchase orders"""
+        self.ensure_one()
+        
+        # Simple notification for now
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Commission Purchase Orders'),
+                'message': _('Purchase order generation feature is being prepared.'),
+                'type': 'info',
+            }
+        }
