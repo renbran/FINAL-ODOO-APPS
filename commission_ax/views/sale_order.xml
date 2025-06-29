@@ -52,9 +52,21 @@
                     <field name="commission_calculation_method" 
                            help="Default method for commission calculation. Each party can override this individually."
                            readonly="state in ['sale', 'done', 'cancel']"/>
+                    <field name="sales_value" string="Sales Value" readonly="1"/>
                     <field name="commission_base_amount" readonly="1"
                            help="Calculated base amount used for commission calculations"/>
                 </xpath>
+
+                <!-- Remove Sales Value from Order Lines -->
+                <!-- (Remove these two blocks) -->
+                <!--
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="sales_value" string="Sales Value" readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form" position="inside">
+                    <field name="sales_value" string="Sales Value" readonly="1"/>
+                </xpath>
+                -->
 
                 <!-- Add Commission Management Page -->
                 <xpath expr="//page[last()]" position="after">
