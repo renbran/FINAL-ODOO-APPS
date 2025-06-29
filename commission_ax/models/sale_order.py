@@ -737,6 +737,17 @@ class SaleOrder(models.Model):
             order.commission_status = 'draft'
         return True
 
+    def action_view_purchase_orders(self):
+        """Open the related purchase orders for this sale order."""
+        self.ensure_one()
+        action = self.env.ref('purchase.purchase_rfq').read()[0]
+        action['domain'] = [('id', 'in', self.purchase_order_ids.ids)]
+        action['context'] = dict(self.env.context)
+        action['context'].update({
+            'default_origin_so_id': self.id,
+        })
+        return action
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
