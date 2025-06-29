@@ -17,7 +17,7 @@
                         <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
                     </button>
                     <button type="object" 
-                            name="action_create_commission_purchase_orders" 
+                            name="action_generate_commission_purchase_orders" 
                             class="oe_stat_button" 
                             icon="fa-plus"
                             invisible="commission_status != 'confirmed'">
@@ -47,15 +47,16 @@
                     <field name="commission_status" widget="statusbar" statusbar_visible="draft,calculated,confirmed,paid"/>
                 </xpath>
 
-                <!-- Add Commission Configuration and Summary -->
+                <!-- Add Commission Configuration -->
                 <xpath expr="//field[@name='payment_term_id']" position="after">
                     <field name="commission_calculation_method" 
-                           help="Default method for commission calculation. Each party can override this individually."/>
+                           help="Default method for commission calculation. Each party can override this individually."
+                           readonly="state in ['sale', 'done', 'cancel']"/>
                     <field name="commission_base_amount" readonly="1"
                            help="Calculated base amount used for commission calculations"/>
                 </xpath>
 
-                <!-- Replace existing commission fields with enhanced notebook -->
+                <!-- Add Commission Management Page -->
                 <xpath expr="//page[last()]" position="after">
                     <page string="Commission Management" name="commission_management">
                         
@@ -90,72 +91,88 @@
                         <!-- Broker Commission -->
                         <group name="broker_commission" string="🏢 Broker Commission">
                             <group>
-                                <field name="broker_partner_id" placeholder="Select broker partner..."/>
+                                <field name="broker_partner_id" placeholder="Select broker partner..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="broker_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="broker_rate" widget="percentage" 
                                        decoration-info="broker_rate &gt; 0"
-                                       invisible="broker_commission_type == 'fixed_amount'"/>
+                                       invisible="broker_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="broker_amount" 
                                        decoration-info="broker_amount &gt; 0"
                                        string="Amount" 
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Referrer Commission -->
                         <group name="referrer_commission" string="👥 Referrer Commission">
                             <group>
-                                <field name="referrer_partner_id" placeholder="Select referrer partner..."/>
+                                <field name="referrer_partner_id" placeholder="Select referrer partner..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="referrer_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="referrer_rate" widget="percentage"
                                        decoration-info="referrer_rate &gt; 0"
-                                       invisible="referrer_commission_type == 'fixed_amount'"/>
+                                       invisible="referrer_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="referrer_amount"
                                        decoration-info="referrer_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Cashback Commission -->
                         <group name="cashback_commission" string="💰 Cashback Commission">
                             <group>
-                                <field name="cashback_partner_id" placeholder="Select cashback recipient..."/>
+                                <field name="cashback_partner_id" placeholder="Select cashback recipient..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="cashback_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="cashback_rate" widget="percentage"
                                        decoration-info="cashback_rate &gt; 0"
-                                       invisible="cashback_commission_type == 'fixed_amount'"/>
+                                       invisible="cashback_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="cashback_amount"
                                        decoration-info="cashback_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Other External Commission -->
                         <group name="other_external_commission" string="🔗 Other External Commission">
                             <group>
-                                <field name="other_external_partner_id" placeholder="Select other external partner..."/>
+                                <field name="other_external_partner_id" placeholder="Select other external partner..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="other_external_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="other_external_rate" widget="percentage"
                                        decoration-info="other_external_rate &gt; 0"
-                                       invisible="other_external_commission_type == 'fixed_amount'"/>
+                                       invisible="other_external_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="other_external_amount"
                                        decoration-info="other_external_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
@@ -174,72 +191,88 @@
                         <!-- Agent 1 Commission -->
                         <group name="agent1_commission" string="👤 Agent 1 Commission">
                             <group>
-                                <field name="agent1_partner_id" placeholder="Select Agent 1..."/>
+                                <field name="agent1_partner_id" placeholder="Select Agent 1..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="agent1_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="agent1_rate" widget="percentage"
                                        decoration-info="agent1_rate &gt; 0"
-                                       invisible="agent1_commission_type == 'fixed_amount'"/>
+                                       invisible="agent1_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="agent1_amount"
                                        decoration-info="agent1_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Agent 2 Commission -->
                         <group name="agent2_commission" string="👤 Agent 2 Commission">
                             <group>
-                                <field name="agent2_partner_id" placeholder="Select Agent 2..."/>
+                                <field name="agent2_partner_id" placeholder="Select Agent 2..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="agent2_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="agent2_rate" widget="percentage"
                                        decoration-info="agent2_rate &gt; 0"
-                                       invisible="agent2_commission_type == 'fixed_amount'"/>
+                                       invisible="agent2_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="agent2_amount"
                                        decoration-info="agent2_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Manager Commission -->
                         <group name="manager_commission" string="👔 Manager Commission">
                             <group>
-                                <field name="manager_partner_id" placeholder="Select Manager..."/>
+                                <field name="manager_partner_id" placeholder="Select Manager..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="manager_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="manager_rate" widget="percentage"
                                        decoration-info="manager_rate &gt; 0"
-                                       invisible="manager_commission_type == 'fixed_amount'"/>
+                                       invisible="manager_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="manager_amount"
                                        decoration-info="manager_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
                         <!-- Director Commission -->
                         <group name="director_commission" string="🎯 Director Commission">
                             <group>
-                                <field name="director_partner_id" placeholder="Select Director..."/>
+                                <field name="director_partner_id" placeholder="Select Director..."
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="director_commission_type" string="Calculation Method"
-                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"/>
+                                       help="• Price Unit: Based on sum of line prices × quantities&#10;• Untaxed Total: Based on order subtotal&#10;• Fixed Amount: Enter a fixed commission amount"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                                 <field name="director_rate" widget="percentage"
                                        decoration-info="director_rate &gt; 0"
-                                       invisible="director_commission_type == 'fixed_amount'"/>
+                                       invisible="director_commission_type == 'fixed_amount'" 
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                             <group>
                                 <field name="director_amount"
                                        decoration-info="director_amount &gt; 0"
                                        string="Amount"
-                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"/>
+                                       help="Commission amount (auto-calculated for percentage, manual for fixed amount)"
+                                       readonly="commission_status in ['confirmed', 'paid']"/>
                             </group>
                         </group>
 
@@ -247,7 +280,7 @@
                     
                     <!-- Generated Purchase Orders Tab -->
                     <page string="Commission Purchase Orders" name="commission_purchase_orders" 
-                          invisible="purchase_order_count == 0">
+                          attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
                         <field name="purchase_order_ids" readonly="1">
                             <tree>
                                 <field name="name"/>
@@ -261,6 +294,20 @@
                     </page>
                 </xpath>
 
+            </field>
+        </record>
+
+        <!-- Enhanced Sale Order Tree View -->
+        <record id="view_order_tree_inherit_commission_enhanced" model="ir.ui.view">
+            <field name="name">sale.order.tree.inherit.commission.enhanced</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total']" position="after">
+                    <field name="commission_status" optional="show"/>
+                    <field name="total_commission_amount" sum="Total Commission" optional="show"/>
+                    <field name="company_share" sum="Company Share" optional="hide"/>
+                </xpath>
             </field>
         </record>
 
@@ -307,18 +354,6 @@
                 </xpath>
             </field>
         </record>
-        <record id="view_order_tree_inherit_commission_enhanced" model="ir.ui.view">
-            <field name="name">sale.order.tree.inherit.commission.enhanced</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="commission_status"/>
-                    <field name="total_commission_amount" sum="Total Commission"/>
-                    <field name="company_share" sum="Company Share"/>
-                </xpath>
-            </field>
-        </record>
 
         <!-- Commission Analysis Action -->
         <record id="action_sale_order_commission_analysis" model="ir.actions.act_window">
@@ -331,6 +366,13 @@
                 'search_default_filter_this_month': 1
             }</field>
         </record>
+
+        <!-- Menu Items -->
+        <menuitem id="menu_commission_analysis"
+                  name="Commission Analysis"
+                  parent="sale.sale_menu_root"
+                  action="action_sale_order_commission_analysis"
+                  sequence="50"/>
 
     </data>
 </odoo>

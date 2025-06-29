@@ -34,11 +34,35 @@
             <field name="inherit_id" ref="purchase.purchase_order_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="commission_type"/>
-                    <field name="origin_so_id"/>
+                    <field name="commission_type" optional="show"/>
+                    <field name="origin_so_id" optional="hide"/>
                 </xpath>
             </field>
         </record>
+
+        <!-- Commission Purchase Orders Action -->
+        <record id="action_commission_purchase_orders" model="ir.actions.act_window">
+            <field name="name">Commission Purchase Orders</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('commission_type', '!=', False)]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No commission purchase orders found!
+                </p>
+                <p>
+                    Commission purchase orders are automatically generated when you confirm commissions on sale orders.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu for Commission Purchase Orders -->
+        <menuitem id="menu_commission_purchase_orders"
+                  name="Commission Purchase Orders"
+                  parent="purchase.menu_procurement_management"
+                  action="action_commission_purchase_orders"
+                  sequence="20"/>
 
     </data>
 </odoo>
