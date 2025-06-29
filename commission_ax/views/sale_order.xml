@@ -12,7 +12,7 @@
                         <group string="Commission Status">
                             <field name="commission_status"/>
                             <field name="commission_processed"/>
-                            <field name="purchase_order_count" invisible="1"/>
+                            <field name="purchase_order_count" modifiers='{"invisible": true}'/>
                         </group>
                         <group string="Commission Summary">
                             <field name="total_commission_rate" widget="percentage"/>
@@ -35,8 +35,8 @@
                             <field name="broker_commission_type"/>
                         </group>
                         <group>
-                            <field name="broker_rate" attrs="{'invisible': [('broker_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="broker_fixed_amount" attrs="{'invisible': [('broker_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="broker_rate" modifiers='{"invisible": [["=", "broker_commission_type", "fixed_amount"]]}'/>
+                            <field name="broker_fixed_amount" modifiers='{"invisible": [["!=", "broker_commission_type", "fixed_amount"]]}'/>
                             <field name="broker_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -48,8 +48,8 @@
                             <field name="referrer_commission_type"/>
                         </group>
                         <group>
-                            <field name="referrer_rate" attrs="{'invisible': [('referrer_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="referrer_fixed_amount" attrs="{'invisible': [('referrer_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="referrer_rate" modifiers='{"invisible": [["=", "referrer_commission_type", "fixed_amount"]]}'/>
+                            <field name="referrer_fixed_amount" modifiers='{"invisible": [["!=", "referrer_commission_type", "fixed_amount"]]}'/>
                             <field name="referrer_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -61,8 +61,8 @@
                             <field name="cashback_commission_type"/>
                         </group>
                         <group>
-                            <field name="cashback_rate" attrs="{'invisible': [('cashback_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="cashback_fixed_amount" attrs="{'invisible': [('cashback_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="cashback_rate" modifiers='{"invisible": [["=", "cashback_commission_type", "fixed_amount"]]}'/>
+                            <field name="cashback_fixed_amount" modifiers='{"invisible": [["!=", "cashback_commission_type", "fixed_amount"]]}'/>
                             <field name="cashback_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -74,8 +74,8 @@
                             <field name="other_external_commission_type"/>
                         </group>
                         <group>
-                            <field name="other_external_rate" attrs="{'invisible': [('other_external_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="other_external_fixed_amount" attrs="{'invisible': [('other_external_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="other_external_rate" modifiers='{"invisible": [["=", "other_external_commission_type", "fixed_amount"]]}'/>
+                            <field name="other_external_fixed_amount" modifiers='{"invisible": [["!=", "other_external_commission_type", "fixed_amount"]]}'/>
                             <field name="other_external_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -96,8 +96,8 @@
                             <field name="agent1_commission_type"/>
                         </group>
                         <group>
-                            <field name="agent1_rate" attrs="{'invisible': [('agent1_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="agent1_fixed_amount" attrs="{'invisible': [('agent1_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="agent1_rate" modifiers='{"invisible": [["=", "agent1_commission_type", "fixed_amount"]]}'/>
+                            <field name="agent1_fixed_amount" modifiers='{"invisible": [["!=", "agent1_commission_type", "fixed_amount"]]}'/>
                             <field name="agent1_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -109,8 +109,8 @@
                             <field name="agent2_commission_type"/>
                         </group>
                         <group>
-                            <field name="agent2_rate" attrs="{'invisible': [('agent2_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="agent2_fixed_amount" attrs="{'invisible': [('agent2_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="agent2_rate" modifiers='{"invisible": [["=", "agent2_commission_type", "fixed_amount"]]}'/>
+                            <field name="agent2_fixed_amount" modifiers='{"invisible": [["!=", "agent2_commission_type", "fixed_amount"]]}'/>
                             <field name="agent2_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -122,8 +122,8 @@
                             <field name="manager_commission_type"/>
                         </group>
                         <group>
-                            <field name="manager_rate" attrs="{'invisible': [('manager_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="manager_fixed_amount" attrs="{'invisible': [('manager_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="manager_rate" modifiers='{"invisible": [["=", "manager_commission_type", "fixed_amount"]]}'/>
+                            <field name="manager_fixed_amount" modifiers='{"invisible": [["!=", "manager_commission_type", "fixed_amount"]]}'/>
                             <field name="manager_amount" widget="monetary"/>
                         </group>
                     </group>
@@ -135,8 +135,8 @@
                             <field name="director_commission_type"/>
                         </group>
                         <group>
-                            <field name="director_rate" attrs="{'invisible': [('director_commission_type', '=', 'fixed_amount')]}"/>
-                            <field name="director_fixed_amount" attrs="{'invisible': [('director_commission_type', '!=', 'fixed_amount')]}"/>
+                            <field name="director_rate" modifiers='{"invisible": [["=", "director_commission_type", "fixed_amount"]]}'/>
+                            <field name="director_fixed_amount" modifiers='{"invisible": [["!=", "director_commission_type", "fixed_amount"]]}'/>
                             <field name="director_amount" widget="monetary"/>
                         </group>
                     </group>
