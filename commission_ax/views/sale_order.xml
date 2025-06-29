@@ -16,6 +16,16 @@
                             invisible="purchase_order_count == 0">
                         <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
                     </button>
+                    <button type="object" 
+                            name="action_generate_commission_purchase_orders" 
+                            class="oe_stat_button" 
+                            icon="fa-plus-circle"
+                            invisible="commission_status != 'confirmed' or commission_processed">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Generate</span>
+                            <span class="o_stat_text">Purchase Orders</span>
+                        </div>
+                    </button>
                 </xpath>
 
                 <!-- Add Commission Action Buttons in Header -->
@@ -30,11 +40,11 @@
                             string="Confirm Commissions" 
                             class="btn-primary"
                             invisible="commission_status != 'calculated'"/>
-                    <button name="action_generate_commission_purchase_orders" 
+                    <button name="action_view_purchase_orders" 
                             type="object" 
-                            string="Generate Purchase Orders" 
-                            class="btn-primary"
-                            invisible="commission_status != 'confirmed'"/>
+                            string="View Purchase Orders" 
+                            class="btn-secondary"
+                            invisible="purchase_order_count == 0"/>
                     <button name="action_reset_commissions" 
                             type="object" 
                             string="Reset to Draft" 
