@@ -118,26 +118,13 @@
                     <!-- Manager Commission -->
                     <group string="Manager Commission">
                         <group>
-                            <field name="manager_partner_id"/>
-                            <field name="manager_commission_type"/>
+                            <field name="manager_partner_id" required="1"/>
+                            <field name="manager_commission_type" required="1"/>
                         </group>
                         <group>
-                            <field name="manager_rate" modifiers='{"invisible": [["=", "manager_commission_type", "fixed_amount"]]}'/>
-                            <field name="manager_fixed_amount" modifiers='{"invisible": [["!=", "manager_commission_type", "fixed_amount"]]}'/>
+                            <field name="manager_rate" modifiers='{"invisible": [["=", "manager_commission_type", "fixed_amount"]]}' required="1"/>
+                            <field name="manager_fixed_amount" modifiers='{"invisible": [["!=", "manager_commission_type", "fixed_amount"]]}' required="1"/>
                             <field name="manager_amount" widget="monetary"/>
-                        </group>
-                    </group>
-                    
-                    <!-- Director Commission -->
-                    <group string="Director Commission">
-                        <group>
-                            <field name="director_partner_id"/>
-                            <field name="director_commission_type"/>
-                        </group>
-                        <group>
-                            <field name="director_rate" modifiers='{"invisible": [["=", "director_commission_type", "fixed_amount"]]}'/>
-                            <field name="director_fixed_amount" modifiers='{"invisible": [["!=", "director_commission_type", "fixed_amount"]]}'/>
-                            <field name="director_amount" widget="monetary"/>
                         </group>
                     </group>
                 </page>
