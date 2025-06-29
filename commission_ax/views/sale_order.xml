@@ -52,12 +52,6 @@
                     <field name="sales_value" string="Sales Value" readonly="1"/>
                 </xpath>
 
-                <!-- Remove Sales Value from Order Lines -->
-                <xpath expr="//field[@name='order_line']/tree/field[@name='sales_value']" position="replace">
-                </xpath>
-                <xpath expr="//field[@name='order_line']/form/field[@name='sales_value']" position="replace">
-                </xpath>
-
                 <!-- Add Commission Management Page -->
                 <xpath expr="//page[last()]" position="after">
                     <page string="Commission Management" name="commission_management">
