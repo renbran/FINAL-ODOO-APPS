@@ -717,6 +717,26 @@ class SaleOrder(models.Model):
         _logger.info(f"Commission purchase orders generated for Sale Order {self.name}")
         return True
 
+    def action_calculate_commissions(self):
+        """Calculate commissions for this sale order."""
+        # Implement commission calculation logic here
+        for order in self:
+            # Example: set status to calculated
+            order.commission_status = 'calculated'
+        return True
+
+    def action_confirm_commissions(self):
+        """Confirm calculated commissions for this sale order."""
+        for order in self:
+            order.commission_status = 'confirmed'
+        return True
+
+    def action_reset_commissions(self):
+        """Reset commission status to draft for this sale order."""
+        for order in self:
+            order.commission_status = 'draft'
+        return True
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
