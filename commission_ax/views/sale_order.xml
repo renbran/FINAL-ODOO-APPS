@@ -49,16 +49,17 @@
 
                 <!-- Add Commission Configuration -->
                 <xpath expr="//field[@name='payment_term_id']" position="after">
-                    <!-- Place sales_value in the main order info group, editable -->
-                    <field name="sales_value" string="Sales Value" attrs="{'readonly': False}"/>
+                    <field name="sales_value" string="Sales Value" options="{'readonly': False}"/>
                 </xpath>
 
                 <!-- Add Sales Value to Commission Management page for reference -->
+                <!--
                 <xpath expr="//group[@name='commission_summary']" position="before">
                     <group string="Sales Value Reference">
-                        <field name="sales_value" string="Sales Value" attrs="{'readonly': False}"/>
+                        <field name="sales_value" string="Sales Value" options="{'readonly': False}"/>
                     </group>
                 </xpath>
+                -->
 
                 <!-- Add Commission Management Page -->
                 <xpath expr="//page[last()]" position="after">
