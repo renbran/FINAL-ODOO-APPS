@@ -69,20 +69,34 @@
                             </div>
 
                             <!-- Real Estate Commission Details (if applicable) -->
-                            <t t-if="o.buyer_id or o.project_id or o.unit_id">
+                            <t t-if="o.buyer or o.project or o.unit or o.developer_commission or o.sale_value or o.deal_id">
                                 <div class="osus-section-header">COMMISSION DETAILS</div>
                                 <div class="row mb-4">
-                                    <div class="col-4" t-if="o.buyer_id">
+                                    <div class="col-4" t-if="o.buyer">
                                         <strong>Buyer:</strong><br/>
-                                        <span t-field="o.buyer_id.name"/>
+                                        <span t-field="o.buyer.name"/>
                                     </div>
-                                    <div class="col-4" t-if="o.project_id">
+                                    <div class="col-4" t-if="o.project">
                                         <strong>Project:</strong><br/>
-                                        <span t-field="o.project_id.name"/>
+                                        <span t-field="o.project.name"/>
                                     </div>
-                                    <div class="col-4" t-if="o.unit_id">
+                                    <div class="col-4" t-if="o.unit">
                                         <strong>Unit:</strong><br/>
-                                        <span t-field="o.unit_id.name"/>
+                                        <span t-field="o.unit.name"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-4" t-if="o.developer_commission">
+                                        <strong>Broker Commission:</strong><br/>
+                                        <span t-field="o.developer_commission" t-options="{'widget': 'float', 'precision': 2}"/>%
+                                    </div>
+                                    <div class="col-4" t-if="o.sale_value">
+                                        <strong>Sale Value:</strong><br/>
+                                        <span t-field="o.sale_value" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </div>
+                                    <div class="col-4" t-if="o.deal_id">
+                                        <strong>Deal ID:</strong><br/>
+                                        <span t-field="o.deal_id"/>
                                     </div>
                                 </div>
                             </t>

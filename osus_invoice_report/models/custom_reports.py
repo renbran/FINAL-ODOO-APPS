@@ -9,11 +9,8 @@ _logger = logging.getLogger(__name__)
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    # Custom fields for real estate commission
-    buyer_id = fields.Many2one('res.partner', string='Buyer', help="The buyer of the property")
-    project_id = fields.Many2one('project.project', string='Project', help="Real estate project")
-    unit_id = fields.Many2one('product.product', string='Unit', help="Property unit")
-    booking_date = fields.Date(string='Booking Date', help="Property booking date")
+    # Use correct custom field names from custom_fields module
+    # booking_date, developer_commission, buyer, deal_id, project, sale_value, unit are already defined in custom_fields
     amount_total_words = fields.Char(string='Amount in Words', compute='_compute_amount_total_words', store=True)
 
     @api.depends('amount_total', 'currency_id')
@@ -79,7 +76,6 @@ class AccountMove(models.Model):
 class CustomInvoiceReport(models.AbstractModel):
     _name = 'report.osus_invoice_report.report_custom_invoice'
     _description = 'OSUS Custom Invoice Report'
-    _inherit = 'report.report_pdf.abstract'
 
     def _get_report_values(self, docids, data=None):
         """Get report values with enhanced data"""
@@ -127,7 +123,6 @@ class CustomInvoiceReport(models.AbstractModel):
 class CustomBillReport(models.AbstractModel):
     _name = 'report.osus_invoice_report.report_custom_bill'
     _description = 'OSUS Custom Bill Report'
-    _inherit = 'report.report_pdf.abstract'
 
     def _get_report_values(self, docids, data=None):
         """Get report values for bills"""
@@ -153,7 +148,6 @@ class CustomBillReport(models.AbstractModel):
 class CustomReceiptReport(models.AbstractModel):
     _name = 'report.osus_invoice_report.report_custom_receipt'
     _description = 'OSUS Custom Receipt Report'
-    _inherit = 'report.report_pdf.abstract'
 
     def _get_report_values(self, docids, data=None):
         """Get report values for receipts"""
