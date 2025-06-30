@@ -55,13 +55,11 @@
                 <field name="project" optional="hide"/>
                 <field name="unit" optional="hide"/>
                 <field name="deal_id" optional="hide"/>
+                <field name="booking_date" optional="hide"/>
             </xpath>
-            <xpath expr="//field[@name='amount_total']" position="after">
+            <xpath expr="//field[@name='state']" position="before">
                 <field name="sale_value" optional="hide"/>
                 <field name="developer_commission" widget="percentage" optional="hide"/>
-            </xpath>
-            <xpath expr="//field[@name='invoice_date']" position="after">
-                <field name="booking_date" optional="hide"/>
             </xpath>
         </field>
     </record>
