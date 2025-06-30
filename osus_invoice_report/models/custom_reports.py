@@ -3,60 +3,22 @@ from odoo import api, fields, models
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    booking_date = fields.Date(
-        string='Booking Date',
-        tracking=True,
-    )
-    
-    developer_commission = fields.Float(
-        string='Broker Commission',
-        tracking=True,
-        digits=(16, 2),
-    )
-    
-    buyer_id = fields.Many2one(
-        'res.partner',
-        string='Buyer',
-        tracking=True,
-    )
-    
-    deal_id = fields.Char(  # Changed from Integer to Char to match usage
-        string='Deal ID',
-        tracking=True,
-    )
-    
-    project_id = fields.Many2one(
-        'product.template',
-        string='Project',
-        tracking=True,
-    )
-    
-    sale_value = fields.Monetary(
-        string='Sale Value',
-        tracking=True,
-        currency_field='currency_id',
-    )
-    
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
-    )
+    booking_date = fields.Date(string='Booking Date', tracking=True)
+    developer_commission = fields.Float(string='Broker Commission', tracking=True, digits=(16, 2))
+    buyer = fields.Many2one('res.partner', string='Buyer', tracking=True)
+    deal_id = fields.Char(string='Deal ID', tracking=True)
+    project = fields.Many2one('product.template', string='Project', tracking=True)
+    sale_value = fields.Monetary(string='Sale Value', tracking=True, currency_field='currency_id')
+    unit = fields.Many2one('product.product', string='Unit', tracking=True, 
+                          domain="[('product_tmpl_id', '=', project)]")
+    sale_order_type_id = fields.Many2one('sale.order.type', string='Sales Order Type',
+                                       compute='_compute_sale_order_type_id', store=True, readonly=False)
+    amount_total_words = fields.Char(string='Amount in Words', compute='_compute_amount_total_words', store=True)
 
-    sale_order_type_id = fields.Many2one(
-        'sale.order.type',
-        string='Sales Order Type',
-        compute='_compute_sale_order_type_id',
-        store=True,
-        readonly=False,
-    )
-
-    amount_total_words = fields.Char(
-        string='Amount in Words',
-        compute='_compute_amount_total_words',
-        store=True,
-    )
+    @api.depends('amount_total')
+    def _compute_amount_total_words(self):
+        for move in self:
+            move.amount_total_words = move.currency_id.amount_to_text(move.amount_total)
 
     @api.depends('invoice_origin')
     def _compute_sale_order_type_id(self):
@@ -64,18 +26,7 @@ class AccountMove(models.Model):
             sale_order = self.env['sale.order'].search([
                 ('name', '=', move.invoice_origin)
             ], limit=1)
-            move.sale_order_type_id = sale_order.type_id.id if sale_order and hasattr(sale_order, 'type_id') else False
-
-    @api.depends('amount_total')
-    def _compute_amount_total_words(self):
-        """Convert amount_total to words"""
-        for record in self:
-            if record.amount_total:
-                # You'll need to implement number to words conversion
-                # This is a placeholder - implement according to your needs
-                record.amount_total_words = f"{record.amount_total} (Amount in words)"
-            else:
-                record.amount_total_words = ""
+            move.sale_order_type_id = sale_order.type_id if sale_order and hasattr(sale_order, 'type_id') else False
 
     @api.onchange('invoice_origin')
     def _onchange_invoice_origin(self):
@@ -83,10 +34,18 @@ class AccountMove(models.Model):
             sale_order = self.env['sale.order'].search([
                 ('name', '=', self.invoice_origin)
             ], limit=1)
-            if sale_order and hasattr(sale_order, 'type_id'):
-                self.sale_order_type_id = sale_order.type_id.id
-            else:
-                self.sale_order_type_id = False
+            if sale_order:
+                self.update({
+                    'booking_date': sale_order.booking_date,
+                    'developer_commission': sale_order.developer_commission,
+                    'buyer': sale_order.buyer_id,
+                    'deal_id': str(sale_order.deal_id) if sale_order.deal_id else False,
+                    'project': sale_order.project_id,
+                    'sale_value': sale_order.sale_value,
+                    'unit': sale_order.unit_id,
+                })
+                if hasattr(sale_order, 'type_id'):
+                    self.sale_order_type_id = sale_order.type_id
 
     @api.model
     def create(self, vals):
@@ -98,10 +57,10 @@ class AccountMove(models.Model):
                 vals.update({
                     'booking_date': sale_order.booking_date,
                     'developer_commission': sale_order.developer_commission,
-                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
-                    'deal_id': sale_order.deal_id,
-                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
+                    'buyer': sale_order.buyer_id.id,
+                    'deal_id': str(sale_order.deal_id) if sale_order.deal_id else False,
+                    'project': sale_order.project_id.id,
                     'sale_value': sale_order.sale_value,
-                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
+                    'unit': sale_order.unit_id.id,
                 })
         return super(AccountMove, self).create(vals)

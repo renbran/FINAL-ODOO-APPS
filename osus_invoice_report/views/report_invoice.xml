@@ -14,8 +14,17 @@
                                     <div class="col-6">
                                         <div class="osus-section-header">CUSTOMER DETAILS</div>
                                         <strong t-field="o.buyer.name"/>
+                                        <div t-if="o.buyer.street">, <span t-field="o.buyer.street"/></div>
+                                        <div t-if="o.buyer.street2">, <span t-field="o.buyer.street2"/></div>
+                                        <div>
+                                            <span t-field="o.buyer.city"/>
+                                            <span t-if="o.buyer.zip">, <span t-field="o.buyer.zip"/></span>
+                                        </div>
+                                        <div t-field="o.buyer.state_id.name"/>
+                                        <div t-field="o.buyer.country_id.name"/>
                                         <div t-if="o.buyer.phone">Phone: <span t-field="o.buyer.phone"/></div>
                                         <div t-if="o.buyer.email">Email: <span t-field="o.buyer.email"/></div>
+                                        <div t-if="o.buyer.vat"><strong>TRN: <span t-field="o.buyer.vat"/></strong></div>
                                     </div>
                                     <div class="col-6 text-end">
                                         <t t-if="o.qr_in_report and o.qr_image">
@@ -35,43 +44,72 @@
                                 <span t-field="o.name"/>
                             </h1>
 
-                            <!-- Deal Information -->
-                            <div class="osus-section-header">DEAL INFORMATION</div>
+                            <!-- Invoice Information Row -->
                             <div class="row mb-4">
                                 <div class="col-4">
-                                    <strong>Deal Reference:</strong><br/>
-                                    <span t-field="o.deal_id"/>
+                                    <strong>Invoice Date:</strong><br/>
+                                    <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                                 </div>
-                                <div class="col-4">
-                                    <strong>Sales Type:</strong><br/>
-                                    <span t-field="o.sale_order_type_id"/>
+                                <div class="col-4 text-center">
+                                    <strong>Due Date:</strong><br/>
+                                    <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-4 text-end">
                                     <strong>Booking Date:</strong><br/>
                                     <span t-field="o.booking_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}" t-if="o.booking_date"/>
                                     <span t-if="not o.booking_date">-</span>
                                 </div>
                             </div>
-                            <div class="row mb-4">
-                                <div class="col-4">
-                                    <strong>Project:</strong><br/>
-                                    <span t-field="o.project.name"/>
+
+                            <!-- Real Estate Commission Details (Updated field references) -->
+                            <t t-if="o.buyer or o.project or o.unit or o.developer_commission or o.sale_value or o.deal_id">
+                                <div class="osus-section-header">REAL ESTATE DEAL INFORMATION</div>
+                                <div class="row mb-4">
+                                    <div class="col-4" t-if="o.buyer">
+                                        <strong>Buyer:</strong><br/>
+                                        <span t-field="o.buyer.name"/>
+                                        <div t-if="o.buyer.phone" class="small text-muted">
+                                            Phone: <span t-field="o.buyer.phone"/>
+                                        </div>
+                                        <div t-if="o.buyer.email" class="small text-muted">
+                                            Email: <span t-field="o.buyer.email"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" t-if="o.project">
+                                        <strong>Project:</strong><br/>
+                                        <span t-field="o.project.name"/>
+                                        <!-- If project is linked to product template -->
+                                        <div t-if="o.project.description" class="small text-muted">
+                                            <span t-field="o.project.description"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" t-if="o.unit">
+                                        <strong>Unit:</strong><br/>
+                                        <span t-field="o.unit"/>
+                                        <!-- If unit is linked to product variant, show additional details -->
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <strong>Unit:</strong><br/>
-                                    <span t-field="o.unit.name"/>
+                                <div class="row mb-4">
+                                    <div class="col-4" t-if="o.deal_id">
+                                        <strong>Deal Reference:</strong><br/>
+                                        <span t-field="o.deal_id"/>
+                                    </div>
+                                    <div class="col-4" t-if="o.sale_value">
+                                        <strong>Property Sale Value:</strong><br/>
+                                        <span t-field="o.sale_value" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </div>
+                                    <div class="col-4" t-if="o.developer_commission">
+                                        <strong>Broker Commission Rate:</strong><br/>
+                                        <span t-field="o.developer_commission" t-options="{'widget': 'float', 'precision': 2}"/>%
+                                        <t t-if="o.sale_value and o.developer_commission">
+                                            <br/>
+                                            <small class="text-muted">
+                                                Amount: <span t-esc="'%.2f' % ((o.sale_value * o.developer_commission) / 100)" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            </small>
+                                        </t>
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <strong>Sale Value:</strong><br/>
-                                    <span t-field="o.sale_value" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-4">
-                                    <strong>Developer Commission:</strong><br/>
-                                    <span t-field="o.developer_commission" t-options="{'widget': 'float', 'precision': 2}"/>%
-                                </div>
-                            </div>
+                            </t>
 
                             <!-- Invoice Line Items -->
                             <div class="osus-section-header">INVOICE DETAILS</div>
