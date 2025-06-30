@@ -11,7 +11,7 @@
 
             <!-- Add commission buttons -->
             <xpath expr="//header" position="inside">
-                <button name="action_calculate_commissions" type="object" string="Calculate Commissions" class="btn-primary" invisible="commission_status != 'draft'"/>
+                <button name="action_process_commissions" type="object" string="Calculate Commissions" class="btn-primary" invisible="commission_status != 'draft'"/>
                 <button name="action_confirm_commissions" type="object" string="Confirm Commissions" class="btn-primary" invisible="commission_status != 'calculated'"/>
                 <button name="action_reset_commissions" type="object" string="Reset to Draft" invisible="commission_status == 'draft'"/>
             </xpath>
