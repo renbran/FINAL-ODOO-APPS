@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_custom_invoice_modern">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="o" t-value="doc.with_context(lang=lang)"/>
+                <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+                <div class="page" style="padding: 15px; font-family: Arial, sans-serif; font-size: 12px;">
+                    <!-- ...existing code from your provided template... -->
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
