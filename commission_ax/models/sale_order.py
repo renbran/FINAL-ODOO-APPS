@@ -29,6 +29,9 @@ class SaleOrder(models.Model):
     company_share = fields.Monetary(string="Company Share", compute="_compute_commissions", store=True)
     net_company_share = fields.Monetary(string="Net Company Share", compute="_compute_commissions", store=True)
 
+    # Sales Value field for commission computation
+    sales_value = fields.Monetary(string="Sales Value", compute="_compute_sales_value", store=True)
+
     # Related fields
     purchase_order_ids = fields.One2many('purchase.order', 'origin_so_id', string="Generated Purchase Orders")
     commission_processed = fields.Boolean(string="Commissions Processed", default=False)
@@ -65,6 +68,12 @@ class SaleOrder(models.Model):
 
             # Net Company Share (after all commissions)
             order.net_company_share = order.company_share - order.director_commission
+
+    @api.depends('amount_total')
+    def _compute_sales_value(self):
+        for order in self:
+            # By default, use amount_total as sales value. Adjust logic if needed.
+            order.sales_value = order.amount_total
 
     @api.constrains('consultant_comm_percentage', 'manager_comm_percentage', 
                     'second_agent_comm_percentage', 'director_comm_percentage')

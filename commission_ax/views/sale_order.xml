@@ -4,9 +4,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add sales_value field in header -->
+            <!-- Remove sales_value field in header -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
-                <field name="sales_value"/>
+                <!-- <field name="sales_value"/> -->
             </xpath>
 
             <!-- Add commission buttons -->
