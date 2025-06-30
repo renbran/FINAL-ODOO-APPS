@@ -27,43 +27,75 @@ class SaleOrder(models.Model):
 
     # Extended Commission Structure - External Commissions
     broker_partner_id = fields.Many2one('res.partner', string="Broker")
-    broker_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    broker_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Broker Commission Type", default='percent_unit_price')
     broker_rate = fields.Float(string="Broker Rate")
     broker_amount = fields.Monetary(string="Broker Commission", compute="_compute_commissions", store=True)
 
     referrer_partner_id = fields.Many2one('res.partner', string="Referrer")
-    referrer_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    referrer_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Referrer Commission Type", default='percent_unit_price')
     referrer_rate = fields.Float(string="Referrer Rate")
     referrer_amount = fields.Monetary(string="Referrer Commission", compute="_compute_commissions", store=True)
 
     cashback_partner_id = fields.Many2one('res.partner', string="Cashback Partner")
-    cashback_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    cashback_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Cashback Type", default='percent_unit_price')
     cashback_rate = fields.Float(string="Cashback Rate")
     cashback_amount = fields.Monetary(string="Cashback Amount", compute="_compute_commissions", store=True)
 
     other_external_partner_id = fields.Many2one('res.partner', string="Other External Partner")
-    other_external_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    other_external_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Other External Commission Type", default='percent_unit_price')
     other_external_rate = fields.Float(string="Other External Rate")
     other_external_amount = fields.Monetary(string="Other External Commission", compute="_compute_commissions", store=True)
 
     # Extended Commission Structure - Internal Commissions
     agent1_partner_id = fields.Many2one('res.partner', string="Agent 1")
-    agent1_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    agent1_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Agent 1 Commission Type", default='percent_unit_price')
     agent1_rate = fields.Float(string="Agent 1 Rate")
     agent1_amount = fields.Monetary(string="Agent 1 Commission", compute="_compute_commissions", store=True)
 
     agent2_partner_id = fields.Many2one('res.partner', string="Agent 2")
-    agent2_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    agent2_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Agent 2 Commission Type", default='percent_unit_price')
     agent2_rate = fields.Float(string="Agent 2 Rate")
     agent2_amount = fields.Monetary(string="Agent 2 Commission", compute="_compute_commissions", store=True)
 
     manager_partner_id = fields.Many2one('res.partner', string="Manager Partner")
-    manager_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    manager_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Manager Commission Type", default='percent_unit_price')
     manager_rate = fields.Float(string="Manager Rate")
     manager_amount = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
 
     director_partner_id = fields.Many2one('res.partner', string="Director Partner")
-    director_commission_type = fields.Selection([('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
+    director_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Director Commission Type", default='percent_unit_price')
     director_rate = fields.Float(string="Director Rate", default=3.0)
     director_amount = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
@@ -94,19 +126,30 @@ class SaleOrder(models.Model):
         for order in self:
             order.purchase_order_count = len(order.purchase_order_ids)
 
-    def _calculate_commission_amount(self, rate, commission_type, base_amount):
-        """Helper method to calculate commission amount based on type."""
+    @api.constrains('order_line')
+    def _check_single_order_line(self):
+        for order in self:
+            if len(order.order_line) > 1:
+                raise ValidationError("Only one order line is allowed per sale order for commission clarity.")
+
+    def _calculate_commission_amount(self, rate, commission_type, order):
         if commission_type == 'fixed':
             return rate
-        else:  # percentage
-            return (rate / 100) * base_amount
+        elif commission_type == 'percent_unit_price':
+            if order.order_line:
+                return (rate / 100.0) * order.order_line[0].price_unit
+            return 0.0
+        elif commission_type == 'percent_untaxed_total':
+            return (rate / 100.0) * order.amount_untaxed
+        return 0.0
 
     @api.depends('amount_total', 'consultant_comm_percentage', 'manager_comm_percentage', 
                  'director_comm_percentage', 'second_agent_comm_percentage',
                  'broker_rate', 'broker_commission_type', 'referrer_rate', 'referrer_commission_type',
                  'cashback_rate', 'cashback_commission_type', 'other_external_rate', 'other_external_commission_type',
                  'agent1_rate', 'agent1_commission_type', 'agent2_rate', 'agent2_commission_type',
-                 'manager_rate', 'manager_commission_type', 'director_rate', 'director_commission_type')
+                 'manager_rate', 'manager_commission_type', 'director_rate', 'director_commission_type',
+                 'order_line.price_unit', 'order_line.price_subtotal', 'amount_untaxed')
     def _compute_commissions(self):
         """Compute commission amounts and company shares."""
         for order in self:
@@ -119,32 +162,16 @@ class SaleOrder(models.Model):
             order.director_commission = (order.director_comm_percentage / 100) * base_amount
 
             # External commissions
-            order.broker_amount = self._calculate_commission_amount(
-                order.broker_rate, order.broker_commission_type, base_amount
-            )
-            order.referrer_amount = self._calculate_commission_amount(
-                order.referrer_rate, order.referrer_commission_type, base_amount
-            )
-            order.cashback_amount = self._calculate_commission_amount(
-                order.cashback_rate, order.cashback_commission_type, base_amount
-            )
-            order.other_external_amount = self._calculate_commission_amount(
-                order.other_external_rate, order.other_external_commission_type, base_amount
-            )
+            order.broker_amount = self._calculate_commission_amount(order.broker_rate, order.broker_commission_type, order)
+            order.referrer_amount = self._calculate_commission_amount(order.referrer_rate, order.referrer_commission_type, order)
+            order.cashback_amount = self._calculate_commission_amount(order.cashback_rate, order.cashback_commission_type, order)
+            order.other_external_amount = self._calculate_commission_amount(order.other_external_rate, order.other_external_commission_type, order)
 
             # Internal commissions
-            order.agent1_amount = self._calculate_commission_amount(
-                order.agent1_rate, order.agent1_commission_type, base_amount
-            )
-            order.agent2_amount = self._calculate_commission_amount(
-                order.agent2_rate, order.agent2_commission_type, base_amount
-            )
-            order.manager_amount = self._calculate_commission_amount(
-                order.manager_rate, order.manager_commission_type, base_amount
-            )
-            order.director_amount = self._calculate_commission_amount(
-                order.director_rate, order.director_commission_type, base_amount
-            )
+            order.agent1_amount = self._calculate_commission_amount(order.agent1_rate, order.agent1_commission_type, order)
+            order.agent2_amount = self._calculate_commission_amount(order.agent2_rate, order.agent2_commission_type, order)
+            order.manager_amount = self._calculate_commission_amount(order.manager_rate, order.manager_commission_type, order)
+            order.director_amount = self._calculate_commission_amount(order.director_rate, order.director_commission_type, order)
 
             # Calculate totals
             order.total_external_commission_amount = (
