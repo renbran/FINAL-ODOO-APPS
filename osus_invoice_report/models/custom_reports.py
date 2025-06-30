@@ -1,113 +1,107 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from num2words import num2words
-import logging
-
-_logger = logging.getLogger(__name__)
+from odoo import api, fields, models
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    # Real Estate Commission Fields - matching sale.order fields
-    buyer_id = fields.Many2one('res.partner', string='Buyer', 
-                              help='The buyer of the property (from sale order)')
-    project_id = fields.Many2one('product.template', string='Project',
-                                help='The real estate project (product template)')
-    unit_id = fields.Many2one('product.product', string='Unit',
-                             help='The specific unit in the project (product variant)')
-    booking_date = fields.Date(string='Booking Date',
-                              help='Date when the property was booked')
-    developer_commission = fields.Float(string='Developer Commission (%)',
-                                       help='Commission percentage from developer')
-    sale_value = fields.Monetary(string='Sale Value',
-                                help='Total sale value of the property')
-    deal_id = fields.Char(string='Deal ID',
-                         help='Reference number for the deal')
+    booking_date = fields.Date(
+        string='Booking Date',
+        tracking=True,
+    )
     
-    # Amount in words
-    amount_total_words = fields.Char(
-        string='Amount in Words', 
-        compute='_compute_amount_total_words', 
-        store=True
+    developer_commission = fields.Float(
+        string='Broker Commission',
+        tracking=True,
+        digits=(16, 2),
+    )
+    
+    buyer_id = fields.Many2one(
+        'res.partner',
+        string='Buyer',
+        tracking=True,
+    )
+    
+    deal_id = fields.Char(  # Changed from Integer to Char to match usage
+        string='Deal ID',
+        tracking=True,
+    )
+    
+    project_id = fields.Many2one(
+        'product.template',
+        string='Project',
+        tracking=True,
+    )
+    
+    sale_value = fields.Monetary(
+        string='Sale Value',
+        tracking=True,
+        currency_field='currency_id',
+    )
+    
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
     )
 
-    @api.depends('amount_total', 'currency_id')
+    sale_order_type_id = fields.Many2one(
+        'sale.order.type',
+        string='Sales Order Type',
+        compute='_compute_sale_order_type_id',
+        store=True,
+        readonly=False,
+    )
+
+    amount_total_words = fields.Char(
+        string='Amount in Words',
+        compute='_compute_amount_total_words',
+        store=True,
+    )
+
+    @api.depends('invoice_origin')
+    def _compute_sale_order_type_id(self):
+        for move in self:
+            sale_order = self.env['sale.order'].search([
+                ('name', '=', move.invoice_origin)
+            ], limit=1)
+            move.sale_order_type_id = sale_order.type_id.id if sale_order and hasattr(sale_order, 'type_id') else False
+
+    @api.depends('amount_total')
     def _compute_amount_total_words(self):
-        """Convert amount to words in English"""
+        """Convert amount_total to words"""
         for record in self:
             if record.amount_total:
-                try:
-                    amount_words = num2words(record.amount_total, lang='en').title()
-                    currency_name = record.currency_id.name or 'Dirhams'
-                    record.amount_total_words = f"{amount_words} {currency_name} Only"
-                except Exception as e:
-                    _logger.warning(f"Error converting amount to words: {e}")
-                    record.amount_total_words = f"{record.amount_total:.2f} {record.currency_id.name or 'AED'} Only"
+                # You'll need to implement number to words conversion
+                # This is a placeholder - implement according to your needs
+                record.amount_total_words = f"{record.amount_total} (Amount in words)"
             else:
                 record.amount_total_words = ""
 
+    @api.onchange('invoice_origin')
+    def _onchange_invoice_origin(self):
+        if self.invoice_origin:
+            sale_order = self.env['sale.order'].search([
+                ('name', '=', self.invoice_origin)
+            ], limit=1)
+            if sale_order and hasattr(sale_order, 'type_id'):
+                self.sale_order_type_id = sale_order.type_id.id
+            else:
+                self.sale_order_type_id = False
+
     @api.model
     def create(self, vals):
-        """Inherit create to copy deal information from sale order"""
-        result = super().create(vals)
-        
-        # If invoice is created from sale order, copy deal information
-        if result.invoice_origin and result.move_type in ['out_invoice', 'out_refund']:
+        if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([
-                ('name', '=', result.invoice_origin)
+                ('name', '=', vals.get('invoice_origin'))
             ], limit=1)
-            
             if sale_order:
-                result.write({
-                    'buyer_id': sale_order.buyer_id.id,
-                    'project_id': sale_order.project_id.id,
-                    'unit_id': sale_order.unit_id.id,
+                vals.update({
                     'booking_date': sale_order.booking_date,
                     'developer_commission': sale_order.developer_commission,
-                    'sale_value': sale_order.sale_value,
+                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
                     'deal_id': sale_order.deal_id,
+                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
+                    'sale_value': sale_order.sale_value,
+                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
                 })
-        
-        return result
-
-    def action_print_custom_invoice(self):
-        """Print custom invoice report"""
-        self.ensure_one()
-        if self.move_type not in ('out_invoice', 'out_refund'):
-            raise UserError(_('This report can only be printed for customer invoices and credit notes.'))
-        
-        return self.env.ref('osus_invoice_report.action_report_custom_invoice').report_action(self)
-
-    def action_print_custom_bill(self):
-        """Print custom bill report"""
-        self.ensure_one()
-        if self.move_type not in ('in_invoice', 'in_refund'):
-            raise UserError(_('This report can only be printed for vendor bills and credit notes.'))
-        
-        return self.env.ref('osus_invoice_report.action_report_custom_bill').report_action(self)
-
-    def action_print_custom_receipt(self):
-        """Print custom receipt report"""
-        self.ensure_one()
-        return self.env.ref('osus_invoice_report.action_report_custom_receipt').report_action(self)
-
-
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    def _prepare_invoice(self):
-        """Override to include deal information in invoice"""
-        invoice_vals = super()._prepare_invoice()
-        
-        # Add deal tracking fields to invoice
-        invoice_vals.update({
-            'buyer_id': self.buyer_id.id,
-            'project_id': self.project_id.id,
-            'unit_id': self.unit_id.id,
-            'booking_date': self.booking_date,
-            'developer_commission': self.developer_commission,
-            'sale_value': self.sale_value,
-            'deal_id': self.deal_id,
-        })
-        
-        return invoice_vals
+        return super(AccountMove, self).create(vals)
