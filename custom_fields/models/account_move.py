@@ -43,6 +43,33 @@ class AccountMove(models.Model):
         domain="[('product_tmpl_id', '=', project)]",
     )
 
+    sale_order_type_id = fields.Many2one(
+        'sale.order.type',
+        string='Sales Order Type',
+        compute='_compute_sale_order_type_id',
+        store=True,
+        readonly=False,
+    )
+
+    @api.depends('invoice_origin')
+    def _compute_sale_order_type_id(self):
+        for move in self:
+            sale_order = self.env['sale.order'].search([
+                ('name', '=', move.invoice_origin)
+            ], limit=1)
+            move.sale_order_type_id = sale_order.type_id.id if sale_order and hasattr(sale_order, 'type_id') else False
+
+    @api.onchange('invoice_origin')
+    def _onchange_invoice_origin(self):
+        if self.invoice_origin:
+            sale_order = self.env['sale.order'].search([
+                ('name', '=', self.invoice_origin)
+            ], limit=1)
+            if sale_order and hasattr(sale_order, 'type_id'):
+                self.sale_order_type_id = sale_order.type_id.id
+            else:
+                self.sale_order_type_id = False
+
     @api.model
     def create(self, vals):
         if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
