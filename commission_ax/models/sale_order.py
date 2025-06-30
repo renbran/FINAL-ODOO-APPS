@@ -320,3 +320,20 @@ class SaleOrder(models.Model):
                 draft_pos.button_cancel()
         
         return super(SaleOrder, self).unlink()
+
+    def action_confirm_commissions(self):
+        """Confirm commissions: set status to 'completed' if commissions are processed, else raise error."""
+        for order in self:
+            if not order.commission_processed:
+                raise UserError("You must calculate/process commissions before confirming.")
+            order.commission_status = 'completed'
+            order.message_post(body="Commissions confirmed.")
+        return True
+
+    def action_reset_commissions(self):
+        """Reset commission status to draft and allow recalculation."""
+        for order in self:
+            order.commission_status = 'not_started'
+            order.commission_processed = False
+            order.message_post(body="Commission status reset to draft. Please recalculate commissions.")
+        return True
