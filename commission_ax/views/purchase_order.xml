@@ -1,57 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Enhanced Purchase Order Form View -->
         <record id="view_purchase_order_form_inherit_enhanced" model="ir.ui.view">
             <field name="name">purchase.order.form.inherit.enhanced</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
-                
-                <!-- Add Commission Information -->
+                <!-- Add Force Post button to header -->
+                <xpath expr="//header/button[@name='button_approve']" position="after">
+                    <button 
+                        name="action_force_post" 
+                        string="Force Post Commission" 
+                        type="object" 
+                        invisible="commission_posted == True or origin_so_id == False"
+                        class="btn-secondary"
+                        groups="purchase.group_purchase_user"
+                    />
+                </xpath>
+
+                <!-- Add commission details fields -->
                 <xpath expr="//field[@name='partner_ref']" position="after">
-                    <field name="origin_so_id" readonly="1" string="Source Sale Order"/>
-                    <field name="commission_type" readonly="1" string="Commission Type"/>
-                </xpath>
-
-            </field>
-        </record>
-
-        <!-- Enhanced Purchase Order Tree View -->
-        <record id="view_purchase_order_tree_inherit_enhanced" model="ir.ui.view">
-            <field name="name">purchase.order.tree.inherit.enhanced</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="commission_type" optional="show"/>
-                    <field name="origin_so_id" optional="hide"/>
+                    <field name="origin_so_id" readonly="1" invisible="origin_so_id == False"/>
+                    <field name="description" readonly="1" invisible="description == False"/>
+                    <field name="commission_posted" readonly="1" invisible="origin_so_id == False"/>
                 </xpath>
             </field>
         </record>
 
-        <!-- Commission Purchase Orders Action -->
-        <record id="action_commission_purchase_orders" model="ir.actions.act_window">
-            <field name="name">Commission Purchase Orders</field>
-            <field name="res_model">purchase.order</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('commission_type', '!=', False)]</field>
-            <field name="context">{}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No commission purchase orders found!
-                </p>
-                <p>
-                    Commission purchase orders are automatically generated when you confirm commissions on sale orders.
-                </p>
-            </field>
+        <!-- Add action to view source sale order -->
+        <record id="action_view_source_sale_order" model="ir.actions.act_window">
+            <field name="name">Source Sale Order</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+            <field name="context">{'default_id': active_id}</field>
         </record>
-
-        <!-- Menu for Commission Purchase Orders -->
-        <menuitem id="menu_commission_purchase_orders"
-                  name="Commission Purchase Orders"
-                  parent="purchase.menu_procurement_management"
-                  action="action_commission_purchase_orders"
-                  sequence="20"/>
-
     </data>
 </odoo>
