@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_external_commission" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.external.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="External Commissions" name="external_commissions">
+                    <group>
+                        <group string="Broker">
+                            <field name="broker_partner_id"/>
+                            <field name="broker_commission_type"/>
+                            <field name="broker_rate"/>
+                            <field name="broker_amount" readonly="1"/>
+                        </group>
+                        <group string="Referrer">
+                            <field name="referrer_partner_id"/>
+                            <field name="referrer_commission_type"/>
+                            <field name="referrer_rate"/>
+                            <field name="referrer_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cashback Recipient">
+                            <field name="cashback_partner_id"/>
+                            <field name="cashback_commission_type"/>
+                            <field name="cashback_rate"/>
+                            <field name="cashback_amount" readonly="1"/>
+                        </group>
+                        <group string="Other External Party">
+                            <field name="other_external_partner_id"/>
+                            <field name="other_external_commission_type"/>
+                            <field name="other_external_rate"/>
+                            <field name="other_external_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="total_external_commission_amount" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
