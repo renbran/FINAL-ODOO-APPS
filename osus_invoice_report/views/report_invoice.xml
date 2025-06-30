@@ -23,7 +23,7 @@
                                         <div t-field="o.company_id.country_id.name"/>
                                         <div t-if="o.company_id.phone">Phone: <span t-field="o.company_id.phone"/></div>
                                         <div t-if="o.company_id.email">Email: <span t-field="o.company_id.email"/></div>
-                                        <div t-if="o.company_id.vat"><strong>VAT Number: <span t-field="o.company_id.vat"/></strong></div>
+                                        <div t-if="o.company_id.vat"><strong>TRN: <span t-field="o.company_id.vat"/></strong></div>
                                     </div>
                                     <div class="col-6 text-end">
                                         <div class="osus-section-header">CUSTOMER DETAILS</div>
@@ -38,7 +38,7 @@
                                         <div t-field="o.partner_id.country_id.name"/>
                                         <div t-if="o.partner_id.phone">Phone: <span t-field="o.partner_id.phone"/></div>
                                         <div t-if="o.partner_id.email">Email: <span t-field="o.partner_id.email"/></div>
-                                        <div t-if="o.partner_id.vat"><strong>VAT Number: <span t-field="o.partner_id.vat"/></strong></div>
+                                        <div t-if="o.partner_id.vat"><strong>TRN: <span t-field="o.partner_id.vat"/></strong></div>
                                     </div>
                                 </div>
                             </div>
@@ -68,35 +68,52 @@
                                 </div>
                             </div>
 
-                            <!-- Real Estate Commission Details (if applicable) -->
-                            <t t-if="o.buyer or o.project or o.unit or o.developer_commission or o.sale_value or o.deal_id">
-                                <div class="osus-section-header">COMMISSION DETAILS</div>
+                            <!-- Real Estate Commission Details (Updated field references) -->
+                            <t t-if="o.buyer_id or o.project_id or o.unit_id or o.developer_commission or o.sale_value or o.deal_id">
+                                <div class="osus-section-header">REAL ESTATE DEAL INFORMATION</div>
                                 <div class="row mb-4">
-                                    <div class="col-4" t-if="o.buyer">
+                                    <div class="col-4" t-if="o.buyer_id">
                                         <strong>Buyer:</strong><br/>
-                                        <span t-field="o.buyer.name"/>
+                                        <span t-field="o.buyer_id.name"/>
+                                        <div t-if="o.buyer_id.phone" class="small text-muted">
+                                            Phone: <span t-field="o.buyer_id.phone"/>
+                                        </div>
+                                        <div t-if="o.buyer_id.email" class="small text-muted">
+                                            Email: <span t-field="o.buyer_id.email"/>
+                                        </div>
                                     </div>
-                                    <div class="col-4" t-if="o.project">
+                                    <div class="col-4" t-if="o.project_id">
                                         <strong>Project:</strong><br/>
-                                        <span t-field="o.project.name"/>
+                                        <span t-field="o.project_id.name"/>
+                                        <!-- If project is linked to product template -->
+                                        <div t-if="o.project_id.description" class="small text-muted">
+                                            <span t-field="o.project_id.description"/>
+                                        </div>
                                     </div>
-                                    <div class="col-4" t-if="o.unit">
+                                    <div class="col-4" t-if="o.unit_id">
                                         <strong>Unit:</strong><br/>
-                                        <span t-field="o.unit.name"/>
+                                        <span t-field="o.unit_id"/>
+                                        <!-- If unit is linked to product variant, show additional details -->
                                     </div>
                                 </div>
                                 <div class="row mb-4">
-                                    <div class="col-4" t-if="o.developer_commission">
-                                        <strong>Broker Commission:</strong><br/>
-                                        <span t-field="o.developer_commission" t-options="{'widget': 'float', 'precision': 2}"/>%
+                                    <div class="col-4" t-if="o.deal_id">
+                                        <strong>Deal Reference:</strong><br/>
+                                        <span t-field="o.deal_id"/>
                                     </div>
                                     <div class="col-4" t-if="o.sale_value">
-                                        <strong>Sale Value:</strong><br/>
+                                        <strong>Property Sale Value:</strong><br/>
                                         <span t-field="o.sale_value" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                     </div>
-                                    <div class="col-4" t-if="o.deal_id">
-                                        <strong>Deal ID:</strong><br/>
-                                        <span t-field="o.deal_id"/>
+                                    <div class="col-4" t-if="o.developer_commission">
+                                        <strong>Broker Commission Rate:</strong><br/>
+                                        <span t-field="o.developer_commission" t-options="{'widget': 'float', 'precision': 2}"/>%
+                                        <t t-if="o.sale_value and o.developer_commission">
+                                            <br/>
+                                            <small class="text-muted">
+                                                Amount: <span t-esc="'%.2f' % ((o.sale_value * o.developer_commission) / 100)" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            </small>
+                                        </t>
                                     </div>
                                 </div>
                             </t>
@@ -106,11 +123,10 @@
                             <table class="table table-bordered mb-4">
                                 <thead class="osus-table-header">
                                     <tr>
-                                        <th style="width: 15%;">Description</th>
+                                        <th style="width: 40%;">Description</th>
                                         <th style="width: 10%;" class="text-center">Qty</th>
                                         <th style="width: 15%;" class="text-end">Unit Price</th>
                                         <th style="width: 10%;" class="text-center">Tax</th>
-                                        <th style="width: 15%;" class="text-end">Tax Amount</th>
                                         <th style="width: 15%;" class="text-end">Subtotal</th>
                                         <th style="width: 15%;" class="text-end">Total</th>
                                     </tr>
@@ -120,8 +136,14 @@
                                         <tr>
                                             <td>
                                                 <span t-field="line.name"/>
+                                                <div t-if="line.product_id" class="small text-muted">
+                                                    Product: <span t-field="line.product_id.name"/>
+                                                </div>
+                                                <!-- Show analytic account if available -->
                                                 <div t-if="line.analytic_distribution" class="small text-muted">
-                                                    Analytic: <span t-esc="', '.join([acc.name for acc in line.analytic_line_ids.mapped('account_id')])"/>
+                                                    <t t-foreach="line.analytic_distribution.items()" t-as="analytic_item">
+                                                        Analytic: <span t-esc="analytic_item[0]"/> (<span t-esc="analytic_item[1]"/>%)
+                                                    </t>
                                                 </div>
                                             </td>
                                             <td class="text-center">
@@ -133,9 +155,6 @@
                                             </td>
                                             <td class="text-center">
                                                 <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"/>
-                                            </td>
-                                            <td class="text-end">
-                                                <span t-esc="sum(line.tax_ids.mapped('amount'))" t-options="{'widget': 'float', 'precision': 2}"/>%
                                             </td>
                                             <td class="text-end">
                                                 <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
@@ -162,7 +181,7 @@
                                             <tr>
                                                 <td>
                                                     <span t-esc="amount_by_group[0]"/>
-                                                    <span t-if="amount_by_group[1] == 1"> (Included)</span>
+                                                    <span t-if="len(amount_by_group) > 2 and amount_by_group[2] == 1"> (Included)</span>
                                                 </td>
                                                 <td class="text-end">
                                                     <span t-esc="amount_by_group[1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
@@ -253,14 +272,4 @@
             </t>
         </t>
     </template>
-
-    <!-- Abstract Report Model -->
-    <record id="report_custom_invoice_abstract" model="ir.actions.report">
-        <field name="name">OSUS Tax Invoice (Abstract)</field>
-        <field name="model">account.move</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_custom_invoice</field>
-        <field name="report_file">osus_invoice_report.report_custom_invoice</field>
-        <field name="paperformat_id" ref="osus_invoice_report.paperformat_osus_invoice"/>
-    </record>
 </odoo>

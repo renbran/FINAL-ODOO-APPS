@@ -21,6 +21,8 @@
         'security/ir.model.access.csv',
         'views/account_move_views.xml',
         'views/report_invoice.xml',
+        'views/report_bills.xml',
+        'views/report_receipt.xml',
         'data/report_paperformat.xml',
     ],
     'assets': {

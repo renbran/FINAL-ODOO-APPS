@@ -51,6 +51,32 @@ class AccountMove(models.Model):
         readonly=False,
     )
 
+    buyer_id = fields.Many2one(
+        'res.partner',
+        string='Buyer',
+        tracking=True,
+    )
+    project_id = fields.Many2one(
+        'product.template',
+        string='Project',
+        tracking=True,
+    )
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
+    )
+    deal_id = fields.Char(
+        string='Deal ID',
+        tracking=True,
+    )
+    amount_total_words = fields.Char(
+        string='Amount in Words',
+        compute='_compute_amount_total_words',
+        store=True,
+    )
+
     @api.depends('invoice_origin')
     def _compute_sale_order_type_id(self):
         for move in self:
