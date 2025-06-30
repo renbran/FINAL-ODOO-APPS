@@ -61,7 +61,7 @@
                                 </div>
                             </div>
 
-                            <!-- Real Estate Commission Details (Updated field references) -->
+                            <!-- Real Estate Commission Details (Updated with new field names) -->
                             <t t-if="o.buyer or o.project or o.unit or o.developer_commission or o.sale_value or o.deal_id">
                                 <div class="osus-section-header">REAL ESTATE DEAL INFORMATION</div>
                                 <div class="row mb-4">
@@ -78,15 +78,13 @@
                                     <div class="col-4" t-if="o.project">
                                         <strong>Project:</strong><br/>
                                         <span t-field="o.project.name"/>
-                                        <!-- If project is linked to product template -->
                                         <div t-if="o.project.description" class="small text-muted">
                                             <span t-field="o.project.description"/>
                                         </div>
                                     </div>
                                     <div class="col-4" t-if="o.unit">
                                         <strong>Unit:</strong><br/>
-                                        <span t-field="o.unit"/>
-                                        <!-- If unit is linked to product variant, show additional details -->
+                                        <span t-field="o.unit.name"/>
                                     </div>
                                 </div>
                                 <div class="row mb-4">
@@ -132,7 +130,6 @@
                                                 <div t-if="line.product_id" class="small text-muted">
                                                     Product: <span t-field="line.product_id.name"/>
                                                 </div>
-                                                <!-- Show analytic account if available -->
                                                 <div t-if="line.analytic_distribution" class="small text-muted">
                                                     <t t-foreach="line.analytic_distribution.items()" t-as="analytic_item">
                                                         Analytic: <span t-esc="analytic_item[0]"/> (<span t-esc="analytic_item[1]"/>%)
