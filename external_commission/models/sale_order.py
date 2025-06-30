@@ -61,12 +61,20 @@ class SaleOrder(models.Model):
                 order.broker_amount + order.referrer_amount + order.cashback_amount + order.other_external_amount
             )
 
+    @api.constrains('order_line')
+    def _check_single_order_line(self):
+        for order in self:
+            if len(order.order_line) > 1:
+                raise ValidationError("Only one order line is allowed per sale order for external commission clarity.")
+
     def _calc_commission(self, comm_type, rate, order):
         if comm_type == 'fixed':
             return rate
         elif comm_type == 'percent_unit_price':
-            # Sum over all order lines
-            return sum([(rate / 100.0) * line.price_unit for line in order.order_line])
+            # With only one order line, this is simplified
+            if order.order_line:
+                return (rate / 100.0) * order.order_line[0].price_unit
+            return 0.0
         elif comm_type == 'percent_untaxed_total':
             return (rate / 100.0) * order.amount_untaxed
         return 0.0
