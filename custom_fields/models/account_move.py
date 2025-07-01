@@ -90,6 +90,6 @@ class AccountMove(models.Model):
                     'project': sale_order.project_id.id if sale_order.project_id else False,
                     'sale_value': sale_order.sale_value,
                     'unit': sale_order.unit_id.id if sale_order.unit_id else False,
-                    'sale_order_type_id': sale_order.type_id.id if sale_order.type_id else False,
+                    'sale_order_type_id': sale_order.sale_order_type_id.id if sale_order.sale_order_type_id else False,
                 })
         return super(AccountMove, self).create(vals)

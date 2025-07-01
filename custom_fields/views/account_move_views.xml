@@ -11,7 +11,6 @@
                     <group>
                         <group string="Customer &amp; Deal Details" name="customer_deal_group">
                             <field name="buyer" 
-                                   options="{'no_create': True, 'no_create_edit': True}"
                                    placeholder="Select buyer..."/>
                             <field name="deal_id" 
                                    placeholder="Enter deal reference..."/>
