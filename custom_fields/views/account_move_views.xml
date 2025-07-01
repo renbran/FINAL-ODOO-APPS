@@ -15,7 +15,7 @@
                                    placeholder="Select buyer..."/>
                             <field name="deal_id" 
                                    placeholder="Enter deal reference..."/>
-                            <field name="sale_order_type_id" string="Sales Type" placeholder="Select sales type..." options="{'no_create': False, 'no_create_edit': False}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="sale_order_type_id" string="Sales Type" placeholder="Select sales type..." options="{'no_create': False, 'no_create_edit': False}"/>
                             <field name="booking_date"/>
                         </group>
                         <group string="Project &amp; Unit Information" name="project_unit_group">
