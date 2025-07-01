@@ -77,12 +77,14 @@
                 <field name="project"/>
                 <field name="unit"/>
                 <field name="deal_id"/>
+                <field name="sale_order_type_id"/>
             </xpath>
             <xpath expr="//group[@expand='0']" position="inside">
                 <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer'}"/>
                 <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project'}"/>
                 <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit'}"/>
                 <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
+                <filter string="Sales Type" name="group_sale_order_type_id" domain="[]" context="{'group_by': 'sale_order_type_id'}"/>
             </xpath>
         </field>
     </record>
