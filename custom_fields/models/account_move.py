@@ -91,10 +91,11 @@ class AccountMove(models.Model):
             sale_order = self.env['sale.order'].search([
                 ('name', '=', self.invoice_origin)
             ], limit=1)
-            if sale_order and hasattr(sale_order, 'type_id'):
+            # Only set sale_order_type_id if not already set by user
+            if sale_order and hasattr(sale_order, 'type_id') and not self.sale_order_type_id:
                 self.sale_order_type_id = sale_order.type_id.id
-            else:
-                self.sale_order_type_id = False
+            elif not sale_order:
+                self.sale_order_type_id = self.sale_order_type_id or False
 
     @api.model
     def create(self, vals):
