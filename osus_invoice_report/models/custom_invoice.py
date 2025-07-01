@@ -43,5 +43,6 @@ class AccountMove(models.Model):
             # Fallback if num2words is not available
             return f"{amount:.2f} AED"
 
-    # No duplicate fields or compute methods for booking_date, buyer, deal_id, project, unit, sale_value, developer_commission, sale_order_type_id, amount_total_words
-    # These should be rendered in the report using the existing fields from other modules (e.g., custom_fields)
+    def action_print_custom_invoice(self):
+        self.ensure_one()
+        return self.env.ref('osus_invoice_report.action_report_custom_invoice').report_action(self)
