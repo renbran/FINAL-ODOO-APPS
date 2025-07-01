@@ -6,35 +6,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Add custom fields for real estate commission -->
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" string="Buyer"
-                       options="{'no_create': True, 'no_create_edit': True}"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"
-                       placeholder="Select buyer..."/>
-                <field name="project" string="Project"
-                       options="{'no_open': True, 'no_edit': True}"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"
-                       placeholder="Select project..."/>
-                <field name="unit" string="Unit"
-                       options="{'no_open': True, 'no_edit': True}"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"
-                       placeholder="Select unit..."/>
-                <field name="deal_id" string="Deal Reference"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"
-                       placeholder="Enter deal reference..."/>
-                <field name="booking_date" string="Booking Date"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="sale_value" string="Property Sale Value"
-                       widget="monetary"
-                       options="{'currency_field': 'currency_id'}"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="developer_commission" string="Commission Rate (%)"
-                       widget="percentage"
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-            </xpath>
-            
-            <!-- Add print buttons in header -->
+            <!-- Only add print buttons, do NOT add duplicate fields -->
             <xpath expr="//header" position="inside">
                 <button name="action_print_custom_invoice" 
                         string="Print OSUS Invoice"
@@ -55,11 +27,6 @@
                         class="btn-secondary"
                         type="object"
                         groups="account.group_account_invoice"/>
-            </xpath>
-            
-            <!-- Add amount in words field -->
-            <xpath expr="//field[@name='amount_total']" position="after">
-                <field name="amount_total_words" string="Amount in Words" readonly="1"/>
             </xpath>
         </field>
     </record>
