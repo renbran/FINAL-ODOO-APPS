@@ -44,7 +44,7 @@ class AccountMove(models.Model):
     )
 
     sale_order_type_id = fields.Many2one(
-        'sale.order.type',
+        'sale.order.type',  # Correct model name
         string='Sales Order Type',
         tracking=True,
     )
