@@ -75,26 +75,6 @@ class AccountMove(models.Model):
         store=True,
     )
 
-    @api.depends('invoice_origin')
-    def _compute_sale_order_type_id(self):
-        for move in self:
-            sale_order = self.env['sale.order'].search([
-                ('name', '=', move.invoice_origin)
-            ], limit=1)
-            move.sale_order_type_id = sale_order.type_id.id if sale_order and hasattr(sale_order, 'type_id') else False
-
-    @api.onchange('invoice_origin')
-    def _onchange_invoice_origin(self):
-        if self.invoice_origin:
-            sale_order = self.env['sale.order'].search([
-                ('name', '=', self.invoice_origin)
-            ], limit=1)
-            # Only set sale_order_type_id if not already set by user
-            if sale_order and hasattr(sale_order, 'type_id') and not self.sale_order_type_id:
-                self.sale_order_type_id = sale_order.type_id.id
-            elif not sale_order:
-                self.sale_order_type_id = self.sale_order_type_id or False
-
     @api.model
     def create(self, vals):
         if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
@@ -110,5 +90,6 @@ class AccountMove(models.Model):
                     'project': sale_order.project_id.id if sale_order.project_id else False,
                     'sale_value': sale_order.sale_value,
                     'unit': sale_order.unit_id.id if sale_order.unit_id else False,
+                    'sale_order_type_id': sale_order.type_id.id if sale_order.type_id else False,
                 })
         return super(AccountMove, self).create(vals)
