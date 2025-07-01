@@ -46,9 +46,7 @@ class AccountMove(models.Model):
     sale_order_type_id = fields.Many2one(
         'sale.order.type',
         string='Sales Order Type',
-        compute='_compute_sale_order_type_id',
-        store=True,
-        readonly=False,
+        tracking=True,
     )
 
     buyer_id = fields.Many2one(
