@@ -50,3 +50,7 @@ class AccountMove(models.Model):
     def action_print_custom_bill(self):
         self.ensure_one()
         return self.env.ref('osus_invoice_report.action_report_custom_bill').report_action(self)
+
+    def action_print_custom_receipt(self):
+        self.ensure_one()
+        return self.env.ref('osus_invoice_report.action_report_custom_receipt').report_action(self)
