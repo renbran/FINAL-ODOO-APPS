@@ -15,7 +15,7 @@
                             <field name="deal_id" 
                                    placeholder="Enter deal reference..."/>
                             <field name="booking_date"/>
-                            <field name="sale_order_type_id" options="{'no_create': True}" domain="[('active','=',True)]"/>
+                            <field name="sale_order_type_id" options="{'no_create': True}"/>
                         </group>
                         <group string="Project &amp; Unit Information" name="project_unit_group">
                             <field name="project" 
