@@ -175,6 +175,61 @@ class CustomFieldsCleanupWizard(models.TransientModel):
             else:
                 log_messages.append("   ℹ️  Skipping ir_model_data cleanup (sale_order_type table doesn't exist)")
             
+            # 8. Fix missing paper format for osus_invoice_report
+            log_messages.append("\n8. Fixing missing paper format for osus_invoice_report...")
+            
+            # Check if the external ID exists
+            existing_paperformat_xmlid = self.env['ir.model.data'].search([
+                ('module', '=', 'osus_invoice_report'),
+                ('name', '=', 'paperformat_osus_invoice'),
+                ('model', '=', 'report.paperformat')
+            ])
+            
+            if not existing_paperformat_xmlid:
+                # Look for existing paper format with similar name
+                existing_format = self.env['report.paperformat'].search([
+                    ('name', 'ilike', 'OSUS%'),
+                ], limit=1)
+                
+                if existing_format:
+                    log_messages.append(f"   Found existing paper format: {existing_format.name}")
+                    # Create missing external ID
+                    self.env['ir.model.data'].create({
+                        'module': 'osus_invoice_report',
+                        'name': 'paperformat_osus_invoice',
+                        'model': 'report.paperformat',
+                        'res_id': existing_format.id,
+                        'noupdate': False,
+                    })
+                    log_messages.append("   ✅ Created missing external ID for existing paper format")
+                else:
+                    # Create new paper format
+                    log_messages.append("   Creating new OSUS paper format...")
+                    new_format = self.env['report.paperformat'].create({
+                        'name': 'OSUS Invoice Format',
+                        'format': 'A4',
+                        'orientation': 'Portrait',
+                        'margin_top': 50,
+                        'margin_bottom': 50,
+                        'margin_left': 10,
+                        'margin_right': 10,
+                        'header_line': False,
+                        'header_spacing': 40,
+                        'dpi': 90,
+                    })
+                    
+                    # Create external ID
+                    self.env['ir.model.data'].create({
+                        'module': 'osus_invoice_report',
+                        'name': 'paperformat_osus_invoice',
+                        'model': 'report.paperformat',
+                        'res_id': new_format.id,
+                        'noupdate': False,
+                    })
+                    log_messages.append(f"   ✅ Created new paper format: {new_format.name}")
+            else:
+                log_messages.append("   ✅ Paper format external ID already exists")
+            
             log_messages.append("\n=== Cleanup Completed Successfully! ===")
             log_messages.append("\n🎉 You can now restart Odoo. The '_unknown' object error should be resolved.")
             

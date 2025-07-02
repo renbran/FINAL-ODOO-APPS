@@ -19,13 +19,13 @@
     'depends': ['account', 'base'],
     'data': [
         'security/ir.model.access.csv',
+        'data/report_paperformat.xml',
         'views/account_move_views.xml',
         'views/report_invoice.xml',
         'views/report_bills.xml',
         'views/report_receipt.xml',
         'views/report_action_invoice.xml',
         'views/report_action_bill.xml',
-        'data/report_paperformat.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
