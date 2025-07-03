@@ -35,21 +35,16 @@ class AccountMove(models.Model):
         string='Buyer',
         tracking=True,
     )
-    # Custom project field, not to be confused with Odoo's project_id
-    project = fields.Many2one(
+    project_id = fields.Many2one(
         'product.template',
-        string='Project',
+        string='Project Name',
         tracking=True,
     )
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project)]",
-    )
-    deal_id = fields.Char(
-        string='Deal ID',
-        tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
     )
     amount_total_words = fields.Char(
         string='Amount in Words',
@@ -69,7 +64,7 @@ class AccountMove(models.Model):
                     'developer_commission': sale_order.developer_commission,
                     'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
                     'deal_id': sale_order.deal_id,
-                    'project': sale_order.project_id.id if sale_order.project_id else False,
+                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
                     'sale_value': sale_order.sale_value,
                     'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
                     'sale_order_type_id': sale_order.sale_order_type_id.id if sale_order.sale_order_type_id else False,
