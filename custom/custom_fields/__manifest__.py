@@ -19,7 +19,7 @@ Features:
 
 All fields are open for creation without domain restrictions and use uniform naming conventions.
     """,
-    'depends': ['sale', 'account'],
+    'depends': ['sale', 'account', 'le_sale_type'],
     'data': [
         'views/sale_order_views.xml',
         'views/account_move_views.xml',

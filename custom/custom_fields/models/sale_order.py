@@ -19,12 +19,6 @@ class SaleOrder(models.Model):
         help='Human-readable format of the sale value'
     )
 
-    @api.depends('sale_value')
-    def _compute_sale_value_formatted(self):
-        from ..utils.number_format import format_amount
-        for rec in self:
-            rec.sale_value_formatted = format_amount(rec.sale_value)
-
     def _prepare_invoice(self):
         """Override to include custom fields in invoice preparation"""
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
@@ -40,8 +34,14 @@ class SaleOrder(models.Model):
             'unit_id': self.unit_id.id if self.unit_id else False,
         })
         
-        # Only include sale_order_type_id if the field exists (from le_sale_type module)
+        # Handle sale_order_type_id field from le_sale_type module
         if hasattr(self, 'sale_order_type_id') and self.sale_order_type_id:
-            invoice_vals['sale_order_type_id'] = self.sale_order_type_id.id
+            try:
+                # Ensure the sale order type record exists
+                if self.sale_order_type_id.exists():
+                    invoice_vals['sale_order_type_id'] = self.sale_order_type_id.id
+            except Exception:
+                # If there's any issue, don't include the field
+                pass
         
         return invoice_vals
