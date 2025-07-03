@@ -21,24 +21,23 @@ class SaleOrder(models.Model):
         """Prepare invoice vals with safe field transfer"""
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         
-        # Safe field transfer with existence checks
-        def safe_transfer(field):
+        # Define fields to transfer with their types
+        transfer_fields = {
+            'booking_date': 'date',
+            'developer_commission': 'float',
+            'buyer_id': 'm2o',
+            'deal_id': 'integer',
+            'project_id': 'm2o',
+            'sale_value': 'monetary',
+            'unit_id': 'm2o'
+        }
+        
+        for field, field_type in transfer_fields.items():
             value = getattr(self, field)
-            if field.endswith('_id') and value:
-                return value.id if value.exists() else False
-            return value if value else False
-        
-        transfer_fields = [
-            'booking_date',
-            'developer_commission',
-            'buyer_id',
-            'deal_id',
-            'project_id',
-            'sale_value',
-            'unit_id'
-        ]
-        
-        for field in transfer_fields:
-            invoice_vals[field] = safe_transfer(field)
+            
+            if field_type == 'm2o':
+                invoice_vals[field] = value.id if value and value.exists() else False
+            elif value or field_type in ('integer', 'float', 'monetary'):
+                invoice_vals[field] = value
         
         return invoice_vals
