@@ -28,6 +28,7 @@ class AccountMove(models.Model):
         'product.template',
         string='Project',
         tracking=True,
+        domain=[('detailed_type', '=', 'service')],
     )
     
     sale_value = fields.Monetary(
@@ -40,6 +41,7 @@ class AccountMove(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
+        domain="[('product_tmpl_id', '=', project)]",
     )
 
     amount_total_words = fields.Char(
@@ -48,14 +50,30 @@ class AccountMove(models.Model):
         store=True,
     )
 
+    @api.depends('amount_total')
+    def _compute_amount_total_words(self):
+        """Convert amount to words"""
+        for record in self:
+            if record.amount_total:
+                # Simple implementation - you can enhance this with a proper number to words library
+                currency_name = record.currency_id.name or 'USD'
+                amount_str = f"{record.amount_total:.2f}"
+                record.amount_total_words = f"{amount_str} {currency_name}"
+            else:
+                record.amount_total_words = ''
+
     @api.model
     def create(self, vals):
-        if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
+        # First call the parent create method to ensure other modules' logic is executed
+        record = super(AccountMove, self).create(vals)
+        
+        # Then populate our custom fields if this is an invoice from a sale order
+        if record.move_type in ['out_invoice', 'out_refund'] and record.invoice_origin:
             sale_order = self.env['sale.order'].search([
-                ('name', '=', vals.get('invoice_origin'))
+                ('name', '=', record.invoice_origin)
             ], limit=1)
             if sale_order:
-                vals.update({
+                record.write({
                     'booking_date': sale_order.booking_date,
                     'developer_commission': sale_order.developer_commission,
                     'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
@@ -63,6 +81,5 @@ class AccountMove(models.Model):
                     'project': sale_order.project_template_id.id if sale_order.project_template_id else False,
                     'sale_value': sale_order.sale_value,
                     'unit': sale_order.unit_id.id if sale_order.unit_id else False,
-                    'sale_order_type_id': sale_order.sale_order_type_id.id if sale_order.sale_order_type_id else False,
                 })
-        return super(AccountMove, self).create(vals)
+        return record
