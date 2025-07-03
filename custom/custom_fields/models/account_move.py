@@ -41,8 +41,8 @@ class AccountMove(models.Model):
             # Create a copy to avoid modifying original
             safe_vals = vals.copy()
             
-            # Validate and clean Many2one fields
-            many2one_fields = ['buyer_id', 'project_id', 'unit_id', 'sale_order_type_id']
+            # Validate and clean Many2one fields (removed sale_order_type_id)
+            many2one_fields = ['buyer_id', 'project_id', 'unit_id']
             for field_name in many2one_fields:
                 if field_name in safe_vals:
                     value = safe_vals[field_name]
@@ -53,8 +53,7 @@ class AccountMove(models.Model):
                         related_model_map = {
                             'buyer_id': 'res.partner',
                             'project_id': 'product.template', 
-                            'unit_id': 'product.product',
-                            'sale_order_type_id': 'sale.order.type'
+                            'unit_id': 'product.product'
                         }
                         if field_name in related_model_map:
                             try:
