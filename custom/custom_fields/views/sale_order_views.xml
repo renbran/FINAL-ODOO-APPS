@@ -18,7 +18,7 @@
                                placeholder="Enter deal reference..."/>
                     </group>
                     <group>
-                        <field name="project" 
+                        <field name="project_id" 
                                options="{'no_open': True, 'no_edit': True}"
                                placeholder="Select or create project..."
                                context="{'form_view_ref': 'custom_fields.project_quick_create_form'}"/>
@@ -43,7 +43,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="buyer_id" optional="hide"/>
-                <field name="project" optional="hide"/>
+                <field name="project_id" optional="hide"/>
                 <field name="unit_id" optional="hide"/>
                 <field name="deal_id" optional="hide"/>
             </xpath>
@@ -65,13 +65,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="buyer_id"/>
-                <field name="project"/>
+                <field name="project_id"/>
                 <field name="unit_id"/>
                 <field name="deal_id"/>
             </xpath>
             <xpath expr="//group[@expand='0']" position="inside">
                 <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
-                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
                 <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
                 <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
             </xpath>
