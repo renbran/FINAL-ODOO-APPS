@@ -1,8 +1,19 @@
 from odoo import api, fields, models
-from .deal_fields_mixin import DealFieldsMixin
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
-    _inherit = ['account.move', 'deal.fields.mixin']
+    _inherit = 'account.move'
+
+    # Add the mixin fields directly to avoid inheritance issues
+    booking_date = fields.Date(string='Booking Date', tracking=True)
+    developer_commission = fields.Float(string='Broker Commission', tracking=True, digits=(16, 2))
+    buyer_id = fields.Many2one('res.partner', string='Buyer', tracking=True)
+    deal_id = fields.Integer(string='Deal ID', tracking=True)
+    project_id = fields.Many2one('product.template', string='Project Name', tracking=True)
+    sale_value = fields.Monetary(string='Sale Value', tracking=True, currency_field='currency_id')
+    unit_id = fields.Many2one('product.product', string='Unit', tracking=True)
 
     amount_total_words = fields.Char(
         string='Amount in Words',
@@ -10,141 +21,109 @@ class AccountMove(models.Model):
         store=True,
     )
 
-    def _transfer_sale_order_fields(self, sale_order, vals):
-        """Transfer custom fields from sale order to invoice"""
-        if not sale_order:
-            return vals
-        
-        # Defensive validation for Many2one fields
-        deal_fields = {
-            'booking_date': sale_order.booking_date,
-            'developer_commission': sale_order.developer_commission,
-            'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id and sale_order.buyer_id.exists() else False,
-            'deal_id': sale_order.deal_id,
-            'project_id': sale_order.project_id.id if sale_order.project_id and sale_order.project_id.exists() else False,
-            'sale_value': sale_order.sale_value,
-            'unit_id': sale_order.unit_id.id if sale_order.unit_id and sale_order.unit_id.exists() else False,
-        }
-        
-        # Only include sale_order_type_id if the field exists on the sale order
-        if hasattr(sale_order, 'sale_order_type_id') and sale_order.sale_order_type_id:
-            try:
-                if sale_order.sale_order_type_id.exists():
-                    deal_fields['sale_order_type_id'] = sale_order.sale_order_type_id.id
-            except Exception:
-                # If any error occurs, skip this field
-                pass
-        
-        # Only update vals if the field is not already set
-        for field_name, field_value in deal_fields.items():
-            if field_name not in vals:
-                vals[field_name] = field_value
-        
-        return vals
-
-    def _validate_many2one_fields(self, vals):
-        """Validate and clean Many2one fields in vals"""
-        cleaned_vals = vals.copy()
-        
-        for field_name, field in self._fields.items():
-            if isinstance(field, fields.Many2one) and field_name in cleaned_vals:
-                val = cleaned_vals[field_name]
-                
-                # Skip if value is falsy (False, None, 0, etc.)
-                if not val:
-                    continue
-                
-                try:
-                    # Handle different value types
-                    if isinstance(val, int):
-                        # Integer ID - check if record exists
-                        if val > 0 and self.env[field.comodel_name].browse(val).exists():
-                            continue  # Valid ID
-                        else:
-                            cleaned_vals[field_name] = False
-                    elif isinstance(val, models.BaseModel):
-                        # Recordset or record object
-                        if hasattr(val, 'exists') and val.exists():
-                            # Valid recordset with existing records
-                            if hasattr(val, 'id'):
-                                cleaned_vals[field_name] = val.id
-                            else:
-                                # Multiple records, take the first one
-                                cleaned_vals[field_name] = val.ids[0] if val.ids else False
-                        else:
-                            cleaned_vals[field_name] = False
-                    else:
-                        # Unknown object type or invalid format
-                        cleaned_vals[field_name] = False
-                        
-                except Exception as e:
-                    # If any error occurs during validation, set to False for safety
-                    cleaned_vals[field_name] = False
-        
-        return cleaned_vals
-
     @api.model
     def create(self, vals_list):
+        """Simplified create method with extensive logging"""
+        _logger.info("AccountMove.create called with vals_list: %s", vals_list)
+        
         # Handle both single dict and list of dicts
         if isinstance(vals_list, dict):
             vals_list = [vals_list]
-        
-        cleaned_vals_list = []
-        for vals in vals_list:
-            # Clean and validate Many2one fields
-            cleaned_vals = self._validate_many2one_fields(vals)
-            
-            # Transfer sale order custom fields if this is an invoice from a sale order
-            if cleaned_vals.get('move_type') in ['out_invoice', 'out_refund'] and cleaned_vals.get('invoice_origin'):
-                sale_order = self.env['sale.order'].search([
-                    ('name', '=', cleaned_vals.get('invoice_origin'))
-                ], limit=1)
-                if sale_order:
-                    cleaned_vals = self._transfer_sale_order_fields(sale_order, cleaned_vals)
-            
-            cleaned_vals_list.append(cleaned_vals)
-        
-        # Call super with cleaned values
-        if len(cleaned_vals_list) == 1:
-            return super(AccountMove, self).create(cleaned_vals_list[0])
+            single_record = True
         else:
-            return super(AccountMove, self).create(cleaned_vals_list)
-
-    def write(self, vals):
-        """Override write to handle changes to invoice_origin"""
-        # Clean Many2one fields in vals
-        cleaned_vals = self._validate_many2one_fields(vals)
+            single_record = False
         
-        result = super(AccountMove, self).write(cleaned_vals)
-        
-        # If invoice_origin is being set or changed, transfer sale order fields
-        if 'invoice_origin' in cleaned_vals:
-            for move in self:
-                if move.move_type in ['out_invoice', 'out_refund'] and move.invoice_origin:
+        # Process each vals dict
+        processed_vals_list = []
+        for i, vals in enumerate(vals_list):
+            _logger.info("Processing vals[%d]: %s", i, vals)
+            
+            # Create a new dict with only safe values
+            safe_vals = {}
+            
+            # Copy standard fields
+            for key, value in vals.items():
+                if key not in self._fields:
+                    safe_vals[key] = value
+                    continue
+                
+                field = self._fields[key]
+                
+                # Handle Many2one fields with extra safety
+                if isinstance(field, fields.Many2one):
+                    if not value:
+                        safe_vals[key] = False
+                    elif isinstance(value, int) and value > 0:
+                        try:
+                            # Check if record exists
+                            if self.env[field.comodel_name].browse(value).exists():
+                                safe_vals[key] = value
+                            else:
+                                _logger.warning("Many2one field %s: record ID %d does not exist", key, value)
+                                safe_vals[key] = False
+                        except Exception as e:
+                            _logger.error("Error validating Many2one field %s with value %s: %s", key, value, e)
+                            safe_vals[key] = False
+                    else:
+                        _logger.warning("Many2one field %s: invalid value type %s", key, type(value))
+                        safe_vals[key] = False
+                else:
+                    # For non-Many2one fields, copy as-is
+                    safe_vals[key] = value
+            
+            # Transfer sale order fields only if it's an invoice
+            if safe_vals.get('move_type') in ['out_invoice', 'out_refund'] and safe_vals.get('invoice_origin'):
+                try:
                     sale_order = self.env['sale.order'].search([
-                        ('name', '=', move.invoice_origin)
+                        ('name', '=', safe_vals.get('invoice_origin'))
                     ], limit=1)
+                    
                     if sale_order:
-                        update_vals = {}
-                        self._transfer_sale_order_fields(sale_order, update_vals)
-                        if update_vals:
-                            # Clean the update values as well
-                            update_vals = self._validate_many2one_fields(update_vals)
-                            super(AccountMove, move).write(update_vals)
+                        _logger.info("Found sale order %s, transferring fields", sale_order.name)
+                        
+                        # Transfer fields safely
+                        transfer_fields = {
+                            'booking_date': sale_order.booking_date,
+                            'developer_commission': sale_order.developer_commission,
+                            'deal_id': sale_order.deal_id,
+                            'sale_value': sale_order.sale_value,
+                        }
+                        
+                        # Handle Many2one fields with existence checks
+                        if sale_order.buyer_id and sale_order.buyer_id.exists():
+                            transfer_fields['buyer_id'] = sale_order.buyer_id.id
+                        
+                        if sale_order.project_id and sale_order.project_id.exists():
+                            transfer_fields['project_id'] = sale_order.project_id.id
+                        
+                        if sale_order.unit_id and sale_order.unit_id.exists():
+                            transfer_fields['unit_id'] = sale_order.unit_id.id
+                        
+                        # Only update if not already set
+                        for field_name, field_value in transfer_fields.items():
+                            if field_name not in safe_vals and field_value:
+                                safe_vals[field_name] = field_value
+                                
+                except Exception as e:
+                    _logger.error("Error transferring sale order fields: %s", e)
+            
+            processed_vals_list.append(safe_vals)
+            _logger.info("Processed safe_vals[%d]: %s", i, safe_vals)
         
-        return result
-
-    @api.model
-    def _move_autocomplete_invoice_lines_create(self, vals_list):
-        """Hook into standard Odoo invoice creation from sale orders"""
-        new_vals_list = []
-        for vals in vals_list:
-            if vals.get('invoice_origin'):
-                sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
-                if sale_order:
-                    vals = self._transfer_sale_order_fields(sale_order, vals)
-            new_vals_list.append(vals)
-        return super(AccountMove, self)._move_autocomplete_invoice_lines_create(new_vals_list)
+        # Call super with processed values
+        try:
+            if single_record:
+                result = super(AccountMove, self).create(processed_vals_list[0])
+            else:
+                result = super(AccountMove, self).create(processed_vals_list)
+            
+            _logger.info("AccountMove.create successful, created: %s", result)
+            return result
+            
+        except Exception as e:
+            _logger.error("Error in super().create(): %s", e)
+            _logger.error("Processed vals_list: %s", processed_vals_list)
+            raise
 
     @api.depends('amount_total')
     def _compute_amount_total_words(self):
@@ -152,14 +131,11 @@ class AccountMove(models.Model):
         for record in self:
             if record.amount_total:
                 try:
-                    # Try to use Odoo's built-in number to words conversion if available
-                    from odoo.tools.misc import formatLang
                     from num2words import num2words
                     amount = record.amount_total
                     currency = record.currency_id.name or 'USD'
                     record.amount_total_words = num2words(amount, lang='en').title() + ' ' + currency
                 except ImportError:
-                    # Fallback if num2words is not available
                     record.amount_total_words = str(record.amount_total) + ' ' + (record.currency_id.name or 'USD')
             else:
                 record.amount_total_words = ''
