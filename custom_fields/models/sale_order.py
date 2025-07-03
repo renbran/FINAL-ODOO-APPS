@@ -31,7 +31,6 @@ class SaleOrder(models.Model):
         'product.template',
         string='Project Name',
         tracking=True,
-        domain=[('detailed_type', '=', 'service')],
         help="Select a product template that represents the project"
     )
     
@@ -45,5 +44,4 @@ class SaleOrder(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_template_id)]",
     )

@@ -28,7 +28,6 @@ class AccountMove(models.Model):
         'product.template',
         string='Project',
         tracking=True,
-        domain=[('detailed_type', '=', 'service')],
     )
     
     sale_value = fields.Monetary(
@@ -41,7 +40,6 @@ class AccountMove(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project)]",
     )
 
     amount_total_words = fields.Char(
