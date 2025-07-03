@@ -49,28 +49,27 @@ class AccountMove(models.Model):
                     if not value:
                         safe_vals[field_name] = False
                     elif isinstance(value, int) and value > 0:
-                        # Determine the comodel based on field name
-                        comodel_map = {
+                        # Determine the related model based on field name
+                        related_model_map = {
                             'buyer_id': 'res.partner',
                             'project_id': 'product.template', 
                             'unit_id': 'product.product',
                             'sale_order_type_id': 'sale.order.type'
                         }
-                        
-                        if field_name in comodel_map:
+                        if field_name in related_model_map:
                             try:
-                                comodel = comodel_map[field_name]
-                                if self.env[comodel].browse(value).exists():
+                                related_model = related_model_map[field_name]
+                                if self.env[related_model].browse(value).exists():
                                     safe_vals[field_name] = value
                                 else:
                                     _logger.warning("Many2one field %s: record ID %d does not exist in %s", 
-                                                  field_name, value, comodel)
+                                                  field_name, value, related_model)
                                     safe_vals[field_name] = False
                             except Exception as e:
                                 _logger.error("Error validating Many2one field %s with value %s: %s", 
                                             field_name, value, e)
                                 safe_vals[field_name] = False
-                    elif hasattr(value, 'id'):
+                    elif hasattr(value, 'id') and isinstance(getattr(value, 'id', None), int):
                         # Handle recordset objects
                         safe_vals[field_name] = value.id if value.id else False
                     else:
@@ -104,13 +103,6 @@ class AccountMove(models.Model):
                         
                         if sale_order.unit_id and sale_order.unit_id.exists():
                             transfer_mapping['unit_id'] = sale_order.unit_id.id
-                        
-                        # Handle sale_order_type_id if available
-                        if hasattr(sale_order, 'sale_order_type_id') and sale_order.sale_order_type_id:
-                            if sale_order.sale_order_type_id.exists():
-                                transfer_mapping['sale_order_type_id'] = sale_order.sale_order_type_id.id
-                        
-                        # Apply transfers only if not already set
                         for field_name, field_value in transfer_mapping.items():
                             if field_name not in safe_vals and field_value:
                                 safe_vals[field_name] = field_value
