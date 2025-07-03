@@ -1,7 +1,7 @@
 {
     'name': 'Custom Fields',
     'version': '1.0',
-    'depends': ['sale', 'account', 'le_sale_type'],
+    'depends': ['sale', 'account'],
     'data': [
         'views/sale_order_views.xml',
         'views/account_move_views.xml',
