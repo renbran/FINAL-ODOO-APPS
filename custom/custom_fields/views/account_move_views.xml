@@ -18,10 +18,8 @@
                         </group>
                         <group string="Project &amp; Unit Information" name="project_unit_group">
                             <field name="project_id" 
-                                   options="{'no_create': True, 'no_create_edit': True}"
                                    placeholder="Select project..."/>
                             <field name="unit_id" 
-                                   options="{'no_create': True, 'no_create_edit': True}"
                                    placeholder="Select unit..."/>
                         </group>
                     </group>
