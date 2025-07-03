@@ -10,17 +10,17 @@
                 <page string="Deal Information" name="deal_info" invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group>
                         <group string="Customer &amp; Deal Details" name="customer_deal_group">
-                            <field name="buyer" 
+                            <field name="buyer_id" 
                                    placeholder="Select buyer..."/>
                             <field name="deal_id" 
                                    placeholder="Enter deal reference..."/>
                             <field name="booking_date"/>
                         </group>
                         <group string="Project &amp; Unit Information" name="project_unit_group">
-                            <field name="project" 
+                            <field name="project_id" 
                                    options="{'no_create': True, 'no_create_edit': True}"
                                    placeholder="Select project..."/>
-                            <field name="unit" 
+                            <field name="unit_id" 
                                    options="{'no_create': True, 'no_create_edit': True}"
                                    placeholder="Select unit..."/>
                         </group>
@@ -50,9 +50,9 @@
         <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" optional="hide"/>
-                <field name="project" optional="hide"/>
-                <field name="unit" optional="hide"/>
+                <field name="buyer_id" optional="hide"/>
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
                 <field name="deal_id" optional="hide"/>
                 <field name="booking_date" optional="hide"/>
                 <field name="sale_order_type_id" optional="hide"/>
@@ -71,16 +71,16 @@
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer"/>
-                <field name="project"/>
-                <field name="unit"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
                 <field name="deal_id"/>
                 <field name="sale_order_type_id"/>
             </xpath>
             <xpath expr="//group[@expand='0']" position="inside">
-                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer'}"/>
-                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project'}"/>
-                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit'}"/>
+                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
                 <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
                 <filter string="Sale Order Type" name="group_sale_order_type" domain="[]" context="{'group_by': 'sale_order_type_id'}"/>
             </xpath>
