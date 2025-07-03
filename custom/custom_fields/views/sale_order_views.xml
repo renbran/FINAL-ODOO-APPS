@@ -12,20 +12,26 @@
                         <field name="booking_date"/>
                         <field name="developer_commission" widget="percentage"/>
                         <field name="buyer_id" 
+                               options="{'no_create': True, 'no_create_edit': True}"
                                placeholder="Select buyer..."/>
                         <field name="deal_id" 
                                placeholder="Enter deal reference..."/>
                     </group>
                     <group>
-                        <field name="project_id" 
+                        <field name="project_template_id" 
+                               options="{'no_open': True, 'no_edit': True}"
                                placeholder="Select or create project..."
                                context="{'form_view_ref': 'custom_fields.project_quick_create_form'}"/>
                         <field name="sale_value" 
                                widget="monetary"
                                options="{'currency_field': 'currency_id'}"/>
                         <field name="unit_id" 
+                               options="{'no_open': True, 'no_edit': True}"
                                placeholder="Select or create unit..."
                                context="{'form_view_ref': 'custom_fields.unit_quick_create_form'}"/>
+                        <field name="sale_order_type_id" 
+                               options="{'no_create': True, 'no_create_edit': True}"
+                               placeholder="Select sale order type..."/>
                     </group>
                 </group>
             </xpath>
@@ -40,9 +46,10 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="buyer_id" optional="hide"/>
-                <field name="project_id" optional="hide"/>
+                <field name="project_template_id" optional="hide"/>
                 <field name="unit_id" optional="hide"/>
                 <field name="deal_id" optional="hide"/>
+                <field name="sale_order_type_id" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='amount_total']" position="after">
                 <field name="sale_value" optional="hide"/>
@@ -62,14 +69,16 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="buyer_id"/>
-                <field name="project_id"/>
+                <field name="project_template_id"/>
                 <field name="unit_id"/>
                 <field name="deal_id"/>
+                <field name="sale_order_type_id"/>
             </xpath>
             <xpath expr="//group[@expand='0']" position="inside">
                 <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
-                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_template_id'}"/>
                 <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
+                <filter string="Sale Order Type" name="group_sale_order_type" domain="[]" context="{'group_by': 'sale_order_type_id'}"/>
                 <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
             </xpath>
         </field>
