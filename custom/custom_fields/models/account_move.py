@@ -42,47 +42,83 @@ class AccountMove(models.Model):
         
         return vals
 
-    @api.model
-    def create(self, vals):
-        # Defensive: Ensure all Many2one fields reference valid records or are set to False
+    def _validate_many2one_fields(self, vals):
+        """Validate and clean Many2one fields in vals"""
+        cleaned_vals = vals.copy()
+        
         for field_name, field in self._fields.items():
-            if isinstance(field, fields.Many2one) and field_name in vals:
-                val = vals[field_name]
-                if val:  # Only process if value is truthy
-                    try:
-                        if isinstance(val, int):
-                            # Check if the record exists
-                            if not self.env[field.comodel_name].browse(val).exists():
-                                vals[field_name] = False
-                        elif hasattr(val, 'exists'):  # Check if it's a recordset
-                            if not val.exists():
-                                vals[field_name] = False
-                        elif hasattr(val, 'id'):  # Check if it's an object with id
-                            if not hasattr(val, 'exists') or not val.exists():
-                                vals[field_name] = False
+            if isinstance(field, fields.Many2one) and field_name in cleaned_vals:
+                val = cleaned_vals[field_name]
+                
+                # Skip if value is falsy (False, None, 0, etc.)
+                if not val:
+                    continue
+                
+                try:
+                    # Handle different value types
+                    if isinstance(val, int):
+                        # Integer ID - check if record exists
+                        if val > 0 and self.env[field.comodel_name].browse(val).exists():
+                            continue  # Valid ID
                         else:
-                            # If it's an unknown object type, set to False for safety
-                            vals[field_name] = False
-                    except Exception:
-                        # If any error occurs during validation, set to False for safety
-                        vals[field_name] = False
+                            cleaned_vals[field_name] = False
+                    elif isinstance(val, models.BaseModel):
+                        # Recordset or record object
+                        if hasattr(val, 'exists') and val.exists():
+                            # Valid recordset with existing records
+                            if hasattr(val, 'id'):
+                                cleaned_vals[field_name] = val.id
+                            else:
+                                # Multiple records, take the first one
+                                cleaned_vals[field_name] = val.ids[0] if val.ids else False
+                        else:
+                            cleaned_vals[field_name] = False
+                    else:
+                        # Unknown object type or invalid format
+                        cleaned_vals[field_name] = False
+                        
+                except Exception as e:
+                    # If any error occurs during validation, set to False for safety
+                    cleaned_vals[field_name] = False
         
-        # Transfer sale order custom fields if this is an invoice from a sale order
-        if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
-            sale_order = self.env['sale.order'].search([
-                ('name', '=', vals.get('invoice_origin'))
-            ], limit=1)
-            if sale_order:
-                vals = self._transfer_sale_order_fields(sale_order, vals)
+        return cleaned_vals
+
+    @api.model
+    def create(self, vals_list):
+        # Handle both single dict and list of dicts
+        if isinstance(vals_list, dict):
+            vals_list = [vals_list]
         
-        return super(AccountMove, self).create(vals)
+        cleaned_vals_list = []
+        for vals in vals_list:
+            # Clean and validate Many2one fields
+            cleaned_vals = self._validate_many2one_fields(vals)
+            
+            # Transfer sale order custom fields if this is an invoice from a sale order
+            if cleaned_vals.get('move_type') in ['out_invoice', 'out_refund'] and cleaned_vals.get('invoice_origin'):
+                sale_order = self.env['sale.order'].search([
+                    ('name', '=', cleaned_vals.get('invoice_origin'))
+                ], limit=1)
+                if sale_order:
+                    cleaned_vals = self._transfer_sale_order_fields(sale_order, cleaned_vals)
+            
+            cleaned_vals_list.append(cleaned_vals)
+        
+        # Call super with cleaned values
+        if len(cleaned_vals_list) == 1:
+            return super(AccountMove, self).create(cleaned_vals_list[0])
+        else:
+            return super(AccountMove, self).create(cleaned_vals_list)
 
     def write(self, vals):
         """Override write to handle changes to invoice_origin"""
-        result = super(AccountMove, self).write(vals)
+        # Clean Many2one fields in vals
+        cleaned_vals = self._validate_many2one_fields(vals)
+        
+        result = super(AccountMove, self).write(cleaned_vals)
         
         # If invoice_origin is being set or changed, transfer sale order fields
-        if 'invoice_origin' in vals:
+        if 'invoice_origin' in cleaned_vals:
             for move in self:
                 if move.move_type in ['out_invoice', 'out_refund'] and move.invoice_origin:
                     sale_order = self.env['sale.order'].search([
@@ -92,6 +128,8 @@ class AccountMove(models.Model):
                         update_vals = {}
                         self._transfer_sale_order_fields(sale_order, update_vals)
                         if update_vals:
+                            # Clean the update values as well
+                            update_vals = self._validate_many2one_fields(update_vals)
                             super(AccountMove, move).write(update_vals)
         
         return result
