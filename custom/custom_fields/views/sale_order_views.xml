@@ -12,21 +12,18 @@
                         <field name="booking_date"/>
                         <field name="developer_commission" widget="percentage"/>
                         <field name="buyer_id" 
-                               options="{'no_create': True, 'no_create_edit': True}"
                                placeholder="Select buyer..."/>
                         <field name="deal_id" 
                                placeholder="Enter deal reference..."/>
                     </group>
                     <group>
                         <field name="project_id" 
-                               options="{'no_open': True, 'no_edit': True}"
                                placeholder="Select or create project..."
                                context="{'form_view_ref': 'custom_fields.project_quick_create_form'}"/>
                         <field name="sale_value" 
                                widget="monetary"
                                options="{'currency_field': 'currency_id'}"/>
                         <field name="unit_id" 
-                               options="{'no_open': True, 'no_edit': True}"
                                placeholder="Select or create unit..."
                                context="{'form_view_ref': 'custom_fields.unit_quick_create_form'}"/>
                     </group>

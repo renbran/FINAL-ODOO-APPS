@@ -10,4 +10,4 @@ class DealFieldsMixin(models.AbstractModel):
     deal_id = fields.Integer(string='Deal ID', tracking=True)
     project_id = fields.Many2one('product.template', string='Project Name', tracking=True)
     sale_value = fields.Monetary(string='Sale Value', tracking=True, currency_field='currency_id')
-    unit_id = fields.Many2one('product.product', string='Unit', tracking=True, domain="[('product_tmpl_id', '=', project_id)]")
+    unit_id = fields.Many2one('product.product', string='Unit', tracking=True)
