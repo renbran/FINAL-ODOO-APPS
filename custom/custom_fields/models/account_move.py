@@ -57,6 +57,13 @@ class AccountMove(models.Model):
         compute='_compute_amount_total_words',
         store=True,
     )
+    
+    sale_order_type = fields.Char(
+        string='Sale Order Type',
+        compute='_compute_sale_order_type',
+        store=True,
+        help="Sale order type copied from the originating sale order"
+    )
 
     @api.depends('amount_total')
     def _compute_amount_total_words(self):
@@ -69,6 +76,21 @@ class AccountMove(models.Model):
                 record.amount_total_words = f"{amount_str} {currency_name}"
             else:
                 record.amount_total_words = ''
+
+    @api.depends('invoice_origin')
+    def _compute_sale_order_type(self):
+        """Compute sale order type from originating sale order"""
+        for record in self:
+            if record.invoice_origin and record.move_type in ['out_invoice', 'out_refund']:
+                sale_order = self.env['sale.order'].search([
+                    ('name', '=', record.invoice_origin)
+                ], limit=1)
+                if sale_order and sale_order.sale_order_type_id:
+                    record.sale_order_type = sale_order.sale_order_type_id.name
+                else:
+                    record.sale_order_type = ''
+            else:
+                record.sale_order_type = ''
 
     @api.model
     def create(self, vals):
