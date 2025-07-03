@@ -31,6 +31,7 @@ class SaleOrder(models.Model):
         'product.template',
         string='Project Name',
         tracking=True,
+        domain=[('detailed_type', '=', 'service')],
     )
     
     sale_value = fields.Monetary(
