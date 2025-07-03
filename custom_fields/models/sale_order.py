@@ -47,3 +47,12 @@ class SaleOrder(models.Model):
         tracking=True,
         domain="[('product_tmpl_id', '=', project_template_id)]",
     )
+    
+    # Override any existing project_id field that might have problematic domain
+    project_id = fields.Many2one(
+        'product.template',
+        string='Project (Legacy)',
+        tracking=True,
+        domain=[('detailed_type', '=', 'service')],
+        help="Legacy project field - use project_template_id instead"
+    )
