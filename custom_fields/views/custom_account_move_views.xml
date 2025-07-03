@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- This file is no longer needed as sale_order_type is now a computed field -->
-    <!-- The field is automatically populated from the originating sale order -->
-</odoo>
