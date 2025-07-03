@@ -10,8 +10,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/sale_order_type_views.xml',
-        'views/sale_order_views.xml',
-    ],
+        'views/sale_order_views.xml',    ],
     'images': ["static/description/banner.png"],
     'installable': True,
     'application': False,
