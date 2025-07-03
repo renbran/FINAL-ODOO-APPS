@@ -31,6 +31,7 @@ class SaleOrder(models.Model):
         'product.template',
         string='Project Name',
         tracking=True,
+        domain=[('detailed_type', '=', 'service')],
         help="Select a product template that represents the project"
     )
     
@@ -45,3 +46,12 @@ class SaleOrder(models.Model):
         string='Unit',
         tracking=True,
     )
+
+    @api.onchange('project_template_id')
+    def _onchange_project_template(self):
+        """Update unit domain when project template changes"""
+        if self.project_template_id:
+            domain = [('product_tmpl_id', '=', self.project_template_id.id)]
+            return {'domain': {'unit_id': domain}}
+        else:
+            return {'domain': {'unit_id': []}}

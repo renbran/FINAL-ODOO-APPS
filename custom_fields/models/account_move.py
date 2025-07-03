@@ -41,7 +41,6 @@ class AccountMove(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project)]",
     )
 
     amount_total_words = fields.Char(
@@ -83,3 +82,12 @@ class AccountMove(models.Model):
                     'unit': sale_order.unit_id.id if sale_order.unit_id else False,
                 })
         return record
+
+    @api.onchange('project')
+    def _onchange_project(self):
+        """Update unit domain when project changes"""
+        if self.project:
+            domain = [('product_tmpl_id', '=', self.project.id)]
+            return {'domain': {'unit': domain}}
+        else:
+            return {'domain': {'unit': []}}
