@@ -27,12 +27,10 @@ class SaleOrder(models.Model):
         copy=False,
     )
     
-    project_template_id = fields.Many2one(
+    project_id = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
-        domain=[('detailed_type', '=', 'service')],
-        help="Select a product template that represents the project"
     )
     
     sale_value = fields.Monetary(
@@ -40,18 +38,21 @@ class SaleOrder(models.Model):
         tracking=True,
         currency_field='currency_id',
     )
+
+    sale_value_formatted = fields.Char(
+        string='Formatted Sale Value',
+        compute='_compute_sale_value_formatted',
+    )
+
+    @api.depends('sale_value')
+    def _compute_sale_value_formatted(self):
+        from ..utils.number_format import format_amount
+        for rec in self:
+            rec.sale_value_formatted = format_amount(rec.sale_value)
     
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
     )
-
-    @api.onchange('project_template_id')
-    def _onchange_project_template(self):
-        """Update unit domain when project template changes"""
-        if self.project_template_id:
-            domain = [('product_tmpl_id', '=', self.project_template_id.id)]
-            return {'domain': {'unit_id': domain}}
-        else:
-            return {'domain': {'unit_id': []}}
