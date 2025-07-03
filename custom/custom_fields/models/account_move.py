@@ -23,7 +23,7 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals_list):
-        """Simplified create method with extensive logging"""
+        """Enhanced create method with proper field validation and sale order integration"""
         _logger.info("AccountMove.create called with vals_list: %s", vals_list)
         
         # Handle both single dict and list of dicts
@@ -38,40 +38,46 @@ class AccountMove(models.Model):
         for i, vals in enumerate(vals_list):
             _logger.info("Processing vals[%d]: %s", i, vals)
             
-            # Create a new dict with only safe values
-            safe_vals = {}
+            # Create a copy to avoid modifying original
+            safe_vals = vals.copy()
             
-            # Copy standard fields
-            for key, value in vals.items():
-                if key not in self._fields:
-                    safe_vals[key] = value
-                    continue
-                
-                field = self._fields[key]
-                
-                # Handle Many2one fields with extra safety
-                if isinstance(field, fields.Many2one):
+            # Validate and clean Many2one fields
+            many2one_fields = ['buyer_id', 'project_id', 'unit_id', 'sale_order_type_id']
+            for field_name in many2one_fields:
+                if field_name in safe_vals:
+                    value = safe_vals[field_name]
                     if not value:
-                        safe_vals[key] = False
+                        safe_vals[field_name] = False
                     elif isinstance(value, int) and value > 0:
-                        try:
-                            # Check if record exists
-                            if self.env[field.comodel_name].browse(value).exists():
-                                safe_vals[key] = value
-                            else:
-                                _logger.warning("Many2one field %s: record ID %d does not exist", key, value)
-                                safe_vals[key] = False
-                        except Exception as e:
-                            _logger.error("Error validating Many2one field %s with value %s: %s", key, value, e)
-                            safe_vals[key] = False
+                        # Determine the comodel based on field name
+                        comodel_map = {
+                            'buyer_id': 'res.partner',
+                            'project_id': 'product.template', 
+                            'unit_id': 'product.product',
+                            'sale_order_type_id': 'sale.order.type'
+                        }
+                        
+                        if field_name in comodel_map:
+                            try:
+                                comodel = comodel_map[field_name]
+                                if self.env[comodel].browse(value).exists():
+                                    safe_vals[field_name] = value
+                                else:
+                                    _logger.warning("Many2one field %s: record ID %d does not exist in %s", 
+                                                  field_name, value, comodel)
+                                    safe_vals[field_name] = False
+                            except Exception as e:
+                                _logger.error("Error validating Many2one field %s with value %s: %s", 
+                                            field_name, value, e)
+                                safe_vals[field_name] = False
+                    elif hasattr(value, 'id'):
+                        # Handle recordset objects
+                        safe_vals[field_name] = value.id if value.id else False
                     else:
-                        _logger.warning("Many2one field %s: invalid value type %s", key, type(value))
-                        safe_vals[key] = False
-                else:
-                    # For non-Many2one fields, copy as-is
-                    safe_vals[key] = value
+                        _logger.warning("Many2one field %s: invalid value type %s", field_name, type(value))
+                        safe_vals[field_name] = False
             
-            # Transfer sale order fields only if it's an invoice
+            # Transfer sale order fields for invoices
             if safe_vals.get('move_type') in ['out_invoice', 'out_refund'] and safe_vals.get('invoice_origin'):
                 try:
                     sale_order = self.env['sale.order'].search([
@@ -81,26 +87,31 @@ class AccountMove(models.Model):
                     if sale_order:
                         _logger.info("Found sale order %s, transferring fields", sale_order.name)
                         
-                        # Transfer fields safely
-                        transfer_fields = {
+                        # Only transfer if not already provided
+                        transfer_mapping = {
                             'booking_date': sale_order.booking_date,
                             'developer_commission': sale_order.developer_commission,
                             'deal_id': sale_order.deal_id,
                             'sale_value': sale_order.sale_value,
                         }
                         
-                        # Handle Many2one fields with existence checks
+                        # Handle Many2one fields safely
                         if sale_order.buyer_id and sale_order.buyer_id.exists():
-                            transfer_fields['buyer_id'] = sale_order.buyer_id.id
+                            transfer_mapping['buyer_id'] = sale_order.buyer_id.id
                         
                         if sale_order.project_id and sale_order.project_id.exists():
-                            transfer_fields['project_id'] = sale_order.project_id.id
+                            transfer_mapping['project_id'] = sale_order.project_id.id
                         
                         if sale_order.unit_id and sale_order.unit_id.exists():
-                            transfer_fields['unit_id'] = sale_order.unit_id.id
+                            transfer_mapping['unit_id'] = sale_order.unit_id.id
                         
-                        # Only update if not already set
-                        for field_name, field_value in transfer_fields.items():
+                        # Handle sale_order_type_id if available
+                        if hasattr(sale_order, 'sale_order_type_id') and sale_order.sale_order_type_id:
+                            if sale_order.sale_order_type_id.exists():
+                                transfer_mapping['sale_order_type_id'] = sale_order.sale_order_type_id.id
+                        
+                        # Apply transfers only if not already set
+                        for field_name, field_value in transfer_mapping.items():
                             if field_name not in safe_vals and field_value:
                                 safe_vals[field_name] = field_value
                                 
@@ -112,11 +123,7 @@ class AccountMove(models.Model):
         
         # Call super with processed values
         try:
-            if single_record:
-                result = super(AccountMove, self).create(processed_vals_list[0])
-            else:
-                result = super(AccountMove, self).create(processed_vals_list)
-            
+            result = super(AccountMove, self).create(processed_vals_list if not single_record else processed_vals_list[0])
             _logger.info("AccountMove.create successful, created: %s", result)
             return result
             
