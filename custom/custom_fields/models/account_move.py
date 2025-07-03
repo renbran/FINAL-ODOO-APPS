@@ -1,50 +1,13 @@
 from odoo import api, fields, models
+from .deal_fields_mixin import DealFieldsMixin
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = ['account.move', 'deal.fields.mixin']
 
-    booking_date = fields.Date(
-        string='Booking Date',
-        tracking=False,
-    )
-    
-    developer_commission = fields.Float(
-        string='Broker Commission',
-        tracking=True,
-    )
-    
-    deal_id = fields.Integer(
-        string='Deal ID',
-        tracking=True,
-    )
-    
-    sale_value = fields.Monetary(
-        string='Sale Value',
-        tracking=True,
-        currency_field='currency_id',
-    )
-    
     sale_order_type_id = fields.Many2one(
         'sale.order.type',  # Correct model name
         string='Sales Order Type',
         tracking=True,
-    )
-
-    buyer_id = fields.Many2one(
-        'res.partner',
-        string='Buyer',
-        tracking=True,
-    )
-    project_id = fields.Many2one(
-        'product.template',
-        string='Project Name',
-        tracking=True,
-    )
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
     )
     amount_total_words = fields.Char(
         string='Amount in Words',
@@ -54,6 +17,17 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
+        # Defensive: Ensure all Many2one fields reference valid records or are set to False
+        for field_name, field in self._fields.items():
+            if isinstance(field, fields.Many2one) and field_name in vals:
+                val = vals[field_name]
+                if isinstance(val, int):
+                    if val and not self.env[field.comodel_name].browse(val).exists():
+                        vals[field_name] = False
+                elif hasattr(val, 'exists'):  # Check if it's a recordset
+                    if not val.exists():
+                        vals[field_name] = False
+        
         if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
             sale_order = self.env['sale.order'].search([
                 ('name', '=', vals.get('invoice_origin'))
