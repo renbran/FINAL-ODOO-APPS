@@ -44,12 +44,6 @@ class AccountMove(models.Model):
         domain="[('product_tmpl_id', '=', project)]",
     )
 
-    sale_order_type_id = fields.Many2one(
-        'sale.order.type',
-        string='Sales Order Type',
-        tracking=True,
-    )
-
     amount_total_words = fields.Char(
         string='Amount in Words',
         compute='_compute_amount_total_words',
