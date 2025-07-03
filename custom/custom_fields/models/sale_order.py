@@ -28,7 +28,10 @@ class SaleOrder(models.Model):
             'project_id': self.project_id.id if self.project_id else False,
             'sale_value': self.sale_value,
             'unit_id': self.unit_id.id if self.unit_id else False,
-            'sale_order_type_id': self.sale_order_type_id.id if self.sale_order_type_id else False,
         })
+        
+        # Only include sale_order_type_id if the field exists (from le_sale_type module)
+        if hasattr(self, 'sale_order_type_id') and self.sale_order_type_id:
+            invoice_vals['sale_order_type_id'] = self.sale_order_type_id.id
         
         return invoice_vals
