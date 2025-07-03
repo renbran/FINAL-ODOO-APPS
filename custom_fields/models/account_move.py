@@ -5,17 +5,17 @@ class AccountMove(models.Model):
 
     booking_date = fields.Date(
         string='Booking Date',
-        tracking=False,
+        tracking=True,
     )
     
     developer_commission = fields.Float(
-        string='Broker Commission',
+        string='Developer Commission',
         tracking=True,
     )
     
     buyer = fields.Many2one(
         'res.partner',
-        string='Buyer Name',
+        string='Buyer',
         tracking=True,
     )
     
@@ -26,8 +26,9 @@ class AccountMove(models.Model):
     
     project = fields.Many2one(
         'product.template',
-        string='Project Name',
+        string='Project',
         tracking=True,
+        domain=[('detailed_type', '=', 'service')],
     )
     
     sale_value = fields.Monetary(
@@ -44,31 +45,11 @@ class AccountMove(models.Model):
     )
 
     sale_order_type_id = fields.Many2one(
-        'sale.order.type',  # Correct model name
+        'sale.order.type',
         string='Sales Order Type',
         tracking=True,
     )
 
-    buyer_id = fields.Many2one(
-        'res.partner',
-        string='Buyer',
-        tracking=True,
-    )
-    project_id = fields.Many2one(
-        'product.template',
-        string='Project',
-        tracking=True,
-    )
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
-    )
-    deal_id = fields.Char(
-        string='Deal ID',
-        tracking=True,
-    )
     amount_total_words = fields.Char(
         string='Amount in Words',
         compute='_compute_amount_total_words',
@@ -87,7 +68,7 @@ class AccountMove(models.Model):
                     'developer_commission': sale_order.developer_commission,
                     'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
                     'deal_id': sale_order.deal_id,
-                    'project': sale_order.project_id.id if sale_order.project_id else False,
+                    'project': sale_order.project_template_id.id if sale_order.project_template_id else False,
                     'sale_value': sale_order.sale_value,
                     'unit': sale_order.unit_id.id if sale_order.unit_id else False,
                     'sale_order_type_id': sale_order.sale_order_type_id.id if sale_order.sale_order_type_id else False,

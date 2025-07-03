@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- This file has been consolidated into custom_account_move_views.xml -->
-    <!-- The sale_order_type_id field is now properly placed in the Deal Information tab -->
-</odoo>
