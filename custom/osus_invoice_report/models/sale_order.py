@@ -23,25 +23,18 @@ class SaleOrder(models.Model):
         """Override to include custom fields in invoice preparation"""
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         
-        # Add custom deal fields to invoice
+        # Add custom deal fields to invoice with existence checks
+        def get_m2o_id(field):
+            return field.id if field and field.exists() else False
+        
         invoice_vals.update({
             'booking_date': self.booking_date,
             'developer_commission': self.developer_commission,
-            'buyer_id': self.buyer_id.id if self.buyer_id else False,
+            'buyer_id': get_m2o_id(self.buyer_id),
             'deal_id': self.deal_id,
-            'project_id': self.project_id.id if self.project_id else False,
+            'project_id': get_m2o_id(self.project_id),
             'sale_value': self.sale_value,
-            'unit_id': self.unit_id.id if self.unit_id else False,
+            'unit_id': get_m2o_id(self.unit_id),
         })
-        
-        # Handle sale_order_type_id field from le_sale_type module
-        if hasattr(self, 'sale_order_type_id') and self.sale_order_type_id:
-            try:
-                # Ensure the sale order type record exists
-                if self.sale_order_type_id.exists():
-                    invoice_vals['sale_order_type_id'] = self.sale_order_type_id.id
-            except Exception:
-                # If there's any issue, don't include the field
-                pass
         
         return invoice_vals
