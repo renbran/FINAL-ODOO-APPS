@@ -4,11 +4,6 @@ from .deal_fields_mixin import DealFieldsMixin
 class AccountMove(models.Model):
     _inherit = ['account.move', 'deal.fields.mixin']
 
-    sale_order_type_id = fields.Many2one(
-        'sale.order.type',  # Correct model name
-        string='Sales Order Type',
-        tracking=True,
-    )
     amount_total_words = fields.Char(
         string='Amount in Words',
         compute='_compute_amount_total_words',
@@ -29,7 +24,6 @@ class AccountMove(models.Model):
             'project_id': sale_order.project_id.id if sale_order.project_id and sale_order.project_id.exists() else False,
             'sale_value': sale_order.sale_value,
             'unit_id': sale_order.unit_id.id if sale_order.unit_id and sale_order.unit_id.exists() else False,
-            'sale_order_type_id': sale_order.sale_order_type_id.id if sale_order.sale_order_type_id and sale_order.sale_order_type_id.exists() else False,
         }
         
         # Only update vals if the field is not already set
