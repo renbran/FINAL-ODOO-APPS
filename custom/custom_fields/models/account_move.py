@@ -26,6 +26,15 @@ class AccountMove(models.Model):
             'unit_id': sale_order.unit_id.id if sale_order.unit_id and sale_order.unit_id.exists() else False,
         }
         
+        # Only include sale_order_type_id if the field exists on the sale order
+        if hasattr(sale_order, 'sale_order_type_id') and sale_order.sale_order_type_id:
+            try:
+                if sale_order.sale_order_type_id.exists():
+                    deal_fields['sale_order_type_id'] = sale_order.sale_order_type_id.id
+            except Exception:
+                # If any error occurs, skip this field
+                pass
+        
         # Only update vals if the field is not already set
         for field_name, field_value in deal_fields.items():
             if field_name not in vals:
@@ -39,11 +48,23 @@ class AccountMove(models.Model):
         for field_name, field in self._fields.items():
             if isinstance(field, fields.Many2one) and field_name in vals:
                 val = vals[field_name]
-                if isinstance(val, int):
-                    if val and not self.env[field.comodel_name].browse(val).exists():
-                        vals[field_name] = False
-                elif hasattr(val, 'exists'):  # Check if it's a recordset
-                    if not val.exists():
+                if val:  # Only process if value is truthy
+                    try:
+                        if isinstance(val, int):
+                            # Check if the record exists
+                            if not self.env[field.comodel_name].browse(val).exists():
+                                vals[field_name] = False
+                        elif hasattr(val, 'exists'):  # Check if it's a recordset
+                            if not val.exists():
+                                vals[field_name] = False
+                        elif hasattr(val, 'id'):  # Check if it's an object with id
+                            if not hasattr(val, 'exists') or not val.exists():
+                                vals[field_name] = False
+                        else:
+                            # If it's an unknown object type, set to False for safety
+                            vals[field_name] = False
+                    except Exception:
+                        # If any error occurs during validation, set to False for safety
                         vals[field_name] = False
         
         # Transfer sale order custom fields if this is an invoice from a sale order
@@ -86,3 +107,21 @@ class AccountMove(models.Model):
                     vals = self._transfer_sale_order_fields(sale_order, vals)
             new_vals_list.append(vals)
         return super(AccountMove, self)._move_autocomplete_invoice_lines_create(new_vals_list)
+
+    @api.depends('amount_total')
+    def _compute_amount_total_words(self):
+        """Convert amount total to words"""
+        for record in self:
+            if record.amount_total:
+                try:
+                    # Try to use Odoo's built-in number to words conversion if available
+                    from odoo.tools.misc import formatLang
+                    from num2words import num2words
+                    amount = record.amount_total
+                    currency = record.currency_id.name or 'USD'
+                    record.amount_total_words = num2words(amount, lang='en').title() + ' ' + currency
+                except ImportError:
+                    # Fallback if num2words is not available
+                    record.amount_total_words = str(record.amount_total) + ' ' + (record.currency_id.name or 'USD')
+            else:
+                record.amount_total_words = ''
