@@ -1,6 +1,6 @@
 {
     'name': 'Real Estate Deal Tracking',
-    'version': '1.0.0',
+    'version': '1.0.1',
     'category': 'Sales/Real Estate',
     'summary': 'Track real estate deals across sales orders and invoices',
     'description': """
