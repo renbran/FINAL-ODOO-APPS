@@ -7,16 +7,23 @@
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='accounting_info']" position="after">
-                    <group string="Deal Information">
-                        <field name="booking_date"/>
-                        <field name="developer_commission"/>
-                        <field name="buyer_id"/>
-                        <field name="deal_id"/>
-                        <field name="project_id"/>
-                        <field name="sale_value"/>
-                        <field name="unit_id"/>
-                    </group>
+                <!-- Add Deal Information Tab -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Deal Information" name="deal_info" invisible="move_type not in ('out_invoice', 'out_refund')">
+                        <group>
+                            <group string="Customer &amp; Deal Details">
+                                <field name="booking_date"/>
+                                <field name="buyer_id"/>
+                                <field name="deal_id"/>
+                            </group>
+                            <group string="Project &amp; Financial Information">
+                                <field name="project_id"/>
+                                <field name="unit_id"/>
+                                <field name="sale_value"/>
+                                <field name="developer_commission" widget="percentage"/>
+                            </group>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
