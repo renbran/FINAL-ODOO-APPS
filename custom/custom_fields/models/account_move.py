@@ -35,6 +35,7 @@ class AccountMove(models.Model):
         string='Buyer',
         tracking=True,
     )
+    # Custom project field, not to be confused with Odoo's project_id
     project = fields.Many2one(
         'product.template',
         string='Project',
