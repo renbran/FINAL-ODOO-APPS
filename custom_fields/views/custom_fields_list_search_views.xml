@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List and Search view for Sale Order Custom Fields -->
+    <record id="view_sale_order_custom_fields_tree" model="ir.ui.view">
+        <field name="name">sale.order.custom.fields.tree</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree string="Sale Orders - Custom Fields" decoration-info="state == 'sale'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="booking_date"/>
+                <field name="developer_commission" widget="float"/>
+                <field name="buyer_id" widget="many2one_avatar_user" options="{'no_create': True}"/>
+                <field name="deal_id"/>
+                <field name="project_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                <field name="sale_value" widget="monetary"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_sale_order_custom_fields_search" model="ir.ui.view">
+        <field name="name">sale.order.custom.fields.search</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Sale Orders - Custom Fields">
+                <field name="booking_date"/>
+                <field name="developer_commission"/>
+                <field name="buyer_id" filter_domain="[]"/>
+                <field name="deal_id"/>
+                <field name="project_id" filter_domain="[]"/>
+                <field name="sale_value"/>
+                <filter string="My Orders" name="my_orders" domain="[('user_id','=',uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_by_buyer" context="{'group_by':'buyer_id'}"/>
+                    <filter string="Project" name="group_by_project" context="{'group_by':'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List and Search view for Account Move Custom Fields -->
+    <record id="view_account_move_custom_fields_tree" model="ir.ui.view">
+        <field name="name">account.move.custom.fields.tree</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Account Moves - Custom Fields" decoration-info="state == 'posted'">
+                <field name="name"/>
+                <field name="booking_date"/>
+                <field name="developer_commission" widget="float"/>
+                <field name="buyer" widget="many2one_avatar_user" options="{'no_create': True}"/>
+                <field name="deal_id"/>
+                <field name="project" widget="many2one_avatar" options="{'no_create': True}"/>
+                <field name="sale_value" widget="monetary"/>
+                <field name="unit" widget="many2one_avatar" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_account_move_custom_fields_search" model="ir.ui.view">
+        <field name="name">account.move.custom.fields.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Search Account Moves - Custom Fields">
+                <field name="booking_date"/>
+                <field name="developer_commission"/>
+                <field name="buyer" filter_domain="[]"/>
+                <field name="deal_id"/>
+                <field name="project" filter_domain="[]"/>
+                <field name="sale_value"/>
+                <field name="unit" filter_domain="[]"/>
+                <filter string="My Invoices" name="my_invoices" domain="[('user_id','=',uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_by_buyer" context="{'group_by':'buyer'}"/>
+                    <filter string="Project" name="group_by_project" context="{'group_by':'project'}"/>
+                    <filter string="Unit" name="group_by_unit" context="{'group_by':'unit'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
