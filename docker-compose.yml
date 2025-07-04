@@ -1,8 +1,0 @@
-services:
-  odoo17final:
-    image: odoo17final
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - 5002:5002
