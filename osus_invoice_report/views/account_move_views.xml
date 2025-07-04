@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <!-- Add Deal Tracking Tab -->
-            <xpath expr="//page[@name='invoice_page']" position="after">
+            <xpath expr="//sheet/notebook" position="inside">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group string="Deal Information">
                         <group>
