@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     'name': 'OSUS Invoice Report',
     'version': '17.0.1.0.0',
     'summary': 'Professional UAE Tax Invoice Reports for Real Estate Commission',
@@ -18,29 +17,17 @@
     'author': 'OSUS Real Estate',
     'website': 'https://www.osus.ae',
     'depends': ['account', 'base', 'sale'],
-    'external_dependencies': {
-        'python': ['qrcode', 'num2words'],
-    },
     'data': [
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
         'views/account_move_views.xml',
         'views/sale_order_views.xml',
         'views/report_invoice.xml',
-=======
-    'name': 'Custom Accounting Reports',
-    'version': '17.0.1.0.0',
-    'summary': 'Custom Invoice, Bill and Receipt Reports',
-    'description': 'UK-formatted documents with UAE receipt standard',
-    'category': 'Accounting/Accounting',
-    'author': 'Your Company',
-    'depends': ['account'],
-    'data': [
-        'views/account_move_views.xml',
-        'views/report_invoice.xml',
-        'views/report_bill.xml',
+        'views/report_bills.xml',
         'views/report_receipt.xml',
->>>>>>> 50419ea8 (QUICK INSTALL)
+        'views/report_action_invoice.xml',
+        'views/report_action_bill.xml',
+        'views/report_custom_invoice_modern.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
@@ -50,8 +37,5 @@
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
-<<<<<<< HEAD
     'auto_install': False,
-=======
->>>>>>> 50419ea8 (QUICK INSTALL)
 }
