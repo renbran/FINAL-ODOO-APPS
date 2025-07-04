@@ -104,14 +104,10 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
-            <!-- Add deal tracking fields for quotations -->
-            <xpath expr="//field[@name='date_order']" position="after">
-                <field name="booking_date" optional="show"/>
-                <field name="deal_id" optional="show"/>
-            </xpath>
-            
             <!-- Add buyer and project info after partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="booking_date" optional="show"/>
+                <field name="deal_id" optional="show"/>
                 <field name="buyer_id" optional="show"/>
                 <field name="project_id" optional="show"/>
                 <field name="unit_id" optional="hide"/>
