@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <notebook position="inside">
-                    <page string="Additional Information">
+                    <page string="Deal Information">
                         <group>
                             <field name="buyer_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                             <field name="booking_date" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
