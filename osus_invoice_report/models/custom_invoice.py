@@ -1,40 +1,57 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 import base64
 import qrcode
 from io import BytesIO
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    # QR Code fields (existing)
-    qr_in_report = fields.Boolean(string='Show QR Code in Report', default=True)
-    qr_image = fields.Binary(string='QR Code Image', compute='_compute_qr_code')
-    
-    # Add amount_total_words field
-    amount_total_words = fields.Char(
-        string='Total Amount in Words',
-        compute='_compute_amount_total_words'
+    # QR Code fields
+    qr_in_report = fields.Boolean(
+        string='Show QR Code in Report',
+        default=True,
+        help="Enable to display QR code on generated documents"
+    )
+    qr_image = fields.Binary(
+        string='QR Code Image',
+        compute='_compute_qr_code',
+        store=True,
+        help="Automatically generated QR code for this document"
     )
     
-    # Real Estate Deal Information Fields (merged from custom_fields)
+    amount_total_words = fields.Char(
+        string='Total Amount in Words',
+        compute='_compute_amount_total_words',
+        help="The total amount expressed in words"
+    )
+
+    # Deal Information Fields
     booking_date = fields.Date(
         string='Booking Date',
         tracking=True,
+        help="Date when the property booking was confirmed"
     )
     deal_id = fields.Integer(
         string='Deal ID',
         tracking=True,
         copy=False,
+        help="Internal reference ID for the real estate deal"
     )
     sale_value = fields.Monetary(
         string='Sale Value',
         tracking=True,
         currency_field='currency_id',
+        help="Total value of the property sale"
     )
     developer_commission = fields.Float(
         string='Broker Commission',
         tracking=True,
         digits=(16, 2),
+        help="Commission percentage for this deal"
     )
 
     # Relational Fields
@@ -42,85 +59,113 @@ class AccountMove(models.Model):
         'res.partner',
         string='Buyer',
         tracking=True,
+        domain="[('is_buyer', '=', True)]",
+        help="The buyer of the property"
     )
     project_id = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
+        domain="[('is_property', '=', True)]",
+        help="The real estate project this deal belongs to"
     )
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
         domain="[('product_tmpl_id', '=', project_id)]",
+        help="The specific property unit in this deal"
     )
 
-    @api.depends('name', 'partner_id', 'amount_total')
+    @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report')
     def _compute_qr_code(self):
         for record in self:
-            if record.name and record.partner_id:
-                # Create QR code content (you can customize this)
-                qr_content = f"Invoice: {record.name}\nVendor: {record.partner_id.name}\nAmount: {record.amount_total} AED"
-                
-                # Generate QR code
-                qr = qrcode.QRCode(version=1, box_size=10, border=5)
-                qr.add_data(qr_content)
-                qr.make(fit=True)
-                
-                # Create QR code image
-                qr_image = qr.make_image(fill_color="black", back_color="white")
-                
-                # Convert to base64
-                buffer = BytesIO()
-                qr_image.save(buffer, format='PNG')
-                qr_image_base64 = base64.b64encode(buffer.getvalue())
-                
-                record.qr_image = qr_image_base64
-            else:
+            if not record.qr_in_report:
                 record.qr_image = False
+                continue
+                
+            try:
+                if record.name and record.partner_id:
+                    qr_content = self._get_qr_content(record)
+                    record.qr_image = self._generate_qr_code(qr_content)
+                else:
+                    record.qr_image = False
+            except Exception as e:
+                _logger.error("Error generating QR code: %s", str(e))
+                record.qr_image = False
+
+    def _get_qr_content(self, record):
+        return f"""
+Invoice: {record.name}
+Vendor: {record.partner_id.name}
+Amount: {record.amount_total} {record.currency_id.name}
+Date: {record.invoice_date or ''}
+Buyer: {record.buyer_id.name or ''}
+Project: {record.project_id.name or ''}
+Unit: {record.unit_id.name or ''}
+""".strip()
+
+    def _generate_qr_code(self, content):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(content)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        return base64.b64encode(buffer.getvalue())
 
     @api.depends('amount_total')
     def _compute_amount_total_words(self):
         for record in self:
-            record.amount_total_words = record._amount_to_words(record.amount_total)
+            try:
+                record.amount_total_words = record._amount_to_words(record.amount_total)
+            except Exception as e:
+                _logger.error("Error converting amount to words: %s", str(e))
+                record.amount_total_words = _("Amount in words unavailable")
 
     def _amount_to_words(self, amount):
-        # Basic implementation - you can enhance this or use a library
         try:
             from num2words import num2words
-            words = num2words(amount, lang='en')
-            return f"{words.title()} AED Only"
+            words = num2words(amount, lang='en').title()
+            return f"{words} {self.currency_id.name or 'AED'} Only"
         except ImportError:
-            # Fallback if num2words is not available
-            return f"{amount:.2f} AED"
+            _logger.warning("num2words library not found, using simple amount display")
+            return f"{amount:.2f} {self.currency_id.name or 'AED'}"
 
-    def action_print_custom_invoice(self):
-        self.ensure_one()
-        return self.env.ref('osus_invoice_report.action_report_custom_invoice').report_action(self)
-
-    def action_print_custom_bill(self):
-        self.ensure_one()
-        return self.env.ref('osus_invoice_report.action_report_custom_bill').report_action(self)
-
-    def action_print_custom_receipt(self):
-        self.ensure_one()
-        return self.env.ref('osus_invoice_report.action_report_custom_receipt').report_action(self)
+    @api.constrains('developer_commission')
+    def _check_developer_commission(self):
+        for record in self:
+            if record.developer_commission < 0 or record.developer_commission > 100:
+                raise ValidationError(_("Commission percentage must be between 0 and 100"))
 
     @api.model
     def create(self, vals):
-        # Auto-populate real estate fields from sale order if creating from invoice
         if vals.get('move_type') in ['out_invoice', 'out_refund'] and vals.get('invoice_origin'):
-            sale_order = self.env['sale.order'].search([
-                ('name', '=', vals.get('invoice_origin'))
-            ], limit=1)
-            if sale_order:
-                vals.update({
-                    'booking_date': sale_order.booking_date,
-                    'developer_commission': sale_order.developer_commission,
-                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
-                    'deal_id': sale_order.deal_id,
-                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
-                    'sale_value': sale_order.sale_value,
-                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
-                })
-        return super(AccountMove, self).create(vals)
+            self._populate_from_sale_order(vals)
+        return super().create(vals)
+
+    def _populate_from_sale_order(self, vals):
+        sale_order = self.env['sale.order'].search([
+            ('name', '=', vals.get('invoice_origin'))
+        ], limit=1)
+        
+        if sale_order:
+            field_map = {
+                'booking_date': 'booking_date',
+                'developer_commission': 'developer_commission',
+                'buyer_id': 'buyer_id',
+                'deal_id': 'deal_id',
+                'project_id': 'project_id',
+                'sale_value': 'sale_value',
+                'unit_id': 'unit_id',
+            }
+            
+            for invoice_field, sale_field in field_map.items():
+                if sale_field in sale_order._fields and invoice_field not in vals:
+                    vals[invoice_field] = sale_order[sale_field].id if hasattr(sale_order[sale_field], 'id') else sale_order[sale_field]

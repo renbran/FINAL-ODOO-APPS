@@ -69,7 +69,7 @@
             </xpath>
             
             <!-- Add filters -->
-            <xpath expr="//filter[@name='order_month']" position="after">
+            <xpath expr="//filter[@name='activities_overdue']" position="after">
                 <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
@@ -80,7 +80,7 @@
             </xpath>
             
             <!-- Add group by options -->
-            <xpath expr="//filter[@name='salesperson']" position="after">
+            <xpath expr="//group[@expand='0']" position="inside">
                 <separator/>
                 <filter string="Buyer" name="group_by_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
                 <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>

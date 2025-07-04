@@ -23,11 +23,6 @@
         'views/account_move_views.xml',
         'views/sale_order_views.xml',
         'views/report_invoice.xml',
-        'views/report_bills.xml',
-        'views/report_receipt.xml',
-        'views/report_action_invoice.xml',
-        'views/report_action_bill.xml',
-        'views/report_custom_invoice_modern.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
