@@ -15,9 +15,9 @@
                         <field name="deal_id"/>
                     </group>
                     <group>
-                        <field name="project_id"/>
+                        <field name="project_id" domain="[]"/>
                         <field name="sale_value"/>
-                        <field name="unit_id"/>
+                        <field name="unit_id" domain="[]"/>
                     </group>
                 </group>
             </xpath>
