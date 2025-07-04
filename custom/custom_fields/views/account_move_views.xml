@@ -5,84 +5,20 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Add Deal Information Tab -->
-            <xpath expr="//notebook" position="inside">
-                <page string="Deal Information" name="deal_info" invisible="move_type not in ('out_invoice', 'out_refund')">
-                    <group>
-                        <group string="Customer &amp; Deal Details" name="customer_deal_group">
-                            <field name="buyer_id" 
-                                   placeholder="Select buyer..."/>
-                            <field name="deal_id" 
-                                   placeholder="Enter deal reference..."/>
-                            <field name="booking_date"/>
-                        </group>
-                        <group string="Project &amp; Unit Information" name="project_unit_group">
-                            <field name="project_id" 
-                                   options="{'no_create': True, 'no_create_edit': True}"
-                                   placeholder="Select project..."/>
-                            <field name="unit_id" 
-                                   options="{'no_create': True, 'no_create_edit': True}"
-                                   placeholder="Select unit..."/>
-                        </group>
-                    </group>
-                    <group>
-                        <group string="Financial Information" name="financial_group">
-                            <field name="sale_value" 
-                                   widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <field name="developer_commission" 
-                                   widget="percentage"
-                                   help="Commission percentage for the developer"/>
-                        </group>
-                        <group string="Additional Information" name="additional_group">
-                            <!-- This group can be used for future deal-related fields -->
-                        </group>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- List View for Account Moves -->
-    <record id="view_move_tree_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.tree.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_tree"/>
-        <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id" optional="hide"/>
-                <field name="project_id" optional="hide"/>
-                <field name="unit_id" optional="hide"/>
-                <field name="deal_id" optional="hide"/>
-                <field name="booking_date" optional="hide"/>
-                <field name="sale_order_type_id" optional="hide"/>
+                <field name="buyer_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </xpath>
-            <xpath expr="//field[@name='state']" position="before">
-                <field name="sale_value" optional="hide"/>
-                <field name="developer_commission" widget="percentage" optional="hide"/>
+            
+            <xpath expr="//field[@name='payment_reference']" position="after">
+                <field name="booking_date" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="deal_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </xpath>
-        </field>
-    </record>
-
-    <!-- Search View for Account Moves -->
-    <record id="view_account_invoice_filter_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.select.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="deal_id"/>
-                <field name="sale_order_type_id"/>
-            </xpath>
-            <xpath expr="//group[@expand='0']" position="inside">
-                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
-                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
-                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
-                <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
-                <filter string="Sale Order Type" name="group_sale_order_type" domain="[]" context="{'group_by': 'sale_order_type_id'}"/>
+            
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                <field name="project_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="unit_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="sale_value" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="developer_commission" widget="percentage" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </xpath>
         </field>
     </record>
