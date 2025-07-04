@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="0">
-    <!-- Delete any problematic old views that might be causing conflicts -->
+    <!-- Delete the specific problematic view by xmlid -->
+    <delete model="ir.ui.view" search="[('xml_id', '=', 'custom_fields.view_move_form_inherit_sale_order_type')]"/>
     <delete model="ir.ui.view" search="[('name', '=', 'account.move.form.inherit.sale.order.type')]"/>
-    <delete model="ir.ui.view" search="[('name', 'like', '%custom_account_move%')]"/>
+    
+    <!-- Delete any views with problematic xpath references -->
     <delete model="ir.ui.view" search="[('arch_db', 'like', '%additional_group%')]"/>
+    <delete model="ir.ui.view" search="[('arch_db', 'like', '%custom_account_move%')]"/>
+    
+    <!-- Force removal of any cached views -->
+    <function model="ir.ui.view" name="clear_caches"/>
 </odoo>
