@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-            </xpath>
-            
-            <xpath expr="//field[@name='payment_reference']" position="after">
-                <field name="booking_date" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="deal_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-            </xpath>
-            
-            <xpath expr="//field[@name='invoice_date']" position="after">
-                <field name="project" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="unit" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="sale_value" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="developer_commission" widget="percentage" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-            </xpath>
-        </field>
-    </record>
+    <data>
+        <!-- Account Move (Invoice) Form View -->
+        <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.custom.fields</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <!-- Add Deal Information Tab -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Deal Information" name="deal_info" invisible="move_type not in ('out_invoice', 'out_refund')">
+                        <group>
+                            <group string="Customer &amp; Deal Details">
+                                <field name="booking_date"/>
+                                <field name="buyer_id"/>
+                                <field name="deal_id"/>
+                            </group>
+                            <group string="Project &amp; Financial Information">
+                                <field name="project_id"/>
+                                <field name="unit_id"/>
+                                <field name="sale_value"/>
+                                <field name="developer_commission" widget="percentage"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
 </odoo>
