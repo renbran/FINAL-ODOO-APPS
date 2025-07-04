@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="0">
-    <!-- Delete the problematic old view -->
+    <!-- Delete any problematic old views that might be causing conflicts -->
     <delete model="ir.ui.view" search="[('name', '=', 'account.move.form.inherit.sale.order.type')]"/>
+    <delete model="ir.ui.view" search="[('name', 'like', '%custom_account_move%')]"/>
+    <delete model="ir.ui.view" search="[('arch_db', 'like', '%additional_group%')]"/>
 </odoo>
