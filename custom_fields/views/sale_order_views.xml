@@ -48,7 +48,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_sales']" position="after">
+            <field name="name" position="after">
                 <field name="booking_date"/>
                 <field name="deal_id"/>
                 <field name="buyer_id"/>
@@ -56,11 +56,7 @@
                 <field name="unit_id"/>
                 <field name="sale_value"/>
                 <field name="developer_commission"/>
-                <group expand="0" string="Group By">
-                    <filter string="By Buyer" name="group_by_buyer" context="{'group_by':'buyer_id'}"/>
-                    <filter string="By Project" name="group_by_project" context="{'group_by':'project_id'}"/>
-                </group>
-            </xpath>
+            </field>
         </field>
     </record>
 </odoo>
