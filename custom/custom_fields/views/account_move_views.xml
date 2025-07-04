@@ -9,7 +9,7 @@
             <!-- Add custom fields in a dedicated group after partner_id for safe positioning -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <group name="custom_deal_info" string="Deal Information" 
-                       attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}">
+                       invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group>
                         <field name="deal_id"/>
                         <field name="sale_value"/>
