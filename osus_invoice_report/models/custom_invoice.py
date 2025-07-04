@@ -59,21 +59,18 @@ class AccountMove(models.Model):
         'res.partner',
         string='Buyer',
         tracking=True,
-        domain="[('is_buyer', '=', True)]",
         help="The buyer of the property"
     )
     project_id = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
-        domain="[('is_property', '=', True)]",
         help="The real estate project this deal belongs to"
     )
     unit_id = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
         help="The specific property unit in this deal"
     )
 
