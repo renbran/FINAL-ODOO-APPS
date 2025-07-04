@@ -27,6 +27,7 @@
         'views/report_receipt.xml',
         'views/report_action_invoice.xml',
         'views/report_action_bill.xml',
+        'views/report_custom_invoice_modern.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
