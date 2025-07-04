@@ -6,20 +6,29 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-            </xpath>
-            
-            <xpath expr="//field[@name='payment_reference']" position="after">
-                <field name="booking_date" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-                <field name="deal_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-            </xpath>
-            
-            <xpath expr="//field[@name='invoice_date']" position="after">
-                <field name="project_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-                <field name="unit_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-                <field name="sale_value" invisible="move_type not in ['out_invoice', 'out_refund']"/>
-                <field name="developer_commission" widget="percentage" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+            <!-- Add Deal Information Tab/Page -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Deal Information" name="deal_info_page" invisible="move_type not in ['out_invoice', 'out_refund']">
+                    <group name="deal_main_info">
+                        <group string="Deal Identification" name="deal_identification">
+                            <field name="deal_id"/>
+                            <field name="booking_date"/>
+                        </group>
+                        <group string="Buyer Information" name="buyer_info">
+                            <field name="buyer_id"/>
+                        </group>
+                    </group>
+                    <group name="deal_project_info">
+                        <group string="Project Details" name="project_details">
+                            <field name="project_id"/>
+                            <field name="unit_id"/>
+                        </group>
+                        <group string="Financial Information" name="financial_info">
+                            <field name="sale_value"/>
+                            <field name="developer_commission" widget="percentage"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
@@ -39,6 +48,7 @@
                 <field name="booking_date" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
                 <field name="sale_value" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
                 <field name="developer_commission" widget="percentage" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="move_type" invisible="1"/>
             </xpath>
         </field>
     </record>
