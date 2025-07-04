@@ -7,19 +7,19 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="buyer_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
             </xpath>
             
             <xpath expr="//field[@name='payment_reference']" position="after">
-                <field name="booking_date" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="deal_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="booking_date" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="deal_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
             </xpath>
             
             <xpath expr="//field[@name='invoice_date']" position="after">
-                <field name="project_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="unit_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="sale_value" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="developer_commission" widget="percentage" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="project_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="unit_id" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="sale_value" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="developer_commission" widget="percentage" invisible="move_type not in ['out_invoice', 'out_refund']"/>
             </xpath>
         </field>
     </record>
@@ -32,13 +32,13 @@
         <field name="arch" type="xml">
             <!-- Add columns after amount_total -->
             <xpath expr="//field[@name='amount_total_signed']" position="after">
-                <field name="deal_id" optional="show" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="buyer_id" optional="show" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="project_id" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="unit_id" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="booking_date" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="sale_value" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="developer_commission" widget="percentage" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="deal_id" optional="show" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="buyer_id" optional="show" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="project_id" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="unit_id" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="booking_date" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="sale_value" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
+                <field name="developer_commission" widget="percentage" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
             </xpath>
         </field>
     </record>
