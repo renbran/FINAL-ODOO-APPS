@@ -41,8 +41,8 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
-            <!-- Add columns after amount_total -->
-            <xpath expr="//field[@name='amount_total']" position="after">
+            <!-- Add columns after state -->
+            <xpath expr="//field[@name='state']" position="after">
                 <field name="deal_id" optional="show" invisible="move_type not in ['out_invoice', 'out_refund']"/>
                 <field name="buyer_id" optional="show" invisible="move_type not in ['out_invoice', 'out_refund']"/>
                 <field name="project_id" optional="hide" invisible="move_type not in ['out_invoice', 'out_refund']"/>
