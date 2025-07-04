@@ -6,7 +6,6 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Only add print buttons, do NOT add duplicate fields -->
             <xpath expr="//header" position="inside">
                 <button name="action_print_custom_invoice" 
                         string="Print OSUS Invoice"
@@ -28,6 +27,27 @@
                         type="object"
                         groups="account.group_account_invoice"/>
             </xpath>
+            
+            <!-- Add Deal Tracking Tab -->
+            <xpath expr="//page[@name='invoice_page']" position="after">
+                <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <group string="Deal Information">
+                        <group>
+                            <field name="booking_date"/>
+                            <field name="deal_id"/>
+                            <field name="sale_value" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="developer_commission" widget="percentage"/>
+                            <field name="buyer_id"/>
+                        </group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="unit_id" domain="[('product_tmpl_id', '=', project_id)]"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 
@@ -38,16 +58,17 @@
         <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" optional="hide"/>
-                <field name="project" optional="hide"/>
-                <field name="unit" optional="hide"/>
+                <field name="buyer_id" optional="hide"/>
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
                 <field name="deal_id" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="booking_date" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='amount_total_signed']" position="after">
-                <field name="sale_value" optional="hide"/>
+                <field name="sale_value" widget="monetary" optional="hide"/>
+                <field name="developer_commission" widget="percentage" optional="hide"/>
                 <field name="developer_commission" widget="percentage" optional="hide"/>
             </xpath>
         </field>

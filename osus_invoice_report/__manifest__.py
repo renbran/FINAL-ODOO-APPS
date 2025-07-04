@@ -16,11 +16,12 @@
     'category': 'Accounting/Accounting',
     'author': 'OSUS Real Estate',
     'website': 'https://www.osus.ae',
-    'depends': ['account', 'base'],
+    'depends': ['account', 'base', 'sale'],
     'data': [
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',
         'views/account_move_views.xml',
+        'views/sale_order_views.xml',
         'views/report_invoice.xml',
         'views/report_bills.xml',
         'views/report_receipt.xml',
