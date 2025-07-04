@@ -91,37 +91,4 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Pivot View for Analytics -->
-    <record id="view_move_pivot_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.pivot.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_pivot"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id" type="row"/>
-                <field name="project_id" type="row"/>
-                <field name="booking_date" type="row" interval="month"/>
-                <field name="deal_id" type="row"/>
-                <field name="sale_value" type="measure"/>
-                <field name="developer_commission" type="measure"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Graph View for Analytics -->
-    <record id="view_move_graph_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.graph.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_graph"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="booking_date" interval="month"/>
-                <field name="sale_value" type="measure"/>
-                <field name="developer_commission" type="measure"/>
-            </xpath>
-        </field>
-    </record>
 </odoo>
