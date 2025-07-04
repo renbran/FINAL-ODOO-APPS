@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Enhanced Sale Order Form View -->
+    <!-- Sale Order Form View Enhancement -->
     <record id="view_order_form_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.deal.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add new notebook page for Deal Information -->
             <xpath expr="//page[@name='other_information']" position="after">
                 <page string="Deal Tracking">
                     <group string="Deal Information">
@@ -29,7 +28,7 @@
         </field>
     </record>
 
-    <!-- Enhanced Sale Order Tree View -->
+    <!-- Sale Order Tree View Enhancement -->
     <record id="view_order_tree_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.tree.deal.tracking</field>
         <field name="model">sale.order</field>
@@ -43,11 +42,11 @@
         </field>
     </record>
 
-    <!-- Enhanced Sale Order Search View -->
+    <!-- Sale Order Search View Enhancement - Version Compatible -->
     <record id="view_order_search_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.search.deal.tracking</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_sales']" position="after">
                 <field name="booking_date"/>
