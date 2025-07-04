@@ -83,35 +83,56 @@ class AccountMove(models.Model):
                 
             try:
                 if record.name and record.partner_id:
-                    qr_content = self._get_qr_content(record)
-                    record.qr_image = self._generate_qr_code(qr_content)
+                    portal_url = record._get_portal_url()
+                    record.qr_image = self._generate_qr_code(portal_url)
                 else:
                     record.qr_image = False
             except Exception as e:
                 _logger.error("Error generating QR code for %s: %s", record.name, str(e))
                 record.qr_image = False
 
-    def _get_qr_content(self, record):
-        """Generate QR code content with real estate deal information"""
+    def _get_portal_url(self):
+        """Generate portal URL for secure access to the document"""
+        try:
+            # Get the base URL of the Odoo instance
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            if not base_url:
+                base_url = 'http://localhost:8069'  # Fallback URL
+            
+            # Generate the portal URL with access token for the invoice
+            relative_url = self.get_portal_url()
+            
+            # Combine the base URL with the relative URL
+            full_url = base_url + relative_url
+            
+            _logger.info("Generated portal URL for %s: %s", self.name, full_url)
+            return full_url
+        except Exception as e:
+            _logger.error("Error generating portal URL for %s: %s", self.name, str(e))
+            # Fallback to informational content if portal URL fails
+            return self._get_qr_content_fallback()
+
+    def _get_qr_content_fallback(self):
+        """Generate QR code content with real estate deal information as fallback"""
         content_lines = [
-            f"Invoice: {record.name}",
-            f"Company: {record.company_id.name}",
-            f"Partner: {record.partner_id.name}",
-            f"Amount: {record.amount_total} {record.currency_id.name}",
-            f"Date: {record.invoice_date or ''}",
+            f"Invoice: {self.name}",
+            f"Company: {self.company_id.name}",
+            f"Partner: {self.partner_id.name}",
+            f"Amount: {self.amount_total} {self.currency_id.name}",
+            f"Date: {self.invoice_date or ''}",
         ]
         
         # Add real estate specific information if available
-        if record.buyer_id:
-            content_lines.append(f"Buyer: {record.buyer_id.name}")
-        if record.project_id:
-            content_lines.append(f"Project: {record.project_id.name}")
-        if record.unit_id:
-            content_lines.append(f"Unit: {record.unit_id.name}")
-        if record.deal_id:
-            content_lines.append(f"Deal ID: {record.deal_id}")
-        if record.sale_value:
-            content_lines.append(f"Sale Value: {record.sale_value} {record.currency_id.name}")
+        if self.buyer_id:
+            content_lines.append(f"Buyer: {self.buyer_id.name}")
+        if self.project_id:
+            content_lines.append(f"Project: {self.project_id.name}")
+        if self.unit_id:
+            content_lines.append(f"Unit: {self.unit_id.name}")
+        if self.deal_id:
+            content_lines.append(f"Deal ID: {self.deal_id}")
+        if self.sale_value:
+            content_lines.append(f"Sale Value: {self.sale_value} {self.currency_id.name}")
         
         return '\n'.join(content_lines)
 

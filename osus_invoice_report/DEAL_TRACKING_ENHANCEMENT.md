@@ -117,6 +117,29 @@ The following deal tracking fields are now more prominently displayed:
 3. Apply **filters** to find property-related invoices
 4. Use **Group By** options to organize by deal criteria
 
+## QR Code Portal Access Enhancement
+
+### Overview
+The QR code functionality has been enhanced to provide secure portal access to documents. When users scan the QR code on invoices or other documents, they will be redirected directly to the portal view of that specific document.
+
+### Key Features:
+1. **Portal URL Generation** - QR codes now contain secure portal access URLs
+2. **Access Token Security** - Each QR code includes a unique access token for secure access
+3. **Mobile-Friendly** - QR codes can be scanned with any mobile device
+4. **Fallback Support** - If portal URL generation fails, falls back to informational content
+
+### Implementation:
+- **Method**: `_get_portal_url()` generates the complete portal URL with access token
+- **Security**: Uses Odoo's built-in `get_portal_url()` method for secure access
+- **Error Handling**: Graceful fallback to informational QR content if portal access fails
+- **Base URL**: Automatically detects the Odoo instance base URL
+
+### Usage:
+1. Enable "Show QR Code in Report" on any invoice
+2. Generate the PDF report or view the document
+3. The QR code can be scanned to access the portal view
+4. Users with appropriate permissions can view the document details
+
 ## Future Enhancements
 - Add deal tracking to other related models (payments, credit notes)
 - Implement deal tracking dashboards
