@@ -4,9 +4,16 @@
     <delete model="ir.ui.view" search="[('xml_id', '=', 'custom_fields.view_move_form_inherit_sale_order_type')]"/>
     <delete model="ir.ui.view" search="[('name', '=', 'account.move.form.inherit.sale.order.type')]"/>
     
+    <!-- Delete le_sale_type conflicting views -->
+    <delete model="ir.ui.view" search="[('xml_id', '=', 'le_sale_type.view_move_form_inherit_sale_order_type')]"/>
+    <delete model="ir.ui.view" search="[('model', '=', 'account.move'), ('name', 'ilike', 'sale.order.type')]"/>
+    
     <!-- Delete any views with problematic xpath references -->
     <delete model="ir.ui.view" search="[('arch_db', 'like', '%additional_group%')]"/>
     <delete model="ir.ui.view" search="[('arch_db', 'like', '%custom_account_move%')]"/>
+    
+    <!-- Clean up external ID records -->
+    <delete model="ir.model.data" search="[('name', '=', 'view_move_form_inherit_sale_order_type')]"/>
     
     <!-- Force removal of any cached views -->
     <function model="ir.ui.view" name="clear_caches"/>
