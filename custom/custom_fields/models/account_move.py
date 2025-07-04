@@ -13,7 +13,7 @@ class AccountMove(models.Model):
         tracking=True,
     )
     
-    buyer_id = fields.Many2one(
+    buyer = fields.Many2one(
         'res.partner',
         string='Buyer Name',
         tracking=True,
@@ -24,7 +24,7 @@ class AccountMove(models.Model):
         tracking=True,
     )
     
-    project_id = fields.Many2one(
+    project = fields.Many2one(
         'product.template',
         string='Project Name',
         tracking=True,
@@ -36,7 +36,7 @@ class AccountMove(models.Model):
         currency_field='currency_id',
     )
     
-    unit_id = fields.Many2one(
+    unit = fields.Many2one(
         'product.product',
         string='Unit',
         tracking=True,
