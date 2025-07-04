@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Alternative: Flat group, all fields open for creation, visible on all move types -->
     <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
         <field name="name">account.move.form.inherit.custom.fields</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <notebook position="inside">
-                    <page string="Deal Information">
-                        <group>
-                            <field name="buyer_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="booking_date" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="deal_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="project_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="unit_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="sale_value" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                            <field name="developer_commission" widget="percentage" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                        </group>
-                    </page>
-                </notebook>
+                <group string="Deal Information">
+                    <field name="buyer_id"/>
+                    <field name="booking_date"/>
+                    <field name="deal_id"/>
+                    <field name="project_id"/>
+                    <field name="unit_id"/>
+                    <field name="sale_value"/>
+                    <field name="developer_commission" widget="percentage"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List view: show all deal info fields, open for creation -->
+    <record id="view_move_tree_inherit_custom_fields" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.custom.fields</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="buyer_id"/>
+                <field name="booking_date"/>
+                <field name="deal_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="sale_value"/>
+                <field name="developer_commission" widget="percentage"/>
             </xpath>
         </field>
     </record>
