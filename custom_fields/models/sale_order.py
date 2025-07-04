@@ -39,4 +39,5 @@ class SaleOrder(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
+        domain="[('product_tmpl_id', '=', project_id)]",
     )

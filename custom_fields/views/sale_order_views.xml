@@ -5,19 +5,20 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Changed to a more specific location -->
-            <xpath expr="//group[@name='sale_header']" position="after">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
                 <group string="Deal Information">
                     <group>
                         <field name="booking_date"/>
                         <field name="developer_commission"/>
-                        <field name="buyer_id"/>
                         <field name="deal_id"/>
                     </group>
                     <group>
-                        <field name="project_id" domain="[]"/>
                         <field name="sale_value"/>
-                        <field name="unit_id" domain="[]"/>
+                        <field name="buyer_id"/>
+                    </group>
+                    <group>
+                        <field name="project_id"/>
+                        <field name="unit_id"/>
                     </group>
                 </group>
             </xpath>

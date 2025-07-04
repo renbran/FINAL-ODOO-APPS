@@ -11,11 +11,12 @@ class AccountMove(models.Model):
     developer_commission = fields.Float(
         string='Broker Commission',
         tracking=True,
+        digits=(16, 2),
     )
     
     buyer_id = fields.Many2one(
         'res.partner',
-        string='Buyer Name',
+        string='Buyer',
         tracking=True,
     )
     
@@ -40,7 +41,7 @@ class AccountMove(models.Model):
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project)]",
+        domain="[('product_tmpl_id', '=', project_id)]",
     )
 
     @api.model
@@ -53,10 +54,10 @@ class AccountMove(models.Model):
                 vals.update({
                     'booking_date': sale_order.booking_date,
                     'developer_commission': sale_order.developer_commission,
-                    'buyer': sale_order.buyer_id.id if sale_order.buyer_id else False,
+                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
                     'deal_id': sale_order.deal_id,
-                    'project': sale_order.project_id.id if sale_order.project_id else False,
+                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
                     'sale_value': sale_order.sale_value,
-                    'unit': sale_order.unit_id.id if sale_order.unit_id else False,
+                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
                 })
         return super(AccountMove, self).create(vals)
