@@ -69,7 +69,6 @@
             <xpath expr="//field[@name='amount_total_signed']" position="after">
                 <field name="sale_value" widget="monetary" optional="hide"/>
                 <field name="developer_commission" widget="percentage" optional="hide"/>
-                <field name="developer_commission" widget="percentage" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -81,15 +80,15 @@
         <field name="inherit_id" ref="account.view_account_move_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer"/>
-                <field name="project"/>
-                <field name="unit"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
                 <field name="deal_id"/>
             </xpath>
             <xpath expr="//group[@expand='0']" position="inside">
-                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer'}"/>
-                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project'}"/>
-                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit'}"/>
+                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
                 <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
             </xpath>
         </field>
