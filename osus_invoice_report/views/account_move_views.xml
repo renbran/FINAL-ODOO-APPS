@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Inherit account move form view to add custom print buttons -->
-    <record id="view_move_form_inherit_osus_v2" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.osus.reports.v2</field>
+    <record id="view_move_form_inherit_osus" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.osus.reports</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_custom_invoice" 
+                        string="Print OSUS Invoice"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                
+                <button name="action_print_custom_bill" 
+                        string="Print OSUS Bill"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        invisible="move_type not in ('in_invoice', 'in_refund')"/>
+                
+                <button name="action_print_custom_receipt" 
+                        string="Print Receipt"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"/>
+            </xpath>
+            
             <!-- Add Deal Tracking Tab -->
-            <xpath expr="//sheet/notebook" position="inside">
+            <xpath expr="//page[@name='invoice_page']" position="after">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group string="Deal Information">
                         <group>
