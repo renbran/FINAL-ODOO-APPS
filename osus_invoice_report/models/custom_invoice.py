@@ -10,6 +10,12 @@ class AccountMove(models.Model):
     qr_in_report = fields.Boolean(string='Show QR Code in Report', default=True)
     qr_image = fields.Binary(string='QR Code Image', compute='_compute_qr_code')
     
+    # Add amount_total_words field
+    amount_total_words = fields.Char(
+        string='Total Amount in Words',
+        compute='_compute_amount_total_words'
+    )
+    
     # Real Estate Deal Information Fields (merged from custom_fields)
     booking_date = fields.Date(
         string='Booking Date',
@@ -72,6 +78,11 @@ class AccountMove(models.Model):
                 record.qr_image = qr_image_base64
             else:
                 record.qr_image = False
+
+    @api.depends('amount_total')
+    def _compute_amount_total_words(self):
+        for record in self:
+            record.amount_total_words = record._amount_to_words(record.amount_total)
 
     def _amount_to_words(self, amount):
         # Basic implementation - you can enhance this or use a library
