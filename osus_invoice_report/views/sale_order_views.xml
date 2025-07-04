@@ -34,10 +34,23 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
+            <!-- Add deal tracking fields after order date -->
             <xpath expr="//field[@name='date_order']" position="after">
                 <field name="booking_date" optional="show"/>
                 <field name="deal_id" optional="show"/>
+            </xpath>
+            
+            <!-- Add buyer and project info after partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id" optional="show"/>
+                <field name="project_id" optional="show"/>
+                <field name="unit_id" optional="hide"/>
+            </xpath>
+            
+            <!-- Add financial fields after amount total -->
+            <xpath expr="//field[@name='amount_total']" position="after">
                 <field name="sale_value" widget="monetary" optional="show"/>
+                <field name="developer_commission" widget="percentage" optional="show"/>
             </xpath>
         </field>
     </record>
@@ -48,6 +61,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
+            <!-- Add search fields -->
             <xpath expr="//field[@name='name']" position="after">
                 <field name="booking_date"/>
                 <field name="deal_id"/>
@@ -56,6 +70,57 @@
                 <field name="unit_id"/>
                 <field name="sale_value"/>
                 <field name="developer_commission"/>
+            </xpath>
+            
+            <!-- Add filters -->
+            <xpath expr="//filter[@name='activities_overdue']" position="after">
+                <separator/>
+                <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
+                <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
+                <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
+                <filter string="This Month Bookings" name="this_month_bookings" 
+                        domain="[('booking_date', '>=', (context_today() - relativedelta(day=1)).strftime('%%Y-%%m-%%d')),
+                                 ('booking_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%%Y-%%m-%%d'))]"/>
+                <separator/>
+                <filter string="Property Deals" name="property_deals" 
+                        domain="['|', '|', ('buyer_id', '!=', False), ('project_id', '!=', False), ('deal_id', '!=', False)]"/>
+                <filter string="High Value Deals" name="high_value_deals" 
+                        domain="[('sale_value', '>', 100000)]"/>
+            </xpath>
+            
+            <!-- Add group by options -->
+            <xpath expr="//group[@expand='0']" position="inside">
+                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
+                <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Quotation Tree View Enhancement -->
+    <record id="view_quotation_tree_inherit_osus_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.quotation.tree.osus.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <!-- Add deal tracking fields for quotations -->
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="booking_date" optional="show"/>
+                <field name="deal_id" optional="show"/>
+            </xpath>
+            
+            <!-- Add buyer and project info after partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id" optional="show"/>
+                <field name="project_id" optional="show"/>
+                <field name="unit_id" optional="hide"/>
+            </xpath>
+            
+            <!-- Add financial fields after amount total -->
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="sale_value" widget="monetary" optional="show"/>
+                <field name="developer_commission" widget="percentage" optional="show"/>
             </xpath>
         </field>
     </record>
