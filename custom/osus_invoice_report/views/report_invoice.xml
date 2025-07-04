@@ -11,7 +11,7 @@
                     <t t-call="web.external_layout">
                         <div class="page">
                             <div class="container">
-                <!-- QR Code and Company/Partner Details -->
+                <!-- QR Code and Customer Details -->
                 <div class="row mb-4">
                     <div class="col-3">
                         <!-- QR Code Section -->
@@ -31,21 +31,7 @@
                             </t>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <h5 style="color: #800020; font-weight: bold; font-size: 14px;">COMPANY DETAILS</h5>
-                        <div style="color: black;" t-field="res_company.name"/>
-                        <div style="color: black;" t-field="res_company.street"/>
-                        <t t-if="res_company.street2">
-                            <div style="color: black;" t-field="res_company.street2"/>
-                        </t>
-                        <div style="color: black;">
-                            <span t-field="res_company.city"/>
-                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
-                        </div>
-                        <div style="color: black;" t-field="res_company.country_id.name"/>
-                        <div style="color: black;">VAT: <span t-field="res_company.vat"/></div>
-                    </div>
-                    <div class="col-5 text-end">
+                    <div class="col-9 text-end">
                         <h5 style="color: #800020; font-weight: bold; font-size: 14px;">CUSTOMER DETAILS</h5>
                         <div style="color: black;" t-field="o.partner_id.name"/>
                         <div style="color: black;" t-field="o.partner_id.street"/>
@@ -224,21 +210,7 @@
                                             </t>
                                         </div>
                                     </div>
-                                    <div class="col-4">
-                                        <h5 style="color: #800020; font-weight: bold;">COMPANY DETAILS</h5>
-                                        <div t-field="res_company.name"/>
-                                        <div t-field="res_company.street"/>
-                                        <t t-if="res_company.street2">
-                                            <div t-field="res_company.street2"/>
-                                        </t>
-                                        <div>
-                                            <span t-field="res_company.city"/>
-                                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
-                                        </div>
-                                        <div t-field="res_company.country_id.name"/>
-                                        <div>VAT: <span t-field="res_company.vat"/></div>
-                                    </div>
-                                    <div class="col-5 text-end">
+                                    <div class="col-9 text-end">
                                         <h5 style="color: #800020; font-weight: bold;">VENDOR DETAILS</h5>
                                         <div t-field="o.partner_id.name"/>
                                         <div t-field="o.partner_id.street"/>
@@ -338,21 +310,7 @@
                                             </t>
                                         </div>
                                     </div>
-                                    <div class="col-4">
-                                        <h5 style="color: #800020; font-weight: bold;">COMPANY DETAILS</h5>
-                                        <div t-field="res_company.name"/>
-                                        <div t-field="res_company.street"/>
-                                        <t t-if="res_company.street2">
-                                            <div t-field="res_company.street2"/>
-                                        </t>
-                                        <div>
-                                            <span t-field="res_company.city"/>
-                                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
-                                        </div>
-                                        <div t-field="res_company.country_id.name"/>
-                                        <div>VAT: <span t-field="res_company.vat"/></div>
-                                    </div>
-                                    <div class="col-5 text-end">
+                                    <div class="col-9 text-end">
                                         <h5 style="color: #800020; font-weight: bold;">CUSTOMER DETAILS</h5>
                                         <div t-field="o.partner_id.name"/>
                                         <div t-field="o.partner_id.street"/>
