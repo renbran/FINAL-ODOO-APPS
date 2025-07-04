@@ -69,7 +69,8 @@
             </xpath>
             
             <!-- Add group by options -->
-            <xpath expr="//group[@name='group_by']" position="inside">
+            <xpath expr="//filter[@name='activities_overdue']" position="after">
+                <separator/>
                 <filter string="Buyer" name="group_by_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
                 <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
                 <filter string="Booking Date" name="group_by_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>

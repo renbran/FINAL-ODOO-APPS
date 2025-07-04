@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="buyer_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </xpath>
             
             <xpath expr="//field[@name='payment_reference']" position="after">
@@ -16,8 +16,8 @@
             </xpath>
             
             <xpath expr="//field[@name='invoice_date']" position="after">
-                <field name="project" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="unit" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="project_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="unit_id" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 <field name="sale_value" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 <field name="developer_commission" widget="percentage" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </xpath>
@@ -33,9 +33,9 @@
             <!-- Add columns after amount_total -->
             <xpath expr="//field[@name='amount_total_signed']" position="after">
                 <field name="deal_id" optional="show" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="buyer" optional="show" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="project" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
-                <field name="unit" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="buyer_id" optional="show" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="project_id" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                <field name="unit_id" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 <field name="booking_date" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 <field name="sale_value" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                 <field name="developer_commission" widget="percentage" optional="hide" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
@@ -52,17 +52,17 @@
             <!-- Add search fields -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="deal_id" string="Deal ID"/>
-                <field name="buyer" string="Buyer"/>
-                <field name="project" string="Project"/>
-                <field name="unit" string="Unit"/>
+                <field name="buyer_id" string="Buyer"/>
+                <field name="project_id" string="Project"/>
+                <field name="unit_id" string="Unit"/>
             </xpath>
             
             <!-- Add filters -->
             <xpath expr="//filter[@name='draft']" position="after">
                 <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
-                <filter string="With Buyer" name="has_buyer" domain="[('buyer', '!=', False)]"/>
-                <filter string="With Project" name="has_project" domain="[('project', '!=', False)]"/>
+                <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
+                <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
                 <filter string="Customer Invoices with Deal Info" name="customer_invoices_with_deal" 
                         domain="[('move_type', 'in', ['out_invoice', 'out_refund']), ('deal_id', '!=', False)]"/>
                 <filter string="This Month Bookings" name="this_month_bookings" 
@@ -71,9 +71,10 @@
             </xpath>
             
             <!-- Add group by options -->
-            <xpath expr="//group[@name='group_by']" position="inside">
-                <filter string="Buyer" name="group_by_buyer" domain="[]" context="{'group_by': 'buyer'}"/>
-                <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project'}"/>
+            <xpath expr="//filter[@name='late']" position="after">
+                <separator/>
+                <filter string="Buyer" name="group_by_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
                 <filter string="Booking Date" name="group_by_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
                 <filter string="Deal ID" name="group_by_deal_id" domain="[]" context="{'group_by': 'deal_id'}"/>
             </xpath>
@@ -87,8 +88,8 @@
         <field name="inherit_id" ref="account.view_move_pivot"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer" type="row"/>
-                <field name="project" type="row"/>
+                <field name="buyer_id" type="row"/>
+                <field name="project_id" type="row"/>
                 <field name="booking_date" type="row" interval="month"/>
                 <field name="deal_id" type="row"/>
                 <field name="sale_value" type="measure"/>
@@ -104,8 +105,8 @@
         <field name="inherit_id" ref="account.view_move_graph"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="buyer"/>
-                <field name="project"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
                 <field name="booking_date" interval="month"/>
                 <field name="sale_value" type="measure"/>
                 <field name="developer_commission" type="measure"/>
