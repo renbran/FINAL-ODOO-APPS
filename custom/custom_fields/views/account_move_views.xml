@@ -1,67 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Account Move Form View - Enhanced with Notebook -->
     <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
         <field name="name">account.move.form.inherit.custom.fields</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Add new notebook page after the main invoice page -->
-            <xpath expr="//page[@name='invoice_page']" position="after">
-                <page string="Deal Tracking" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])}">
-                    <group string="Deal Information">
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="Additional Information">
                         <group>
-                            <field name="booking_date"/>
-                            <field name="deal_id"/>
-                            <field name="sale_value" widget="monetary"/>
+                            <field name="buyer_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="booking_date" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="deal_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="project_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="unit_id" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="sale_value" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                            <field name="developer_commission" widget="percentage" options="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
                         </group>
-                        <group>
-                            <field name="developer_commission" widget="percentage"/>
-                            <field name="buyer_id"/>
-                        </group>
-                        <group>
-                            <field name="project_id"/>
-                            <field name="unit_id" domain="[('product_tmpl_id', '=', project_id)]"/>
-                        </group>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Account Move Tree View - Aligned Fields -->
-    <record id="view_move_tree_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.tree.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="deal_id" optional="hide"/>
-                <field name="sale_value" widget="monetary" optional="hide"/>
-                <field name="buyer_id" optional="hide"/>
-                <field name="project_id" optional="hide"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Account Move Search View - Enhanced Filters -->
-    <record id="view_account_invoice_filter_inherit_custom_fields" model="ir.ui.view">
-        <field name="name">account.move.select.inherit.custom.fields</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//group[@name='group_by']" position="before">
-                <field name="booking_date"/>
-                <field name="deal_id"/>
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="sale_value"/>
-                <field name="developer_commission"/>
-                <group expand="0" string="Group By">
-                    <filter string="By Buyer" name="buyer" context="{'group_by': 'buyer_id'}"/>
-                    <filter string="By Project" name="project" context="{'group_by': 'project_id'}"/>
-                </group>
+                    </page>
+                </notebook>
             </xpath>
         </field>
     </record>
