@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Account Move Form View Enhancement - Safe inheritance -->
+    <!-- Account Move Form View Enhancement -->
     <record id="view_move_form_inherit_custom_fields" model="ir.ui.view">
         <field name="name">account.move.form.inherit.custom.fields</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Add custom fields in a dedicated group after partner_id for safe positioning -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <group name="custom_deal_info" string="Deal Information" 
                        invisible="move_type not in ('out_invoice', 'out_refund')">
@@ -17,9 +16,9 @@
                         <field name="developer_commission" widget="percentage"/>
                     </group>
                     <group>
-                        <field name="buyer_id" options="{'no_quick_create': False, 'no_create_edit': False}"/>
-                        <field name="project_id" options="{'no_quick_create': False, 'no_create_edit': False}"/>
-                        <field name="unit_id" options="{'no_quick_create': False, 'no_create_edit': False}"/>
+                        <field name="buyer_id"/>
+                        <field name="project_id"/>
+                        <field name="unit_id"/>
                     </group>
                 </group>
             </xpath>
@@ -32,7 +31,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='amount_total']" position="after">
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="deal_id" optional="hide"/>
                 <field name="sale_value" optional="hide"/>
                 <field name="buyer_id" optional="hide"/>
@@ -47,7 +46,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
+            <xpath expr="//filter[@name='search_invoice']" position="after">
                 <field name="deal_id"/>
                 <field name="buyer_id"/>
                 <field name="project_id"/>
