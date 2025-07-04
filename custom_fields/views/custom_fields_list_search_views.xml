@@ -11,9 +11,9 @@
                 <field name="developer_commission" widget="float"/>
                 <field name="sale_value" widget="monetary"/>
                 <field name="deal_id"/>
-                <!-- Relational fields grouped -->
                 <field name="buyer_id" widget="many2one_avatar_user"/>
                 <field name="project_id" widget="many2one_avatar"/>
+                <field name="unit_id" widget="many2one_avatar"/>
             </tree>
         </field>
     </record>
@@ -24,7 +24,7 @@
             <form string="Sale Order Custom Fields">
                 <sheet>
                     <notebook>
-                        <page string="General Info">
+                        <page string="Deal Information">
                             <group>
                                 <field name="name"/>
                                 <field name="booking_date"/>
@@ -40,6 +40,9 @@
                                 </group>
                                 <group>
                                     <field name="project_id" widget="many2one_avatar"/>
+                                </group>
+                                <group>
+                                    <field name="unit_id" widget="many2one_avatar"/>
                                 </group>
                             </group>
                         </page>
@@ -58,11 +61,13 @@
                 <field name="buyer_id"/>
                 <field name="deal_id"/>
                 <field name="project_id"/>
+                <field name="unit_id"/>
                 <field name="sale_value"/>
                 <filter string="My Orders" name="my_orders" domain="[('user_id','=',uid)]"/>
                 <group expand="0" string="Group By">
                     <filter string="Buyer" name="group_by_buyer_id" context="{'group_by':'buyer_id'}"/>
                     <filter string="Project" name="group_by_project_id" context="{'group_by':'project_id'}"/>
+                    <filter string="Unit" name="group_by_unit_id" context="{'group_by':'unit_id'}"/>
                 </group>
             </search>
         </field>
@@ -79,10 +84,9 @@
                 <field name="developer_commission" widget="float"/>
                 <field name="sale_value" widget="monetary"/>
                 <field name="deal_id"/>
-                <!-- Relational fields grouped -->
-                <field name="buyer" widget="many2one_avatar_user"/>
-                <field name="project" widget="many2one_avatar"/>
-                <field name="unit" widget="many2one_avatar"/>
+                <field name="buyer_id" widget="many2one_avatar_user"/>
+                <field name="project_id" widget="many2one_avatar"/>
+                <field name="unit_id" widget="many2one_avatar"/>
             </tree>
         </field>
     </record>
@@ -93,7 +97,7 @@
             <form string="Account Move Custom Fields">
                 <sheet>
                     <notebook>
-                        <page string="General Info">
+                        <page string="Deal Information">
                             <group>
                                 <field name="name"/>
                                 <field name="booking_date"/>
@@ -105,13 +109,13 @@
                         <page string="Relations">
                             <group string="Relational Fields">
                                 <group>
-                                    <field name="buyer" widget="many2one_avatar_user"/>
+                                    <field name="buyer_id" widget="many2one_avatar_user"/>
                                 </group>
                                 <group>
-                                    <field name="project" widget="many2one_avatar"/>
+                                    <field name="project_id" widget="many2one_avatar"/>
                                 </group>
                                 <group>
-                                    <field name="unit" widget="many2one_avatar"/>
+                                    <field name="unit_id" widget="many2one_avatar"/>
                                 </group>
                             </group>
                         </page>
@@ -127,16 +131,16 @@
             <search string="Search Account Moves - Custom Fields">
                 <field name="booking_date"/>
                 <field name="developer_commission"/>
-                <field name="buyer"/>
+                <field name="buyer_id"/>
                 <field name="deal_id"/>
-                <field name="project"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
                 <field name="sale_value"/>
-                <field name="unit"/>
                 <filter string="My Invoices" name="my_invoices" domain="[('user_id','=',uid)]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Buyer" name="group_by_buyer" context="{'group_by':'buyer'}"/>
-                    <filter string="Project" name="group_by_project" context="{'group_by':'project'}"/>
-                    <filter string="Unit" name="group_by_unit" context="{'group_by':'unit'}"/>
+                    <filter string="Buyer" name="group_by_buyer_id" context="{'group_by':'buyer_id'}"/>
+                    <filter string="Project" name="group_by_project_id" context="{'group_by':'project_id'}"/>
+                    <filter string="Unit" name="group_by_unit_id" context="{'group_by':'unit_id'}"/>
                 </group>
             </search>
         </field>
