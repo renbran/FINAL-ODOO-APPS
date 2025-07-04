@@ -1,62 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Sale Order Form View Enhancement -->
+    <!-- Enhanced Form View (existing) -->
     <record id="view_order_form_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.deal.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='other_information']" position="after">
-                <page string="Deal Tracking">
-                    <group string="Deal Information">
-                        <group>
-                            <field name="booking_date"/>
+            <!-- Add Deal Information Tab/Page -->
+            <xpath expr="//field[@name='note']" position="after">
+                <notebook>
+                    <page string="Deal Information" name="deal_info_page">
+                    <group name="deal_main_info">
+                        <group string="Deal Identification" name="deal_identification">
                             <field name="deal_id"/>
-                            <field name="sale_value" widget="monetary"/>
+                            <field name="booking_date"/>
                         </group>
-                        <group>
-                            <field name="developer_commission" widget="percentage"/>
+                        <group string="Buyer Information" name="buyer_info">
                             <field name="buyer_id"/>
                         </group>
-                        <group>
+                    </group>
+                    <group name="deal_project_info">
+                        <group string="Project Details" name="project_details">
                             <field name="project_id"/>
-                            <field name="unit_id" domain="[('product_tmpl_id', '=', project_id)]"/>
+                            <field name="unit_id"/>
+                        </group>
+                        <group string="Financial Information" name="financial_info">
+                            <field name="sale_value"/>
+                            <field name="developer_commission" widget="percentage"/>
                         </group>
                     </group>
-                </page>
+                    </page>
+                </notebook>
             </xpath>
         </field>
     </record>
 
-    <!-- Sale Order Tree View Enhancement -->
+    <!-- Enhanced List View -->
     <record id="view_order_tree_inherit_deal_tracking" model="ir.ui.view">
         <field name="name">sale.order.tree.deal.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='date_order']" position="after">
-                <field name="booking_date" optional="show"/>
+            <!-- Add columns after the standard fields -->
+            <xpath expr="//field[@name='amount_total']" position="after">
                 <field name="deal_id" optional="show"/>
-                <field name="sale_value" widget="monetary" optional="show"/>
+                <field name="buyer_id" optional="show"/>
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
+                <field name="booking_date" optional="hide"/>
+                <field name="sale_value" optional="hide"/>
+                <field name="developer_commission" widget="percentage" optional="hide"/>
             </xpath>
         </field>
     </record>
 
-    <!-- Sale Order Search View Enhancement - Version Compatible -->
-    <record id="view_order_search_inherit_deal_tracking" model="ir.ui.view">
-        <field name="name">sale.order.search.deal.tracking</field>
+    <!-- Enhanced Search View -->
+    <record id="view_sales_order_filter_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.select.deal.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="booking_date"/>
-                <field name="deal_id"/>
-                <field name="buyer_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="sale_value"/>
-                <field name="developer_commission"/>
-            </field>
+            <!-- Add search fields -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="deal_id" string="Deal ID"/>
+                <field name="buyer_id" string="Buyer"/>
+                <field name="project_id" string="Project"/>
+                <field name="unit_id" string="Unit"/>
+            </xpath>
+            
+            <!-- Add filters -->
+            <xpath expr="//filter[@name='order_month']" position="after">
+                <separator/>
+                <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
+                <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
+                <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
+                <filter string="This Month Bookings" name="this_month_bookings" 
+                        domain="[('booking_date', '>=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                ('booking_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+            </xpath>
+            
+            <!-- Add group by options -->
+            <xpath expr="//filter[@name='salesperson']" position="after">
+                <separator/>
+                <filter string="Buyer" name="group_by_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Booking Date" name="group_by_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Kanban View Enhancement -->
+    <record id="view_sale_order_kanban_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.kanban.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <t t-if="record.deal_id.raw_value">
+                    <span class="badge badge-pill badge-info">
+                        Deal: <t t-esc="record.deal_id.value"/>
+                    </span>
+                </t>
+                <t t-if="record.buyer_id.raw_value">
+                    <div class="text-muted">
+                        <i class="fa fa-user"/> <t t-esc="record.buyer_id.value"/>
+                    </div>
+                </t>
+                <t t-if="record.project_id.raw_value">
+                    <div class="text-muted">
+                        <i class="fa fa-building"/> <t t-esc="record.project_id.value"/>
+                    </div>
+                </t>
+            </xpath>
         </field>
     </record>
 </odoo>

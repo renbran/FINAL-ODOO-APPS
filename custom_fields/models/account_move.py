@@ -11,12 +11,11 @@ class AccountMove(models.Model):
     developer_commission = fields.Float(
         string='Broker Commission',
         tracking=True,
-        digits=(16, 2),
     )
     
-    buyer_id = fields.Many2one(
+    buyer_id = fields.Many2one(  # Changed from 'buyer' to 'buyer_id'
         'res.partner',
-        string='Buyer',
+        string='Buyer Name',
         tracking=True,
     )
     
@@ -25,7 +24,7 @@ class AccountMove(models.Model):
         tracking=True,
     )
     
-    project_id = fields.Many2one(
+    project_id = fields.Many2one(  # Changed from 'project' to 'project_id'
         'product.template',
         string='Project Name',
         tracking=True,
@@ -37,11 +36,11 @@ class AccountMove(models.Model):
         currency_field='currency_id',
     )
     
-    unit_id = fields.Many2one(
+    unit_id = fields.Many2one(  # Changed from 'unit' to 'unit_id'
         'product.product',
         string='Unit',
         tracking=True,
-        domain="[('product_tmpl_id', '=', project_id)]",
+        domain="[('product_tmpl_id', '=', project_id)]",  # Updated domain reference
     )
 
     @api.model
@@ -54,10 +53,10 @@ class AccountMove(models.Model):
                 vals.update({
                     'booking_date': sale_order.booking_date,
                     'developer_commission': sale_order.developer_commission,
-                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,
+                    'buyer_id': sale_order.buyer_id.id if sale_order.buyer_id else False,  # Updated
                     'deal_id': sale_order.deal_id,
-                    'project_id': sale_order.project_id.id if sale_order.project_id else False,
+                    'project_id': sale_order.project_id.id if sale_order.project_id else False,  # Updated
                     'sale_value': sale_order.sale_value,
-                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,
+                    'unit_id': sale_order.unit_id.id if sale_order.unit_id else False,  # Updated
                 })
         return super(AccountMove, self).create(vals)
