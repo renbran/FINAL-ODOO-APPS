@@ -77,7 +77,7 @@ class AccountMove(models.Model):
         help="The specific property unit in this deal"
     )
 
-    @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report')
+    @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report', 'buyer_id', 'project_id', 'unit_id')
     def _compute_qr_code(self):
         for record in self:
             if not record.qr_in_report:
@@ -91,34 +91,52 @@ class AccountMove(models.Model):
                 else:
                     record.qr_image = False
             except Exception as e:
-                _logger.error("Error generating QR code: %s", str(e))
+                _logger.error("Error generating QR code for %s: %s", record.name, str(e))
                 record.qr_image = False
 
     def _get_qr_content(self, record):
-        return f"""
-Invoice: {record.name}
-Vendor: {record.partner_id.name}
-Amount: {record.amount_total} {record.currency_id.name}
-Date: {record.invoice_date or ''}
-Buyer: {record.buyer_id.name or ''}
-Project: {record.project_id.name or ''}
-Unit: {record.unit_id.name or ''}
-""".strip()
+        """Generate QR code content with real estate deal information"""
+        content_lines = [
+            f"Invoice: {record.name}",
+            f"Company: {record.company_id.name}",
+            f"Partner: {record.partner_id.name}",
+            f"Amount: {record.amount_total} {record.currency_id.name}",
+            f"Date: {record.invoice_date or ''}",
+        ]
+        
+        # Add real estate specific information if available
+        if record.buyer_id:
+            content_lines.append(f"Buyer: {record.buyer_id.name}")
+        if record.project_id:
+            content_lines.append(f"Project: {record.project_id.name}")
+        if record.unit_id:
+            content_lines.append(f"Unit: {record.unit_id.name}")
+        if record.deal_id:
+            content_lines.append(f"Deal ID: {record.deal_id}")
+        if record.sale_value:
+            content_lines.append(f"Sale Value: {record.sale_value} {record.currency_id.name}")
+        
+        return '\n'.join(content_lines)
 
     def _generate_qr_code(self, content):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(content)
-        qr.make(fit=True)
-        
-        img = qr.make_image(fill_color="black", back_color="white")
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        return base64.b64encode(buffer.getvalue())
+        """Generate QR code image from content"""
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(content)
+            qr.make(fit=True)
+            
+            img = qr.make_image(fill_color="black", back_color="white")
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            return base64.b64encode(buffer.getvalue())
+        except Exception as e:
+            _logger.error("Error generating QR code image: %s", str(e))
+            return False
 
     @api.depends('amount_total')
     def _compute_amount_total_words(self):

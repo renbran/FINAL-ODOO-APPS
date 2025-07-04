@@ -17,6 +17,9 @@
     'author': 'OSUS Real Estate',
     'website': 'https://www.osus.ae',
     'depends': ['account', 'base', 'sale'],
+    'external_dependencies': {
+        'python': ['qrcode', 'num2words'],
+    },
     'data': [
         'security/ir.model.access.csv',
         'data/report_paperformat.xml',

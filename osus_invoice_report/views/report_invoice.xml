@@ -11,40 +11,55 @@
                     <t t-call="web.external_layout">
                         <div class="page">
                             <div class="container">
-                                <!-- QR Code and Partner Details -->
-                                <div class="row mb-4">
-                                    <div class="col-6">
-                                        <!-- QR Code Section -->
-                                        <div style="display: flex; align-items: flex-start; height: 150px;">
-                                            <t t-if="o.qr_in_report == True">
-                                                <div style="width:150px; height:150px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">
-                                                    <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
-                                                         style="max-width: 140px; max-height: 140px; width: auto; height: auto;" 
-                                                         alt="QR Code" t-if="o.qr_image"/>
-                                                </div>
-                                            </t>
-                                            <t t-if="not o.qr_in_report or not o.qr_image">
-                                                <div style="width:150px; height:150px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                                    <span style="color: #6c757d;">QR Code</span>
-                                                </div>
-                                            </t>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <h5 style="color: #800020; font-weight: bold; font-size: 14px;">VENDOR DETAILS</h5>
-                                        <div style="color: black;" t-field="o.partner_id.name"/>
-                                        <div style="color: black;" t-field="o.partner_id.street"/>
-                                        <t t-if="o.partner_id.street2">
-                                            <div style="color: black;" t-field="o.partner_id.street2"/>
-                                        </t>
-                                        <div style="color: black;">
-                                            <span t-field="o.partner_id.city"/>
-                                            <t t-if="o.partner_id.zip">, <span t-field="o.partner_id.zip"/></t>
-                                        </div>
-                                        <div style="color: black;" t-field="o.partner_id.country_id.name"/>
-                                        <div style="color: black;">VAT: <span t-field="o.partner_id.vat"/></div>
-                                    </div>
+                <!-- QR Code and Company/Partner Details -->
+                <div class="row mb-4">
+                    <div class="col-3">
+                        <!-- QR Code Section -->
+                        <div class="text-center">
+                            <t t-if="o.qr_in_report and o.qr_image">
+                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
+                                         style="max-width: 110px; max-height: 110px; width: auto; height: auto;" 
+                                         alt="QR Code"/>
                                 </div>
+                                <small style="color: #666; font-size: 10px;">Scan for Details</small>
+                            </t>
+                            <t t-else="">
+                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; margin: 0 auto;">
+                                    <span style="color: #6c757d; font-size: 12px;">QR Code</span>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h5 style="color: #800020; font-weight: bold; font-size: 14px;">COMPANY DETAILS</h5>
+                        <div style="color: black;" t-field="res_company.name"/>
+                        <div style="color: black;" t-field="res_company.street"/>
+                        <t t-if="res_company.street2">
+                            <div style="color: black;" t-field="res_company.street2"/>
+                        </t>
+                        <div style="color: black;">
+                            <span t-field="res_company.city"/>
+                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
+                        </div>
+                        <div style="color: black;" t-field="res_company.country_id.name"/>
+                        <div style="color: black;">VAT: <span t-field="res_company.vat"/></div>
+                    </div>
+                    <div class="col-5 text-end">
+                        <h5 style="color: #800020; font-weight: bold; font-size: 14px;">CUSTOMER DETAILS</h5>
+                        <div style="color: black;" t-field="o.partner_id.name"/>
+                        <div style="color: black;" t-field="o.partner_id.street"/>
+                        <t t-if="o.partner_id.street2">
+                            <div style="color: black;" t-field="o.partner_id.street2"/>
+                        </t>
+                        <div style="color: black;">
+                            <span t-field="o.partner_id.city"/>
+                            <t t-if="o.partner_id.zip">, <span t-field="o.partner_id.zip"/></t>
+                        </div>
+                        <div style="color: black;" t-field="o.partner_id.country_id.name"/>
+                        <div style="color: black;">VAT: <span t-field="o.partner_id.vat"/></div>
+                    </div>
+                </div>
 
                                 <!-- Invoice Header -->
                                 <h2 class="text-center mb-4" style="color: #800020; font-size: 18px;">TAX INVOICE <span t-field="o.name"/></h2>
@@ -189,9 +204,41 @@
                                 <!-- Bill Header -->
                                 <h2 class="text-center mb-4" style="color: #800020; font-size: 18px;">BILL <span t-field="o.name"/></h2>
                                 
-                                <!-- Bill Content - Similar structure to invoice -->
+                                <!-- Bill Header with QR Code -->
                                 <div class="row mb-4">
-                                    <div class="col-6">
+                                    <div class="col-3">
+                                        <!-- QR Code Section -->
+                                        <div class="text-center">
+                                            <t t-if="o.qr_in_report and o.qr_image">
+                                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                                    <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
+                                                         style="max-width: 110px; max-height: 110px; width: auto; height: auto;" 
+                                                         alt="QR Code"/>
+                                                </div>
+                                                <small style="color: #666; font-size: 10px;">Scan for Details</small>
+                                            </t>
+                                            <t t-else="">
+                                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; margin: 0 auto;">
+                                                    <span style="color: #6c757d; font-size: 12px;">QR Code</span>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 style="color: #800020; font-weight: bold;">COMPANY DETAILS</h5>
+                                        <div t-field="res_company.name"/>
+                                        <div t-field="res_company.street"/>
+                                        <t t-if="res_company.street2">
+                                            <div t-field="res_company.street2"/>
+                                        </t>
+                                        <div>
+                                            <span t-field="res_company.city"/>
+                                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
+                                        </div>
+                                        <div t-field="res_company.country_id.name"/>
+                                        <div>VAT: <span t-field="res_company.vat"/></div>
+                                    </div>
+                                    <div class="col-5 text-end">
                                         <h5 style="color: #800020; font-weight: bold;">VENDOR DETAILS</h5>
                                         <div t-field="o.partner_id.name"/>
                                         <div t-field="o.partner_id.street"/>
@@ -204,9 +251,6 @@
                                         </div>
                                         <div t-field="o.partner_id.country_id.name"/>
                                         <div>VAT: <span t-field="o.partner_id.vat"/></div>
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <h5 style="color: #800020; font-weight: bold;">BILL DETAILS</h5>
                                         <div><strong>Date:</strong> <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
                                         <div><strong>Due Date:</strong> <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
                                     </div>
@@ -274,9 +318,41 @@
                                 <!-- Receipt Header -->
                                 <h2 class="text-center mb-4" style="color: #800020; font-size: 18px;">RECEIPT <span t-field="o.name"/></h2>
                                 
-                                <!-- Receipt Content -->
+                                <!-- Receipt Header with QR Code -->
                                 <div class="row mb-4">
-                                    <div class="col-6">
+                                    <div class="col-3">
+                                        <!-- QR Code Section -->
+                                        <div class="text-center">
+                                            <t t-if="o.qr_in_report and o.qr_image">
+                                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                                    <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
+                                                         style="max-width: 110px; max-height: 110px; width: auto; height: auto;" 
+                                                         alt="QR Code"/>
+                                                </div>
+                                                <small style="color: #666; font-size: 10px;">Scan for Details</small>
+                                            </t>
+                                            <t t-else="">
+                                                <div style="width:120px; height:120px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; margin: 0 auto;">
+                                                    <span style="color: #6c757d; font-size: 12px;">QR Code</span>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 style="color: #800020; font-weight: bold;">COMPANY DETAILS</h5>
+                                        <div t-field="res_company.name"/>
+                                        <div t-field="res_company.street"/>
+                                        <t t-if="res_company.street2">
+                                            <div t-field="res_company.street2"/>
+                                        </t>
+                                        <div>
+                                            <span t-field="res_company.city"/>
+                                            <t t-if="res_company.zip">, <span t-field="res_company.zip"/></t>
+                                        </div>
+                                        <div t-field="res_company.country_id.name"/>
+                                        <div>VAT: <span t-field="res_company.vat"/></div>
+                                    </div>
+                                    <div class="col-5 text-end">
                                         <h5 style="color: #800020; font-weight: bold;">CUSTOMER DETAILS</h5>
                                         <div t-field="o.partner_id.name"/>
                                         <div t-field="o.partner_id.street"/>
@@ -288,9 +364,6 @@
                                             <t t-if="o.partner_id.zip">, <span t-field="o.partner_id.zip"/></t>
                                         </div>
                                         <div t-field="o.partner_id.country_id.name"/>
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <h5 style="color: #800020; font-weight: bold;">RECEIPT DETAILS</h5>
                                         <div><strong>Date:</strong> <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
                                         <div><strong>Payment Method:</strong> <span t-field="o.payment_reference"/></div>
                                     </div>
