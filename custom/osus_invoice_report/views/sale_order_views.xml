@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale Order Form View Enhancement -->
+    <record id="view_order_form_inherit_osus_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.osus.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_information']" position="after">
+                <page string="Deal Tracking">
+                    <group string="Deal Information">
+                        <group>
+                            <field name="booking_date"/>
+                            <field name="deal_id"/>
+                            <field name="sale_value" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="developer_commission" widget="percentage"/>
+                            <field name="buyer_id"/>
+                        </group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="unit_id" domain="[('product_tmpl_id', '=', project_id)]"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Tree View Enhancement -->
+    <record id="view_order_tree_inherit_osus_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.tree.osus.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="booking_date" optional="show"/>
+                <field name="deal_id" optional="show"/>
+                <field name="sale_value" widget="monetary" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Search View Enhancement -->
+    <record id="view_order_search_inherit_osus_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.search.osus.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sales']" position="after">
+                <field name="booking_date"/>
+                <field name="deal_id"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="sale_value"/>
+                <field name="developer_commission"/>
+                <group expand="0" string="Group By">
+                    <filter string="By Buyer" name="group_by_buyer" context="{'group_by':'buyer_id'}"/>
+                    <filter string="By Project" name="group_by_project" context="{'group_by':'project_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
