@@ -81,7 +81,7 @@
             </xpath>
             
             <!-- Add filters -->
-            <xpath expr="//filter[@name='invoice_filter_date_range']" position="after">
+            <xpath expr="//field[@name='sale_value']" position="after">
                 <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
