@@ -6,6 +6,8 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
+                <!-- Add number formatting function -->
+                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
                 <div class="page">
                     <h3>
                         <center>
@@ -122,11 +124,11 @@
                                         </th>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['initial_total_debit']"
-                                               t-esc="move_line['initial_total_debit']"/>
+                                               t-esc="format_number(move_line['initial_total_debit'])"/>
                                         </th>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['initial_total_credit']"
-                                               t-esc="move_line['initial_total_credit']"/>
+                                               t-esc="format_number(move_line['initial_total_credit'])"/>
                                         </th>
                                         <t t-if="apply_comparison == true">
                                             <t t-set="number_of_periods"
@@ -135,29 +137,29 @@
                                                t-as="num" t-key="num">
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['dynamic_total_debit_' + str(num)]"
-                                                       t-esc="move_line['dynamic_total_debit_' + str(num)]"/>
+                                                       t-esc="format_number(move_line['dynamic_total_debit_' + str(num)])"/>
                                                 </th>
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['dynamic_total_credit_' + str(num)]"
-                                                       t-esc="move_line['dynamic_total_credit_' + str(num)]"/>
+                                                       t-esc="format_number(move_line['dynamic_total_credit_' + str(num)])"/>
                                                 </th>
                                             </t>
                                         </t>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['total_debit']"
-                                               t-esc="move_line['total_debit']"/>
+                                               t-esc="format_number(move_line['total_debit'])"/>
                                         </th>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['total_credit']"
-                                               t-esc="move_line['total_credit']"/>
+                                               t-esc="format_number(move_line['total_credit'])"/>
                                         </th>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['end_total_debit']"
-                                               t-esc="move_line['end_total_debit']"/>
+                                               t-esc="format_number(move_line['end_total_debit'])"/>
                                         </th>
                                         <th style="text-align:center;">
                                             <t t-if="move_line['end_total_credit']"
-                                               t-esc="move_line['end_total_credit']"/>
+                                               t-esc="format_number(move_line['end_total_credit'])"/>
                                         </th>
                                     </tr>
                                 </t>

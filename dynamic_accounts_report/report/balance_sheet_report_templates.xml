@@ -6,7 +6,8 @@
     <template id="dynamic_accounts_report.balance_sheet">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
-
+                <!-- Add number formatting function -->
+                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
                 <t t-set="data_report_dpi" t-value="110"/>
                 <div class="page">
                     <h3>
@@ -94,7 +95,7 @@
                                                     <th class="text-end"
                                                         style="font-weight: normal;">
                                                         <span>
-                                                            <t t-esc="account['amount']"/>
+                                                            <t t-esc="format_number(account['amount'])"/>
                                                         </span>
                                                     </th>
                                                 </t>
@@ -157,7 +158,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -223,7 +224,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -288,7 +289,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -309,7 +310,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="datas['total_current_asset']"/>
+                                            <t t-esc="format_number(datas['total_current_asset'])"/>
                                         </span>
                                     </th>
                                 </t>
@@ -369,7 +370,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -435,7 +436,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -532,7 +533,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -597,7 +598,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -678,7 +679,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -791,7 +792,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -872,7 +873,7 @@
                                                             <th class="text-end"
                                                                 style="font-weight: normal;">
                                                                 <span>
-                                                                    <t t-esc="datas['amount']"/>
+                                                                    <t t-esc="format_number(datas['amount'])"/>
                                                                 </span>
                                                             </th>
                                                         </t>
@@ -908,7 +909,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="datas['total_balance']"/>
+                                            <t t-esc="format_number(datas['total_balance'])"/>
                                         </span>
                                     </th>
                                 </t>
