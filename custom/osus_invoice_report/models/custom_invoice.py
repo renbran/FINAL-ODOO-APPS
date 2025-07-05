@@ -83,35 +83,78 @@ class AccountMove(models.Model):
                 
             try:
                 if record.name and record.partner_id:
-                    qr_content = self._get_qr_content(record)
-                    record.qr_image = self._generate_qr_code(qr_content)
+                    portal_url = record._get_portal_url()
+                    record.qr_image = self._generate_qr_code(portal_url)
                 else:
                     record.qr_image = False
             except Exception as e:
                 _logger.error("Error generating QR code for %s: %s", record.name, str(e))
                 record.qr_image = False
 
-    def _get_qr_content(self, record):
-        """Generate QR code content with real estate deal information"""
+    def _get_portal_url(self):
+        """Generate portal URL for secure access to the document"""
+        try:
+            # Get the base URL of the Odoo instance
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            if not base_url:
+                base_url = 'http://localhost:8069'  # Fallback URL
+            
+            # Generate the portal URL with access token for the invoice
+            # This uses Odoo's built-in method which automatically includes the access token
+            relative_url = self.get_portal_url()
+            
+            # Combine the base URL with the relative URL
+            full_url = base_url + relative_url
+            
+            _logger.info("Generated portal URL for %s: %s", self.name, full_url)
+            return full_url
+        except Exception as e:
+            _logger.error("Error generating portal URL for %s: %s", self.name, str(e))
+            # Fallback to manual URL construction if portal URL fails
+            return self._get_manual_portal_url()
+
+    def _get_manual_portal_url(self):
+        """Generate manual portal URL as fallback"""
+        try:
+            # Get the base URL of the Odoo instance
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            if not base_url:
+                base_url = 'http://localhost:8069'  # Fallback URL
+            
+            # Get or create access token
+            access_token = self._portal_ensure_token()
+            
+            # Construct the portal URL manually
+            portal_url = f"{base_url}/my/invoices/{self.id}?access_token={access_token}"
+            
+            _logger.info("Generated manual portal URL for %s: %s", self.name, portal_url)
+            return portal_url
+        except Exception as e:
+            _logger.error("Error generating manual portal URL for %s: %s", self.name, str(e))
+            # Final fallback to informational content
+            return self._get_qr_content_fallback()
+
+    def _get_qr_content_fallback(self):
+        """Generate QR code content with real estate deal information as fallback"""
         content_lines = [
-            f"Invoice: {record.name}",
-            f"Company: {record.company_id.name}",
-            f"Partner: {record.partner_id.name}",
-            f"Amount: {record.amount_total} {record.currency_id.name}",
-            f"Date: {record.invoice_date or ''}",
+            f"Invoice: {self.name}",
+            f"Company: {self.company_id.name}",
+            f"Partner: {self.partner_id.name}",
+            f"Amount: {self.amount_total} {self.currency_id.name}",
+            f"Date: {self.invoice_date or ''}",
         ]
         
         # Add real estate specific information if available
-        if record.buyer_id:
-            content_lines.append(f"Buyer: {record.buyer_id.name}")
-        if record.project_id:
-            content_lines.append(f"Project: {record.project_id.name}")
-        if record.unit_id:
-            content_lines.append(f"Unit: {record.unit_id.name}")
-        if record.deal_id:
-            content_lines.append(f"Deal ID: {record.deal_id}")
-        if record.sale_value:
-            content_lines.append(f"Sale Value: {record.sale_value} {record.currency_id.name}")
+        if self.buyer_id:
+            content_lines.append(f"Buyer: {self.buyer_id.name}")
+        if self.project_id:
+            content_lines.append(f"Project: {self.project_id.name}")
+        if self.unit_id:
+            content_lines.append(f"Unit: {self.unit_id.name}")
+        if self.deal_id:
+            content_lines.append(f"Deal ID: {self.deal_id}")
+        if self.sale_value:
+            content_lines.append(f"Sale Value: {self.sale_value} {self.currency_id.name}")
         
         return '\n'.join(content_lines)
 
@@ -158,6 +201,24 @@ class AccountMove(models.Model):
         for record in self:
             if record.developer_commission < 0 or record.developer_commission > 100:
                 raise ValidationError(_("Commission percentage must be between 0 and 100"))
+
+    @api.model
+    def _ensure_base_url_configured(self):
+        """Ensure the base URL is correctly configured for QR code generation"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        if not base_url or base_url == 'http://localhost:8069':
+            _logger.warning("Base URL not properly configured. QR codes may not work correctly.")
+            return False
+        return True
+
+    def get_qr_code_url(self):
+        """Public method to get the QR code URL for testing purposes"""
+        return self._get_portal_url()
+
+    def regenerate_qr_code(self):
+        """Manually regenerate QR code for this invoice"""
+        self._compute_qr_code()
+        return True
 
     @api.model
     def create(self, vals):
