@@ -175,8 +175,8 @@
     <record id="action_property_deals_dashboard" model="ir.actions.act_window">
         <field name="name">Property Deals Dashboard</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">kanban,tree,form,graph,pivot</field>
-        <field name="view_id" ref="view_move_kanban_deals"/>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False)]</field>
         <field name="context">{
@@ -195,70 +195,4 @@
         action="action_property_deals_dashboard"
         sequence="14"/>
 
-    <!-- Custom Kanban View for Deal Tracking -->
-    <record id="view_move_kanban_deals" model="ir.ui.view">
-        <field name="name">account.move.kanban.deals</field>
-        <field name="model">account.move</field>
-        <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" sample="1">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="buyer_id"/>
-                <field name="amount_total"/>
-                <field name="sale_value"/>
-                <field name="state"/>
-                <field name="move_type"/>
-                <field name="currency_id"/>
-                <field name="booking_date"/>
-                <field name="deal_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="o_kanban_card_header">
-                                <div class="o_kanban_card_header_title">
-                                    <div class="o_primary">
-                                        <strong t-esc="record.name.value"/>
-                                    </div>
-                                    <div class="text-muted">
-                                        <t t-esc="record.partner_id.value"/>
-                                        <t t-if="record.buyer_id.value"> • Buyer: <t t-esc="record.buyer_id.value"/></t>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="o_kanban_card_content">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <strong>Amount: </strong><field name="amount_total" widget="monetary"/>
-                                    </div>
-                                    <div class="col-6" t-if="record.sale_value.value">
-                                        <strong>Sale Value: </strong><field name="sale_value" widget="monetary"/>
-                                    </div>
-                                </div>
-                                <div class="row" t-if="record.deal_id.value or record.booking_date.value">
-                                    <div class="col-6" t-if="record.deal_id.value">
-                                        <strong>Deal #: </strong><t t-esc="record.deal_id.value"/>
-                                    </div>
-                                    <div class="col-6" t-if="record.booking_date.value">
-                                        <strong>Booked: </strong><t t-esc="record.booking_date.value"/>
-                                    </div>
-                                </div>
-                                <div class="row" t-if="record.project_id.value or record.unit_id.value">
-                                    <div class="col-12">
-                                        <t t-if="record.project_id.value"><strong>Project: </strong><t t-esc="record.project_id.value"/></t>
-                                        <t t-if="record.unit_id.value"> • <strong>Unit: </strong><t t-esc="record.unit_id.value"/></t>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
-                                <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
-                                <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
 </odoo>
