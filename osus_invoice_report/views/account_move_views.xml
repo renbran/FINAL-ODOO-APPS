@@ -9,6 +9,15 @@
             <!-- Add Deal Tracking Tab -->
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <!-- Deal Summary Banner -->
+                    <div class="alert alert-info" invisible="not is_property_deal" role="alert">
+                        <strong>Property Deal Summary:</strong>
+                        <span invisible="not buyer_id">Buyer: <field name="buyer_id" class="oe_inline"/></span>
+                        <span invisible="not project_id">| Project: <field name="project_id" class="oe_inline"/></span>
+                        <span invisible="not unit_id">| Unit: <field name="unit_id" class="oe_inline"/></span>
+                        <span invisible="not deal_id">| Deal #<field name="deal_id" class="oe_inline"/></span>
+                    </div>
+                    
                     <group string="Deal Information">
                         <group>
                             <field name="booking_date"/>
@@ -17,11 +26,13 @@
                         </group>
                         <group>
                             <field name="developer_commission" widget="percentage"/>
+                            <field name="commission_amount" widget="monetary" readonly="1"/>
                             <field name="buyer_id" options="{'quick_create': True, 'create_edit': True}"/>
                         </group>
                         <group>
                             <field name="project_id" options="{'quick_create': True, 'create_edit': True}"/>
                             <field name="unit_id" options="{'quick_create': True, 'create_edit': True}"/>
+                            <field name="is_property_deal" invisible="1"/>
                         </group>
                     </group>
                     <group string="Report Settings">
@@ -51,11 +62,15 @@
                 <field name="buyer_id" optional="show"/>
                 <field name="deal_id" optional="show"/>
                 <field name="booking_date" optional="show"/>
+                <!-- Add a visual indicator for deals -->
+                <field name="is_property_deal" widget="boolean_toggle" optional="show" string="Property Deal"/>
             </xpath>
             
             <!-- Add financial fields after amount total -->
             <xpath expr="//field[@name='amount_total_signed']" position="after">
                 <field name="sale_value" widget="monetary" optional="show"/>
+                <!-- Add commission amount for quick reference -->
+                <field name="commission_amount" widget="monetary" optional="hide" string="Commission"/>
             </xpath>
             
             <!-- Add project info (hidden by default) -->
@@ -91,6 +106,14 @@
                 <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
                 <filter string="Property Deals" name="property_deals" 
                         domain="['|', '|', ('buyer_id', '!=', False), ('project_id', '!=', False), ('deal_id', '!=', False)]"/>
+                <filter string="High Value Deals" name="high_value_deals" 
+                        domain="[('sale_value', '>', 1000000)]"/>
+                <filter string="With Commission" name="has_commission" 
+                        domain="[('developer_commission', '>', 0)]"/>
+                <separator/>
+                <filter string="This Month's Bookings" name="booking_this_month" 
+                        domain="[('booking_date', '>=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
+                                ('booking_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
             </xpath>
             
             <!-- Add group by options -->
@@ -149,12 +172,12 @@
     <record id="action_move_out_invoice_type_osus" model="ir.actions.act_window">
         <field name="name">Invoices with Deal Tracking</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,kanban,form</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
         <field name="context">{'default_move_type': 'out_invoice'}</field>
-        <field name="help">Track property deals and commissions with enhanced invoice list view</field>
+        <field name="help">Track property deals and commissions with enhanced invoice views. Use filters to find specific deals quickly.</field>
     </record>
 
     <!-- Menu item for Invoice List with Deal Tracking -->
@@ -164,4 +187,103 @@
         parent="account.menu_finance_receivables"
         action="action_move_out_invoice_type_osus"
         sequence="15"/>
+
+    <!-- Property Deals Dashboard Action -->
+    <record id="action_property_deals_dashboard" model="ir.actions.act_window">
+        <field name="name">Property Deals Dashboard</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="view_id" ref="view_move_kanban_deals"/>
+        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('is_property_deal', '=', True)]</field>
+        <field name="context">{
+            'default_move_type': 'out_invoice',
+            'search_default_property_deals': 1,
+            'search_default_group_buyer': 1
+        }</field>
+        <field name="help">Comprehensive dashboard for property deal management and analytics</field>
+    </record>
+
+    <!-- Menu item for Property Deals Dashboard -->
+    <menuitem 
+        id="menu_property_deals_dashboard"
+        name="Property Deals Dashboard"
+        parent="account.menu_finance_receivables"
+        action="action_property_deals_dashboard"
+        sequence="14"/>
+
+    <!-- Custom Kanban View for Deal Tracking -->
+    <record id="view_move_kanban_deals" model="ir.ui.view">
+        <field name="name">account.move.kanban.deals</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="buyer_id"/>
+                <field name="amount_total"/>
+                <field name="sale_value"/>
+                <field name="state"/>
+                <field name="move_type"/>
+                <field name="currency_id"/>
+                <field name="booking_date"/>
+                <field name="deal_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="is_property_deal"/>
+                <field name="commission_amount"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong t-esc="record.name.value"/>
+                                        <span t-if="record.is_property_deal.raw_value" class="badge badge-info ml-2">Property Deal</span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <t t-esc="record.partner_id.value"/>
+                                        <t t-if="record.buyer_id.value"> • Buyer: <t t-esc="record.buyer_id.value"/></t>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Amount: </strong><field name="amount_total" widget="monetary"/>
+                                    </div>
+                                    <div class="col-6" t-if="record.sale_value.value">
+                                        <strong>Sale Value: </strong><field name="sale_value" widget="monetary"/>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="record.deal_id.value or record.booking_date.value">
+                                    <div class="col-6" t-if="record.deal_id.value">
+                                        <strong>Deal #: </strong><t t-esc="record.deal_id.value"/>
+                                    </div>
+                                    <div class="col-6" t-if="record.booking_date.value">
+                                        <strong>Booked: </strong><t t-esc="record.booking_date.value"/>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="record.project_id.value or record.unit_id.value">
+                                    <div class="col-12">
+                                        <t t-if="record.project_id.value"><strong>Project: </strong><t t-esc="record.project_id.value"/></t>
+                                        <t t-if="record.unit_id.value"> • <strong>Unit: </strong><t t-esc="record.unit_id.value"/></t>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="record.commission_amount.value">
+                                    <div class="col-12">
+                                        <strong>Commission: </strong><field name="commission_amount" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 </odoo>

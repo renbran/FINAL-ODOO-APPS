@@ -74,6 +74,21 @@ class AccountMove(models.Model):
         help="The specific property unit in this deal"
     )
 
+    # Computed fields for enhanced tree view
+    is_property_deal = fields.Boolean(
+        string='Is Property Deal',
+        compute='_compute_deal_status',
+        store=True,
+        help="Indicates if this invoice is related to a property deal"
+    )
+    commission_amount = fields.Monetary(
+        string='Commission Amount',
+        compute='_compute_commission_amount',
+        store=True,
+        currency_field='currency_id',
+        help="Calculated commission amount based on sale value and percentage"
+    )
+
     @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report', 'buyer_id', 'project_id', 'unit_id')
     def _compute_qr_code(self):
         for record in self:
@@ -245,3 +260,21 @@ class AccountMove(models.Model):
             for invoice_field, sale_field in field_map.items():
                 if sale_field in sale_order._fields and invoice_field not in vals:
                     vals[invoice_field] = sale_order[sale_field].id if hasattr(sale_order[sale_field], 'id') else sale_order[sale_field]
+
+    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_date')
+    def _compute_deal_status(self):
+        """Compute if this is a property deal based on available deal information"""
+        for record in self:
+            record.is_property_deal = bool(
+                record.buyer_id or record.project_id or 
+                record.unit_id or record.deal_id or record.booking_date
+            )
+
+    @api.depends('sale_value', 'developer_commission')
+    def _compute_commission_amount(self):
+        """Compute commission amount from sale value and percentage"""
+        for record in self:
+            if record.sale_value and record.developer_commission:
+                record.commission_amount = (record.sale_value * record.developer_commission) / 100
+            else:
+                record.commission_amount = 0.0
