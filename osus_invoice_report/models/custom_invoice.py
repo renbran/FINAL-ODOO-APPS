@@ -100,6 +100,7 @@ class AccountMove(models.Model):
                 base_url = 'http://localhost:8069'  # Fallback URL
             
             # Generate the portal URL with access token for the invoice
+            # This uses Odoo's built-in method which automatically includes the access token
             relative_url = self.get_portal_url()
             
             # Combine the base URL with the relative URL
@@ -109,7 +110,28 @@ class AccountMove(models.Model):
             return full_url
         except Exception as e:
             _logger.error("Error generating portal URL for %s: %s", self.name, str(e))
-            # Fallback to informational content if portal URL fails
+            # Fallback to manual URL construction if portal URL fails
+            return self._get_manual_portal_url()
+
+    def _get_manual_portal_url(self):
+        """Generate manual portal URL as fallback"""
+        try:
+            # Get the base URL of the Odoo instance
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            if not base_url:
+                base_url = 'http://localhost:8069'  # Fallback URL
+            
+            # Get or create access token
+            access_token = self._portal_ensure_token()
+            
+            # Construct the portal URL manually
+            portal_url = f"{base_url}/my/invoices/{self.id}?access_token={access_token}"
+            
+            _logger.info("Generated manual portal URL for %s: %s", self.name, portal_url)
+            return portal_url
+        except Exception as e:
+            _logger.error("Error generating manual portal URL for %s: %s", self.name, str(e))
+            # Final fallback to informational content
             return self._get_qr_content_fallback()
 
     def _get_qr_content_fallback(self):
@@ -179,6 +201,24 @@ class AccountMove(models.Model):
         for record in self:
             if record.developer_commission < 0 or record.developer_commission > 100:
                 raise ValidationError(_("Commission percentage must be between 0 and 100"))
+
+    @api.model
+    def _ensure_base_url_configured(self):
+        """Ensure the base URL is correctly configured for QR code generation"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        if not base_url or base_url == 'http://localhost:8069':
+            _logger.warning("Base URL not properly configured. QR codes may not work correctly.")
+            return False
+        return True
+
+    def get_qr_code_url(self):
+        """Public method to get the QR code URL for testing purposes"""
+        return self._get_portal_url()
+
+    def regenerate_qr_code(self):
+        """Manually regenerate QR code for this invoice"""
+        self._compute_qr_code()
+        return True
 
     @api.model
     def create(self, vals):

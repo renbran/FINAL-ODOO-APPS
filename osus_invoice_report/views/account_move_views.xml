@@ -27,6 +27,8 @@
                     <group string="Report Settings">
                         <group>
                             <field name="qr_in_report"/>
+                            <button name="regenerate_qr_code" string="Regenerate QR Code" type="object" 
+                                    class="btn-primary" invisible="not qr_in_report"/>
                         </group>
                         <group>
                             <field name="qr_image" widget="image" readonly="1" invisible="not qr_in_report"/>
@@ -42,24 +44,25 @@
         <field name="name">account.move.tree.inherit.osus</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <!-- Add deal tracking fields after partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="buyer_id" optional="show"/>
-                <field name="project_id" optional="show"/>
-                <field name="unit_id" optional="hide"/>
                 <field name="deal_id" optional="show"/>
-            </xpath>
-            
-            <!-- Add booking date after invoice date -->
-            <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="booking_date" optional="show"/>
             </xpath>
             
             <!-- Add financial fields after amount total -->
             <xpath expr="//field[@name='amount_total_signed']" position="after">
                 <field name="sale_value" widget="monetary" optional="show"/>
-                <field name="developer_commission" widget="percentage" optional="show"/>
+            </xpath>
+            
+            <!-- Add project info (hidden by default) -->
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
+                <field name="developer_commission" widget="percentage" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -141,4 +144,24 @@
         <field name="print_report_name">'OSUS-Receipt-%s' % (object.name or 'draft')</field>
         <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
     </record>
+
+    <!-- Invoice List Action with Deal Tracking -->
+    <record id="action_move_out_invoice_type_osus" model="ir.actions.act_window">
+        <field name="name">Invoices with Deal Tracking</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_move_tree_inherit_osus"/>
+        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="help">Track property deals and commissions with enhanced invoice list view</field>
+    </record>
+
+    <!-- Menu item for Invoice List with Deal Tracking -->
+    <menuitem 
+        id="menu_action_move_out_invoice_type_osus"
+        name="Deal Tracking Invoices"
+        parent="account.menu_finance_receivables"
+        action="action_move_out_invoice_type_osus"
+        sequence="15"/>
 </odoo>
