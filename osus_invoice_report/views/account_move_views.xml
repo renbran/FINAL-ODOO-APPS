@@ -9,15 +9,6 @@
             <!-- Add Deal Tracking Tab -->
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
-                    <!-- Deal Summary Banner -->
-                    <div class="alert alert-info" invisible="not buyer_id and not project_id and not unit_id and not deal_id" role="alert">
-                        <strong>Property Deal Summary:</strong>
-                        <span invisible="not buyer_id">Buyer: <field name="buyer_id" class="oe_inline"/></span>
-                        <span invisible="not project_id">| Project: <field name="project_id" class="oe_inline"/></span>
-                        <span invisible="not unit_id">| Unit: <field name="unit_id" class="oe_inline"/></span>
-                        <span invisible="not deal_id">| Deal #<field name="deal_id" class="oe_inline"/></span>
-                    </div>
-                    
                     <group string="Deal Information">
                         <group>
                             <field name="booking_date"/>
@@ -36,8 +27,6 @@
                     <group string="Report Settings">
                         <group>
                             <field name="qr_in_report"/>
-                            <button name="regenerate_qr_code" string="Regenerate QR Code" type="object" 
-                                    class="btn-primary" invisible="not qr_in_report"/>
                         </group>
                         <group>
                             <field name="qr_image" widget="image" readonly="1" invisible="not qr_in_report"/>
