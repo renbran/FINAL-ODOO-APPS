@@ -22,3 +22,4 @@
 from . import controllers
 from . import models
 from . import report
+from .report import format_number

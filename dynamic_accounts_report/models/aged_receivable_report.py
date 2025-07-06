@@ -24,6 +24,7 @@ import json
 
 import xlsxwriter
 from odoo import models, fields, api
+from odoo.addons.dynamic_accounts_report.report import format_number
 
 
 class AgeReceivableReport(models.TransientModel):
@@ -320,3 +321,15 @@ class AgeReceivableReport(models.TransientModel):
         output.seek(0)
         response.stream.write(output.read())
         output.close()
+
+    @api.model
+    def get_report_values(self, docids, data=None):
+        # Provide format_number to QWeb context for robust formatting
+        docs = self.browse(docids)
+        context = {
+            'docs': docs,
+            'format_number': format_number,
+        }
+        if data:
+            context.update(data)
+        return context
