@@ -43,8 +43,7 @@
                                         <t t-foreach="filters['partner']"
                                            t-as="selected_partner"
                                            t-key="partner_index">
-                                            <t t-out="selected_partner['display_name']"/>
-                                            ,
+                                            <t t-out="selected_partner['display_name']"/>,
                                         </t>
                                     </th>
                                 </tr>
@@ -146,7 +145,7 @@
                                                 <t t-if="total[move_line]['credit_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['credit_sum']"
-                                                   t-esc="total[move_line]['credit_sum']"/>
+                                                   t-esc="format_number(total[move_line]['credit_sum'])"/>
                                             </span>
                                         </th>
                                     </tr>
