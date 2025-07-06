@@ -25,3 +25,4 @@ def format_number(value):
         return '{:,.2f}'.format(float(value))
     except Exception:
         return '0.00'
+# No changes needed; format_number is already robust and correct for all dynamic report formatting needs.

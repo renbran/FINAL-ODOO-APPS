@@ -72,21 +72,24 @@ class AgeReceivableReport(models.TransientModel):
                 val['diff3'] = val['debit'] if 60 < diffrence <= 90 else 0.0
                 val['diff4'] = val['debit'] if 90 < diffrence <= 120 else 0.0
                 val['diff5'] = val['debit'] if diffrence > 120 else 0.0
+                # Format all numeric values as strings for QWeb
+                val['debit'] = format_number(val['debit'])
+                val['amount_currency'] = format_number(val['amount_currency']) if val.get('amount_currency') else ''
+                val['diff0'] = format_number(val['diff0'])
+                val['diff1'] = format_number(val['diff1'])
+                val['diff2'] = format_number(val['diff2'])
+                val['diff3'] = format_number(val['diff3'])
+                val['diff4'] = format_number(val['diff4'])
+                val['diff5'] = format_number(val['diff5'])
             move_line_list[partner_id.name] = move_line_data
             partner_total[partner_id.name] = {
-                'debit_sum': sum(val['debit'] for val in move_line_data),
-                'diff0_sum': round(sum(val['diff0'] for val in move_line_data),
-                                   2),
-                'diff1_sum': round(sum(val['diff1'] for val in move_line_data),
-                                   2),
-                'diff2_sum': round(sum(val['diff2'] for val in move_line_data),
-                                   2),
-                'diff3_sum': round(sum(val['diff3'] for val in move_line_data),
-                                   2),
-                'diff4_sum': round(sum(val['diff4'] for val in move_line_data),
-                                   2),
-                'diff5_sum': round(sum(val['diff5'] for val in move_line_data),
-                                   2),
+                'debit_sum': format_number(sum(float(val['debit'].replace(",", "")) for val in move_line_data)),
+                'diff0_sum': format_number(sum(float(val['diff0'].replace(",", "")) for val in move_line_data)),
+                'diff1_sum': format_number(sum(float(val['diff1'].replace(",", "")) for val in move_line_data)),
+                'diff2_sum': format_number(sum(float(val['diff2'].replace(",", "")) for val in move_line_data)),
+                'diff3_sum': format_number(sum(float(val['diff3'].replace(",", "")) for val in move_line_data)),
+                'diff4_sum': format_number(sum(float(val['diff4'].replace(",", "")) for val in move_line_data)),
+                'diff5_sum': format_number(sum(float(val['diff5'].replace(",", "")) for val in move_line_data)),
                 'currency_id': currency_id,
                 'partner_id': partner_id.id
             }

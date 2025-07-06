@@ -26,6 +26,7 @@ import xlsxwriter
 from odoo import api, fields, models
 from datetime import datetime
 from odoo.tools import date_utils
+from dynamic_accounts_report.report import format_number
 
 
 class AccountPartnerLedger(models.TransientModel):
@@ -81,18 +82,22 @@ class AccountPartnerLedger(models.TransientModel):
                 if account_code:
                     move_line_data[0]['jrnl'] = journal_code
                     move_line_data[0]['code'] = account_code
+                # Format numbers
+                move_line_data[0]['debit'] = format_number(move_line_data[0].get('debit', 0.0))
+                move_line_data[0]['credit'] = format_number(move_line_data[0].get('credit', 0.0))
+                move_line_data[0]['amount_currency'] = format_number(move_line_data[0].get('amount_currency', 0.0))
                 move_line_list.append(move_line_data)
             partner_dict[partner.name] = move_line_list
             currency_id = self.env.company.currency_id.symbol
             partner_totals[partner.name] = {
-                'total_debit': round(sum(move_line_id.mapped('debit')), 2),
-                'total_credit': round(sum(move_line_id.mapped('credit')), 2),
+                'total_debit': format_number(sum(move_line_id.mapped('debit'))),
+                'total_credit': format_number(sum(move_line_id.mapped('credit'))),
                 'currency_id': currency_id,
-                'initial_balance': balance,
+                'initial_balance': format_number(balance),
                 'partner_id': partner.id,
                 'move_name': 'Initial Balance',
-                'initial_debit': total_debit_balance,
-                'initial_credit': total_credit_balance,
+                'initial_debit': format_number(total_debit_balance),
+                'initial_credit': format_number(total_credit_balance),
             }
             partner_dict['partner_totals'] = partner_totals
         return partner_dict
@@ -320,6 +325,9 @@ class AccountPartnerLedger(models.TransientModel):
                 if account_code:
                     move_line_data[0]['jrnl'] = journal_code
                     move_line_data[0]['code'] = account_code
+                move_line_data[0]['debit'] = format_number(move_line_data[0].get('debit', 0.0))
+                move_line_data[0]['credit'] = format_number(move_line_data[0].get('credit', 0.0))
+                move_line_data[0]['amount_currency'] = format_number(move_line_data[0].get('amount_currency', 0.0))
                 move_line_list.append(move_line_data)
             for remaining_move in balance_move_line_ids:
                 if remaining_move.invoice_date:
@@ -330,14 +338,14 @@ class AccountPartnerLedger(models.TransientModel):
             partner_dict[partner] = move_line_list
             currency_id = self.env.company.currency_id.symbol
             partner_totals[partner] = {
-                'total_debit': round(sum(move_line_ids.mapped('debit')), 2),
-                'total_credit': round(sum(move_line_ids.mapped('credit')), 2),
+                'total_debit': format_number(sum(move_line_ids.mapped('debit'))),
+                'total_credit': format_number(sum(move_line_ids.mapped('credit'))),
                 'currency_id': currency_id,
                 'partner_id': partners,
-                'initial_balance': balance,
+                'initial_balance': format_number(balance),
                 'move_name': 'Initial Balance',
-                'initial_debit': total_debit_balance,
-                'initial_credit': total_credit_balance,
+                'initial_debit': format_number(total_debit_balance),
+                'initial_credit': format_number(total_credit_balance),
             }
             partner_dict['partner_totals'] = partner_totals
         return partner_dict
