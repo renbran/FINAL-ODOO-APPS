@@ -155,7 +155,7 @@
     <record id="action_move_out_invoice_type_osus" model="ir.actions.act_window">
         <field name="name">Invoices with Deal Tracking</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
