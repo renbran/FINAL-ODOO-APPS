@@ -21,9 +21,9 @@ class OeSaleDashboard extends Component {
         this.state = useState({
             startDate: startDate,
             endDate: today,
-            postedSalesData: [],
-            unpostedSalesData: [],
             quotationsData: [],
+            salesOrdersData: [],
+            invoicedSalesData: [],
             isLoading: false,
         });
 
@@ -77,20 +77,20 @@ class OeSaleDashboard extends Component {
 
 
     /**
-     * Fetches sales data for a specific company within the selected date range.
-     * @param {number} companyId - The ID of the company.
+     * Fetches sales data for a specific sales type within the selected date range.
+     * @param {number} salesTypeId - The ID of the sales type.
      * @param {string} start_date_str - The start date in YYYY-MM-DD format.
      * @param {string} end_date_str - The end date in YYYY-MM-DD format.
      * @param {Array} baseDomain - The base domain for the sales order query (e.g., state, invoice_status).
      * @returns {Object} Object with amount_total, sale_value totals and count for the given period.
      */
-    async _fetchSalesByCompanyAndDateRange(companyId, start_date_str, end_date_str, baseDomain) {
+    async _fetchSalesBySalesTypeAndDateRange(salesTypeId, start_date_str, end_date_str, baseDomain) {
         // Convert dates to datetime strings for proper filtering
         const startDateTime = start_date_str + ' 00:00:00';
         const endDateTime = end_date_str + ' 23:59:59';
         
         let domain = [
-            ['company_id', '=', companyId],
+            ['sale_order_type_id', '=', salesTypeId],
             ['booking_date', '>=', startDateTime],
             ['booking_date', '<=', endDateTime],
             ...baseDomain
@@ -120,7 +120,7 @@ class OeSaleDashboard extends Component {
     }
 
     /**
-     * Loads all dashboard data (posted, unposted, quotations) for the selected date range.
+     * Loads all dashboard data (quotations, sales orders, invoiced sales) for the selected date range.
      */
     async _loadDashboardData() {
         this.state.isLoading = true;
@@ -132,63 +132,64 @@ class OeSaleDashboard extends Component {
                 return;
             }
 
-            const companies = await this.orm.searchRead(
-                "res.company",
+            // Fetch all sales types (Primary Sales, Secondary Sales, Exclusive Sales)
+            const salesTypes = await this.orm.searchRead(
+                "sale.order.type",
                 [],
                 ['id', 'name']
             );
 
-            const postedSales = [];
-            const unpostedSales = [];
             const quotations = [];
+            const salesOrders = [];
+            const invoicedSales = [];
 
-            for (const company of companies) {
-                const companyId = company.id;
-                const companyName = company.name;
+            for (const salesType of salesTypes) {
+                const salesTypeId = salesType.id;
+                const salesTypeName = salesType.name;
 
-                // Fetch Posted Sale Orders (confirmed and invoiced)
-                const postedAmounts = await this._fetchSalesByCompanyAndDateRange(
-                    companyId, 
-                    this.state.startDate, 
-                    this.state.endDate, 
-                    [['state', '=', 'sale'], ['invoice_status', '=', 'invoiced']]
-                );
-
-                postedSales.push({
-                    company_name: companyName,
-                    count: postedAmounts.count,
-                    amount_total: postedAmounts.amount_total,
-                    sale_value: postedAmounts.sale_value,
-                });
-
-                // Fetch Unposted Sale Orders (confirmed but not invoiced)
-                const unpostedAmounts = await this._fetchSalesByCompanyAndDateRange(
-                    companyId, 
-                    this.state.startDate, 
-                    this.state.endDate, 
-                    [['state', '=', 'sale'], '|', ['invoice_status', '=', 'to invoice'], ['invoice_status', '=', 'no']]
-                );
-
-                unpostedSales.push({
-                    company_name: companyName,
-                    count: unpostedAmounts.count,
-                    amount: unpostedAmounts.amount_total,
-                    sale_value: unpostedAmounts.sale_value,
-                });
-
-                // Fetch All Quotations (draft and sent)
-                const quotationsAmounts = await this._fetchSalesByCompanyAndDateRange(
-                    companyId, 
+                // Fetch Quotations (draft and sent states)
+                const quotationAmounts = await this._fetchSalesBySalesTypeAndDateRange(
+                    salesTypeId, 
                     this.state.startDate, 
                     this.state.endDate, 
                     [['state', 'in', ['draft', 'sent']]]
                 );
 
                 quotations.push({
-                    company_name: companyName,
-                    count: quotationsAmounts.count,
-                    amount: quotationsAmounts.amount_total,
-                    sale_value: quotationsAmounts.sale_value,
+                    sales_type_name: salesTypeName,
+                    count: quotationAmounts.count,
+                    amount: quotationAmounts.amount_total,
+                    sale_value: quotationAmounts.sale_value,
+                });
+
+                // Fetch Sales Orders (confirmed but not invoiced - to invoice status)
+                const salesOrderAmounts = await this._fetchSalesBySalesTypeAndDateRange(
+                    salesTypeId, 
+                    this.state.startDate, 
+                    this.state.endDate, 
+                    [['state', '=', 'sale'], '|', ['invoice_status', '=', 'to invoice'], ['invoice_status', '=', 'no']]
+                );
+
+                salesOrders.push({
+                    sales_type_name: salesTypeName,
+                    count: salesOrderAmounts.count,
+                    amount: salesOrderAmounts.amount_total,
+                    sale_value: salesOrderAmounts.sale_value,
+                });
+
+                // Fetch Invoiced Sale Orders (confirmed and invoiced)
+                const invoicedAmounts = await this._fetchSalesBySalesTypeAndDateRange(
+                    salesTypeId, 
+                    this.state.startDate, 
+                    this.state.endDate, 
+                    [['state', '=', 'sale'], ['invoice_status', '=', 'invoiced']]
+                );
+
+                invoicedSales.push({
+                    sales_type_name: salesTypeName,
+                    count: invoicedAmounts.count,
+                    amount: invoicedAmounts.amount_total,
+                    sale_value: invoicedAmounts.sale_value,
                 });
             }
 
@@ -196,30 +197,28 @@ class OeSaleDashboard extends Component {
             const calculateTotals = (data) => {
                 if (data.length === 0) {
                     return {
-                        company_name: "Total", 
+                        sales_type_name: "Total", 
                         count: 0,
                         amount: 0,
-                        amount_total: 0,
                         sale_value: 0
                     };
                 }
                 
                 return {
-                    company_name: "Total",
+                    sales_type_name: "Total",
                     count: data.reduce((sum, item) => sum + item.count, 0),
                     amount: data.reduce((sum, item) => sum + (item.amount || 0), 0),
-                    amount_total: data.reduce((sum, item) => sum + (item.amount_total || 0), 0),
                     sale_value: data.reduce((sum, item) => sum + (item.sale_value || 0), 0)
                 };
             };
 
-            const postedSalesTotal = calculateTotals(postedSales);
-            const unpostedSalesTotal = calculateTotals(unpostedSales);
             const quotationsTotal = calculateTotals(quotations);
+            const salesOrdersTotal = calculateTotals(salesOrders);
+            const invoicedSalesTotal = calculateTotals(invoicedSales);
 
-            this.state.postedSalesData = [...postedSales, postedSalesTotal];
-            this.state.unpostedSalesData = [...unpostedSales, unpostedSalesTotal];
             this.state.quotationsData = [...quotations, quotationsTotal];
+            this.state.salesOrdersData = [...salesOrders, salesOrdersTotal];
+            this.state.invoicedSalesData = [...invoicedSales, invoicedSalesTotal];
 
             this.notification.add(_t(`Sales data updated for: ${this.state.startDate} to ${this.state.endDate}`), { type: 'success' });
 

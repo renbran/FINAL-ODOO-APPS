@@ -21,7 +21,7 @@
     """,
     'author': 'Sheikh Muhammad Saad, OdooElevate',
     'website': 'https://odooelevate.odoo.com/',
-    'depends': ['web', 'sale_management', 'osus_invoice_report'],
+    'depends': ['web', 'sale_management', 'osus_invoice_report', 'le_sale_type'],
     'data': [
         'data/sale_order_data.xml',
         'views/dashboard_views.xml',

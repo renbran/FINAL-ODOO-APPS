@@ -123,97 +123,97 @@
                 </div>
             </div>
 
-            <!-- Posted Sale Orders Section -->
+            <!-- Quotations Section (Draft Status) -->
             <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Posted Sale Orders</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                        <thead>
-                            <tr class="bg-blue-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Company</th>
-                                <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total</th>
-                                <th class="py-3 px-6 border-b">Sale Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="state.postedSalesData" t-as="company_data" t-key="company_data.company_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-blue-50': company_data.company_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount_total)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
-                                </tr>
-                            </t>
-                            <t t-if="state.postedSalesData.length === 0 &amp;&amp; !state.isLoading">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No posted sales data available.</td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <br/><br/>
-
-            <!-- Unposted Sale Orders Section -->
-            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Unposted Sale Orders</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                        <thead>
-                            <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Company</th>
-                                <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total</th>
-                                <th class="py-3 px-6 border-b">Sale Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="state.unpostedSalesData" t-as="company_data" t-key="company_data.company_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-green-50': company_data.company_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
-                                </tr>
-                            </t>
-                            <t t-if="state.unpostedSalesData.length === 0 &amp;&amp; !state.isLoading">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <br/><br/>
-
-            <!-- All Quotations Section -->
-            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">All Quotations</h2>
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Quotations</h2>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                         <thead>
                             <tr class="bg-purple-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Sales Type</th>
                                 <th class="py-3 px-6 border-b">Count</th>
                                 <th class="py-3 px-6 border-b">Total</th>
                                 <th class="py-3 px-6 border-b">Sale Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="state.quotationsData" t-as="company_data" t-key="company_data.company_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-purple-50': company_data.company_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
+                            <t t-foreach="state.quotationsData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-purple-50': sales_type_data.sales_type_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
                                     <td colspan="4" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br/><br/>
+
+            <!-- Sales Orders Section (To Invoice Status) -->
+            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Sales Orders</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                <th class="py-3 px-6 border-b">Sales Type</th>
+                                <th class="py-3 px-6 border-b">Count</th>
+                                <th class="py-3 px-6 border-b">Total</th>
+                                <th class="py-3 px-6 border-b">Sale Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.salesOrdersData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-green-50': sales_type_data.sales_type_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                                </tr>
+                            </t>
+                            <t t-if="state.salesOrdersData.length === 0 &amp;&amp; !state.isLoading">
+                                <tr>
+                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No sales orders data available.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br/><br/>
+
+            <!-- Invoiced Sale Orders Section (Invoiced Status) -->
+            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Invoiced Sale Orders</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-blue-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                <th class="py-3 px-6 border-b">Sales Type</th>
+                                <th class="py-3 px-6 border-b">Count</th>
+                                <th class="py-3 px-6 border-b">Total</th>
+                                <th class="py-3 px-6 border-b">Sale Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.invoicedSalesData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-blue-50': sales_type_data.sales_type_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                                </tr>
+                            </t>
+                            <t t-if="state.invoicedSalesData.length === 0 &amp;&amp; !state.isLoading">
+                                <tr>
+                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No invoiced sales data available.</td>
                                 </tr>
                             </t>
                         </tbody>
