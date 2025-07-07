@@ -188,30 +188,6 @@
         action="action_move_out_invoice_type_osus"
         sequence="15"/>
 
-    <!-- Property Deals Dashboard Action -->
-    <record id="action_property_deals_dashboard" model="ir.actions.act_window">
-        <field name="name">Property Deals Dashboard</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">kanban,tree,form,graph,pivot</field>
-        <field name="view_id" ref="view_move_kanban_deals"/>
-        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('is_property_deal', '=', True)]</field>
-        <field name="context">{
-            'default_move_type': 'out_invoice',
-            'search_default_property_deals': 1,
-            'search_default_group_buyer': 1
-        }</field>
-        <field name="help">Comprehensive dashboard for property deal management and analytics</field>
-    </record>
-
-    <!-- Menu item for Property Deals Dashboard -->
-    <menuitem 
-        id="menu_property_deals_dashboard"
-        name="Property Deals Dashboard"
-        parent="account.menu_finance_receivables"
-        action="action_property_deals_dashboard"
-        sequence="14"/>
-
     <!-- Custom Kanban View for Deal Tracking -->
     <record id="view_move_kanban_deals" model="ir.ui.view">
         <field name="name">account.move.kanban.deals</field>
@@ -286,4 +262,28 @@
             </kanban>
         </field>
     </record>
+
+    <!-- Property Deals Dashboard Action -->
+    <record id="action_property_deals_dashboard" model="ir.actions.act_window">
+        <field name="name">Property Deals Dashboard</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="view_id" ref="view_move_kanban_deals"/>
+        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('is_property_deal', '=', True)]</field>
+        <field name="context">{
+            'default_move_type': 'out_invoice',
+            'search_default_property_deals': 1,
+            'search_default_group_buyer': 1
+        }</field>
+        <field name="help">Comprehensive dashboard for property deal management and analytics</field>
+    </record>
+
+    <!-- Menu item for Property Deals Dashboard -->
+    <menuitem 
+        id="menu_property_deals_dashboard"
+        name="Property Deals Dashboard"
+        parent="account.menu_finance_receivables"
+        action="action_property_deals_dashboard"
+        sequence="14"/>
 </odoo>
