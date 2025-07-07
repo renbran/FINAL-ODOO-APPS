@@ -173,6 +173,7 @@ class OeSaleDashboard extends Component {
                     company_name: companyName,
                     count: unpostedAmounts.count,
                     amount: unpostedAmounts.amount_total,
+                    sale_value: unpostedAmounts.sale_value,
                 });
 
                 // Fetch All Quotations (draft and sent)
@@ -187,43 +188,34 @@ class OeSaleDashboard extends Component {
                     company_name: companyName,
                     count: quotationsAmounts.count,
                     amount: quotationsAmounts.amount_total,
+                    sale_value: quotationsAmounts.sale_value,
                 });
             }
 
             // Calculate "Total" rows for each section
-            const calculateTotals = (data, hasAmountField = false, hasSaleValueField = false) => {
+            const calculateTotals = (data) => {
                 if (data.length === 0) {
-                    const result = {
+                    return {
                         company_name: "Total", 
-                        count: 0
+                        count: 0,
+                        amount: 0,
+                        amount_total: 0,
+                        sale_value: 0
                     };
-                    if (hasAmountField) result.amount = 0;
-                    if (hasSaleValueField) {
-                        result.amount_total = 0;
-                        result.sale_value = 0;
-                    }
-                    return result;
                 }
                 
-                const result = {
+                return {
                     company_name: "Total",
-                    count: data.reduce((sum, item) => sum + item.count, 0)
+                    count: data.reduce((sum, item) => sum + item.count, 0),
+                    amount: data.reduce((sum, item) => sum + (item.amount || 0), 0),
+                    amount_total: data.reduce((sum, item) => sum + (item.amount_total || 0), 0),
+                    sale_value: data.reduce((sum, item) => sum + (item.sale_value || 0), 0)
                 };
-                
-                if (hasAmountField) {
-                    result.amount = data.reduce((sum, item) => sum + item.amount, 0);
-                }
-                if (hasSaleValueField) {
-                    result.amount_total = data.reduce((sum, item) => sum + item.amount_total, 0);
-                    result.sale_value = data.reduce((sum, item) => sum + item.sale_value, 0);
-                }
-                
-                return result;
             };
 
-            const postedSalesTotal = calculateTotals(postedSales, false, true);
-            const unpostedSalesTotal = calculateTotals(unpostedSales, true, false);
-            const quotationsTotal = calculateTotals(quotations, true, false);
+            const postedSalesTotal = calculateTotals(postedSales);
+            const unpostedSalesTotal = calculateTotals(unpostedSales);
+            const quotationsTotal = calculateTotals(quotations);
 
             this.state.postedSalesData = [...postedSales, postedSalesTotal];
             this.state.unpostedSalesData = [...unpostedSales, unpostedSalesTotal];

@@ -132,7 +132,7 @@
                             <tr class="bg-blue-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
                                 <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total Amount</th>
+                                <th class="py-3 px-6 border-b">Total</th>
                                 <th class="py-3 px-6 border-b">Sale Value</th>
                             </tr>
                         </thead>
@@ -165,7 +165,8 @@
                             <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
                                 <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Amount</th>
+                                <th class="py-3 px-6 border-b">Total</th>
+                                <th class="py-3 px-6 border-b">Sale Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -174,11 +175,12 @@
                                     <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.unpostedSalesData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="3" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
+                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
                                 </tr>
                             </t>
                         </tbody>
@@ -196,7 +198,8 @@
                             <tr class="bg-purple-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
                                 <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Amount</th>
+                                <th class="py-3 px-6 border-b">Total</th>
+                                <th class="py-3 px-6 border-b">Sale Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -205,11 +208,12 @@
                                     <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="3" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
+                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
                                 </tr>
                             </t>
                         </tbody>
