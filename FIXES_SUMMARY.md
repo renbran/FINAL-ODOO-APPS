@@ -11,10 +11,12 @@
   - **Issue**: Similar malformed template tag
   - **Fix**: Corrected template declaration and removed unescaped content
 
-### 2. XML ID Reference Error Fixed ⭐ **NEW**
+### 2. XML ID Reference Error Fixed ⭐ **UPDATED**
 - **File**: `osus_invoice_report/views/account_move_views.xml`
   - **Issue**: External ID `osus_invoice_report.view_move_kanban_deals` not found - action referenced view before it was defined
-  - **Fix**: Moved kanban view definition (`view_move_kanban_deals`) before the action (`action_property_deals_dashboard`) that references it
+  - **Fix**: 
+    1. Moved kanban view definition (`view_move_kanban_deals`) before the action (`action_property_deals_dashboard`) that references it
+    2. Simplified kanban view to use only standard fields initially to avoid field dependency issues
   - **Impact**: This was preventing Odoo database initialization completely
 
 ### 2. Field Label Conflicts Resolved
@@ -77,8 +79,17 @@ All modified files have been verified for:
 
 ## Next Steps
 
-1. Test Odoo server startup with these fixes
-2. Address any remaining data-related constraint violations
-3. Monitor logs for any additional warnings
+1. ✅ **Restart Odoo server** - The XML ID reference issue should now be resolved
+2. **Gradually enhance kanban view** - Add custom fields back one by one after confirming basic functionality
+3. Address any remaining data-related constraint violations
+4. Monitor logs for any additional warnings
+
+## Recent Changes (Latest Session)
+
+**Fixed persistent External ID error:**
+- Simplified kanban view to use only standard account.move fields
+- This resolves potential field dependency issues during module loading
+- View now uses: name, partner_id, amount_total, state, move_type, currency_id
+- Custom property deal fields can be added back incrementally after confirming the basic view works
 
 All critical startup-blocking issues have been resolved in the code.

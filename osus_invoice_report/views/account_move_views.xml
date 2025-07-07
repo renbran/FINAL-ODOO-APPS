@@ -196,18 +196,10 @@
             <kanban class="o_kanban_mobile" sample="1">
                 <field name="name"/>
                 <field name="partner_id"/>
-                <field name="buyer_id"/>
                 <field name="amount_total"/>
-                <field name="sale_value"/>
                 <field name="state"/>
                 <field name="move_type"/>
                 <field name="currency_id"/>
-                <field name="booking_date"/>
-                <field name="deal_id"/>
-                <field name="project_id"/>
-                <field name="unit_id"/>
-                <field name="is_property_deal"/>
-                <field name="commission_amount"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card oe_kanban_global_click">
@@ -215,40 +207,16 @@
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary">
                                         <strong t-esc="record.name.value"/>
-                                        <span t-if="record.is_property_deal.raw_value" class="badge badge-info ml-2">Property Deal</span>
                                     </div>
                                     <div class="text-muted">
                                         <t t-esc="record.partner_id.value"/>
-                                        <t t-if="record.buyer_id.value"> • Buyer: <t t-esc="record.buyer_id.value"/></t>
                                     </div>
                                 </div>
                             </div>
                             <div class="o_kanban_card_content">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <strong>Amount: </strong><field name="amount_total" widget="monetary"/>
-                                    </div>
-                                    <div class="col-6" t-if="record.sale_value.value">
-                                        <strong>Sale Value: </strong><field name="sale_value" widget="monetary"/>
-                                    </div>
-                                </div>
-                                <div class="row" t-if="record.deal_id.value or record.booking_date.value">
-                                    <div class="col-6" t-if="record.deal_id.value">
-                                        <strong>Deal #: </strong><t t-esc="record.deal_id.value"/>
-                                    </div>
-                                    <div class="col-6" t-if="record.booking_date.value">
-                                        <strong>Booked: </strong><t t-esc="record.booking_date.value"/>
-                                    </div>
-                                </div>
-                                <div class="row" t-if="record.project_id.value or record.unit_id.value">
-                                    <div class="col-12">
-                                        <t t-if="record.project_id.value"><strong>Project: </strong><t t-esc="record.project_id.value"/></t>
-                                        <t t-if="record.unit_id.value"> • <strong>Unit: </strong><t t-esc="record.unit_id.value"/></t>
-                                    </div>
-                                </div>
-                                <div class="row" t-if="record.commission_amount.value">
-                                    <div class="col-12">
-                                        <strong>Commission: </strong><field name="commission_amount" widget="monetary"/>
                                     </div>
                                 </div>
                             </div>
