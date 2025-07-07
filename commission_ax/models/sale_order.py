@@ -121,6 +121,9 @@ class SaleOrder(models.Model):
         ('confirmed', 'Confirmed')
     ], string="Commission Processing Status", default='draft')
 
+    # Booking Date for reporting and commission basis
+    booking_date = fields.Date(string="Booking Date", help="Date used as the basis for commission and reporting.")
+
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
         for order in self:
@@ -248,9 +251,11 @@ class SaleOrder(models.Model):
         if amount <= 0:
             raise UserError("Commission amount must be greater than zero")
         
+        # Use booking_date as the report date basis if set, else fallback to today
+        po_date = self.booking_date or fields.Date.today()
         return {
             'partner_id': partner.id,
-            'date_order': fields.Date.today(),
+            'date_order': po_date,
             'currency_id': self.currency_id.id,
             'company_id': self.company_id.id,
             'origin': self.name,
@@ -544,3 +549,12 @@ class SaleOrder(models.Model):
                 draft_pos.button_cancel()
         
         return super(SaleOrder, self).unlink()
+
+    @api.model
+    def get_orders_by_booking_date(cls, start_date, end_date):
+        """
+        Helper method to fetch sale orders filtered by booking_date.
+        Usage: SaleOrder.get_orders_by_booking_date(start, end)
+        """
+        domain = [('booking_date', '>=', start_date), ('booking_date', '<=', end_date)]
+        return cls.search(domain)
