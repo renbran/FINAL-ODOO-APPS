@@ -11,8 +11,10 @@
             <xpath expr="//field[@name='date_order']" position="after">
                 <field name="booking_date" string="Booking Date"/>
             </xpath>
-            <xpath expr="//field[@name='amount_total']" position="after">
-                <field name="sale_value" string="Sale Value"/>
+            <xpath expr="//page[@name='other_information']" position="inside">
+                <group>
+                    <field name="sale_value" string="Sale Value"/>
+                </group>
             </xpath>
         </field>
     </record>
@@ -26,7 +28,7 @@
             <xpath expr="//field[@name='date_order']" position="after">
                 <field name="booking_date" string="Booking Date"/>
             </xpath>
-            <xpath expr="//field[@name='amount_total']" position="after">
+            <xpath expr="//field[@name='user_id']" position="after">
                 <field name="sale_value" string="Sale Value"/>
             </xpath>
         </field>
