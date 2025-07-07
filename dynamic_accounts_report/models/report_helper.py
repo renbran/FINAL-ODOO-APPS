@@ -20,4 +20,19 @@
 #
 ################################################################################
 
-from .format_helper import format_number
+from odoo import models
+from ..report.format_helper import format_number
+
+
+class ReportHelper(models.AbstractModel):
+    _name = 'report.helper'
+    _description = 'Report Helper Functions'
+
+    def format_number(self, value):
+        """Make format_number available to QWeb templates"""
+        return format_number(value)
+
+
+# Add format_number to builtins so QWeb templates can access it
+import builtins
+builtins.format_number = format_number
