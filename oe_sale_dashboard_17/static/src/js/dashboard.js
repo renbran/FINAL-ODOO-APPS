@@ -35,6 +35,8 @@ class OeSaleDashboard extends Component {
 
         // Load dashboard data when the component is mounted
         onMounted(async () => {
+            // Optionally, you could fetch the most recent booking date here
+            // and set it as the default selectedDate
             console.log("OE Sales Dashboard - Selected Date (default):", this.state.selectedDate);
             await this._loadDashboardData(this.state.selectedDate);
         });
