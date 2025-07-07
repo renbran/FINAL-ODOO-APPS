@@ -48,7 +48,7 @@ class AccountMove(models.Model):
         help="Total value of the property sale"
     )
     developer_commission = fields.Float(
-        string='Broker Commission',
+        string='Developer Commission %',
         tracking=True,
         digits=(16, 2),
         help="Commission percentage for this deal"
