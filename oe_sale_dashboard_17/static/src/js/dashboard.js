@@ -146,10 +146,13 @@ class OeSaleDashboard extends Component {
      * @returns {number} The total amount for the given period.
      */
     async _fetchSalesByCompanyAndPeriod(companyId, start_date_str, end_date_str, baseDomain) {
+        // Remove time part from date strings for booking_date (date only)
+        const startDateOnly = start_date_str.split(' ')[0];
+        const endDateOnly = end_date_str.split(' ')[0];
         let domain = [
             ['company_id', '=', companyId],
-            ['date_order', '>=', start_date_str],
-            ['date_order', '<=', end_date_str],
+            ['booking_date', '>=', startDateOnly],
+            ['booking_date', '<=', endDateOnly],
             ...baseDomain
         ];
 

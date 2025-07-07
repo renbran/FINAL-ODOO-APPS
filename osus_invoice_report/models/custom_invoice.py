@@ -30,10 +30,10 @@ class AccountMove(models.Model):
     )
 
     # Deal Information Fields
-    booking_date = fields.Date(
-        string='Booking Date',
+    booking_datetime = fields.Datetime(
+        string='Booking Datetime',
         tracking=True,
-        help="Date when the property booking was confirmed"
+        help="Date and time when the property booking was confirmed"
     )
     deal_id = fields.Integer(
         string='Deal ID',
@@ -248,7 +248,7 @@ class AccountMove(models.Model):
         
         if sale_order:
             field_map = {
-                'booking_date': 'booking_date',
+                'booking_datetime': 'booking_datetime',
                 'developer_commission': 'developer_commission',
                 'buyer_id': 'buyer_id',
                 'deal_id': 'deal_id',
@@ -261,13 +261,13 @@ class AccountMove(models.Model):
                 if sale_field in sale_order._fields and invoice_field not in vals:
                     vals[invoice_field] = sale_order[sale_field].id if hasattr(sale_order[sale_field], 'id') else sale_order[sale_field]
 
-    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_date')
+    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_datetime')
     def _compute_deal_status(self):
         """Compute if this is a property deal based on available deal information"""
         for record in self:
             record.is_property_deal = bool(
                 record.buyer_id or record.project_id or 
-                record.unit_id or record.deal_id or record.booking_date
+                record.unit_id or record.deal_id or record.booking_datetime
             )
 
     @api.depends('sale_value', 'developer_commission')
