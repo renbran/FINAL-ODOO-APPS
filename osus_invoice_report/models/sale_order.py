@@ -4,8 +4,8 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # --- Deal Information Fields ---
-    booking_datetime = fields.Datetime(
-        string='Booking Datetime',
+    booking_date = fields.Date(
+        string='Booking Date',
         tracking=True,
     )
     deal_id = fields.Integer(
