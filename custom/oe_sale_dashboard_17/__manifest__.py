@@ -27,7 +27,6 @@
     'data': [
         'data/sale_order_data.xml',
         'views/dashboard_views.xml',
-        'views/sale_order_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
