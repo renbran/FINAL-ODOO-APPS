@@ -21,7 +21,6 @@ class OeSaleDashboard extends Component {
         this.state = useState({
             startDate: startDate,
             endDate: today,
-            amountField: 'amount_total', // 'amount_total' or 'sale_value'
             postedSalesData: [],
             unpostedSalesData: [],
             quotationsData: [],
@@ -75,16 +74,6 @@ class OeSaleDashboard extends Component {
         this._loadDashboardData();
     }
 
-    /**
-     * Handles the change event of the amount field dropdown.
-     * Updates the selected amount field and reloads dashboard data.
-     * @param {Event} ev - The change event.
-     */
-    onAmountFieldChange(ev) {
-        this.state.amountField = ev.target.value;
-        this._loadDashboardData();
-    }
-
 
 
     /**
@@ -93,7 +82,7 @@ class OeSaleDashboard extends Component {
      * @param {string} start_date_str - The start date in YYYY-MM-DD format.
      * @param {string} end_date_str - The end date in YYYY-MM-DD format.
      * @param {Array} baseDomain - The base domain for the sales order query (e.g., state, invoice_status).
-     * @returns {number} The total amount for the given period.
+     * @returns {Object} Object with amount_total and sale_value totals for the given period.
      */
     async _fetchSalesByCompanyAndDateRange(companyId, start_date_str, end_date_str, baseDomain) {
         // Convert dates to datetime strings for proper filtering
@@ -107,22 +96,24 @@ class OeSaleDashboard extends Component {
             ...baseDomain
         ];
 
-        // Determine which field to read based on the selected amount field
-        const fieldToRead = this.state.amountField === 'sale_value' ? 'sale_value' : 'amount_total';
-        
-        // Fetch sales orders
+        // Fetch both amount_total and sale_value fields
         const salesOrders = await this.orm.searchRead(
             "sale.order",
             domain,
-            [fieldToRead]
+            ['amount_total', 'sale_value']
         );
 
-        // Sum the total amount
-        let total = 0.0;
+        // Sum both totals
+        let totalAmount = 0.0;
+        let totalSaleValue = 0.0;
         for (const order of salesOrders) {
-            total += order[fieldToRead] || 0.0;
+            totalAmount += order.amount_total || 0.0;
+            totalSaleValue += order.sale_value || 0.0;
         }
-        return total;
+        return {
+            amount_total: totalAmount,
+            sale_value: totalSaleValue
+        };
     }
 
     /**
@@ -153,7 +144,7 @@ class OeSaleDashboard extends Component {
                 const companyName = company.name;
 
                 // Fetch Posted Sale Orders (confirmed and invoiced)
-                const postedAmount = await this._fetchSalesByCompanyAndDateRange(
+                const postedAmounts = await this._fetchSalesByCompanyAndDateRange(
                     companyId, 
                     this.state.startDate, 
                     this.state.endDate, 
@@ -162,11 +153,12 @@ class OeSaleDashboard extends Component {
 
                 postedSales.push({
                     company_name: companyName,
-                    amount: postedAmount,
+                    amount_total: postedAmounts.amount_total,
+                    sale_value: postedAmounts.sale_value,
                 });
 
                 // Fetch Unposted Sale Orders (confirmed but not invoiced)
-                const unpostedAmount = await this._fetchSalesByCompanyAndDateRange(
+                const unpostedAmounts = await this._fetchSalesByCompanyAndDateRange(
                     companyId, 
                     this.state.startDate, 
                     this.state.endDate, 
@@ -175,11 +167,12 @@ class OeSaleDashboard extends Component {
 
                 unpostedSales.push({
                     company_name: companyName,
-                    amount: unpostedAmount,
+                    amount_total: unpostedAmounts.amount_total,
+                    sale_value: unpostedAmounts.sale_value,
                 });
 
                 // Fetch All Quotations (draft and sent)
-                const quotationsAmount = await this._fetchSalesByCompanyAndDateRange(
+                const quotationsAmounts = await this._fetchSalesByCompanyAndDateRange(
                     companyId, 
                     this.state.startDate, 
                     this.state.endDate, 
@@ -188,7 +181,8 @@ class OeSaleDashboard extends Component {
 
                 quotations.push({
                     company_name: companyName,
-                    amount: quotationsAmount,
+                    amount_total: quotationsAmounts.amount_total,
+                    sale_value: quotationsAmounts.sale_value,
                 });
             }
 
@@ -196,11 +190,13 @@ class OeSaleDashboard extends Component {
             const calculateTotals = (data) => {
                 if (data.length === 0) return {
                     company_name: "Total", 
-                    amount: 0
+                    amount_total: 0,
+                    sale_value: 0
                 };
                 return {
                     company_name: "Total",
-                    amount: data.reduce((sum, item) => sum + item.amount, 0),
+                    amount_total: data.reduce((sum, item) => sum + item.amount_total, 0),
+                    sale_value: data.reduce((sum, item) => sum + item.sale_value, 0),
                 };
             };
 
@@ -212,8 +208,7 @@ class OeSaleDashboard extends Component {
             this.state.unpostedSalesData = [...unpostedSales, unpostedSalesTotal];
             this.state.quotationsData = [...quotations, quotationsTotal];
 
-            const fieldDisplayName = this.state.amountField === 'sale_value' ? 'Sale Value' : 'Total Amount';
-            this.notification.add(_t(`Sales data updated for: ${this.state.startDate} to ${this.state.endDate} (${fieldDisplayName})`), { type: 'success' });
+            this.notification.add(_t(`Sales data updated for: ${this.state.startDate} to ${this.state.endDate}`), { type: 'success' });
 
         } catch (error) {
             console.error("Error loading dashboard data:", error);

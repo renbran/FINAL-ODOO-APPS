@@ -99,10 +99,7 @@
                 }
             </style>
 
-            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Sales Report</h1>
-
-            <!-- Copyright Notice -->
-            <p class="text-sm text-gray-500 text-center mb-4">This module is under copyright of 'OdooElevate'</p>
+            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">OSUS Sales</h1>
 
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-md">
                 <div class="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
@@ -115,14 +112,6 @@
                         <label for="endDate" class="block text-gray-700 text-sm font-semibold mb-1">End Date:</label>
                         <input type="date" id="endDate" t-att-value="state.endDate" t-on-change="onEndDateChange"
                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="amountField" class="block text-gray-700 text-sm font-semibold mb-1">Amount Field:</label>
-                        <select id="amountField" t-att-value="state.amountField" t-on-change="onAmountFieldChange"
-                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="amount_total">Total Amount</option>
-                            <option value="sale_value">Sale Value</option>
-                        </select>
                     </div>
                 </div>
                 <div t-if="state.isLoading" class="flex items-center justify-center text-blue-600 text-xs">
@@ -142,19 +131,23 @@
                         <thead>
                             <tr class="bg-blue-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
-                                <th class="py-3 px-6 border-b">Amount</th>
+                                <th class="py-3 px-6 border-b">Count</th>
+                                <th class="py-3 px-6 border-b">Total Amount</th>
+                                <th class="py-3 px-6 border-b">Sale Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="state.postedSalesData" t-as="company_data" t-key="company_data.company_name">
                                 <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-blue-50': company_data.company_name === 'Total'}">
                                     <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount_total)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.postedSalesData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="2" class="py-3 px-6 text-center text-gray-600">No posted sales data available.</td>
+                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No posted sales data available.</td>
                                 </tr>
                             </t>
                         </tbody>
@@ -171,6 +164,7 @@
                         <thead>
                             <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Count</th>
                                 <th class="py-3 px-6 border-b">Amount</th>
                             </tr>
                         </thead>
@@ -178,12 +172,13 @@
                             <t t-foreach="state.unpostedSalesData" t-as="company_data" t-key="company_data.company_name">
                                 <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-green-50': company_data.company_name === 'Total'}">
                                     <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
                                 </tr>
                             </t>
                             <t t-if="state.unpostedSalesData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="2" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
+                                    <td colspan="3" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
                                 </tr>
                             </t>
                         </tbody>
@@ -200,6 +195,7 @@
                         <thead>
                             <tr class="bg-purple-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                                 <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Count</th>
                                 <th class="py-3 px-6 border-b">Amount</th>
                             </tr>
                         </thead>
@@ -207,12 +203,13 @@
                             <t t-foreach="state.quotationsData" t-as="company_data" t-key="company_data.company_name">
                                 <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-purple-50': company_data.company_name === 'Total'}">
                                     <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="company_data.count || 0"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.amount)"/>
                                 </tr>
                             </t>
                             <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="2" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
+                                    <td colspan="3" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
                                 </tr>
                             </t>
                         </tbody>

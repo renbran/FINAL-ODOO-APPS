@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This module is under copyright of 'OdooElevate'
 {
-    'name': 'Sales Report Dashboard',
+    'name': 'OSUS Sales Dashboard',
     'version': '17.0.0.1.1',
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
@@ -16,10 +16,8 @@
         - Real-time dashboard updates
         - Responsive design with modern UI
         
-        This module adds booking_date and sale_value fields to sale orders and provides
-        a comprehensive dashboard for sales analysis based on these enhanced data points.
-        
-        This module is under copyright of 'OdooElevate'.
+        Comprehensive dashboard for sales analysis using booking_date and sale_value fields
+        from the osus_invoice_report module.
     """,
     'author': 'Sheikh Muhammad Saad, OdooElevate',
     'website': 'https://odooelevate.odoo.com/',
