@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This module is under copyright of 'OdooElevate' -->
+<odoo>
+    <!-- 
+    NOTE: View customizations for booking_date and sale_value are already 
+    provided by the osus_invoice_report module. This module only provides 
+    the dashboard functionality and doesn't need to redefine the views.
+    -->
+</odoo>

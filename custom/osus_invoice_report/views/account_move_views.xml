@@ -1,58 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Add print buttons to the form view header -->
-    <record id="view_move_form_inherit" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.custom.reports</field>
+    <!-- Inherit account move form view to add custom print buttons -->
+    <record id="view_move_form_inherit_osus_v2" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.osus.reports.v2</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Add to existing button box -->
-            <xpath expr="//div[hasclass('o_form_button_box')]" position="inside">
-                <button name="action_print_custom_invoice" 
-                        string="Print Invoice"
-                        class="btn-secondary"
-                        type="object"
-                        groups="account.group_account_invoice"
-                        t-if="move_type in ('out_invoice', 'out_refund')"/>
-                
-                <button name="action_print_custom_bill" 
-                        string="Print Bill"
-                        class="btn-secondary"
-                        type="object"
-                        groups="account.group_account_invoice"
-                        t-if="move_type in ('in_invoice', 'in_refund')"/>
-                
-                <button name="action_print_custom_receipt" 
-                        string="Print Receipt"
-                        class="btn-secondary"
-                        type="object"
-                        groups="account.group_account_invoice"/>
+            <!-- Add Deal Tracking Tab -->
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <group string="Deal Information">
+                        <group>
+                            <field name="booking_date"/>
+                            <field name="deal_id"/>
+                            <field name="sale_value" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="developer_commission" widget="percentage"/>
+                            <field name="buyer_id" options="{'quick_create': True, 'create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="project_id" options="{'quick_create': True, 'create_edit': True}"/>
+                            <field name="unit_id" options="{'quick_create': True, 'create_edit': True}"/>
+                        </group>
+                    </group>
+                    <group string="Report Settings">
+                        <group>
+                            <field name="qr_in_report"/>
+                        </group>
+                        <group>
+                            <field name="qr_image" widget="image" readonly="1" invisible="not qr_in_report"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
 
-    <!-- Add reports to the Print dropdown menu -->
-    <record id="account_move_action_print_custom_invoice" model="ir.actions.act_window">
-        <field name="name">Print Custom Invoice</field>
-        <field name="res_model">account.move</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="binding_type">report</field>
-        <field name="report_ref">custom_reports.action_report_custom_invoice</field>
+    <!-- Inherit account move tree view to show deal information -->
+    <record id="view_move_tree_inherit_osus" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.osus</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <!-- Add deal tracking fields after partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id" optional="show"/>
+                <field name="deal_id" optional="show"/>
+                <field name="booking_date" optional="show"/>
+            </xpath>
+            
+            <!-- Add financial fields after amount total -->
+            <xpath expr="//field[@name='amount_total_signed']" position="after">
+                <field name="sale_value" widget="monetary" optional="show"/>
+            </xpath>
+            
+            <!-- Add project info (hidden by default) -->
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
+                <field name="developer_commission" widget="percentage" optional="hide"/>
+            </xpath>
+        </field>
     </record>
 
-    <record id="account_move_action_print_custom_bill" model="ir.actions.act_window">
-        <field name="name">Print Custom Bill</field>
-        <field name="res_model">account.move</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="binding_type">report</field>
-        <field name="report_ref">custom_reports.action_report_custom_bill</field>
+    <!-- Search view for account moves with deal information -->
+    <record id="view_account_move_filter_inherit_osus" model="ir.ui.view">
+        <field name="name">account.move.select.inherit.osus</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <!-- Add search fields -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="deal_id"/>
+                <field name="booking_date"/>
+                <field name="sale_value"/>
+            </xpath>
+            
+            <!-- Add filters -->
+            <xpath expr="//field[@name='sale_value']" position="after">
+                <separator/>
+                <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
+                <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
+                <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
+                <filter string="Property Deals" name="property_deals" 
+                        domain="['|', '|', ('buyer_id', '!=', False), ('project_id', '!=', False), ('deal_id', '!=', False)]"/>
+                <filter string="High Value Deals" name="high_value_deals" 
+                        domain="[('sale_value', '>', 1000000)]"/>
+                <filter string="With Commission" name="has_commission" 
+                        domain="[('developer_commission', '>', 0)]"/>
+                <separator/>
+                <filter string="This Month's Bookings" name="booking_this_month" 
+                        domain="[('booking_date', '>=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
+                                ('booking_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+            </xpath>
+            
+            <!-- Add group by options -->
+            <xpath expr="//group[@expand='0']" position="inside">
+                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
+                <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
+            </xpath>
+        </field>
     </record>
 
-    <record id="account_move_action_print_custom_receipt" model="ir.actions.act_window">
-        <field name="name">Print Custom Receipt</field>
-        <field name="res_model">account.move</field>
+    <!-- Custom Invoice Report Action -->
+    <record id="action_report_custom_invoice" model="ir.actions.report">
+        <field name="name">OSUS Tax Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">osus_invoice_report.report_custom_invoice_document</field>
+        <field name="report_file">osus_invoice_report.report_custom_invoice_document</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
-        <field name="report_ref">custom_reports.action_report_custom_receipt</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+        <field name="print_report_name">'OSUS-Invoice-%s' % (object.name or 'draft')</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
     </record>
+
+    <!-- Custom Bill Report Action -->
+    <record id="action_report_custom_bill" model="ir.actions.report">
+        <field name="name">OSUS Bill</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">osus_invoice_report.report_custom_bill</field>
+        <field name="report_file">osus_invoice_report.report_custom_bill</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+        <field name="print_report_name">'OSUS-Bill-%s' % (object.name or 'draft')</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <!-- Custom Receipt Report Action -->
+    <record id="action_report_custom_receipt" model="ir.actions.report">
+        <field name="name">OSUS Receipt</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">osus_invoice_report.report_custom_receipt</field>
+        <field name="report_file">osus_invoice_report.report_custom_receipt</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+        <field name="print_report_name">'OSUS-Receipt-%s' % (object.name or 'draft')</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <!-- Invoice List Action with Deal Tracking -->
+    <record id="action_move_out_invoice_type_osus" model="ir.actions.act_window">
+        <field name="name">Invoices with Deal Tracking</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_move_tree_inherit_osus"/>
+        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="help">Track property deals and commissions with enhanced invoice views. Use filters to find specific deals quickly.</field>
+    </record>
+
+    <!-- Menu item for Invoice List with Deal Tracking -->
+    <menuitem 
+        id="menu_action_move_out_invoice_type_osus"
+        name="Deal Tracking Invoices"
+        parent="account.menu_finance_receivables"
+        action="action_move_out_invoice_type_osus"
+        sequence="15"/>
+
+    <!-- Property Deals Dashboard Action -->
+    <record id="action_property_deals_dashboard" model="ir.actions.act_window">
+        <field name="name">Property Deals Dashboard</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="view_id" ref="view_move_tree_inherit_osus"/>
+        <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False)]</field>
+        <field name="context">{
+            'default_move_type': 'out_invoice',
+            'search_default_property_deals': 1,
+            'search_default_group_buyer': 1
+        }</field>
+        <field name="help">Comprehensive dashboard for property deal management and analytics</field>
+    </record>
+
+    <!-- Menu item for Property Deals Dashboard -->
+    <menuitem 
+        id="menu_property_deals_dashboard"
+        name="Property Deals Dashboard"
+        parent="account.menu_finance_receivables"
+        action="action_property_deals_dashboard"
+        sequence="14"/>
+
 </odoo>

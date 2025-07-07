@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_commission_deal" model="ir.ui.view">
+        <field name="name">account.move.form.commission.deal</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="deal_id_display" string="Deal ID" readonly="1"/>
+                <field name="booking_date"/>
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="sale_value"/>
+            </xpath>
+            <xpath expr="//sheet/notebook" position="before">
+                <notebook>
+                    <page string="Deal Information" name="deal_information">
+                        <group>
+                            <field name="deal_id_display" string="Deal ID" readonly="1"/>
+                            <field name="booking_date"/>
+                            <field name="buyer_id"/>
+                            <field name="project_id" string="Project Name"/>
+                            <field name="unit_id"/>
+                            <field name="sale_value"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree View Extension to match Sales Order tree view -->
+    <record id="view_move_tree_commission_custom_layout" model="ir.ui.view">
+        <field name="name">account.move.tree.commission.custom.layout</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="replace">
+                <tree string="Account Moves">
+                    <field name="deal_id_display" string="Deal ID" readonly="1"/>
+                    <field name="booking_date" string="Booking Date"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="buyer_id" string="Buyer Name"/>
+                    <field name="project_id" string="Project"/>
+                    <field name="unit_id" string="Unit"/>
+                    <field name="sale_value" string="Sale Value"/>
+                    <!-- Quantity field is not available on account.move, so not added. -->
+                    <field name="state" string="Status"/>
+                    <field name="move_type" string="Move Type"/>
+                </tree>
+            </xpath>
+        </field>
+    </record>
+</odoo>
