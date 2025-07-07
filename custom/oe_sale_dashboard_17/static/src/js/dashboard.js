@@ -82,7 +82,7 @@ class OeSaleDashboard extends Component {
      * @param {string} start_date_str - The start date in YYYY-MM-DD format.
      * @param {string} end_date_str - The end date in YYYY-MM-DD format.
      * @param {Array} baseDomain - The base domain for the sales order query (e.g., state, invoice_status).
-     * @returns {Object} Object with amount_total and sale_value totals for the given period.
+     * @returns {Object} Object with amount_total, sale_value totals and count for the given period.
      */
     async _fetchSalesByCompanyAndDateRange(companyId, start_date_str, end_date_str, baseDomain) {
         // Convert dates to datetime strings for proper filtering
@@ -103,16 +103,19 @@ class OeSaleDashboard extends Component {
             ['amount_total', 'sale_value']
         );
 
-        // Sum both totals
+        // Sum both totals and count records
         let totalAmount = 0.0;
         let totalSaleValue = 0.0;
+        const count = salesOrders.length;
+        
         for (const order of salesOrders) {
             totalAmount += order.amount_total || 0.0;
             totalSaleValue += order.sale_value || 0.0;
         }
         return {
             amount_total: totalAmount,
-            sale_value: totalSaleValue
+            sale_value: totalSaleValue,
+            count: count
         };
     }
 
@@ -153,6 +156,7 @@ class OeSaleDashboard extends Component {
 
                 postedSales.push({
                     company_name: companyName,
+                    count: postedAmounts.count,
                     amount_total: postedAmounts.amount_total,
                     sale_value: postedAmounts.sale_value,
                 });
@@ -167,8 +171,8 @@ class OeSaleDashboard extends Component {
 
                 unpostedSales.push({
                     company_name: companyName,
-                    amount_total: unpostedAmounts.amount_total,
-                    sale_value: unpostedAmounts.sale_value,
+                    count: unpostedAmounts.count,
+                    amount: unpostedAmounts.amount_total,
                 });
 
                 // Fetch All Quotations (draft and sent)
@@ -181,28 +185,45 @@ class OeSaleDashboard extends Component {
 
                 quotations.push({
                     company_name: companyName,
-                    amount_total: quotationsAmounts.amount_total,
-                    sale_value: quotationsAmounts.sale_value,
+                    count: quotationsAmounts.count,
+                    amount: quotationsAmounts.amount_total,
                 });
             }
 
             // Calculate "Total" rows for each section
-            const calculateTotals = (data) => {
-                if (data.length === 0) return {
-                    company_name: "Total", 
-                    amount_total: 0,
-                    sale_value: 0
-                };
-                return {
+            const calculateTotals = (data, hasAmountField = false, hasSaleValueField = false) => {
+                if (data.length === 0) {
+                    const result = {
+                        company_name: "Total", 
+                        count: 0
+                    };
+                    if (hasAmountField) result.amount = 0;
+                    if (hasSaleValueField) {
+                        result.amount_total = 0;
+                        result.sale_value = 0;
+                    }
+                    return result;
+                }
+                
+                const result = {
                     company_name: "Total",
-                    amount_total: data.reduce((sum, item) => sum + item.amount_total, 0),
-                    sale_value: data.reduce((sum, item) => sum + item.sale_value, 0),
+                    count: data.reduce((sum, item) => sum + item.count, 0)
                 };
+                
+                if (hasAmountField) {
+                    result.amount = data.reduce((sum, item) => sum + item.amount, 0);
+                }
+                if (hasSaleValueField) {
+                    result.amount_total = data.reduce((sum, item) => sum + item.amount_total, 0);
+                    result.sale_value = data.reduce((sum, item) => sum + item.sale_value, 0);
+                }
+                
+                return result;
             };
 
-            const postedSalesTotal = calculateTotals(postedSales);
-            const unpostedSalesTotal = calculateTotals(unpostedSales);
-            const quotationsTotal = calculateTotals(quotations);
+            const postedSalesTotal = calculateTotals(postedSales, false, true);
+            const unpostedSalesTotal = calculateTotals(unpostedSales, true, false);
+            const quotationsTotal = calculateTotals(quotations, true, false);
 
             this.state.postedSalesData = [...postedSales, postedSalesTotal];
             this.state.unpostedSalesData = [...unpostedSales, unpostedSalesTotal];
