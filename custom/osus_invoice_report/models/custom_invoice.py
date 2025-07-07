@@ -242,8 +242,10 @@ class AccountMove(models.Model):
         return super().create(vals)
 
     def _populate_from_sale_order(self, vals):
+        # Ensure we only fetch active (non-cancelled) sale orders
         sale_order = self.env['sale.order'].search([
-            ('name', '=', vals.get('invoice_origin'))
+            ('name', '=', vals.get('invoice_origin')),
+            ('state', '!=', 'cancel')  # Exclude cancelled orders
         ], limit=1)
         
         if sale_order:
