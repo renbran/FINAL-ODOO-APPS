@@ -34,6 +34,21 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
+            <!-- Add "Set to Quotation" button in header -->
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button name="action_draft" string="Set to Quotation" type="object" 
+                            class="btn-secondary" 
+                            invisible="state == 'draft'"
+                            confirm="This will reset the order to quotation state. Are you sure?"/>
+                </header>
+            </xpath>
+            
+            <!-- Ensure state field is available for button visibility -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="state" optional="hide"/>
+            </xpath>
+            
             <!-- Add deal tracking fields after order date -->
             <xpath expr="//field[@name='date_order']" position="after">
                 <field name="booking_date" optional="show"/>
@@ -108,6 +123,21 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
+            <!-- Add "Set to Quotation" button in header -->
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button name="action_draft" string="Set to Quotation" type="object" 
+                            class="btn-secondary" 
+                            invisible="state == 'draft'"
+                            confirm="This will reset the order to quotation state. Are you sure?"/>
+                </header>
+            </xpath>
+            
+            <!-- Ensure state field is available for button visibility -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="state" optional="hide"/>
+            </xpath>
+            
             <!-- Add buyer and project info after partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="booking_date" optional="show"/>
