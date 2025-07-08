@@ -29,50 +29,9 @@ class AccountMove(models.Model):
         help="The total amount expressed in words"
     )
 
-    # Deal Information Fields
-    booking_date = fields.Date(
-        string='Booking Date',
-        tracking=True,
-        help="Date when the property booking was confirmed"
-    )
-    deal_id = fields.Integer(
-        string='Deal ID',
-        tracking=True,
-        copy=False,
-        help="Internal reference ID for the real estate deal"
-    )
-    sale_value = fields.Monetary(
-        string='Sale Value',
-        tracking=True,
-        currency_field='currency_id',
-        help="Total value of the property sale"
-    )
-    developer_commission = fields.Float(
-        string='Broker Commission',
-        tracking=True,
-        digits=(16, 2),
-        help="Commission percentage for this deal"
-    )
-
-    # Relational Fields
-    buyer_id = fields.Many2one(
-        'res.partner',
-        string='Buyer',
-        tracking=True,
-        help="The buyer of the property"
-    )
-    project_id = fields.Many2one(
-        'product.template',
-        string='Project Name',
-        tracking=True,
-        help="The real estate project this deal belongs to"
-    )
-    unit_id = fields.Many2one(
-        'product.product',
-        string='Unit',
-        tracking=True,
-        help="The specific property unit in this deal"
-    )
+    # Deal Information Fields - These fields are defined in commission modules
+    # We don't define them here to avoid conflicts with commission_fields and advance_commission modules
+    # The fields are: booking_date, deal_id, sale_value, developer_commission, buyer_id, project_id, unit_id
 
     # Computed fields for enhanced tree view
     is_property_deal = fields.Boolean(
@@ -89,7 +48,7 @@ class AccountMove(models.Model):
         help="Calculated commission amount based on sale value and percentage"
     )
 
-    @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report', 'buyer_id', 'project_id', 'unit_id')
+    @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report')
     def _compute_qr_code(self):
         for record in self:
             # Skip QR code generation for cancelled records
@@ -165,15 +124,16 @@ class AccountMove(models.Model):
         ]
         
         # Add real estate specific information if available
-        if self.buyer_id:
+        # These fields come from commission modules
+        if hasattr(self, 'buyer_id') and self.buyer_id:
             content_lines.append(f"Buyer: {self.buyer_id.name}")
-        if self.project_id:
+        if hasattr(self, 'project_id') and self.project_id:
             content_lines.append(f"Project: {self.project_id.name}")
-        if self.unit_id:
+        if hasattr(self, 'unit_id') and self.unit_id:
             content_lines.append(f"Unit: {self.unit_id.name}")
-        if self.deal_id:
+        if hasattr(self, 'deal_id') and self.deal_id:
             content_lines.append(f"Deal ID: {self.deal_id}")
-        if self.sale_value:
+        if hasattr(self, 'sale_value') and self.sale_value:
             content_lines.append(f"Sale Value: {self.sale_value} {self.currency_id.name}")
         
         return '\n'.join(content_lines)
@@ -268,21 +228,29 @@ class AccountMove(models.Model):
                 if sale_field in sale_order._fields and invoice_field not in vals:
                     vals[invoice_field] = sale_order[sale_field].id if hasattr(sale_order[sale_field], 'id') else sale_order[sale_field]
 
-    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_date')
     def _compute_deal_status(self):
         """Compute if this is a property deal based on available deal information"""
         for record in self:
+            # Check if deal-related fields exist (they come from commission modules)
+            has_buyer = hasattr(record, 'buyer_id') and record.buyer_id
+            has_project = hasattr(record, 'project_id') and record.project_id
+            has_unit = hasattr(record, 'unit_id') and record.unit_id
+            has_deal_id = hasattr(record, 'deal_id') and record.deal_id
+            has_booking_date = hasattr(record, 'booking_date') and record.booking_date
+            
             record.is_property_deal = bool(
-                record.buyer_id or record.project_id or 
-                record.unit_id or record.deal_id or record.booking_date
+                has_buyer or has_project or has_unit or has_deal_id or has_booking_date
             )
 
-    @api.depends('sale_value', 'developer_commission')
     def _compute_commission_amount(self):
         """Compute commission amount from sale value and percentage"""
         for record in self:
-            if record.sale_value and record.developer_commission:
-                record.commission_amount = (record.sale_value * record.developer_commission) / 100
+            # Check if commission fields exist (they come from commission modules)
+            sale_value = getattr(record, 'sale_value', 0) if hasattr(record, 'sale_value') else 0
+            commission_pct = getattr(record, 'developer_commission', 0) if hasattr(record, 'developer_commission') else 0
+            
+            if sale_value and commission_pct:
+                record.commission_amount = (sale_value * commission_pct) / 100
             else:
                 record.commission_amount = 0.0
 
