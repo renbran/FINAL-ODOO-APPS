@@ -7,10 +7,15 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     # UAE Specific Fields
+    joining_date = fields.Date(string='Joining Date', required=True, 
+                             help='Date when the employee joined the company')
     visa_expiry_date = fields.Date(string='Visa Expiry Date')
     passport_expiry_date = fields.Date(string='Passport Expiry Date')
     emirates_id = fields.Char(string='Emirates ID')
     emirates_id_expiry_date = fields.Date(string='Emirates ID Expiry Date')
+    is_uae_national = fields.Boolean(string='Is UAE National')
+    country_id = fields.Many2one('res.country', string='Home Country', 
+                                help='Employee\'s home country for air ticket purposes')
 
     # Annual Benefits
     annual_air_ticket = fields.Boolean(string='Eligible for Annual Air Ticket')
