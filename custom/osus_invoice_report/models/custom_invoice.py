@@ -92,6 +92,11 @@ class AccountMove(models.Model):
     @api.depends('name', 'partner_id', 'amount_total', 'invoice_date', 'qr_in_report', 'buyer_id', 'project_id', 'unit_id')
     def _compute_qr_code(self):
         for record in self:
+            # Skip QR code generation for cancelled records
+            if record.state == 'cancel':
+                record.qr_image = False
+                continue
+                
             if not record.qr_in_report:
                 record.qr_image = False
                 continue
@@ -280,3 +285,16 @@ class AccountMove(models.Model):
                 record.commission_amount = (record.sale_value * record.developer_commission) / 100
             else:
                 record.commission_amount = 0.0
+
+    @api.model
+    def _get_active_records_domain(self):
+        """Return domain to filter out cancelled records"""
+        return [('state', '!=', 'cancel')]
+
+    @api.model
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+        """Override search to exclude cancelled records by default"""
+        # Add active filter if not explicitly searching for cancelled records
+        if not any('state' in str(arg) for arg in args if isinstance(arg, (list, tuple))):
+            args = args + self._get_active_records_domain()
+        return super().search(args, offset=offset, limit=limit, order=order, count=count)

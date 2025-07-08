@@ -84,6 +84,10 @@
             <!-- Add filters -->
             <xpath expr="//field[@name='sale_value']" position="after">
                 <separator/>
+                <!-- Active Data Filters -->
+                <filter string="Active Only" name="active_only" domain="[('state', '!=', 'cancel')]"/>
+                <filter string="Posted Only" name="posted_only" domain="[('state', '=', 'posted')]"/>
+                <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
                 <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
@@ -158,8 +162,8 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
-        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '!=', 'cancel')]</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'search_default_active_only': 1}</field>
         <field name="help">Track property deals and commissions with enhanced invoice views. Use filters to find specific deals quickly.</field>
     </record>
 
@@ -178,11 +182,12 @@
         <field name="view_mode">tree,form,graph,pivot</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False)]</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False), ('state', '!=', 'cancel')]</field>
         <field name="context">{
             'default_move_type': 'out_invoice',
             'search_default_property_deals': 1,
-            'search_default_group_buyer': 1
+            'search_default_group_buyer': 1,
+            'search_default_active_only': 1
         }</field>
         <field name="help">Comprehensive dashboard for property deal management and analytics</field>
     </record>

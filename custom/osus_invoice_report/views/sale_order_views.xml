@@ -75,6 +75,10 @@
             <!-- Add filters -->
             <xpath expr="//filter[@name='activities_overdue']" position="after">
                 <separator/>
+                <!-- Active Data Filters -->
+                <filter string="Active Only" name="active_only" domain="[('state', '!=', 'cancel')]"/>
+                <filter string="Confirmed Orders" name="confirmed_only" domain="[('state', 'in', ['sale', 'done'])]"/>
+                <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
                 <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
