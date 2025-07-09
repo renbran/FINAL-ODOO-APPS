@@ -7,6 +7,7 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
+                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
                 <div class="page">
                     <h3>
                         <center>
@@ -117,7 +118,7 @@
                                         </t>
                                     </t>
                                     <th style="text-align:center;font-weight: 700;">
-                                        <t t-esc="sale_total"/>
+                                        <t t-esc="format_number(sale_total)"/>
                                     </th>
                                 </tr>
                                 <t t-set="i" t-value="0"/>
@@ -149,7 +150,7 @@
                                                         <span>
                                                             <t t-esc="sale_tax_line['name']"/>
                                                             (
-                                                            <t t-esc="sale_tax_line['amount']"/>
+                                                            <t t-esc="format_number(sale_tax_line['amount'])"/>
                                                             %)
                                                         </span>
                                                     </th>
@@ -167,7 +168,7 @@
                                                 <t t-else="">
                                                     <t t-esc="sale_tax_line['name']"/>
                                                     (
-                                                    <t t-esc="sale_tax_line['amount']"/>
+                                                    <t t-esc="format_number(sale_tax_line['amount'])"/>
                                                     %)
                                                 </t>
                                             </span>
@@ -180,23 +181,23 @@
                                                    t-as="num">
                                                     <th style="text-align:center;font-weight: 400;">
                                                         <t t-if="sale_tax_line['dynamic net']['dynamic_total_net_sum' + str(num)]"
-                                                           t-esc="sale_tax_line['dynamic net']['dynamic_total_net_sum' + str(num)]"/>
+                                                           t-esc="format_number(sale_tax_line['dynamic net']['dynamic_total_net_sum' + str(num)])"/>
                                                     </th>
                                                     <th style="text-align:center;font-weight: 400;">
                                                         <t t-if="sale_tax_line['dynamic tax']['dynamic_total_tax_sum' + str(num)]"
-                                                           t-esc="sale_tax_line['dynamic tax']['dynamic_total_tax_sum' + str(num)]"/>
+                                                           t-esc="format_number(sale_tax_line['dynamic tax']['dynamic_total_tax_sum' + str(num)])"/>
                                                     </th>
                                                 </t>
                                             </t>
                                         </t>
                                         <th style="text-align:center;">
                                             <span style="font-weight: 400;">
-                                                <t t-esc="sale_tax_line['net']"/>
+                                                <t t-esc="format_number(sale_tax_line['net'])"/>
                                             </span>
                                         </th>
                                         <th style="text-align:center;">
                                             <span style="font-weight: 400;">
-                                                <t t-esc="sale_tax_line['tax']"/>
+                                                <t t-esc="format_number(sale_tax_line['tax'])"/>
                                             </span>
                                         </th>
                                     </tr>
@@ -220,7 +221,7 @@
                                         </t>
                                     </t>
                                     <th style="text-align:center;font-weight: 700;">
-                                        <t t-esc="purchase_total"/>
+                                        <t t-esc="format_number(purchase_total)"/>
                                     </th>
                                 </tr>
                                 <t t-set="i" t-value="0"/>
@@ -247,7 +248,7 @@
                                                     <span>
                                                         <t t-esc="purchase_tax_line['name']"/>
                                                         (
-                                                        <t t-esc="purchase_tax_line['amount']"/>
+                                                        <t t-esc="format_number(purchase_tax_line['amount'])"/>
                                                         %)
                                                     </span>
                                                 </th>
@@ -264,7 +265,7 @@
                                                 <t t-else="">
                                                     <t t-esc="purchase_tax_line['name']"/>
                                                     (
-                                                    <t t-esc="purchase_tax_line['amount']"/>
+                                                    <t t-esc="format_number(purchase_tax_line['amount'])"/>
                                                     %)
                                                 </t>
                                             </span>
@@ -277,23 +278,23 @@
                                                    t-as="period">
                                                     <th style="text-align:center;font-weight: 400;">
                                                         <t t-if="purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)]"
-                                                           t-esc="purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)]"/>
+                                                           t-esc="format_number(purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)])"/>
                                                     </th>
                                                     <th style="text-align:center;font-weight: 400;">
                                                         <t t-if="purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)]"
-                                                           t-esc="purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)]"/>
+                                                           t-esc="format_number(purchase_tax_line['dynamic net']['dynamic_total_net_sum' + str(period)])"/>
                                                     </th>
                                                 </t>
                                             </t>
                                         </t>
                                         <th style="text-align:center;">
                                             <span style="font-weight: 400;">
-                                                <t t-esc="purchase_tax_line['net']"/>
+                                                <t t-esc="format_number(purchase_tax_line['net'])"/>
                                             </span>
                                         </th>
                                         <th style="text-align:center;">
                                             <span style="font-weight: 400;">
-                                                <t t-esc="purchase_tax_line['tax']"/>
+                                                <t t-esc="format_number(purchase_tax_line['tax'])"/>
                                             </span>
                                         </th>
                                     </tr>
