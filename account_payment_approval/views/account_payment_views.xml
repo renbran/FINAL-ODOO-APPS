@@ -14,7 +14,7 @@
                             class="oe_highlight" visibility="is_approve_person and state == 'waiting_approval'"/>
                 </xpath>
                 <xpath expr="//header//button[@name='action_post']" position="attributes">
-                    <attribute name="visibility">state in ['draft','approved']</attribute>
+                    <attribute name="visibility">state == 'approved'</attribute>
                 </xpath>
                 <xpath expr="//header//button[@name='action_cancel']" position="attributes">
                     <attribute name="visibility">not (state in ['cancelled', 'posted', 'rejected'])</attribute>
