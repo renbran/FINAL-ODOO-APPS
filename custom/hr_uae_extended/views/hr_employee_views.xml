@@ -27,13 +27,13 @@
                             <field name="annual_leave_days"/>
                             <field name="annual_leave_salary_type"/>
                         </group>
-                        <group string="Agent Settings" invisible_if="not is_agent">
+                        <group string="Agent Settings" invisible="not is_agent">
                             <field name="is_agent"/>
-                            <field name="agent_type" required_if="is_agent"/>
-                            <field name="primary_agent_commission" attrs="{'invisible': [('agent_type', '!=', 'primary')]}"/>
-                            <field name="secondary_agent_commission" attrs="{'invisible': [('agent_type', '!=', 'secondary')]}"/>
-                            <field name="exclusive_rm_commission" attrs="{'invisible': [('agent_type', '!=', 'exclusive_rm')]}"/>
-                            <field name="exclusive_sm_commission" attrs="{'invisible': [('agent_type', '!=', 'exclusive_sm')]}"/>
+                            <field name="agent_type" required="is_agent"/>
+                            <field name="primary_agent_commission" invisible="agent_type != 'primary'"/>
+                            <field name="secondary_agent_commission" invisible="agent_type != 'secondary'"/>
+                            <field name="exclusive_rm_commission" invisible="agent_type != 'exclusive_rm'"/>
+                            <field name="exclusive_sm_commission" invisible="agent_type != 'exclusive_sm'"/>
                         </group>
                     </group>
                 </page>

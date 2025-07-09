@@ -38,9 +38,9 @@
                         </group>
                     </group>
                     <group>
-                        <group string="Payment Details" invisible_if="payment_type != 'split'">
-                            <field name="full_pay_days" required_if="payment_type == 'split'"/>
-                            <field name="half_pay_days" required_if="payment_type == 'split'"/>
+                        <group string="Payment Details" invisible="payment_type != 'split'">
+                            <field name="full_pay_days" required="payment_type == 'split'"/>
+                            <field name="half_pay_days" required="payment_type == 'split'"/>
                             <field name="unpaid_days"/>
                         </group>
                         <group string="Additional Settings">
