@@ -27,15 +27,21 @@ class SaleOrder(models.Model):
             # Determine if it's a personal lead
             is_personal_lead = False
             if order.source_id:
-                is_personal_lead = 'personal' in order.source_id.name.lower()
+                is_personal_lead = 'personal' in order.source_id.name.lower() or 'referral' in order.source_id.name.lower()
             elif order.origin:
-                is_personal_lead = 'personal' in order.origin.lower()
+                is_personal_lead = 'personal' in order.origin.lower() or 'referral' in order.origin.lower()
 
-            # Assign commissions based on agent type
+            # Assign commissions for primary and secondary agents
             if order.primary_agent_id:
-                order.primary_agent_commission = order.primary_agent_id.primary_agent_commission if not is_personal_lead else order.primary_agent_id.secondary_agent_commission
+                if is_personal_lead:
+                    order.primary_agent_commission = order.primary_agent_id.primary_agent_personal_commission
+                else:
+                    order.primary_agent_commission = order.primary_agent_id.primary_agent_business_commission
             if order.secondary_agent_id:
-                order.secondary_agent_commission = order.secondary_agent_id.secondary_agent_commission
+                if is_personal_lead:
+                    order.secondary_agent_commission = order.secondary_agent_id.secondary_agent_personal_commission
+                else:
+                    order.secondary_agent_commission = order.secondary_agent_id.secondary_agent_business_commission
             if order.exclusive_rm_id:
                 order.exclusive_rm_commission = order.exclusive_rm_id.exclusive_rm_commission
             if order.exclusive_sm_id:

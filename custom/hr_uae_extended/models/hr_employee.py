@@ -48,6 +48,12 @@ class HrEmployee(models.Model):
     exclusive_rm_commission = fields.Float(string='Exclusive RM Commission %', digits=(5, 2), default=5.0)
     exclusive_sm_commission = fields.Float(string='Exclusive SM Commission %', digits=(5, 2), default=2.0)
 
+    # Commission rates for business and personal leads
+    primary_agent_business_commission = fields.Float(string='Primary Agent Business Lead %', digits=(5, 2), default=40.0)
+    primary_agent_personal_commission = fields.Float(string='Primary Agent Personal Lead %', digits=(5, 2), default=60.0)
+    secondary_agent_business_commission = fields.Float(string='Secondary Agent Business Lead %', digits=(5, 2), default=40.0)
+    secondary_agent_personal_commission = fields.Float(string='Secondary Agent Personal Lead %', digits=(5, 2), default=60.0)
+
     @api.depends('last_ticket_date', 'air_ticket_frequency')
     def _compute_next_ticket_date(self):
         for employee in self:
