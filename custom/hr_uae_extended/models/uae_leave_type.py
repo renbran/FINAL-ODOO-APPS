@@ -34,6 +34,8 @@ class UAELeaveType(models.Model):
         help='Number of months within which the leave must be taken (e.g., 6 months for parental leave)'
     )
     
+    hr_leave_type_id = fields.Many2one('hr.leave.type', string='HR Leave Type', help='Link to Odoo Time Off Type')
+    
     _sql_constraints = [
         ('code_unique', 'unique(code)', 'Leave type code must be unique!')
     ]

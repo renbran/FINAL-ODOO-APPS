@@ -13,6 +13,7 @@
                             <field name="passport_expiry_date"/>
                             <field name="emirates_id"/>
                             <field name="emirates_id_expiry_date"/>
+                            <field name="joining_date"/>
                         </group>
                         <group string="Annual Benefits">
                             <field name="annual_air_ticket"/>
