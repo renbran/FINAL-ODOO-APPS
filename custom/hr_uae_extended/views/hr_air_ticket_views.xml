@@ -26,21 +26,12 @@
         <field name="arch" type="xml">
             <form string="Air Ticket">
                 <header>
-                    <button name="action_submit" string="Submit" type="object" 
-                            class="oe_highlight" states="draft"/>
-                    <button name="action_approve" string="Approve" type="object" 
-                            class="oe_highlight" states="submitted"
-                            groups="hr.group_hr_manager"/>
-                    <button name="action_reject" string="Reject" type="object" 
-                            states="submitted"
-                            groups="hr.group_hr_manager"/>
-                    <button name="action_cancel" string="Cancel" type="object" 
-                            states="draft,submitted"/>
-                    <button name="action_reset_to_draft" string="Reset to Draft" 
-                            type="object" states="cancelled,rejected"
-                            groups="hr.group_hr_manager"/>
-                    <field name="state" widget="statusbar" 
-                           statusbar_visible="draft,submitted,approved"/>
+                    <button name="action_submit" string="Submit" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_approve" string="Approve" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'submitted')]}" groups="hr.group_hr_manager"/>
+                    <button name="action_reject" string="Reject" type="object" attrs="{'invisible': [('state', '!=', 'submitted')]}" groups="hr.group_hr_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'submitted'])]}"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" attrs="{'invisible': [('state', 'not in', ['cancelled', 'rejected'])]}" groups="hr.group_hr_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -50,19 +41,18 @@
                     </div>
                     <group>
                         <group>
-                            <field name="employee_id" options="{'no_create': True}"
-                                   readonly_if="state != 'draft'"/>
+                            <field name="employee_id" options="{'no_create': True}" readonly="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="joining_date" readonly="1"/>
                             <field name="service_years" readonly="1"/>
                             <field name="is_eligible" readonly="1"/>
                             <field name="home_country" readonly="1"/>
                         </group>
                         <group>
-                            <field name="request_date" readonly_if="state != 'draft'"/>
-                            <field name="ticket_date" readonly_if="state != 'draft'"/>
-                            <field name="destination_city" readonly_if="state != 'draft'"/>
-                            <field name="ticket_class" readonly_if="state != 'draft'"/>
-                            <field name="ticket_amount" readonly_if="state != 'draft'"/>
+                            <field name="request_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="ticket_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="destination_city" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="ticket_class" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="ticket_amount" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                     </group>
                     <group>
