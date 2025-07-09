@@ -171,6 +171,49 @@
         action="action_move_out_invoice_type_osus"
         sequence="15"/>
 
+    <!-- Custom Kanban View for Deal Tracking -->
+    <record id="view_move_kanban_deals" model="ir.ui.view">
+        <field name="name">account.move.kanban.deals</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <field name="move_type"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong t-esc="record.name.value"/>
+                                    </div>
+                                    <div class="text-muted">
+                                        <t t-esc="record.partner_id.value"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <strong>Amount: </strong><field name="amount_total" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- Property Deals Dashboard Action -->
     <record id="action_property_deals_dashboard" model="ir.actions.act_window">
         <field name="name">Property Deals Dashboard</field>
@@ -194,5 +237,8 @@
         parent="account.menu_finance_receivables"
         action="action_property_deals_dashboard"
         sequence="14"/>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 </odoo>

@@ -14,11 +14,11 @@ class SaleOrder(models.Model):
 
     manager_id = fields.Many2one('res.partner', string="Manager")
     manager_comm_percentage = fields.Float(string="Manager Commission (%)", default=0.0)
-    manager_commission = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
+    manager_commission = fields.Monetary(string="Manager Commission (Legacy)", compute="_compute_commissions", store=True)
 
     director_id = fields.Many2one('res.partner', string="Director")
     director_comm_percentage = fields.Float(string="Director Commission (%)", default=3.0)
-    director_commission = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
+    director_commission = fields.Monetary(string="Director Commission (Legacy)", compute="_compute_commissions", store=True)
 
     # Second Agent fields
     second_agent_id = fields.Many2one('res.partner', string="Second Agent")
