@@ -34,31 +34,28 @@ class HRAirTicket(models.Model):
     destination_city = fields.Char(string='Destination City', required=True)
     notes = fields.Text(string='Notes')
     
-    @api.depends('joining_date', 'request_date')
+    @api.depends('joining_date', 'ticket_date')
     def _compute_service_years(self):
         for record in self:
-            if record.joining_date and record.request_date:
-                delta = relativedelta(record.request_date, record.joining_date)
+            if record.joining_date and record.ticket_date:
+                delta = relativedelta(record.ticket_date, record.joining_date)
                 record.service_years = delta.years + (delta.months / 12.0)
             else:
                 record.service_years = 0.0
 
-    @api.depends('service_years', 'employee_id.last_ticket_date')
+    @api.depends('joining_date', 'ticket_date', 'employee_id.air_ticket_frequency')
     def _compute_eligibility(self):
         for record in self:
-            # Check if employee has completed 1 year
-            is_one_year_complete = record.service_years >= 1.0
-            
-            # Check if sufficient time has passed since last ticket
-            eligible_by_last_ticket = True
-            if record.employee_id.last_ticket_date:
-                last_ticket_delta = relativedelta(record.request_date, record.employee_id.last_ticket_date)
-                if record.employee_id.air_ticket_frequency == 'yearly':
-                    eligible_by_last_ticket = last_ticket_delta.years >= 1
-                else:  # two_yearly
-                    eligible_by_last_ticket = last_ticket_delta.years >= 2
-            
-            record.is_eligible = is_one_year_complete and eligible_by_last_ticket
+            # Check if employee has completed 1 year (or 2 years for two_yearly)
+            if not record.joining_date or not record.ticket_date:
+                record.is_eligible = False
+                continue
+            delta = relativedelta(record.ticket_date, record.joining_date)
+            years = delta.years + (delta.months / 12.0)
+            if record.employee_id.air_ticket_frequency == 'yearly':
+                record.is_eligible = years >= 1.0
+            else:  # two_yearly
+                record.is_eligible = years >= 2.0
 
     @api.model
     def create(self, vals):
