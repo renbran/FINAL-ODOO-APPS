@@ -9,6 +9,15 @@
             <!-- Add Deal Tracking Tab -->
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <!-- Deal Summary Banner -->
+                    <div class="alert alert-info" invisible="not is_property_deal" role="alert">
+                        <strong>Property Deal Summary:</strong>
+                        <span invisible="not buyer_id">Buyer: <field name="buyer_id" class="oe_inline"/></span>
+                        <span invisible="not project_id">| Project: <field name="project_id" class="oe_inline"/></span>
+                        <span invisible="not unit_id">| Unit: <field name="unit_id" class="oe_inline"/></span>
+                        <span invisible="not deal_id">| Deal #<field name="deal_id" class="oe_inline"/></span>
+                    </div>
+                    
                     <group string="Deal Information">
                         <group>
                             <field name="booking_date"/>
@@ -17,16 +26,20 @@
                         </group>
                         <group>
                             <field name="developer_commission" widget="percentage"/>
+                            <field name="commission_amount" widget="monetary" readonly="1"/>
                             <field name="buyer_id" options="{'quick_create': True, 'create_edit': True}"/>
                         </group>
                         <group>
                             <field name="project_id" options="{'quick_create': True, 'create_edit': True}"/>
                             <field name="unit_id" options="{'quick_create': True, 'create_edit': True}"/>
+                            <field name="is_property_deal" invisible="1"/>
                         </group>
                     </group>
                     <group string="Report Settings">
                         <group>
                             <field name="qr_in_report"/>
+                            <button name="regenerate_qr_code" string="Regenerate QR Code" type="object" 
+                                    class="btn-primary" invisible="not qr_in_report"/>
                         </group>
                         <group>
                             <field name="qr_image" widget="image" readonly="1" invisible="not qr_in_report"/>
@@ -49,11 +62,15 @@
                 <field name="buyer_id" optional="show"/>
                 <field name="deal_id" optional="show"/>
                 <field name="booking_date" optional="show"/>
+                <!-- Add a visual indicator for deals -->
+                <field name="is_property_deal" widget="boolean_toggle" optional="show" string="Property Deal"/>
             </xpath>
             
             <!-- Add financial fields after amount total -->
             <xpath expr="//field[@name='amount_total_signed']" position="after">
                 <field name="sale_value" widget="monetary" optional="show"/>
+                <!-- Add commission amount for quick reference -->
+                <field name="commission_amount" widget="monetary" optional="hide" string="Commission"/>
             </xpath>
             
             <!-- Add project info (hidden by default) -->
@@ -155,7 +172,7 @@
     <record id="action_move_out_invoice_type_osus" model="ir.actions.act_window">
         <field name="name">Invoices with Deal Tracking</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,kanban,form</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
@@ -218,10 +235,10 @@
     <record id="action_property_deals_dashboard" model="ir.actions.act_window">
         <field name="name">Property Deals Dashboard</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form,graph,pivot</field>
-        <field name="view_id" ref="view_move_tree_inherit_osus"/>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="view_id" ref="view_move_kanban_deals"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False)]</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('is_property_deal', '=', True)]</field>
         <field name="context">{
             'default_move_type': 'out_invoice',
             'search_default_property_deals': 1,
@@ -237,8 +254,4 @@
         parent="account.menu_finance_receivables"
         action="action_property_deals_dashboard"
         sequence="14"/>
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 </odoo>

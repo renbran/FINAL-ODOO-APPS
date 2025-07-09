@@ -33,19 +33,3 @@ class AccountMove(models.Model):
                        ('rejected', 'Rejected')],
         ondelete={'submit_review': 'set default', 'waiting_approval': 'set default', 'approved': 'set default',
                   'rejected': 'set default'}, help="States of approval.")
-
-    def button_submit_review(self):
-        """Set the state to 'submit_review'."""
-        self.state = 'submit_review'
-
-    def button_approve(self):
-        """Set the state to 'approved'."""
-        self.state = 'approved'
-
-    def button_reject(self):
-        """Set the state to 'rejected'."""
-        self.state = 'rejected'
-
-    def button_reset_to_draft(self):
-        """Reset the state to 'draft'."""
-        self.state = 'draft'

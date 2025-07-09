@@ -70,7 +70,7 @@
                                     <th class="text-end"
                                         style="font-weight: normal;">
                                         <span>
-                                            <t t-esc="format_number(datas['asset_cash'][1])"/>
+                                            <t t-esc="datas['asset_cash'][1]"/>
                                         </span>
                                     </th>
                                 </t>
@@ -457,7 +457,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="format_number(datas['total_assets'])"/>
+                                            <t t-esc="datas['total_assets']"/>
                                         </span>
                                     </th>
                                 </t>
@@ -619,7 +619,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="format_number(datas['total_current_liability'])"/>
+                                            <t t-esc="datas['total_current_liability']"/>
                                         </span>
                                     </th>
                                 </t>
@@ -700,7 +700,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="format_number(datas['total_liability'])"/>
+                                            <t t-esc="datas['total_liability']"/>
                                         </span>
                                     </th>
                                 </t>
@@ -732,7 +732,7 @@
                                     <th class="text-end"
                                         style="font-weight: normal;">
                                         <span>
-                                            <t t-esc="format_number(datas['total_earnings'])"/>
+                                            <t t-esc="datas['total_earnings']"/>
                                         </span>
                                     </th>
                                 </t>
@@ -813,7 +813,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="format_number(datas['total_unallocated_earning'])"/>
+                                            <t t-esc="datas['total_unallocated_earning']"/>
                                         </span>
                                     </th>
                                 </t>
@@ -894,7 +894,7 @@
                                    t-key="datas_index">
                                     <th class="text-end">
                                         <span style="font-weight: bolder; margin-left: 4%;">
-                                            <t t-esc="format_number(datas['total_equity'])"/>
+                                            <t t-esc="datas['total_equity']"/>
                                         </span>
                                     </th>
                                 </t>
