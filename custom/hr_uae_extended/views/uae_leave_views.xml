@@ -122,6 +122,39 @@
         </field>
     </record>
 
+    <!-- UAE Leave Type Search View -->
+    <record id="view_uae_leave_type_search" model="ir.ui.view">
+        <field name="name">uae.leave.type.search</field>
+        <field name="model">uae.leave.type</field>
+        <field name="arch" type="xml">
+            <search string="Search UAE Leave Types">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_paid"/>
+                <filter string="Paid" name="paid" domain="[('is_paid','=',True)]"/>
+                <filter string="Unpaid" name="unpaid" domain="[('is_paid','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- UAE Leave Allocation Search View -->
+    <record id="view_uae_leave_allocation_search" model="ir.ui.view">
+        <field name="name">uae.leave.allocation.search</field>
+        <field name="model">uae.leave.allocation</field>
+        <field name="arch" type="xml">
+            <search string="Search Leave Allocations">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="leave_type_id"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirm" domain="[('state','=','confirm')]"/>
+                <filter string="Validated" name="validate" domain="[('state','=','validate')]"/>
+                <filter string="Refused" name="refuse" domain="[('state','=','refuse')]"/>
+            </search>
+        </field>
+    </record>
+
     <!-- Actions -->
     <record id="action_uae_leave_type" model="ir.actions.act_window">
         <field name="name">UAE Leave Types</field>
