@@ -30,10 +30,12 @@
                         <group string="Agent Settings">
                             <field name="is_agent"/>
                             <field name="agent_type"/>
-                            <field name="primary_agent_commission" invisible="agent_type != 'primary'"/>
-                            <field name="secondary_agent_commission" invisible="agent_type != 'secondary'"/>
-                            <field name="exclusive_rm_commission" invisible="agent_type != 'exclusive_rm'"/>
-                            <field name="exclusive_sm_commission" invisible="agent_type != 'exclusive_sm'"/>
+                            <field name="primary_agent_business_commission"/>
+                            <field name="primary_agent_personal_commission"/>
+                            <field name="secondary_agent_business_commission"/>
+                            <field name="secondary_agent_personal_commission"/>
+                            <field name="exclusive_rm_commission"/>
+                            <field name="exclusive_sm_commission"/>
                         </group>
                     </group>
                 </page>
