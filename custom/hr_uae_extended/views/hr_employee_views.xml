@@ -30,12 +30,10 @@
                         <group string="Agent Settings" invisible_if="not is_agent">
                             <field name="is_agent"/>
                             <field name="agent_type" required_if="is_agent"/>
-                            <field name="business_lead_commission" required_if="is_agent"/>
-                            <field name="personal_lead_commission" required_if="is_agent"/>
-                            <field name="is_sales_manager"/>
-                            <field name="is_relationship_manager"/>
-                            <field name="sales_manager_commission" invisible_if="not is_sales_manager" required_if="is_sales_manager"/>
-                            <field name="relationship_manager_commission" invisible_if="not is_relationship_manager" required_if="is_relationship_manager"/>
+                            <field name="primary_agent_commission" attrs="{'invisible': [('agent_type', '!=', 'primary')]}"/>
+                            <field name="secondary_agent_commission" attrs="{'invisible': [('agent_type', '!=', 'secondary')]}"/>
+                            <field name="exclusive_rm_commission" attrs="{'invisible': [('agent_type', '!=', 'exclusive_rm')]}"/>
+                            <field name="exclusive_sm_commission" attrs="{'invisible': [('agent_type', '!=', 'exclusive_sm')]}"/>
                         </group>
                     </group>
                 </page>

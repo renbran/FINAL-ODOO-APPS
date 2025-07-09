@@ -37,15 +37,16 @@ class HrEmployee(models.Model):
     # Agent Commission
     is_agent = fields.Boolean(string='Is Agent')
     agent_type = fields.Selection([
-        ('business_lead', 'Business Lead'),
-        ('personal_lead', 'Personal Lead')
+        ('primary', 'Primary Agent'),
+        ('secondary', 'Secondary Agent'),
+        ('exclusive_rm', 'Exclusive Agent (RM)'),
+        ('exclusive_sm', 'Exclusive Agent (SM)'),
     ], string='Agent Type')
-    business_lead_commission = fields.Float(string='Business Lead Commission %', digits=(5, 2), default=55.0)
-    personal_lead_commission = fields.Float(string='Personal Lead Commission %', digits=(5, 2), default=45.0)
-    is_sales_manager = fields.Boolean(string='Is Sales Manager')
-    is_relationship_manager = fields.Boolean(string='Is Relationship Manager')
-    sales_manager_commission = fields.Float(string='Sales Manager Commission %', digits=(5, 2), default=2.0)
-    relationship_manager_commission = fields.Float(string='Relationship Manager Commission %', digits=(5, 2), default=5.0)
+    # Commission percentages for each agent type
+    primary_agent_commission = fields.Float(string='Primary Agent Commission %', digits=(5, 2), default=55.0)
+    secondary_agent_commission = fields.Float(string='Secondary Agent Commission %', digits=(5, 2), default=45.0)
+    exclusive_rm_commission = fields.Float(string='Exclusive RM Commission %', digits=(5, 2), default=5.0)
+    exclusive_sm_commission = fields.Float(string='Exclusive SM Commission %', digits=(5, 2), default=2.0)
 
     @api.depends('last_ticket_date', 'air_ticket_frequency')
     def _compute_next_ticket_date(self):

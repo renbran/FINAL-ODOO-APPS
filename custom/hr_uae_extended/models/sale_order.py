@@ -4,47 +4,51 @@ from odoo import models, fields, api, _
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.onchange('agent1', 'agent2', 'source_id', 'origin', 'sale_type')
+    # Agent fields for new logic
+    primary_agent_id = fields.Many2one('hr.employee', string='Primary Agent', domain=[('is_agent', '=', True), ('agent_type', '=', 'primary')])
+    secondary_agent_id = fields.Many2one('hr.employee', string='Secondary Agent', domain=[('is_agent', '=', True), ('agent_type', '=', 'secondary')])
+    exclusive_rm_id = fields.Many2one('hr.employee', string='Exclusive Agent (RM)', domain=[('is_agent', '=', True), ('agent_type', '=', 'exclusive_rm')])
+    exclusive_sm_id = fields.Many2one('hr.employee', string='Exclusive Agent (SM)', domain=[('is_agent', '=', True), ('agent_type', '=', 'exclusive_sm')])
+    # Commission fields
+    primary_agent_commission = fields.Float(string='Primary Agent Commission %', digits=(5, 2), default=0.0)
+    secondary_agent_commission = fields.Float(string='Secondary Agent Commission %', digits=(5, 2), default=0.0)
+    exclusive_rm_commission = fields.Float(string='Exclusive RM Commission %', digits=(5, 2), default=0.0)
+    exclusive_sm_commission = fields.Float(string='Exclusive SM Commission %', digits=(5, 2), default=0.0)
+
+    @api.onchange('primary_agent_id', 'secondary_agent_id', 'exclusive_rm_id', 'exclusive_sm_id', 'source_id', 'origin', 'sale_type')
     def _onchange_agent_commission(self):
         for order in self:
             # Reset commissions
-            order.commission_agent1 = 0.0
-            order.commission_agent2 = 0.0
-            order.commission_sales_manager = 0.0
+            order.primary_agent_commission = 0.0
+            order.secondary_agent_commission = 0.0
+            order.exclusive_rm_commission = 0.0
+            order.exclusive_sm_commission = 0.0
 
             # Determine if it's a personal lead
             is_personal_lead = False
-            if order.source_id:  # Check source_id first
-                is_personal_lead = order.source_id.name.lower().find('personal') >= 0
-            elif order.origin:  # If no source_id, check origin field
-                is_personal_lead = order.origin.lower().find('personal') >= 0
+            if order.source_id:
+                is_personal_lead = 'personal' in order.source_id.name.lower()
+            elif order.origin:
+                is_personal_lead = 'personal' in order.origin.lower()
 
-            # Check if it's an exclusive sale
-            is_exclusive = order.sale_type and order.sale_type.name.lower().find('exclusive') >= 0
-
-            if is_exclusive and order.agent2:  # Exclusive sale with exclusive agent
-                # Base commission rate depends on lead type
-                total_commission = 45.0 if is_personal_lead else 55.0
-                
-                # Distribution for exclusive sales:
-                order.commission_agent2 = 5.0  # RM gets 5%
-                order.commission_sales_manager = 2.0  # SM gets 2%
-                order.commission_agent1 = total_commission - 7.0  # Primary agent gets remaining
-                
-            else:  # Non-exclusive sale or no exclusive agent
-                # Only primary agent gets commission
-                if order.agent1:
-                    order.commission_agent1 = 45.0 if is_personal_lead else 55.0
+            # Assign commissions based on agent type
+            if order.primary_agent_id:
+                order.primary_agent_commission = order.primary_agent_id.primary_agent_commission if not is_personal_lead else order.primary_agent_id.secondary_agent_commission
+            if order.secondary_agent_id:
+                order.secondary_agent_commission = order.secondary_agent_id.secondary_agent_commission
+            if order.exclusive_rm_id:
+                order.exclusive_rm_commission = order.exclusive_rm_id.exclusive_rm_commission
+            if order.exclusive_sm_id:
+                order.exclusive_sm_commission = order.exclusive_sm_id.exclusive_sm_commission
 
     def action_confirm(self):
-        # Before confirming the sale order, validate the commissions
         for order in self:
-            # Ensure primary agent (agent1) is set
-            if not order.agent1:
-                raise models.ValidationError(_('Primary Agent (Agent 1) must be set before confirming the order.'))
-                
-            # If agent2 is set, ensure it's different from agent1
-            if order.agent2 and order.agent2 == order.agent1:
-                raise models.ValidationError(_('Primary Agent and Exclusive Agent must be different.'))
-
+            if not order.primary_agent_id:
+                raise models.ValidationError(_('Primary Agent must be set before confirming the order.'))
+            if order.secondary_agent_id and order.secondary_agent_id == order.primary_agent_id:
+                raise models.ValidationError(_('Primary Agent and Secondary Agent must be different.'))
+            if order.exclusive_rm_id and order.exclusive_rm_id == order.primary_agent_id:
+                raise models.ValidationError(_('Primary Agent and Exclusive RM must be different.'))
+            if order.exclusive_sm_id and order.exclusive_sm_id == order.primary_agent_id:
+                raise models.ValidationError(_('Primary Agent and Exclusive SM must be different.'))
         return super(SaleOrder, self).action_confirm()
