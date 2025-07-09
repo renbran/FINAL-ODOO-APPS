@@ -27,9 +27,9 @@
                             <field name="annual_leave_days"/>
                             <field name="annual_leave_salary_type"/>
                         </group>
-                        <group string="Agent Settings" invisible="not is_agent">
+                        <group string="Agent Settings">
                             <field name="is_agent"/>
-                            <field name="agent_type" required="is_agent"/>
+                            <field name="agent_type"/>
                             <field name="primary_agent_commission" invisible="agent_type != 'primary'"/>
                             <field name="secondary_agent_commission" invisible="agent_type != 'secondary'"/>
                             <field name="exclusive_rm_commission" invisible="agent_type != 'exclusive_rm'"/>
