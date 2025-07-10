@@ -6,8 +6,26 @@ from io import BytesIO
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    # QR Code fields
     qr_in_report = fields.Boolean(string='Show QR Code in Report', default=True)
     qr_image = fields.Binary(string='QR Code Image', compute='_compute_qr_code')
+    
+    # Deal tracking fields
+    booking_date = fields.Date(string='Booking Date', help="Date when the property booking was confirmed")
+    deal_id = fields.Char(string='Deal ID', help="Internal reference ID for the real estate deal")
+    sale_value = fields.Monetary(string='Sale Value', currency_field='currency_id', help="Total value of the property sale")
+    developer_commission = fields.Float(string='Developer Commission %', digits=(16, 2), help="Commission percentage for this deal")
+    buyer = fields.Many2one('res.partner', string='Buyer', help="The buyer of the property")
+    project = fields.Char(string='Project Name', help="The real estate project this deal belongs to")
+    unit = fields.Char(string='Unit', help="The specific property unit in this deal")
+    
+    # Amount in words field
+    amount_total_words = fields.Char(string='Amount in Words', compute='_compute_amount_total_words')
+
+    @api.depends('amount_total')
+    def _compute_amount_total_words(self):
+        for record in self:
+            record.amount_total_words = record._amount_to_words(record.amount_total)
 
     @api.depends('name', 'partner_id', 'amount_total')
     def _compute_qr_code(self):
