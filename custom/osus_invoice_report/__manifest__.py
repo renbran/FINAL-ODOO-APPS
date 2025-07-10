@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Invoice Report',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'summary': 'Professional UAE Tax Invoice Reports for Real Estate Commission',
     'description': '''
         Professional Tax Invoice Reports
