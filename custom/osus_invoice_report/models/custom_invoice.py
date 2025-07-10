@@ -32,6 +32,12 @@ class AccountMove(models.Model):
     # Deal Information Fields - These fields are defined in commission modules
     # We don't define them here to avoid conflicts with commission_fields and advance_commission modules
     # The fields are: booking_date, deal_id, sale_value, developer_commission, buyer_id, project_id, unit_id
+    booking_date = fields.Date(
+        string='Booking Date',
+        help='Date of property booking for commission tracking',
+        copy=False,
+        index=True,
+    )
 
     # Computed fields for enhanced tree view
     is_property_deal = fields.Boolean(
