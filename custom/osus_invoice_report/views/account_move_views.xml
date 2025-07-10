@@ -28,8 +28,8 @@
                         groups="account.group_account_invoice"/>
             </xpath>
             
-            <!-- Add Deal Tracking Tab -->
-            <xpath expr="//page[@name='invoice_page']" position="after">
+            <!-- Add Deal Tracking Tab to the main notebook -->
+            <xpath expr="//notebook" position="inside">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group string="Deal Information">
                         <group>
