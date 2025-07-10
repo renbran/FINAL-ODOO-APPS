@@ -5,8 +5,7 @@ class ReportCustomInvoice(models.AbstractModel):
     _description = 'OSUS Custom Invoice Report'
 
     def _get_report_values(self, docids, data=None):
-        # Filter to only get active (non-cancelled) account moves
-        docs = self.env['account.move'].browse(docids).filtered(lambda m: m.state != 'cancel')
+        docs = self.env['account.move'].browse(docids)
         return {
             'docs': docs,
         }
