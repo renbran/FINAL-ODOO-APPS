@@ -77,16 +77,16 @@
                         <tbody>
                             <tr>
                                 <td style="color: black;">
-                                    <span t-field="o.buyer_id.name" t-if="o.buyer_id"/>
-                                    <span t-if="not o.buyer_id">-</span>
+                                    <span t-field="o.buyer.name" t-if="o.buyer"/>
+                                    <span t-if="not o.buyer">-</span>
                                 </td>
                                 <td style="color: black;">
-                                    <span t-field="o.project_id.name" t-if="o.project_id"/>
-                                    <span t-if="not o.project_id">-</span>
+                                    <span t-field="o.project" t-if="o.project"/>
+                                    <span t-if="not o.project">-</span>
                                 </td>
                                 <td style="color: black;">
-                                    <span t-field="o.unit_id.name" t-if="o.unit_id"/>
-                                    <span t-if="not o.unit_id">-</span>
+                                    <span t-field="o.unit" t-if="o.unit"/>
+                                    <span t-if="not o.unit">-</span>
                                 </td>
                                 <td class="text-end" style="color: black;">
                                     <t t-if="o.invoice_line_ids">
