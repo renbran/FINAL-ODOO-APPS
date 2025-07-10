@@ -102,16 +102,16 @@
                             </div>
 
                             <!-- Real Estate Commission Details (if applicable) -->
-                            <t t-if="o.buyer or o.project or o.unit">
+                            <t t-if="o.buyer_id or o.project_id or o.unit_id">
                                 <div class="osus-section-header">PROPERTY DETAILS</div>
                                 <table class="table table-bordered mb-4">
-                                    <tr t-if="o.buyer">
+                                    <tr t-if="o.buyer_id">
                                         <td class="fw-bold osus-table-header" style="width: 30%;">Buyer:</td>
-                                        <td><span t-field="o.buyer.name"/></td>
+                                        <td><span t-field="o.buyer_id.name"/></td>
                                     </tr>
-                                    <tr t-if="o.project">
+                                    <tr t-if="o.project_id">
                                         <td class="fw-bold osus-table-header">Project:</td>
-                                        <td><span t-field="o.project"/></td>
+                                        <td><span t-field="o.project_id.name"/></td>
                                     </tr>
                                     <tr t-if="o.unit_id">
                                         <td class="fw-bold osus-table-header">Unit:</td>

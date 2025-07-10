@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Invoice Report',
-    'version': '17.0.1.0.2',
+    'version': '17.0.1.0.0',
     'summary': 'Professional UAE Tax Invoice Reports for Real Estate Commission',
     'description': '''
         Professional Tax Invoice Reports
@@ -16,16 +16,16 @@
     'category': 'Accounting/Accounting',
     'author': 'OSUS Real Estate',
     'website': 'https://www.osus.ae',
-    'depends': ['account', 'base'],
+    'depends': ['account', 'base', 'sale'],
+    'external_dependencies': {
+        'python': ['qrcode', 'num2words'],
+    },
     'data': [
         'security/ir.model.access.csv',
-        'views/account_move_views.xml',
-        'views/report_invoice.xml',
-        'views/report_bills.xml',
-        'views/report_receipt.xml',
-        'views/report_action_invoice.xml',
-        'views/report_action_bill.xml',
         'data/report_paperformat.xml',
+        'views/account_move_views.xml',
+        'views/sale_order_views.xml',
+        'views/report_invoice.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
