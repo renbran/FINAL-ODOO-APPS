@@ -259,8 +259,4 @@
         parent="account.menu_finance_receivables"
         action="action_property_deals_dashboard"
         sequence="14"/>
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 </odoo>
