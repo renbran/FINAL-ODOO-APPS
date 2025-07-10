@@ -125,11 +125,6 @@ class AccountAssetCategory(models.Model):
                              ('purchase', 'Purchase: Asset')], required=True,
                             index=True, default='purchase')
 
-    @classmethod
-    def _valid_field_parameter(cls, field, name):
-        # Allow 'hide' parameter for fields in this model
-        return name in ('hide',) or super()._valid_field_parameter(field, name)
-
     @api.onchange('account_asset_id')
     def onchange_account_asset(self):
         if self.type == "purchase":
