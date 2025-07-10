@@ -34,21 +34,6 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
-            <!-- Add "Set to Quotation" button in header -->
-            <xpath expr="//tree" position="inside">
-                <header>
-                    <button name="action_draft" string="Set to Quotation" type="object" 
-                            class="btn-secondary" 
-                            invisible="state == 'draft'"
-                            confirm="This will reset the order to quotation state. Are you sure?"/>
-                </header>
-            </xpath>
-            
-            <!-- Ensure state field is available for button visibility -->
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="state" optional="hide"/>
-            </xpath>
-            
             <!-- Add deal tracking fields after order date -->
             <xpath expr="//field[@name='date_order']" position="after">
                 <field name="booking_date" optional="show"/>
@@ -90,10 +75,6 @@
             <!-- Add filters -->
             <xpath expr="//filter[@name='activities_overdue']" position="after">
                 <separator/>
-                <!-- Active Data Filters -->
-                <filter string="Active Only" name="active_only" domain="[('state', '!=', 'cancel')]"/>
-                <filter string="Confirmed Orders" name="confirmed_only" domain="[('state', 'in', ['sale', 'done'])]"/>
-                <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
                 <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
@@ -123,21 +104,6 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
-            <!-- Add "Set to Quotation" button in header -->
-            <xpath expr="//tree" position="inside">
-                <header>
-                    <button name="action_draft" string="Set to Quotation" type="object" 
-                            class="btn-secondary" 
-                            invisible="state == 'draft'"
-                            confirm="This will reset the order to quotation state. Are you sure?"/>
-                </header>
-            </xpath>
-            
-            <!-- Ensure state field is available for button visibility -->
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="state" optional="hide"/>
-            </xpath>
-            
             <!-- Add buyer and project info after partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="booking_date" optional="show"/>
