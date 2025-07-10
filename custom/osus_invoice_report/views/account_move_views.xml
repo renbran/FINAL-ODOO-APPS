@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Inherit account move form view to add custom print buttons -->
-    <record id="view_move_form_inherit_osus_v2" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.osus.reports.v2</field>
+    <record id="view_move_form_inherit_osus" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.osus.reports</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_custom_invoice" 
+                        string="Print OSUS Invoice"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                
+                <button name="action_print_custom_bill" 
+                        string="Print OSUS Bill"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"
+                        invisible="move_type not in ('in_invoice', 'in_refund')"/>
+                
+                <button name="action_print_custom_receipt" 
+                        string="Print Receipt"
+                        class="btn-secondary"
+                        type="object"
+                        groups="account.group_account_invoice"/>
+            </xpath>
+            
             <!-- Add Deal Tracking Tab -->
-            <xpath expr="//sheet/notebook" position="inside">
+            <xpath expr="//page[@name='invoice_page']" position="after">
                 <page string="Deal Tracking" invisible="move_type not in ('out_invoice', 'out_refund')">
                     <group string="Deal Information">
                         <group>
@@ -84,10 +106,6 @@
             <!-- Add filters -->
             <xpath expr="//field[@name='sale_value']" position="after">
                 <separator/>
-                <!-- Active Data Filters -->
-                <filter string="Active Only" name="active_only" domain="[('state', '!=', 'cancel')]"/>
-                <filter string="Posted Only" name="posted_only" domain="[('state', '=', 'posted')]"/>
-                <separator/>
                 <filter string="With Deal ID" name="has_deal_id" domain="[('deal_id', '!=', False)]"/>
                 <filter string="With Buyer" name="has_buyer" domain="[('buyer_id', '!=', False)]"/>
                 <filter string="With Project" name="has_project" domain="[('project_id', '!=', False)]"/>
@@ -162,8 +180,8 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '!=', 'cancel')]</field>
-        <field name="context">{'default_move_type': 'out_invoice', 'search_default_active_only': 1}</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
         <field name="help">Track property deals and commissions with enhanced invoice views. Use filters to find specific deals quickly.</field>
     </record>
 
@@ -175,6 +193,49 @@
         action="action_move_out_invoice_type_osus"
         sequence="15"/>
 
+    <!-- Custom Kanban View for Deal Tracking -->
+    <record id="view_move_kanban_deals" model="ir.ui.view">
+        <field name="name">account.move.kanban.deals</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <field name="move_type"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong t-esc="record.name.value"/>
+                                    </div>
+                                    <div class="text-muted">
+                                        <t t-esc="record.partner_id.value"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <strong>Amount: </strong><field name="amount_total" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- Property Deals Dashboard Action -->
     <record id="action_property_deals_dashboard" model="ir.actions.act_window">
         <field name="name">Property Deals Dashboard</field>
@@ -182,12 +243,11 @@
         <field name="view_mode">tree,form,graph,pivot</field>
         <field name="view_id" ref="view_move_tree_inherit_osus"/>
         <field name="search_view_id" ref="view_account_move_filter_inherit_osus"/>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False), ('state', '!=', 'cancel')]</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('buyer_id', '!=', False)]</field>
         <field name="context">{
             'default_move_type': 'out_invoice',
             'search_default_property_deals': 1,
-            'search_default_group_buyer': 1,
-            'search_default_active_only': 1
+            'search_default_group_buyer': 1
         }</field>
         <field name="help">Comprehensive dashboard for property deal management and analytics</field>
     </record>
@@ -199,5 +259,8 @@
         parent="account.menu_finance_receivables"
         action="action_property_deals_dashboard"
         sequence="14"/>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 </odoo>

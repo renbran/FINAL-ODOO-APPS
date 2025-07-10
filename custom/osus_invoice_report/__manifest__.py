@@ -12,7 +12,6 @@
         - Professional styling with Bootstrap 5
         - Multi-company support
         - Inheritance-safe implementation
-        - Compatible with commission management modules
     ''',
     'category': 'Accounting/Accounting',
     'author': 'OSUS Real Estate',
@@ -37,6 +36,4 @@
     'application': False,
     'license': 'LGPL-3',
     'auto_install': False,
-    # Load after commission modules if they exist
-    'sequence': 100,
 }
