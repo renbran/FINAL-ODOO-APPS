@@ -15,7 +15,10 @@ services:
       - HOST=db
       - USER=odoo
       - PASSWORD=odoo
-    command: -- --dev=reload
+      - PROXY_MODE=True
+      - SERVER_WIDE_MODULES=web
+      - WEBSITE_HOST=erposus.com
+    command: -- --dev=reload --proxy-mode --update all
     restart: unless-stopped
     depends_on:
       - db
