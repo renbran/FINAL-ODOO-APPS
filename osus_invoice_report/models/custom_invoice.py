@@ -59,7 +59,7 @@ class AccountMove(models.Model):
         help="Automatically generated QR code for this document"
     )
 
-    @api.depends('id')
+    @api.depends()
     def _compute_qr_code(self):
         # Dummy implementation, replace with actual QR code logic
         for record in self:
