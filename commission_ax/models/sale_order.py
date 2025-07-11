@@ -17,7 +17,7 @@ class SaleOrder(models.Model):
     manager_commission = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
 
     director_id = fields.Many2one('res.partner', string="Director")
-    director_comm_percentage = fields.Float(string="Director Commission (%)", default=0.0)
+    director_comm_percentage = fields.Float(string="Director Commission (%)", default=3.0)
     director_commission = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
     # Second Agent fields
@@ -96,7 +96,7 @@ class SaleOrder(models.Model):
         ('percent_unit_price', 'Percentage of Unit Price'),
         ('percent_untaxed_total', 'Percentage of Untaxed Total')
     ], string="Director Commission Type", default='percent_unit_price')
-    director_rate = fields.Float(string="Director Rate", default=0.0)
+    director_rate = fields.Float(string="Director Rate", default=3.0)
     director_amount = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
     # Summary fields
@@ -120,9 +120,6 @@ class SaleOrder(models.Model):
         ('calculated', 'Calculated'),
         ('confirmed', 'Confirmed')
     ], string="Commission Processing Status", default='draft')
-
-    # Booking Date for reporting and commission basis
-    booking_date = fields.Date(string="Booking Date", help="Date used as the basis for commission and reporting.")
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -251,11 +248,9 @@ class SaleOrder(models.Model):
         if amount <= 0:
             raise UserError("Commission amount must be greater than zero")
         
-        # Use booking_date as the report date basis if set, else fallback to today
-        po_date = self.booking_date or fields.Date.today()
         return {
             'partner_id': partner.id,
-            'date_order': po_date,
+            'date_order': fields.Date.today(),
             'currency_id': self.currency_id.id,
             'company_id': self.company_id.id,
             'origin': self.name,
@@ -549,12 +544,3 @@ class SaleOrder(models.Model):
                 draft_pos.button_cancel()
         
         return super(SaleOrder, self).unlink()
-
-    @api.model
-    def get_orders_by_booking_date(cls, start_date, end_date):
-        """
-        Helper method to fetch sale orders filtered by booking_date.
-        Usage: SaleOrder.get_orders_by_booking_date(start, end)
-        """
-        domain = [('booking_date', '>=', start_date), ('booking_date', '<=', end_date)]
-        return cls.search(domain)
