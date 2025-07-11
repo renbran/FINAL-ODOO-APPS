@@ -28,7 +28,10 @@ from pytz import utc
 from odoo import models
 from odoo.tools import float_utils
 
-# This will generate 16th of days
+# ROUNDING_FACTOR is used to divide a day into 16 equal parts (1/16th of a day).
+# This allows for precise rounding of fractional workdays, ensuring consistency
+# in calculations. The choice of 16 is based on the need to balance precision
+# and computational efficiency in payroll calculations.
 ROUNDING_FACTOR = 16
 
 
