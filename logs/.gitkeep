@@ -1,0 +1,3 @@
+# Create logs directory
+mkdir -p logs
+touch logs/.gitkeep
