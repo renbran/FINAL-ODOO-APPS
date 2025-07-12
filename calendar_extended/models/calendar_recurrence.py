@@ -8,14 +8,16 @@ class CalendarRecurrence(models.Model):
     _inherit = 'calendar.recurrence'
 
     # Extended recurrence patterns
-    recurrence_pattern = fields.Selection(
-        selection_add=[
-            ('custom', 'Custom Pattern'),
-            ('business_days', 'Business Days'),
-            ('first_monday', 'First Monday of Month'),
-            ('last_friday', 'Last Friday of Month'),
-        ]
-    )
+    recurrence_pattern = fields.Selection([
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'), 
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+        ('custom', 'Custom Pattern'),
+        ('business_days', 'Business Days'),
+        ('first_monday', 'First Monday of Month'),
+        ('last_friday', 'Last Friday of Month'),
+    ], string='Recurrence Pattern', default='weekly')
     
     custom_pattern = fields.Char(
         string='Custom Pattern',
@@ -55,9 +57,6 @@ class CalendarRecurrence(models.Model):
                 raise ValidationError(
                     _('Number of occurrences cannot exceed the maximum limit.')
                 )
-
-
-class CalendarReminder(models.Model):
     _name = 'calendar.reminder'
     _description = 'Calendar Event Reminder'
     _order = 'reminder_time desc'

@@ -102,3 +102,54 @@ class CalendarReminder(models.Model):
         """Send push notification reminder"""
         # Implementation for push notification
         pass
+
+
+class CalendarReminderTemplate(models.Model):
+    _name = 'calendar.reminder.template'
+    _description = 'Calendar Reminder Template'
+    _order = 'name'
+
+    name = fields.Char(string='Name', required=True)
+    
+    description = fields.Text(string='Description')
+    
+    reminder_type = fields.Selection([
+        ('email', 'Email'),
+        ('popup', 'Popup'),
+        ('sms', 'SMS'),
+        ('push', 'Push Notification')
+    ], string='Reminder Type', required=True, default='email')
+    
+    minutes_before = fields.Integer(
+        string='Minutes Before Event',
+        required=True,
+        default=15
+    )
+    
+    message_template = fields.Text(
+        string='Message Template',
+        help='Template for reminder message'
+    )
+    
+    email_template_id = fields.Many2one(
+        'mail.template',
+        string='Email Template'
+    )
+    
+    active = fields.Boolean(string='Active', default=True)
+    
+    def create_reminder(self, event_id):
+        """Create reminder from template"""
+        event = self.env['calendar.event'].browse(event_id)
+        reminder_time = self.env['calendar.reminder']._compute_reminder_time(
+            event.start, self.minutes_before
+        )
+        
+        return self.env['calendar.reminder'].create({
+            'event_id': event_id,
+            'reminder_type': self.reminder_type,
+            'reminder_time': reminder_time,
+            'minutes_before': self.minutes_before,
+            'message': self.message_template,
+            'template_id': self.email_template_id.id if self.email_template_id else False,
+        })
