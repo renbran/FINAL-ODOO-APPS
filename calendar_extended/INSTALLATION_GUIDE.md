@@ -14,12 +14,15 @@ The Calendar Extended module provides advanced internal meeting management with 
 
 ## 🚀 Installation Steps
 
+**IMPORTANT:** The module has been updated with a critical fix for the `recurrence_pattern` field. Please follow these steps:
+
+### Option 1: Server Shell Access
 1. **Navigate to Odoo directory:**
    ```bash
    cd /var/odoo/osuserp
    ```
 
-2. **Install the module:**
+2. **Update the module:**
    ```bash
    sudo -u odoo venv/bin/python3 src/odoo-bin -c odoo.conf --no-http --stop-after-init --update calendar_extended
    ```
@@ -28,6 +31,17 @@ The Calendar Extended module provides advanced internal meeting management with 
    ```bash
    sudo systemctl restart odoo
    ```
+
+### Option 2: Via Odoo Interface (Recommended if no shell access)
+1. **Go to Apps menu** in Odoo
+2. **Remove the Calendar Extended module** (if already installed)
+3. **Upload/sync the updated module files** to your server
+4. **Install Calendar Extended** again from Apps menu
+
+### Option 3: Development Mode
+1. **Enable Developer Mode** in Odoo
+2. **Go to Apps → Update Apps List**
+3. **Find Calendar Extended** and click **Upgrade**
 
 ## 📋 Post-Installation Verification
 

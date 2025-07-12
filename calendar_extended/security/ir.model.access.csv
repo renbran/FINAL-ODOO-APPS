@@ -1,4 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calendar_announcement_user,calendar.announcement.user,model_calendar_announcement,group_calendar_user,1,1,1,1
+access_calendar_announcement_manager,calendar.announcement.manager,model_calendar_announcement,group_calendar_manager,1,1,1,1
+access_calendar_department_select_wizard_user,calendar.department.select.wizard.user,model_calendar_department_select_wizard,group_calendar_user,1,1,1,1
+access_calendar_send_invitation_wizard_user,calendar.send.invitation.wizard.user,model_calendar_send_invitation_wizard,group_calendar_user,1,1,1,1
 access_calendar_internal_meeting_user,access.calendar.internal.meeting.user,model_calendar_internal_meeting,group_calendar_user,1,1,1,1
 access_calendar_internal_meeting_manager,access.calendar.internal.meeting.manager,model_calendar_internal_meeting,group_calendar_manager,1,1,1,1
 access_calendar_meeting_attendee_user,access.calendar.meeting.attendee.user,model_calendar_meeting_attendee,group_calendar_user,1,1,1,1
