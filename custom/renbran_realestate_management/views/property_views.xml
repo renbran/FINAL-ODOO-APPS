@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Property Type Views -->
+    <record id="view_property_type_form" model="ir.ui.view">
+        <field name="name">property.type.form</field>
+        <field name="model">property.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="property_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description" string="Description">
+                            <field name="description" placeholder="Add a description..."/>
+                        </page>
+                        <page name="properties" string="Properties">
+                            <field name="property_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="property_reference"/>
+                                    <field name="property_price"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_property_type_tree" model="ir.ui.view">
+        <field name="name">property.type.tree</field>
+        <field name="model">property.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="property_count" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_property_type_search" model="ir.ui.view">
+        <field name="name">property.type.search</field>
+        <field name="model">property.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_property_type" model="ir.actions.act_window">
+        <field name="name">Property Types</field>
+        <field name="res_model">property.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new property type
+            </p>
+            <p>
+                Define property types such as apartments, villas, offices, etc.
+            </p>
+        </field>
+    </record>
+
+    <!-- Property Tag Views -->
+    <record id="view_property_tag_form" model="ir.ui.view">
+        <field name="name">property.tag.form</field>
+        <field name="model">property.tag</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" widget="color_picker"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_property_tag_tree" model="ir.ui.view">
+        <field name="name">property.tag.tree</field>
+        <field name="model">property.tag</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_property_tag" model="ir.actions.act_window">
+        <field name="name">Property Tags</field>
+        <field name="res_model">property.tag</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new property tag
+            </p>
+            <p>
+                Define tags to categorize your properties (e.g., New, Exclusive, etc.)
+            </p>
+        </field>
+    </record>
+
+    <!-- Property Views -->
+    <record id="view_property_form" model="ir.ui.view">
+        <field name="name">property.property.form</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_view_offers" string="View Offers" type="object" class="btn-primary"/>
+                    <button name="action_create_sale" string="Create Sale" type="object"
+                        class="btn-primary"
+                        modifiers='{"invisible": [["state", "not in", ["available", "reserved", "booked"]]]}'/>
+                    <button name="action_mark_as_available" string="Mark as Available" type="object"
+                        class="btn-secondary"
+                        modifiers='{"invisible": [["state", "=", "available"]]}'
+                        groups="base.group_user"/>
+                    <button name="action_mark_as_reserved" string="Mark as Reserved" type="object"
+                        class="btn-secondary"
+                        modifiers='{"invisible": [["state", "=", "reserved"]]}'
+                        groups="base.group_user"/>
+                    <button name="action_mark_as_sold" string="Mark as Sold" type="object"
+                        class="btn-secondary"
+                        modifiers='{"invisible": [["state", "=", "sold"]]}'
+                        groups="base.group_user"/>
+                    <button name="action_mark_as_cancelled" string="Mark as Cancelled" type="object"
+                        class="btn-secondary"
+                        modifiers='{"invisible": [["state", "=", "cancelled"]]}'
+                        groups="base.group_user"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="available,reserved,booked,sold"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_offers" type="object"
+                            class="oe_stat_button" icon="fa-handshake-o">
+                            <field name="offer_count" widget="statinfo" string="Offers"/>
+                        </button>
+                        <button name="action_view_sales" type="object"
+                            class="oe_stat_button" icon="fa-dollar"
+                            modifiers='{"invisible": [["sale_count", "=", 0]]}'>
+                            <field name="sale_count" widget="statinfo" string="Sales"/>
+                        </button>
+                    </div>
+                    <field name="property_image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Property Name"/>
+                        </h1>
+                        <h2>
+                            <field name="property_reference" readonly="1"/>
+                        </h2>
+                    </div>
+                    <notebook>
+                        <page name="general_info" string="General Information">
+                            <group>
+                                <group>
+                                    <field name="property_type_id" options="{'no_create': True}"/>
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="sale_rent" required="1"/>
+                                    <field name="state" readonly="1"/>
+                                    <field name="status" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="property_price" widget="monetary"/>
+                                    <field name="expected_revenue" widget="monetary"/>
+                                    <field name="selling_price" widget="monetary" readonly="1"/>
+                                    <field name="currency_id" options="{'no_create': True}"/>
+                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group name="property_metrics" string="Property Metrics">
+                                    <field name="total_sqft"/>
+                                    <field name="price_per_sqft" readonly="1"/>
+                                </group>
+                                <group name="property_details" string="Property Details">
+                                    <field name="project_name"/>
+                                    <field name="tower"/>
+                                    <field name="level"/>
+                                    <field name="unit_no"/>
+                                    <field name="unit_view"/>
+                                </group>
+                            </group>
+                            <group name="address_info" string="Address Information">
+                                <field name="address" placeholder="Address..."/>
+                                <newline/>
+                                <field name="city" placeholder="City"/>
+                                <field name="state_id" placeholder="State" options="{'no_create': True}"/>
+                                <field name="country_id" placeholder="Country" options="{'no_create': True}"/>
+                                <field name="zip_code" placeholder="ZIP Code"/>
+                            </group>
+                            <group name="description_group" string="Description">
+                                <field name="description" nolabel="1" placeholder="Add a description..."/>
+                            </group>
+                        </page>
+                        <page name="images" string="Images">
+                            <group>
+                                <field name="property_image" widget="image" options="{'size': [800, 600]}" nolabel="1"/>
+                                <field name="floor_plan" widget="image" options="{'size': [800, 600]}" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="payment_details" string="Payment Details" modifiers='{"invisible": [["active_sale_id", "=", false]]}'>
+                            <group>
+                                <group>
+                                    <field name="active_sale_id" readonly="1"/>
+                                    <field name="payment_progress" widget="progressbar" modifiers='{"invisible": [["state", "!=", "sold"]]}'/>
+                                </group>
+                                <group>
+                                    <field name="total_invoiced" widget="monetary"/>
+                                    <field name="total_paid" widget="monetary"/>
+                                    <field name="remaining_amount" widget="monetary"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="accounting" string="Accounting">
+                            <group>
+                                <field name="revenue_account_id" options="{'no_create': True}"/>
+                                <field name="partner_id" options="{'no_create': True}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_property_tree" model="ir.ui.view">
+        <field name="name">property.property.tree</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'available'"
+                  decoration-info="state == 'reserved'"
+                  decoration-warning="state == 'booked'"
+                  decoration-danger="state == 'sold'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="property_reference"/>
+                <field name="name"/>
+                <field name="property_type_id"/>
+                <field name="sale_rent"/>
+                <field name="address"/>
+                <field name="total_sqft"/>
+                <field name="property_price" sum="Total Value"/>
+                <field name="payment_progress" widget="progressbar" attrs="{'invisible': [('state', '!=', 'sold')]}"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_property_search" model="ir.ui.view">
+        <field name="name">property.property.search</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="property_reference"/>
+                <field name="property_type_id"/>
+                <field name="project_name"/>
+                <field name="partner_id"/>
+                <field name="address"/>
+                <field name="city"/>
+                <filter string="Available" name="available" domain="[('state', '=', 'available')]"/>
+                <filter string="Reserved" name="reserved" domain="[('state', '=', 'reserved')]"/>
+                <filter string="Booked" name="booked" domain="[('state', '=', 'booked')]"/>
+                <filter string="Sold" name="sold" domain="[('state', '=', 'sold')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <filter string="For Sale" name="for_sale" domain="[('sale_rent', '=', 'for_sale')]"/>
+                <filter string="For Rent" name="for_rent" domain="[('sale_rent', '=', 'for_rent')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Property Type" name="group_property_type" domain="[]" context="{'group_by': 'property_type_id'}"/>
+                    <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_name'}"/>
+                    <filter string="City" name="group_city" domain="[]" context="{'group_by': 'city'}"/>
+                    <filter string="Owner" name="group_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_property_kanban" model="ir.ui.view">
+        <field name="name">property.property.kanban</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="property_reference"/>
+                <field name="name"/>
+                <field name="property_type_id"/>
+                <field name="property_price"/>
+                <field name="property_image"/>
+                <field name="currency_id"/>
+                <field name="state"/>
+                <field name="sale_rent"/>
+                <field name="address"/>
+                <field name="city"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image me-1">
+                                <img t-att-src="kanban_image('property.property', 'property_image', record.id.raw_value)"
+                                     t-att-alt="record.name.value" class="o_image_64_cover"/>
+                            </div>
+                            <div class="oe_kanban_details d-flex flex-column">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="property_reference"/>
+                                </div>
+                                <div class="o_kanban_tags_section">
+                                    <span class="badge rounded-pill text-bg-info" t-if="record.sale_rent.raw_value == 'for_sale'">For Sale</span>
+                                    <span class="badge rounded-pill text-bg-warning" t-if="record.sale_rent.raw_value == 'for_rent'">For Rent</span>
+                                </div>
+                                <ul>
+                                    <li><strong>Price:</strong> <field name="property_price" widget="monetary" options="{'currency_field': 'currency_id'}"/></li>
+                                    <li><strong>Type:</strong> <field name="property_type_id"/></li>
+                                    <li><strong>Address:</strong> <field name="address"/></li>
+                                </ul>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span t-attf-class="badge rounded-pill #{record.state.raw_value == 'available' ? 'text-bg-success' : record.state.raw_value == 'reserved' ? 'text-bg-info' : record.state.raw_value == 'booked' ? 'text-bg-warning' : record.state.raw_value == 'sold' ? 'text-bg-danger' : 'text-bg-muted'}">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_property_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new property
+            </p>
+            <p>
+                Create and manage your real estate properties.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Dashboard View (placeholder) -->
+    <record id="action_property_dashboard" model="ir.actions.act_window">
+        <field name="name">Property Dashboard</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No properties found
+            </p>
+            <p>
+                Start by creating properties to see your dashboard.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Sales Report (placeholder) -->
+    <record id="action_property_sales_report" model="ir.actions.act_window">
+        <field name="name">Property Sales Report</field>
+        <field name="res_model">property.sale</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No property sales found
+            </p>
+            <p>
+                Create property sales to see analytics.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Commission Report (placeholder) -->
+    <record id="action_property_commission_report" model="ir.actions.act_window">
+        <field name="name">Commission Analysis</field>
+        <field name="res_model">broker.commission.invoice</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No commission data found
+            </p>
+            <p>
+                Create commissions to see analytics.
+            </p>
+        </field>
+    </record>
+</odoo>

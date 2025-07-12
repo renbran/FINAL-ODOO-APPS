@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_property_type,property.type,model_property_type,base.group_user,1,1,1,1
+access_property_property,property.property,model_property_property,base.group_user,1,1,1,1
+access_property_dashboard,property.dashboard,model_property_dashboard,base.group_user,1,0,0,0

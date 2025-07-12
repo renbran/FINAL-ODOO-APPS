@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Broker Commission Invoice Tree View -->
+    <record id="view_broker_commission_invoice_tree" model="ir.ui.view">
+        <field name="name">broker.commission.invoice.tree</field>
+        <field name="model">broker.commission.invoice</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="display_name"/>
+                <field name="property_sale_id"/>
+                <field name="seller_id"/>
+                <field name="commission_amount"/>
+                <field name="state" widget="badge"/>
+                <field name="payment_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Broker Commission Invoice Form View -->
+    <record id="view_broker_commission_invoice_form" model="ir.ui.view">
+        <field name="name">broker.commission.invoice.form</field>
+        <field name="model">broker.commission.invoice</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" clickable="1"/>
+                    <button name="action_confirm" string="Confirm" modifiers="draft"/>
+                    <button name="action_cancel" string="Cancel" modifiers="draft,confirmed"/>
+                    <button name="action_generate_customer_invoice" string="Generate Invoice" modifiers="confirmed"/>
+                    <button name="action_view_invoice" string="View Invoice" modifiers="invoiced,paid" options="{'invisible': [('invoice_id', '=', False)]}"/>
+                    <button name="action_mark_as_paid" string="Mark as Paid" modifiers="invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_sale_id"/>
+                            <field name="property_name"/>
+                            <field name="customer_name"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="seller_id"/>
+                            <field name="commission_percentage"/>
+                            <field name="commission_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payment" options="{'invisible': [('state', 'not in', ['paid'])]}">
+                            <field name="payment_date"/>
+                            <field name="payment_reference"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Broker Commission Invoice Search View -->
+    <record id="view_broker_commission_invoice_search" model="ir.ui.view">
+        <field name="name">broker.commission.invoice.search</field>
+        <field name="model">broker.commission.invoice</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="display_name"/>
+                <field name="property_sale_id"/>
+                <field name="seller_id"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Invoiced" name="invoiced" domain="[('state','=','invoiced')]"/>
+                <filter string="Paid" name="paid" domain="[('state','=','paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Property Sale" name="group_by_sale" context="{'group_by':'property_sale_id'}"/>
+                    <filter string="Broker" name="group_by_broker" context="{'group_by':'seller_id'}"/>
+                    <filter string="State" name="group_by_state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Internal Commission Tree View -->
+    <record id="view_internal_commission_tree" model="ir.ui.view">
+        <field name="name">internal.commission.tree</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="display_name"/>
+                <field name="property_sale_id"/>
+                <field name="sales_person_id"/>
+                <field name="commission_amount"/>
+                <field name="state" widget="badge"/>
+                <field name="payment_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Internal Commission Form View -->
+    <record id="view_internal_commission_form" model="ir.ui.view">
+        <field name="name">internal.commission.form</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" clickable="1"/>
+                    <button name="action_confirm" string="Confirm" modifiers="draft"/>
+                    <button name="action_approve" string="Approve" modifiers="confirmed"/>
+                    <button name="action_reject" string="Reject" modifiers="draft,confirmed"/>
+                    <button name="action_cancel" string="Cancel" modifiers="draft,confirmed,approved"/>
+                    <button name="action_mark_as_paid" string="Mark as Paid" modifiers="approved"/>
+                    <button name="action_draft" string="Set to Draft" modifiers="confirmed,rejected,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_sale_id"/>
+                            <field name="property_name"/>
+                            <field name="customer_name"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="sales_person_id"/>
+                            <field name="commission_percentage"/>
+                            <field name="commission_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approval" options="{'invisible': [('state', 'not in', ['approved','rejected'])]}">
+                            <field name="approved_by" options="{'readonly': [('state', '!=', 'approved')]}"/>
+                            <field name="approval_date" options="{'readonly': [('state', '!=', 'approved')]}"/>
+                            <field name="rejection_reason" options="{'readonly': [('state', '!=', 'rejected')]}"/>
+                        </page>
+                        <page string="Payment" options="{'invisible': [('state', '!=', 'paid')]}">
+                            <field name="payment_date"/>
+                            <field name="payment_reference"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Internal Commission Search View -->
+    <record id="view_internal_commission_search" model="ir.ui.view">
+        <field name="name">internal.commission.search</field>
+        <field name="model">internal.commission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="display_name"/>
+                <field name="property_sale_id"/>
+                <field name="sales_person_id"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <filter string="Paid" name="paid" domain="[('state','=','paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Property Sale" name="group_by_sale" context="{'group_by':'property_sale_id'}"/>
+                    <filter string="Sales Person" name="group_by_sales_person" context="{'group_by':'sales_person_id'}"/>
+                    <filter string="State" name="group_by_state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Commission Rule Tree View -->
+    <record id="view_commission_rule_tree" model="ir.ui.view">
+        <field name="name">commission.rule.tree</field>
+        <field name="model">commission.rule</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="rule_type"/>
+                <field name="commission_type"/>
+                <field name="commission_percentage" options="{'invisible': [('commission_type', '!=', 'percentage')]}"/>
+                <field name="commission_amount" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Commission Rule Form View -->
+    <record id="view_commission_rule_form" model="ir.ui.view">
+        <field name="name">commission.rule.form</field>
+        <field name="model">commission.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="active"/>
+                            <field name="sequence"/>
+                            <field name="rule_type"/>
+                            <field name="commission_type"/>
+                            <field name="commission_percentage" options="{'invisible': [('commission_type', '!=', 'percentage')]}"/>
+                            <field name="commission_amount" options="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conditions">
+                            <group>
+                                <group>
+                                    <field name="min_property_value"/>
+                                    <field name="max_property_value"/>
+                                    <field name="property_type_ids" widget="many2many_tags"/>
+                                </group>
+                                <group>
+                                    <field name="broker_partner_ids" widget="many2many_tags" options="{'invisible': [('rule_type', '!=', 'broker')]}"/>
+                                    <field name="user_ids" widget="many2many_tags" options="{'invisible': [('rule_type', '!=', 'internal')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Commission Rule Search View -->
+    <record id="view_commission_rule_search" model="ir.ui.view">
+        <field name="name">commission.rule.search</field>
+        <field name="model">commission.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="rule_type"/>
+                <field name="active"/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Broker Commissions" name="broker" domain="[('rule_type','=','broker')]"/>
+                <filter string="Internal Commissions" name="internal" domain="[('rule_type','=','internal')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Rule Type" name="group_by_rule_type" context="{'group_by':'rule_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

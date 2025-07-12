@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="dashboard_main" name="Dashboard Main Template">
+        <t t-call="web.layout">
+            <t t-set="title">Property Dashboard</t>
+            <div class="o_property_dashboard p-3">
+                <h1><t t-esc="dashboard.name"/></h1>
+                
+                <div class="row mb-4">
+                    <div class="col-md-2 stats_card p-3 m-2 bg-light rounded shadow-sm">
+                        <h4>Total</h4>
+                        <h2 class="text-primary"><t t-esc="dashboard.total_properties"/></h2>
+                    </div>
+                    <div class="col-md-2 stats_card p-3 m-2 bg-light rounded shadow-sm">
+                        <h4>Available</h4>
+                        <h2 class="text-success"><t t-esc="dashboard.available_properties"/></h2>
+                    </div>
+                    <div class="col-md-2 stats_card p-3 m-2 bg-light rounded shadow-sm">
+                        <h4>Sold</h4>
+                        <h2 class="text-danger"><t t-esc="dashboard.sold_properties"/></h2>
+                    </div>
+                    <div class="col-md-2 stats_card p-3 m-2 bg-light rounded shadow-sm">
+                        <h4>Reserved</h4>
+                        <h2 class="text-warning"><t t-esc="dashboard.reserved_properties"/></h2>
+                    </div>
+                    <div class="col-md-2 stats_card p-3 m-2 bg-light rounded shadow-sm">
+                        <h4>Maintenance</h4>
+                        <h2 class="text-info"><t t-esc="dashboard.maintenance_properties"/></h2>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Property Status</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="statusChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Property Types</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="typeChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Trending Properties</h3>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="dashboard.trending_property_ids" t-as="prop">
+                                            <tr>
+                                                <td><t t-esc="prop.name"/></td>
+                                                <td><t t-esc="prop.property_type_id.name"/></td>
+                                                <td><t t-esc="prop.price"/></td>
+                                                <td><t t-esc="prop.status"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    // Status Chart
+                    var statusCtx = document.getElementById('statusChart').getContext('2d');
+                    var statusData = <t t-raw="dashboard.property_status_chart"/>;
+                    var statusChart = new Chart(statusCtx, {
+                        type: 'pie',
+                        data: statusData
+                    });
+                    
+                    // Type Chart
+                    var typeCtx = document.getElementById('typeChart').getContext('2d');
+                    var typeData = <t t-raw="dashboard.property_type_chart"/>;
+                    var typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: typeData,
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                });
+            </script>
+        </t>
+    </template>
+</odoo>
