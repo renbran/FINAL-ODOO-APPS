@@ -50,11 +50,15 @@ class AccountPayment(models.Model):
                                        help="Enable/disable if approving"
                                             " person.")
     is_locked = fields.Boolean(string='Locked', compute='_compute_is_locked', store=True)
-    state = fields.Selection(selection_add=[
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('posted', 'Posted'),
+        ('cancel', 'Cancelled'),
         ('waiting_approval', 'Waiting for Approval'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
-    ])
+    ], string='Status', required=True, readonly=True, copy=False, tracking=True,
+        default='draft')
 
     @api.depends('state')
     def _compute_is_locked(self):
