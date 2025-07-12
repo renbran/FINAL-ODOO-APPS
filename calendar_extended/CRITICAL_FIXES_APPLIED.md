@@ -41,7 +41,19 @@ recurrence_pattern = fields.Selection([
 - ✅ Moved `CalendarReminderTemplate` class to `calendar_reminder.py`
 - ✅ Updated access control file to include new model
 
-### 3. Files Modified
+### 3. Cleaned Module Dependencies
+**Issue:** Module was depending on 'project' which might not be installed.
+
+**Fix Applied:**
+- ✅ Removed 'project' dependency from manifest
+- ✅ Verified no actual project module references in code
+- ✅ Only text references to "project" remain (meeting types, agenda items)
+
+### 4. Files Modified
+
+**calendar_extended/__manifest__.py:**
+- ✅ Removed unnecessary 'project' dependency
+- ✅ Clean dependency list with only required modules
 
 **calendar_extended/models/calendar_recurrence.py:**
 - ✅ Fixed `recurrence_pattern` field with proper selection values
