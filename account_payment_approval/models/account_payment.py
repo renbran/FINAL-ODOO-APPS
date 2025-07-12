@@ -48,7 +48,8 @@ class AccountPayment(models.Model):
                                        compute=_compute_is_approve_person,
                                        readonly=True,
                                        help="Enable/disable if approving"
-                                            " person.")
+                                            " person")
+
     is_locked = fields.Boolean(string='Locked', compute='_compute_is_locked', store=True)
 
     @api.depends('state')
