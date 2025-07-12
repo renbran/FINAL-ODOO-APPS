@@ -50,6 +50,11 @@ class AccountPayment(models.Model):
                                        help="Enable/disable if approving"
                                             " person.")
     is_locked = fields.Boolean(string='Locked', compute='_compute_is_locked', store=True)
+    state = fields.Selection(selection_add=[
+        ('waiting_approval', 'Waiting for Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ])
 
     @api.depends('state')
     def _compute_is_locked(self):
@@ -101,26 +106,25 @@ class AccountPayment(models.Model):
                     return False
         return True
 
+    def action_submit_review(self):
+        """Submit the payment for review"""
+        for record in self:
+            if record.state == 'draft':
+                record.state = 'waiting_approval'
+
     def approve_transfer(self):
-        """This function changes state to approved state if approving person
-         approves payment"""
-        if self.is_approve_person:
-            self.write({
-                'state': 'approved'
-            })
+        """Approve the payment transfer"""
+        for record in self:
+            if record.state == 'waiting_approval' and record.is_approve_person:
+                record.state = 'approved'
 
     def reject_transfer(self):
-        """This function changes state to rejected state if approving person
-                reject approval"""
-        self.write({
-            'state': 'rejected'
-        })
-
-    def action_submit_review(self):
-        """Submit payment for review, set state to submit_review and lock editing."""
-        for rec in self:
-            if rec.state == 'draft':
-                rec.write({'state': 'submit_review'})
+        """Reject the payment transfer"""
+        for record in self:
+            if record.state == 'waiting_approval' and record.is_approve_person:
+                record.state = 'rejected'
+                # Allow draft and cancel actions after rejection
+                record.is_locked = False
 
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(AccountPayment, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
