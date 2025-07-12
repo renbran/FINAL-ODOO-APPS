@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Property Menu -->
+    <menuitem id="menu_property_root" name="Property Management" web_icon="property_sale_management,static/description/icon.png" sequence="10"/>
+    
+    <!-- Properties Submenu -->
+    <menuitem id="menu_properties" name="Properties" parent="menu_property_root" sequence="10"/>
+    
+    <!-- Property Action -->
+    <record id="action_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+    
+    <menuitem id="menu_property_list" name="Property List" 
+              parent="menu_properties" action="action_property" sequence="10"/>
+    
+    <!-- Property Sales Menu -->
+    <menuitem id="menu_property_sales" name="Sales" 
+              parent="menu_property_root" sequence="20"/>
+    
+    <!-- Property Sale Action -->
+    <record id="action_property_sale" model="ir.actions.act_window">
+        <field name="name">Property Sales</field>
+        <field name="res_model">property.sale</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <menuitem id="menu_property_sale_list" name="Sale Orders" 
+              parent="menu_property_sales" action="action_property_sale" sequence="10"/>
+    
+    <!-- Commissions Submenu -->
+    <menuitem id="menu_commissions" name="Commissions" 
+              parent="menu_property_sales" sequence="30"/>
+    
+    <!-- Internal Commissions Action -->
+    <record id="action_internal_commission" model="ir.actions.act_window">
+        <field name="name">Commission Allocations</field>
+        <field name="res_model">internal.commission</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- Broker Commissions Action -->
+    <record id="action_broker_commission_invoice" model="ir.actions.act_window">
+        <field name="name">Broker Commissions</field>
+        <field name="res_model">broker.commission.invoice</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- Commission Menu Items -->
+    <menuitem id="menu_internal_commissions" name="Internal Allocations" 
+              parent="menu_commissions" action="action_internal_commission" sequence="10"/>
+              
+    <menuitem id="menu_broker_commissions" name="Broker Commissions" 
+              parent="menu_commissions" action="action_broker_commission_invoice" sequence="20"/>
+    
+    <!-- Configuration Menu -->
+    <menuitem id="menu_property_config" name="Configuration" 
+              parent="menu_property_root" sequence="100"/>
+    
+    <!-- Property Type Action -->
+    <record id="action_property_type" model="ir.actions.act_window">
+        <field name="name">Property Types</field>
+        <field name="res_model">property.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <menuitem id="menu_property_type" name="Property Types" 
+              parent="menu_property_config" action="action_property_type" sequence="10"/>
+    
+    <!-- Reporting Menu -->
+    <menuitem id="menu_property_reporting" name="Reporting" 
+              parent="menu_property_root" sequence="90"/>
+    
+    <!-- Sales Analysis Action -->
+    <record id="action_property_sale_analysis" model="ir.actions.act_window">
+        <field name="name">Sales Analysis</field>
+        <field name="res_model">property.sale.report</field>
+        <field name="view_mode">pivot,graph</field>
+    </record>
+    
+    <menuitem id="menu_property_sale_analysis" name="Sales Analysis" 
+              parent="menu_property_reporting" action="action_property_sale_analysis" sequence="10"/>
+</odoo>
