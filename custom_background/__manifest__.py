@@ -14,9 +14,6 @@
         "views/ir_actions.xml",
         "views/res_company_view.xml",
     ],
-    "qweb": [
-        "views/report_layout_override.xml",
-    ],
     "installable": True,
     "application": False,
     "assets": {
