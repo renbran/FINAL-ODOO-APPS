@@ -7,7 +7,6 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
                 <div class="page">
                     <h3>
                         <center>
@@ -77,7 +76,7 @@
                                 <th class="text-end">
                                     <span class="fw-bolder">
                                         <t t-if="total['total']"
-                                           t-esc="format_number(total['total'])"/>
+                                           t-esc="total['total']"/>
                                     </span>
                                 </th>
                             </t>
@@ -104,7 +103,7 @@
                            t-key="total_index">
                                 <th class="text-end">
                                     <span>
-                                        <t t-esc="format_number(total['income'][1])"/>
+                                        <t t-esc="total['income'][1]"/>
                                     </span>
                                 </th>
                             </t>
@@ -119,7 +118,7 @@
                            t-key="total_index">
                             <th class="text-end">
                                 <span>
-                                    <t t-esc="format_number(total['expense_direct_cost'][1])"/>
+                                    <t t-esc="total['expense_direct_cost'][1]"/>
                                 </span>
                             </th>
                             </t>
@@ -133,7 +132,7 @@
                            t-key="total_index">
                             <th class="text-end">
                                 <span>
-                                    <t t-esc="format_number(total['income_other'][1])"/>
+                                    <t t-esc="total['income_other'][1]"/>
                                 </span>
                             </th>
                             </t>
@@ -148,7 +147,7 @@
                            t-key="total_index">
                             <th class="text-end">
                                 <span class="fw-bolder">
-                                    <t t-esc="format_number(total['total_income'])"/>
+                                    <t t-esc="total['total_income']"/>
                                 </span>
                             </th>
                             </t>
@@ -168,7 +167,7 @@
                            t-key="total_index">
                                 <th class="text-end">
                                     <span>
-                                        <t t-esc="format_number(total['expense'][1])"/>
+                                        <t t-esc="total['expense'][1]"/>
                                     </span>
                                 </th>
                                 </t>
@@ -182,7 +181,7 @@
                            t-key="total_index">
                                 <th class="text-end">
                                     <span>
-                                        <t t-esc="format_number(total['expense_depreciation'][1])"/>
+                                        <t t-esc="total['expense_depreciation'][1]"/>
                                     </span>
                                 </th>
                                 </t>
@@ -196,7 +195,7 @@
                            t-key="total_index">
                                 <th class="text-end">
                                     <span class="fw-bolder">
-                                        <t t-esc="format_number(total['total_expense'])"/>
+                                        <t t-esc="total['total_expense']"/>
                                     </span>
                                 </th>
                             </t>

@@ -7,8 +7,6 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <!-- Add format_number utility for consistent number formatting -->
-                <t t-set="format_number" t-value="lambda n: '{:,.2f}'.format(n) if n is not None else ''"/>
                 <div class="page">
                     <h3>
                         <center>
@@ -122,7 +120,7 @@
                                                     <t t-if="total[move_line]['total_debit']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="total[move_line]['total_debit']"
-                                                       t-esc="format_number(total[move_line]['total_debit'])"/>
+                                                       t-esc="total[move_line]['total_debit']"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -132,7 +130,7 @@
                                                     <t t-if="total[move_line]['total_credit']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="total[move_line]['total_credit']"
-                                                       t-esc="format_number(total[move_line]['total_credit'])"/>
+                                                       t-esc="total[move_line]['total_credit']"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -140,7 +138,7 @@
                                             <strong>
                                                 <span class="fw-bolder">
                                                     <t t-esc="total[move_line]['currency_id']"/>
-                                                    <t t-esc="format_number(total[move_line]['total_debit'] - total[move_line]['total_credit'])"/>
+                                                    <t t-esc="total[move_line]['total_debit'] - total[move_line]['total_credit']"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -189,7 +187,7 @@
                                                     <t t-if="valuelist['debit']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['debit']"
-                                                       t-esc="format_number(valuelist['debit'])"/>
+                                                       t-esc="valuelist['debit']"/>
                                                 </span>
                                             </th>
                                             <th style="width:10%">
@@ -197,7 +195,7 @@
                                                     <t t-if="valuelist['credit']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['credit']"
-                                                       t-esc="format_number(valuelist['credit'])"/>
+                                                       t-esc="valuelist['credit']"/>
                                                 </span>
                                             </th>
                                             <th style="width:10%"/>
@@ -213,15 +211,15 @@
                                 <th style="width:60%;">Total</th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_debit'])"/>
+                                    <t t-out="grand_total['total_debit']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_credit'])"/>
+                                    <t t-out="grand_total['total_credit']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(float(grand_total['total_debit']) - float(grand_total['total_credit']))"/>
+                                    <t t-out="float(grand_total['total_debit']) - float(grand_total['total_credit'])"/>
                                 </th>
                             </tr>
                         </tbody>
