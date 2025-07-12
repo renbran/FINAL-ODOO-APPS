@@ -41,7 +41,6 @@ Technical Features:
         'web',
         'resource',
         'hr',
-        'project',
     ],
     'data': [
         'security/calendar_extended_security.xml',
