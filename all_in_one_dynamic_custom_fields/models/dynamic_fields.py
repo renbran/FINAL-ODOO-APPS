@@ -284,3 +284,10 @@ class DynamicFields(models.Model):
             self.created_tree_view_id.active = False
         res = super(DynamicFields, self).unlink()
         return res
+
+    @classmethod
+    def _valid_field_parameter(cls, field, name):
+        """Override to allow 'tracking' parameter for dynamic fields."""
+        if name == 'tracking':
+            return True
+        return super()._valid_field_parameter(field, name)

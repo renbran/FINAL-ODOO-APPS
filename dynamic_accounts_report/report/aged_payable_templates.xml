@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--    Report template for Aged Payable Report.-->
-    <template id="aged_payable">
-                                            <span>
-                                                <t t-if="total[move_line]['credit_sum']"
-                                                   t-esc="total[move_line]['currency_id']"/>
-                                                <t t-if="total[move_line]['credit_sum']"
-                                                   t-esc="format_number(total[move_line]['credit_sum'])"/>
-                                            </span>  <t t-call="web.html_container">
+    <template id="aged_payable" name="Aged Payable Report Template">
+        <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
@@ -43,7 +38,8 @@
                                         <t t-foreach="filters['partner']"
                                            t-as="selected_partner"
                                            t-key="partner_index">
-                                            <t t-out="selected_partner['display_name']"/>,
+                                            <t t-out="selected_partner['display_name']"/>
+                                            ,
                                         </t>
                                     </th>
                                 </tr>
@@ -145,7 +141,7 @@
                                                 <t t-if="total[move_line]['credit_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['credit_sum']"
-                                                   t-esc="format_number(total[move_line]['credit_sum'])"/>
+                                                   t-esc="total[move_line]['credit_sum']"/>
                                             </span>
                                         </th>
                                     </tr>

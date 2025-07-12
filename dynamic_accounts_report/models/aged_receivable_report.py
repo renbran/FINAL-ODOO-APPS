@@ -264,9 +264,10 @@ class AgeReceivableReport(models.TransientModel):
                                 txt_name)
                     for rec in data['data'][move_line]:
                         row += 1
-                        if not rec['name']:
-                            rec['name'] = ' '
-                        sheet.write(row, col, rec['move_name'] + rec['name'],
+                        # Ensure both move_name and name are strings
+                        move_name = str(rec.get('move_name', '')) if rec.get('move_name') else ''
+                        name = str(rec.get('name', '')) if rec.get('name') else ' '
+                        sheet.write(row, col, move_name + name,
                                     txt_name)
                         sheet.write(row, col + 1, rec['date'],
                                     txt_name)

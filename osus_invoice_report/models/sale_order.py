@@ -19,7 +19,7 @@ class SaleOrder(models.Model):
         currency_field='currency_id',
     )
     developer_commission = fields.Float(
-        string='Broker Commission',
+        string='Developer Commission %',
         tracking=True,
         digits=(16, 2),
     )

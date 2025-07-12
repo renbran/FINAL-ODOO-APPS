@@ -1,0 +1,6 @@
+volumes:
+  - odoo-web-data:/var/lib/odoo
+  - ./config:/etc/odoo:rw
+  - ./custom:/mnt/addons/custom:rw
+  - ./enterprise:/mnt/addons/enterprise:rw
+  - ./data:/var/lib/odoo/data:rw

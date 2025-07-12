@@ -141,7 +141,7 @@
                                             <strong>
                                                 <span class="fw-bolder">
                                                     <t t-esc="total[accounts]['currency_id']"/>
-                                                    <t t-esc="format_number(total[accounts]['total_debit'] - total[accounts]['total_credit'])"/>
+                                                    <t t-esc="total[accounts]['total_debit'] - total[accounts]['total_credit']"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -208,7 +208,7 @@
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(float(grand_total['total_debit']) - float(grand_total['total_credit']))"/>
+                                    <t t-out="float(grand_total['total_debit']) - float(grand_total['total_credit'])"/>
                                 </th>
                             </tr>
                         </tbody>

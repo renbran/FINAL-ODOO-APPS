@@ -43,8 +43,8 @@
                                         <t t-foreach="filters['partner']"
                                            t-as="selected_partner"
                                            t-key="partner_index">
-                                            <t t-out="selected_partner['display_name']"/>,
-
+                                            <t t-out="selected_partner['display_name']"/>
+                                            ,
                                         </t>
                                     </th>
                                     <th>
@@ -52,7 +52,6 @@
                                            t-as="selected_account"
                                            t-key="account_index">
                                             <t t-out="selected_account"/>,
-
                                         </t>
                                     </th>
                                     <th>
@@ -60,7 +59,6 @@
                                            t-as="selected_options"
                                            t-key="options_index">
                                             <t t-out="selected_options"/>,
-
                                         </t>
                                     </th>
                                 </tr>
@@ -82,10 +80,12 @@
                                         <th style="width:10%">Account</th>
                                         <th style="width:10%">Ref</th>
                                         <th style="width:10%">Due Date</th>
-                                        <th style="width:10%">Matching Number</th>
+                                        <th style="width:10%">Matching Number
+                                        </th>
                                         <th style="width:10%">Debit</th>
                                         <th style="width:10%">Credit</th>
-                                        <th style="width:10%">Amount Currency</th>
+                                        <th style="width:10%">Amount Currency
+                                        </th>
                                         <th style="width:10%">Balance</th>
                                     </tr>
                                 </thead>
@@ -104,7 +104,9 @@
                                                         </strong>
                                                     </t>
                                                     <t t-else="">
-                                                        <span>Unknown Partner</span>
+                                                        <span>Unknown
+                                                            Partner
+                                                        </span>
                                                     </t>
                                                 </span>
                                             </div>
@@ -150,6 +152,7 @@
                                         <t t-if="j == 1 and total[partner]['initial_balance'] != 0">
                                             <th colspan="6">
                                                 <span style="gap: 12px;display: flex;">
+
                                                 </span>
                                             </th>
                                             <th>
