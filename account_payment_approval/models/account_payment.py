@@ -103,11 +103,22 @@ class AccountPayment(models.Model):
 
     def approve_transfer(self):
         """This function changes state to approved state if approving person
-         approves payment"""
+         approves payment and automatically posts the payment"""
         if self.is_approve_person:
             self.write({
                 'state': 'approved'
             })
+            # Automatically post the payment after approval
+            try:
+                self.action_post()
+            except Exception as e:
+                # If posting fails, log the error but keep the approval
+                import logging
+                _logger = logging.getLogger(__name__)
+                _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
+                # Optionally, you can raise a user error to show the issue
+                # raise UserError(f"Payment approved but failed to post: {str(e)}")
+                pass
 
     def reject_transfer(self):
         """This function changes state to rejected state if approving person
