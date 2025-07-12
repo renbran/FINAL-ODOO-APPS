@@ -63,8 +63,7 @@ class AccountPayment(models.Model):
         currently Odoo allows payment posting only in draft stage."""
         validation = self._check_payment_approval()
         if validation:
-            if self.state == (
-                    'posted', 'cancel', 'waiting_approval', 'rejected'):
+            if self.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
                 raise UserError(
                     _("Only a draft or approved payment can be posted."))
             if any(inv.state != 'posted' for inv in
