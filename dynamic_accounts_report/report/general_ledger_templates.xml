@@ -7,8 +7,7 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <!-- Add number formatting function -->
-                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
+                <!-- All number formatting is now handled in Python. -->
                 <div class="page">
                     <h3>
                         <center>
@@ -124,7 +123,7 @@
                                                     <t t-if="total[accounts]['total_debit']"
                                                        t-esc="total[accounts]['currency_id']"/>
                                                     <t t-if="total[accounts]['total_debit']"
-                                                       t-esc="format_number(total[accounts]['total_debit'])"/>
+                                                       t-esc="total[accounts]['total_debit']"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -134,7 +133,7 @@
                                                     <t t-if="total[accounts]['total_credit']"
                                                        t-esc="total[accounts]['currency_id']"/>
                                                     <t t-if="total[accounts]['total_credit']"
-                                                       t-esc="format_number(total[accounts]['total_credit'])"/>
+                                                       t-esc="total[accounts]['total_credit']"/>
                                                 </span>
                                             </strong>
                                         </th>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--    Report Template for Partner Ledger.-->
+    <!-- Report Template for Partner Ledger.-->
     <template id="partner_ledger">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
+                <!-- All number formatting is now handled in Python. -->
                 <div class="page">
                     <h3>
                         <center>
@@ -170,18 +170,18 @@
                                             </th>
                                             <th>
                                                 <span>
-                                                    <t t-esc="format_number(total[partner]['initial_debit'])"/>
+                                                    <t t-esc="total[partner]['initial_debit']"/>
                                                 </span>
                                             </th>
                                             <th>
                                                 <span>
-                                                    <t t-esc="format_number(total[partner]['initial_credit'])"/>
+                                                    <t t-esc="total[partner]['initial_credit']"/>
                                                 </span>
                                             </th>
                                             <th/>
                                             <th>
                                                 <span>
-                                                    <t t-esc="format_number(total[partner]['initial_balance'])"/>
+                                                    <t t-esc="total[partner]['initial_balance']"/>
                                                 </span>
                                             </th>
                                         </t>
@@ -229,7 +229,7 @@
                                                     <t t-if="valuelist[0]['debit']"
                                                        t-esc="total[partner]['currency_id']"/>
                                                     <t t-if="valuelist[0]['debit']"
-                                                       t-esc="format_number(valuelist[0]['debit'])"/>
+                                                       t-esc="valuelist[0]['debit']"/>
                                                 </span>
                                             </th>
                                             <th style="width:10%">
@@ -237,7 +237,7 @@
                                                     <t t-if="valuelist[0]['credit']"
                                                        t-esc="total[partner]['currency_id']"/>
                                                     <t t-if="valuelist[0]['credit']"
-                                                       t-esc="format_number(valuelist[0]['credit'])"/>
+                                                       t-esc="valuelist[0]['credit']"/>
                                                 </span>
                                             </th>
                                             <th style="width:10%">
@@ -245,7 +245,7 @@
                                                     <t t-if="valuelist[0]['amount_currency']"
                                                        t-esc="total[partner]['currency_id']"/>
                                                     <t t-if="valuelist[0]['amount_currency']"
-                                                       t-esc="format_number(valuelist[0]['amount_currency'])"/>
+                                                       t-esc="valuelist[0]['amount_currency']"/>
                                                 </span>
                                             </th>
                                             <th style="width:10%"/>
@@ -261,16 +261,16 @@
                                 <th style="width:60%;">Total</th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_debit'])"/>
+                                    <t t-out="grand_total['total_debit']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_credit'])"/>
+                                    <t t-out="grand_total['total_credit']"/>
                                 </th>
                                 <th style="width:10%"/>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_debit'] - grand_total['total_credit'])"/>
+                                    <t t-out="grand_total['total_debit'] - grand_total['total_credit']"/>
                                 </th>
                             </tr>
                         </tbody>

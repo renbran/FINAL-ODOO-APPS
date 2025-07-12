@@ -26,6 +26,7 @@ import xlsxwriter
 import datetime
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from dynamic_accounts_report.report import format_number
 
 _logger = logging.getLogger(__name__)
 
@@ -87,37 +88,37 @@ class AgePayableReport(models.TransientModel):
 
         for partner_id in partner_ids:
             move_line_data = self._get_move_lines(partner_id, paid)
-            
-            # Process each move line
             for val in move_line_data:
                 date_maturity = val.get('date_maturity', False)
                 diffrence = self._calculate_date_difference(date_maturity, today)
-                
-                # Calculate aging buckets
                 val['diff0'] = val['credit'] if diffrence <= 0 else 0.0
                 val['diff1'] = val['credit'] if 0 < diffrence <= 30 else 0.0
                 val['diff2'] = val['credit'] if 30 < diffrence <= 60 else 0.0
                 val['diff3'] = val['credit'] if 60 < diffrence <= 90 else 0.0
                 val['diff4'] = val['credit'] if 90 < diffrence <= 120 else 0.0
                 val['diff5'] = val['credit'] if diffrence > 120 else 0.0
-
-            # Store move lines for this partner
+                # Format all numeric values as strings for QWeb
+                val['credit'] = format_number(val['credit'])
+                val['amount_currency'] = format_number(val['amount_currency']) if val.get('amount_currency') else ''
+                val['diff0'] = format_number(val['diff0'])
+                val['diff1'] = format_number(val['diff1'])
+                val['diff2'] = format_number(val['diff2'])
+                val['diff3'] = format_number(val['diff3'])
+                val['diff4'] = format_number(val['diff4'])
+                val['diff5'] = format_number(val['diff5'])
             move_line_list[partner_id.name] = move_line_data
-            
-            # Calculate totals for this partner
-            credit_sum = sum(val['credit'] for val in move_line_data)
+            credit_sum = sum(float(val['credit'].replace(',', '')) for val in move_line_data)
             partner_total[partner_id.name] = {
-                'credit_sum': credit_sum,
-                'diff0_sum': round(sum(val['diff0'] for val in move_line_data), 2),
-                'diff1_sum': round(sum(val['diff1'] for val in move_line_data), 2),
-                'diff2_sum': round(sum(val['diff2'] for val in move_line_data), 2),
-                'diff3_sum': round(sum(val['diff3'] for val in move_line_data), 2),
-                'diff4_sum': round(sum(val['diff4'] for val in move_line_data), 2),
-                'diff5_sum': round(sum(val['diff5'] for val in move_line_data), 2),
+                'credit_sum': format_number(credit_sum),
+                'diff0_sum': format_number(sum(float(val['diff0'].replace(',', '')) for val in move_line_data)),
+                'diff1_sum': format_number(sum(float(val['diff1'].replace(',', '')) for val in move_line_data)),
+                'diff2_sum': format_number(sum(float(val['diff2'].replace(',', '')) for val in move_line_data)),
+                'diff3_sum': format_number(sum(float(val['diff3'].replace(',', '')) for val in move_line_data)),
+                'diff4_sum': format_number(sum(float(val['diff4'].replace(',', '')) for val in move_line_data)),
+                'diff5_sum': format_number(sum(float(val['diff5'].replace(',', '')) for val in move_line_data)),
                 'currency_id': currency.id,
                 'partner_id': partner_id.id
             }
-
         move_line_list['partner_totals'] = partner_total
         return move_line_list
 

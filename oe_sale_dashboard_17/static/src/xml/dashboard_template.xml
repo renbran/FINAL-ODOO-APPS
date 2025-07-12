@@ -99,20 +99,16 @@
                 }
             </style>
 
-            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">OSUS Sales</h1>
+            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Sales Report</h1>
+
+            <!-- Copyright Notice -->
+            <p class="text-sm text-gray-500 text-center mb-4">This module is under copyright of 'OdooElevate'</p>
 
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-md">
-                <div class="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
-                    <div class="flex flex-col">
-                        <label for="startDate" class="block text-gray-700 text-sm font-semibold mb-1">Start Date:</label>
-                        <input type="date" id="startDate" t-att-value="state.startDate" t-on-change="onStartDateChange"
-                               class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="endDate" class="block text-gray-700 text-sm font-semibold mb-1">End Date:</label>
-                        <input type="date" id="endDate" t-att-value="state.endDate" t-on-change="onEndDateChange"
-                               class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                    </div>
+                <div class="mb-4 md:mb-0 md:mr-4">
+                    <label for="dashboardDate" class="block text-gray-700 text-lg font-semibold mb-2">Select Date:</label>
+                    <input type="date" id="dashboardDate" t-att-value="state.selectedDate" t-on-change="onDateChange"
+                           class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                 </div>
                 <div t-if="state.isLoading" class="flex items-center justify-center text-blue-600 text-xs">
                     <svg class="animate-spin mr-0.5 h-2 w-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -123,97 +119,109 @@
                 </div>
             </div>
 
-            <!-- Quotations Section (Draft Status) -->
+            <!-- Posted Sale Orders Section -->
             <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Quotations</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                        <thead>
-                            <tr class="bg-purple-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Sales Type</th>
-                                <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total</th>
-                                <th class="py-3 px-6 border-b">Sale Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="state.quotationsData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-purple-50': sales_type_data.sales_type_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
-                                </tr>
-                            </t>
-                            <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <br/><br/>
-
-            <!-- Sales Orders Section (To Invoice Status) -->
-            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Sales Orders</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                        <thead>
-                            <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Sales Type</th>
-                                <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total</th>
-                                <th class="py-3 px-6 border-b">Sale Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="state.salesOrdersData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-green-50': sales_type_data.sales_type_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
-                                </tr>
-                            </t>
-                            <t t-if="state.salesOrdersData.length === 0 &amp;&amp; !state.isLoading">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No sales orders data available.</td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <br/><br/>
-
-            <!-- Invoiced Sale Orders Section (Invoiced Status) -->
-            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Invoiced Sale Orders</h2>
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Posted Sale Orders</h2>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                         <thead>
                             <tr class="bg-blue-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                                <th class="py-3 px-6 border-b">Sales Type</th>
-                                <th class="py-3 px-6 border-b">Count</th>
-                                <th class="py-3 px-6 border-b">Total</th>
-                                <th class="py-3 px-6 border-b">Sale Value</th>
+                                <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Today</th>
+                                <th class="py-3 px-6 border-b">Yesterday</th>
+                                <th class="py-3 px-6 border-b">Last Week</th>
+                                <th class="py-3 px-6 border-b">Last Month</th>
+                                <th class="py-3 px-6 border-b">Last Year</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="state.invoicedSalesData" t-as="sales_type_data" t-key="sales_type_data.sales_type_name">
-                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-blue-50': sales_type_data.sales_type_name === 'Total'}">
-                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="sales_type_data.sales_type_name"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                            <t t-foreach="state.postedSalesData" t-as="company_data" t-key="company_data.company_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-blue-50': company_data.company_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Today)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Yesterday)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Week'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Month'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Year'])"/>
                                 </tr>
                             </t>
-                            <t t-if="state.invoicedSalesData.length === 0 &amp;&amp; !state.isLoading">
+                            <t t-if="state.postedSalesData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No invoiced sales data available.</td>
+                                    <td colspan="6" class="py-3 px-6 text-center text-gray-600">No posted sales data available.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br/><br/>
+
+            <!-- Unposted Sale Orders Section -->
+            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">Unposted Sale Orders</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-green-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Today</th>
+                                <th class="py-3 px-6 border-b">Yesterday</th>
+                                <th class="py-3 px-6 border-b">Last Week</th>
+                                <th class="py-3 px-6 border-b">Last Month</th>
+                                <th class="py-3 px-6 border-b">Last Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.unpostedSalesData" t-as="company_data" t-key="company_data.company_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-green-50': company_data.company_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Today)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Yesterday)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Week'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Month'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Year'])"/>
+                                </tr>
+                            </t>
+                            <t t-if="state.unpostedSalesData.length === 0 &amp;&amp; !state.isLoading">
+                                <tr>
+                                    <td colspan="6" class="py-3 px-6 text-center text-gray-600">No unposted sales data available.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br/><br/>
+
+            <!-- All Quotations Section -->
+            <div class="sales-section mb-8 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 text-center">All Quotations</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-purple-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                <th class="py-3 px-6 border-b">Company</th>
+                                <th class="py-3 px-6 border-b">Today</th>
+                                <th class="py-3 px-6 border-b">Yesterday</th>
+                                <th class="py-3 px-6 border-b">Last Week</th>
+                                <th class="py-3 px-6 border-b">Last Month</th>
+                                <th class="py-3 px-6 border-b">Last Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.quotationsData" t-as="company_data" t-key="company_data.company_name">
+                                <tr class="hover:bg-gray-50" t-att-class="{'font-bold bg-purple-50': company_data.company_name === 'Total'}">
+                                    <td class="py-3 px-6 border-b text-gray-900" t-esc="company_data.company_name"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Today)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data.Yesterday)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Week'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Month'])"/>
+                                    <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(company_data['Last Year'])"/>
+                                </tr>
+                            </t>
+                            <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
+                                <tr>
+                                    <td colspan="6" class="py-3 px-6 text-center text-gray-600">No quotations data available.</td>
                                 </tr>
                             </t>
                         </tbody>

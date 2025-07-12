@@ -27,6 +27,7 @@ import xlsxwriter
 from odoo import api, fields, models
 from datetime import datetime
 from odoo.tools import date_utils
+from dynamic_accounts_report.report import format_number
 
 
 class AccountGeneralLedger(models.TransientModel):
@@ -67,12 +68,15 @@ class AccountGeneralLedger(models.TransientModel):
                     ['date', 'name', 'move_name', 'debit', 'credit',
                      'partner_id', 'account_id', 'journal_id', 'move_id',
                      'analytic_line_ids'])
+                # Format debit and credit
+                move_line_data[0]['debit'] = format_number(move_line_data[0].get('debit', 0.0))
+                move_line_data[0]['credit'] = format_number(move_line_data[0].get('credit', 0.0))
                 move_line_list.append(move_line_data)
             account_dict[account.display_name] = move_line_list
             currency_id = self.env.company.currency_id.symbol
             account_totals[account.display_name] = {
-                'total_debit': round(sum(move_line_id.mapped('debit')), 2),
-                'total_credit': round(sum(move_line_id.mapped('credit')), 2),
+                'total_debit': format_number(sum(move_line_id.mapped('debit'))),
+                'total_credit': format_number(sum(move_line_id.mapped('credit'))),
                 'currency_id': currency_id,
                 'account_id': account.id}
             account_dict['account_totals'] = account_totals
@@ -186,12 +190,14 @@ class AccountGeneralLedger(models.TransientModel):
                     ['date', 'name', 'move_name', 'debit', 'credit',
                      'partner_id', 'account_id', 'journal_id', 'move_id',
                      'analytic_line_ids'])
+                move_line_data[0]['debit'] = format_number(move_line_data[0].get('debit', 0.0))
+                move_line_data[0]['credit'] = format_number(move_line_data[0].get('credit', 0.0))
                 move_line_list.append(move_line_data)
             account_dict[account.display_name] = move_line_list
             currency_id = self.env.company.currency_id.symbol
             account_totals[account.display_name] = {
-                'total_debit': round(sum(move_line_id.mapped('debit')), 2),
-                'total_credit': round(sum(move_line_id.mapped('credit')), 2),
+                'total_debit': format_number(sum(move_line_id.mapped('debit'))),
+                'total_credit': format_number(sum(move_line_id.mapped('credit'))),
                 'currency_id': currency_id,
                 'account_id': account.id}
             account_dict['account_totals'] = account_totals

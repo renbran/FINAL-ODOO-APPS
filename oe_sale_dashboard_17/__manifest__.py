@@ -1,29 +1,20 @@
 # -*- coding: utf-8 -*-
 # This module is under copyright of 'OdooElevate'
 {
-    'name': 'OSUS Sales Dashboard',
+    'name': 'Sales Report Dashboard',
     'version': '17.0.0.1.1',
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
     'description': """
-        Enhanced sales dashboard module with advanced filtering and field selection capabilities.
-        
-        Key Features:
-        - Date range filtering (start date to end date) 
-        - Booking date reference instead of order date
-        - Amount field selection (Total Amount vs Sale Value)
-        - Simplified company-based reporting
-        - Real-time dashboard updates
-        - Responsive design with modern UI
-        
-        Comprehensive dashboard for sales analysis using booking_date and sale_value fields
-        from the osus_invoice_report module.
+        This module provides a custom sales dashboard to visualize yearly sales data.
+        It includes posted sales orders, unposted sales orders, and quotations,
+        with dynamic data updates based on selected dates.
+        This module is under copyright of 'OdooElevate'.
     """,
     'author': 'Sheikh Muhammad Saad, OdooElevate',
     'website': 'https://odooelevate.odoo.com/',
-    'depends': ['web', 'sale_management', 'osus_invoice_report', 'le_sale_type'],
+    'depends': ['web', 'sale_management'],
     'data': [
-        'data/sale_order_data.xml',
         'views/dashboard_views.xml',
     ],
     'assets': {

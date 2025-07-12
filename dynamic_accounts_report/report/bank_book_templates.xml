@@ -7,6 +7,7 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
+                <!-- All number formatting is now handled in Python. -->
                 <div class="page">
                     <h3>
                         <center>
@@ -138,7 +139,7 @@
                                             <strong>
                                                 <span class="fw-bolder">
                                                     <t t-esc="total[move_line]['currency_id']"/>
-                                                    <t t-esc="total[move_line]['total_debit'] - total[move_line]['total_credit']"/>
+                                                    <t t-esc="format_number(total[move_line]['total_debit'] - total[move_line]['total_credit'])"/>
                                                 </span>
                                             </strong>
                                         </th>
@@ -219,7 +220,7 @@
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="float(grand_total['total_debit']) - float(grand_total['total_credit'])"/>
+                                    <t t-out="format_number(float(grand_total['total_debit']) - float(grand_total['total_credit']))"/>
                                 </th>
                             </tr>
                         </tbody>

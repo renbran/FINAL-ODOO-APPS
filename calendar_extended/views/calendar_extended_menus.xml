@@ -1,32 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Calendar Extended Menu Items -->
     
-    <!-- Main Menu -->
-    <menuitem id="calendar_extended_main_menu"
-              name="Meeting Announcements"
-              parent="calendar.mail_menu_calendar"
-              sequence="5"/>
+    <!-- Main Calendar Extended Menu -->
+    <menuitem id="menu_calendar_extended_root" 
+              name="Calendar Extended" 
+              sequence="15"
+              web_icon="calendar_extended,static/description/icon.png"/>
     
-    <!-- Meeting Announcements Menu -->
-    <menuitem id="calendar_announcement_menu"
-              name="Announcements"
-              parent="calendar_extended_main_menu"
-              action="calendar_announcement_action"
+    <!-- Internal Meetings Submenu -->
+    <menuitem id="menu_calendar_internal_meetings" 
+              name="Internal Meetings" 
+              parent="menu_calendar_extended_root" 
               sequence="10"/>
     
-    <!-- Configuration Menu -->
-    <menuitem id="calendar_extended_config_menu"
-              name="Configuration"
-              parent="calendar_extended_main_menu"
-              groups="calendar_extended.group_calendar_manager"
-              sequence="90"/>
-    
-    <!-- Departments Menu (under Configuration) -->
-    <menuitem id="calendar_departments_menu"
-              name="Departments"
-              parent="calendar_extended_config_menu"
-              action="hr.open_module_tree_department"
-              groups="calendar_extended.group_calendar_manager"
+    <!-- Internal Meetings -->
+    <menuitem id="menu_calendar_internal_meeting_all" 
+              name="All Meetings" 
+              parent="menu_calendar_internal_meetings" 
+              action="action_calendar_internal_meeting" 
               sequence="10"/>
+    
+    <!-- My Meetings -->
+    <menuitem id="menu_calendar_internal_meeting_my" 
+              name="My Meetings" 
+              parent="menu_calendar_internal_meetings" 
+              action="action_calendar_internal_meeting_my" 
+              sequence="20"/>
+    
+    <!-- Meetings Pending Approval -->
+    <menuitem id="menu_calendar_internal_meeting_approval" 
+              name="Pending Approval" 
+              parent="menu_calendar_internal_meetings" 
+              action="action_calendar_internal_meeting_approval" 
+              sequence="30"
+              groups="calendar_extended.group_calendar_manager"/>
+    
+    <!-- Configuration Submenu -->
+    <menuitem id="menu_calendar_extended_config" 
+              name="Configuration" 
+              parent="menu_calendar_extended_root" 
+              sequence="90"
+              groups="calendar_extended.group_calendar_manager"/>
+    
+    <!-- Department Groups -->
+    <menuitem id="menu_calendar_department_groups" 
+              name="Department Groups" 
+              parent="menu_calendar_extended_config" 
+              action="action_calendar_department_group" 
+              sequence="10"/>
+    
+    <!-- Event Types -->
+    <menuitem id="menu_calendar_event_types" 
+              name="Event Types" 
+              parent="menu_calendar_extended_config" 
+              action="action_calendar_event_type" 
+              sequence="20"/>
+    
+    <!-- Resources -->
+    <menuitem id="menu_calendar_resources" 
+              name="Resources" 
+              parent="menu_calendar_extended_config" 
+              action="action_calendar_resource" 
+              sequence="30"/>
+    
+    <!-- Templates -->
+    <menuitem id="menu_calendar_templates" 
+              name="Templates" 
+              parent="menu_calendar_extended_config" 
+              action="action_calendar_template" 
+              sequence="40"/>
+
 </odoo>
