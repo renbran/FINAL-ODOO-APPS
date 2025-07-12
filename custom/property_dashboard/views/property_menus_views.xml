@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Main menu -->
+    <menuitem id="menu_property_root" name="Property Monitor" sequence="1"/>
+    
+    <!-- Property Management submenu -->
+    <menuitem id="menu_property_management"
+              name="Property Management"
+              parent="menu_property_root"
+              sequence="1"/>
+    
+    <!-- Dashboard menu item -->
+    <menuitem id="menu_property_dashboard"
+              name="Property Dashboard"
+              parent="menu_property_root"
+              sequence="0"
+              action="action_property_dashboard"/>
+    
+    <!-- Properties list menu item -->
+    <menuitem id="menu_property_list"
+              name="Properties"
+              parent="menu_property_management"
+              sequence="1"
+              action="action_property_property_list"/>
+    
+    <!-- Property types menu item -->
+    <menuitem id="menu_property_types"
+              name="Property Types"
+              parent="menu_property_management"
+              sequence="2"
+              action="action_property_type_list"/>
+              
+    <!-- Property Dashboard Configuration menu item -->
+    <menuitem id="menu_property_dashboard_config"
+              name="Dashboard Configuration"
+              parent="menu_property_management"
+              sequence="10"
+              action="action_property_dashboard_list"/>
+</odoo>

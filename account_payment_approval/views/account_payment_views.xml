@@ -9,24 +9,19 @@
                 <xpath expr="//header//button[@name='action_post']" position="after">
                     <button name="approve_transfer" string="Approve" type="object"
                             class="oe_highlight"
-                            invisible="is_approve_person == False or state !='waiting_approval'"/>
+                            visibility="is_approve_person and state == 'waiting_approval'"/>
                     <button name="reject_transfer" string="Reject" type="object"
-                            class="oe_highlight" invisible="is_approve_person == False or state !='waiting_approval'"/>
+                            class="oe_highlight" visibility="is_approve_person and state == 'waiting_approval'"/>
                 </xpath>
                 <xpath expr="//header//button[@name='action_post']" position="attributes">
-                    <attribute name="invisible"> state not in ['draft','approved']</attribute>
+                    <attribute name="visibility">state == 'approved'</attribute>
                 </xpath>
                 <xpath expr="//header//button[@name='action_cancel']" position="attributes">
-                    <attribute name="invisible">state in ['cancelled', 'posted', 'rejected']
-                    </attribute>
+                    <attribute name="visibility">not (state in ['cancelled', 'posted', 'rejected'])</attribute>
                 </xpath>
                 <xpath expr="//header//button[@name='action_post']" position="before">
                     <button name="action_submit_review" string="Submit for Review" type="object"
-                            class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                </xpath>
-                <xpath expr="//form" position="attributes">
-                    <attribute name="edit">0</attribute>
-                    <attribute name="edit" eval="context.get('state') in ['draft', 'rejected']"/>
+                            class="oe_highlight" visibility="state == 'draft'"/>
                 </xpath>
                 <field name="partner_id" position="after">
                     <field name="is_approve_person" invisible="1"/>

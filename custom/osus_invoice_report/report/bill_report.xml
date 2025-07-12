@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_osus_bill_document">
+        <t t-call="web.external_layout">
+            <div style="background: transparent; padding: 0;">
+                <!-- Header Section -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <img src="/osus_invoice_report/static/src/img/osus_logo.png" style="height: 60px; margin-top: 10px;"/>
+                    <div style="text-align: right;">
+                        <span style="font-size: 13px; font-weight: bold;">OSUS PROPERTIES</span><br/>
+                        SINGLE TOWER FLOOR 29 OFFICE 02 &amp; 03 BUSINESS BAY<br/>
+                        Building 7 4th floor<br/>
+                        Dubai DU 00000<br/>
+                        United Arab Emirates
+                    </div>
+                </div>
+                <hr style="margin: 10px 0;"/>
+                <div style="text-align: right; font-size: 13px; margin-bottom: 10px;">
+                    <span t-esc="o.partner_id.name"/>
+                </div>
+                <h2 style="color: #b20000; margin: 10px 0;">TAX Invoice INV/<span t-esc="o.name"/></h2>
+                <table style="width: 100%; margin-bottom: 10px;">
+                    <tr>
+                        <td><strong>Invoice Date:</strong> <span t-esc="o.invoice_date"/></td>
+                        <td><strong>Due Date:</strong> <span t-esc="o.invoice_date_due"/></td>
+                        <td><strong>Source:</strong> <span t-esc="o.source"/></td>
+                        <td><strong>Reference:</strong> <span t-esc="o.ref"/></td>
+                    </tr>
+                </table>
+                <table class="table table-sm" style="width: 100%; border: 1px solid #222;">
+                    <thead style="background: #fff; color: #222;">
+                        <tr>
+                            <th>DESCRIPTION</th>
+                            <th>QUANTITY</th>
+                            <th>UNIT PRICE</th>
+                            <th>VAT</th>
+                            <th>VAT AMOUNT</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.invoice_line_ids" t-as="line">
+                            <td t-esc="line.name"/>
+                            <td t-esc="line.quantity"/>
+                            <td t-esc="line.price_unit"/>
+                            <td t-esc="line.tax_ids[0].amount if line.tax_ids else ''"/>
+                            <td t-esc="line.price_total - line.price_subtotal"/>
+                            <td t-esc="line.price_total"/>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 10px; text-align: right;">
+                    <table style="float: right;">
+                        <tr><td>Untaxed Amount</td><td t-esc="o.amount_untaxed"/></tr>
+                        <tr><td>VAT</td><td t-esc="o.amount_tax"/></tr>
+                        <tr style="font-weight: bold; color: #b20000;"><td>Total</td><td t-esc="o.amount_total"/></tr>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; font-size: 12px; color: #888;">
+                    Payment Communication: <span t-esc="o.ref"/>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

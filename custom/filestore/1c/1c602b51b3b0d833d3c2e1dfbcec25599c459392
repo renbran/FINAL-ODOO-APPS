@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:20250603T122224Z - 67323@vultr
+DTSTART:20250604T060000Z
+DTEND:20250604T070000Z
+ATTENDEE:MAILTO:salescompliance@osusproperties.com
+ATTENDEE:MAILTO:DAVIDE@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:FARAAZ@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:KARIM.ELSABAGH@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:MAICKEL.FARAGALLA@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:SAAD.KHAN@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:WESSAM@OSUSPROPERTIES.COM
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:s.kurshid@osusproperties.com
+CREATED:20250603T122224Z
+DESCRIPTION:Good day!\n\nWe are pleased to invite you and your team to our 
+ next Property Monitor online training session on Wednesday (June 4) - 10am
+ .\nIn anticipation of the Eid holidays\, it has been moved from the usual 
+ Thursday to Wednesday.\n\nIt will be held via Teams together with other Pr
+ emium subscribers.\n\nHere is the link to Register for the event\nRegistra
+ tion Link ---> https://events.teams.microsoft.com/event/ed419b10-5e24-40db
+ -be7d-53dc57aab894@83af217e-0b17-4ebb-8356-a84e11cffe1b [1]\n\nPlease feel
+  free to share to the Team who may want to join.\n\nWishing you and the te
+ am a nice day ahead!\n\n\n[1] https://events.teams.microsoft.com/event/
+ ed419b10-5e24-40db-be7d-53dc57aab894@83af217e-0b17-4ebb-8356-a84e11cffe1b
+DTSTAMP:20250603T122224Z
+ORGANIZER;CN=ADMINISTRATOR:MAILTO:salescompliance@osusproperties.com
+SUMMARY:PROPERTY MONITOR - ONLINE TUTORIAL
+END:VEVENT
+END:VCALENDAR
