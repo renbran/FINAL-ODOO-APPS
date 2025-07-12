@@ -35,19 +35,27 @@ class ResConfigSettings(models.TransientModel):
         account_manager_ids = user_ids.filtered(
             lambda x: x.has_group('account.group_account_manager'))
         return [('id', 'in', account_manager_ids.ids)]
-    payment_approval = fields.Boolean(string='Payment Approval',
-                                      config_parameter='account_payment_'
-                                                       'approval.payment_'
-                                                       'approval',
-                                      help="Enable/disable payment"
-                                           " approval to approve for payment "
-                                           "if needed.")
-    approval_user_id = fields.Many2one('res.users',
-                                       string="Payment Approving person",
-                                       required=False,
-                                       domain=_get_account_manager_ids,
-                                       config_parameter='account_payment_'
-                                                        'approval.approval_'
+    payment_approval = fields.Boolean(
+        string='Payment Approval',
+        config_parameter='account_payment_approval.payment_approval',
+        help="Enable/disable payment approval to approve for payment if needed."
+    )
+    approval_user_id = fields.Many2one(
+        'res.users',
+        string="Payment Approving Person",
+        domain=_get_account_manager_ids,
+        config_parameter='account_payment_approval.approval_user_id'
+    )
+    approval_amount = fields.Float(
+        string='Minimum Amount for Approval',
+        config_parameter='account_payment_approval.approval_amount',
+        help="Payments exceeding this amount will require approval"
+    )
+    approval_currency_id = fields.Many2one(
+        'res.currency',
+        string='Approval Amount Currency',
+        config_parameter='account_payment_approval.approval_currency_id',
+        default=lambda self: self.env.company.currency_idapproval_'
                                                         'user_id',
                                        help="Select the payment approving "
                                             "person.")
