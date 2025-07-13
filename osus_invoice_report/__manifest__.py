@@ -27,20 +27,15 @@
         # Data
         'data/report_paperformat.xml',
         
-        # Views - Existing files only
+        # Views
         'views/account_move_views.xml',
         'views/sale_order_views.xml',
-        'views/report_custom_invoice_modern.xml',
-        'views/report_bills.xml',
-        'views/report_receipt.xml',
-        'views/report_invoice.xml',
-        'views/osus_invoice_report_view.xml',
         
-        # Reports - Files in report/ directory
+        # Reports
         'report/report_action.xml',
+        'report/bill_report_action.xml',
         'report/invoice_report.xml',
         'report/bill_report.xml',
-        'report/report_invoice.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
