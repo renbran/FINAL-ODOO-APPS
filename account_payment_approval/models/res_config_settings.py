@@ -35,6 +35,7 @@ class ResConfigSettings(models.TransientModel):
         account_manager_ids = user_ids.filtered(
             lambda x: x.has_group('account.group_account_manager'))
         return [('id', 'in', account_manager_ids.ids)]
+
     payment_approval = fields.Boolean(string='Payment Approval',
                                       config_parameter='account_payment_approval.payment_approval',
                                       help="Enable/disable payment"
