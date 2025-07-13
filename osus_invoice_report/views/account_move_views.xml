@@ -7,22 +7,22 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <!-- Add custom print buttons in header -->
-            <xpath expr="//header" position="inside">
+            <xpath expr="//header//button[@name='action_invoice_print']" position="after">
                 <button name="action_print_custom_invoice" 
                         string="Print OSUS Invoice" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'out_invoice' and state == 'posted'"/>
+                        visibility="move_type == 'out_invoice' and state in ['posted', 'draft']"/>
                 <button name="action_print_custom_bill" 
                         string="Print OSUS Bill" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'in_invoice' and state == 'posted'"/>
+                        visibility="move_type == 'in_invoice' and state in ['posted', 'draft']"/>
                 <button name="action_print_custom_receipt" 
                         string="Print OSUS Receipt" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'out_refund' and state == 'posted'"/>
+                        visibility="move_type == 'out_refund' and state in ['posted', 'draft']"/>
             </xpath>
 
             <!-- Add Deal Tracking tab after other_info -->

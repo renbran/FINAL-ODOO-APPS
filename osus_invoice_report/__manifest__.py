@@ -36,7 +36,6 @@
         'report/bill_report_action.xml',
         'report/invoice_report.xml',
         'report/bill_report.xml',
-        'report/report_invoice.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
