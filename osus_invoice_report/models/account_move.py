@@ -3,7 +3,6 @@ from odoo import models, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    @api.multi
     def action_print_custom_invoice(self):
         """
         Print the PDF copy of the invoice using the custom report action.
