@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Report Template for Partner Ledger.-->
+    <!--    Report Template for Partner Ledger.-->
     <template id="partner_ledger">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <!-- All number formatting is now handled in Python. -->
                 <div class="page">
                     <h3>
                         <center>

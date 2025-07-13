@@ -24,7 +24,6 @@ import json
 
 import xlsxwriter
 from odoo import models, fields, api
-from ..report import format_number
 
 
 class AgeReceivableReport(models.TransientModel):
@@ -35,16 +34,25 @@ class AgeReceivableReport(models.TransientModel):
     @api.model
     def view_report(self):
         """
-        Generate a report with move line data categorized by partner and debit difference.
-        All numeric fields are formatted using format_number for professional display.
+        Generate a report with move line data categorized by partner and debit
+        difference.This method retrieves move line data from the
+        'account.move.line' model, filters the records based on specific
+        criteria (parent_state, account_type, reconciled),and categorizes the
+        data by each partner's name. For each move line, it calculates the debit
+        difference based on the number of days between today's date and the
+        maturity date of the move line.
+        Returns:
+        dict: Dictionary containing move line data categorized by partner names.
+              Each partner's data includes debit amounts and debit differences
+              based on days between maturity date and today.
+              The 'partner_totals' key contains summary data for each partner.
         """
-        from ..report import format_number
         partner_total = {}
         move_line_list = {}
-        paid = self.env['account.move.line'].search([
-            ('parent_state', '=', 'posted'),
-            ('account_type', '=', 'asset_receivable'),
-            ('reconciled', '=', False)])
+        paid = self.env['account.move.line'].search(
+            [('parent_state', '=', 'posted'),
+             ('account_type', '=', 'asset_receivable'),
+             ('reconciled', '=', False)])
         currency_id = self.env.company.currency_id.symbol
         partner_ids = paid.mapped('partner_id')
         today = fields.Date.today()
@@ -63,24 +71,21 @@ class AgeReceivableReport(models.TransientModel):
                 val['diff3'] = val['debit'] if 60 < diffrence <= 90 else 0.0
                 val['diff4'] = val['debit'] if 90 < diffrence <= 120 else 0.0
                 val['diff5'] = val['debit'] if diffrence > 120 else 0.0
-                # Format all numeric values as strings for QWeb
-                val['debit'] = format_number(val['debit'])
-                val['amount_currency'] = format_number(val['amount_currency']) if val.get('amount_currency') else ''
-                val['diff0'] = format_number(val['diff0'])
-                val['diff1'] = format_number(val['diff1'])
-                val['diff2'] = format_number(val['diff2'])
-                val['diff3'] = format_number(val['diff3'])
-                val['diff4'] = format_number(val['diff4'])
-                val['diff5'] = format_number(val['diff5'])
             move_line_list[partner_id.name] = move_line_data
             partner_total[partner_id.name] = {
-                'debit_sum': format_number(sum(float(val['debit'].replace(",", "")) for val in move_line_data)),
-                'diff0_sum': format_number(sum(float(val['diff0'].replace(",", "")) for val in move_line_data)),
-                'diff1_sum': format_number(sum(float(val['diff1'].replace(",", "")) for val in move_line_data)),
-                'diff2_sum': format_number(sum(float(val['diff2'].replace(",", "")) for val in move_line_data)),
-                'diff3_sum': format_number(sum(float(val['diff3'].replace(",", "")) for val in move_line_data)),
-                'diff4_sum': format_number(sum(float(val['diff4'].replace(",", "")) for val in move_line_data)),
-                'diff5_sum': format_number(sum(float(val['diff5'].replace(",", "")) for val in move_line_data)),
+                'debit_sum': sum(val['debit'] for val in move_line_data),
+                'diff0_sum': round(sum(val['diff0'] for val in move_line_data),
+                                   2),
+                'diff1_sum': round(sum(val['diff1'] for val in move_line_data),
+                                   2),
+                'diff2_sum': round(sum(val['diff2'] for val in move_line_data),
+                                   2),
+                'diff3_sum': round(sum(val['diff3'] for val in move_line_data),
+                                   2),
+                'diff4_sum': round(sum(val['diff4'] for val in move_line_data),
+                                   2),
+                'diff5_sum': round(sum(val['diff5'] for val in move_line_data),
+                                   2),
                 'currency_id': currency_id,
                 'partner_id': partner_id.id
             }
@@ -264,10 +269,9 @@ class AgeReceivableReport(models.TransientModel):
                                 txt_name)
                     for rec in data['data'][move_line]:
                         row += 1
-                        # Ensure both move_name and name are strings
-                        move_name = str(rec.get('move_name', '')) if rec.get('move_name') else ''
-                        name = str(rec.get('name', '')) if rec.get('name') else ' '
-                        sheet.write(row, col, move_name + name,
+                        if not rec['name']:
+                            rec['name'] = ' '
+                        sheet.write(row, col, rec['move_name'] + rec['name'],
                                     txt_name)
                         sheet.write(row, col + 1, rec['date'],
                                     txt_name)
@@ -316,15 +320,3 @@ class AgeReceivableReport(models.TransientModel):
         output.seek(0)
         response.stream.write(output.read())
         output.close()
-
-    @api.model
-    def get_report_values(self, docids, data=None):
-        # Provide format_number to QWeb context for robust formatting
-        docs = self.browse(docids)
-        context = {
-            'docs': docs,
-            'format_number': format_number,
-        }
-        if data:
-            context.update(data)
-        return context

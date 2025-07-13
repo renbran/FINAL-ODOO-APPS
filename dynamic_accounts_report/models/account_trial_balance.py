@@ -38,13 +38,15 @@ class AccountTrialBalance(models.TransientModel):
     def view_report(self):
         """
         Generates a trial balance report for multiple accounts.
-        All numeric fields are formatted using format_number for professional display.
+        Retrieves account information and calculates total debit and credit
+        amounts for each account within the specified date range. Returns a list
+        of dictionaries containing account details and transaction totals.
 
         :return: List of dictionaries representing the trial balance report.
         :rtype: list
         """
-        from ..report import format_number
-        account_ids = self.env['account.move.line'].search([]).mapped('account_id')
+        account_ids = self.env['account.move.line'].search([]).mapped(
+            'account_id')
         today = fields.Date.today()
         move_line_list = []
         for account_id in account_ids:
@@ -52,28 +54,31 @@ class AccountTrialBalance(models.TransientModel):
                 [('date', '<', get_month(today)[0]),
                  ('account_id', '=', account_id.id),
                  ('parent_state', '=', 'posted')])
-            initial_total_debit = format_number(sum(initial_move_line_ids.mapped('debit')))
-            initial_total_credit = format_number(sum(initial_move_line_ids.mapped('credit')))
+            initial_total_debit = round(
+                sum(initial_move_line_ids.mapped('debit')), 2)
+            initial_total_credit = round(
+                sum(initial_move_line_ids.mapped('credit')), 2)
             move_line_ids = self.env['account.move.line'].search(
                 [('date', '>=', get_month(today)[0]),
                  ('account_id', '=', account_id.id),
                  ('date', '<=', get_month(today)[1]),
                  ('parent_state', '=', 'posted')])
-            total_debit = format_number(sum(move_line_ids.mapped('debit')))
-            total_credit = format_number(sum(move_line_ids.mapped('credit')))
-            sum_debit = float(initial_total_debit.replace(',', '')) + float(total_debit.replace(',', ''))
-            sum_credit = float(initial_total_credit.replace(',', '')) + float(total_credit.replace(',', ''))
+            total_debit = round(sum(move_line_ids.mapped('debit')), 2)
+            total_credit = round(sum(move_line_ids.mapped('credit')), 2)
+            sum_debit = initial_total_debit + total_debit
+            sum_credit = initial_total_credit + total_credit
             diff_credit_debit = sum_debit - sum_credit
             if diff_credit_debit > 0:
-                end_total_debit = format_number(diff_credit_debit)
-                end_total_credit = format_number(0.0)
+                end_total_debit = diff_credit_debit
+                end_total_credit = 0.0
             else:
-                end_total_debit = format_number(0.0)
-                end_total_credit = format_number(abs(diff_credit_debit))
+                end_total_debit = 0.0
+                end_total_credit = abs(diff_credit_debit)
             data = {
                 'account': account_id.display_name,
                 'account_id': account_id.id,
-                'journal_ids': self.env['account.journal'].search_read([], ['name']),
+                'journal_ids': self.env['account.journal'].search_read([], [
+                    'name']),
                 'initial_total_debit': initial_total_debit,
                 'initial_total_credit': initial_total_credit,
                 'total_debit': total_debit,

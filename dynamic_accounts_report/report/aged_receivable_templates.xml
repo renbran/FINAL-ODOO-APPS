@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--    Report template for Aged Receivable Report.-->
-    <template id="aged_receivabl">
-        <span>
-            <t t-if="total[move_line]['debit_sum']"
-               t-esc="total[move_line]['currency_id']"/>
-            <t t-if="total[move_line]['debit_sum']"
-               t-esc="total[move_line]['debit_sum']"/>
-        </span>
+    <template id="aged_receivable">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="data_report_margin_top" t-value="12"/>
@@ -43,8 +37,8 @@
                                         <t t-foreach="filters['partner']"
                                            t-as="selected_partner"
                                            t-key="partner_index">
-                                            <t t-out="selected_partner['display_name']"/>,
-
+                                            <t t-out="selected_partner['display_name']"/>
+                                            ,
                                         </t>
                                     </th>
                                 </tr>

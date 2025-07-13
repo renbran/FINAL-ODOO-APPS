@@ -27,7 +27,6 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.tools.date_utils import get_month, get_fiscal_year, get_quarter, \
     subtract
-from ..report import format_number
 
 
 class ProfitLossReport(models.TransientModel):
@@ -178,17 +177,21 @@ class ProfitLossReport(models.TransientModel):
                     account_entries[account_type][0])
                 total = total_liability + total_equity
                 data = {
-                    'total': format_number(total_income - total_expense),
-                    'total_expense': format_number(total_expense),
-                    'total_income': format_number(total_income),
-                    'total_current_asset': format_number(total_current_asset),
-                    'total_assets': format_number(total_assets),
-                    'total_current_liability': format_number(total_current_liability),
-                    'total_liability': format_number(total_liability),
-                    'total_earnings': format_number(total_income - total_expense),
-                    'total_unallocated_earning': format_number(total_unallocated_earning),
-                    'total_equity': format_number(total_equity),
-                    'total_balance': format_number(total),
+                    'total': total_income - total_expense,
+                    'total_expense': "{:,.2f}".format(total_expense),
+                    'total_income': "{:,.2f}".format(total_income),
+                    'total_current_asset': "{:,.2f}".format(
+                        total_current_asset),
+                    'total_assets': "{:,.2f}".format(total_assets),
+                    'total_current_liability': "{:,.2f}".format(
+                        total_current_liability),
+                    'total_liability': "{:,.2f}".format(total_liability),
+                    'total_earnings': "{:,.2f}".format(
+                        total_income - total_expense),
+                    'total_unallocated_earning': "{:,.2f}".format(
+                        total_unallocated_earning),
+                    'total_equity': "{:,.2f}".format(total_equity),
+                    'total_balance': "{:,.2f}".format(total),
                     **account_entries}
                 datas.append(data)
         else:
@@ -260,17 +263,20 @@ class ProfitLossReport(models.TransientModel):
                 ['equity'] for entry in account_entries[account_type][0])
             total = total_liability + total_equity
             data = {
-                'total': format_number(total_income - total_expense),
-                'total_expense': format_number(total_expense),
-                'total_income': format_number(total_income),
-                'total_current_asset': format_number(total_current_asset),
-                'total_assets': format_number(total_assets),
-                'total_current_liability': format_number(total_current_liability),
-                'total_liability': format_number(total_liability),
-                'total_earnings': format_number(total_income - total_expense),
-                'total_unallocated_earning': format_number(total_unallocated_earning),
-                'total_equity': format_number(total_equity),
-                'total_balance': format_number(total),
+                'total': total_income - total_expense,
+                'total_expense': "{:,.2f}".format(total_expense),
+                'total_income': "{:,.2f}".format(total_income),
+                'total_current_asset': "{:,.2f}".format(total_current_asset),
+                'total_assets': "{:,.2f}".format(total_assets),
+                'total_current_liability': "{:,.2f}".format(
+                    total_current_liability),
+                'total_liability': "{:,.2f}".format(total_liability),
+                'total_earnings': "{:,.2f}".format(
+                    total_income - total_expense),
+                'total_unallocated_earning': "{:,.2f}".format(
+                    total_unallocated_earning),
+                'total_equity': "{:,.2f}".format(total_equity),
+                'total_balance': "{:,.2f}".format(total),
                 **account_entries}
             datas.append(data)
         filters = self._get_filter_data()

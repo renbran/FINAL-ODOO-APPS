@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--    Report template for Aged Payable Report.-->
-    <template id="aged_payable" name="Aged Payable Report Template">
+    <template id="aged_payable">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v and v != 0 else '0.00'"/>
                 <div class="page">
                     <h3>
                         <center>
@@ -93,7 +92,7 @@
                                                 <t t-if="total[move_line]['diff0_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff0_sum']"
-                                                   t-esc="format_number(total[move_line]['diff0_sum'])"/>
+                                                   t-esc="total[move_line]['diff0_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;font-size:11px;font-weight:100;">
@@ -101,7 +100,7 @@
                                                 <t t-if="total[move_line]['diff1_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff1_sum']"
-                                                   t-esc="format_number(total[move_line]['diff1_sum'])"/>
+                                                   t-esc="total[move_line]['diff1_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;font-size:11px;font-weight:100;">
@@ -109,7 +108,7 @@
                                                 <t t-if="total[move_line]['diff2_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff2_sum']"
-                                                   t-esc="format_number(total[move_line]['diff2_sum'])"/>
+                                                   t-esc="total[move_line]['diff2_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;font-size:11px;font-weight:100;">
@@ -117,7 +116,7 @@
                                                 <t t-if="total[move_line]['diff3_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff3_sum']"
-                                                   t-esc="format_number(total[move_line]['diff3_sum'])"/>
+                                                   t-esc="total[move_line]['diff3_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;font-size:11px;font-weight:100;">
@@ -125,7 +124,7 @@
                                                 <t t-if="total[move_line]['diff4_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff4_sum']"
-                                                   t-esc="format_number(total[move_line]['diff4_sum'])"/>
+                                                   t-esc="total[move_line]['diff4_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;font-size:11px;font-weight:100;">
@@ -133,7 +132,7 @@
                                                 <t t-if="total[move_line]['diff5_sum']"
                                                    t-esc="total[move_line]['currency_id']"/>
                                                 <t t-if="total[move_line]['diff5_sum']"
-                                                   t-esc="format_number(total[move_line]['diff5_sum'])"/>
+                                                   t-esc="total[move_line]['diff5_sum']"/>
                                             </span>
                                         </th>
                                         <th style="border:0px solid transparent;border-right: thin solid #dee2e6;font-size:11px;font-weight:100;">
@@ -163,7 +162,7 @@
                                             </th>
                                             <th>
                                                 <span>
-                                                    <t t-esc="format_number(valuelist['amount_currency'])"/>
+                                                    <t t-esc="valuelist['amount_currency']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -187,7 +186,7 @@
                                                     <t t-if="valuelist['diff0']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff0']"
-                                                       t-esc="format_number(valuelist['diff0'])"/>
+                                                       t-esc="valuelist['diff0']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -195,7 +194,7 @@
                                                     <t t-if="valuelist['diff1']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff1']"
-                                                       t-esc="format_number(valuelist['diff1'])"/>
+                                                       t-esc="valuelist['diff1']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -203,7 +202,7 @@
                                                     <t t-if="valuelist['diff2']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff2']"
-                                                       t-esc="format_number(valuelist['diff2'])"/>
+                                                       t-esc="valuelist['diff2']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -211,7 +210,7 @@
                                                     <t t-if="valuelist['diff3']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff3']"
-                                                       t-esc="format_number(valuelist['diff3'])"/>
+                                                       t-esc="valuelist['diff3']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -219,7 +218,7 @@
                                                     <t t-if="valuelist['diff4']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff4']"
-                                                       t-esc="format_number(valuelist['diff4'])"/>
+                                                       t-esc="valuelist['diff4']"/>
                                                 </span>
                                             </th>
                                             <th>
@@ -227,7 +226,7 @@
                                                     <t t-if="valuelist['diff5']"
                                                        t-esc="total[move_line]['currency_id']"/>
                                                     <t t-if="valuelist['diff5']"
-                                                       t-esc="format_number(valuelist['diff5'])"/>
+                                                       t-esc="valuelist['diff5']"/>
                                                 </span>
                                             </th>
                                             <th/>
@@ -243,31 +242,31 @@
                                 <th style="width:60%;">Total</th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff0_sum'])"/>
+                                    <t t-out="grand_total['diff0_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff1_sum'])"/>
+                                    <t t-out="grand_total['diff1_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff2_sum'])"/>
+                                    <t t-out="grand_total['diff2_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff3_sum'])"/>
+                                    <t t-out="grand_total['diff3_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff4_sum'])"/>
+                                    <t t-out="grand_total['diff4_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['diff5_sum'])"/>
+                                    <t t-out="grand_total['diff5_sum']"/>
                                 </th>
                                 <th style="width:10%">
                                     <t t-out="grand_total['currency']"/>
-                                    <t t-out="format_number(grand_total['total_credit'])"/>
+                                    <t t-out="grand_total['total_credit']"/>
                                 </th>
                             </tr>
                         </tbody>

@@ -7,7 +7,6 @@
                 <t t-set="data_report_margin_top" t-value="12"/>
                 <t t-set="data_report_header_spacing" t-value="9"/>
                 <t t-set="data_report_dpi" t-value="110"/>
-                <!-- All number formatting is now handled in Python. -->
                 <div class="page">
                     <h3>
                         <center>

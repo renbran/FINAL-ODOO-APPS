@@ -26,7 +26,6 @@ import xlsxwriter
 from datetime import datetime
 from odoo.tools import date_utils
 from odoo import api, fields, models
-from ..report import format_number
 
 
 class BankBookReport(models.TransientModel):
@@ -59,15 +58,11 @@ class BankBookReport(models.TransientModel):
                 ['date', 'journal_id', 'partner_id', 'move_name', 'debit',
                  'move_id',
                  'credit', 'name', 'ref'])
-            # Format debit and credit in each move line
-            for line in move_line_data:
-                line['debit'] = format_number(line.get('debit', 0.0))
-                line['credit'] = format_number(line.get('credit', 0.0))
             data[move_lines.mapped('account_id').display_name] = move_line_data
             currency_id = self.env.company.currency_id.symbol
             move_lines_total[move_lines.mapped('account_id').display_name] = {
-                'total_debit': format_number(sum(move_lines.mapped('debit'))),
-                'total_credit': format_number(sum(move_lines.mapped('credit'))),
+                'total_debit': round(sum(move_lines.mapped('debit')), 2),
+                'total_credit': round(sum(move_lines.mapped('credit')), 2),
                 'currency_id': currency_id}
         data['move_lines_total'] = move_lines_total
         data['accounts'] = accounts
@@ -174,14 +169,11 @@ class BankBookReport(models.TransientModel):
                 ['date', 'journal_id', 'partner_id', 'move_name', 'debit',
                  'move_id',
                  'credit', 'name', 'ref'])
-            for line in move_line_data:
-                line['debit'] = format_number(line.get('debit', 0.0))
-                line['credit'] = format_number(line.get('credit', 0.0))
             data[move_lines.mapped('account_id').display_name] = move_line_data
             currency_id = self.env.company.currency_id.symbol
             move_lines_total[move_lines.mapped('account_id').display_name] = {
-                'total_debit': format_number(sum(move_lines.mapped('debit'))),
-                'total_credit': format_number(sum(move_lines.mapped('credit'))),
+                'total_debit': round(sum(move_lines.mapped('debit')), 2),
+                'total_credit': round(sum(move_lines.mapped('credit')), 2),
                 'currency_id': currency_id}
         data['move_lines_total'] = move_lines_total
         return data
