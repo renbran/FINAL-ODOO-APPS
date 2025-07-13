@@ -58,19 +58,25 @@ class AccountPayment(models.Model):
             rec.is_locked = rec.state not in ['draft', 'rejected']
 
     def action_post(self):
-        """Overwrites the _post() to validate the payment in the 'approved'
+        """Overwrites the action_post() to validate the payment in the 'approved'
          stage too.
         currently Odoo allows payment posting only in draft stage."""
-        validation = self._check_payment_approval()
-        if validation:
-            if self.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
-                raise UserError(
-                    _("Only a draft or approved payment can be posted."))
-            if any(inv.state != 'posted' for inv in
-                   self.reconciled_invoice_ids):
-                raise ValidationError(_("The payment cannot be processed "
-                                        "because the invoice is not open!"))
-            self.move_id._post(soft=False)
+        # Skip approval check if called from approve_transfer
+        if not self.env.context.get('skip_approval_check'):
+            validation = self._check_payment_approval()
+            if not validation:
+                return False
+                
+        if self.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
+            raise UserError(
+                _("Only a draft or approved payment can be posted."))
+        if any(inv.state != 'posted' for inv in
+               self.reconciled_invoice_ids):
+            raise ValidationError(_("The payment cannot be processed "
+                                    "because the invoice is not open!"))
+        # Call the parent's action_post method to ensure proper sequence generation
+        # and all standard Odoo posting logic
+        return super(AccountPayment, self).action_post()
 
     def _check_payment_approval(self):
         """This function checks the payment approval if payment_amount grater
@@ -105,20 +111,27 @@ class AccountPayment(models.Model):
         """This function changes state to approved state if approving person
          approves payment and automatically posts the payment"""
         if self.is_approve_person:
+            # First, set state to approved
             self.write({
                 'state': 'approved'
             })
+            # Ensure the record is refreshed before posting
+            self.invalidate_recordset()
             # Automatically post the payment after approval
             try:
-                self.action_post()
+                # Temporarily set state to draft for posting, then post
+                original_state = self.state
+                self.with_context(skip_approval_check=True).write({'state': 'draft'})
+                result = self.action_post()
+                return result
             except Exception as e:
-                # If posting fails, log the error but keep the approval
+                # If posting fails, revert to approved state and log the error
+                self.write({'state': 'approved'})
                 import logging
                 _logger = logging.getLogger(__name__)
                 _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
-                # Optionally, you can raise a user error to show the issue
-                # raise UserError(f"Payment approved but failed to post: {str(e)}")
-                pass
+                # Raise a user-friendly error
+                raise UserError(f"Payment approved but failed to post: {str(e)}")
 
     def reject_transfer(self):
         """This function changes state to rejected state if approving person
