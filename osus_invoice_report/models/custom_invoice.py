@@ -8,8 +8,10 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
-    booking_date = fields.Date(string='Booking Date', help="Date when the property booking was confirmed")
     _inherit = 'account.move'
+
+    # Deal Information Fields
+    booking_date = fields.Date(string='Booking Date', help="Date when the property booking was confirmed")
 
     # QR Code fields
     qr_in_report = fields.Boolean(
