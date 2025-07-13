@@ -5,7 +5,7 @@
         <field name="name">target.achieve.view.tree</field>
         <field name="model">target.achieve</field>
         <field name="arch" type="xml">
-            <tree string="Sales Target Details" decoration-success="achievement_percentage >= 100" decoration-info="achievement_percentage >= 75 and achievement_percentage < 100" decoration-danger="achievement_percentage < 75">
+            <tree string="Sales Target Details" decoration-success="achievement_percentage &gt;= 100" decoration-info="achievement_percentage &gt;= 75 and achievement_percentage &lt; 100" decoration-danger="achievement_percentage &lt; 75">
                 <field name="name"/>
                 <field name="consultant_id"/>
                 <field name="manager_id"/>
@@ -154,7 +154,7 @@
                                     <strong><field name="name"/></strong>
                                 </div>
                                 <div class="col-6 text-end">
-                                    <span class="badge rounded-pill" t-attf-class="bg-#{{'success': record.achievement_percentage.raw_value >= 100, 'warning': record.achievement_percentage.raw_value >= 75 and record.achievement_percentage.raw_value < 100, 'danger': record.achievement_percentage.raw_value < 75}}">
+                                    <span class="badge rounded-pill" t-attf-class="bg-#{{'success': record.achievement_percentage.raw_value &gt;= 100, 'warning': record.achievement_percentage.raw_value &gt;= 75 and record.achievement_percentage.raw_value &lt; 100, 'danger': record.achievement_percentage.raw_value &lt; 75}}">
                                         <field name="achievement_percentage" widget="percentage"/>
                                     </span>
                                 </div>

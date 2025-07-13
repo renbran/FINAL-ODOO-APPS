@@ -47,10 +47,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="property_id" options="{'no_create': True}" 
-                                   options="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="partner_id" options="{'no_create': True}" 
-                                   options="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="property_id" options="{'no_create': True, 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="partner_id" options="{'no_create': True, 'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date" options="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="validity" options="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date_deadline" readonly="1"/>
@@ -74,8 +72,7 @@
                         <group>
                             <field name="down_payment_percentage" 
                                    options="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="payment_term_id" options="{'no_create': True}" 
-                                   options="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="payment_term_id" options="{'no_create': True, 'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                     </group>
                     <notebook>

@@ -15,11 +15,3 @@
         <field name="property_advance_tax_payment_account_id" ref="124001_account_Muhlhel"/>
     </record>
 </odoo>
-        <field name="property_account_income_id" ref="47910_general_product_sales"/>
-        <field name="default_pos_receivable_account_id" ref="account_receivable_pos" />
-        
-        
-        
-         -->
-    </record>
-</odoo>
