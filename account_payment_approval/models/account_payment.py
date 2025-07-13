@@ -51,6 +51,15 @@ class AccountPayment(models.Model):
                                             " person")
 
     is_locked = fields.Boolean(string='Locked', compute='_compute_is_locked', store=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('posted', 'Posted'),
+        ('cancel', 'Cancelled'),
+        ('waiting_approval', 'Waiting for Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], string='Status', required=True, readonly=True, copy=False, tracking=True,
+        default='draft')
 
     @api.depends('state')
     def _compute_is_locked(self):
@@ -107,44 +116,45 @@ class AccountPayment(models.Model):
                     return False
         return True
 
+    def action_submit_review(self):
+        """Submit the payment for review"""
+        for record in self:
+            if record.state == 'draft':
+                record.state = 'waiting_approval'
+
     def approve_transfer(self):
         """This function changes state to approved state if approving person
          approves payment and automatically posts the payment"""
-        if self.is_approve_person:
-            # First, set state to approved
-            self.write({
-                'state': 'approved'
-            })
-            # Ensure the record is refreshed before posting
-            self.invalidate_recordset()
-            # Automatically post the payment after approval
-            try:
-                # Temporarily set state to draft for posting, then post
-                original_state = self.state
-                self.with_context(skip_approval_check=True).write({'state': 'draft'})
-                result = self.action_post()
-                return result
-            except Exception as e:
-                # If posting fails, revert to approved state and log the error
-                self.write({'state': 'approved'})
-                import logging
-                _logger = logging.getLogger(__name__)
-                _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
-                # Raise a user-friendly error
-                raise UserError(f"Payment approved but failed to post: {str(e)}")
+        for record in self:
+            if record.state == 'waiting_approval' and record.is_approve_person:
+                # First, set state to approved
+                record.write({
+                    'state': 'approved'
+                })
+                # Ensure the record is refreshed before posting
+                record.invalidate_recordset()
+                # Automatically post the payment after approval
+                try:
+                    # Temporarily set state to draft for posting, then post
+                    record.with_context(skip_approval_check=True).write({'state': 'draft'})
+                    result = record.action_post()
+                    return result
+                except Exception as e:
+                    # If posting fails, revert to approved state and log the error
+                    record.write({'state': 'approved'})
+                    import logging
+                    _logger = logging.getLogger(__name__)
+                    _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
+                    # Raise a user-friendly error
+                    raise UserError(f"Payment approved but failed to post: {str(e)}")
 
     def reject_transfer(self):
-        """This function changes state to rejected state if approving person
-                reject approval"""
-        self.write({
-            'state': 'rejected'
-        })
-
-    def action_submit_review(self):
-        """Submit payment for review, set state to submit_review and lock editing."""
-        for rec in self:
-            if rec.state == 'draft':
-                rec.write({'state': 'submit_review'})
+        """Reject the payment transfer"""
+        for record in self:
+            if record.state == 'waiting_approval' and record.is_approve_person:
+                record.state = 'rejected'
+                # Allow draft and cancel actions after rejection
+                record.is_locked = False
 
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(AccountPayment, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)

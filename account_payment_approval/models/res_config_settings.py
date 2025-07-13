@@ -36,24 +36,28 @@ class ResConfigSettings(models.TransientModel):
             lambda x: x.has_group('account.group_account_manager'))
         return [('id', 'in', account_manager_ids.ids)]
 
-    payment_approval = fields.Boolean(string='Payment Approval',
-                                      config_parameter='account_payment_approval.payment_approval',
-                                      help="Enable/disable payment"
-                                           " approval to approve for payment "
-                                           "if needed.")
-    approval_user_id = fields.Many2one('res.users',
-                                       string="Payment Approving person",
-                                       required=False,
-                                       domain=_get_account_manager_ids,
-                                       config_parameter='account_payment_approval.approval_user_id',
-                                       help="Select the payment approving "
-                                            "person.")
+    payment_approval = fields.Boolean(
+        string='Payment Approval',
+        config_parameter='account_payment_approval.payment_approval',
+        help="Enable/disable payment approval to approve for payment if needed."
+    )
+    approval_user_id = fields.Many2one(
+        'res.users',
+        string="Payment Approving Person",
+        required=False,
+        domain=_get_account_manager_ids,
+        config_parameter='account_payment_approval.approval_user_id',
+        help="Select the payment approving person."
+    )
     approval_amount = fields.Float(
-        string='Minimum Approval Amount',
+        string='Minimum Amount for Approval',
         config_parameter='account_payment_approval.approval_amount',
-        help="If amount is 0.00, All the payments go through approval.")
-    approval_currency_id = fields.Many2one('res.currency',
-                                           string='Approval Currency',
-                                           config_parameter='account_payment_approval.approval_currency_id',
-                                           help="Converts the payment amount"
-                                                " to this currency if chosen.")
+        help="Payments exceeding this amount will require approval. If amount is 0.00, All the payments go through approval."
+    )
+    approval_currency_id = fields.Many2one(
+        'res.currency',
+        string='Approval Amount Currency',
+        config_parameter='account_payment_approval.approval_currency_id',
+        default=lambda self: self.env.company.currency_id,
+        help="Converts the payment amount to this currency if chosen."
+    )
