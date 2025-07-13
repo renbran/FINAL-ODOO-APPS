@@ -7,22 +7,22 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <!-- Add custom print buttons in header -->
-            <xpath expr="//header//button[@name='action_invoice_print']" position="after">
+            <xpath expr="//header" position="inside">
                 <button name="action_print_custom_invoice" 
                         string="Print OSUS Invoice" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'out_invoice'"/>
+                        visibility="move_type == 'out_invoice' and state == 'posted'"/>
                 <button name="action_print_custom_bill" 
                         string="Print OSUS Bill" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'in_invoice'"/>
+                        visibility="move_type == 'in_invoice' and state == 'posted'"/>
                 <button name="action_print_custom_receipt" 
                         string="Print OSUS Receipt" 
                         type="object" 
                         class="btn-secondary"
-                        visibility="move_type == 'out_refund'"/>
+                        visibility="move_type == 'out_refund' and state == 'posted'"/>
             </xpath>
 
             <!-- Add Deal Tracking tab after other_info -->
@@ -105,14 +105,13 @@
                         domain="[('is_property_deal', '=', False)]"/>
             </xpath>
             
-            <!-- Add grouping options -->
-            <xpath expr="//group[@name='groupby']" position="inside">
-                <filter string="Buyer" name="group_buyer" 
-                        context="{'group_by': 'buyer_id'}"/>
-                <filter string="Project" name="group_project" 
-                        context="{'group_by': 'project_id'}"/>
-                <filter string="Booking Date" name="group_booking_date" 
-                        context="{'group_by': 'booking_date'}"/>
+            <!-- Add search fields -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="deal_id"/>
+                <field name="booking_date"/>
             </xpath>
         </field>
     </record>
