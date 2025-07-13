@@ -5,8 +5,8 @@
     "author": "BizzAppDev Systems Pvt. Ltd.",
     "website": "http://www.bizzappdev.com",
     "category": "GenericModules",
-    "depends": ["base", "web", "base_accounting_kit"],
-    "summary": "Custom Background",
+    "depends": ["base", "web"],
+    "summary": "Custom  Background",
     "images": ["images/image.png"],
     "init_xml": [],
     "data": [
