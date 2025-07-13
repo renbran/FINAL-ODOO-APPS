@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <!-- Add custom print buttons in header -->
-            <xpath expr="//header//button[@name='action_invoice_print']" position="after">
+            <xpath expr="//header" position="inside">
                 <button name="action_print_custom_invoice" 
                         string="Print OSUS Invoice" 
                         type="object" 
