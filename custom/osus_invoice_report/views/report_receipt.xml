@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- OSUS Custom Receipt Report Template -->
-    <template id="report_custom_receipt">
+    <!-- Duplicate receipt template removed: see main osus_invoice_report/views/report_receipt.xml -->
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang or 'en_US'"/>
