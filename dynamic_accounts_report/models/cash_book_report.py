@@ -26,7 +26,7 @@ import xlsxwriter
 from datetime import datetime
 from odoo.tools import date_utils
 from odoo import api, fields, models
-from dynamic_accounts_report.report import format_number
+from ..report import format_number
 
 
 class CashBookReport(models.TransientModel):

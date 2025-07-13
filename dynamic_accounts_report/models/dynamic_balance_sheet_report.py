@@ -27,7 +27,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.tools.date_utils import get_month, get_fiscal_year, get_quarter, \
     subtract
-from dynamic_accounts_report.report import format_number
+from ..report import format_number
 
 
 class ProfitLossReport(models.TransientModel):

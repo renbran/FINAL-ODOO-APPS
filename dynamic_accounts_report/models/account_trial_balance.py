@@ -43,7 +43,7 @@ class AccountTrialBalance(models.TransientModel):
         :return: List of dictionaries representing the trial balance report.
         :rtype: list
         """
-        from dynamic_accounts_report.report import format_number
+        from ..report import format_number
         account_ids = self.env['account.move.line'].search([]).mapped('account_id')
         today = fields.Date.today()
         move_line_list = []

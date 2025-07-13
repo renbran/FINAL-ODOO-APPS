@@ -26,7 +26,7 @@ import xlsxwriter
 import datetime
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from dynamic_accounts_report.report import format_number
+from ..report import format_number
 
 _logger = logging.getLogger(__name__)
 

@@ -24,7 +24,7 @@ import json
 
 import xlsxwriter
 from odoo import models, fields, api
-from dynamic_accounts_report.report import format_number
+from ..report import format_number
 
 
 class AgeReceivableReport(models.TransientModel):
@@ -38,7 +38,7 @@ class AgeReceivableReport(models.TransientModel):
         Generate a report with move line data categorized by partner and debit difference.
         All numeric fields are formatted using format_number for professional display.
         """
-        from odoo.addons.dynamic_accounts_report.report import format_number
+        from ..report import format_number
         partner_total = {}
         move_line_list = {}
         paid = self.env['account.move.line'].search([

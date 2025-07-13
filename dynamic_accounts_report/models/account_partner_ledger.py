@@ -26,7 +26,7 @@ import xlsxwriter
 from odoo import api, fields, models
 from datetime import datetime
 from odoo.tools import date_utils
-from dynamic_accounts_report.report import format_number
+from ..report import format_number
 
 
 class AccountPartnerLedger(models.TransientModel):
