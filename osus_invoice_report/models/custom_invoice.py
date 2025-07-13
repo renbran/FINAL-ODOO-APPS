@@ -13,20 +13,35 @@ class AccountMove(models.Model):
     def action_print_custom_invoice(self):
         """
         Print the PDF copy of the invoice using the custom report action.
+        With fallback to standard invoice report if custom report is not available.
         """
-        return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+        except ValueError as e:
+            _logger.warning("Custom invoice report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(self)
 
     def action_print_custom_bill(self):
         """
         Print the PDF copy of the bill using the custom report action.
+        With fallback to standard bill report if custom report is not available.
         """
-        return self.env.ref('osus_invoice_report.action_report_osus_bill').report_action(self)
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_bill').report_action(self)
+        except ValueError as e:
+            _logger.warning("Custom bill report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(self)
 
     def action_print_custom_receipt(self):
         """
         Print the PDF copy of the receipt using the custom report action.
+        With fallback to standard invoice report if custom report is not available.
         """
-        return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+        except ValueError as e:
+            _logger.warning("Custom receipt report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(self)
 
     # Deal Information Fields
     booking_date = fields.Date(string='Booking Date', help="Date when the property booking was confirmed")
