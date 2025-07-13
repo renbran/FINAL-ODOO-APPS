@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- OSUS Custom Receipt Report Template -->
+    <!-- Duplicate receipt template removed: see main osus_invoice_report/views/report_receipt.xml -->
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang or 'en_US'"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="container-fluid">
+                            <!-- Header Section -->
+                            <div class="text-center osus-invoice-header mb-4">
+                                <h3 t-field="o.company_id.name"/>
+                                <div t-field="o.company_id.street"/>
+                                <div>
+                                    <span t-field="o.company_id.city"/>
+                                    <span t-if="o.company_id.zip">, <span t-field="o.company_id.zip"/></span>
+                                </div>
+                                <div t-field="o.company_id.country_id.name"/>
+                                <div t-if="o.company_id.vat">TRN: <span t-field="o.company_id.vat"/></div>
+                                <div t-if="o.company_id.phone">Tel: <span t-field="o.company_id.phone"/></div>
+                            </div>
+
+                            <!-- Receipt Title -->
+                            <h1 class="osus-invoice-title text-center">
+                                RECEIPT VOUCHER
+                            </h1>
+
+                            <!-- Receipt Details -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td class="fw-bold osus-table-header" style="width: 30%;">Receipt No:</td>
+                                            <td><strong t-field="o.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold osus-table-header">Date:</td>
+                                            <td><span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold osus-table-header">Received from:</td>
+                                            <td><strong t-field="o.partner_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="o.partner_id.vat">
+                                            <td class="fw-bold osus-table-header">Customer TRN:</td>
+                                            <td><span t-field="o.partner_id.vat"/></td>
+                                        </tr>
+                                        <tr t-if="o.partner_id.street">
+                                            <td class="fw-bold osus-table-header">Address:</td>
+                                            <td>
+                                                <span t-field="o.partner_id.street"/>
+                                                <span t-if="o.partner_id.street2">, <span t-field="o.partner_id.street2"/></span>
+                                                <br t-if="o.partner_id.city"/>
+                                                <span t-field="o.partner_id.city"/>
+                                                <span t-if="o.partner_id.zip">, <span t-field="o.partner_id.zip"/></span>
+                                                <br t-if="o.partner_id.country_id"/>
+                                                <span t-field="o.partner_id.country_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold osus-table-header">Payment Method:</td>
+                                            <td>
+                                                <t t-if="o.payment_reference">
+                                                    <span t-field="o.payment_reference"/>
+                                                </t>
+                                                <t t-else="">
+                                                    Cash / Bank Transfer
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr class="osus-table-total">
+                                            <td class="fw-bold">Amount Received (AED):</td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold osus-table-header">For:</td>
+                                            <td>
+                                                <t t-if="o.invoice_line_ids">
+                                                    <div t-foreach="o.invoice_line_ids.filtered(lambda line: not line.display_type)" t-as="line">
+                                                        <span t-field="line.name"/>
+                                                        <t t-if="not line_last"><br/></t>
+                                                    </div>
+                                                </t>
+                                                <t t-else="">
+                                                    Payment received
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Amount in Words -->
+                            <div class="osus-amount-words" t-if="o.amount_total_words">
+                                <strong>Amount in Words:</strong><br/>
+                                <span t-field="o.amount_total_words"/>
+                            </div>
+
+                            <!-- Real Estate Commission Details (if applicable) -->
+                            <t t-if="o.buyer or o.project or o.unit">
+                                <div class="osus-section-header">PROPERTY DETAILS</div>
+                                <table class="table table-bordered mb-4">
+                                    <tr t-if="o.buyer">
+                                        <td class="fw-bold osus-table-header" style="width: 30%;">Buyer:</td>
+                                        <td><span t-field="o.buyer.name"/></td>
+                                    </tr>
+                                    <tr t-if="o.project">
+                                        <td class="fw-bold osus-table-header">Project:</td>
+                                        <td><span t-field="o.project"/></td>
+                                    </tr>
+                                    <tr t-if="o.unit_id">
+                                        <td class="fw-bold osus-table-header">Unit:</td>
+                                        <td><span t-field="o.unit_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="o.booking_date">
+                                        <td class="fw-bold osus-table-header">Booking Date:</td>
+                                        <td><span t-field="o.booking_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                                    </tr>
+                                </table>
+                            </t>
+
+                            <!-- Signature Section -->
+                            <div class="row mt-5 pt-4">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto;"></div>
+                                        <div class="mt-2"><strong>Received by</strong></div>
+                                        <div class="small text-muted">OSUS Real Estate</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto;"></div>
+                                        <div class="mt-2"><strong>Authorized Signature</strong></div>
+                                        <div class="small text-muted">Date: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="osus-footer-note mt-4">
+                                <div class="text-center">
+                                    <small><i class="fa fa-info-circle"/> This receipt is valid and computer-generated.</small>
+                                    <br/>
+                                    <small>Thank you for your business!</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+
+                <!-- Amount in Words -->
+                <div class="border border-1 border-dashed p-3 mb-4">
+                    <strong>Amount in Words:</strong> <span t-field="o.amount_total_words"/>
+                </div>
+
+                <!-- Signature and Stamp -->
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <div style="height: 50px;">_________________________</div>
+                        <div>Authorized Signature</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="height: 50px; border: 1px solid #000;"></div>
+                        <div>Company Stamp</div>
+                    </div>
+                </div>
+
+                <div class="text-center small mt-4">
+                    This is a computer generated receipt. No signature required for amounts below AED 10,000.
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
