@@ -9,22 +9,16 @@
                 <xpath expr="//header//button[@name='action_post']" position="attributes">
                     <attribute name="visibility">state == 'approved'</attribute>
                 </xpath>
-                <xpath expr="//header//button[@name='action_post']" position="after">
-                    <button name="approve_transfer" string="Approve &amp; Confirm" type="object"
-                            class="oe_highlight"
-                            visibility="is_approve_person and state == 'waiting_approval'"/>
-                    <button name="reject_transfer" string="Reject" type="object"
-                            class="oe_highlight" visibility="is_approve_person and state == 'waiting_approval'"/>
-                </xpath>
                 <xpath expr="//header//button[@name='action_cancel']" position="attributes">
-                    <attribute name="visibility">state in ['rejected']</attribute>
+                    <attribute name="visibility">state in ['draft', 'waiting_approval', 'approved']</attribute>
                 </xpath>
                 <xpath expr="//header//button[@name='action_draft']" position="attributes">
-                    <attribute name="visibility">state in ['rejected']</attribute>
+                    <attribute name="visibility">state in ['rejected', 'cancelled']</attribute>
                 </xpath>
                 <xpath expr="//header//button[@name='action_post']" position="before">
                     <button name="action_submit_review" string="Submit for Review" type="object"
-                            class="oe_highlight" visibility="state == 'draft'"/>
+                            class="oe_highlight" 
+                            visibility="state == 'draft'"/>
                     <button name="approve_transfer" string="Approve" type="object"
                             class="oe_highlight"
                             visibility="is_approve_person and state == 'waiting_approval'"/>
