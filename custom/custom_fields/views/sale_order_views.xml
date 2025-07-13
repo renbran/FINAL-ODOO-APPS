@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Changed to a more specific location -->
+            <xpath expr="//group[@name='sale_header']" position="after">
+                <group string="Deal Information">
+                    <group>
+                        <field name="booking_date"/>
+                        <field name="developer_commission" widget="percentage"/>
+                        <field name="buyer_id" 
+                               options="{'no_create': True, 'no_create_edit': True}"
+                               placeholder="Select buyer..."/>
+                        <field name="deal_id" 
+                               placeholder="Enter deal reference..."/>
+                    </group>
+                    <group>
+                        <field name="project_id" 
+                               options="{'no_open': True, 'no_edit': True}"
+                               placeholder="Select or create project..."
+                               context="{'form_view_ref': 'custom_fields.project_quick_create_form'}"/>
+                        <field name="sale_value" 
+                               widget="monetary"
+                               options="{'currency_field': 'currency_id'}"/>
+                        <field name="unit_id" 
+                               options="{'no_open': True, 'no_edit': True}"
+                               placeholder="Select or create unit..."
+                               context="{'form_view_ref': 'custom_fields.unit_quick_create_form'}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List View for Sales Orders -->
+    <record id="view_order_tree_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.tree.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id" optional="hide"/>
+                <field name="project_id" optional="hide"/>
+                <field name="unit_id" optional="hide"/>
+                <field name="deal_id" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="sale_value" optional="hide"/>
+                <field name="developer_commission" widget="percentage" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="booking_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search View for Sales Orders -->
+    <record id="view_sales_order_filter_inherit_deal_tracking" model="ir.ui.view">
+        <field name="name">sale.order.select.deal.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="buyer_id"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="deal_id"/>
+            </xpath>
+            <xpath expr="//group[@expand='0']" position="inside">
+                <filter string="Buyer" name="group_buyer" domain="[]" context="{'group_by': 'buyer_id'}"/>
+                <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                <filter string="Unit" name="group_unit" domain="[]" context="{'group_by': 'unit_id'}"/>
+                <filter string="Booking Date" name="group_booking_date" domain="[]" context="{'group_by': 'booking_date'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Quick Create Form for Project (Product Template) -->
+    <record id="project_quick_create_form" model="ir.ui.view">
+        <field name="name">product.template.quick.create.form</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" placeholder="Project Name..." required="1"/>
+                    <field name="categ_id" options="{'no_create': True}" required="1"/>
+                    <field name="type" default="service"/>
+                    <field name="sale_ok" default="True" invisible="1"/>
+                    <field name="purchase_ok" default="False" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Quick Create Form for Unit (Product Variant) -->
+    <record id="unit_quick_create_form" model="ir.ui.view">
+        <field name="name">product.product.quick.create.form</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" placeholder="Unit Name/Number..." required="1"/>
+                    <field name="product_tmpl_id" 
+                           string="Project" 
+                           options="{'no_create': True}"
+                           placeholder="Select project..."
+                           required="1"/>
+                    <field name="type" default="service" invisible="1"/>
+                    <field name="sale_ok" default="True" invisible="1"/>
+                    <field name="purchase_ok" default="False" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

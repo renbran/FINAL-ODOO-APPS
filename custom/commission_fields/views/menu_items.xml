@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Commission Reporting Menu -->
+    <menuitem id="menu_commission_root" name="Commissions" sequence="60"/>
+    
+    <menuitem id="menu_commission_analysis" name="Commission Analysis" 
+              parent="menu_commission_root" action="action_commission_analysis" sequence="10"/>
+    
+    <!-- Add Commission section to Sales menu -->
+    <menuitem id="menu_sale_commission" name="Commission Tracking" 
+              parent="sale.menu_sale_config" sequence="50"/>
+</odoo>

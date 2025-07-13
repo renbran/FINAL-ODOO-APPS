@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List and Search view for Sale Order Custom Fields -->
+    <record id="view_sale_order_custom_fields_tree" model="ir.ui.view">
+        <field name="name">sale.order.custom.fields.tree</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree string="Sale Orders - Custom Fields" decoration-info="state == 'sale'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="booking_date"/>
+                <field name="developer_commission" widget="float"/>
+                <field name="sale_value" widget="monetary"/>
+                <field name="deal_id"/>
+                <!-- Relational fields grouped -->
+                <field name="buyer_id" widget="many2one_avatar_user"/>
+                <field name="project_id" widget="many2one_avatar"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_sale_order_custom_fields_form" model="ir.ui.view">
+        <field name="name">sale.order.custom.fields.form</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Sale Order Custom Fields">
+                <sheet>
+                    <notebook>
+                        <page string="General Info">
+                            <group>
+                                <field name="name"/>
+                                <field name="booking_date"/>
+                                <field name="developer_commission" widget="float"/>
+                                <field name="sale_value" widget="monetary"/>
+                                <field name="deal_id"/>
+                            </group>
+                        </page>
+                        <page string="Relations">
+                            <group string="Relational Fields">
+                                <group>
+                                    <field name="buyer_id" widget="many2one_avatar_user"/>
+                                </group>
+                                <group>
+                                    <field name="project_id" widget="many2one_avatar"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_sale_order_custom_fields_search" model="ir.ui.view">
+        <field name="name">sale.order.custom.fields.search</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Sale Orders - Custom Fields">
+                <field name="booking_date"/>
+                <field name="developer_commission"/>
+                <field name="buyer_id"/>
+                <field name="deal_id"/>
+                <field name="project_id"/>
+                <field name="sale_value"/>
+                <filter string="My Orders" name="my_orders" domain="[('user_id','=',uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_by_buyer_id" context="{'group_by':'buyer_id'}"/>
+                    <filter string="Project" name="group_by_project_id" context="{'group_by':'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List and Search view for Account Move Custom Fields -->
+    <record id="view_account_move_custom_fields_tree" model="ir.ui.view">
+        <field name="name">account.move.custom.fields.tree</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Account Moves - Custom Fields" decoration-info="state == 'posted'">
+                <field name="name"/>
+                <field name="booking_date"/>
+                <field name="developer_commission" widget="float"/>
+                <field name="sale_value" widget="monetary"/>
+                <field name="deal_id"/>
+                <!-- Relational fields grouped -->
+                <field name="buyer" widget="many2one_avatar_user"/>
+                <field name="project" widget="many2one_avatar"/>
+                <field name="unit" widget="many2one_avatar"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_account_move_custom_fields_form" model="ir.ui.view">
+        <field name="name">account.move.custom.fields.form</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <form string="Account Move Custom Fields">
+                <sheet>
+                    <notebook>
+                        <page string="General Info">
+                            <group>
+                                <field name="name"/>
+                                <field name="booking_date"/>
+                                <field name="developer_commission" widget="float"/>
+                                <field name="sale_value" widget="monetary"/>
+                                <field name="deal_id"/>
+                            </group>
+                        </page>
+                        <page string="Relations">
+                            <group string="Relational Fields">
+                                <group>
+                                    <field name="buyer" widget="many2one_avatar_user"/>
+                                </group>
+                                <group>
+                                    <field name="project" widget="many2one_avatar"/>
+                                </group>
+                                <group>
+                                    <field name="unit" widget="many2one_avatar"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_account_move_custom_fields_search" model="ir.ui.view">
+        <field name="name">account.move.custom.fields.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Search Account Moves - Custom Fields">
+                <field name="booking_date"/>
+                <field name="developer_commission"/>
+                <field name="buyer"/>
+                <field name="deal_id"/>
+                <field name="project"/>
+                <field name="sale_value"/>
+                <field name="unit"/>
+                <filter string="My Invoices" name="my_invoices" domain="[('user_id','=',uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_by_buyer" context="{'group_by':'buyer'}"/>
+                    <filter string="Project" name="group_by_project" context="{'group_by':'project'}"/>
+                    <filter string="Unit" name="group_by_unit" context="{'group_by':'unit'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
