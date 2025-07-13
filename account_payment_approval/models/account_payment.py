@@ -64,18 +64,34 @@ class AccountPayment(models.Model):
     @api.depends('state')
     def _compute_is_locked(self):
         for rec in self:
+            # Allow editing only in draft and rejected states
+            # Approved payments should be locked for editing but allow posting
             rec.is_locked = rec.state not in ['draft', 'rejected']
+
+    def write(self, vals):
+        """Override write to add workflow validation"""
+        if 'state' in vals:
+            for record in self:
+                # Validate state transitions
+                if record.state == 'posted' and vals['state'] != 'cancel':
+                    raise UserError(_("Posted payments can only be cancelled."))
+                if record.state == 'waiting_approval' and vals['state'] not in ['approved', 'rejected', 'cancel']:
+                    raise UserError(_("Payments waiting for approval can only be approved, rejected, or cancelled."))
+                if record.state == 'approved' and vals['state'] not in ['posted', 'cancel']:
+                    raise UserError(_("Approved payments can only be posted or cancelled."))
+        return super(AccountPayment, self).write(vals)
 
     def action_post(self):
         """Overwrites the action_post() to validate the payment in the 'approved'
          stage too.
         currently Odoo allows payment posting only in draft stage."""
-        # Skip approval check if called from approve_transfer
-        if not self.env.context.get('skip_approval_check'):
+        # Skip approval check if called from approve_transfer or if already approved
+        if not self.env.context.get('skip_approval_check') and self.state == 'draft':
             validation = self._check_payment_approval()
             if not validation:
                 return False
                 
+        # Allow posting from both draft and approved states
         if self.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
             raise UserError(
                 _("Only a draft or approved payment can be posted."))
@@ -135,18 +151,16 @@ class AccountPayment(models.Model):
                 record.invalidate_recordset()
                 # Automatically post the payment after approval
                 try:
-                    # Temporarily set state to draft for posting, then post
-                    record.with_context(skip_approval_check=True).write({'state': 'draft'})
-                    result = record.action_post()
+                    # Post the payment directly from approved state
+                    result = record.with_context(skip_approval_check=True).action_post()
                     return result
                 except Exception as e:
-                    # If posting fails, revert to approved state and log the error
-                    record.write({'state': 'approved'})
+                    # If posting fails, keep approved state and log the error
                     import logging
                     _logger = logging.getLogger(__name__)
                     _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
-                    # Raise a user-friendly error
-                    raise UserError(f"Payment approved but failed to post: {str(e)}")
+                    # Raise a user-friendly error but keep the approved state
+                    raise UserError(f"Payment approved successfully but failed to post automatically: {str(e)}. You can manually post it from the approved state.")
 
     def reject_transfer(self):
         """Reject the payment transfer"""
@@ -161,6 +175,7 @@ class AccountPayment(models.Model):
         if view_type == 'form':
             doc = etree.XML(res['arch'])
             for node in doc.xpath("//form"):
+                # Allow editing only in draft and rejected states
                 node.set('edit', "0" if self.state not in ['draft', 'rejected'] else "1")
             res['arch'] = etree.tostring(doc, encoding='unicode')
         return res
