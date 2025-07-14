@@ -14,10 +14,10 @@
         </xpath>
     </template>
 
-    <!-- Alternative method: override the report action to use our template -->
-    <data noupdate="0">
-        <record id="account.account_invoices" model="ir.actions.report">
-            <field name="report_name">osus_invoice_report.report_osus_invoice_document</field>
-        </record>
-    </data>
+    <!-- Override the portal invoice page to use our custom template -->
+    <template id="portal_invoice_page_inherit" inherit_id="account.portal_invoice_page">
+        <xpath expr="//t[@t-call='account.portal_invoice_report']" position="attributes">
+            <attribute name="t-call">osus_invoice_report.report_osus_invoice_document</attribute>
+        </xpath>
+    </template>
 </odoo>
