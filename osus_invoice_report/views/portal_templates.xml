@@ -7,13 +7,6 @@
         </xpath>
     </template>
 
-    <!-- Override portal invoice report specifically -->
-    <template id="portal_invoice_report_inherit" inherit_id="account.portal_invoice_report" priority="99">
-        <xpath expr="." position="replace">
-            <t t-call="osus_invoice_report.report_osus_invoice_document"/>
-        </xpath>
-    </template>
-
     <!-- Override portal invoice page sidebar to use standard iframe approach -->
     <template id="portal_invoice_page_inherit" inherit_id="account.portal_invoice_page" priority="99">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
