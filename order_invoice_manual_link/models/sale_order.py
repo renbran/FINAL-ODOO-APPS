@@ -19,12 +19,16 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 ################################################################################
-from odoo import models
+from odoo import models, fields
 
 
-class SaleOrderLine(models.Model):
+class SaleOrder(models.Model):
     """Extend Sale Order to add functionality."""
     _inherit = 'sale.order'
+
+    invoice_ids = fields.One2many('account.move', 'sale_order_id', 
+                                 string="Linked Invoices",
+                                 help="Invoices linked to this Sale Order")
 
     def action_open_invoices(self):
         """
