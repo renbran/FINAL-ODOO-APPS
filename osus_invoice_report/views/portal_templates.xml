@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Override portal invoice page to use OSUS custom template -->
+    <template id="portal_invoice_page_inherit" inherit_id="account.portal_invoice_page">
+        <!-- Replace the default invoice document call with our custom OSUS template -->
+        <xpath expr="//div[hasclass('o_portal_invoice_print')]//iframe" position="attributes">
+            <attribute name="t-att-src">invoice.get_portal_url(report_type='pdf', query_string='&amp;report_ref=osus_invoice_report.action_report_osus_invoice')</attribute>
+        </xpath>
+    </template>
+
+    <!-- Override the portal invoice report to use our custom template -->
+    <template id="portal_invoice_report_inherit" inherit_id="account.portal_invoice_report">
+        <xpath expr="//t[@t-call='account.report_invoice_document']" position="replace">
+            <t t-call="osus_invoice_report.report_osus_invoice_document"/>
+        </xpath>
+    </template>
+
+    <!-- Override the invoice portal content for PDF download -->
+    <template id="account_invoice_portal_content_inherit" inherit_id="account.account_invoice_portal_content">
+        <!-- Modify PDF download link to use our custom report -->
+        <xpath expr="//div[hasclass('o_download_pdf')]//a" position="attributes">
+            <attribute name="t-att-href">invoice.get_portal_url(report_type='pdf', download=True, query_string='&amp;report_ref=osus_invoice_report.action_report_osus_invoice')</attribute>
+        </xpath>
+    </template>
+
+    <!-- Override portal print button to use our custom template -->
+    <template id="portal_invoice_print_inherit" inherit_id="account.portal_invoice_print">
+        <xpath expr="//a[@title='Print']" position="attributes">
+            <attribute name="t-att-href">invoice.get_portal_url(report_type='pdf', query_string='&amp;report_ref=osus_invoice_report.action_report_osus_invoice')</attribute>
+        </xpath>
+    </template>
+
+    <!-- Add a fallback template that forces our custom invoice document to be used -->
+    <template id="portal_invoice_document_fallback" inherit_id="account.report_invoice_document" priority="99">
+        <xpath expr="//t[@t-call='web.html_container']" position="replace">
+            <t t-call="osus_invoice_report.report_osus_invoice_document"/>
+        </xpath>
+    </template>
+</odoo>

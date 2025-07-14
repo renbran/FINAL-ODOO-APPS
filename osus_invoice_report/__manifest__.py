@@ -16,7 +16,7 @@
     'category': 'Accounting/Accounting',
     'author': 'OSUS Real Estate',
     'website': 'https://www.osus.ae',
-    'depends': ['account', 'base', 'sale'],
+    'depends': ['account', 'base', 'sale', 'portal'],
     'external_dependencies': {
         'python': ['qrcode', 'num2words'],
     },
@@ -30,6 +30,7 @@
         # Views
         'views/account_move_views.xml',
         'views/sale_order_views.xml',
+        'views/portal_templates.xml',
         
         # Reports
         'report/report_action.xml',
