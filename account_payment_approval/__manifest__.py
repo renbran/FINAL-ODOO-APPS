@@ -36,6 +36,8 @@
     'data': [
         'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
+        'views/account_move_views.xml',
+        'data/server_actions.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],

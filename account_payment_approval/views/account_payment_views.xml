@@ -29,6 +29,9 @@
                 <field name="partner_id" position="after">
                     <field name="is_approve_person" invisible="1"/>
                     <field name="is_locked" invisible="1"/>
+                    <field name="authorized_approvers_display" readonly="1" 
+                           invisible="state not in ['waiting_approval', 'approved', 'rejected']"
+                           help="These users can approve this payment"/>
                 </field>
                 <xpath expr="//field" position="attributes">
                     <attribute name="readonly">is_locked</attribute>
@@ -48,6 +51,67 @@
                             domain="[('state', '=', 'approved')]"/>
                     <filter string="Rejected" name="state_rejected"
                             domain="[('state', '=', 'rejected')]"/>
+                </xpath>
+            </field>
+        </record>
+
+<!--        Server actions for bulk operations -->
+        <record id="action_bulk_approve_payments" model="ir.actions.server">
+            <field name="name">Bulk Approve &amp; Post</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_approve_payments()
+                    if action:
+                        action = action
+            </field>
+        </record>
+
+        <record id="action_bulk_reject_payments" model="ir.actions.server">
+            <field name="name">Bulk Reject</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_reject_payments()
+                    if action:
+                        action = action
+            </field>
+        </record>
+
+        <record id="action_bulk_draft_payments" model="ir.actions.server">
+            <field name="name">Bulk Set to Draft</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_draft_payments()
+                    if action:
+                        action = action
+            </field>
+        </record>
+
+<!--        Enhance the original tree view with minimal changes -->
+        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.view.tree.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="decoration-info">state == 'waiting_approval'</attribute>
+                    <attribute name="decoration-success">state in ['approved', 'posted']</attribute>
+                    <attribute name="decoration-danger">state == 'rejected'</attribute>
+                    <attribute name="decoration-muted">state == 'cancel'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="authorized_approvers_display" optional="hide"/>
                 </xpath>
             </field>
         </record>
