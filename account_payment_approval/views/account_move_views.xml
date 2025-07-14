@@ -6,32 +6,37 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <!-- Modify cancel button visibility for vendor bills -->
+            <!-- Modify cancel button visibility - show for bills/invoices that can be cancelled -->
             <xpath expr="//header//button[@name='button_cancel']" position="attributes">
-                <attribute name="invisible">state not in ['draft', 'waiting_approval', 'approved'] or move_type not in ['in_invoice', 'in_refund']</attribute>
+                <attribute name="invisible">state in ['cancel'] or (move_type in ['in_invoice', 'in_refund'] and state not in ['draft', 'waiting_approval', 'approved', 'posted']) or (move_type in ['out_invoice', 'out_refund'] and state not in ['draft', 'posted'])</attribute>
             </xpath>
             
-            <!-- Ensure draft button is visible for vendor bills in new states -->
+            <!-- Ensure draft button is visible - show for bills/invoices that can be reset to draft -->
             <xpath expr="//header//button[@name='button_draft']" position="attributes">
-                <attribute name="invisible">state not in ['cancel', 'rejected'] or move_type not in ['in_invoice', 'in_refund']</attribute>
+                <attribute name="invisible">state in ['draft'] or (move_type in ['in_invoice', 'in_refund'] and state not in ['cancel', 'rejected', 'posted']) or (move_type in ['out_invoice', 'out_refund'] and state not in ['cancel', 'posted'])</attribute>
             </xpath>
             
-            <!-- Add approval-specific buttons for vendor bills if needed -->
+            <!-- Add approval-specific buttons for vendor bills with improved visibility -->
             <xpath expr="//header//button[@name='button_cancel']" position="before">
-                <!-- Submit for Review button for vendor bills -->
+                <!-- Submit for Review button - only for draft vendor bills -->
                 <button name="action_submit_review" string="Submit for Review" type="object"
                         class="oe_highlight" 
                         invisible="state != 'draft' or move_type not in ['in_invoice', 'in_refund']"/>
                 
-                <!-- Approve button for vendor bills -->
+                <!-- Approve button - only for bills waiting approval -->
                 <button name="approve_transfer" string="Approve" type="object"
                         class="oe_highlight"
                         invisible="state != 'waiting_approval' or move_type not in ['in_invoice', 'in_refund']"/>
                 
-                <!-- Reject button for vendor bills -->
+                <!-- Reject button - only for bills waiting approval -->
                 <button name="reject_transfer" string="Reject" type="object"
-                        class="oe_highlight" 
+                        class="btn-secondary" 
                         invisible="state != 'waiting_approval' or move_type not in ['in_invoice', 'in_refund']"/>
+                
+                <!-- Post button - only for approved bills -->
+                <button name="action_post" string="Post" type="object"
+                        class="oe_highlight"
+                        invisible="state != 'approved' or move_type not in ['in_invoice', 'in_refund']"/>
             </xpath>
         </field>
     </record>
