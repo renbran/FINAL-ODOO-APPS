@@ -207,20 +207,24 @@ class AccountPayment(models.Model):
         """Overwrites the action_post() to validate the payment in the 'approved'
          stage too.
         currently Odoo allows payment posting only in draft stage."""
-        # Skip approval check if called from approve_transfer or if already approved
-        if not self.env.context.get('skip_approval_check') and self.state == 'draft':
-            validation = self._check_payment_approval()
-            if not validation:
-                return False
-                
-        # Allow posting from both draft and approved states
-        if self.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
-            raise UserError(
-                _("Only a draft or approved payment can be posted."))
-        if any(inv.state != 'posted' for inv in
-               self.reconciled_invoice_ids):
-            raise ValidationError(_("The payment cannot be processed "
-                                    "because the invoice is not open!"))
+        
+        # Handle multiple records by processing each one individually
+        for payment in self:
+            # Skip approval check if called from approve_transfer or if already approved
+            if not self.env.context.get('skip_approval_check') and payment.state == 'draft':
+                validation = payment._check_payment_approval()
+                if not validation:
+                    return False
+                    
+            # Allow posting from both draft and approved states
+            if payment.state in ('posted', 'cancel', 'waiting_approval', 'rejected'):
+                raise UserError(
+                    _("Only a draft or approved payment can be posted."))
+            if any(inv.state != 'posted' for inv in
+                   payment.reconciled_invoice_ids):
+                raise ValidationError(_("The payment cannot be processed "
+                                        "because the invoice is not open!"))
+        
         # Call the parent's action_post method to ensure proper sequence generation
         # and all standard Odoo posting logic
         return super(AccountPayment, self).action_post()
@@ -509,7 +513,9 @@ class AccountPayment(models.Model):
 
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(AccountPayment, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
-        if view_type == 'form':
+        if view_type == 'form' and self:
+            # Ensure we have a single record for state access
+            self.ensure_one()
             doc = etree.XML(res['arch'])
             for node in doc.xpath("//form"):
                 # Allow editing only in draft and rejected states
