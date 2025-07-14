@@ -28,6 +28,8 @@ class AccountMove(models.Model):
 
     link_invoice = fields.Boolean(string="Select",
                                   help="Invoices that need to be linked")
+    sale_order_id = fields.Many2one('sale.order', string="Linked Sale Order",
+                                   help="Sale order linked to this invoice")
 
     def action_unlink_invoice(self):
         """

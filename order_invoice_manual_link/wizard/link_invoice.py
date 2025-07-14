@@ -66,12 +66,3 @@ class LinkInvoice(models.TransientModel):
                     raise ValidationError(_(
                         "Partner mismatch between Sale Order and Invoice. "
                         "Please remove it to Link Invoice"))
-
-
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    invoice_line_tab = fields.One2many(
-        'account.move.line', 'move_id',
-        string="Linked Invoices",
-        help="Shows invoices linked to this Sale Order.")
