@@ -38,6 +38,18 @@
                         class="oe_highlight"
                         invisible="state != 'approved' or move_type not in ['in_invoice', 'in_refund']"/>
             </xpath>
+            
+            <!-- Add helpful information about journal restrictions -->
+            <xpath expr="//form//field[@name='journal_id']" position="after">
+                <div class="alert alert-warning" role="alert" 
+                     invisible="not journal_id or not journal_id.restrict_mode_hash_table or state != 'posted'"
+                     style="margin-top: 8px;">
+                    <i class="fa fa-warning"/> <strong>Strict Mode Journal:</strong> 
+                    This entry is from a journal with strict mode enabled. 
+                    Posted entries cannot be modified directly. 
+                    <br/>Use <strong>Credit Note</strong> to reverse this entry if changes are needed.
+                </div>
+            </xpath>
         </field>
     </record>
 
@@ -53,6 +65,12 @@
                 <attribute name="decoration-info">state in ('waiting_approval', 'submit_review')</attribute>
                 <attribute name="decoration-success">state == 'approved'</attribute>
                 <attribute name="decoration-danger">state == 'rejected'</attribute>
+            </xpath>
+            
+            <!-- Add journal restriction info in tree view -->
+            <xpath expr="//tree//field[@name='journal_id']" position="after">
+                <field name="journal_restrict_mode" string="🔒" 
+                       invisible="1"/>
             </xpath>
         </field>
     </record>

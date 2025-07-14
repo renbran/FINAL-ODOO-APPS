@@ -34,6 +34,25 @@ class AccountMove(models.Model):
                        ('rejected', 'Rejected')],
         ondelete={'submit_review': 'set default', 'waiting_approval': 'set default', 'approved': 'set default',
                   'rejected': 'set default'}, help="States of approval.")
+    
+    journal_restrict_mode = fields.Boolean(
+        string="Journal Restrict Mode",
+        related="journal_id.restrict_mode_hash_table",
+        help="Indicates if the journal has strict mode enabled"
+    )
+
+    def _check_journal_hash_restriction(self):
+        """Check if journal has strict mode enabled and provide helpful error message"""
+        for record in self:
+            if record.journal_id.restrict_mode_hash_table and record.state == 'posted':
+                raise UserError(_(
+                    "Cannot modify posted entry from journal '%s' because it is in strict mode.\n\n"
+                    "Solutions:\n"
+                    "1. Create a Credit Note/Reverse Entry instead of modifying the original entry\n"
+                    "2. Ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in the journal settings\n"
+                    "3. Use the 'Reset to Draft' button before making changes (if available)\n\n"
+                    "This restriction exists to maintain data integrity and compliance requirements."
+                ) % record.journal_id.name)
 
     def _is_user_authorized_approver_move(self, user_id=None):
         """Helper method to check if a user is authorized to approve vendor bills.
@@ -103,8 +122,18 @@ class AccountMove(models.Model):
                 record.state = 'rejected'
 
     def button_cancel(self):
-        """Override button_cancel to allow cancellation from new states for vendor bills"""
+        """Override button_cancel to handle strict mode journals properly"""
         for record in self:
+            # Check for strict mode before attempting to cancel
+            if record.state == 'posted' and record.journal_id.restrict_mode_hash_table:
+                raise UserError(_(
+                    "Cannot cancel posted entry from journal '%s' because it is in strict mode.\n\n"
+                    "To cancel this entry:\n"
+                    "1. Create a Credit Note/Reverse Entry using the 'Credit Note' button instead\n"
+                    "2. Or ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in journal settings\n\n"
+                    "This restriction protects the integrity of your accounting records."
+                ) % record.journal_id.name)
+            
             # Allow cancellation from new approval states for vendor bills
             if (record.move_type in ['in_invoice', 'in_refund'] and 
                 record.state in ['waiting_approval', 'approved', 'rejected']):
@@ -116,8 +145,19 @@ class AccountMove(models.Model):
         return super(AccountMove, self).button_cancel()
 
     def button_draft(self):
-        """Override button_draft to allow draft from new states for vendor bills"""
+        """Override button_draft to handle strict mode journals properly"""
         for record in self:
+            # Check for strict mode before attempting to reset to draft
+            if record.state == 'posted' and record.journal_id.restrict_mode_hash_table:
+                raise UserError(_(
+                    "Cannot reset posted entry from journal '%s' to draft because it is in strict mode.\n\n"
+                    "To modify this entry:\n"
+                    "1. Create a Credit Note/Reverse Entry to cancel the original entry\n"
+                    "2. Create a new entry with the correct information\n"
+                    "3. Or ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in journal settings\n\n"
+                    "This restriction maintains audit compliance and data integrity."
+                ) % record.journal_id.name)
+            
             # Allow setting to draft from rejected state for vendor bills
             if (record.move_type in ['in_invoice', 'in_refund'] and 
                 record.state == 'rejected'):
