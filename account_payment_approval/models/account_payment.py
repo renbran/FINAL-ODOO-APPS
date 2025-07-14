@@ -23,6 +23,9 @@ from odoo import fields, models, _
 from odoo.exceptions import ValidationError, UserError
 from lxml import etree
 from odoo import api
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class AccountPayment(models.Model):
@@ -156,8 +159,6 @@ class AccountPayment(models.Model):
                     return result
                 except Exception as e:
                     # If posting fails, keep approved state and log the error
-                    import logging
-                    _logger = logging.getLogger(__name__)
                     _logger.error(f"Failed to auto-post payment after approval: {str(e)}")
                     # Raise a user-friendly error but keep the approved state
                     raise UserError(f"Payment approved successfully but failed to post automatically: {str(e)}. You can manually post it from the approved state.")
@@ -169,6 +170,168 @@ class AccountPayment(models.Model):
                 record.state = 'rejected'
                 # Allow draft and cancel actions after rejection
                 record.is_locked = False
+
+    def bulk_approve_payments(self):
+        """Bulk approve multiple payments that are waiting for approval.
+        This method overrides singleton constraint and allows bulk processing."""
+        # Check if current user is the approving person
+        approval = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.payment_approval')
+        approver_id = int(self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_id'))
+        
+        if not (self.env.user.id == approver_id and approval):
+            raise UserError(_("You are not authorized to approve payments."))
+        
+        # Filter payments that can be approved
+        approvable_payments = self.filtered(lambda p: p.state == 'waiting_approval')
+        
+        if not approvable_payments:
+            raise UserError(_("No payments found that are waiting for approval."))
+        
+        approved_count = 0
+        failed_payments = []
+        
+        # Process each payment individually to handle any errors gracefully
+        for payment in approvable_payments:
+            try:
+                # Set state to approved first
+                payment.write({'state': 'approved'})
+                # Ensure the record is refreshed before posting
+                payment.invalidate_recordset()
+                # Automatically post the payment after approval
+                payment.with_context(skip_approval_check=True).action_post()
+                approved_count += 1
+            except Exception as e:
+                failed_payments.append({
+                    'payment': payment,
+                    'error': str(e)
+                })
+                # Keep the payment in approved state even if posting fails
+                _logger.error(f"Failed to post payment {payment.name} after bulk approval: {str(e)}")
+        
+        # Prepare result message
+        if approved_count > 0:
+            message = _("%d payment(s) have been approved and posted successfully.") % approved_count
+            if failed_payments:
+                message += _(" %d payment(s) were approved but failed to post automatically and can be posted manually.") % len(failed_payments)
+            
+            # Show notification to user
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Bulk Approval Complete'),
+                    'message': message,
+                    'type': 'success' if not failed_payments else 'warning',
+                    'sticky': False,
+                }
+            }
+        else:
+            raise UserError(_("No payments could be approved."))
+
+    def bulk_reject_payments(self):
+        """Bulk reject multiple payments that are waiting for approval.
+        This method overrides singleton constraint and allows bulk processing."""
+        # Check if current user is the approving person
+        approval = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.payment_approval')
+        approver_id = int(self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_id'))
+        
+        if not (self.env.user.id == approver_id and approval):
+            raise UserError(_("You are not authorized to reject payments."))
+        
+        # Filter payments that can be rejected
+        rejectable_payments = self.filtered(lambda p: p.state == 'waiting_approval')
+        
+        if not rejectable_payments:
+            raise UserError(_("No payments found that are waiting for approval."))
+        
+        rejected_count = 0
+        failed_payments = []
+        
+        # Process each payment individually to handle any errors gracefully
+        for payment in rejectable_payments:
+            try:
+                # Set state to rejected and unlock
+                payment.write({
+                    'state': 'rejected',
+                    'is_locked': False
+                })
+                rejected_count += 1
+            except Exception as e:
+                failed_payments.append({
+                    'payment': payment,
+                    'error': str(e)
+                })
+                _logger.error(f"Failed to reject payment {payment.name}: {str(e)}")
+        
+        # Prepare result message
+        if rejected_count > 0:
+            message = _("%d payment(s) have been rejected successfully.") % rejected_count
+            if failed_payments:
+                message += _(" %d payment(s) failed to be rejected.") % len(failed_payments)
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Bulk Rejection Complete'),
+                    'message': message,
+                    'type': 'success' if not failed_payments else 'warning',
+                    'sticky': False,
+                }
+            }
+        else:
+            raise UserError(_("No payments could be rejected."))
+
+    def bulk_draft_payments(self):
+        """Bulk set multiple payments back to draft state.
+        This method allows resetting rejected or cancelled payments to draft."""
+        # Filter payments that can be set to draft
+        draftable_payments = self.filtered(lambda p: p.state in ['rejected', 'cancel'])
+        
+        if not draftable_payments:
+            raise UserError(_("No payments found that can be set to draft state. Only rejected or cancelled payments can be reset to draft."))
+        
+        drafted_count = 0
+        failed_payments = []
+        
+        # Process each payment individually to handle any errors gracefully
+        for payment in draftable_payments:
+            try:
+                # Set state to draft and unlock
+                payment.write({
+                    'state': 'draft',
+                    'is_locked': False
+                })
+                drafted_count += 1
+            except Exception as e:
+                failed_payments.append({
+                    'payment': payment,
+                    'error': str(e)
+                })
+                _logger.error(f"Failed to set payment {payment.name} to draft: {str(e)}")
+        
+        # Prepare result message
+        if drafted_count > 0:
+            message = _("%d payment(s) have been set to draft successfully.") % drafted_count
+            if failed_payments:
+                message += _(" %d payment(s) failed to be set to draft.") % len(failed_payments)
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Bulk Draft Complete'),
+                    'message': message,
+                    'type': 'success' if not failed_payments else 'warning',
+                    'sticky': False,
+                }
+            }
+        else:
+            raise UserError(_("No payments could be set to draft."))
 
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(AccountPayment, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)

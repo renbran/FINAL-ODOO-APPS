@@ -51,4 +51,40 @@
                 </xpath>
             </field>
         </record>
+
+<!--        Inherit tree view to add bulk approve button -->
+        <record id="view_account_payment_tree" model="ir.ui.view">
+            <field name="name">account.payment.view.tree.inherit.account.payment.approval</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="multi_edit">1</attribute>
+                    <attribute name="js_class">payment_approval_list</attribute>
+                </xpath>
+                <xpath expr="//tree" position="inside">
+                    <header>
+                        <button name="bulk_approve_payments" string="Bulk Approve &amp; Post" type="object"
+                                class="btn-primary"
+                                confirm="Are you sure you want to approve and post all selected payments?"
+                                groups="base.group_user"/>
+                        <button name="bulk_reject_payments" string="Bulk Reject" type="object"
+                                class="btn-secondary"
+                                confirm="Are you sure you want to reject all selected payments?"
+                                groups="base.group_user"/>
+                        <button name="bulk_draft_payments" string="Bulk Set to Draft" type="object"
+                                class="btn-secondary"
+                                confirm="Are you sure you want to set all selected payments back to draft?"
+                                groups="base.group_user"/>
+                    </header>
+                    <field name="is_approve_person" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="decoration-info">state == 'waiting_approval'</attribute>
+                    <attribute name="decoration-success">state in ['approved', 'posted']</attribute>
+                    <attribute name="decoration-danger">state == 'rejected'</attribute>
+                    <attribute name="decoration-muted">state == 'cancel'</attribute>
+                </xpath>
+            </field>
+        </record>
 </odoo>

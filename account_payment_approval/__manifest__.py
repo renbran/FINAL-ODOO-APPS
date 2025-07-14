@@ -37,6 +37,11 @@
         'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'account_payment_approval/static/src/js/payment_approval_list.js',
+        ],
+    },
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],
     'installable': True,
