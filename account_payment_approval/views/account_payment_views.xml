@@ -55,68 +55,48 @@
             </field>
         </record>
 
-<!--        Create new tree view with bulk operations -->
-        <record id="view_account_payment_tree_approval" model="ir.ui.view">
-            <field name="name">account.payment.view.tree.approval</field>
-            <field name="model">account.payment</field>
-            <field name="arch" type="xml">
-                <tree js_class="payment_approval_list" multi_edit="1">
-                    <header>
-                        <button name="bulk_approve_payments" string="Bulk Approve &amp; Post" type="object"
-                                class="btn-primary"
-                                confirm="Are you sure you want to approve and post all selected payments?"
-                                groups="base.group_user"/>
-                        <button name="bulk_reject_payments" string="Bulk Reject" type="object"
-                                class="btn-secondary"
-                                confirm="Are you sure you want to reject all selected payments?"
-                                groups="base.group_user"/>
-                        <button name="bulk_draft_payments" string="Bulk Set to Draft" type="object"
-                                class="btn-secondary"
-                                confirm="Are you sure you want to set all selected payments back to draft?"
-                                groups="base.group_user"/>
-                    </header>
-                    <field name="name"/>
-                    <field name="date"/>
-                    <field name="payment_type"/>
-                    <field name="partner_id" string="Customer/Vendor"/>
-                    <field name="payment_method_line_id"/>
-                    <field name="amount" sum="Total"/>
-                    <field name="currency_id"/>
-                    <field name="state" 
-                           decoration-info="state == 'waiting_approval'"
-                           decoration-success="state in ['approved', 'posted']"
-                           decoration-danger="state == 'rejected'"
-                           decoration-muted="state == 'cancel'"/>
-                    <field name="is_approve_person" optional="hide"/>
-                    <field name="authorized_approvers_display" optional="hide"/>
-                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
-                </tree>
+<!--        Server actions for bulk operations -->
+        <record id="action_bulk_approve_payments" model="ir.actions.server">
+            <field name="name">Bulk Approve &amp; Post</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_approve_payments()
+                    if action:
+                        action = action
             </field>
         </record>
 
-        <!-- Add action to use our new tree view -->
-        <record id="action_account_payments_approval" model="ir.actions.act_window">
-            <field name="name">Payment Approvals</field>
-            <field name="res_model">account.payment</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_account_payment_tree_approval"/>
-            <field name="context">{'default_payment_type': 'outbound'}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create a payment for approval workflow
-                </p><p>
-                    Payments with bulk approval operations for efficient processing.
-                </p>
+        <record id="action_bulk_reject_payments" model="ir.actions.server">
+            <field name="name">Bulk Reject</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_reject_payments()
+                    if action:
+                        action = action
             </field>
         </record>
 
-        <!-- Add menu item for payment approvals -->
-        <menuitem
-            id="menu_account_payment_approval"
-            name="Payment Approvals"
-            parent="account.menu_finance_payables"
-            action="action_account_payments_approval"
-            sequence="20"/>
+        <record id="action_bulk_draft_payments" model="ir.actions.server">
+            <field name="name">Bulk Set to Draft</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.bulk_draft_payments()
+                    if action:
+                        action = action
+            </field>
+        </record>
 
 <!--        Enhance the original tree view with minimal changes -->
         <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
