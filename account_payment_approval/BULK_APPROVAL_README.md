@@ -39,15 +39,22 @@ All buttons are located in the payment list view header:
 - **Access**: Available to all users
 - **Result**: Payments are reset to "Draft" state and unlocked for editing
 
+#### 4. Bulk Submit for Approval
+- **Function**: Submits multiple draft payments for approval workflow
+- **Target**: Payments in "Draft" state
+- **Access**: Available to all users
+- **Result**: Payments exceeding approval threshold are moved to "Waiting for Approval" state
+
 ### Key Benefits
 1. **Efficiency**: Process multiple payments simultaneously instead of one by one
-2. **Complete Workflow Coverage**: Handle approve, reject, and draft operations in bulk
+2. **Complete Workflow Coverage**: Handle approve, reject, draft, and submit operations in bulk
 3. **Multiple Approver Support**: Configure multiple users who can approve payments
 4. **Flexible Configuration**: Support both single and multiple approver setups
 5. **Override Singleton Constraint**: All bulk methods safely handle multiple records
 6. **Smart Filtering**: Only processes eligible payments and informs users of filtered selections
-7. **Error Handling**: Graceful handling of individual payment failures
-8. **User Feedback**: Clear notifications about success/failure status
+7. **Intelligent Submission**: Automatically checks approval thresholds during bulk submit
+8. **Error Handling**: Graceful handling of individual payment failures
+9. **User Feedback**: Clear notifications about success/failure status
 
 ## Configuration
 
@@ -92,9 +99,18 @@ All buttons are located in the payment list view header:
 1. Navigate to Accounting > Payments
 2. Filter to show "Rejected" or "Cancelled" payments
 3. Select multiple payments to reset
-4. Click "Bulk Set to Draft" button
+4. Click "Action" menu > "Bulk Set to Draft"
 5. Confirm the action
 6. Payments will be reset to "Draft" state
+
+### Bulk Submit for Approval
+1. Navigate to Accounting > Payments
+2. Filter to show "Draft" payments
+3. Select multiple payments to submit
+4. Click "Action" menu > "Bulk Submit for Approval"
+5. Confirm the action
+6. Payments exceeding approval threshold will be moved to "Waiting for Approval"
+7. Payments below threshold will be skipped with notification
 
 ## Technical Implementation
 
@@ -102,6 +118,7 @@ All buttons are located in the payment list view header:
 - Added `bulk_approve_payments()` method for bulk approval and posting
 - Added `bulk_reject_payments()` method for bulk rejection
 - Added `bulk_draft_payments()` method for bulk draft reset
+- Added `bulk_submit_for_approval()` method for bulk submission to approval workflow
 - Added `_is_user_authorized_approver()` helper method for authorization checks
 - Added `get_authorized_approvers()` method to retrieve approver list
 - Enhanced `_compute_is_approve_person()` to support multiple approvers
@@ -109,12 +126,19 @@ All buttons are located in the payment list view header:
 - All methods handle singleton constraint override
 - Individual error handling per payment
 - Comprehensive logging for all operations
+- Smart threshold checking for approval requirements
 
 ### Configuration Enhancement
 - Added `approval_user_ids` Many2many field for multiple approvers
 - Added `get_current_approvers()` method in settings
 - Enhanced configuration view with separate single/multiple approver sections
 - Backward compatibility with existing single approver setups
+
+### Server Actions Enhancement
+- Four server actions for comprehensive bulk operations
+- Separate file organization for better maintainability
+- Smart filtering and validation for each operation type
+- User-friendly notifications and error handling
 
 ### View Enhancement
 - Extended list view with three header buttons
@@ -163,3 +187,9 @@ The bulk operations respect the existing workflow:
 - Source: Rejected or Cancelled → Draft
 - Unlocks payments for editing
 - Enables workflow restart
+
+### Bulk Submit for Approval
+- Source: Draft → Waiting for Approval (if amount exceeds threshold)
+- Intelligent threshold checking
+- Skips payments below approval amount with notification
+- Batch processing for efficient workflow initiation

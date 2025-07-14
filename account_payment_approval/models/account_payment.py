@@ -442,6 +442,71 @@ class AccountPayment(models.Model):
         else:
             raise UserError(_("No payments could be set to draft."))
 
+    def bulk_submit_for_approval(self):
+        """Bulk submit multiple payments for approval.
+        This method submits draft payments that exceed the approval amount threshold."""
+        
+        # Filter payments that can be submitted for approval (draft state)
+        submittable_payments = self.filtered(lambda p: p.state == 'draft')
+        
+        if not submittable_payments:
+            raise UserError(_("No draft payments found that can be submitted for approval."))
+        
+        submitted_count = 0
+        skipped_count = 0
+        failed_payments = []
+        
+        # Process each payment individually to handle any errors gracefully
+        for payment in submittable_payments:
+            try:
+                # Check if this payment needs approval based on amount threshold
+                # _check_payment_approval returns False when approval is needed and sets state to waiting_approval
+                approval_result = payment._check_payment_approval()
+                
+                if not approval_result:
+                    # Payment was automatically set to waiting_approval by _check_payment_approval
+                    submitted_count += 1
+                else:
+                    # Payment doesn't need approval (amount below threshold)
+                    skipped_count += 1
+                    
+            except Exception as e:
+                failed_payments.append({
+                    'payment': payment,
+                    'error': str(e)
+                })
+                _logger.error(f"Failed to submit payment {payment.name} for approval: {str(e)}")
+        
+        # Prepare result message
+        message_parts = []
+        notification_type = 'success'
+        
+        if submitted_count > 0:
+            message_parts.append(_("%d payment(s) have been submitted for approval successfully.") % submitted_count)
+        
+        if skipped_count > 0:
+            message_parts.append(_("%d payment(s) were skipped as they don't require approval (amount below threshold).") % skipped_count)
+            notification_type = 'info'
+        
+        if failed_payments:
+            message_parts.append(_("%d payment(s) failed to be submitted for approval.") % len(failed_payments))
+            notification_type = 'warning'
+        
+        if submitted_count > 0 or skipped_count > 0:
+            message = ' '.join(message_parts)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Bulk Submit Complete'),
+                    'message': message,
+                    'type': notification_type,
+                    'sticky': False,
+                }
+            }
+        else:
+            raise UserError(_("No payments could be submitted for approval."))
+
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(AccountPayment, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
         if view_type == 'form':
