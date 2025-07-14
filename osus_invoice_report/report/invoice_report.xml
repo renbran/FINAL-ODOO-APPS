@@ -1,93 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_osus_invoice_document">
-        <t t-call="web.external_layout">
-            <div style="background: transparent; padding: 0;">
-                <!-- Header Section -->
-                <div style="display: flex; justify-content: space-between;">
-                    <div>
-                        <strong>COMPANY DETAILS</strong><br/>
-                        OSUS PROPERTIES<br/>
-                        SINGLE BUSINESS TOWER FLOOR 29 OFFICE 02 &amp; 03<br/>
-                        BUSINESS BAY<br/>
-                        Dubai 00000<br/>
-                        United Arab Emirates<br/>
-                        VAT: 100236589600003
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="o" t-value="doc.with_context(lang=lang)"/>
+                <t t-set="format_uk_date" t-value="lambda d: d.strftime('%d/%m/%Y') if d else ''"/>
+                <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v else '0.00'"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="container">
+                            <!-- QR Code and Partner Details -->
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <!-- QR Code Section -->
+                                    <div style="display: flex; align-items: flex-start; height: 150px;">
+                                        <t t-if="o.qr_in_report == True">
+                                            <div style="width:150px; height:150px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">
+                                                <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
+                                                     style="max-width: 140px; max-height: 140px; width: auto; height: auto;" 
+                                                     alt="QR Code" t-if="o.qr_image"/>
+                                            </div>
+                                        </t>
+                                        <t t-if="not o.qr_in_report or not o.qr_image">
+                                            <div style="width:150px; height:150px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                <span style="color: #6c757d;">QR Code</span>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <h5 style="color: #800020; font-weight: bold; font-size: 14px;">VENDOR DETAILS</h5>
+                                    <div style="color: black;" t-field="o.partner_id.name"/>
+                                    <div style="color: black;" t-field="o.partner_id.street"/>
+                                    <t t-if="o.partner_id.street2">
+                                        <div style="color: black;" t-field="o.partner_id.street2"/>
+                                    </t>
+                                    <div style="color: black;">
+                                        <span t-field="o.partner_id.city"/>
+                                        <t t-if="o.partner_id.zip">, <span t-field="o.partner_id.zip"/></t>
+                                    </div>
+                                    <div style="color: black;" t-field="o.partner_id.country_id.name"/>
+                                    <div style="color: black;">VAT: <span t-field="o.partner_id.vat"/></div>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Header -->
+                            <h2 class="text-center mb-4" style="color: #800020; font-size: 28px; font-weight: bold;">
+                                TAX INVOICE <span t-field="o.name" style="color: #800020;"/>
+                            </h2>
+
+                            <!-- Dates -->
+                            <div class="row mb-4">
+                                <div class="col-4">
+                                    <strong style="color: black;">Invoice Date:</strong> 
+                                    <span style="color: black;" t-out="format_uk_date(o.invoice_date)"/>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <strong style="color: black;">Due Date:</strong> 
+                                    <span style="color: black;" t-out="format_uk_date(o.invoice_date_due)"/>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <strong style="color: black;">Booking Date:</strong> 
+                                    <span style="color: black;" t-out="format_uk_date(o.booking_date)"/>
+                                </div>
+                            </div>
+
+                            <!-- Line Items -->
+                            <table class="table table-bordered mb-4">
+                                <thead>
+                                    <tr style="background-color: #800020; color: white; font-weight: bold;">
+                                        <th style="color: white;">BUYER</th>
+                                        <th style="color: white;">PROJECT</th>
+                                        <th style="color: white;">UNIT</th>
+                                        <th class="text-end" style="color: white;">COMMISSION RATE</th>
+                                        <th class="text-end" style="color: white;">UNIT PRICE</th>
+                                        <th class="text-center" style="color: white;">VAT</th>
+                                        <th class="text-end" style="color: white;">VAT AMOUNT</th>
+                                        <th class="text-end" style="color: white;">AMOUNT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="color: black;"><span t-field="o.buyer_id.name"/></td>
+                                        <td style="color: black;"><span t-field="o.project_id.name"/></td>
+                                        <td style="color: black;"><span t-field="o.unit_id.name"/></td>
+                                        <td class="text-end" style="color: black;">
+                                            <t t-if="o.invoice_line_ids">
+                                                <span t-esc="format_number(o.invoice_line_ids[0].quantity * 100)"/>%
+                                            </t>
+                                            <t t-else="">0.00%</t>
+                                        </td>
+                                        <td class="text-end" style="color: black;">
+                                            <span t-esc="format_number(o.sale_value)"/> AED
+                                        </td>
+                                        <td class="text-center" style="color: black;">5%</td>
+                                        <td class="text-end" style="color: black;">
+                                            <span t-esc="format_number(o.amount_tax)"/> AED
+                                        </td>
+                                        <td class="text-end" style="color: black;">
+                                            <span t-esc="format_number(o.amount_total)"/> AED
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Totals - All rows with burgundy background -->
+                            <div class="row justify-content-end">
+                                <div class="col-5">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr style="background-color: #800020; color: white; font-weight: bold;">
+                                            <td style="border: 1px solid #ddd; padding: 8px;">Untaxed Amount</td>
+                                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                <span t-esc="format_number(o.amount_untaxed)"/> AED
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #800020; color: white; font-weight: bold;">
+                                            <td style="border: 1px solid #ddd; padding: 8px;">Tax</td>
+                                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                <span t-esc="format_number(o.amount_tax)"/> AED
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #800020; color: white; font-weight: bold;">
+                                            <td style="border: 1px solid #ddd; padding: 8px;">Total Due Amount</td>
+                                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                <span t-esc="format_number(o.amount_total)"/> AED
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Amount in Words -->
+                            <div class="mb-4" style="color: black;">
+                                <strong>Amount in Words (Total):</strong>
+                                <span t-field="o.amount_total_words"/>
+                            </div>
+
+                            <!-- Payment Instructions -->
+                            <div class="mb-4">
+                                <h4 style="color: #800020;">Payment Instructions</h4>
+                                <p style="color: black;">Please pay to this Account Details in Cheque or Bank Transfer</p>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 30%; color: black; font-weight: bold; padding: 4px;">Bank Name</td>
+                                        <td style="color: black; padding: 4px;">ABU DHABI COMMERCIAL BANK (ADCB)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: black; font-weight: bold; padding: 4px;">Account Name</td>
+                                        <td style="color: black; padding: 4px;">OSUS REAL ESTATE BROKERAGE LLC</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: black; font-weight: bold; padding: 4px;">Account No.</td>
+                                        <td style="color: black; padding: 4px;">14041417820001 - AED</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: black; font-weight: bold; padding: 4px;">IBAN</td>
+                                        <td style="color: black; padding: 4px;">AE35003001404141782000</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: black; font-weight: bold; padding: 4px;">Branch</td>
+                                        <td style="color: black; padding: 4px;">Business Bay</td>
+                                    </tr>
+                                </table>
+                                <p class="fst-italic" style="color: black; margin-top: 8px;">Please include your reference number when making the payment</p>
+                            </div>
+
+                            <!-- Footer with larger disclaimer -->
+                            <div class="text-center" style="color: black; font-size: 13px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; font-weight: bold;">
+                                This is a computer generated document. No signature or stamp required.
+                            </div>
+                        </div>
                     </div>
-                    <div style="text-align: right;">
-                        <strong>VENDOR DETAILS</strong><br/>
-                        G J R E REAL ESTATE LLC<br/>
-                        Sky Spiral Building (Ground Floor)<br/>
-                        VAT: 104072243900003
-                    </div>
-                </div>
-                <h2 style="text-align: center; color: #b20000; margin-top: 20px;">TAX INVOICE INV/<span t-esc="o.name"/></h2>
-                <!-- Invoice Info -->
-                <table style="width: 100%; margin-bottom: 10px;">
-                    <tr>
-                        <td><strong>Invoice Date:</strong> <span t-esc="o.invoice_date"/></td>
-                        <td><strong>Due Date:</strong> <span t-esc="o.invoice_date_due"/></td>
-                        <td><strong>Booking Date:</strong> <span t-esc="o.invoice_date"/></td>
-                    </tr>
-                </table>
-                <!-- Buyer Table -->
-                <table class="table table-sm" style="width: 100%; border: 1px solid #b20000;">
-                    <thead style="background: #b20000; color: #fff;">
-                        <tr>
-                            <th>BUYER</th>
-                            <th>PROJECT</th>
-                            <th>UNIT</th>
-                            <th>COMMISSION RATE</th>
-                            <th>SALE VALUE</th>
-                            <th>VAT</th>
-                            <th>VAT AMOUNT</th>
-                            <th>AMOUNT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td t-esc="o.partner_id.name"/>
-                            <td>BILTMORE</td>
-                            <td>809</td>
-                            <td>2.00%</td>
-                            <td>2,608,128.00 AED</td>
-                            <td>5.00%</td>
-                            <td>2,608.13 AED</td>
-                            <td t-esc="o.amount_total"/>
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- Amounts -->
-                <div style="margin-top: 10px; text-align: right;">
-                    <table style="float: right;">
-                        <tr><td>Untaxed Amount</td><td t-esc="o.amount_untaxed"/></tr>
-                        <tr><td>VAT</td><td t-esc="o.amount_tax"/></tr>
-                        <tr style="font-weight: bold; color: #b20000;"><td>Total</td><td t-esc="o.amount_total"/></tr>
-                    </table>
-                </div>
-                <!-- Amount in Words -->
-                <div style="margin-top: 40px;">
-                    <strong>Amount in Words (Total):</strong><br/>
-                    <span t-esc="o.currency_id.amount_to_text(o.amount_total)"/>
-                </div>
-                <!-- Payment Instructions -->
-                <div style="margin-top: 20px; background: #b20000; color: #fff; padding: 5px 10px; font-weight: bold;">Payment Instructions</div>
-                <div style="border: 1px solid #b20000; padding: 10px;">
-                    Please pay to this Account Details in Cheque or Bank Transfer
-                    <table style="width: 100%; margin-top: 10px;">
-                        <tr><td><strong>Bank Name</strong></td><td>ABU DHABI COMMERCIAL BANK (ADCB)</td></tr>
-                        <tr><td><strong>Account Name</strong></td><td>OSUS REAL ESTATE BROKERAGE LLC</td></tr>
-                        <tr><td><strong>Account No.</strong></td><td>14041417820001 - AED</td></tr>
-                        <tr><td><strong>IBAN</strong></td><td>AE35003001404141782000</td></tr>
-                        <tr><td><strong>Branch</strong></td><td>Business Bay</td></tr>
-                    </table>
-                    <i>Please include your reference number when making the payment</i>
-                </div>
-                <div style="margin-top: 20px; font-size: 10px; color: #888; text-align: center;">
-                    This is a computer generated document. No signature or stamp required.<br/>
-                    <span style="color: #b20000;">&#9742; +971 55 775 6776 | &#9993; info@osusproperties.com</span> | 2902 - 2903, Single Tower, Business Bay, Dubai, UAE
-                </div>
-            </div>
+                </t>
+            </t>
         </t>
     </template>
 </odoo>
