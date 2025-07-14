@@ -1,9 +1,22 @@
-# Account Payment Approval - Bulk Operations Feature
+# Account Payment Approval - Bulk Operations & Multiple Approvers Feature
 
 ## Overview
-This module has been enhanced with comprehensive bulk operations that allow authorized users to process multiple payments at once from the list view.
+This module has been enhanced with comprehensive bulk operations and multiple approver support that allow authorized users to process multiple payments at once from the list view.
 
 ## New Features
+
+### Multiple Approvers Support
+The module now supports both single and multiple approver configurations:
+
+#### Single Approver Mode
+- Configure one user who can approve payments
+- Backward compatible with existing installations
+
+#### Multiple Approvers Mode  
+- Configure multiple users who can approve payments
+- Any user from the approved list can approve payments
+- Takes precedence over single approver if both are configured
+- Useful for teams or departments with multiple authorized personnel
 
 ### Bulk Operations Buttons
 All buttons are located in the payment list view header:
@@ -29,10 +42,33 @@ All buttons are located in the payment list view header:
 ### Key Benefits
 1. **Efficiency**: Process multiple payments simultaneously instead of one by one
 2. **Complete Workflow Coverage**: Handle approve, reject, and draft operations in bulk
-3. **Override Singleton Constraint**: All bulk methods safely handle multiple records
-4. **Smart Filtering**: Only processes eligible payments and informs users of filtered selections
-5. **Error Handling**: Graceful handling of individual payment failures
-6. **User Feedback**: Clear notifications about success/failure status
+3. **Multiple Approver Support**: Configure multiple users who can approve payments
+4. **Flexible Configuration**: Support both single and multiple approver setups
+5. **Override Singleton Constraint**: All bulk methods safely handle multiple records
+6. **Smart Filtering**: Only processes eligible payments and informs users of filtered selections
+7. **Error Handling**: Graceful handling of individual payment failures
+8. **User Feedback**: Clear notifications about success/failure status
+
+## Configuration
+
+### Setting Up Approvers
+
+1. Navigate to Accounting > Configuration > Settings
+2. Scroll to "Payment Approval" section
+3. Enable "Payment Approval"
+4. Choose your approval setup:
+
+#### For Single Approver:
+- Select one user in "Single Approver" field
+- Leave "Multiple Approvers" empty
+
+#### For Multiple Approvers:
+- Add multiple users in "Multiple Approvers" field using tags
+- Single approver will be ignored if multiple approvers are set
+
+5. Set the minimum amount requiring approval
+6. Choose the currency for amount comparison
+7. Save settings
 
 ## How to Use
 
@@ -66,9 +102,19 @@ All buttons are located in the payment list view header:
 - Added `bulk_approve_payments()` method for bulk approval and posting
 - Added `bulk_reject_payments()` method for bulk rejection
 - Added `bulk_draft_payments()` method for bulk draft reset
+- Added `_is_user_authorized_approver()` helper method for authorization checks
+- Added `get_authorized_approvers()` method to retrieve approver list
+- Enhanced `_compute_is_approve_person()` to support multiple approvers
+- Added `authorized_approvers_display` field to show approvers on forms
 - All methods handle singleton constraint override
 - Individual error handling per payment
 - Comprehensive logging for all operations
+
+### Configuration Enhancement
+- Added `approval_user_ids` Many2many field for multiple approvers
+- Added `get_current_approvers()` method in settings
+- Enhanced configuration view with separate single/multiple approver sections
+- Backward compatibility with existing single approver setups
 
 ### View Enhancement
 - Extended list view with three header buttons
@@ -92,10 +138,13 @@ All buttons are located in the payment list view header:
 - User-friendly error messages with operation counts
 
 ## Security & Access Control
-- Bulk approve and reject: Only authorized approval users
+- Bulk approve and reject: Only authorized approval users (single or multiple)
 - Bulk draft: Available to all users (for rejected/cancelled payments)
+- Multiple approvers: Any user from the configured list can approve
+- Single approver: Only the configured user can approve
 - Respects existing approval workflow and amount limits
 - Maintains complete audit trail for all actions
+- Authorized approvers are displayed on payment forms for transparency
 
 ## States and Workflow
 The bulk operations respect the existing workflow:

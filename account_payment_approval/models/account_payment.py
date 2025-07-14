@@ -34,24 +34,143 @@ class AccountPayment(models.Model):
     _inherits = {'account.move': 'move_id'}
 
     def _compute_is_approve_person(self):
-        """This function fetches the value of the
-        'account_payment_approval.payment_approval' parameter using the
-        get_param method and converts to integer, it checks if the current
-        user's ID matches the ID stored in the 'approval_user_id'
-        parameter. If both conditions are met, it sets the is_approve_person
-         field to True"""
+        """This function checks if the current user is authorized to approve payments.
+        It supports both single approver and multiple approvers configuration.
+        Multiple approvers take precedence over single approver if both are configured."""
+        for record in self:
+            approval = self.env['ir.config_parameter'].sudo().get_param(
+                'account_payment_approval.payment_approval')
+            
+            if not approval:
+                record.is_approve_person = False
+                continue
+                
+            # Check for multiple approvers first (takes precedence)
+            multiple_approvers_param = self.env['ir.config_parameter'].sudo().get_param(
+                'account_payment_approval.approval_user_ids', '')
+            
+            if multiple_approvers_param:
+                try:
+                    # Parse the comma-separated string of user IDs
+                    approver_ids = [int(x.strip()) for x in multiple_approvers_param.split(',') if x.strip()]
+                    if approver_ids:  # Only use if we actually have IDs
+                        record.is_approve_person = self.env.user.id in approver_ids
+                        continue
+                except (ValueError, AttributeError):
+                    # If parsing fails, fall back to single approver
+                    pass
+            
+            # Fall back to single approver configuration
+            single_approver_param = self.env['ir.config_parameter'].sudo().get_param(
+                'account_payment_approval.approval_user_id', '')
+            if single_approver_param:
+                try:
+                    approver_id = int(single_approver_param)
+                    record.is_approve_person = self.env.user.id == approver_id
+                except (ValueError, TypeError):
+                    record.is_approve_person = False
+            else:
+                record.is_approve_person = False
+
+    def _is_user_authorized_approver(self, user_id=None):
+        """Helper method to check if a user is authorized to approve payments.
+        Supports both single and multiple approver configurations.
+        
+        Args:
+            user_id (int): User ID to check. If None, uses current user.
+            
+        Returns:
+            bool: True if user is authorized to approve payments
+        """
+        if user_id is None:
+            user_id = self.env.user.id
+            
         approval = self.env['ir.config_parameter'].sudo().get_param(
             'account_payment_approval.payment_approval')
-        approver_id = int(self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_approval.approval_user_id'))
-        self.is_approve_person = True if (self.env.user.id == approver_id and
-                                          approval) else False
+        
+        if not approval:
+            return False
+            
+        # Check for multiple approvers first (takes precedence)
+        multiple_approvers_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_ids', '')
+        
+        if multiple_approvers_param:
+            try:
+                # Parse the comma-separated string of user IDs
+                approver_ids = [int(x.strip()) for x in multiple_approvers_param.split(',') if x.strip()]
+                if approver_ids:  # Only use if we actually have IDs
+                    return user_id in approver_ids
+            except (ValueError, AttributeError):
+                # If parsing fails, fall back to single approver
+                pass
+        
+        # Fall back to single approver configuration
+        single_approver_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_id', '')
+        if single_approver_param:
+            try:
+                approver_id = int(single_approver_param)
+                return user_id == approver_id
+            except (ValueError, TypeError):
+                return False
+        
+        return False
+
+    def get_authorized_approvers(self):
+        """Get list of authorized approvers for this payment"""
+        approval = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.payment_approval')
+        
+        if not approval:
+            return self.env['res.users']
+            
+        # Check for multiple approvers first
+        multiple_approvers_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_ids', '')
+        
+        if multiple_approvers_param:
+            try:
+                approver_ids = [int(x.strip()) for x in multiple_approvers_param.split(',') if x.strip()]
+                if approver_ids:  # Only use if we actually have IDs
+                    return self.env['res.users'].browse(approver_ids).exists()
+            except (ValueError, AttributeError):
+                pass
+        
+        # Fall back to single approver
+        single_approver_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_id', '')
+        if single_approver_param:
+            try:
+                approver_id = int(single_approver_param)
+                return self.env['res.users'].browse(approver_id).exists()
+            except (ValueError, TypeError):
+                pass
+        
+        return self.env['res.users']
 
     is_approve_person = fields.Boolean(string='Approving Person',
                                        compute=_compute_is_approve_person,
                                        readonly=True,
                                        help="Enable/disable if approving"
                                             " person")
+
+    authorized_approvers_display = fields.Char(
+        string='Authorized Approvers',
+        compute='_compute_authorized_approvers_display',
+        readonly=True,
+        help="List of users authorized to approve this payment"
+    )
+
+    def _compute_authorized_approvers_display(self):
+        """Compute display string for authorized approvers"""
+        for record in self:
+            approvers = record.get_authorized_approvers()
+            if approvers:
+                approver_names = approvers.mapped('name')
+                record.authorized_approvers_display = ', '.join(approver_names)
+            else:
+                record.authorized_approvers_display = 'No approvers configured'
 
     is_locked = fields.Boolean(string='Locked', compute='_compute_is_locked', store=True)
     state = fields.Selection([
@@ -145,7 +264,7 @@ class AccountPayment(models.Model):
         """This function changes state to approved state if approving person
          approves payment and automatically posts the payment"""
         for record in self:
-            if record.state == 'waiting_approval' and record.is_approve_person:
+            if record.state == 'waiting_approval' and record._is_user_authorized_approver():
                 # First, set state to approved
                 record.write({
                     'state': 'approved'
@@ -166,7 +285,7 @@ class AccountPayment(models.Model):
     def reject_transfer(self):
         """Reject the payment transfer"""
         for record in self:
-            if record.state == 'waiting_approval' and record.is_approve_person:
+            if record.state == 'waiting_approval' and record._is_user_authorized_approver():
                 record.state = 'rejected'
                 # Allow draft and cancel actions after rejection
                 record.is_locked = False
@@ -174,13 +293,8 @@ class AccountPayment(models.Model):
     def bulk_approve_payments(self):
         """Bulk approve multiple payments that are waiting for approval.
         This method overrides singleton constraint and allows bulk processing."""
-        # Check if current user is the approving person
-        approval = self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_approval.payment_approval')
-        approver_id = int(self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_approval.approval_user_id'))
-        
-        if not (self.env.user.id == approver_id and approval):
+        # Check if current user is an authorized approver
+        if not self._is_user_authorized_approver():
             raise UserError(_("You are not authorized to approve payments."))
         
         # Filter payments that can be approved
@@ -233,13 +347,8 @@ class AccountPayment(models.Model):
     def bulk_reject_payments(self):
         """Bulk reject multiple payments that are waiting for approval.
         This method overrides singleton constraint and allows bulk processing."""
-        # Check if current user is the approving person
-        approval = self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_approval.payment_approval')
-        approver_id = int(self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_approval.approval_user_id'))
-        
-        if not (self.env.user.id == approver_id and approval):
+        # Check if current user is an authorized approver
+        if not self._is_user_authorized_approver():
             raise UserError(_("You are not authorized to reject payments."))
         
         # Filter payments that can be rejected

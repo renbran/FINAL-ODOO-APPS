@@ -29,6 +29,9 @@
                 <field name="partner_id" position="after">
                     <field name="is_approve_person" invisible="1"/>
                     <field name="is_locked" invisible="1"/>
+                    <field name="authorized_approvers_display" readonly="1" 
+                           invisible="state not in ['waiting_approval', 'approved', 'rejected']"
+                           help="These users can approve this payment"/>
                 </field>
                 <xpath expr="//field" position="attributes">
                     <attribute name="readonly">is_locked</attribute>
@@ -52,17 +55,12 @@
             </field>
         </record>
 
-<!--        Inherit tree view to add bulk approve button -->
-        <record id="view_account_payment_tree" model="ir.ui.view">
-            <field name="name">account.payment.view.tree.inherit.account.payment.approval</field>
+<!--        Create new tree view with bulk operations -->
+        <record id="view_account_payment_tree_approval" model="ir.ui.view">
+            <field name="name">account.payment.view.tree.approval</field>
             <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <attribute name="multi_edit">1</attribute>
-                    <attribute name="js_class">payment_approval_list</attribute>
-                </xpath>
-                <xpath expr="//tree" position="inside">
+                <tree js_class="payment_approval_list" multi_edit="1">
                     <header>
                         <button name="bulk_approve_payments" string="Bulk Approve &amp; Post" type="object"
                                 class="btn-primary"
@@ -77,13 +75,63 @@
                                 confirm="Are you sure you want to set all selected payments back to draft?"
                                 groups="base.group_user"/>
                     </header>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="payment_type"/>
+                    <field name="partner_id" string="Customer/Vendor"/>
+                    <field name="payment_method_line_id"/>
+                    <field name="amount" sum="Total"/>
+                    <field name="currency_id"/>
+                    <field name="state" 
+                           decoration-info="state == 'waiting_approval'"
+                           decoration-success="state in ['approved', 'posted']"
+                           decoration-danger="state == 'rejected'"
+                           decoration-muted="state == 'cancel'"/>
                     <field name="is_approve_person" optional="hide"/>
-                </xpath>
+                    <field name="authorized_approvers_display" optional="hide"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Add action to use our new tree view -->
+        <record id="action_account_payments_approval" model="ir.actions.act_window">
+            <field name="name">Payment Approvals</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_payment_tree_approval"/>
+            <field name="context">{'default_payment_type': 'outbound'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a payment for approval workflow
+                </p><p>
+                    Payments with bulk approval operations for efficient processing.
+                </p>
+            </field>
+        </record>
+
+        <!-- Add menu item for payment approvals -->
+        <menuitem
+            id="menu_account_payment_approval"
+            name="Payment Approvals"
+            parent="account.menu_finance_payables"
+            action="action_account_payments_approval"
+            sequence="20"/>
+
+<!--        Enhance the original tree view with minimal changes -->
+        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.view.tree.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
                 <xpath expr="//field[@name='state']" position="attributes">
                     <attribute name="decoration-info">state == 'waiting_approval'</attribute>
                     <attribute name="decoration-success">state in ['approved', 'posted']</attribute>
                     <attribute name="decoration-danger">state == 'rejected'</attribute>
                     <attribute name="decoration-muted">state == 'cancel'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="authorized_approvers_display" optional="hide"/>
                 </xpath>
             </field>
         </record>
