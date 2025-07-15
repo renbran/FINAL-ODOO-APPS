@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
     <!-- The gl_template_new template for the GeneralLedger component. -->
-    <t t-name="gl_template_new" owl="1">
-        <div class="w-100 enterprise-report-container">
-            <div class="fin_report enterprise-report-wrapper">
+    <t t-name="gl_template_new">
+        <div class="w-100 o_dynamic_accounts_report_container">
+            <div class="fin_report o_dynamic_accounts_report_wrapper">
                 <!-- Enhanced Header Section -->
-                <div class="enterprise-report-header">
-                    <div class="report-title-section">
+                <div class="o_dynamic_accounts_report_header">
+                    <div class="o_dynamic_accounts_report_title_section">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="report-icon-gradient">
+                            <div class="o_dynamic_accounts_report_icon_gradient">
                                 <i class="fa fa-book"></i>
                             </div>
                             <div>
-                                <h1 class="enterprise-report-title">
+                                <h1 class="o_dynamic_accounts_report_title">
                                     <t t-if="state.title">
                                         <t t-esc="state.title"/>
                                     </t>
@@ -20,13 +20,13 @@
                                         <t t-esc="props.action.name"/>
                                     </t>
                                 </h1>
-                                <p class="enterprise-report-subtitle">Detailed Transaction History by Account</p>
+                                <p class="o_dynamic_accounts_report_subtitle">Detailed Transaction History by Account</p>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Action Buttons Section -->
-                    <div class="report-actions d-flex gap-2">
+                    <div class="o_dynamic_accounts_report_actions d-flex gap-2">
                         <button type="button"
                                 class="btn btn-enterprise-outline"
                                 t-on-click="printPdf"

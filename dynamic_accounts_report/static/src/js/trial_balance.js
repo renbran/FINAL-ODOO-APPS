@@ -1,15 +1,16 @@
-/** @odoo-module */
-const { Component } = owl;
+/** @odoo-module **/
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { useRef, useState } from "@odoo/owl";
+import { Component, useRef, useState } from "@odoo/owl";
 import { BlockUI } from "@web/core/ui/block_ui";
 import { download } from "@web/core/network/download";
+import { formatDate } from "@web/core/l10n/dates";
+
 const actionRegistry = registry.category("actions");
 const today = luxon.DateTime.now();
 let monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-class TrialBalance extends owl.Component {
+class TrialBalance extends Component {
     async setup() {
         super.setup(...arguments);
         this.initial_render = true;

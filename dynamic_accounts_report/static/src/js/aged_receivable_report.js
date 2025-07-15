@@ -1,14 +1,14 @@
-/** @odoo-module */
-const { Component } = owl;
+/** @odoo-module **/
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { useRef, useState } from "@odoo/owl";
+import { Component, useRef, useState } from "@odoo/owl";
 import { BlockUI } from "@web/core/ui/block_ui";
 import { download } from "@web/core/network/download";
+
 const actionRegistry = registry.category("actions");
 const today = luxon.DateTime.now();
 
-class AgedReceivable extends owl.Component {
+class AgedReceivable extends Component {
     async setup() {
         super.setup(...arguments);
         this.initial_render = true;

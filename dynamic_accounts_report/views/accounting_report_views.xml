@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!--    Enhanced Client actions for enterprise reporting-->
-    <record id="action_general_ledger" model="ir.actions.client">
-        <field name="name">📋 General Ledger</field>
-        <field name="tag">gen_l</field>
-    </record>
+    <data>
+        <!--    Enhanced Client actions for enterprise reporting-->
+        <record id="action_general_ledger" model="ir.actions.client">
+            <field name="name">📋 General Ledger</field>
+            <field name="tag">gen_l</field>
+        </record>
     
     <record id="action_trial_balance" model="ir.actions.client">
         <field name="name">⚖️ Trial Balance</field>
@@ -147,4 +148,5 @@
               name="Tax Report" 
               sequence="1"
               parent="menu_compliance_reports"/>
+    </data>
 </odoo>

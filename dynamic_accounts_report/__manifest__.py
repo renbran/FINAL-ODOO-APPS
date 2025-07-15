@@ -83,7 +83,7 @@ Perfect for enterprise organizations requiring professional financial reporting.
             'dynamic_accounts_report/static/src/xml/aged_payable_report_views.xml',
             'dynamic_accounts_report/static/src/xml/aged_receivable_report_views.xml',
             'dynamic_accounts_report/static/src/xml/tax_report_views.xml',
-            'dynamic_accounts_report/static/src/css/accounts_report.css',
+            'dynamic_accounts_report/static/src/scss/dynamic_accounts_report.scss',
             'dynamic_accounts_report/static/src/js/general_ledger.js',
             'dynamic_accounts_report/static/src/js/trial_balance.js',
             'dynamic_accounts_report/static/src/js/cash_flow.js',
