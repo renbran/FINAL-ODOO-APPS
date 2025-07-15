@@ -59,10 +59,8 @@
                                 Date Range
                                 <i class="fa fa-chevron-down ms-2"></i>
                             </a>
-                                    Date Range
-                                </a>
-                                <div class="dropdown-menu" role="menu">
-                                    <div class="list-group">
+                            <div class="dropdown-menu" role="menu">
+                                <div class="list-group">
                                         <button class="report-filter-button"
                                                 t-att-data-value="'month'"
                                                 type="button"

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
     <!-- Template for cash book report -->
-    <t t-name="csh_b_template_new" owl="1">
-        <div class="w-100 enterprise-report-container">
-            <div class="fin_report enterprise-report-wrapper">
+    <t t-name="csh_b_template_new">
+        <div class="w-100 o_dynamic_accounts_report_container">
+            <div class="fin_report o_dynamic_accounts_report_wrapper">
                 <!-- Enhanced Header Section -->
-                <div class="enterprise-report-header">
+                <div class="o_dynamic_accounts_report_header">
                     <div class="report-title-section">
                         <div class="d-flex align-items-center gap-3">
                             <div class="report-icon-gradient">
