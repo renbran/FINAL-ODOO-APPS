@@ -11,8 +11,15 @@ class HrEmployee(models.Model):
 
     @api.model
     def create(self, vals):
-        """Override create to handle missing resource_id gracefully"""
+        """Override create to handle missing resource_id gracefully and partner name conflicts"""
+        # Handle transaction rollback if needed
         try:
+            # Handle partner name uniqueness constraint BEFORE creating employee
+            if 'name' in vals and vals['name']:
+                original_name = vals['name'].upper()
+                vals['name'] = self._ensure_unique_partner_name(original_name)
+                _logger.info(f"Employee name processed: '{original_name}' -> '{vals['name']}'")
+            
             # If resource_id is provided but doesn't exist, handle it
             if 'resource_id' in vals and vals.get('resource_id'):
                 resource_id = vals['resource_id']
@@ -53,13 +60,85 @@ class HrEmployee(models.Model):
         except Exception as e:
             _logger.error(f"Error creating employee: {str(e)}")
             
+            # Handle partner name constraint violations specifically
+            if "duplicate key value violates unique constraint" in str(e) and "res_partner_name_uniqu" in str(e):
+                _logger.warning("Partner name constraint violation, attempting to resolve...")
+                # Rollback the transaction to clear the error state
+                try:
+                    self.env.cr.rollback()
+                except:
+                    pass
+                if 'name' in vals:
+                    # Try to find alternative name
+                    original_name = vals['name'].upper()
+                    vals['name'] = self._ensure_unique_partner_name(original_name, attempt=2)
+                    _logger.info(f"Retrying with name: {vals['name']}")
+                    return self.create(vals)
+            
+            # Handle transaction aborted errors
+            if "current transaction is aborted" in str(e):
+                _logger.warning("Transaction aborted, rolling back and retrying...")
+                try:
+                    self.env.cr.rollback()
+                except:
+                    pass
+                # Retry the operation
+                return self.create(vals)
+            
             # If all else fails, remove resource_id and let Odoo auto-create
             if 'resource_id' in vals:
                 _logger.warning("Removing resource_id from vals and letting Odoo auto-create")
+                # Rollback transaction before retry
+                try:
+                    self.env.cr.rollback()
+                except:
+                    pass
                 del vals['resource_id']
                 return super(HrEmployee, self).create(vals)
             else:
                 raise
+
+    def _ensure_unique_partner_name(self, name, attempt=1):
+        """
+        Ensure partner name is unique by checking existing partners
+        and appending suffixes if necessary
+        """
+        if not name:
+            return name
+            
+        upper_name = name.upper()
+        
+        # Check if name already exists
+        existing_partner = self.env['res.partner'].search([('name', '=', upper_name)], limit=1)
+        
+        if not existing_partner:
+            return upper_name
+        
+        # Name exists, try alternatives
+        _logger.info(f"Partner name '{upper_name}' already exists, generating alternative...")
+        
+        # Try various suffix strategies
+        suffixes_to_try = [
+            f' (EMP-{attempt})',
+            f' ({attempt})',
+            ' (EMPLOYEE)',
+            f' (STAFF-{attempt})',
+            f' (HR-{attempt})'
+        ]
+        
+        for suffix in suffixes_to_try:
+            alternative_name = upper_name + suffix
+            existing = self.env['res.partner'].search([('name', '=', alternative_name)], limit=1)
+            if not existing:
+                _logger.info(f"Using alternative name: {alternative_name}")
+                return alternative_name
+        
+        # If all else fails, add timestamp-based suffix
+        import time
+        timestamp_suffix = f' (T{int(time.time() % 10000)})'
+        final_name = upper_name + timestamp_suffix
+        _logger.info(f"Using timestamp-based name: {final_name}")
+        return final_name
 
     @api.model
     def safe_bulk_create(self, employees_data):
@@ -80,12 +159,21 @@ class HrEmployee(models.Model):
             'error_count': 0
         }
         
+        _logger.info(f"Starting bulk employee import for {len(employees_data)} employees")
+        
         for employee_data in employees_data:
             results['total_processed'] += 1
             
+            # Use savepoint for each employee to isolate transaction errors
+            savepoint_name = f"employee_import_{results['total_processed']}"
+            
             try:
-                # Clean the data
+                # Create savepoint
+                self.env.cr.execute(f"SAVEPOINT {savepoint_name}")
+                
+                # Clean the data (includes name uniqueness check)
                 clean_data = self._clean_employee_data(employee_data)
+                _logger.info(f"Processing employee {results['total_processed']}: {clean_data.get('name', 'Unknown')}")
                 
                 # Create employee
                 employee = self.create(clean_data)
@@ -96,8 +184,25 @@ class HrEmployee(models.Model):
                 })
                 results['success_count'] += 1
                 
+                # Release savepoint on success
+                self.env.cr.execute(f"RELEASE SAVEPOINT {savepoint_name}")
+                _logger.info(f"Successfully created employee: {employee.name}")
+                
             except Exception as e:
                 error_msg = str(e)
+                
+                # Rollback to savepoint to clear error state
+                try:
+                    self.env.cr.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+                    _logger.info(f"Rolled back to savepoint for employee {results['total_processed']}")
+                except Exception as rollback_error:
+                    # If savepoint rollback fails, do full rollback
+                    _logger.warning(f"Savepoint rollback failed, doing full rollback: {str(rollback_error)}")
+                    try:
+                        self.env.cr.rollback()
+                    except:
+                        pass
+                
                 results['errors'].append({
                     'data': employee_data,
                     'error': error_msg,
@@ -106,6 +211,7 @@ class HrEmployee(models.Model):
                 results['error_count'] += 1
                 _logger.error(f"Error creating employee at row {results['total_processed']}: {error_msg}")
         
+        _logger.info(f"Bulk import complete: {results['success_count']} created, {results['error_count']} errors")
         return results
 
     def _clean_employee_data(self, data):
@@ -119,6 +225,13 @@ class HrEmployee(models.Model):
             dict: Cleaned employee data
         """
         cleaned_data = data.copy()
+        
+        # Handle partner name uniqueness constraint FIRST
+        if 'name' in cleaned_data and cleaned_data['name']:
+            original_name = cleaned_data['name']
+            cleaned_data['name'] = self._ensure_unique_partner_name(original_name)
+            if original_name != cleaned_data['name']:
+                _logger.info(f"Cleaned employee name: '{original_name}' -> '{cleaned_data['name']}'")
         
         # Handle resource_id issues
         if 'resource_id' in cleaned_data:
@@ -172,35 +285,67 @@ class HrEmployee(models.Model):
         return cleaned_data
 
     @api.model
-    def fix_orphaned_employees(self):
+    def fix_existing_duplicate_partners(self):
         """
-        Fix existing employees with missing resource records
+        Fix existing duplicate partner names in the database
+        This should be run before importing new employees
         """
-        # Find employees with invalid resource_id
-        employees = self.search([])
+        _logger.info("Starting fix for existing duplicate partner names...")
+        
+        # Find duplicate partner names using SQL for better performance
+        self.env.cr.execute("""
+            SELECT name, COUNT(*), array_agg(id ORDER BY id) as ids
+            FROM res_partner 
+            WHERE name IS NOT NULL 
+            GROUP BY name 
+            HAVING COUNT(*) > 1
+            ORDER BY COUNT(*) DESC
+        """)
+        
+        duplicates = self.env.cr.fetchall()
+        _logger.info(f"Found {len(duplicates)} duplicate partner name groups")
+        
         fixed_count = 0
         
-        for employee in employees:
-            try:
-                # Check if resource exists
-                if not employee.resource_id.exists():
-                    # Create new resource
-                    resource_vals = {
-                        'name': employee.name or f'Resource for {employee.employee_number}',
-                        'resource_type': 'user',
-                        'company_id': employee.company_id.id,
-                        'active': employee.active,
-                    }
-                    new_resource = self.env['resource.resource'].create(resource_vals)
-                    employee.resource_id = new_resource.id
-                    fixed_count += 1
-                    _logger.info(f"Fixed resource for employee {employee.name}")
-            except Exception as e:
-                _logger.error(f"Error fixing employee {employee.name}: {str(e)}")
+        for name, count, ids in duplicates:
+            _logger.info(f"Fixing duplicate name '{name}' with {count} records: {ids}")
+            
+            # Keep the first record with original name, rename others
+            keep_id = ids[0]
+            duplicate_ids = ids[1:]
+            
+            for i, partner_id in enumerate(duplicate_ids, 1):
+                try:
+                    partner = self.env['res.partner'].browse(partner_id)
+                    if partner.exists():
+                        # Generate unique name
+                        if partner.email:
+                            # Use email-based naming if available
+                            email_part = partner.email.split('@')[0].upper()
+                            new_name = f"{name} ({email_part})"
+                        else:
+                            # Use counter-based naming
+                            new_name = f"{name} ({i})"
+                        
+                        # Ensure the new name is also unique
+                        counter = 1
+                        original_new_name = new_name
+                        while self.env['res.partner'].search([('name', '=', new_name)], limit=1):
+                            new_name = f"{original_new_name}-{counter}"
+                            counter += 1
+                        
+                        # Update the partner name
+                        partner.write({'name': new_name})
+                        _logger.info(f"Renamed partner {partner_id}: '{name}' -> '{new_name}'")
+                        fixed_count += 1
+                        
+                except Exception as e:
+                    _logger.error(f"Error fixing partner {partner_id}: {str(e)}")
         
         return {
             'fixed_count': fixed_count,
-            'message': f'Fixed {fixed_count} employee records with missing resources'
+            'message': f'Fixed {fixed_count} duplicate partner names',
+            'duplicates_found': len(duplicates)
         }
 
 
