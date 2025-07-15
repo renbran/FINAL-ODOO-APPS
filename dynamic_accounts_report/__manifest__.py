@@ -20,14 +20,38 @@
 #
 ################################################################################
 {
-    'name': 'Odoo17 Dynamic Accounting Reports',
-    'version': '17.0.1.1.2',
+    'name': 'Enterprise Dynamic Accounting Reports',
+    'version': '17.0.2.0.0',
     'category': 'Accounting',
-    'summary': "Odoo 17 Accounting Financial Reports,Dynamic Accounting Reports, Dynamic Financial Reports,Dynamic Report Odoo17, Odoo17,Financial Reports, Odoo17 Accounting,Accounting, Odoo Apps",
-    'description': "This module creates dynamic Accounting General Ledger, Trial"
-                   "Balance, Balance Sheet, Proft and Loss, Cash Book, Partner"
-                   "Ledger, Aged Payable, Aged Receivable, Bank book and Tax"
-                   "Reports in Odoo 17 community edition, Reporting, Odoo17 Accounting, odoo17 reporting, odoo17, odoo17 accounts reports",
+    'summary': "Professional Enterprise-Level Dynamic Financial Reports with Modern UI/UX",
+    'description': """
+Enterprise Dynamic Accounting Reports
+=====================================
+
+Enhanced dynamic financial reporting with enterprise-level features and modern UI:
+
+🚀 Key Enhancements:
+* Modern, responsive dashboard interface
+* Professional report layouts with clean typography
+* Advanced filtering and comparison tools
+* Interactive charts and data visualization
+* Mobile-friendly responsive design
+* Enhanced navigation and user experience
+* Export capabilities (PDF, Excel)
+* Real-time data updates
+
+📊 Available Reports:
+* Balance Sheet with trend analysis
+* Profit & Loss with variance analysis
+* Trial Balance with drill-down capabilities
+* General Ledger with advanced filtering
+* Partner Ledger with aging analysis
+* Cash Flow and Bank Book reports
+* Aged Receivables/Payables with insights
+* Tax Reports with compliance features
+
+Perfect for enterprise organizations requiring professional financial reporting.
+    """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',

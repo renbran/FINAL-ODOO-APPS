@@ -1,0 +1,220 @@
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;odoo&gt;
+    
+    &lt;!-- Dashboard Main Action --&gt;
+    &lt;record id="action_enterprise_dashboard_main" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Enterprise Financial Dashboard&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_dashboard_main&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Balance Sheet Report Action --&gt;
+    &lt;record id="action_balance_sheet_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Balance Sheet Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_balance_sheet_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Profit &amp; Loss Report Action --&gt;
+    &lt;record id="action_profit_loss_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Profit &amp; Loss Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_profit_loss_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Trial Balance Report Action --&gt;
+    &lt;record id="action_trial_balance_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Trial Balance Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_trial_balance_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- General Ledger Report Action --&gt;
+    &lt;record id="action_general_ledger_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;General Ledger Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_general_ledger_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Cash Flow Report Action --&gt;
+    &lt;record id="action_cash_flow_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Cash Flow Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_cash_flow_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Aged Receivables Report Action --&gt;
+    &lt;record id="action_aged_receivables_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Aged Receivables Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_aged_receivables_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Aged Payables Report Action --&gt;
+    &lt;record id="action_aged_payables_report" model="ir.actions.client"&gt;
+        &lt;field name="name"&gt;Aged Payables Report&lt;/field&gt;
+        &lt;field name="tag"&gt;enterprise_aged_payables_report&lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Dashboard Configuration Views --&gt;
+    &lt;record id="enterprise_dashboard_view_form" model="ir.ui.view"&gt;
+        &lt;field name="name"&gt;enterprise.dashboard.form&lt;/field&gt;
+        &lt;field name="model"&gt;enterprise.dashboard&lt;/field&gt;
+        &lt;field name="arch" type="xml"&gt;
+            &lt;form string="Enterprise Dashboard"&gt;
+                &lt;header&gt;
+                    &lt;button name="action_activate" type="object" 
+                            class="btn-primary" string="Activate"
+                            invisible="state == 'active'"/&gt;
+                    &lt;button name="action_archive" type="object" 
+                            class="btn-secondary" string="Archive"
+                            invisible="state == 'archived'"/&gt;
+                    &lt;field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/&gt;
+                &lt;/header&gt;
+                &lt;sheet&gt;
+                    &lt;div class="oe_title"&gt;
+                        &lt;h1&gt;
+                            &lt;field name="name" placeholder="Dashboard Name..."/&gt;
+                        &lt;/h1&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;group&gt;
+                        &lt;group&gt;
+                            &lt;field name="company_id"/&gt;
+                            &lt;field name="user_id"/&gt;
+                            &lt;field name="is_default"/&gt;
+                        &lt;/group&gt;
+                        &lt;group&gt;
+                            &lt;field name="theme_mode"/&gt;
+                            &lt;field name="date_from"/&gt;
+                            &lt;field name="date_to"/&gt;
+                        &lt;/group&gt;
+                    &lt;/group&gt;
+                    
+                    &lt;notebook&gt;
+                        &lt;page string="Widgets"&gt;
+                            &lt;field name="widget_ids"&gt;
+                                &lt;tree editable="bottom"&gt;
+                                    &lt;field name="sequence" widget="handle"/&gt;
+                                    &lt;field name="name"/&gt;
+                                    &lt;field name="widget_type"/&gt;
+                                    &lt;field name="is_active"/&gt;
+                                    &lt;field name="position"/&gt;
+                                &lt;/tree&gt;
+                            &lt;/field&gt;
+                        &lt;/page&gt;
+                        &lt;page string="Layout Configuration"&gt;
+                            &lt;field name="layout_config" widget="ace" options="{'mode': 'json'}"/&gt;
+                        &lt;/page&gt;
+                    &lt;/notebook&gt;
+                &lt;/sheet&gt;
+                &lt;div class="oe_chatter"&gt;
+                    &lt;field name="message_follower_ids"/&gt;
+                    &lt;field name="activity_ids"/&gt;
+                    &lt;field name="message_ids"/&gt;
+                &lt;/div&gt;
+            &lt;/form&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;record id="enterprise_dashboard_view_tree" model="ir.ui.view"&gt;
+        &lt;field name="name"&gt;enterprise.dashboard.tree&lt;/field&gt;
+        &lt;field name="model"&gt;enterprise.dashboard&lt;/field&gt;
+        &lt;field name="arch" type="xml"&gt;
+            &lt;tree string="Enterprise Dashboards"&gt;
+                &lt;field name="name"/&gt;
+                &lt;field name="company_id"/&gt;
+                &lt;field name="user_id"/&gt;
+                &lt;field name="is_default"/&gt;
+                &lt;field name="state" decoration-success="state == 'active'" 
+                       decoration-muted="state == 'archived'"/&gt;
+                &lt;field name="create_date"/&gt;
+            &lt;/tree&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;record id="enterprise_dashboard_view_search" model="ir.ui.view"&gt;
+        &lt;field name="name"&gt;enterprise.dashboard.search&lt;/field&gt;
+        &lt;field name="model"&gt;enterprise.dashboard&lt;/field&gt;
+        &lt;field name="arch" type="xml"&gt;
+            &lt;search string="Search Dashboards"&gt;
+                &lt;field name="name"/&gt;
+                &lt;field name="company_id"/&gt;
+                &lt;field name="user_id"/&gt;
+                &lt;filter string="My Dashboards" name="my_dashboards" 
+                        domain="[('user_id', '=', uid)]"/&gt;
+                &lt;filter string="Active" name="active" 
+                        domain="[('state', '=', 'active')]"/&gt;
+                &lt;filter string="Default" name="default" 
+                        domain="[('is_default', '=', True)]"/&gt;
+                &lt;separator/&gt;
+                &lt;group expand="0" string="Group By"&gt;
+                    &lt;filter string="Company" name="group_company" 
+                            context="{'group_by': 'company_id'}"/&gt;
+                    &lt;filter string="Owner" name="group_user" 
+                            context="{'group_by': 'user_id'}"/&gt;
+                    &lt;filter string="State" name="group_state" 
+                            context="{'group_by': 'state'}"/&gt;
+                &lt;/group&gt;
+            &lt;/search&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;record id="action_enterprise_dashboard_config" model="ir.actions.act_window"&gt;
+        &lt;field name="name"&gt;Dashboard Configuration&lt;/field&gt;
+        &lt;field name="res_model"&gt;enterprise.dashboard&lt;/field&gt;
+        &lt;field name="view_mode"&gt;tree,form&lt;/field&gt;
+        &lt;field name="context"&gt;{'search_default_my_dashboards': 1}&lt;/field&gt;
+        &lt;field name="help" type="html"&gt;
+            &lt;p class="o_view_nocontent_smiling_face"&gt;
+                Create your first financial dashboard!
+            &lt;/p&gt;
+            &lt;p&gt;
+                Configure personalized dashboards with financial KPIs, charts, and reports
+                to get real-time insights into your company's financial performance.
+            &lt;/p&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+    
+    &lt;!-- Balance Sheet Report Configuration Views --&gt;
+    &lt;record id="balance_sheet_report_view_form" model="ir.ui.view"&gt;
+        &lt;field name="name"&gt;enterprise.balance.sheet.report.form&lt;/field&gt;
+        &lt;field name="model"&gt;enterprise.balance.sheet.report&lt;/field&gt;
+        &lt;field name="arch" type="xml"&gt;
+            &lt;form string="Balance Sheet Report Configuration"&gt;
+                &lt;header&gt;
+                    &lt;button name="action_generate_report" type="object" 
+                            class="btn-primary" string="Generate Report"/&gt;
+                    &lt;button name="action_export_pdf" type="object" 
+                            class="btn-secondary" string="Export PDF"/&gt;
+                    &lt;button name="action_export_xlsx" type="object" 
+                            class="btn-secondary" string="Export Excel"/&gt;
+                &lt;/header&gt;
+                &lt;sheet&gt;
+                    &lt;group&gt;
+                        &lt;group string="Date Range"&gt;
+                            &lt;field name="date_from"/&gt;
+                            &lt;field name="date_to"/&gt;
+                            &lt;field name="company_id"/&gt;
+                        &lt;/group&gt;
+                        &lt;group string="Options"&gt;
+                            &lt;field name="target_move"/&gt;
+                            &lt;field name="comparison_mode"/&gt;
+                            &lt;field name="show_hierarchy"/&gt;
+                            &lt;field name="show_zero_balance"/&gt;
+                            &lt;field name="drill_down_level"/&gt;
+                        &lt;/group&gt;
+                    &lt;/group&gt;
+                    
+                    &lt;group string="Comparison Period" 
+                           invisible="comparison_mode == 'none'"&gt;
+                        &lt;group&gt;
+                            &lt;field name="comparison_date_from"/&gt;
+                            &lt;field name="comparison_date_to"/&gt;
+                        &lt;/group&gt;
+                    &lt;/group&gt;
+                    
+                    &lt;group string="Filters"&gt;
+                        &lt;field name="journal_ids" widget="many2many_tags"/&gt;
+                        &lt;field name="account_ids" widget="many2many_tags"/&gt;
+                        &lt;field name="analytic_account_ids" widget="many2many_tags"/&gt;
+                    &lt;/group&gt;
+                &lt;/sheet&gt;
+            &lt;/form&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+    
+&lt;/odoo&gt;

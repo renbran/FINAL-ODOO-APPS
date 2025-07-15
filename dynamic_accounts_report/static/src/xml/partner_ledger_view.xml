@@ -5,19 +5,23 @@
     @param {Object} state - The state object containing the component's state data.
     -->
     <t t-name="pl_template_new" owl="1">
-        <div class="w-100">
-            <div class="fin_report">
-                <!-- Filter View -->
-                <div class="filter_view_pl">
-                    <!-- Title -->
-                    <div class="">
-                        <h1 style="padding:10px">
-                            <t t-esc="state.title"/>
-                        </h1>
+        <div class="w-100 enterprise-report-container">
+            <div class="fin_report enterprise-report-wrapper">
+                <!-- Enhanced Header Section -->
+                <div class="enterprise-report-header">
+                    <div class="report-title-section">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="report-icon-gradient">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div>
+                                <h1 class="enterprise-report-title">
+                                    <t t-esc="state.title"/>
+                                </h1>
+                                <p class="enterprise-report-subtitle">Partner Transaction History and Balance Analysis</p>
+                            </div>
+                        </div>
                     </div>
-                    <div style="margin-right: 10px; margin-left: 10px;margin-bottom: 15px;display: flex;">
-                        <div class="sub_container_left" style="width:70%;">
-                            <div class="report_print">
                                 <!-- Print (PDF) Button -->
                                 <button type="button"
                                         class="btn btn-info btn-report-print"

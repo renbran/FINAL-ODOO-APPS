@@ -6,176 +6,207 @@
     <t t-name="bls_template_new" owl="1">
         <t t-log="state"/>
         <t t-log="state.title"/>
-        <div class="w-100">
-            <div class="fin_report">
-                <!--  Filter View  -->
-                <div class="filter_view_dfr p-2">
-                    <div class="">
-                        <h1 style="padding:10px">
-                            <t t-esc="state.title"/>
-                        </h1>
+        <div class="w-100 enterprise-report-container">
+            <div class="fin_report enterprise-report-wrapper">
+                <!-- Enhanced Header Section -->
+                <div class="enterprise-report-header">
+                    <div class="report-title-section">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="report-icon-gradient">
+                                <i class="fa fa-balance-scale"></i>
+                            </div>
+                            <div>
+                                <h1 class="enterprise-report-title">
+                                    <t t-esc="state.title"/>
+                                </h1>
+                                <p class="enterprise-report-subtitle">Comprehensive Financial Position Report</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="sub_container_right d-flex mx-2">
+                    
+                    <!-- Action Buttons Section -->
+                    <div class="report-actions d-flex gap-2">
                         <t t-if="state.filter_data">
-                            <div class="report_print">
+                            <div class="report_print d-flex gap-2">
                                 <button type="button"
-                                        class="btn btn-info btn-report-print"
+                                        class="btn btn-enterprise-outline"
                                         t-on-click="print_pdf"
-                                        style="margin-right: 8px;">
-                                    Print (PDF)
+                                        title="Export as PDF">
+                                    <i class="fa fa-file-pdf-o me-2"></i>Print PDF
                                 </button>
                                 <button type="button"
-                                        class="btn btn-info btn-report-print"
+                                        class="btn btn-enterprise-success"
                                         t-on-click="print_xlsx"
-                                        style="position: relative;">
-                                    Export (XLSX)
+                                        title="Export as Excel">
+                                    <i class="fa fa-file-excel-o me-2"></i>Export XLSX
                                 </button>
                             </div>
-                            <div class="filter d-flex ms-auto"
-                                 style="gap: 1.5rem;">
-                                <div class="time_range" style="">
-                                    <a type="button" class="dropdown-toggle"
-                                       data-bs-toggle="dropdown">
-                                        <span class="fa fa-calendar"
-                                              title="Dates"
-                                              role="img"
-                                              aria-label="Dates"/>
-                                        Date Range
-                                    </a>
-                                    <div class="dropdown-menu" role="menu">
-                                        <div class="list-group">
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'month'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                This Month
-                                            </button>
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'quarter'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                This Quarter
-                                            </button>
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'year'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                This Year
-                                            </button>
-                                            <div role="separator"
-                                                 class="dropdown-divider"/>
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'last-month'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                Last month
-                                            </button>
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'last-quarter'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                Last quarter
-                                            </button>
-                                            <button class="report-filter-button"
-                                                    t-att-data-value="'last-year'"
-                                                    type="button"
-                                                    t-on-click="apply_date">
-                                                Last year
-                                            </button>
-                                            <div role="separator"
-                                                 class="dropdown-divider"/>
-                                            <label class="" for="date_from">
-                                                Start
-                                                Date :
-                                            </label>
-                                            <div class="input-group date"
-                                                 t-ref="date_from"
-                                                 data-target-input="nearest">
+                        </t>
+                    </div>
+                </div>
 
-                                                <input type="date"
-                                                       id="start_date"
-                                                       t-on-change="apply_date"
-                                                       style="border:none;border-bottom: 1px solid #000;padding: 5px;outline: none;"
-                                                       name="start_date"/>
-                                            </div>
-
-                                            <label class="" for="date_to">End
-                                                Date
-                                                :
-                                            </label>
-                                            <div class="input-group date"
-                                                 t-ref="date_to"
-                                                 data-target-input="nearest">
-                                                <input type="date"
-                                                       id="end_date"
-                                                       t-on-change="apply_date"
-                                                       style="border:none;border-bottom: 1px solid #000;padding: 5px;outline: none;"
-                                                       name="end_date"/>
+                <!-- Enhanced Filter Controls -->
+                <div class="enterprise-filter-panel">
+                    <div class="filter-panel-header">
+                        <h3><i class="fa fa-filter me-2"></i>Report Filters</h3>
+                        <span class="filter-description">Customize your balance sheet view</span>
+                    </div>
+                    
+                    <t t-if="state.filter_data">
+                        <div class="filter-controls-grid">
+                            <!-- Date Range Filter -->
+                            <div class="time_range dropdown">
+                                <a type="button" class="dropdown-toggle enterprise-filter-btn"
+                                   data-bs-toggle="dropdown"
+                                   title="Select reporting period">
+                                    <i class="fa fa-calendar me-2"></i>
+                                    Date Range
+                                    <i class="fa fa-chevron-down ms-2"></i>
+                                </a>
+                                <div class="dropdown-menu enterprise-dropdown" role="menu">
+                                    <div class="dropdown-header">
+                                        <strong>Select Period</strong>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <div class="period-options">
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'month'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-calendar-o me-2"></i>This Month
+                                        </button>
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'quarter'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-calendar-check-o me-2"></i>This Quarter
+                                        </button>
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'year'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-calendar me-2"></i>This Year
+                                        </button>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'last-month'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-arrow-left me-2"></i>Last Month
+                                        </button>
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'last-quarter'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-arrow-left me-2"></i>Last Quarter
+                                        </button>
+                                        <button class="report-filter-button"
+                                                t-att-data-value="'last-year'"
+                                                type="button"
+                                                t-on-click="apply_date">
+                                            <i class="fa fa-arrow-left me-2"></i>Last Year
+                                        </button>
+                                        <div class="dropdown-divider"></div>
+                                        <div class="p-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    <i class="fa fa-calendar-plus-o me-2"></i><strong>Custom Date Range</strong>
+                                                </label>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <label class="form-label small">Start Date:</label>
+                                                        <div class="input-group date" t-ref="date_from">
+                                                            <input type="date"
+                                                                   id="start_date"
+                                                                   t-on-change="apply_date"
+                                                                   class="form-control"
+                                                                   name="start_date"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small">End Date:</label>
+                                                        <div class="input-group date" t-ref="date_to">
+                                                            <input type="date"
+                                                                   id="end_date"
+                                                                   t-on-change="apply_date"
+                                                                   class="form-control"
+                                                                   name="end_date"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-primary btn-sm w-100 mt-2"
+                                                        type="button"
+                                                        t-on-click="apply_date">
+                                                    <i class="fa fa-check me-1"></i>Apply Date Range
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="comparison_range" style="">
-                                <a type="button" class="dropdown-toggle"
-                                   data-bs-toggle="dropdown">
-                                    <span class="fa fa-signal"
-                                          title="Comparison"
-                                          role="img"
-                                          aria-label="Comparison"/>
-                                    Comparison
-                                </a>
-                                <div class="dropdown-menu" role="menu">
-                                    <div class="list-group">
-                                        <button class="report-filter-button"
-                                                t-att-data-value="'no comparison'"
-                                                type="button"
-                                                t-on-click="apply_comparison">
-                                            No Comparison
-                                        </button>
-                                        <div role="separator"
-                                             class="dropdown-divider"/>
-                                        <label class="" for="periods"
-                                               style="display: flex;padding: 4px 20px;color: #000;">
-                                            Previous Period
-                                            <br/>
-                                            Number of Periods:
-                                        </label>
-                                        <div class="input-group comparison"
-                                             data-target-input="nearest">
-
-                                            <input type="number"
-                                                   t-ref="periods"
-                                                   min="1"
-                                                   t-on-input="onPeriodChange"
-                                                   style="border:none;border-bottom: 1px solid #000;padding: 5px;outline: none;"
-                                                   name="previous_period"/>
-                                        </div>
-                                        <button class="btn btn-primary"
-                                                type="button"
-                                                style="margin-left: 19px;margin-top: 4px;"
-                                                t-on-click="applyComparisonPeriod">
-                                            Apply
-                                        </button>
-                                        <div role="separator"
-                                             class="dropdown-divider"/>
-                                        <label class="" for="period_year"
-                                               style="display: flex;padding: 4px 20px;color: #000;">
-                                            Same Period Last Year
-                                            <br/>
-                                            Number of Periods:
-                                        </label>
-                                        <div class="input-group comparison"
-                                             data-target-input="nearest">
-                                            <input type="number"
-                                                   t-ref="period_year"
-                                                   t-on-input="onPeriodYearChange"
-                                                   min="1"
-                                                   style="border:none;border-bottom: 1px solid #000;padding: 5px;outline: none;"
-                                                   name="period_year"/>
-                                        </div>
-                                        <button class="btn btn-primary"
-                                                type="button"
+                <!-- Comparison Filter -->
+            <div class="comparison_range dropdown">
+                <a type="button" class="dropdown-toggle enterprise-filter-btn"
+                   data-bs-toggle="dropdown"
+                   title="Compare with previous periods">
+                    <i class="fa fa-line-chart me-2"></i>
+                    Comparison
+                    <i class="fa fa-chevron-down ms-2"></i>
+                </a>
+                <div class="dropdown-menu enterprise-dropdown" role="menu">
+                    <div class="dropdown-header">
+                        <strong>Comparison Options</strong>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <button class="report-filter-button"
+                            t-att-data-value="'no comparison'"
+                            type="button"
+                            t-on-click="apply_comparison">
+                        <i class="fa fa-ban me-2"></i>No Comparison
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fa fa-history me-2"></i><strong>Previous Period</strong>
+                            </label>
+                            <p class="text-muted small mb-2">Compare with previous periods</p>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Periods:</span>
+                                <input type="number"
+                                       t-ref="periods"
+                                       min="1"
+                                       max="12"
+                                       t-on-input="onPeriodChange"
+                                       class="form-control"
+                                       placeholder="1"
+                                       name="previous_period"/>                            </div>
+                            <button class="btn btn-primary btn-sm w-100"
+                                    type="button"
+                                    t-on-click="applyComparisonPeriod">
+                                <i class="fa fa-check me-1"></i>Apply Period Comparison
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fa fa-calendar me-2"></i><strong>Same Period Last Year</strong>
+                            </label>
+                            <p class="text-muted small mb-2">Compare with same period in previous years</p>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Years:</span>
+                                <input type="number"
+                                       t-ref="period_year"
+                                       t-on-input="onPeriodYearChange"
+                                       min="1"
+                                       max="5"
+                                       class="form-control"
+                                       placeholder="1"
+                                       name="period_year"/>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100"
+                                    type="button"
                                                 style="margin-left: 19px;margin-top: 4px;"
                                                 t-on-click="applyComparisonYear">
                                             Apply
