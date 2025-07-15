@@ -25,6 +25,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/commission_demo_data.xml',
+        'data/cron_data.xml',
         'views/sale_order.xml',
         'views/purchase_order.xml',
     ],
