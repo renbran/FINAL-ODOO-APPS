@@ -1,12 +1,23 @@
-# Sales Dashboard Module - Enhanced Version
+# OSUS Executive Sales Dashboard
+
+A beautiful, modern executive dashboard for Odoo 17 with advanced visualizations and business intelligence capabilities.
 
 This module is under copyright of 'OdooElevate'
 
-## Overview
+## ✨ Key Features
 
-This enhanced sales dashboard module provides a comprehensive view of sales data with improved filtering capabilities and field selection options.
+### 🎨 Modern Visual Design
+- **Executive-Grade Interface**: Professional gradient backgrounds and modern card layouts
+- **Interactive Charts**: Custom chart implementation with doughnut and line charts
+- **Animated Components**: Smooth transitions and loading animations
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 
-## Key Features
+### 📊 Advanced Analytics
+- **KPI Cards**: Key performance indicators with trend indicators
+  - Total Pipeline Value
+  - Revenue Realized
+  - Conversion Rate
+  - Average Deal Size
 
 ### 1. Date Range Filtering
 - **Start Date & End Date**: Select custom date ranges for filtering sales data

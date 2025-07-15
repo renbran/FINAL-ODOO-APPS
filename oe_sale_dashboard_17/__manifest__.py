@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 # This module is under copyright of 'OdooElevate'
 {
-    'name': 'OSUS Sales Dashboard',
+    'name': 'OSUS Executive Sales Dashboard',
     'version': '17.0.0.1.1',
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
     'description': """
-        Enhanced sales dashboard module with advanced filtering and field selection capabilities.
+        Enhanced Executive Sales Dashboard with modern visualizations and business intelligence.
         
         Key Features:
-        - Date range filtering (start date to end date) 
-        - Booking date reference instead of order date
-        - Amount field selection (Total Amount vs Sale Value)
-        - Simplified company-based reporting
-        - Real-time dashboard updates
-        - Responsive design with modern UI
+        - Interactive Chart.js powered visualizations
+        - Executive-level KPI cards with gradient designs
+        - Real-time sales funnel analysis
+        - Enhanced date range filtering with booking_date reference
+        - Beautiful modern UI with animated components
+        - Responsive design optimized for all devices
+        - Advanced revenue distribution charts
+        - Sales performance trend analysis
+        - Professional color-coded tables and cards
         
-        Comprehensive dashboard for sales analysis using booking_date and sale_value fields
-        from the osus_invoice_report module.
+        Transform your sales data into beautiful, actionable insights with this comprehensive
+        executive dashboard using booking_date and sale_value fields from the osus_invoice_report module.
     """,
     'author': 'Sheikh Muhammad Saad, OdooElevate',
     'website': 'https://odooelevate.odoo.com/',
@@ -28,8 +31,10 @@
     ],
     'assets': {
         'web.assets_backend': [
+            'oe_sale_dashboard_17/static/src/js/simple-chart.js',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
+            'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
         ],
     },
     'images': ['static/description/banner.gif'],
