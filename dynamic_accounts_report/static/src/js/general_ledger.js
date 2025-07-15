@@ -34,10 +34,11 @@ class GeneralLedger extends Component {
             date_range: null,
             options: null,
             method: {
-                        'accural': true
+                        'accrual': true
                     },
         });
-        this.load_data(self.initial_render = true);
+        this.wizard_id = this.props.action?.context?.active_id || null;
+        this.load_data();
     }
     async load_data() {
         let account_list = []

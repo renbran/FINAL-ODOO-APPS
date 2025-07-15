@@ -44,7 +44,7 @@ class TaxReport extends Component {
             options: null,
             report_type: null,
             method: {
-                        'accural': true
+                        'accrual': true
                     },
         });
         this.load_data(self.initial_render = true);

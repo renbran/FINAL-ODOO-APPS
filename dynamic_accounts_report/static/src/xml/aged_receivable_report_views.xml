@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="age_r_template_new" owl="1">
+        <div class="o_dynamic_accounts_report_aged_receivable">
+            <div class="o_dynamic_accounts_report_header">
+                <h3>Aged Receivable Report</h3>
+                <div class="o_dynamic_accounts_report_filters">
+                    <div class="filter-group">
+                        <label>Date From:</label>
+                        <input type="date" name="start_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date To:</label>
+                        <input type="date" name="end_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_content">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th class="text-right">Current</th>
+                            <th class="text-right">1-30 Days</th>
+                            <th class="text-right">31-60 Days</th>
+                            <th class="text-right">61-90 Days</th>
+                            <th class="text-right">Over 90 Days</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-if="state.account_data">
+                            <t t-foreach="state.account_data" t-as="partner" t-key="partner.id">
+                                <tr>
+                                    <td t-esc="partner.name"/>
+                                    <td class="text-right" t-esc="partner.current"/>
+                                    <td class="text-right" t-esc="partner.days_30"/>
+                                    <td class="text-right" t-esc="partner.days_60"/>
+                                    <td class="text-right" t-esc="partner.days_90"/>
+                                    <td class="text-right" t-esc="partner.over_90"/>
+                                    <td class="text-right" t-esc="partner.total"/>
+                                </tr>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading aged receivable data...</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_footer">
+                <button class="btn btn-info" t-on-click="printPdf">Export PDF</button>
+                <button class="btn btn-success" t-on-click="print_xlsx">Export Excel</button>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="dfr_template_new" owl="1">
+        <div class="o_dynamic_accounts_report_profit_loss">
+            <div class="o_dynamic_accounts_report_header">
+                <h3>Profit &amp; Loss Report</h3>
+                <div class="o_dynamic_accounts_report_filters">
+                    <div class="filter-group">
+                        <label>Date From:</label>
+                        <input type="date" name="start_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date To:</label>
+                        <input type="date" name="end_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_content">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-if="state.account_data">
+                            <t t-foreach="state.account_data" t-as="account" t-key="account.id">
+                                <tr>
+                                    <td t-esc="account.name"/>
+                                    <td class="text-right" t-esc="account.amount"/>
+                                </tr>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <td colspan="2" class="text-center">Loading profit &amp; loss data...</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_footer">
+                <button class="btn btn-info" t-on-click="printPdf">Export PDF</button>
+                <button class="btn btn-success" t-on-click="print_xlsx">Export Excel</button>
+            </div>
+        </div>
+    </t>
+</templates>

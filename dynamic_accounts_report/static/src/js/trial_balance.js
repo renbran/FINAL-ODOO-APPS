@@ -39,7 +39,7 @@ class TrialBalance extends Component {
             comparison_number: null,
             options: null,
             method: {
-                        'accural': true
+                        'accrual': true
                     },
         });
         this.load_data(self.initial_render = true);

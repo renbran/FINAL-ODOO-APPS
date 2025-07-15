@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="tax_r_template_new" owl="1">
+        <div class="o_dynamic_accounts_report_tax">
+            <div class="o_dynamic_accounts_report_header">
+                <h3>Tax Report</h3>
+                <div class="o_dynamic_accounts_report_filters">
+                    <div class="filter-group">
+                        <label>Date From:</label>
+                        <input type="date" name="start_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date To:</label>
+                        <input type="date" name="end_date" class="form-control" t-on-change="applyFilter"/>
+                    </div>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_content">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Tax Name</th>
+                            <th class="text-right">Tax Rate</th>
+                            <th class="text-right">Base Amount</th>
+                            <th class="text-right">Tax Amount</th>
+                            <th class="text-right">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-if="state.account_data">
+                            <t t-foreach="state.account_data" t-as="tax" t-key="tax.id">
+                                <tr>
+                                    <td t-esc="tax.name"/>
+                                    <td class="text-right" t-esc="tax.rate"/>
+                                    <td class="text-right" t-esc="tax.base_amount"/>
+                                    <td class="text-right" t-esc="tax.tax_amount"/>
+                                    <td class="text-right" t-esc="tax.total_amount"/>
+                                </tr>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <td colspan="5" class="text-center">Loading tax data...</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="o_dynamic_accounts_report_footer">
+                <button class="btn btn-info" t-on-click="printPdf">Export PDF</button>
+                <button class="btn btn-success" t-on-click="print_xlsx">Export Excel</button>
+            </div>
+        </div>
+    </t>
+</templates>

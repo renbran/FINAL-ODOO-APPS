@@ -16,6 +16,7 @@ class PartnerLedger extends Component {
         this.tbody = useRef('tbody');
         this.unfoldButton = useRef('unfoldButton');
         this.dialog = useService("dialog");
+        this.wizard_id = this.props.action?.context?.active_id || null;
         this.state = useState({
             partners: null,
             data: null,
