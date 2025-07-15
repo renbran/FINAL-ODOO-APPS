@@ -54,29 +54,13 @@ Perfect for:
         'mail'
     ],
     'data': [
-        'security/security.xml',
         'security/ir.model.access.csv',
-        'views/dashboard_views.xml',
         'views/menu.xml',
     ],
     'assets': {
         'web.assets_backend': [
             # CSS/SCSS
             'enterprise_dynamic_reports/static/src/scss/enterprise_reports.scss',
-            'enterprise_dynamic_reports/static/src/scss/dashboard.scss',
-            
-            # JavaScript Components
-            'enterprise_dynamic_reports/static/src/js/main.esm.js',
-            'enterprise_dynamic_reports/static/src/js/dashboard/main_dashboard.esm.js',
-            
-            # XML Templates
-            'enterprise_dynamic_reports/static/src/xml/dashboard_templates.xml',
-            'enterprise_dynamic_reports/static/src/xml/report_templates.xml',
-            
-            # External Libraries
-            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.44.0/apexcharts.min.js',
-            'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css',
         ],
     },
     'images': ['static/description/banner.png'],
