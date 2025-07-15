@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Default duplicate detection rules -->
+        <record id="duplicate_rule_name_exact" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.rule_name_exact_weight</field>
+            <field name="value">3.0</field>
+        </record>
+        
+        <record id="duplicate_rule_email_exact" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.rule_email_exact_weight</field>
+            <field name="value">1.0</field>
+        </record>
+        
+        <record id="duplicate_rule_phone_exact" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.rule_phone_exact_weight</field>
+            <field name="value">1.0</field>
+        </record>
+        
+        <record id="duplicate_rule_vat_exact" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.rule_vat_exact_weight</field>
+            <field name="value">1.0</field>
+        </record>
+        
+        <record id="duplicate_rule_similarity_threshold" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.similarity_threshold</field>
+            <field name="value">0.7</field>
+        </record>
+        
+        <record id="duplicate_rule_name_similarity_threshold" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.name_similarity_threshold</field>
+            <field name="value">0.8</field>
+        </record>
+        
+        <record id="duplicate_rule_email_similarity_threshold" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.email_similarity_threshold</field>
+            <field name="value">0.8</field>
+        </record>
+        
+        <record id="duplicate_rule_address_similarity_threshold" model="ir.config_parameter">
+            <field name="key">contact_deduplicate.address_similarity_threshold</field>
+            <field name="value">0.8</field>
+        </record>
+
+    </data>
+</odoo>

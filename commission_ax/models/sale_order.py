@@ -120,6 +120,10 @@ class SaleOrder(models.Model):
         ('calculated', 'Calculated'),
         ('confirmed', 'Confirmed')
     ], string="Commission Processing Status", default='draft')
+    
+    # Email notification tracking
+    agent_email_sent = fields.Boolean(string="Agent Email Sent", default=False, 
+                                     help="True if invoice notification email has been sent to Agent 1")
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -371,6 +375,14 @@ class SaleOrder(models.Model):
         if self.amount_total <= 0:
             raise UserError("Cannot process commissions for orders with zero or negative amounts.")
         
+        # Check payment status for regular processing (not for force processing)
+        if not self._context.get('force_process'):
+            posted_invoices = self.invoice_ids.filtered(lambda inv: inv.state == 'posted')
+            paid_invoices = posted_invoices.filtered(lambda inv: inv.payment_state in ['in_payment', 'paid'])
+            
+            if not paid_invoices:
+                raise UserError("At least one invoice must be paid before processing commissions. Use 'Force Process' button to override this check.")
+        
         # Update status
         self.commission_status = 'calculated'
         
@@ -423,6 +435,23 @@ class SaleOrder(models.Model):
         """Manual action to process commissions."""
         for order in self:
             order._create_commission_purchase_orders()
+        return True
+
+    def action_force_process_commissions(self):
+        """Force process commissions even if not fully paid - manual override."""
+        for order in self:
+            if order.commission_processed:
+                raise UserError("Commissions have already been processed for this order.")
+            
+            if order.amount_total <= 0:
+                raise UserError("Cannot process commissions for orders with zero or negative amounts.")
+                
+            # Check if order is at least invoiced
+            if order.invoice_status != 'invoiced':
+                raise UserError("Order must be invoiced before processing commissions.")
+            
+            # Use force context to bypass payment check
+            order.with_context(force_process=True)._create_commission_purchase_orders()
         return True
 
     def action_confirm_commissions(self):
@@ -512,7 +541,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def _cron_auto_process_commissions(self):
-        """Scheduled action to auto-process commissions for invoiced orders."""
+        """Scheduled action to auto-process commissions for invoiced and paid orders."""
         orders = self.search([
             ('state', 'in', ['sale', 'done']),
             ('commission_processed', '=', False),
@@ -520,13 +549,18 @@ class SaleOrder(models.Model):
         ])
         
         for order in orders:
+            # Check if all invoices are posted and at least one is paid
             posted_invoices = order.invoice_ids.filtered(lambda inv: inv.state == 'posted')
-            if posted_invoices:
+            paid_invoices = posted_invoices.filtered(lambda inv: inv.payment_state in ['in_payment', 'paid'])
+            
+            if posted_invoices and paid_invoices:
                 try:
                     order._create_commission_purchase_orders()
                     _logger.info(f"Auto-processed commissions for order {order.name}")
                 except Exception as e:
                     _logger.error(f"Failed to auto-process commissions for {order.name}: {str(e)}")
+        
+        _logger.info(f"Commission cron processed {len(orders)} orders")
 
     def unlink(self):
         """Override unlink to handle related purchase orders."""

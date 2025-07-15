@@ -49,7 +49,9 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for order in self:
-            if not order.primary_agent_id:
+            # Check for primary agent using either field (new logic or commission_ax)
+            primary_agent = order.primary_agent_id or order.agent1_partner_id
+            if not primary_agent:
                 raise models.ValidationError(_('Primary Agent must be set before confirming the order.'))
             if order.secondary_agent_id and order.secondary_agent_id == order.primary_agent_id:
                 raise models.ValidationError(_('Primary Agent and Secondary Agent must be different.'))

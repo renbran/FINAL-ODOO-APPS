@@ -33,7 +33,6 @@
                         <group>
                             <field name="is_property_deal"/>
                             <field name="booking_date" visibility="is_property_deal"/>
-                            <field name="booking_datetime" visibility="is_property_deal"/>
                             <field name="deal_id" visibility="is_property_deal"/>
                         </group>
                         <group>

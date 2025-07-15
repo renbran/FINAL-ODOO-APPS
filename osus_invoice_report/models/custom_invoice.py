@@ -65,12 +65,6 @@ class AccountMove(models.Model):
         help="The total amount expressed in words"
     )
 
-    # Deal Information Fields
-    booking_datetime = fields.Datetime(
-        string='Booking Datetime',
-        tracking=True,
-        help="Date and time when the property booking was confirmed"
-    )
     deal_id = fields.Integer(
         string='Deal ID',
         tracking=True,
@@ -283,8 +277,10 @@ class AccountMove(models.Model):
         ], limit=1)
         
         if sale_order:
+            _logger.info(f"Populating invoice fields from sale order {sale_order.name}")
+            
             field_map = {
-                'booking_datetime': 'booking_datetime',
+                'booking_date': 'booking_date',  # Added missing booking_date mapping
                 'developer_commission': 'developer_commission',
                 'buyer_id': 'buyer_id',
                 'deal_id': 'deal_id',
@@ -295,15 +291,28 @@ class AccountMove(models.Model):
             
             for invoice_field, sale_field in field_map.items():
                 if sale_field in sale_order._fields and invoice_field not in vals:
-                    vals[invoice_field] = sale_order[sale_field].id if hasattr(sale_order[sale_field], 'id') else sale_order[sale_field]
+                    field_value = sale_order[sale_field]
+                    if field_value:  # Only set if value exists
+                        if hasattr(field_value, 'id'):
+                            vals[invoice_field] = field_value.id
+                        else:
+                            vals[invoice_field] = field_value
+                        _logger.info(f"Mapped {sale_field} -> {invoice_field}: {vals[invoice_field]}")
+                    else:
+                        _logger.debug(f"Field {sale_field} is empty in sale order")
+                else:
+                    if sale_field not in sale_order._fields:
+                        _logger.debug(f"Field {sale_field} not found in sale order model")
+                    if invoice_field in vals:
+                        _logger.debug(f"Field {invoice_field} already set in vals")
 
-    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_datetime')
+    @api.depends('buyer_id', 'project_id', 'unit_id', 'deal_id', 'booking_date')
     def _compute_deal_status(self):
         """Compute if this is a property deal based on available deal information"""
         for record in self:
             record.is_property_deal = bool(
                 record.buyer_id or record.project_id or 
-                record.unit_id or record.deal_id or record.booking_datetime
+                record.unit_id or record.deal_id or record.booking_date
             )
 
     @api.depends('sale_value', 'developer_commission')
