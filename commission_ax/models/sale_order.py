@@ -120,6 +120,10 @@ class SaleOrder(models.Model):
         ('calculated', 'Calculated'),
         ('confirmed', 'Confirmed')
     ], string="Commission Processing Status", default='draft')
+    
+    # Email notification tracking
+    agent_email_sent = fields.Boolean(string="Agent Email Sent", default=False, 
+                                     help="True if invoice notification email has been sent to Agent 1")
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
