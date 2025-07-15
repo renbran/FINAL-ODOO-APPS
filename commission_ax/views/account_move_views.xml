@@ -13,7 +13,7 @@
                             type="object" 
                             string="Resend Agent Email" 
                             class="btn-secondary"
-                            attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"
+                            options="{'invisible': [('move_type', '!=', 'out_invoice')]}"
                             help="Resend invoice notification email to the assigned agent"/>
                 </xpath>
             </field>
