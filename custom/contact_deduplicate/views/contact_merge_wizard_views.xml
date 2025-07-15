@@ -30,7 +30,7 @@
                         </page>
                         
                         <page string="Merge Data" name="merge_data" 
-                              attrs="{'invisible': [('merge_strategy', '!=', 'manual')]}">
+                              invisible="merge_strategy != 'manual'">
                             <group>
                                 <group string="Basic Information">
                                     <field name="name"/>

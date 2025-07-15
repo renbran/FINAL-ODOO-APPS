@@ -17,13 +17,13 @@
                 <field name="review_user_id"/>
                 <button name="action_mark_as_duplicate" type="object"
                         string="Merge" icon="fa-compress"
-                        attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                        invisible="state in ['merged', 'ignored']"/>
                 <button name="action_ignore_duplicate" type="object"
                         string="Ignore" icon="fa-times"
-                        attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                        invisible="state in ['merged', 'ignored']"/>
                 <button name="action_review_duplicate" type="object"
                         string="Review" icon="fa-eye"
-                        attrs="{'invisible': [('state', '!=', 'new')]}"/>
+                        invisible="state != 'new'"/>
             </tree>
         </field>
     </record>
@@ -37,13 +37,13 @@
                 <header>
                     <button name="action_mark_as_duplicate" type="object"
                             string="Merge Contacts" class="btn-primary"
-                            attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                            invisible="state in ['merged', 'ignored']"/>
                     <button name="action_ignore_duplicate" type="object"
                             string="Ignore Duplicate" class="btn-secondary"
-                            attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                            invisible="state in ['merged', 'ignored']"/>
                     <button name="action_review_duplicate" type="object"
                             string="Mark as Reviewed" class="btn-secondary"
-                            attrs="{'invisible': [('state', '!=', 'new')]}"/>
+                            invisible="state != 'new'"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>

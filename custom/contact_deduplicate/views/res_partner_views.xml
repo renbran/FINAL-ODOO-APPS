@@ -22,7 +22,7 @@
             
             <xpath expr="//page[@name='sales_purchases']" position="after">
                 <page name="duplicates" string="Duplicates" 
-                      attrs="{'invisible': [('duplicate_count', '=', 0)]}">
+                      invisible="duplicate_count == 0">
                     <group>
                         <field name="is_duplicate_checked"/>
                         <field name="duplicate_count"/>
@@ -35,16 +35,16 @@
                             <field name="state"/>
                             <button name="action_mark_as_duplicate" type="object"
                                     string="Merge" icon="fa-compress"
-                                    attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                                    invisible="state in ['merged', 'ignored']"/>
                             <button name="action_ignore_duplicate" type="object"
                                     string="Ignore" icon="fa-times"
-                                    attrs="{'invisible': [('state', 'in', ['merged', 'ignored'])]}"/>
+                                    invisible="state in ['merged', 'ignored']"/>
                         </tree>
                     </field>
                 </page>
                 
                 <page name="merge_history" string="Merge History"
-                      attrs="{'invisible': [('merge_history_ids', '=', [])]}">
+                      invisible="not merge_history_ids">
                     <field name="merge_history_ids">
                         <tree>
                             <field name="merge_date"/>
