@@ -83,6 +83,44 @@
                     overflow-x: auto;
                 }
 
+                /* KPI Cards Styling */
+                .oe_sale_dashboard_17_container .grid {
+                    display: grid;
+                    gap: 1.5rem;
+                }
+
+                .oe_sale_dashboard_17_container .grid-cols-1 {
+                    grid-template-columns: repeat(1, minmax(0, 1fr));
+                }
+
+                .oe_sale_dashboard_17_container .grid-cols-2 {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .oe_sale_dashboard_17_container .grid-cols-4 {
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                }
+
+                /* Chart Container Styling */
+                .oe_sale_dashboard_17_container .chart-container {
+                    margin-bottom: 2rem;
+                }
+
+                /* Funnel Chart Styling */
+                .oe_sale_dashboard_17_container .funnel-stage {
+                    margin-bottom: 1rem;
+                }
+
+                /* Enhanced styling for invoiced amount column */
+                .oe_sale_dashboard_17_container .text-green-600 {
+                    color: #059669;
+                }
+
+                /* Gradient backgrounds for KPI cards */
+                .oe_sale_dashboard_17_container .bg-gradient-to-r {
+                    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+                }
+
                 /* Ensure proper display on smaller screens */
                 @media (max-width: 768px) {
                     .oe_sale_dashboard_17_container {
@@ -96,10 +134,28 @@
                     .oe_sale_dashboard_17_container .flex-col-md {
                         flex-direction: column;
                     }
+
+                    .oe_sale_dashboard_17_container .grid-cols-4 {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+
+                    .oe_sale_dashboard_17_container .lg\\:grid-cols-2 {
+                        grid-template-columns: repeat(1, minmax(0, 1fr));
+                    }
                 }
             </style>
 
-            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">OSUS Sales</h1>
+            <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">OSUS Sales Dashboard</h1>
+
+            <!-- KPI Cards Container -->
+            <div class="kpi-container"></div>
+
+            <!-- Visual Charts Container -->
+            <div class="charts-grid grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="sales-type-chart"></div>
+                <div class="sales-funnel-chart"></div>
+            </div>
+            <div class="trend-chart mb-8"></div>
 
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-md">
                 <div class="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
@@ -200,6 +256,7 @@
                                 <th class="py-3 px-6 border-b">Count</th>
                                 <th class="py-3 px-6 border-b">Total</th>
                                 <th class="py-3 px-6 border-b">Sale Value</th>
+                                <th class="py-3 px-6 border-b">Invoiced Amount</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -209,11 +266,12 @@
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="sales_type_data.count || 0"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.amount)"/>
                                     <td class="py-3 px-6 border-b text-gray-700" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                                    <td class="py-3 px-6 border-b text-gray-700 font-semibold text-green-600" t-esc="this.formatNumber(sales_type_data.invoiced_amount)"/>
                                 </tr>
                             </t>
                             <t t-if="state.invoicedSalesData.length === 0 &amp;&amp; !state.isLoading">
                                 <tr>
-                                    <td colspan="4" class="py-3 px-6 text-center text-gray-600">No invoiced sales data available.</td>
+                                    <td colspan="5" class="py-3 px-6 text-center text-gray-600">No invoiced sales data available.</td>
                                 </tr>
                             </t>
                         </tbody>
