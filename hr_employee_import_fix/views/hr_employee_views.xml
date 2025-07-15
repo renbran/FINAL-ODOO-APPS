@@ -80,7 +80,7 @@ action = {
     <menuitem 
         id="menu_fix_orphaned_employees"
         name="Fix Orphaned Employees"
-        parent="hr.menu_hr_configuration"
+        parent="hr.menu_hr_employee"
         action="action_fix_orphaned_employees"
         sequence="100"/>
 
