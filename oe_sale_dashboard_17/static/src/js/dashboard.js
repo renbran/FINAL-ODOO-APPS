@@ -48,6 +48,9 @@ class OeSaleDashboard extends Component {
         onMounted(async () => {
             console.log("Executive Sales Dashboard - Date Range:", this.state.startDate, "to", this.state.endDate);
             await this._loadDashboardData();
+            
+            // Add scroll-to-top functionality
+            this._addScrollToTopButton();
         });
     }
 
@@ -740,6 +743,192 @@ class OeSaleDashboard extends Component {
             data.push(Math.floor(baseValue + trend));
         }
         return data;
+    }
+
+    /**
+     * Add scroll-to-top button and scroll functionality
+     */
+    _addScrollToTopButton() {
+        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
+        if (!dashboardContainer) return;
+
+        // Create navigation and scroll controls container
+        const scrollContainer = document.createElement('div');
+        scrollContainer.className = 'scroll-controls';
+        scrollContainer.innerHTML = `
+            <div class="navigation-menu">
+                <button class="nav-btn" data-target="kpi-section" title="KPI Overview">
+                    <i class="fa fa-dashboard"></i>
+                </button>
+                <button class="nav-btn" data-target="charts-section" title="Visual Analytics">
+                    <i class="fa fa-bar-chart"></i>
+                </button>
+                <button class="nav-btn" data-target="quotations-section" title="Quotations">
+                    <i class="fa fa-file-text-o"></i>
+                </button>
+                <button class="nav-btn" data-target="orders-section" title="Sales Orders">
+                    <i class="fa fa-shopping-cart"></i>
+                </button>
+                <button class="nav-btn" data-target="invoiced-section" title="Invoiced Sales">
+                    <i class="fa fa-check-circle"></i>
+                </button>
+                <div class="separator"></div>
+                <button class="scroll-to-top-btn" title="Back to Top">
+                    <i class="fa fa-chevron-up"></i>
+                </button>
+            </div>
+        `;
+
+        // Add navigation functionality
+        scrollContainer.addEventListener('click', (e) => {
+            const navBtn = e.target.closest('.nav-btn');
+            const scrollBtn = e.target.closest('.scroll-to-top-btn');
+            
+            if (navBtn) {
+                const targetId = navBtn.dataset.target;
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                    
+                    // Update active state
+                    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                    navBtn.classList.add('active');
+                }
+            } else if (scrollBtn) {
+                dashboardContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        // Show/hide based on scroll position and update active nav
+        dashboardContainer.addEventListener('scroll', () => {
+            const scrollTop = dashboardContainer.scrollTop;
+            
+            if (scrollTop > 300) {
+                scrollContainer.classList.add('visible');
+            } else {
+                scrollContainer.classList.remove('visible');
+            }
+
+            // Update active navigation based on scroll position
+            this._updateActiveNavigation();
+        });
+
+        // Append to dashboard
+        dashboardContainer.appendChild(scrollContainer);
+
+        // Add smooth scrolling to all internal links
+        this._addSmoothScrolling();
+    }
+
+    /**
+     * Add smooth scrolling behavior to internal navigation
+     */
+    _addSmoothScrolling() {
+        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
+        if (!dashboardContainer) return;
+
+        // Enhance table scrolling on mobile
+        const tables = dashboardContainer.querySelectorAll('.table-wrapper');
+        tables.forEach(table => {
+            // Add momentum scrolling for iOS
+            table.style.webkitOverflowScrolling = 'touch';
+            
+            // Add scroll snap for better UX
+            table.style.scrollSnapType = 'x mandatory';
+            
+            // Add scroll indicators
+            this._addScrollIndicators(table);
+        });
+    }
+
+    /**
+     * Add scroll indicators for tables
+     */
+    _addScrollIndicators(tableWrapper) {
+        const table = tableWrapper.querySelector('table');
+        if (!table) return;
+
+        // Check if table needs horizontal scrolling
+        const needsScrolling = table.scrollWidth > tableWrapper.clientWidth;
+        
+        if (needsScrolling) {
+            // Add subtle scroll indicators
+            tableWrapper.style.position = 'relative';
+            
+            // Right scroll indicator
+            const rightIndicator = document.createElement('div');
+            rightIndicator.style.cssText = `
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 20px;
+                background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+                pointer-events: none;
+                z-index: 1;
+            `;
+            
+            // Update indicator visibility based on scroll
+            tableWrapper.addEventListener('scroll', () => {
+                const isAtEnd = tableWrapper.scrollLeft >= (table.scrollWidth - tableWrapper.clientWidth - 10);
+                rightIndicator.style.opacity = isAtEnd ? '0' : '1';
+            });
+            
+            tableWrapper.appendChild(rightIndicator);
+        }
+    }
+
+    /**
+     * Update active navigation based on scroll position
+     */
+    _updateActiveNavigation() {
+        const sections = ['kpi-section', 'charts-section', 'quotations-section', 'orders-section', 'invoiced-section'];
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
+        
+        if (!dashboardContainer) return;
+        
+        const scrollTop = dashboardContainer.scrollTop;
+        const containerHeight = dashboardContainer.clientHeight;
+        
+        let activeSection = null;
+        
+        // Find the section that's most visible in the viewport
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const rect = section.getBoundingClientRect();
+                const containerRect = dashboardContainer.getBoundingClientRect();
+                
+                // Check if section is in viewport
+                const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top;
+                
+                if (isVisible) {
+                    // Calculate how much of the section is visible
+                    const visibleTop = Math.max(rect.top, containerRect.top);
+                    const visibleBottom = Math.min(rect.bottom, containerRect.bottom);
+                    const visibleHeight = visibleBottom - visibleTop;
+                    const totalHeight = rect.height;
+                    const visibilityRatio = visibleHeight / totalHeight;
+                    
+                    // If more than 30% of the section is visible, consider it active
+                    if (visibilityRatio > 0.3) {
+                        activeSection = sectionId;
+                    }
+                }
+            }
+        });
+        
+        // Update active state
+        navButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.target === activeSection) {
+                btn.classList.add('active');
+            }
+        });
     }
 }
 

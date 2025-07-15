@@ -2,6 +2,15 @@
 /* This module is under copyright of 'OdooElevate' */
 /* Modern Executive Dashboard Styling for OSUS Sales Dashboard */
 
+// Global Scrolling Behavior
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+}
+
 // Color Variables
 :root {
     --o-oe-primary: #1e40af;
@@ -29,9 +38,45 @@
     min-height: 100vh;
     padding: 2rem;
     color: var(--o-oe-dark);
+    
+    // Enhanced Scrolling Support
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100vh;
+    box-sizing: border-box;
+    
+    // Custom Scrollbar Styling
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        transition: background 0.3s ease;
+        
+        &:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    }
+    
+    // Firefox scrollbar styling
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
 
     @media (max-width: 768px) {
         padding: 1rem;
+        height: 100vh;
+        
+        // Mobile scrollbar
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
     }
 
     // Executive Dashboard Header
@@ -335,8 +380,45 @@
 
         .table-wrapper {
             overflow-x: auto;
+            overflow-y: visible;
             border-radius: 12px;
             border: 1px solid var(--o-oe-border);
+            max-height: 600px;
+            
+            // Enhanced Table Scrolling
+            &::-webkit-scrollbar {
+                height: 8px;
+            }
+            
+            &::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 4px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 4px;
+                transition: background 0.3s ease;
+                
+                &:hover {
+                    background: #94a3b8;
+                }
+            }
+            
+            // Firefox scrollbar
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+            
+            // Smooth scrolling
+            scroll-behavior: smooth;
+            
+            @media (max-width: 768px) {
+                max-height: 400px;
+                
+                &::-webkit-scrollbar {
+                    height: 4px;
+                }
+            }
 
             table {
                 width: 100%;
@@ -512,6 +594,99 @@
                 font-weight: 500;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
+            }
+        }
+    }
+
+    // Enhanced Scroll Controls with Navigation
+    .scroll-controls {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+
+        &.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .navigation-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            .nav-btn,
+            .scroll-to-top-btn {
+                width: 2.5rem;
+                height: 2.5rem;
+                border: none;
+                border-radius: 0.5rem;
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                font-size: 1rem;
+
+                &:hover {
+                    background: rgba(59, 130, 246, 0.2);
+                    transform: scale(1.05);
+                }
+
+                &.active {
+                    background: #3b82f6;
+                    color: white;
+                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                }
+
+                i {
+                    font-size: 1rem;
+                }
+            }
+
+            .scroll-to-top-btn {
+                background: rgba(34, 197, 94, 0.1);
+                color: #22c55e;
+
+                &:hover {
+                    background: rgba(34, 197, 94, 0.2);
+                }
+            }
+
+            .separator {
+                height: 1px;
+                background: rgba(0, 0, 0, 0.1);
+                margin: 0.25rem 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            bottom: 1rem;
+            right: 1rem;
+
+            .navigation-menu {
+                padding: 0.75rem;
+                gap: 0.4rem;
+
+                .nav-btn,
+                .scroll-to-top-btn {
+                    width: 2.2rem;
+                    height: 2.2rem;
+                    font-size: 0.9rem;
+                }
             }
         }
     }

@@ -2,7 +2,7 @@
 <!-- This module is under copyright of 'OdooElevate' -->
 <templates id="template" xml:space="preserve">
     <t t-name="oe_sale_dashboard_17.yearly_sales_dashboard_template" owl="1">
-        <div t-ref="dashboard_root" class="o_oe_sale_dashboard_17_container">
+        <div t-ref="dashboard_root" class="o_oe_sale_dashboard_17_container" style="overflow-y: auto; overflow-x: hidden; height: 100vh; padding-bottom: 2rem;">
             
             <!-- Executive Dashboard Header -->
             <div class="o_oe_sale_dashboard_17_container__header">
@@ -31,12 +31,12 @@
             </div>
 
             <!-- Executive KPI Cards -->
-            <div class="o_oe_sale_dashboard_17_container__kpi-grid" t-ref="kpiContainer">
+            <div id="kpi-section" class="o_oe_sale_dashboard_17_container__kpi-grid" t-ref="kpiContainer">
                 <!-- KPI cards will be dynamically generated here -->
             </div>
 
             <!-- Interactive Charts Section -->
-            <div class="o_oe_sale_dashboard_17_container__charts">
+            <div id="charts-section" class="o_oe_sale_dashboard_17_container__charts">
                 <!-- Revenue Distribution Chart -->
                 <div class="chart-container">
                     <div class="chart-header">
@@ -83,7 +83,7 @@
 
             <!-- Enhanced Data Tables -->
             <!-- Quotations Section -->
-            <div class="o_oe_sale_dashboard_17_container__table-section">
+            <div id="quotations-section" class="o_oe_sale_dashboard_17_container__table-section">
                 <div class="table-header">
                     <h2>
                         Quotations
@@ -131,7 +131,7 @@
             </div>
 
             <!-- Sales Orders Section -->
-            <div class="o_oe_sale_dashboard_17_container__table-section">
+            <div id="orders-section" class="o_oe_sale_dashboard_17_container__table-section">
                 <div class="table-header">
                     <h2>
                         Sales Orders
@@ -179,7 +179,7 @@
             </div>
 
             <!-- Invoiced Sales Section -->
-            <div class="o_oe_sale_dashboard_17_container__table-section">
+            <div id="invoiced-section" class="o_oe_sale_dashboard_17_container__table-section">
                 <div class="table-header">
                     <h2>
                         Invoiced Sales
