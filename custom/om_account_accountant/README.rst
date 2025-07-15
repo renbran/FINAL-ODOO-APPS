@@ -1,5 +1,5 @@
 ==================
-Odoo 17 Accounting
+Odoo 17 Accounting Community
 ==================
 
 This Module will adds following accounting features to Odoo 17 community edition:

@@ -1,8 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Odoo 17 Accounting',
-    'version': '2.0.2',
+    'name': 'Odoo 17 Accounting Community',
+    'version': '17.0.1.0.3',
     'category': 'Accounting',
     'summary': 'Accounting Reports, Asset Management and Budget, Recurring Payments, '
                'Lock Dates, Fiscal Year, Accounting Dashboard, Financial Reports, '
@@ -11,7 +11,7 @@
                    'Budget, Financial Reports, Recurring Payments, '
                    'Bank Statement Import, Customer Follow Up Management,'
                    'Account Lock Date, Accounting Dashboard',
-    'live_test_url': 'https://www.walnutit.com',
+    'live_test_url': 'https://www.youtube.com/c/OdooMates',
     'sequence': '1',
     'website': 'https://www.walnutit.com',
     'author': 'Odoo Mates, Walnut Software Solutions, Odoo SA',
