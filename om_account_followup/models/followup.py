@@ -95,9 +95,9 @@ Best Regards,
                                         "manual action to be taken for that customer. ")
     manual_action_note = fields.Text('Action To Do')
     manual_action_responsible_id = fields.Many2one('res.users',
-                                                   string='Assign a Responsible', ondelete='set_null')
+                                                   string='Assign a Responsible', ondelete='set null')
     email_template_id = fields.Many2one('mail.template', 'Email Template',
-                                        ondelete='set_null')
+                                        ondelete='set null')
 
     _sql_constraints = [('days_uniq', 'unique(followup_id, delay)',
                          'Days of the follow-up levels must be different')]
