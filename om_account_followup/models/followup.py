@@ -17,6 +17,28 @@ class FollowupFollowup(models.Model):
 
     _sql_constraints = [('company_uniq', 'unique(company_id)',
                          'Only one follow-up per company is allowed')]
+                         
+    def create_or_update_followup(self, company_id):
+        """Create or update the follow-up for a given company."""
+        existing_record = self.search([('company_id', '=', company_id)], limit=1)
+        if not existing_record:
+            # Create new follow-up record if it doesn't exist
+            self.create({
+                'company_id': company_id,
+                # Add other fields as needed
+            })
+            _logger.info("Follow-up record created for company_id: %s", company_id)
+        else:
+            # Handle case where record already exists
+            _logger.info("Record already exists for company_id: %s", company_id)
+            # You can update fields here if needed
+            # existing_record.write({...})
+
+    @api.model
+    def create_followup_if_needed(self):
+        """Example method to check for the company follow-up creation."""
+        company_id = self.env.company.id  # Example: Using the current company
+        self.create_or_update_followup(company_id)
 
 
 class FollowupLine(models.Model):
@@ -45,7 +67,8 @@ class FollowupLine(models.Model):
         store=False,
         help="Gives the sequence order when displaying a list of follow-up lines."
     )
-    followup_id = fields.Many2one('followup.followup', 'Follow Ups', required=True, ondelete="cascade")
+    followup_id = fields.Many2one('followup.followup', 'Follow Ups',
+                                  required=True, ondelete="cascade")
     delay = fields.Integer('Due Days',
                            help="The number of days after the due date of the "
                                 "invoice to wait before sending the reminder. Could be negative if you want "
@@ -94,30 +117,3 @@ Best Regards,
 
 
 _logger = logging.getLogger(__name__)
-
-# Methods for the existing FollowupFollowup model
-def create_or_update_followup(self, company_id):
-    """Create or update the follow-up for a given company."""
-    existing_record = self.search([('company_id', '=', company_id)], limit=1)
-    if not existing_record:
-        # Create new follow-up record if it doesn't exist
-        self.create({
-            'company_id': company_id,
-            # Add other fields as needed
-        })
-        _logger.info("Follow-up record created for company_id: %s", company_id)
-    else:
-        # Handle case where record already exists
-        _logger.info("Record already exists for company_id: %s", company_id)
-        # You can update fields here if needed
-        # existing_record.write({...})
-
-@api.model
-def create_followup_if_needed(self):
-    """Example method to check for the company follow-up creation."""
-    company_id = self.env.company.id  # Example: Using the current company
-    self.create_or_update_followup(company_id)
-
-# Add these methods to the FollowupFollowup class
-FollowupFollowup.create_or_update_followup = create_or_update_followup
-FollowupFollowup.create_followup_if_needed = create_followup_if_needed
