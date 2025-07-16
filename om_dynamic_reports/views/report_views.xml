@@ -39,7 +39,7 @@
 
         <!-- Menu Items -->
         <menuitem id="menu_dynamic_reports" name="Dynamic Reports" 
-                  parent="om_account_accountant_v17.menu_accounting"
+                  parent="account.menu_finance_reports"
                   sequence="15"/>
 
         <menuitem id="menu_general_ledger_report" name="General Ledger" 

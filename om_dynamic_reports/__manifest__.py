@@ -8,8 +8,8 @@
     'category': 'Accounting',
     'summary': 'Dynamic Accounting Reports compatible with OM Accounting',
     'description': """
-        This module provides dynamic accounting reports compatible with the 
-        om_account_accountant_v17 module. It includes General Ledger, Trial Balance, 
+        This module provides dynamic accounting reports compatible with Odoo 17 
+        standard accounting module. It includes General Ledger, Trial Balance, 
         Balance Sheet, Profit and Loss, Cash Book, Partner Ledger, Aged Payable, 
         Aged Receivable, Bank book, and Tax Reports.
     """,
@@ -20,7 +20,7 @@
     'license': 'LGPL-3',
     'support': 'odoomates@gmail.com',
     'depends': [
-        'om_account_accountant_v17',
+        'account',
         'accounting_pdf_reports',
     ],
     'data': [
