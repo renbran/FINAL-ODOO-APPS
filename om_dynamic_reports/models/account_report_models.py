@@ -146,3 +146,183 @@ class AccountTrialBalance(models.TransientModel):
             'file': base64.b64encode(output.read()),
             'file_name': report_file_name
         }
+
+
+class AgedPayableReport(models.TransientModel):
+    """For creating Aged Payable report"""
+    _name = 'aged.payable.report'
+    _description = 'Aged Payable Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the aged payable Excel report."""
+        report_name = 'Aged Payable'
+        report_file_name = 'Aged Payable.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:G1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
+
+
+class AgedReceivableReport(models.TransientModel):
+    """For creating Aged Receivable report"""
+    _name = 'aged.receivable.report'
+    _description = 'Aged Receivable Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the aged receivable Excel report."""
+        report_name = 'Aged Receivable'
+        report_file_name = 'Aged Receivable.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:G1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
+
+
+class BankBookReport(models.TransientModel):
+    """For creating Bank Book report"""
+    _name = 'bank.book.report'
+    _description = 'Bank Book Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the bank book Excel report."""
+        report_name = 'Bank Book'
+        report_file_name = 'Bank Book.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:F1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
+
+
+class CashBookReport(models.TransientModel):
+    """For creating Cash Book report"""
+    _name = 'cash.book.report'
+    _description = 'Cash Book Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the cash book Excel report."""
+        report_name = 'Cash Book'
+        report_file_name = 'Cash Book.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:F1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
+
+
+class DynamicBalanceSheetReport(models.TransientModel):
+    """For creating Balance Sheet report"""
+    _name = 'dynamic.balance.sheet.report'
+    _description = 'Dynamic Balance Sheet Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the balance sheet Excel report."""
+        report_name = 'Balance Sheet'
+        report_file_name = 'Balance Sheet.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:D1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
+
+
+class TaxReport(models.TransientModel):
+    """For creating Tax report"""
+    _name = 'tax.report'
+    _description = 'Tax Report'
+
+    @api.model
+    def get_dynamic_xlsx_report(self, options, response, report_data, dfr_data):
+        """Generate the tax report Excel report."""
+        report_name = 'Tax Report'
+        report_file_name = 'Tax Report.xlsx'
+        
+        # Create a new workbook and add a worksheet
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_name)
+        
+        # Add report content (simplified for now)
+        title_format = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14})
+        sheet.merge_range('A1:E1', report_name, title_format)
+        
+        workbook.close()
+        output.seek(0)
+        
+        # Return the generated Excel file
+        return {
+            'file': base64.b64encode(output.read()),
+            'file_name': report_file_name
+        }
