@@ -236,22 +236,41 @@ class SaleDashboard(models.Model):
                 (partner_field, '!=', False)  # Must have agent/broker assigned
             ]
 
-            # Get all orders with the specified criteria
+            # Get all orders with the specified criteria  
+            # Include all necessary fields for comprehensive ranking
             orders = self.search_read(base_domain, [
                 partner_field, 'amount_total', 'sale_value', amount_field, 
-                'state', 'invoice_status', 'name'
+                'state', 'invoice_status', 'name', 'booking_date'
             ])
+            
+            # Debug logging
+            import logging
+            _logger = logging.getLogger(__name__)
+            _logger.info(f"Found {len(orders)} orders for {performer_type} ranking")
+            if orders:
+                _logger.info(f"Sample order fields: {list(orders[0].keys())}")
+                _logger.info(f"Sample order data: {orders[0]}")
+                _logger.info(f"Looking for partner field: {partner_field}, amount field: {amount_field}")
 
             # Group data by partner
             partner_data = {}
             
             for order in orders:
-                partner_id = order[partner_field]
+                partner_id = order.get(partner_field)
                 if not partner_id:
                     continue
                     
-                partner_key = partner_id[0] if isinstance(partner_id, tuple) else partner_id
-                partner_name = partner_id[1] if isinstance(partner_id, tuple) else f"Partner {partner_id}"
+                # Handle both tuple format (id, name) and plain id
+                if isinstance(partner_id, tuple) and len(partner_id) == 2:
+                    partner_key = partner_id[0]
+                    partner_name = partner_id[1]
+                elif isinstance(partner_id, (int, list)):
+                    partner_key = partner_id[0] if isinstance(partner_id, list) else partner_id
+                    # Get partner name from res.partner model
+                    partner_rec = self.env['res.partner'].browse(partner_key)
+                    partner_name = partner_rec.name if partner_rec.exists() else f"Partner {partner_key}"
+                else:
+                    continue
                 
                 if partner_key not in partner_data:
                     partner_data[partner_key] = {
@@ -265,31 +284,57 @@ class SaleDashboard(models.Model):
                         'invoiced_commission': 0.0
                     }
                 
+                # Get values with proper fallbacks and validation
+                sales_value = float(order.get('sale_value') or order.get('amount_total') or 0.0)
+                commission_value = float(order.get(amount_field) or 0.0)
+                
+                # Debug logging for first few records
+                if len(partner_data) < 3:
+                    _logger.info(f"Processing order {order.get('name')}: sales_value={sales_value}, commission={commission_value}, partner={partner_name}")
+                
                 # Add to totals
                 partner_data[partner_key]['count'] += 1
-                partner_data[partner_key]['total_sales_value'] += order['sale_value'] or order['amount_total'] or 0
-                partner_data[partner_key]['total_commission'] += order[amount_field] or 0
+                partner_data[partner_key]['total_sales_value'] += sales_value
+                partner_data[partner_key]['total_commission'] += commission_value
                 
                 # If invoiced, add to invoiced totals
-                if order['state'] == 'sale' and order['invoice_status'] == 'invoiced':
+                if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
                     partner_data[partner_key]['invoiced_count'] += 1
                     
                     # Try to get actual invoiced amount
-                    invoiced_amount = self._get_actual_invoiced_amount(order['name'])
-                    sales_value = invoiced_amount or order['sale_value'] or order['amount_total'] or 0
+                    order_name = order.get('name', '')
+                    invoiced_amount = self._get_actual_invoiced_amount(order_name)
+                    final_sales_value = invoiced_amount or sales_value
                     
-                    partner_data[partner_key]['invoiced_sales_value'] += sales_value
-                    partner_data[partner_key]['invoiced_commission'] += order[amount_field] or 0
+                    partner_data[partner_key]['invoiced_sales_value'] += final_sales_value
+                    partner_data[partner_key]['invoiced_commission'] += commission_value
 
-            # Convert to list and sort by total sales value (descending)
+            # Convert to list and sort by total sales value (descending), then by commission
             performers_list = list(partner_data.values())
-            performers_list.sort(key=lambda x: x['total_sales_value'], reverse=True)
+            
+            # Sort by multiple criteria for better ranking
+            performers_list.sort(key=lambda x: (
+                -float(x.get('total_sales_value', 0)),      # Primary: Total sales value (descending)
+                -float(x.get('total_commission', 0)),       # Secondary: Total commission (descending) 
+                -int(x.get('count', 0))                     # Tertiary: Number of sales (descending)
+            ))
+            
+            # Debug logging
+            _logger.info(f"Sorted {len(performers_list)} {performer_type}s. Top 3:")
+            for i, performer in enumerate(performers_list[:3]):
+                _logger.info(f"  {i+1}. {performer.get('partner_name')} - Sales: {performer.get('total_sales_value')}, Commission: {performer.get('total_commission')}")
             
             # Return top performers limited to the specified count
-            return performers_list[:limit]
+            top_performers = performers_list[:limit]
+            _logger.info(f"Returning top {len(top_performers)} {performer_type}s")
+            return top_performers
             
         except Exception as e:
-            return {
-                'error': str(e),
-                'performers': []
-            }
+            # Log the error for debugging
+            import logging
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error in get_top_performers_data: {str(e)}")
+            _logger.error(f"Parameters: start_date={start_date}, end_date={end_date}, performer_type={performer_type}, limit={limit}")
+            
+            # Return empty list instead of error dict for frontend compatibility
+            return []
