@@ -7,7 +7,7 @@ To help Copilot activate its full potential and generate a well-structured, comp
 
 **Prompt for Copilot:**
 
-"Generate a complete and well-structured Odoo 17 module named `custom_sales` that adheres to Odoo's best practices. The module should include the following components:
+"Generate a complete and well-structured Odoo 17 module named `custom` that adheres to Odoo's best practices. The module should include the following components:
 
 1. **Module Structure**:
    - Create the necessary directory structure: `__manifest__.py`, `models/`, `views/`, `controllers/`, `security/`, `data/`, and `tests/`.
