@@ -6,12 +6,17 @@
     'name': 'Odoo 17 Dynamic Accounting Reports',
     'version': '17.0.1.0.0',
     'category': 'Accounting',
-    'summary': 'Dynamic Accounting Reports compatible with OM Accounting',
+    'summary': 'Dynamic General Ledger Report for Odoo 17',
     'description': """
-        This module provides dynamic accounting reports compatible with Odoo 17 
-        standard accounting module. It includes General Ledger, Trial Balance, 
-        Balance Sheet, Profit and Loss, Cash Book, Partner Ledger, Aged Payable, 
-        Aged Receivable, Bank book, and Tax Reports.
+        This module provides dynamic General Ledger report compatible with Odoo 17 
+        standard accounting module. 
+        
+        Currently implemented:
+        - General Ledger Report with dynamic filtering and drill-down capabilities
+        
+        Note: This is a simplified version. For complete reporting suite including
+        Trial Balance, Balance Sheet, Profit & Loss, etc., use the 
+        'dynamic_accounts_report' module instead.
     """,
     'sequence': '1',
     'website': 'https://www.walnutit.com',
@@ -28,14 +33,6 @@
         'views/report_views.xml',
         'report/trial_balance.xml',
         'report/general_ledger_templates.xml',
-        'report/financial_report_template.xml',
-        'report/partner_ledger_templates.xml',
-        'report/financial_reports_views.xml',
-        'report/balance_sheet_report_templates.xml',
-        'report/bank_book_templates.xml',
-        'report/aged_payable_templates.xml',
-        'report/aged_receivable_templates.xml',
-        'report/tax_report_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
