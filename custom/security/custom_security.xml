@@ -1,0 +1,11 @@
+<odoo>
+    <record id="group_custom_sales_manager" model="res.groups">
+        <field name="name">Custom Sales Manager</field>
+        <field name="category_id" ref="base.module_category_sales_management"/>
+    </record>
+    <record id="group_custom_sales_user" model="res.groups">
+        <field name="name">Custom Sales User</field>
+        <field name="category_id" ref="base.module_category_sales_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_custom_sales_manager'))]"/>
+    </record>
+</odoo>

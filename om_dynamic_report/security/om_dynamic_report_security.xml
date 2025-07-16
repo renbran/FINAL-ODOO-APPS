@@ -1,0 +1,11 @@
+<odoo>
+    <record id="group_om_dynamic_report_manager" model="res.groups">
+        <field name="name">OM Dynamic Report Manager</field>
+        <field name="category_id" ref="base.module_category_reporting"/>
+    </record>
+    <record id="group_om_dynamic_report_user" model="res.groups">
+        <field name="name">OM Dynamic Report User</field>
+        <field name="category_id" ref="base.module_category_reporting"/>
+        <field name="implied_ids" eval="[(4, ref('group_om_dynamic_report_manager'))]"/>
+    </record>
+</odoo>

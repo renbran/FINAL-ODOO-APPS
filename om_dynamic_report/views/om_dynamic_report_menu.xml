@@ -1,0 +1,11 @@
+<odoo>
+    <menuitem id="menu_om_dynamic_report_root" name="Dynamic Reports" sequence="10"/>
+    <menuitem id="menu_om_dynamic_report" name="OM Dynamic Reports" parent="menu_om_dynamic_report_root" action="action_om_dynamic_report" sequence="20"/>
+
+    <record id="action_om_dynamic_report" model="ir.actions.act_window">
+        <field name="name">OM Dynamic Reports</field>
+        <field name="res_model">om.dynamic.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+</odoo>

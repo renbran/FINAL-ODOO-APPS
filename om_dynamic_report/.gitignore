@@ -1,0 +1,15 @@
+*.pyc
+__pycache__/
+*.pyo
+*.swp
+*.bak
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+.env
+*.egg-info/
+dist/
+build/
+.coverage
+*.log
