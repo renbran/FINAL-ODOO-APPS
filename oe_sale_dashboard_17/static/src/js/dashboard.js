@@ -48,6 +48,74 @@ class OeSaleDashboard extends Component {
             useGrouping: true
         });
 
+        // Modern Color Palette for Charts
+        this.colorPalette = {
+            primary: {
+                background: 'rgba(59, 130, 246, 0.8)',
+                border: 'rgba(59, 130, 246, 1)',
+                gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(96, 165, 250, 0.8))'
+            },
+            secondary: {
+                background: 'rgba(16, 185, 129, 0.8)',
+                border: 'rgba(16, 185, 129, 1)',
+                gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(52, 211, 153, 0.8))'
+            },
+            accent: {
+                background: 'rgba(245, 158, 11, 0.8)',
+                border: 'rgba(245, 158, 11, 1)',
+                gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(251, 191, 36, 0.8))'
+            },
+            purple: {
+                background: 'rgba(139, 92, 246, 0.8)',
+                border: 'rgba(139, 92, 246, 1)',
+                gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(167, 139, 250, 0.8))'
+            },
+            danger: {
+                background: 'rgba(239, 68, 68, 0.8)',
+                border: 'rgba(239, 68, 68, 1)',
+                gradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(248, 113, 113, 0.8))'
+            },
+            success: {
+                background: 'rgba(16, 185, 129, 0.8)',
+                border: 'rgba(16, 185, 129, 1)',
+                gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(52, 211, 153, 0.8))'
+            },
+            info: {
+                background: 'rgba(6, 182, 212, 0.8)',
+                border: 'rgba(6, 182, 212, 1)',
+                gradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(34, 211, 238, 0.8))'
+            },
+            pink: {
+                background: 'rgba(236, 72, 153, 0.8)',
+                border: 'rgba(236, 72, 153, 1)',
+                gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.8), rgba(244, 114, 182, 0.8))'
+            }
+        };
+
+        // Chart color arrays for easy use
+        this.chartColors = {
+            backgrounds: [
+                this.colorPalette.primary.background,
+                this.colorPalette.secondary.background,
+                this.colorPalette.purple.background,
+                this.colorPalette.accent.background,
+                this.colorPalette.danger.background,
+                this.colorPalette.info.background,
+                this.colorPalette.pink.background,
+                'rgba(156, 163, 175, 0.8)'  // Gray fallback
+            ],
+            borders: [
+                this.colorPalette.primary.border,
+                this.colorPalette.secondary.border,
+                this.colorPalette.purple.border,
+                this.colorPalette.accent.border,
+                this.colorPalette.danger.border,
+                this.colorPalette.info.border,
+                this.colorPalette.pink.border,
+                'rgba(156, 163, 175, 1)'    // Gray fallback
+            ]
+        };
+
         // Load dashboard data when the component is mounted
         onMounted(async () => {
             console.log("Executive Sales Dashboard - Date Range:", this.state.startDate, "to", this.state.endDate);
@@ -622,24 +690,8 @@ class OeSaleDashboard extends Component {
                         : (item.amount || 0);
                     return value;
                 }),
-                backgroundColor: [
-                    'rgba(59, 130, 246, 0.8)',   // Blue
-                    'rgba(16, 185, 129, 0.8)',   // Green
-                    'rgba(139, 92, 246, 0.8)',   // Purple
-                    'rgba(245, 158, 11, 0.8)',   // Orange
-                    'rgba(239, 68, 68, 0.8)',    // Red
-                    'rgba(156, 163, 175, 0.8)',  // Gray
-                    'rgba(236, 72, 153, 0.8)',   // Pink
-                ],
-                borderColor: [
-                    'rgba(59, 130, 246, 1)',
-                    'rgba(16, 185, 129, 1)',
-                    'rgba(139, 92, 246, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(156, 163, 175, 1)',
-                    'rgba(236, 72, 153, 1)',
-                ],
+                backgroundColor: this.chartColors.backgrounds,
+                borderColor: this.chartColors.borders,
                 borderWidth: 2,
                 hoverOffset: 10
             }]
@@ -885,24 +937,8 @@ class OeSaleDashboard extends Component {
             datasets: [{
                 label: 'Sales Count by Type',
                 data: data,
-                backgroundColor: [
-                    'rgba(99, 102, 241, 0.8)',   // Indigo
-                    'rgba(34, 197, 94, 0.8)',    // Green
-                    'rgba(168, 85, 247, 0.8)',   // Violet
-                    'rgba(251, 146, 60, 0.8)',   // Orange
-                    'rgba(244, 63, 94, 0.8)',    // Rose
-                    'rgba(14, 165, 233, 0.8)',   // Sky
-                    'rgba(132, 204, 22, 0.8)',   // Lime
-                ],
-                borderColor: [
-                    'rgba(99, 102, 241, 1)',
-                    'rgba(34, 197, 94, 1)',
-                    'rgba(168, 85, 247, 1)',
-                    'rgba(251, 146, 60, 1)',
-                    'rgba(244, 63, 94, 1)',
-                    'rgba(14, 165, 233, 1)',
-                    'rgba(132, 204, 22, 1)',
-                ],
+                backgroundColor: this.chartColors.backgrounds,
+                borderColor: this.chartColors.borders,
                 borderWidth: 2,
                 hoverOffset: 8
             }]
@@ -971,24 +1007,8 @@ class OeSaleDashboard extends Component {
             datasets: [{
                 label: 'Sales Amount by Type',
                 data: data,
-                backgroundColor: [
-                    'rgba(79, 70, 229, 0.8)',    // Indigo
-                    'rgba(16, 185, 129, 0.8)',   // Emerald
-                    'rgba(139, 92, 246, 0.8)',   // Violet  
-                    'rgba(245, 158, 11, 0.8)',   // Amber
-                    'rgba(239, 68, 68, 0.8)',    // Red
-                    'rgba(6, 182, 212, 0.8)',    // Cyan
-                    'rgba(101, 163, 13, 0.8)',   // Lime
-                ],
-                borderColor: [
-                    'rgba(79, 70, 229, 1)',
-                    'rgba(16, 185, 129, 1)',
-                    'rgba(139, 92, 246, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(6, 182, 212, 1)',
-                    'rgba(101, 163, 13, 1)',
-                ],
+                backgroundColor: this.chartColors.backgrounds,
+                borderColor: this.chartColors.borders,
                 borderWidth: 2,
                 hoverOffset: 8
             }]
