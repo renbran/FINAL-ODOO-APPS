@@ -485,18 +485,36 @@ class OeSaleDashboard extends Component {
      * @returns {Object} - Contains the context and prepared default options
      */
     _prepareChartCanvas(canvasId, chartType) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn(`Chart.js not available or canvas ${canvasId} not found`);
-            return null;
-        }
+        try {
+            // Wait for DOM to be ready
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.warn(`Canvas element with ID '${canvasId}' not found in DOM`);
+                return null;
+            }
+            
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js library not available');
+                return null;
+            }
 
-        // Reset canvas dimensions for proper rendering
-        const chartContainer = canvas.parentElement;
-        canvas.width = chartContainer.offsetWidth;
-        canvas.height = 300; // Fixed height for consistent rendering
-        
-        const ctx = canvas.getContext('2d');
+            // Ensure canvas has proper parent container
+            const chartContainer = canvas.parentElement;
+            if (!chartContainer) {
+                console.warn(`Canvas ${canvasId} has no parent container`);
+                return null;
+            }
+
+            // Reset canvas dimensions for proper rendering
+            const containerWidth = chartContainer.offsetWidth || 400; // Fallback width
+            canvas.width = containerWidth;
+            canvas.height = 300; // Fixed height for consistent rendering
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.warn(`Failed to get 2D context for canvas ${canvasId}`);
+                return null;
+            }
         
         // Common base options for all charts
         const baseOptions = {
@@ -557,19 +575,24 @@ class OeSaleDashboard extends Component {
         }
         
         return { ctx, options: baseOptions };
+        } catch (error) {
+            console.error(`Error preparing canvas ${canvasId}:`, error);
+            return null;
+        }
     }
     
     /**
      * Create revenue distribution chart using Chart.js
      */
     _createRevenueDistributionChart() {
-        const chartSetup = this._prepareChartCanvas('revenueChart', 'doughnut');
-        if (!chartSetup) {
-            console.warn('Failed to prepare canvas for revenue chart');
-            return;
-        }
-        
-        const { ctx, options } = chartSetup;
+        try {
+            const chartSetup = this._prepareChartCanvas('revenueChart', 'doughnut');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for revenue chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
 
         // Filter out 'Total' rows and get valid data with non-zero invoiced amounts
         const invoicedData = this.state.invoicedSalesData.filter(item => 
@@ -649,6 +672,9 @@ class OeSaleDashboard extends Component {
             data: chartData,
             options: chartOptions
         });
+        } catch (error) {
+            console.error('Error creating revenue chart:', error);
+        }
     }
     /**
      * Create enhanced funnel visualization
