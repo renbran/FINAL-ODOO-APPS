@@ -206,6 +206,83 @@
     border-radius: var(--radius-lg);
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
     flex-shrink: 0;
+    position: relative;
+}
+
+/* CSS-based icon styles for better browser compatibility */
+.kpi-icon.icon-pipeline::before {
+    content: "💰";
+    font-size: 2rem;
+}
+
+.kpi-icon.icon-quotations::before {
+    content: "📝";
+    font-size: 2rem;
+}
+
+.kpi-icon.icon-orders::before {
+    content: "📊";
+    font-size: 2rem;
+}
+
+.kpi-icon.icon-revenue::before {
+    content: "💵";
+    font-size: 2rem;
+}
+
+.kpi-icon.icon-conversion::before {
+    content: "🎯";
+    font-size: 2rem;
+}
+
+.kpi-icon.icon-deal-size::before {
+    content: "📈";
+    font-size: 2rem;
+}
+
+/* Fallback for browsers that don't support emoji */
+@supports not (content: "💰") {
+    .kpi-icon.icon-pipeline::before {
+        content: "$";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-primary);
+    }
+    
+    .kpi-icon.icon-quotations::before {
+        content: "Q";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-secondary);
+    }
+    
+    .kpi-icon.icon-orders::before {
+        content: "O";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-accent);
+    }
+    
+    .kpi-icon.icon-revenue::before {
+        content: "R";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-success);
+    }
+    
+    .kpi-icon.icon-conversion::before {
+        content: "%";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-info);
+    }
+    
+    .kpi-icon.icon-deal-size::before {
+        content: "↗";
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--o-oe-warning);
+    }
 }
 
 .kpi-content {

@@ -34,7 +34,7 @@
             <div id="kpi-section" class="o_oe_sale_dashboard_17_container__kpi-grid" t-ref="kpiContainer">
                 <!-- Total Pipeline Value KPI -->
                 <div class="kpi-card kpi-card--primary">
-                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-icon icon-pipeline"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Total Pipeline Value</div>
                         <div class="kpi-value" t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
@@ -44,7 +44,7 @@
 
                 <!-- Active Quotations KPI -->
                 <div class="kpi-card kpi-card--secondary">
-                    <div class="kpi-icon">📝</div>
+                    <div class="kpi-icon icon-quotations"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Active Quotations</div>
                         <div class="kpi-value" t-esc="state.quotationsData.find(item => item.sales_type_name === 'Total')?.count || 0"/>
@@ -54,7 +54,7 @@
 
                 <!-- Sales Orders KPI -->
                 <div class="kpi-card kpi-card--accent">
-                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-icon icon-orders"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Sales Orders</div>
                         <div class="kpi-value" t-esc="state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.count || 0"/>
@@ -64,7 +64,7 @@
 
                 <!-- Revenue Realized KPI -->
                 <div class="kpi-card kpi-card--success">
-                    <div class="kpi-icon">💵</div>
+                    <div class="kpi-icon icon-revenue"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Revenue Realized</div>
                         <div class="kpi-value" t-esc="this.formatDashboardValue(state.realizedRevenue || 0)"/>
@@ -74,7 +74,7 @@
 
                 <!-- Conversion Rate KPI -->
                 <div class="kpi-card kpi-card--info">
-                    <div class="kpi-icon">🎯</div>
+                    <div class="kpi-icon icon-conversion"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Overall Conversion Rate</div>
                         <div class="kpi-value" t-esc="(state.overallConversionRate || 0) + '%'"/>
@@ -84,7 +84,7 @@
 
                 <!-- Average Deal Size KPI -->
                 <div class="kpi-card kpi-card--warning">
-                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-icon icon-deal-size"></div>
                     <div class="kpi-content">
                         <div class="kpi-label">Average Deal Size</div>
                         <div class="kpi-value" t-esc="this.formatDashboardValue(state.averageDealSize || 0)"/>

@@ -27,6 +27,11 @@ class OeSaleDashboard extends Component {
             topAgentsData: [],
             topAgenciesData: [],
             isLoading: false,
+            // KPI values for dashboard cards
+            totalPipelineValue: 0,
+            realizedRevenue: 0,
+            averageDealSize: 0,
+            overallConversionRate: 0,
         });
 
         // Chart instances for cleanup
@@ -148,13 +153,13 @@ class OeSaleDashboard extends Component {
         const absValue = Math.abs(value);
         
         if (absValue >= 1_000_000_000) {
-            const formatted = Math.round((value / 1_000_000_000) * 100) / 100;
+            const formatted = (value / 1_000_000_000).toFixed(1);
             return `${formatted} B`;
         } else if (absValue >= 1_000_000) {
-            const formatted = Math.round((value / 1_000_000) * 100) / 100;
+            const formatted = (value / 1_000_000).toFixed(1);
             return `${formatted} M`;
         } else if (absValue >= 1_000) {
-            const formatted = Math.round(value / 1_000);
+            const formatted = (value / 1_000).toFixed(0);
             return `${formatted} K`;
         } else {
             return `${Math.round(value)}`;
