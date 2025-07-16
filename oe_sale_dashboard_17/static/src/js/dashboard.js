@@ -1835,6 +1835,69 @@ class OeSaleDashboard extends Component {
         console.log('Charts object:', this.charts);
     }
 
+    /**
+     * Create performance summary cards
+     */
+    _createPerformanceSummary() {
+        const performanceContainer = document.querySelector('.o_oe_sale_dashboard_17_container__performance');
+        if (!performanceContainer) {
+            console.warn('Performance container not found');
+            return;
+        }
+
+        // Calculate performance metrics
+        const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
+        const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
+        const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
+
+        // Calculate conversion rates
+        const quotationCount = quotationsTotal.count || 0;
+        const salesOrderCount = salesOrdersTotal.count || 0;
+        const invoicedCount = invoicedSalesTotal.count || 0;
+        
+        const quotationToOrderRate = quotationCount > 0 ? ((salesOrderCount / quotationCount) * 100).toFixed(1) : 0;
+        const orderToInvoiceRate = salesOrderCount > 0 ? ((invoicedCount / salesOrderCount) * 100).toFixed(1) : 0;
+        const overallConversionRate = quotationCount > 0 ? ((invoicedCount / quotationCount) * 100).toFixed(1) : 0;
+
+        // Calculate revenue metrics
+        const totalPipelineValue = (quotationsTotal.amount || 0) + (salesOrdersTotal.amount || 0);
+        const realizedRevenue = invoicedSalesTotal.invoiced_amount || 0;
+        const revenueRealizationRate = totalPipelineValue > 0 ? ((realizedRevenue / totalPipelineValue) * 100).toFixed(1) : 0;
+
+        // Create performance summary HTML using existing CSS classes
+        performanceContainer.innerHTML = `
+            <div class="performance-card performance-card--quotations">
+                <div class="performance-value">${overallConversionRate}%</div>
+                <div class="performance-label">Overall Conversion Rate</div>
+            </div>
+            
+            <div class="performance-card performance-card--orders">
+                <div class="performance-value">${quotationToOrderRate}%</div>
+                <div class="performance-label">Quote Success Rate</div>
+            </div>
+            
+            <div class="performance-card performance-card--invoiced">
+                <div class="performance-value">${orderToInvoiceRate}%</div>
+                <div class="performance-label">Invoice Completion</div>
+            </div>
+            
+            <div class="performance-card performance-card--quotations">
+                <div class="performance-value">${revenueRealizationRate}%</div>
+                <div class="performance-label">Revenue Realization</div>
+            </div>
+            
+            <div class="performance-card performance-card--orders">
+                <div class="performance-value">${this.formatNumber(totalPipelineValue)}</div>
+                <div class="performance-label">Total Pipeline Value</div>
+            </div>
+            
+            <div class="performance-card performance-card--invoiced">
+                <div class="performance-value">${this.formatNumber(realizedRevenue)}</div>
+                <div class="performance-label">Realized Revenue</div>
+            </div>
+        `;
+    }
+
     // ...existing code...
 }
 
