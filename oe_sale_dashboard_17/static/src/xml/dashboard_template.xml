@@ -67,7 +67,7 @@
                     <div class="kpi-icon">💵</div>
                     <div class="kpi-content">
                         <div class="kpi-label">Revenue Realized</div>
-                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0)"/>
+                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.realizedRevenue || 0)"/>
                         <div class="kpi-change positive">+22.1% vs last month</div>
                     </div>
                 </div>
@@ -77,7 +77,7 @@
                     <div class="kpi-icon">🎯</div>
                     <div class="kpi-content">
                         <div class="kpi-label">Overall Conversion Rate</div>
-                        <div class="kpi-value">67.8%</div>
+                        <div class="kpi-value" t-esc="(state.overallConversionRate || 0) + '%'"/>
                         <div class="kpi-change positive">+3.2% vs last month</div>
                     </div>
                 </div>

@@ -416,6 +416,22 @@ class OeSaleDashboard extends Component {
             this.state.salesOrdersData = [...salesOrders, salesOrdersTotal];
             this.state.invoicedSalesData = [...invoicedSales, invoicedSalesTotal];
 
+            // Calculate KPI values for the dashboard cards
+            const totalPipelineValue = (quotationsTotal.amount || 0) + (salesOrdersTotal.amount || 0);
+            const realizedRevenue = invoicedSalesTotal.invoiced_amount || 0;
+            const totalCount = (quotationsTotal.count || 0) + (salesOrdersTotal.count || 0) + (invoicedSalesTotal.count || 0);
+            const averageDealSize = totalCount > 0 ? (totalPipelineValue + realizedRevenue) / totalCount : 0;
+
+            // Store KPI values in state for template access
+            this.state.totalPipelineValue = totalPipelineValue;
+            this.state.realizedRevenue = realizedRevenue;
+            this.state.averageDealSize = averageDealSize;
+            
+            // Calculate conversion rates
+            const quotationCount = quotationsTotal.count || 0;
+            const invoicedCount = invoicedSalesTotal.count || 0;
+            this.state.overallConversionRate = quotationCount > 0 ? ((invoicedCount / quotationCount) * 100).toFixed(1) : 0;
+
             // Load top performing agents and agencies data
             await this._loadTopPerformersData();
 
@@ -2063,12 +2079,12 @@ class OeSaleDashboard extends Component {
             </div>
             
             <div class="performance-card performance-card--orders">
-                <div class="performance-value">${this.formatNumber(totalPipelineValue)}</div>
+                <div class="performance-value">${this.formatDashboardValue(totalPipelineValue)}</div>
                 <div class="performance-label">Total Pipeline Value</div>
             </div>
             
             <div class="performance-card performance-card--invoiced">
-                <div class="performance-value">${this.formatNumber(realizedRevenue)}</div>
+                <div class="performance-value">${this.formatDashboardValue(realizedRevenue)}</div>
                 <div class="performance-label">Realized Revenue</div>
             </div>
         `;

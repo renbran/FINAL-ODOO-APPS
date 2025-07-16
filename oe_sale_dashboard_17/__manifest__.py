@@ -2,7 +2,7 @@
 # This module is under copyright of 'OdooElevate'
 {
     'name': 'OSUS Executive Sales Dashboard',
-    'version': '17.0.0.1.4',
+    'version': '17.0.0.1.5',
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
     'description': """
