@@ -136,6 +136,32 @@ class OeSaleDashboard extends Component {
     }
 
     /**
+     * Format large numbers for dashboard display with K/M/B suffixes
+     * @param {number} value - The numerical value to format
+     * @returns {string} - Formatted string with appropriate suffix
+     */
+    formatDashboardValue(value) {
+        if (!value || value === 0) {
+            return "0";
+        }
+        
+        const absValue = Math.abs(value);
+        
+        if (absValue >= 1_000_000_000) {
+            const formatted = Math.round((value / 1_000_000_000) * 100) / 100;
+            return `${formatted} B`;
+        } else if (absValue >= 1_000_000) {
+            const formatted = Math.round((value / 1_000_000) * 100) / 100;
+            return `${formatted} M`;
+        } else if (absValue >= 1_000) {
+            const formatted = Math.round(value / 1_000);
+            return `${formatted} K`;
+        } else {
+            return `${Math.round(value)}`;
+        }
+    }
+
+    /**
      * Handles the change event of the start date input.
      * Updates the start date and reloads dashboard data.
      * @param {Event} ev - The change event.

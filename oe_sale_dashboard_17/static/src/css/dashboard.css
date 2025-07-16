@@ -228,6 +228,17 @@
     line-height: 1.2;
     margin-bottom: 0.5rem;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.kpi-value .suffix {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
 
 .kpi-change {

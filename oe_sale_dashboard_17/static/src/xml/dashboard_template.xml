@@ -37,7 +37,7 @@
                     <div class="kpi-icon">💰</div>
                     <div class="kpi-content">
                         <div class="kpi-label">Total Pipeline Value</div>
-                        <div class="kpi-value" t-esc="this.formatNumber(state.totalPipelineValue || 0)"/>
+                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
                         <div class="kpi-change positive">+12.5% vs last month</div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                     <div class="kpi-icon">💵</div>
                     <div class="kpi-content">
                         <div class="kpi-label">Revenue Realized</div>
-                        <div class="kpi-value" t-esc="this.formatNumber(state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0)"/>
+                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0)"/>
                         <div class="kpi-change positive">+22.1% vs last month</div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
                     <div class="kpi-icon">📈</div>
                     <div class="kpi-content">
                         <div class="kpi-label">Average Deal Size</div>
-                        <div class="kpi-value" t-esc="this.formatNumber(state.averageDealSize || 0)"/>
+                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.averageDealSize || 0)"/>
                         <div class="kpi-change negative">-2.4% vs last month</div>
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                             <strong t-esc="state.quotationsData.find(item => item.sales_type_name === 'Total')?.count || 0"/> Active Quotes
                         </div>
                         <div class="summary-item">
-                            Total Value: <strong t-esc="this.formatNumber(state.quotationsData.find(item => item.sales_type_name === 'Total')?.amount || 0)"/>
+                            Total Value: <strong t-esc="this.formatDashboardValue(state.quotationsData.find(item => item.sales_type_name === 'Total')?.amount || 0)"/>
                         </div>
                     </div>
                 </div>
@@ -204,8 +204,8 @@
                                 <tr t-att-class="{'total-row': sales_type_data.sales_type_name === 'Total'}">
                                     <td t-esc="sales_type_data.sales_type_name"/>
                                     <td class="count-cell" t-esc="sales_type_data.count || 0"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.amount)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.quotationsData.length === 0 &amp;&amp; !state.isLoading">
@@ -233,7 +233,7 @@
                             <strong t-esc="state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.count || 0"/> Pending Orders
                         </div>
                         <div class="summary-item">
-                            Total Value: <strong t-esc="this.formatNumber(state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.amount || 0)"/>
+                            Total Value: <strong t-esc="this.formatDashboardValue(state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.amount || 0)"/>
                         </div>
                     </div>
                 </div>
@@ -252,8 +252,8 @@
                                 <tr t-att-class="{'total-row': sales_type_data.sales_type_name === 'Total'}">
                                     <td t-esc="sales_type_data.sales_type_name"/>
                                     <td class="count-cell" t-esc="sales_type_data.count || 0"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.amount)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.sale_value)"/>
                                 </tr>
                             </t>
                             <t t-if="state.salesOrdersData.length === 0 &amp;&amp; !state.isLoading">
@@ -281,7 +281,7 @@
                             <strong t-esc="state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.count || 0"/> Completed Sales
                         </div>
                         <div class="summary-item">
-                            Revenue Realized: <strong t-esc="this.formatNumber(state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0)"/>
+                            Revenue Realized: <strong t-esc="this.formatDashboardValue(state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0)"/>
                         </div>
                     </div>
                 </div>
@@ -301,9 +301,9 @@
                                 <tr t-att-class="{'total-row': sales_type_data.sales_type_name === 'Total'}">
                                     <td t-esc="sales_type_data.sales_type_name"/>
                                     <td class="count-cell" t-esc="sales_type_data.count || 0"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.amount)"/>
-                                    <td class="amount-cell" t-esc="this.formatNumber(sales_type_data.sale_value)"/>
-                                    <td class="amount-cell" style="font-weight: 700; color: var(--o-oe-success);" t-esc="this.formatNumber(sales_type_data.invoiced_amount)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.amount)"/>
+                                    <td class="amount-cell" t-esc="this.formatDashboardValue(sales_type_data.sale_value)"/>
+                                    <td class="amount-cell" style="font-weight: 700; color: var(--o-oe-success);" t-esc="this.formatDashboardValue(sales_type_data.invoiced_amount)"/>
                                 </tr>
                             </t>
                             <t t-if="state.invoicedSalesData.length === 0 &amp;&amp; !state.isLoading">
@@ -338,7 +338,7 @@
                                 <strong t-esc="state.topAgentsData.length"/> Agents Listed
                             </div>
                             <div class="summary-item">
-                                Total Commission: <strong t-esc="this.formatNumber(state.topAgentsData.reduce((sum, agent) => sum + (agent.total_commission || 0), 0))"/>
+                                Total Commission: <strong t-esc="this.formatDashboardValue(state.topAgentsData.reduce((sum, agent) => sum + (agent.total_commission || 0), 0))"/>
                             </div>
                         </div>
                     </div>
@@ -363,10 +363,10 @@
                                         </td>
                                         <td class="name-cell" t-esc="agent_data.partner_name"/>
                                         <td class="count-cell" t-esc="agent_data.count || 0"/>
-                                        <td class="amount-cell" t-esc="this.formatNumber(agent_data.total_sales_value)"/>
-                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agent_data.total_commission)"/>
-                                        <td class="amount-cell" t-esc="this.formatNumber(agent_data.invoiced_sales_value)"/>
-                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agent_data.invoiced_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatDashboardValue(agent_data.total_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatDashboardValue(agent_data.total_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatDashboardValue(agent_data.invoiced_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatDashboardValue(agent_data.invoiced_commission)"/>
                                     </tr>
                                 </t>
                                 <t t-if="state.topAgentsData.length === 0 &amp;&amp; !state.isLoading">
@@ -394,7 +394,7 @@
                                 <strong t-esc="state.topAgenciesData.length"/> Agencies Listed
                             </div>
                             <div class="summary-item">
-                                Total Commission: <strong t-esc="this.formatNumber(state.topAgenciesData.reduce((sum, agency) => sum + (agency.total_commission || 0), 0))"/>
+                                Total Commission: <strong t-esc="this.formatDashboardValue(state.topAgenciesData.reduce((sum, agency) => sum + (agency.total_commission || 0), 0))"/>
                             </div>
                         </div>
                     </div>
@@ -419,10 +419,10 @@
                                         </td>
                                         <td class="name-cell" t-esc="agency_data.partner_name"/>
                                         <td class="count-cell" t-esc="agency_data.count || 0"/>
-                                        <td class="amount-cell" t-esc="this.formatNumber(agency_data.total_sales_value)"/>
-                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agency_data.total_commission)"/>
-                                        <td class="amount-cell" t-esc="this.formatNumber(agency_data.invoiced_sales_value)"/>
-                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agency_data.invoiced_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatDashboardValue(agency_data.total_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatDashboardValue(agency_data.total_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatDashboardValue(agency_data.invoiced_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatDashboardValue(agency_data.invoiced_commission)"/>
                                     </tr>
                                 </t>
                                 <t t-if="state.topAgenciesData.length === 0 &amp;&amp; !state.isLoading">

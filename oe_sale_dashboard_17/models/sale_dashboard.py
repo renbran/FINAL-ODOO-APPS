@@ -10,6 +10,32 @@ class SaleDashboard(models.Model):
     _inherit = 'sale.order'
 
     @api.model
+    def format_dashboard_value(self, value):
+        """
+        Format large numbers for dashboard display with K/M/B suffixes
+        Args:
+            value (float/int): The numerical value to format
+        Returns:
+            str: Formatted string with appropriate suffix
+        """
+        if not value or value == 0:
+            return "0"
+        
+        abs_value = abs(value)
+        
+        if abs_value >= 1_000_000_000:
+            formatted = round(value / 1_000_000_000, 2)
+            return f"{formatted} B"
+        elif abs_value >= 1_000_000:
+            formatted = round(value / 1_000_000, 2)
+            return f"{formatted} M"
+        elif abs_value >= 1_000:
+            formatted = round(value / 1_000)
+            return f"{formatted:.0f} K"
+        else:
+            return f"{round(value):.0f}"
+
+    @api.model
     def get_monthly_fluctuation_data(self, start_date, end_date, sales_type_ids=None):
         """
         Get monthly fluctuation data for deal analysis
