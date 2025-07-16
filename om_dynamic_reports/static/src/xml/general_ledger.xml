@@ -10,6 +10,7 @@
                             <label for="company_id">Company</label>
                             <select name="company_id" class="form-select">
                                 <option t-foreach="env.companies" t-as="company" 
+                                        t-key="company.id"
                                         t-att-value="company.id" 
                                         t-att-selected="company.id === env.company.id">
                                     <t t-esc="company.name"/>
