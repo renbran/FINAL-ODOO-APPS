@@ -24,6 +24,8 @@ class OeSaleDashboard extends Component {
             quotationsData: [],
             salesOrdersData: [],
             invoicedSalesData: [],
+            topAgentsData: [],
+            topAgenciesData: [],
             isLoading: false,
         });
 
@@ -319,6 +321,9 @@ class OeSaleDashboard extends Component {
             this.state.quotationsData = [...quotations, quotationsTotal];
             this.state.salesOrdersData = [...salesOrders, salesOrdersTotal];
             this.state.invoicedSalesData = [...invoicedSales, invoicedSalesTotal];
+
+            // Load top performing agents and agencies data
+            await this._loadTopPerformersData();
 
             // Create enhanced visualizations after data is loaded
             this._createEnhancedVisualizations();
@@ -1896,6 +1901,38 @@ class OeSaleDashboard extends Component {
                 <div class="performance-label">Realized Revenue</div>
             </div>
         `;
+    }
+
+    /**
+     * Load top performing agents and agencies data
+     */
+    async _loadTopPerformersData() {
+        try {
+            // Load top 10 agents based on agent1_partner_id
+            const topAgents = await this.orm.call(
+                "sale.order",
+                "get_top_performers_data", 
+                [this.state.startDate, this.state.endDate, 'agent', 10]
+            );
+
+            // Load top 10 agencies based on broker_partner_id  
+            const topAgencies = await this.orm.call(
+                "sale.order", 
+                "get_top_performers_data",
+                [this.state.startDate, this.state.endDate, 'agency', 10]
+            );
+
+            this.state.topAgentsData = topAgents || [];
+            this.state.topAgenciesData = topAgencies || [];
+
+            console.log('Top Agents Data:', this.state.topAgentsData);
+            console.log('Top Agencies Data:', this.state.topAgenciesData);
+
+        } catch (error) {
+            console.warn('Could not load top performers data:', error);
+            this.state.topAgentsData = [];
+            this.state.topAgenciesData = [];
+        }
     }
 
     // ...existing code...

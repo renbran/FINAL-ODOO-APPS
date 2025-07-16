@@ -204,3 +204,92 @@ class SaleDashboard(models.Model):
                 'amount_distribution': {},
                 'error': str(e)
             }
+
+    @api.model 
+    def get_top_performers_data(self, start_date, end_date, performer_type='agent', limit=10):
+        """
+        Get top performing agents or agencies based on sales performance
+        Args:
+            start_date: Start date for filtering
+            end_date: End date for filtering  
+            performer_type: 'agent' for agents, 'agency' for agencies
+            limit: Number of top performers to return (default 10)
+        Returns:
+            List of top performers with their metrics
+        """
+        try:
+            # Determine field names based on performer type
+            if performer_type == 'agent':
+                partner_field = 'agent1_partner_id'
+                amount_field = 'agent1_amount'
+            elif performer_type == 'agency':
+                partner_field = 'broker_partner_id'
+                amount_field = 'broker_amount'
+            else:
+                return []
+
+            # Base domain for filtering
+            base_domain = [
+                ('booking_date', '>=', start_date),
+                ('booking_date', '<=', end_date),
+                ('state', '!=', 'cancel'),  # Exclude cancelled orders
+                (partner_field, '!=', False)  # Must have agent/broker assigned
+            ]
+
+            # Get all orders with the specified criteria
+            orders = self.search_read(base_domain, [
+                partner_field, 'amount_total', 'sale_value', amount_field, 
+                'state', 'invoice_status', 'name'
+            ])
+
+            # Group data by partner
+            partner_data = {}
+            
+            for order in orders:
+                partner_id = order[partner_field]
+                if not partner_id:
+                    continue
+                    
+                partner_key = partner_id[0] if isinstance(partner_id, tuple) else partner_id
+                partner_name = partner_id[1] if isinstance(partner_id, tuple) else f"Partner {partner_id}"
+                
+                if partner_key not in partner_data:
+                    partner_data[partner_key] = {
+                        'partner_id': partner_key,
+                        'partner_name': partner_name,
+                        'count': 0,
+                        'total_sales_value': 0.0,
+                        'total_commission': 0.0,
+                        'invoiced_count': 0,
+                        'invoiced_sales_value': 0.0,
+                        'invoiced_commission': 0.0
+                    }
+                
+                # Add to totals
+                partner_data[partner_key]['count'] += 1
+                partner_data[partner_key]['total_sales_value'] += order['sale_value'] or order['amount_total'] or 0
+                partner_data[partner_key]['total_commission'] += order[amount_field] or 0
+                
+                # If invoiced, add to invoiced totals
+                if order['state'] == 'sale' and order['invoice_status'] == 'invoiced':
+                    partner_data[partner_key]['invoiced_count'] += 1
+                    
+                    # Try to get actual invoiced amount
+                    invoiced_amount = self._get_actual_invoiced_amount(order['name'])
+                    sales_value = invoiced_amount or order['sale_value'] or order['amount_total'] or 0
+                    
+                    partner_data[partner_key]['invoiced_sales_value'] += sales_value
+                    partner_data[partner_key]['invoiced_commission'] += order[amount_field] or 0
+
+            # Convert to list and sort by total sales value (descending)
+            performers_list = list(partner_data.values())
+            performers_list.sort(key=lambda x: x['total_sales_value'], reverse=True)
+            
+            # Return top performers limited to the specified count
+            return performers_list[:limit]
+            
+        except Exception as e:
+            return {
+                'error': str(e),
+                'performers': []
+            }

@@ -640,6 +640,134 @@ body {
         }
     }
 
+    // Top Performers Section Styling
+    &__top-performers {
+        margin-top: 3rem;
+        
+        .status-badge {
+            &--agents {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            &--agencies {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            }
+        }
+        
+        .rank-cell {
+            text-align: center;
+            
+            .rank-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 2rem;
+                height: 2rem;
+                border-radius: 50%;
+                font-weight: 700;
+                font-size: 0.875rem;
+                color: white;
+                
+                // Top 3 get special colors
+                &:nth-child(1) {
+                    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); // Gold
+                    color: #1a1a1a;
+                }
+                
+                // For rank 1
+                tr:nth-child(1) & {
+                    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); // Gold
+                    color: #1a1a1a;
+                    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+                }
+                
+                // For rank 2  
+                tr:nth-child(2) & {
+                    background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); // Silver
+                    color: #1a1a1a;
+                    box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+                }
+                
+                // For rank 3
+                tr:nth-child(3) & {
+                    background: linear-gradient(135deg, #cd7f32 0%, #d4af37 100%); // Bronze
+                    color: white;
+                    box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
+                }
+                
+                // For rank 4-10
+                tr:nth-child(n+4) & {
+                    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+                    color: white;
+                }
+            }
+        }
+        
+        .name-cell {
+            font-weight: 600;
+            color: var(--o-oe-dark);
+            
+            // Highlight top 3 performers
+            tr:nth-child(-n+3) & {
+                color: var(--o-oe-primary);
+                font-weight: 700;
+            }
+        }
+        
+        .commission-cell {
+            color: var(--o-oe-success);
+            font-weight: 600;
+            
+            // Highlight larger commissions
+            &:hover {
+                background: rgba(16, 185, 129, 0.1);
+                border-radius: 4px;
+            }
+        }
+        
+        // Enhanced table styling for performance tables
+        table {
+            thead tr {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                
+                th {
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: var(--o-oe-dark);
+                    padding: 1rem 0.75rem;
+                    border-bottom: 2px solid var(--o-oe-border);
+                }
+            }
+            
+            tbody tr {
+                transition: all 0.2s ease;
+                
+                &:hover {
+                    background: rgba(59, 130, 246, 0.05);
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+                
+                // Top 3 get enhanced styling
+                &:nth-child(-n+3) {
+                    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+                    border-left: 4px solid var(--o-oe-primary);
+                    
+                    &:hover {
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+                    }
+                }
+                
+                td {
+                    padding: 1rem 0.75rem;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                }
+            }
+        }
+    }
+
     // Enhanced Scroll Controls with Navigation
     .scroll-controls {
         position: fixed;

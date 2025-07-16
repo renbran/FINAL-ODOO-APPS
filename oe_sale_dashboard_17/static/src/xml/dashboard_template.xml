@@ -266,6 +266,121 @@
                 <!-- Performance cards will be generated here -->
             </div>
 
+            <!-- Top Performers Section -->
+            <div class="o_oe_sale_dashboard_17_container__top-performers">
+                <!-- Top 10 Agents Section -->
+                <div id="top-agents-section" class="o_oe_sale_dashboard_17_container__table-section">
+                    <div class="table-header">
+                        <h2>
+                            Top 10 Performing Agents
+                            <span class="status-badge status-badge--agents">Performance</span>
+                        </h2>
+                        <div class="table-summary">
+                            <div class="summary-item">
+                                <strong t-esc="state.topAgentsData.length"/> Agents Listed
+                            </div>
+                            <div class="summary-item">
+                                Total Commission: <strong t-esc="this.formatNumber(state.topAgentsData.reduce((sum, agent) => sum + (agent.total_commission || 0), 0))"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Agent Name</th>
+                                    <th>Sales Count</th>
+                                    <th>Total Sales Value</th>
+                                    <th>Total Commission</th>
+                                    <th>Invoiced Sales</th>
+                                    <th>Invoiced Commission</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.topAgentsData" t-as="agent_data" t-key="agent_data.partner_id">
+                                    <tr>
+                                        <td class="rank-cell">
+                                            <span class="rank-badge" t-esc="agent_data_index + 1"/>
+                                        </td>
+                                        <td class="name-cell" t-esc="agent_data.partner_name"/>
+                                        <td class="count-cell" t-esc="agent_data.count || 0"/>
+                                        <td class="amount-cell" t-esc="this.formatNumber(agent_data.total_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agent_data.total_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatNumber(agent_data.invoiced_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agent_data.invoiced_commission)"/>
+                                    </tr>
+                                </t>
+                                <t t-if="state.topAgentsData.length === 0 &amp;&amp; !state.isLoading">
+                                    <tr>
+                                        <td colspan="7" class="no-data">
+                                            <div class="no-data-icon">👥</div>
+                                            <div>No agent performance data available for the selected period.</div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top 10 Agencies Section -->
+                <div id="top-agencies-section" class="o_oe_sale_dashboard_17_container__table-section">
+                    <div class="table-header">
+                        <h2>
+                            Top 10 Performing Agencies
+                            <span class="status-badge status-badge--agencies">Performance</span>
+                        </h2>
+                        <div class="table-summary">
+                            <div class="summary-item">
+                                <strong t-esc="state.topAgenciesData.length"/> Agencies Listed
+                            </div>
+                            <div class="summary-item">
+                                Total Commission: <strong t-esc="this.formatNumber(state.topAgenciesData.reduce((sum, agency) => sum + (agency.total_commission || 0), 0))"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Agency Name</th>
+                                    <th>Sales Count</th>
+                                    <th>Total Sales Value</th>
+                                    <th>Total Commission</th>
+                                    <th>Invoiced Sales</th>
+                                    <th>Invoiced Commission</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.topAgenciesData" t-as="agency_data" t-key="agency_data.partner_id">
+                                    <tr>
+                                        <td class="rank-cell">
+                                            <span class="rank-badge" t-esc="agency_data_index + 1"/>
+                                        </td>
+                                        <td class="name-cell" t-esc="agency_data.partner_name"/>
+                                        <td class="count-cell" t-esc="agency_data.count || 0"/>
+                                        <td class="amount-cell" t-esc="this.formatNumber(agency_data.total_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agency_data.total_commission)"/>
+                                        <td class="amount-cell" t-esc="this.formatNumber(agency_data.invoiced_sales_value)"/>
+                                        <td class="amount-cell commission-cell" t-esc="this.formatNumber(agency_data.invoiced_commission)"/>
+                                    </tr>
+                                </t>
+                                <t t-if="state.topAgenciesData.length === 0 &amp;&amp; !state.isLoading">
+                                    <tr>
+                                        <td colspan="7" class="no-data">
+                                            <div class="no-data-icon">🏢</div>
+                                            <div>No agency performance data available for the selected period.</div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </t>
 </templates>
