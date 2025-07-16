@@ -31,10 +31,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'oe_sale_dashboard_17/static/src/js/simple-chart.js',
+            'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
-            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
-            'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
         ],
     },
     'images': ['static/description/banner.gif'],
