@@ -1,0 +1,100 @@
+.om_dynamic_reports_form {
+    padding: 16px;
+}
+
+.om_dynamic_reports_form .filter_section {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.om_dynamic_reports_form .filter_section h4 {
+    margin-bottom: 16px;
+    color: #4c4c4c;
+}
+
+.om_dynamic_reports_form .filter_row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.om_dynamic_reports_form .filter_item {
+    flex: 1;
+    min-width: 200px;
+    margin-right: 16px;
+    margin-bottom: 8px;
+}
+
+.om_dynamic_reports_form .filter_item:last-child {
+    margin-right: 0;
+}
+
+.om_dynamic_reports_form .filter_item label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #666;
+}
+
+.om_dynamic_reports_form .button_section {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.om_dynamic_reports_form .generate_button {
+    padding: 8px 24px;
+}
+
+.om_dynamic_reports_form .checkbox_item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.om_dynamic_reports_form .checkbox_item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Specific styles for tables in reports */
+.report_table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report_table th, 
+.report_table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.report_table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+}
+
+.report_table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.report_table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Styling for totals rows */
+.report_table .total_row {
+    font-weight: bold;
+    background-color: #e6e6e6;
+}
+
+/* Styling for date fields */
+.report_table .date_field {
+    white-space: nowrap;
+}
+
+/* Styling for amount fields */
+.report_table .amount_field {
+    text-align: right;
+}

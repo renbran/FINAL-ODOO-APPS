@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- General Ledger Report Menu Action -->
+        <record id="action_general_ledger_report" model="ir.actions.client">
+            <field name="name">General Ledger</field>
+            <field name="tag">om_dynamic_reports.general_ledger_action</field>
+        </record>
+
+        <!-- Partner Ledger Report Menu Action -->
+        <record id="action_partner_ledger_report" model="ir.actions.client">
+            <field name="name">Partner Ledger</field>
+            <field name="tag">om_dynamic_reports.partner_ledger_action</field>
+        </record>
+
+        <!-- Trial Balance Report Menu Action -->
+        <record id="action_trial_balance_report" model="ir.actions.client">
+            <field name="name">Trial Balance</field>
+            <field name="tag">om_dynamic_reports.trial_balance_action</field>
+        </record>
+
+        <!-- Aged Payable Report Menu Action -->
+        <record id="action_aged_payable_report" model="ir.actions.client">
+            <field name="name">Aged Payable</field>
+            <field name="tag">om_dynamic_reports.aged_payable_action</field>
+        </record>
+
+        <!-- Aged Receivable Report Menu Action -->
+        <record id="action_aged_receivable_report" model="ir.actions.client">
+            <field name="name">Aged Receivable</field>
+            <field name="tag">om_dynamic_reports.aged_receivable_action</field>
+        </record>
+
+        <!-- Tax Report Menu Action -->
+        <record id="action_tax_report" model="ir.actions.client">
+            <field name="name">Tax Report</field>
+            <field name="tag">om_dynamic_reports.tax_report_action</field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem id="menu_dynamic_reports" name="Dynamic Reports" 
+                  parent="om_account_accountant_v17.menu_accounting"
+                  sequence="15"/>
+
+        <menuitem id="menu_general_ledger_report" name="General Ledger" 
+                  parent="menu_dynamic_reports"
+                  action="action_general_ledger_report"
+                  sequence="10"/>
+
+        <menuitem id="menu_partner_ledger_report" name="Partner Ledger" 
+                  parent="menu_dynamic_reports"
+                  action="action_partner_ledger_report"
+                  sequence="20"/>
+
+        <menuitem id="menu_trial_balance_report" name="Trial Balance" 
+                  parent="menu_dynamic_reports"
+                  action="action_trial_balance_report"
+                  sequence="30"/>
+
+        <menuitem id="menu_financial_reports" name="Financial Reports" 
+                  parent="menu_dynamic_reports"
+                  sequence="40"/>
+
+        <menuitem id="menu_aged_reports" name="Aged Reports" 
+                  parent="menu_dynamic_reports"
+                  sequence="50"/>
+
+        <menuitem id="menu_aged_payable_report" name="Aged Payable" 
+                  parent="menu_aged_reports"
+                  action="action_aged_payable_report"
+                  sequence="10"/>
+
+        <menuitem id="menu_aged_receivable_report" name="Aged Receivable" 
+                  parent="menu_aged_reports"
+                  action="action_aged_receivable_report"
+                  sequence="20"/>
+
+        <menuitem id="menu_tax_report" name="Tax Report" 
+                  parent="menu_dynamic_reports"
+                  action="action_tax_report"
+                  sequence="60"/>
+    </data>
+</odoo>

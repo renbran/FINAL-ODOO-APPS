@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="om_dynamic_reports.GeneralLedgerView" owl="1">
+        <div class="om_dynamic_reports_form">
+            <form t-ref="form">
+                <div class="filter_section">
+                    <h4>General Ledger Report</h4>
+                    <div class="filter_row">
+                        <div class="filter_item">
+                            <label for="company_id">Company</label>
+                            <select name="company_id" class="form-select">
+                                <option t-foreach="env.companies" t-as="company" 
+                                        t-att-value="company.id" 
+                                        t-att-selected="company.id === env.company.id">
+                                    <t t-esc="company.name"/>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter_row">
+                        <div class="filter_item">
+                            <label for="date_from">Start Date</label>
+                            <input type="date" name="date_from" class="form-control"/>
+                        </div>
+                        <div class="filter_item">
+                            <label for="date_to">End Date</label>
+                            <input type="date" name="date_to" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="filter_row">
+                        <div class="filter_item">
+                            <label for="journal_ids">Journals</label>
+                            <select name="journal_ids" class="form-select" multiple="multiple">
+                                <option value="">All Journals</option>
+                                <!-- Journals will be populated via JS -->
+                            </select>
+                        </div>
+                        <div class="filter_item">
+                            <label for="account_ids">Accounts</label>
+                            <select name="account_ids" class="form-select" multiple="multiple">
+                                <option value="">All Accounts</option>
+                                <!-- Accounts will be populated via JS -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter_row">
+                        <div class="filter_item">
+                            <label for="target_move">Target Moves</label>
+                            <select name="target_move" class="form-select">
+                                <option value="posted">All Posted Entries</option>
+                                <option value="all">All Entries</option>
+                            </select>
+                        </div>
+                        <div class="filter_item">
+                            <label for="sortby">Sort By</label>
+                            <select name="sortby" class="form-select">
+                                <option value="sort_date">Date</option>
+                                <option value="sort_journal_partner">Journal &amp; Partner</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter_row">
+                        <div class="filter_item">
+                            <div class="checkbox_item">
+                                <input type="checkbox" id="initial_balance" name="initial_balance"/>
+                                <label for="initial_balance">Include Initial Balances</label>
+                            </div>
+                        </div>
+                        <div class="filter_item">
+                            <label for="display_account">Display Accounts</label>
+                            <select name="display_account" class="form-select">
+                                <option value="all">All</option>
+                                <option value="movement">With movements</option>
+                                <option value="not_zero">With balance not equal to zero</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="button_section">
+                    <button type="button" class="btn btn-primary generate_button" t-on-click="onClickGenerateReport">
+                        Generate Excel Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </t>
+</templates>

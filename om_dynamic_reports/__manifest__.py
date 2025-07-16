@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+# Copyright 2025 Odoo Mates, Walnut Software Solutions
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
+
+{
+    'name': 'Odoo 17 Dynamic Accounting Reports',
+    'version': '17.0.1.0.0',
+    'category': 'Accounting',
+    'summary': 'Dynamic Accounting Reports compatible with OM Accounting',
+    'description': """
+        This module provides dynamic accounting reports compatible with the 
+        om_account_accountant_v17 module. It includes General Ledger, Trial Balance, 
+        Balance Sheet, Profit and Loss, Cash Book, Partner Ledger, Aged Payable, 
+        Aged Receivable, Bank book, and Tax Reports.
+    """,
+    'sequence': '1',
+    'website': 'https://www.walnutit.com',
+    'author': 'Odoo Mates, Walnut Software Solutions',
+    'maintainer': 'Odoo Mates, Walnut Software Solutions',
+    'license': 'LGPL-3',
+    'support': 'odoomates@gmail.com',
+    'depends': [
+        'om_account_accountant_v17',
+        'accounting_pdf_reports',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/assets.xml',
+        'views/report_views.xml',
+        'report/trial_balance.xml',
+        'report/general_ledger_templates.xml',
+        'report/financial_report_template.xml',
+        'report/partner_ledger_templates.xml',
+        'report/financial_reports_views.xml',
+        'report/balance_sheet_report_templates.xml',
+        'report/bank_book_templates.xml',
+        'report/aged_payable_templates.xml',
+        'report/aged_receivable_templates.xml',
+        'report/tax_report_templates.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'om_dynamic_reports/static/src/xml/general_ledger_view.xml',
+            'om_dynamic_reports/static/src/xml/trial_balance_view.xml',
+            'om_dynamic_reports/static/src/xml/cash_flow_templates.xml',
+            'om_dynamic_reports/static/src/xml/bank_flow_templates.xml',
+            'om_dynamic_reports/static/src/xml/profit_and_loss_templates.xml',
+            'om_dynamic_reports/static/src/xml/balance_sheet_template.xml',
+            'om_dynamic_reports/static/src/xml/partner_ledger_view.xml',
+            'om_dynamic_reports/static/src/xml/aged_payable_report_views.xml',
+            'om_dynamic_reports/static/src/xml/aged_receivable_report_views.xml',
+            'om_dynamic_reports/static/src/xml/tax_report_views.xml',
+            'om_dynamic_reports/static/src/css/accounts_report.css',
+            'om_dynamic_reports/static/src/js/general_ledger.js',
+            'om_dynamic_reports/static/src/js/trial_balance.js',
+            'om_dynamic_reports/static/src/js/cash_flow.js',
+            'om_dynamic_reports/static/src/js/bank_flow.js',
+            'om_dynamic_reports/static/src/js/profit_and_loss.js',
+            'om_dynamic_reports/static/src/js/balance_sheet.js',
+            'om_dynamic_reports/static/src/js/partner_ledger.js',
+            'om_dynamic_reports/static/src/js/aged_payable_report.js',
+            'om_dynamic_reports/static/src/js/aged_receivable_report.js',
+            'om_dynamic_reports/static/src/js/tax_report.js',
+        ],
+    },
+    'images': ['static/description/banner.gif'],
+    'license': 'LGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!-- CSS -->
+                <link rel="stylesheet" type="text/css" href="/om_dynamic_reports/static/src/css/report_styles.css"/>
+                
+                <!-- JavaScript -->
+                <script type="text/javascript" src="/om_dynamic_reports/static/src/js/general_ledger.js"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>

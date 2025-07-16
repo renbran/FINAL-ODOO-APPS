@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="trial_balance_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Trial Balance</h2>
+                        
+                        <div class="row mb-4">
+                            <div class="col-3">
+                                <strong>Company:</strong> <span t-esc="company_name"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Period:</strong> <span t-esc="date_from"/> to <span t-esc="date_to"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Target Moves:</strong> <span t-esc="target_move"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Display Account:</strong> <span t-esc="display_account"/>
+                            </div>
+                        </div>
+                        
+                        <table class="table table-sm table-bordered report_table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Account</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th class="text-end">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="accounts" t-as="account">
+                                    <tr>
+                                        <td><span t-esc="account['code']"/></td>
+                                        <td><span t-esc="account['name']"/></td>
+                                        <td class="text-end"><span t-esc="account['debit']" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
+                                        <td class="text-end"><span t-esc="account['credit']" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
+                                        <td class="text-end"><span t-esc="account['balance']" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
+                                    </tr>
+                                </t>
+                                <tr class="total_row">
+                                    <td colspan="2"><strong>Total</strong></td>
+                                    <td class="text-end"><strong><span t-esc="total_debit" t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="total_credit" t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="total_balance" t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
