@@ -348,18 +348,36 @@ class OeSaleDashboard extends Component {
         // Create executive KPI cards
         this._createExecutiveKPICards();
         
-        // Create interactive charts with a delay to ensure DOM is ready
-        setTimeout(async () => {
+        // Wait for Chart.js to load and DOM to be ready
+        this._waitForChartJS().then(() => {
             this._createRevenueDistributionChart();
             this._createEnhancedFunnelChart();
             this._createTrendAnalysisChart();
-            await this._createSalesTypePieCharts();
-            await this._createDealFluctuationChart();
-            this._createPerformanceSummary();
-            
-            // Add chart control event listeners
-            this._setupChartControlListeners();
-        }, 200);
+            this._createSalesTypePieCharts().then(() => {
+                this._createDealFluctuationChart().then(() => {
+                    this._createPerformanceSummary();
+                    
+                    // Add chart control event listeners
+                    this._setupChartControlListeners();
+                });
+            });
+        });
+    }
+
+    /**
+     * Wait for Chart.js to be available
+     */
+    async _waitForChartJS() {
+        return new Promise((resolve) => {
+            const checkChart = () => {
+                if (typeof Chart !== 'undefined') {
+                    resolve();
+                } else {
+                    setTimeout(checkChart, 100);
+                }
+            };
+            checkChart();
+        });
     }
 
     /**
@@ -545,8 +563,13 @@ class OeSaleDashboard extends Component {
      * Create revenue distribution chart using Chart.js
      */
     _createRevenueDistributionChart() {
-        const { ctx, options } = this._prepareChartCanvas('revenueChart', 'doughnut');
-        if (!ctx) return;
+        const chartSetup = this._prepareChartCanvas('revenueChart', 'doughnut');
+        if (!chartSetup) {
+            console.warn('Failed to prepare canvas for revenue chart');
+            return;
+        }
+        
+        const { ctx, options } = chartSetup;
 
         // Filter out 'Total' rows and get valid data with non-zero invoiced amounts
         const invoicedData = this.state.invoicedSalesData.filter(item => 
@@ -683,8 +706,13 @@ class OeSaleDashboard extends Component {
      * Create trend analysis chart using Chart.js
      */
     _createTrendAnalysisChart() {
-        const { ctx, options } = this._prepareChartCanvas('trendChart', 'line');
-        if (!ctx) return;
+        const chartSetup = this._prepareChartCanvas('trendChart', 'line');
+        if (!chartSetup) {
+            console.warn('Failed to prepare canvas for trend chart');
+            return;
+        }
+        
+        const { ctx, options } = chartSetup;
 
         // Generate trend data based on current date range and actual data
         const { labels, trendData } = this._generateTrendDataFromActualData();
@@ -1197,13 +1225,13 @@ class OeSaleDashboard extends Component {
      * Create bar chart showing deal fluctuations over time
      */
     async _createDealFluctuationChart() {
-        const canvas = document.getElementById('dealFluctuationChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or dealFluctuationChart canvas not found');
+        const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
+        if (!chartSetup) {
+            console.warn('Failed to prepare canvas for deal fluctuation chart');
             return;
         }
-
-        const ctx = canvas.getContext('2d');
+        
+        const { ctx, options } = chartSetup;
         
         // Calculate monthly data for the current date range
         const monthlyData = await this._calculateMonthlyFluctuations();
