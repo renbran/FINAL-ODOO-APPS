@@ -461,21 +461,107 @@ class OeSaleDashboard extends Component {
     }
 
     /**
+     * Helper function to prepare canvas and set common chart options
+     * @param {string} canvasId - ID of the canvas element
+     * @param {string} chartType - Type of chart to prepare settings for
+     * @returns {Object} - Contains the context and prepared default options
+     */
+    _prepareChartCanvas(canvasId, chartType) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || typeof Chart === 'undefined') {
+            console.warn(`Chart.js not available or canvas ${canvasId} not found`);
+            return null;
+        }
+
+        // Reset canvas dimensions for proper rendering
+        const chartContainer = canvas.parentElement;
+        canvas.width = chartContainer.offsetWidth;
+        canvas.height = 300; // Fixed height for consistent rendering
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Common base options for all charts
+        const baseOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: chartType === 'doughnut' || chartType === 'pie' ? 'bottom' : 'top',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    padding: 12,
+                    cornerRadius: 4,
+                    displayColors: true
+                }
+            }
+        };
+        
+        // Additional options based on chart type
+        if (chartType === 'bar' || chartType === 'line') {
+            baseOptions.scales = {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            };
+        }
+        
+        return { ctx, options: baseOptions };
+    }
+    
+    /**
      * Create revenue distribution chart using Chart.js
      */
     _createRevenueDistributionChart() {
-        const canvas = document.getElementById('revenueChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or canvas not found');
-            return;
-        }
+        const { ctx, options } = this._prepareChartCanvas('revenueChart', 'doughnut');
+        if (!ctx) return;
 
-        const ctx = canvas.getContext('2d');
         // Filter out 'Total' rows and get valid data with non-zero invoiced amounts
         const invoicedData = this.state.invoicedSalesData.filter(item => 
             item.sales_type_name !== 'Total' && 
             (item.invoiced_amount > 0 || item.amount > 0)
         );
+        
+        // Provide fallback data if no valid data exists
+        if (!invoicedData.length) {
+            invoicedData.push({
+                sales_type_name: 'No Data',
+                invoiced_amount: 0,
+                amount: 0
+            });
+        }
         
         console.log('Revenue Chart Data:', invoicedData); // Debug log
         
@@ -488,7 +574,6 @@ class OeSaleDashboard extends Component {
                     const value = (item.invoiced_amount && item.invoiced_amount > 0) 
                         ? item.invoiced_amount 
                         : (item.amount || 0);
-                    console.log(`${item.sales_type_name}: invoiced=${item.invoiced_amount}, amount=${item.amount}, using=${value}`);
                     return value;
                 }),
                 backgroundColor: [
@@ -514,41 +599,32 @@ class OeSaleDashboard extends Component {
             }]
         };
 
+        // Merge base options with chart-specific options
+        const chartOptions = Object.assign({}, options, {
+            plugins: Object.assign({}, options.plugins, {
+                tooltip: Object.assign({}, options.plugins.tooltip, {
+                    callbacks: {
+                        label: (context) => {
+                            const label = context.label || '';
+                            const value = this.formatNumber(context.parsed);
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                })
+            }),
+            animation: {
+                animateRotate: true,
+                duration: 1000
+            },
+            cutout: '65%', // Makes the doughnut hole slightly larger for better appearance
+        });
+
         this.charts.revenue = new Chart(ctx, {
             type: 'doughnut',
             data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const label = context.label || '';
-                                const value = this.formatNumber(context.parsed);
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    animateRotate: true,
-                    duration: 1500
-                }
-            }
+            options: chartOptions
         });
     }
     /**
@@ -607,14 +683,9 @@ class OeSaleDashboard extends Component {
      * Create trend analysis chart using Chart.js
      */
     _createTrendAnalysisChart() {
-        const canvas = document.getElementById('trendChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or canvas not found for trend chart');
-            return;
-        }
+        const { ctx, options } = this._prepareChartCanvas('trendChart', 'line');
+        if (!ctx) return;
 
-        const ctx = canvas.getContext('2d');
-        
         // Generate trend data based on current date range and actual data
         const { labels, trendData } = this._generateTrendDataFromActualData();
 
