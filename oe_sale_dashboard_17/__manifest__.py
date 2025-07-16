@@ -32,6 +32,7 @@
     'assets': {
         'web.assets_backend': [
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
+            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
         ],
     },
