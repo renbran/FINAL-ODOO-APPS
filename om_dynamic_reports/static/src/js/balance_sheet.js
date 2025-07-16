@@ -284,6 +284,11 @@ class BalanceSheet extends owl.Component {
 
 }
 BalanceSheet.template = 'bls_template_new';
+BalanceSheet.props = {
+    action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+};
 //BalanceSheet.components = {
 //    FinancialReportControlPanel
 //}

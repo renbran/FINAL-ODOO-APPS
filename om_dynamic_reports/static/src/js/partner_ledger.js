@@ -399,4 +399,10 @@ PartnerLedger.defaultProps = {
     resIds: [],
 };
 PartnerLedger.template = 'pl_template_new';
+PartnerLedger.props = {
+    action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+    resIds: { type: Array, optional: true },
+};
 actionRegistry.add("p_l", PartnerLedger);

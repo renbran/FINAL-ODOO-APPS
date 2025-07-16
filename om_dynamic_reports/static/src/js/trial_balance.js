@@ -524,4 +524,9 @@ class TrialBalance extends owl.Component {
     }
 }
 TrialBalance.template = 'trl_b_template_new';
+TrialBalance.props = {
+    action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+};
 actionRegistry.add("trl_b", TrialBalance);

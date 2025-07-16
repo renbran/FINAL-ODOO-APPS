@@ -45,6 +45,10 @@ class GeneralLedgerController extends Component {
 }
 
 GeneralLedgerController.template = "om_dynamic_reports.GeneralLedgerView";
-GeneralLedgerController.props = {};
+GeneralLedgerController.props = {
+    action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+};
 
 registry.category("actions").add("om_dynamic_reports.general_ledger_action", GeneralLedgerController);
