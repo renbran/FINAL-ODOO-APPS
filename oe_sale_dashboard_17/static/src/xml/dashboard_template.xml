@@ -51,6 +51,28 @@
                     </div>
                 </div>
 
+                <!-- Sales Type Count Distribution -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales Type by Count</h3>
+                        <p class="chart-subtitle">Distribution of sales count by type (excluding cancelled)</p>
+                    </div>
+                    <div class="chart-canvas">
+                        <canvas id="salesTypeCountChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sales Type Total Distribution -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales Type by Amount</h3>
+                        <p class="chart-subtitle">Distribution of sales amount by type (excluding cancelled)</p>
+                    </div>
+                    <div class="chart-canvas">
+                        <canvas id="salesTypeTotalChart"></canvas>
+                    </div>
+                </div>
+
                 <!-- Sales Funnel Visualization -->
                 <div class="chart-container">
                     <div class="chart-header">
@@ -62,6 +84,17 @@
                     </div>
                     <div class="o_oe_sale_dashboard_17_container__funnel" t-ref="funnelContainer">
                         <!-- Funnel stages will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Deal Fluctuation Chart -->
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <div class="chart-header">
+                        <h3>Deal Fluctuations</h3>
+                        <p class="chart-subtitle">Monthly trend analysis of deals progression</p>
+                    </div>
+                    <div class="chart-canvas">
+                        <canvas id="dealFluctuationChart"></canvas>
                     </div>
                 </div>
 

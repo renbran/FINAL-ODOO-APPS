@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 # This module is under copyright of 'OdooElevate'
 
-from . import models
+from . import sale_dashboard
