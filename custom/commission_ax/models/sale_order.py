@@ -17,7 +17,7 @@ class SaleOrder(models.Model):
     manager_commission = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
 
     director_id = fields.Many2one('res.partner', string="Director")
-    director_comm_percentage = fields.Float(string="Director Commission (%)", default=3.0)
+    director_comm_percentage = fields.Float(string="Director Commission (%)", default=0.0)
     director_commission = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
     # Second Agent fields
@@ -96,7 +96,7 @@ class SaleOrder(models.Model):
         ('percent_unit_price', 'Percentage of Unit Price'),
         ('percent_untaxed_total', 'Percentage of Untaxed Total')
     ], string="Director Commission Type", default='percent_unit_price')
-    director_rate = fields.Float(string="Director Rate", default=3.0)
+    director_rate = fields.Float(string="Director Rate", default=0.0)
     director_amount = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
     # Summary fields
