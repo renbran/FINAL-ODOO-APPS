@@ -10,14 +10,11 @@ class AutomatedMailRule(models.Model):
     _description = 'Automated Mail Rule'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
-    _sql_constraints = [
-        ('unique_name', 'unique(name)', 'Rule name must be unique'),
-    ]
 
     name = fields.Char(string='Rule Name', required=True, index=True, help="Name of the automated mail rule.")
     model_id = fields.Many2one('ir.model', string='Target Model', required=True, help="Model to apply the rule on.")
     active = fields.Boolean(default=True, string='Active')
-    mail_template_id = fields.Many2one('mail.template', string='Mail Template', required=True, ondelete='set null', help="Mail template to use.")
+    mail_template_id = fields.Many2one('mail.template', string='Mail Template', required=True, help="Mail template to use.")
     rule_type = fields.Selection([
         ('birthday', 'Birthday'),
         ('work_anniversary', 'Work Anniversary'),

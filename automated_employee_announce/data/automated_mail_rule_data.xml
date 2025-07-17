@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Example: Birthday Announcement Rule for hr.employee -->
-    <record id="automated_mail_rule_birthday" model="automated.mail.rule">
-        <field name="name">Birthday Announcement</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="rule_type">birthday</field>
-        <field name="mail_template_id" ref="mail_template_employee_birthday"/>
-        <field name="active">1</field>
-    </record>
-    <!-- Example: Work Anniversary Announcement Rule for hr.employee -->
-    <record id="automated_mail_rule_anniversary" model="automated.mail.rule">
-        <field name="name">Work Anniversary Announcement</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="rule_type">work_anniversary</field>
-        <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
-        <field name="active">1</field>
-    </record>
-    <!-- Mail Templates (to be customized) -->
+    <!-- Mail Templates for Birthday and Anniversary -->
     <record id="mail_template_employee_birthday" model="mail.template">
         <field name="name">Employee Birthday Announcement</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
@@ -34,6 +18,7 @@
             </div>
         ]]></field>
     </record>
+    
     <record id="mail_template_employee_anniversary" model="mail.template">
         <field name="name">Employee Work Anniversary Announcement</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
@@ -50,5 +35,22 @@
                 If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
             </div>
         ]]></field>
+    </record>
+
+    <!-- Automated Mail Rules -->
+    <record id="rule_birthday_announcement" model="automated.mail.rule">
+        <field name="name">Employee Birthday Announcements</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="active" eval="True"/>
+        <field name="mail_template_id" ref="mail_template_employee_birthday"/>
+        <field name="rule_type">birthday</field>
+    </record>
+
+    <record id="rule_anniversary_announcement" model="automated.mail.rule">
+        <field name="name">Employee Work Anniversary Announcements</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="active" eval="True"/>
+        <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
+        <field name="rule_type">work_anniversary</field>
     </record>
 </odoo>
