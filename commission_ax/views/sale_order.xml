@@ -13,7 +13,14 @@
                             string="Calculate Commissions" 
                             class="btn-primary" 
                             invisible="commission_status != 'draft'"
-                            help="Calculate and create commission purchase orders"/>
+                            help="Calculate and create commission purchase orders (requires payment)"/>
+                    <button name="action_force_process_commissions" 
+                            type="object" 
+                            string="Force Process Commissions" 
+                            class="btn-warning" 
+                            invisible="commission_status != 'draft' or invoice_status != 'invoiced'"
+                            confirm="Are you sure you want to process commissions without full payment? This should only be used in special cases."
+                            help="Force process commissions even if not fully paid - manual override"/>
                     <button name="action_confirm_commissions" 
                             type="object" 
                             string="Confirm Commissions" 

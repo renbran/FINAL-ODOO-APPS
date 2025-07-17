@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Contact Merge Wizard Form View -->
+    <record id="view_contact_merge_wizard_form" model="ir.ui.view">
+        <field name="name">contact.merge.wizard.form</field>
+        <field name="model">contact.merge.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Merge Contacts">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Merge Contacts</h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="partner_ids" widget="many2many_tags" required="1"/>
+                            <field name="master_partner_id" required="1" 
+                                   domain="[('id', 'in', partner_ids)]"/>
+                            <field name="merge_strategy" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="duplicate_record_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Preview" name="preview">
+                            <field name="preview_html" widget="html" nolabel="1"/>
+                        </page>
+                        
+                        <page string="Merge Data" name="merge_data" 
+                              invisible="merge_strategy != 'manual'">
+                            <group>
+                                <group string="Basic Information">
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="mobile"/>
+                                    <field name="vat"/>
+                                    <field name="website"/>
+                                </group>
+                                <group string="Address">
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="city"/>
+                                    <field name="zip"/>
+                                    <field name="state_id"/>
+                                    <field name="country_id"/>
+                                </group>
+                            </group>
+                            <group string="Internal Notes">
+                                <field name="comment" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_merge" type="object" string="Merge Contacts" 
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
