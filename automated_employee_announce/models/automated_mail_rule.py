@@ -15,7 +15,7 @@ class AutomatedMailRule(models.Model):
     ]
 
     name = fields.Char(string='Rule Name', required=True, index=True, help="Name of the automated mail rule.")
-    model_id = fields.Many2one('ir.model', string='Target Model', required=True, ondelete='cascade', help="Model to apply the rule on.")
+    model_id = fields.Many2one('ir.model', string='Target Model', required=True, help="Model to apply the rule on.")
     active = fields.Boolean(default=True, string='Active')
     mail_template_id = fields.Many2one('mail.template', string='Mail Template', required=True, ondelete='set null', help="Mail template to use.")
     rule_type = fields.Selection([
