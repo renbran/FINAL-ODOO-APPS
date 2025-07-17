@@ -36,9 +36,9 @@ class AutomatedMailRule(models.Model):
                     self.mail_template_id.send_mail(emp.id, force_send=True)
                     emp.message_post(body="Automated: Birthday announcement email sent.")
         elif self.rule_type == 'work_anniversary':
-            employees = model.search([('work_email', '!=', False), ('hire_date', '!=', False)])
+            employees = model.search([('work_email', '!=', False), ('joining_date', '!=', False)])
             for emp in employees:
-                if emp.hire_date and emp.hire_date.month == today.month and emp.hire_date.day == today.day:
+                if emp.joining_date and emp.joining_date.month == today.month and emp.joining_date.day == today.day:
                     self.mail_template_id.send_mail(emp.id, force_send=True)
                     emp.message_post(body="Automated: Work anniversary announcement email sent.")
         self.last_run = today
