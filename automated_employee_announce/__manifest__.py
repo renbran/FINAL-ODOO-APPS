@@ -21,8 +21,8 @@ Automatically send announcement emails to all employees for birthdays and work a
         'data/mail_template_saleorder_payment_initiated.xml',
         'data/mail_template_saleorder_deal_status_reminder.xml',
         'data/ir_cron_deal_status_reminder.xml',
-        'views/menu.xml',
         'views/automated_mail_rule_views.xml',
+        'views/menu.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [
