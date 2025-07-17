@@ -24,11 +24,6 @@
         <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
         <field name="email_to">${object.work_email}</field>
         <field name="body_html"><![CDATA[
-<<<<<<< HEAD
-            <p>Dear Team,</p>
-            <p>Today is <strong>${object.name}</strong>'s birthday! 🎉<br/>
-            Please join us in wishing them a wonderful day.</p>
-=======
             <div style="font-family: Arial, sans-serif; color: #800020;">
                 <h2 style="color: #800020;">Happy Birthday!</h2>
                 <p>Dear Team,</p>
@@ -37,7 +32,6 @@
                 <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
                 If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
             </div>
->>>>>>> staging
         ]]></field>
     </record>
     <record id="mail_template_employee_anniversary" model="mail.template">
@@ -47,11 +41,6 @@
         <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
         <field name="email_to">${object.work_email}</field>
         <field name="body_html"><![CDATA[
-<<<<<<< HEAD
-            <p>Dear Team,</p>
-            <p>Today marks <strong>${object.name}</strong>'s work anniversary! 🎊<br/>
-            Let's congratulate them on their journey with us.</p>
-=======
             <div style="font-family: Arial, sans-serif; color: #800020;">
                 <h2 style="color: #800020;">Happy Work Anniversary!</h2>
                 <p>Dear Team,</p>
@@ -60,7 +49,6 @@
                 <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
                 If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
             </div>
->>>>>>> staging
         ]]></field>
     </record>
 </odoo>
