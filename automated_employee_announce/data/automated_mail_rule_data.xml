@@ -1,56 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Mail Templates for Birthday and Anniversary -->
-    <record id="mail_template_employee_birthday" model="mail.template">
-        <field name="name">Employee Birthday Announcement</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="subject">Happy Birthday, ${object.name}!</field>
-        <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
-        <field name="email_to">${object.work_email}</field>
-        <field name="body_html"><![CDATA[
-            <div style="font-family: Arial, sans-serif; color: #800020;">
-                <h2 style="color: #800020;">Happy Birthday!</h2>
-                <p>Dear Team,</p>
-                <p>Today is <strong>${object.name}</strong>'s birthday! 🎉<br/>
-                Please join us in wishing them a wonderful day.</p>
-                <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
-                If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
-            </div>
-        ]]></field>
-    </record>
-    
-    <record id="mail_template_employee_anniversary" model="mail.template">
-        <field name="name">Employee Work Anniversary Announcement</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="subject">Happy Work Anniversary, ${object.name}!</field>
-        <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
-        <field name="email_to">${object.work_email}</field>
-        <field name="body_html"><![CDATA[
-            <div style="font-family: Arial, sans-serif; color: #800020;">
-                <h2 style="color: #800020;">Happy Work Anniversary!</h2>
-                <p>Dear Team,</p>
-                <p>Today marks <strong>${object.name}</strong>'s work anniversary! 🎊<br/>
-                Let's congratulate them on their journey with us.</p>
-                <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
-                If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
-            </div>
-        ]]></field>
-    </record>
+    <data noupdate="1">
+        <!-- Default Birthday Rule -->
+        <record id="default_birthday_rule" model="automated.mail.rule">
+            <field name="name">Default Birthday Announcements</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="mail_template_id" ref="mail_template_employee_birthday"/>
+            <field name="rule_type">birthday</field>
+            <field name="active">True</field>
+            <field name="send_to_all_employees">False</field>
+            <field name="days_before">0</field>
+        </record>
 
-    <!-- Automated Mail Rules -->
-    <record id="rule_birthday_announcement" model="automated.mail.rule">
-        <field name="name">Employee Birthday Announcements</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="active" eval="True"/>
-        <field name="mail_template_id" ref="mail_template_employee_birthday"/>
-        <field name="rule_type">birthday</field>
-    </record>
+        <!-- Default Work Anniversary Rule -->
+        <record id="default_anniversary_rule" model="automated.mail.rule">
+            <field name="name">Default Work Anniversary Announcements</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
+            <field name="rule_type">work_anniversary</field>
+            <field name="active">True</field>
+            <field name="send_to_all_employees">False</field>
+            <field name="days_before">0</field>
+        </record>
 
-    <record id="rule_anniversary_announcement" model="automated.mail.rule">
-        <field name="name">Employee Work Anniversary Announcements</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="active" eval="True"/>
-        <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
-        <field name="rule_type">work_anniversary</field>
-    </record>
+        <!-- Company-wide Birthday Announcement Rule -->
+        <record id="company_birthday_rule" model="automated.mail.rule">
+            <field name="name">Company-wide Birthday Announcements</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="mail_template_id" ref="mail_template_employee_birthday"/>
+            <field name="rule_type">birthday</field>
+            <field name="active">False</field>
+            <field name="send_to_all_employees">True</field>
+            <field name="days_before">0</field>
+        </record>
+
+        <!-- Company-wide Anniversary Announcement Rule -->
+        <record id="company_anniversary_rule" model="automated.mail.rule">
+            <field name="name">Company-wide Anniversary Announcements</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
+            <field name="rule_type">work_anniversary</field>
+            <field name="active">False</field>
+            <field name="send_to_all_employees">True</field>
+            <field name="days_before">0</field>
+        </record>
+    </data>
 </odoo>

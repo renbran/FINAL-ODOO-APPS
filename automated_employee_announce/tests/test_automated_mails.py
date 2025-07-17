@@ -62,3 +62,76 @@ class TestAutomatedEmployeeAnnounce(TransactionCase):
         self.env['sale.order'].send_deal_status_reminders()
         messages = self.sale_order.message_ids.filtered(lambda m: 'deal status reminder' in (m.body or '').lower())
         self.assertTrue(messages, 'Deal status reminder mail not sent!')
+
+    def test_work_anniversary_announcement_mail(self):
+        """Test work anniversary announcement mail rule."""
+        rule = self.env['automated.mail.rule'].create({
+            'name': 'Anniversary Rule',
+            'model_id': self.env['ir.model']._get_id('hr.employee'),
+            'mail_template_id': self.env.ref('automated_employee_announce.mail_template_employee_anniversary').id,
+            'rule_type': 'work_anniversary',
+        })
+        rule.run_rule()
+        # Check mail sent in mail.message
+        messages = self.hr_employee.message_ids.filtered(lambda m: 'anniversary' in (m.subject or '').lower())
+        self.assertTrue(messages, 'Work anniversary announcement mail not sent!')
+
+    def test_automated_mail_rule_constraints(self):
+        """Test validation constraints on automated mail rules."""
+        # Test negative days_before
+        with self.assertRaises(ValidationError):
+            self.env['automated.mail.rule'].create({
+                'name': 'Invalid Rule',
+                'model_id': self.env['ir.model']._get_id('hr.employee'),
+                'mail_template_id': self.env.ref('automated_employee_announce.mail_template_employee_birthday').id,
+                'rule_type': 'birthday',
+                'days_before': -1,
+            })
+
+    def test_employee_years_of_service(self):
+        """Test years of service computation."""
+        # Set a specific joining date
+        from datetime import date, timedelta
+        self.hr_employee.write({
+            'joining_date': date.today() - timedelta(days=730)  # 2 years ago
+        })
+        self.hr_employee._compute_years_of_service()
+        self.assertEqual(self.hr_employee.years_of_service, 2, 'Years of service calculation is incorrect!')
+
+    def test_manual_birthday_wish(self):
+        """Test manual birthday wish action."""
+        result = self.hr_employee.action_send_birthday_wish()
+        self.assertEqual(result.get('type'), 'ir.actions.client', 'Manual birthday wish action failed!')
+
+    def test_manual_anniversary_wish(self):
+        """Test manual anniversary wish action."""
+        self.hr_employee.joining_date = date.today() - timedelta(days=365)
+        result = self.hr_employee.action_send_anniversary_wish()
+        self.assertEqual(result.get('type'), 'ir.actions.client', 'Manual anniversary wish action failed!')
+
+    def test_run_all_active_rules(self):
+        """Test running all active rules."""
+        # Create some rules
+        birthday_rule = self.env['automated.mail.rule'].create({
+            'name': 'Test Birthday Rule',
+            'model_id': self.env['ir.model']._get_id('hr.employee'),
+            'mail_template_id': self.env.ref('automated_employee_announce.mail_template_employee_birthday').id,
+            'rule_type': 'birthday',
+            'active': True,
+        })
+        
+        anniversary_rule = self.env['automated.mail.rule'].create({
+            'name': 'Test Anniversary Rule',
+            'model_id': self.env['ir.model']._get_id('hr.employee'),
+            'mail_template_id': self.env.ref('automated_employee_announce.mail_template_employee_anniversary').id,
+            'rule_type': 'work_anniversary',
+            'active': True,
+        })
+        
+        # Run all active rules
+        total_sent = self.env['automated.mail.rule'].run_all_active_rules()
+        self.assertIsInstance(total_sent, int, 'Run all active rules should return an integer!')
+        
+        # Check that rules were executed
+        self.assertIsNotNone(birthday_rule.last_run, 'Birthday rule was not executed!')
+        self.assertIsNotNone(anniversary_rule.last_run, 'Anniversary rule was not executed!')
