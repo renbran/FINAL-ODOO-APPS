@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Example: Birthday Announcement Rule for hr.employee -->
+    <record id="automated_mail_rule_birthday" model="automated.mail.rule">
+        <field name="name">Birthday Announcement</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="rule_type">birthday</field>
+        <field name="mail_template_id" ref="mail_template_employee_birthday"/>
+        <field name="active">1</field>
+    </record>
+    <!-- Example: Work Anniversary Announcement Rule for hr.employee -->
+    <record id="automated_mail_rule_anniversary" model="automated.mail.rule">
+        <field name="name">Work Anniversary Announcement</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="rule_type">work_anniversary</field>
+        <field name="mail_template_id" ref="mail_template_employee_anniversary"/>
+        <field name="active">1</field>
+    </record>
+    <!-- Mail Templates (to be customized) -->
+    <record id="mail_template_employee_birthday" model="mail.template">
+        <field name="name">Employee Birthday Announcement</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="subject">Happy Birthday, ${object.name}!</field>
+        <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
+        <field name="email_to">${object.work_email}</field>
+        <field name="body_html"><![CDATA[
+            <div style="font-family: Arial, sans-serif; color: #800020;">
+                <h2 style="color: #800020;">Happy Birthday!</h2>
+                <p>Dear Team,</p>
+                <p>Today is <strong>${object.name}</strong>'s birthday! 🎉<br/>
+                Please join us in wishing them a wonderful day.</p>
+                <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
+                If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
+            </div>
+        ]]></field>
+    </record>
+    <record id="mail_template_employee_anniversary" model="mail.template">
+        <field name="name">Employee Work Anniversary Announcement</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="subject">Happy Work Anniversary, ${object.name}!</field>
+        <field name="email_from">${(user.email or 'noreply@yourcompany.com')|safe}</field>
+        <field name="email_to">${object.work_email}</field>
+        <field name="body_html"><![CDATA[
+            <div style="font-family: Arial, sans-serif; color: #800020;">
+                <h2 style="color: #800020;">Happy Work Anniversary!</h2>
+                <p>Dear Team,</p>
+                <p>Today marks <strong>${object.name}</strong>'s work anniversary! 🎊<br/>
+                Let's congratulate them on their journey with us.</p>
+                <p style="color: #888; font-size: 12px;">This is an automated message. Please do not reply directly to this email.<br/>
+                If you believe you received this email in error, please <a href='mailto:r.antthony@osusproperties.com' style='color:#800020;text-decoration:underline;'>contact us</a>.</p>
+            </div>
+        ]]></field>
+    </record>
+</odoo>

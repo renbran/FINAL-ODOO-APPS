@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_automated_employee_announce_root" name="Employee Announcements" sequence="10"/>
+    <menuitem id="menu_automated_mail_rule" name="Automated Mail Rules" parent="menu_automated_employee_announce_root" action="action_automated_mail_rule" sequence="20"/>
+</odoo>
