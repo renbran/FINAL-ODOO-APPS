@@ -9,7 +9,7 @@ Automatically send announcement emails to all employees for birthdays and work a
     'author': 'Your Company',
     'website': 'https://yourcompany.com',
     'license': 'LGPL-3',
-    'depends': ['base', 'hr', 'mail', 'web', 'hr_holidays', 'sale_management'],
+    'depends': ['base', 'hr', 'mail', 'web', 'hr_holidays', 'sale_management', 'commission_ax'],
     'external_dependencies': {
         'python': [],
         'bin': [],

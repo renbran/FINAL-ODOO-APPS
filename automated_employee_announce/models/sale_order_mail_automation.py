@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, api, fields
 from datetime import date, timedelta
 
 class SaleOrder(models.Model):
