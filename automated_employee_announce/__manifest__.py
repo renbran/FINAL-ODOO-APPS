@@ -16,7 +16,6 @@ Automatically send announcement emails to all employees for birthdays and work a
     },
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
         'data/automated_mail_rule_data.xml',
         'data/mail_template_saleorder_invoiced.xml',
         'data/mail_template_saleorder_payment_initiated.xml',
@@ -24,6 +23,7 @@ Automatically send announcement emails to all employees for birthdays and work a
         'data/ir_cron_deal_status_reminder.xml',
         'views/menu.xml',
         'views/automated_mail_rule_views.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [
         'demo/demo.xml',
