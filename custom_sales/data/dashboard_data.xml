@@ -105,14 +105,12 @@
             <field name="sequence">1</field>
             <field name="dashboard_config_id" ref="default_dashboard_config"/>
             <field name="chart_type">bar</field>
-            <field name="model_name">custom.sales.order</field>
-            <field name="x_field">create_date</field>
-            <field name="y_field">actual_revenue</field>
-            <field name="limit">12</field>
-            <field name="width">6</field>
-            <field name="height">400</field>
+            <field name="data_source">sales_orders</field>
+            <field name="group_by_field">month</field>
+            <field name="value_field">total_revenue</field>
+            <field name="width">400</field>
+            <field name="height">300</field>
             <field name="show_legend" eval="True"/>
-            <field name="show_labels" eval="True"/>
         </record>
         
         <record id="chart_sales_by_team" model="custom.sales.chart.config">
@@ -120,14 +118,13 @@
             <field name="sequence">2</field>
             <field name="dashboard_config_id" ref="default_dashboard_config"/>
             <field name="chart_type">doughnut</field>
-            <field name="model_name">custom.sales.order</field>
-            <field name="x_field">sales_team_id</field>
-            <field name="y_field">actual_revenue</field>
-            <field name="limit">10</field>
-            <field name="width">6</field>
-            <field name="height">400</field>
+            <field name="data_source">sales_orders</field>
+            <field name="group_by_field">sales_team_id</field>
+            <field name="value_field">total_revenue</field>
+            <field name="width">400</field>
+            <field name="height">300</field>
             <field name="show_legend" eval="True"/>
-            <field name="show_labels" eval="True"/>
+            <field name="color_scheme">brand</field>
         </record>
         
         <record id="chart_customer_types" model="custom.sales.chart.config">
@@ -135,13 +132,13 @@
             <field name="sequence">3</field>
             <field name="dashboard_config_id" ref="default_dashboard_config"/>
             <field name="chart_type">pie</field>
-            <field name="model_name">custom.sales.order</field>
-            <field name="x_field">customer_type</field>
-            <field name="y_field">actual_revenue</field>
-            <field name="width">6</field>
-            <field name="height">400</field>
+            <field name="data_source">sales_orders</field>
+            <field name="group_by_field">customer_type</field>
+            <field name="value_field">total_revenue</field>
+            <field name="width">400</field>
+            <field name="height">300</field>
             <field name="show_legend" eval="True"/>
-            <field name="show_labels" eval="True"/>
+            <field name="color_scheme">blue</field>
         </record>
         
         <record id="chart_sales_trend" model="custom.sales.chart.config">
@@ -149,14 +146,13 @@
             <field name="sequence">4</field>
             <field name="dashboard_config_id" ref="default_dashboard_config"/>
             <field name="chart_type">line</field>
-            <field name="model_name">custom.sales.order</field>
-            <field name="x_field">create_date</field>
-            <field name="y_field">actual_revenue</field>
-            <field name="limit">30</field>
-            <field name="width">6</field>
-            <field name="height">400</field>
+            <field name="data_source">sales_orders</field>
+            <field name="group_by_field">month</field>
+            <field name="value_field">total_revenue</field>
+            <field name="width">400</field>
+            <field name="height">300</field>
             <field name="show_legend" eval="True"/>
-            <field name="show_labels" eval="False"/>
+            <field name="color_scheme">brand</field>
         </record>
         
         <!-- Dashboard Action -->
