@@ -1,8 +1,3 @@
-/** @odoo-module **/
-/* This module is under copyright of 'OdooElevate' */
-/* Simple Chart Implementation for Executive Dashboard */
-
-// Simple Chart.js-like implementation for Odoo compatibility
 window.SimpleChart = class SimpleChart {
     constructor(ctx, config) {
         this.ctx = ctx;

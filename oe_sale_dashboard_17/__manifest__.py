@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# This module is under copyright of 'OdooElevate'
 {
     'name': 'OSUS Executive Sales Dashboard',
     'version': '17.0.0.1.6',
@@ -22,8 +20,8 @@
         Transform your sales data into beautiful, actionable insights with this comprehensive
         executive dashboard using booking_date and sale_value fields from the osus_invoice_report module.
     """,
-    'author': 'Sheikh Muhammad Saad, OdooElevate',
-    'website': 'https://odooelevate.odoo.com/',
+    'author': 'RENBRAN',
+    'website': 'WWW.TACHIMAO.COM',
     'depends': ['web', 'sale_management', 'osus_invoice_report', 'le_sale_type'],
     'data': [
         'data/sale_order_data.xml',
