@@ -53,47 +53,52 @@ class OeSaleDashboard extends Component {
             useGrouping: true
         });
 
-        // Modern Color Palette for Charts
+        // Brand Color Palette for Charts
         this.colorPalette = {
             primary: {
-                background: 'rgba(59, 130, 246, 0.8)',
-                border: 'rgba(59, 130, 246, 1)',
-                gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(96, 165, 250, 0.8))'
+                background: 'rgba(126, 54, 54, 0.8)',      // burgundy
+                border: 'rgba(126, 54, 54, 1)',
+                gradient: 'linear-gradient(135deg, rgba(126, 54, 54, 0.8), rgba(178, 34, 34, 0.8))'
             },
             secondary: {
-                background: 'rgba(16, 185, 129, 0.8)',
-                border: 'rgba(16, 185, 129, 1)',
-                gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(52, 211, 153, 0.8))'
+                background: 'rgba(178, 34, 34, 0.8)',      // red wine
+                border: 'rgba(178, 34, 34, 1)',
+                gradient: 'linear-gradient(135deg, rgba(178, 34, 34, 0.8), rgba(126, 54, 54, 0.8))'
             },
             accent: {
-                background: 'rgba(245, 158, 11, 0.8)',
-                border: 'rgba(245, 158, 11, 1)',
-                gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(251, 191, 36, 0.8))'
+                background: 'rgba(255, 215, 0, 0.8)',      // gold
+                border: 'rgba(255, 215, 0, 1)',
+                gradient: 'linear-gradient(135deg, rgba(255, 215, 0, 0.8), rgba(244, 228, 188, 0.8))'
+            },
+            lightGold: {
+                background: 'rgba(244, 228, 188, 0.8)',    // light gold
+                border: 'rgba(244, 228, 188, 1)',
+                gradient: 'linear-gradient(135deg, rgba(244, 228, 188, 0.8), rgba(255, 215, 0, 0.8))'
             },
             purple: {
-                background: 'rgba(139, 92, 246, 0.8)',
-                border: 'rgba(139, 92, 246, 1)',
-                gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(167, 139, 250, 0.8))'
+                background: 'rgba(126, 54, 54, 0.6)',      // burgundy variant
+                border: 'rgba(126, 54, 54, 0.8)',
+                gradient: 'linear-gradient(135deg, rgba(126, 54, 54, 0.6), rgba(178, 34, 34, 0.6))'
             },
             danger: {
-                background: 'rgba(239, 68, 68, 0.8)',
-                border: 'rgba(239, 68, 68, 1)',
-                gradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(248, 113, 113, 0.8))'
+                background: 'rgba(178, 34, 34, 0.8)',      // red wine
+                border: 'rgba(178, 34, 34, 1)',
+                gradient: 'linear-gradient(135deg, rgba(178, 34, 34, 0.8), rgba(126, 54, 54, 0.8))'
             },
             success: {
-                background: 'rgba(16, 185, 129, 0.8)',
-                border: 'rgba(16, 185, 129, 1)',
-                gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(52, 211, 153, 0.8))'
+                background: 'rgba(255, 215, 0, 0.8)',      // gold
+                border: 'rgba(255, 215, 0, 1)',
+                gradient: 'linear-gradient(135deg, rgba(255, 215, 0, 0.8), rgba(244, 228, 188, 0.8))'
             },
             info: {
-                background: 'rgba(6, 182, 212, 0.8)',
-                border: 'rgba(6, 182, 212, 1)',
-                gradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(34, 211, 238, 0.8))'
+                background: 'rgba(244, 228, 188, 0.8)',    // light gold
+                border: 'rgba(244, 228, 188, 1)',
+                gradient: 'linear-gradient(135deg, rgba(244, 228, 188, 0.8), rgba(255, 215, 0, 0.8))'
             },
             pink: {
-                background: 'rgba(236, 72, 153, 0.8)',
-                border: 'rgba(236, 72, 153, 1)',
-                gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.8), rgba(244, 114, 182, 0.8))'
+                background: 'rgba(178, 34, 34, 0.6)',      // red wine variant
+                border: 'rgba(178, 34, 34, 0.8)',
+                gradient: 'linear-gradient(135deg, rgba(178, 34, 34, 0.6), rgba(126, 54, 54, 0.6))'
             }
         };
 
@@ -124,10 +129,16 @@ class OeSaleDashboard extends Component {
         // Load dashboard data when the component is mounted
         onMounted(async () => {
             console.log("Executive Sales Dashboard - Date Range:", this.state.startDate, "to", this.state.endDate);
-            await this._loadDashboardData();
             
-            // Add scroll-to-top functionality
-            this._addScrollToTopButton();
+            try {
+                // Initialize dashboard with enhanced error handling
+                await this._initializeDashboard();
+                
+                // Add scroll-to-top functionality
+                this._addScrollToTopButton();
+            } catch (error) {
+                this._handleDashboardError(error, 'mount');
+            }
         });
     }
 
@@ -1033,11 +1044,12 @@ class OeSaleDashboard extends Component {
      * Create pie chart showing sales type distribution by total amount using backend data
      */
     _createSalesTypeTotalChartWithData(amountData) {
-        const canvas = document.getElementById('salesTypeTotalChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or salesTypeTotalChart canvas not found');
-            return;
-        }
+        try {
+            const canvas = document.getElementById('salesTypeTotalChart');
+            if (!canvas || typeof Chart === 'undefined') {
+                console.warn('Chart.js not available or salesTypeTotalChart canvas not found');
+                return;
+            }
 
         const ctx = canvas.getContext('2d');
         
@@ -1097,291 +1109,170 @@ class OeSaleDashboard extends Component {
                 }
             }
         });
+
+        } catch (error) {
+            console.error('Error creating sales type total chart:', error);
+            this._handleDashboardError(error, 'sales type total chart');
+        }
     }
 
     /**
-     * Create pie chart showing sales type distribution by count
+     * Create sales type count distribution chart
      */
     _createSalesTypeCountChart() {
-        const canvas = document.getElementById('salesTypeCountChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or salesTypeCountChart canvas not found');
-            return;
-        }
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeCountChart', 'pie');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type count chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
 
-        const ctx = canvas.getContext('2d');
-        
-        // Get all sales data combined (excluding cancelled and Total rows)
-        const allSalesData = [];
-        
-        // Combine data from quotations, sales orders, and invoiced sales
-        const quotationsData = this.state.quotationsData.filter(item => item.sales_type_name !== 'Total');
-        const salesOrdersData = this.state.salesOrdersData.filter(item => item.sales_type_name !== 'Total');
-        const invoicedSalesData = this.state.invoicedSalesData.filter(item => item.sales_type_name !== 'Total');
-        
-        // Create a map to aggregate counts by sales type
-        const salesTypeMap = new Map();
-        
-        // Process each category
-        [quotationsData, salesOrdersData, invoicedSalesData].forEach(dataSet => {
-            dataSet.forEach(item => {
-                const typeName = item.sales_type_name;
-                const count = item.count || 0;
-                
-                if (salesTypeMap.has(typeName)) {
-                    salesTypeMap.set(typeName, salesTypeMap.get(typeName) + count);
-                } else {
-                    salesTypeMap.set(typeName, count);
+            // Combine all sales data for count distribution
+            const combinedData = {};
+            
+            // Add quotations data
+            this.state.quotationsData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
                 }
             });
-        });
+            
+            // Add sales orders data
+            this.state.salesOrdersData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+            
+            // Add invoiced sales data
+            this.state.invoicedSalesData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
 
-        // Convert map to arrays for chart
-        const labels = Array.from(salesTypeMap.keys());
-        const data = Array.from(salesTypeMap.values());
-        
-        const chartData = {
-            labels: labels,
-            datasets: [{
-                label: 'Sales Count by Type',
-                data: data,
-                backgroundColor: [
-                    'rgba(99, 102, 241, 0.8)',   // Indigo
-                    'rgba(34, 197, 94, 0.8)',    // Green
-                    'rgba(168, 85, 247, 0.8)',   // Violet
-                    'rgba(251, 146, 60, 0.8)',   // Orange
-                    'rgba(244, 63, 94, 0.8)',    // Rose
-                    'rgba(14, 165, 233, 0.8)',   // Sky
-                    'rgba(132, 204, 22, 0.8)',   // Lime
-                ],
-                borderColor: [
-                    'rgba(99, 102, 241, 1)',
-                    'rgba(34, 197, 94, 1)',
-                    'rgba(168, 85, 247, 1)',
-                    'rgba(251, 146, 60, 1)',
-                    'rgba(244, 63, 94, 1)',
-                    'rgba(14, 165, 233, 1)',
-                    'rgba(132, 204, 22, 1)',
-                ],
-                borderWidth: 2,
-                hoverOffset: 8
-            }]
-        };
+            const labels = Object.keys(combinedData);
+            const data = Object.values(combinedData);
 
-        this.charts.salesTypePie = new Chart(ctx, {
-            type: 'pie',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+            if (labels.length === 0) {
+                labels.push('No Data Available');
+                data.push(1);
+            }
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Count by Sales Type',
+                    data: data,
+                    backgroundColor: this.chartColors.backgrounds,
+                    borderColor: this.chartColors.borders,
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            };
+
+            const chartOptions = {
+                ...options,
                 plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 11,
-                                family: 'Inter'
-                            }
-                        }
-                    },
+                    ...options.plugins,
                     tooltip: {
+                        ...options.plugins.tooltip,
                         callbacks: {
                             label: (context) => {
                                 const label = context.label || '';
                                 const value = context.parsed;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                return `${label}: ${value} sales (${percentage}%)`;
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return `${label}: ${value} deals (${percentage}%)`;
                             }
                         }
                     }
                 },
                 animation: {
                     animateRotate: true,
-                    duration: 1200
+                    duration: 1000
                 }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeCount) {
+                this.charts.salesTypeCount.destroy();
             }
-        });
+
+            this.charts.salesTypeCount = this._createChartSafely('salesTypeCountChart', {
+                type: 'pie',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type count chart:', error);
+            this._handleDashboardError(error, 'sales type count chart');
+        }
     }
 
     /**
-     * Create pie chart showing sales type distribution by total amount
+     * Create sales type total amount distribution chart
      */
     _createSalesTypeTotalChart() {
-        const canvas = document.getElementById('salesTypeTotalChart');
-        if (!canvas || typeof Chart === 'undefined') {
-            console.warn('Chart.js not available or salesTypeTotalChart canvas not found');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        
-        // Get all sales data combined (excluding cancelled and Total rows)
-        const quotationsData = this.state.quotationsData.filter(item => item.sales_type_name !== 'Total');
-        const salesOrdersData = this.state.salesOrdersData.filter(item => item.sales_type_name !== 'Total');
-        const invoicedSalesData = this.state.invoicedSalesData.filter(item => item.sales_type_name !== 'Total');
-        
-        // Create a map to aggregate amounts by sales type
-        const salesTypeMap = new Map();
-        
-        // Process each category - sum all amounts for comprehensive view
-        [quotationsData, salesOrdersData, invoicedSalesData].forEach(dataSet => {
-            dataSet.forEach(item => {
-                const typeName = item.sales_type_name;
-                // Use invoiced_amount for invoiced sales, otherwise use amount
-                const amount = (item.invoiced_amount && item.invoiced_amount > 0) 
-                    ? item.invoiced_amount 
-                    : (item.amount || 0);
-                
-                if (salesTypeMap.has(typeName)) {
-                    salesTypeMap.set(typeName, salesTypeMap.get(typeName) + amount);
-                } else {
-                    salesTypeMap.set(typeName, amount);
-                }
-            });
-        });
-
-        // Convert map to arrays for chart
-        const labels = Array.from(salesTypeMap.keys());
-        const data = Array.from(salesTypeMap.values());
-        
-        const chartData = {
-            labels: labels,
-            datasets: [{
-                label: 'Sales Amount by Type',
-                data: data,
-                backgroundColor: [
-                    'rgba(79, 70, 229, 0.8)',    // Indigo
-                    'rgba(16, 185, 129, 0.8)',   // Emerald
-                    'rgba(139, 92, 246, 0.8)',   // Violet  
-                    'rgba(245, 158, 11, 0.8)',   // Amber
-                    'rgba(239, 68, 68, 0.8)',    // Red
-                    'rgba(6, 182, 212, 0.8)',    // Cyan
-                    'rgba(101, 163, 13, 0.8)',   // Lime
-                ],
-                borderColor: [
-                    'rgba(79, 70, 229, 1)',
-                    'rgba(16, 185, 129, 1)',
-                    'rgba(139, 92, 246, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(6, 182, 212, 1)',
-                    'rgba(101, 163, 13, 1)',
-                ],
-                borderWidth: 2,
-                hoverOffset: 8
-            }]
-        };
-
-        // Note: Using same chart instance as count chart for now - will be separated with proper canvas
-        new Chart(ctx, {
-            type: 'pie',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 11,
-                                family: 'Inter'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const label = context.label || '';
-                                const value = this.formatNumber(context.parsed);
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    animateRotate: true,
-                    duration: 1200
-                }
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeTotalChart', 'bar');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type total chart');
+                return;
             }
-        });
-    }
+            
+            const { ctx, options } = chartSetup;
 
-    /**
-     * Create bar chart showing deal fluctuations over time
-     */
-    async _createDealFluctuationChart() {
-        const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
-        if (!chartSetup) {
-            console.warn('Failed to prepare canvas for deal fluctuation chart');
-            return;
-        }
-        
-        const { ctx, options } = chartSetup;
-        
-        // Calculate monthly data for the current date range
-        const monthlyData = await this._calculateMonthlyFluctuations();
-        
-        const chartData = {
-            labels: monthlyData.labels,
-            datasets: [
-                {
-                    label: 'Quotations',
-                    data: monthlyData.quotations,
-                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 2,
-                    tension: 0.1
-                },
-                {
-                    label: 'Sales Orders',
-                    data: monthlyData.sales_orders || monthlyData.salesOrders, // Handle both naming conventions
-                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    borderWidth: 2,
-                    tension: 0.1
-                },
-                {
-                    label: 'Invoiced Sales',
-                    data: monthlyData.invoiced_sales || monthlyData.invoicedSales, // Handle both naming conventions
-                    backgroundColor: 'rgba(139, 92, 246, 0.6)',
-                    borderColor: 'rgba(139, 92, 246, 1)',
-                    borderWidth: 2,
-                    tension: 0.1
-                }
-            ]
-        };
+            // Get invoiced sales data excluding totals
+            const invoicedData = this.state.invoicedSalesData.filter(item => 
+                item.sales_type_name !== 'Total'
+            );
 
-        this.charts.dealFluctuation = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        }
+            if (invoicedData.length === 0) {
+                invoicedData.push({
+                    sales_type_name: 'No Data Available',
+                    amount: 0,
+                    sale_value: 0,
+                    invoiced_amount: 0
+                });
+            }
+
+            const chartData = {
+                labels: invoicedData.map(item => item.sales_type_name),
+                datasets: [
+                    {
+                        label: 'Total Amount',
+                        data: invoicedData.map(item => item.amount || 0),
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 2
                     },
+                    {
+                        label: 'Sale Value',
+                        data: invoicedData.map(item => item.sale_value || 0),
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Revenue Realized',
+                        data: invoicedData.map(item => item.invoiced_amount || 0),
+                        backgroundColor: this.colorPalette.accent.background,
+                        borderColor: this.colorPalette.accent.border,
+                        borderWidth: 2
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
                     tooltip: {
+                        ...options.plugins.tooltip,
                         callbacks: {
                             label: (context) => {
                                 const label = context.dataset.label || '';
@@ -1392,633 +1283,212 @@ class OeSaleDashboard extends Component {
                     }
                 },
                 scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Time Period',
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
+                    ...options.scales,
                     y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Amount',
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        },
+                        ...options.scales.y,
                         ticks: {
-                            callback: (value) => this.formatNumber(value)
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
+                    }
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeTotal) {
+                this.charts.salesTypeTotal.destroy();
+            }
+
+            this.charts.salesTypeTotal = this._createChartSafely('salesTypeTotalChart', {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type total chart:', error);
+            this._handleDashboardError(error, 'sales type total chart');
+        }
+    }
+
+    /**
+     * Create deal fluctuation trend chart
+     */
+    _createDealFluctuationChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for deal fluctuation chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock monthly data for demonstration
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const quotationsData = [45, 52, 38, 65, 72, 58];
+            const salesOrdersData = [35, 42, 28, 48, 55, 45];
+            const invoicedData = [25, 32, 22, 38, 42, 35];
+
+            const chartData = {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Quotations',
+                        data: quotationsData,
+                        backgroundColor: this.colorPalette.info.background,
+                        borderColor: this.colorPalette.info.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Sales Orders',
+                        data: salesOrdersData,
+                        backgroundColor: this.colorPalette.warning.background,
+                        borderColor: this.colorPalette.warning.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Invoiced Sales',
+                        data: invoicedData,
+                        backgroundColor: this.colorPalette.success.background,
+                        borderColor: this.colorPalette.success.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                return `${label}: ${value} deals`;
+                            }
                         }
                     }
                 },
-                animation: {
-                    duration: 1500
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
                 }
-            }
-        });
-    }
+            };
 
-    /**
-     * Calculate monthly fluctuations for deal fluctuation chart
-     */
-    async _calculateMonthlyFluctuations() {
-        try {
-            // Try to get real monthly data from the backend
-            const monthlyData = await this.orm.call(
-                "sale.order",
-                "get_monthly_fluctuation_data", 
-                [this.state.startDate, this.state.endDate]
-            );
-            
-            if (monthlyData && monthlyData.labels) {
-                return monthlyData;
-            }
-        } catch (error) {
-            console.warn('Could not fetch monthly fluctuation data from backend, using fallback:', error);
-        }
-        
-        // Fallback to simplified data distribution if backend method fails
-        const startDate = new Date(this.state.startDate);
-        const endDate = new Date(this.state.endDate);
-        
-        const months = [];
-        const quotations = [];
-        const salesOrders = [];
-        const invoicedSales = [];
-        
-        // Generate month labels for the date range
-        const currentDate = new Date(startDate);
-        currentDate.setDate(1); // Start from beginning of month
-        
-        while (currentDate <= endDate) {
-            const monthLabel = currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-            months.push(monthLabel);
-            
-            // Use simplified data distribution
-            const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total')?.amount || 0;
-            const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.amount || 0;
-            const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total')?.invoiced_amount || 0;
-            
-            // Distribute data across months with some variance
-            const monthIndex = months.length - 1;
-            const totalMonths = Math.max(1, months.length);
-            const variance = 0.7 + Math.random() * 0.6; // 0.7 to 1.3 multiplier
-            
-            quotations.push((quotationsTotal / totalMonths) * variance);
-            salesOrders.push((salesOrdersTotal / totalMonths) * variance);
-            invoicedSales.push((invoicedSalesTotal / totalMonths) * variance);
-            
-            currentDate.setMonth(currentDate.getMonth() + 1);
-        }
-        
-        return {
-            labels: months,
-            quotations: quotations,
-            sales_orders: salesOrders,
-            invoiced_sales: invoicedSales
-        };
-    }
-
-    /**
-     * Helper method to calculate funnel width percentage
-     */
-    _calculateFunnelWidth(current, total) {
-        if (!total || total === 0) return 0;
-        return Math.min(100, Math.max(15, (current / total) * 100));
-    }
-
-    /**
-     * Generate month labels for trend chart
-     */
-    _generateMonthLabels() {
-        const months = [];
-        const currentDate = new Date();
-        for (let i = 5; i >= 0; i--) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-            months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-        }
-        return months;
-    }
-
-    /**
-     * Generate quarter labels for trend analysis
-     */
-    _generateQuarterLabels() {
-        const currentYear = new Date().getFullYear();
-        return [
-            `Q1 ${currentYear - 1}`,
-            `Q2 ${currentYear - 1}`,
-            `Q3 ${currentYear - 1}`,
-            `Q4 ${currentYear - 1}`,
-            `Q1 ${currentYear}`,
-            `Q2 ${currentYear}`
-        ];
-    }
-
-    /**
-     * Generate year labels for trend analysis
-     */
-    _generateYearLabels() {
-        const currentYear = new Date().getFullYear();
-        return Array.from({length: 5}, (_, i) => (currentYear - 4 + i).toString());
-    }
-
-    /**
-     * Generate sample trend data (replace with actual data in production)
-     */
-    _generateTrendData(length, min, max) {
-        const data = [];
-        for (let i = 0; i < length; i++) {
-            const baseValue = min + (max - min) * Math.random();
-            const trend = i * (max - min) * 0.05; // Add slight upward trend
-            data.push(Math.floor(baseValue + trend));
-        }
-        return data;
-    }
-
-    /**
-     * Generate trend data based on actual dashboard data and date range
-     */
-    _generateTrendDataFromActualData() {
-        const startDate = new Date(this.state.startDate);
-        const endDate = new Date(this.state.endDate);
-        const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-        
-        // Get current totals for scaling
-        const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-        const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-        const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
-
-        let labels = [];
-        let periods = 6; // Default number of periods
-        
-        if (daysDiff <= 32) {
-            // Daily view for periods up to a month
-            labels = this._generateDailyLabels(startDate, endDate);
-            periods = labels.length;
-        } else if (daysDiff <= 93) {
-            // Weekly view for periods up to 3 months
-            labels = this._generateWeeklyLabels(startDate, endDate);
-            periods = labels.length;
-        } else if (daysDiff <= 366) {
-            // Monthly view for periods up to a year
-            labels = this._generateMonthLabels();
-            periods = labels.length;
-        } else {
-            // Quarterly view for longer periods
-            labels = this._generateQuarterLabels();
-            periods = labels.length;
-        }
-        
-        // Generate trend data based on actual totals with realistic distribution
-        const trendData = {
-            quotations: this._generateRealisticTrendData(periods, quotationsTotal.amount || 0),
-            orders: this._generateRealisticTrendData(periods, salesOrdersTotal.amount || 0),
-            invoiced: this._generateRealisticTrendData(periods, invoicedSalesTotal.invoiced_amount || 0)
-        };
-        
-        return { labels, trendData };
-    }
-
-    /**
-     * Generate realistic trend data based on actual values
-     */
-    _generateRealisticTrendData(periods, totalValue) {
-        if (totalValue === 0) return Array(periods).fill(0);
-        
-        const trend = [];
-        const avgValue = totalValue / periods;
-        
-        for (let i = 0; i < periods; i++) {
-            // Add some realistic variance (±30%)
-            const variance = (Math.random() - 0.5) * 0.6;
-            const growth = Math.sin((i / periods) * Math.PI) * 0.3; // Smooth growth curve
-            const value = avgValue * (1 + variance + growth);
-            trend.push(Math.max(0, Math.round(value)));
-        }
-        
-        return trend;
-    }
-
-    /**
-     * Generate daily labels for short date ranges
-     */
-    _generateDailyLabels(startDate, endDate) {
-        const labels = [];
-        const currentDate = new Date(startDate);
-        
-        while (currentDate <= endDate) {
-            labels.push(currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-        
-        return labels;
-    }
-
-    /**
-     * Generate weekly labels for medium date ranges
-     */
-    _generateWeeklyLabels(startDate, endDate) {
-        const labels = [];
-        const currentDate = new Date(startDate);
-        
-        // Start from the beginning of the week
-        currentDate.setDate(currentDate.getDate() - currentDate.getDay());
-        
-        let weekNum = 1;
-        while (currentDate <= endDate) {
-            labels.push(`Week ${weekNum}`);
-            currentDate.setDate(currentDate.getDate() + 7);
-            weekNum++;
-        }
-        
-        return labels;
-    }
-
-    /**
-     * Add scroll-to-top button and scroll functionality
-     */
-    _addScrollToTopButton() {
-        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
-        if (!dashboardContainer) return;
-
-        // Create navigation and scroll controls container
-        const scrollContainer = document.createElement('div');
-        scrollContainer.className = 'scroll-controls';
-        scrollContainer.innerHTML = `
-            <div class="navigation-menu">
-                <button class="nav-btn" data-target="kpi-section" title="KPI Overview">
-                    <i class="fa fa-dashboard"></i>
-                </button>
-                <button class="nav-btn" data-target="charts-section" title="Visual Analytics">
-                    <i class="fa fa-bar-chart"></i>
-                </button>
-                <button class="nav-btn" data-target="quotations-section" title="Quotations">
-                    <i class="fa fa-file-text-o"></i>
-                </button>
-                <button class="nav-btn" data-target="orders-section" title="Sales Orders">
-                    <i class="fa fa-shopping-cart"></i>
-                </button>
-                <button class="nav-btn" data-target="invoiced-section" title="Invoiced Sales">
-                    <i class="fa fa-check-circle"></i>
-                </button>
-                <div class="separator"></div>
-                <button class="scroll-to-top-btn" title="Back to Top">
-                    <i class="fa fa-chevron-up"></i>
-                </button>
-            </div>
-        `;
-
-        // Add navigation functionality
-        scrollContainer.addEventListener('click', (e) => {
-            const navBtn = e.target.closest('.nav-btn');
-            const scrollBtn = e.target.closest('.scroll-to-top-btn');
-            
-            if (navBtn) {
-                const targetId = navBtn.dataset.target;
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
-                    
-                    // Update active state
-                    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-                    navBtn.classList.add('active');
-                }
-            } else if (scrollBtn) {
-                dashboardContainer.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        });
-
-        // Show/hide based on scroll position and update active nav
-        dashboardContainer.addEventListener('scroll', () => {
-            const scrollTop = dashboardContainer.scrollTop;
-            
-            if (scrollTop > 300) {
-                scrollContainer.classList.add('visible');
-            } else {
-                scrollContainer.classList.remove('visible');
+            // Clean up existing chart
+            if (this.charts.dealFluctuation) {
+                this.charts.dealFluctuation.destroy();
             }
 
-            // Update active navigation based on scroll position
-            this._updateActiveNavigation();
-        });
-
-        // Append to dashboard
-        dashboardContainer.appendChild(scrollContainer);
-
-        // Add smooth scrolling to all internal links
-        this._addSmoothScrolling();
-    }
-
-    /**
-     * Add smooth scrolling behavior to internal navigation
-     */
-    _addSmoothScrolling() {
-        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
-        if (!dashboardContainer) return;
-
-        // Enhance table scrolling on mobile
-        const tables = dashboardContainer.querySelectorAll('.table-wrapper');
-        tables.forEach(table => {
-            // Add momentum scrolling for iOS
-            table.style.webkitOverflowScrolling = 'touch';
-            
-            // Add scroll snap for better UX
-            table.style.scrollSnapType = 'x mandatory';
-            
-            // Add scroll indicators
-            this._addScrollIndicators(table);
-        });
-    }
-
-    /**
-     * Add scroll indicators for tables
-     */
-    _addScrollIndicators(tableWrapper) {
-        const table = tableWrapper.querySelector('table');
-        if (!table) return;
-
-        // Check if table needs horizontal scrolling
-        const needsScrolling = table.scrollWidth > tableWrapper.clientWidth;
-        
-        if (needsScrolling) {
-            // Add subtle scroll indicators
-            tableWrapper.style.position = 'relative';
-            
-            // Right scroll indicator
-            const rightIndicator = document.createElement('div');
-            rightIndicator.style.cssText = `
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                width: 20px;
-                background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
-                pointer-events: none;
-                z-index: 1;
-            `;
-            
-            // Update indicator visibility based on scroll
-            tableWrapper.addEventListener('scroll', () => {
-                const isAtEnd = tableWrapper.scrollLeft >= (table.scrollWidth - tableWrapper.clientWidth - 10);
-                rightIndicator.style.opacity = isAtEnd ? '0' : '1';
+            this.charts.dealFluctuation = this._createChartSafely('dealFluctuationChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
             });
-            
-            tableWrapper.appendChild(rightIndicator);
+
+        } catch (error) {
+            console.error('Error creating deal fluctuation chart:', error);
+            this._handleDashboardError(error, 'deal fluctuation chart');
         }
     }
 
     /**
-     * Update active navigation based on scroll position
+     * Create sales performance trend chart
      */
-    _updateActiveNavigation() {
-        const sections = ['kpi-section', 'charts-section', 'quotations-section', 'orders-section', 'invoiced-section'];
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const dashboardContainer = document.querySelector('.o_oe_sale_dashboard_17_container');
-        
-        if (!dashboardContainer) return;
-        
-        const scrollTop = dashboardContainer.scrollTop;
-        const containerHeight = dashboardContainer.clientHeight;
-        
-        let activeSection = null;
-        
-        // Find the section that's most visible in the viewport
-        sections.forEach(sectionId => {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                const rect = section.getBoundingClientRect();
-                const containerRect = dashboardContainer.getBoundingClientRect();
-                
-                // Check if section is in viewport
-                const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top;
-                
-                if (isVisible) {
-                    // Calculate how much of the section is visible
-                    const visibleTop = Math.max(rect.top, containerRect.top);
-                    const visibleBottom = Math.min(rect.bottom, containerRect.bottom);
-                    const visibleHeight = visibleBottom - visibleTop;
-                    const totalHeight = rect.height;
-                    const visibilityRatio = visibleHeight / totalHeight;
-                    
-                    // If more than 30% of the section is visible, consider it active
-                    if (visibilityRatio > 0.3) {
-                        activeSection = sectionId;
+    _createTrendChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('trendChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for trend chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock quarterly data
+            const quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'];
+            const revenueData = [125000, 145000, 138000, 165000, 155000];
+            const targetData = [130000, 140000, 150000, 160000, 170000];
+
+            const chartData = {
+                labels: quarters,
+                datasets: [
+                    {
+                        label: 'Actual Revenue',
+                        data: revenueData,
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Target Revenue',
+                        data: targetData,
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = this.formatNumber(context.parsed.y);
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...options.scales,
+                    y: {
+                        ...options.scales.y,
+                        ticks: {
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
                     }
                 }
+            };
+
+            // Clean up existing chart
+            if (this.charts.trend) {
+                this.charts.trend.destroy();
             }
-        });
-        
-        // Update active state
-        navButtons.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.target === activeSection) {
-                btn.classList.add('active');
-            }
-        });
-    }
 
-    /**
-     * Setup event listeners for chart controls and filters
-     */
-    _setupChartControlListeners() {
-        // Revenue chart controls
-        const revenueControls = document.querySelectorAll('[data-chart]');
-        revenueControls.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Update active state
-                button.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                
-                // Update chart based on selection
-                const chartType = button.dataset.chart;
-                this._updateRevenueChart(chartType);
+            this.charts.trend = this._createChartSafely('trendChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
             });
-        });
 
-        // Funnel chart controls
-        const funnelControls = document.querySelectorAll('[data-funnel]');
-        funnelControls.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Update active state
-                button.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                
-                // Update funnel based on selection
-                const funnelType = button.dataset.funnel;
-                this._updateFunnelChart(funnelType);
-            });
-        });
-
-        // Trend chart controls
-        const trendControls = document.querySelectorAll('[data-period]');
-        trendControls.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Update active state
-                button.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                
-                // Update trend chart based on selection
-                const period = button.dataset.period;
-                this._updateTrendChart(period);
-            });
-        });
-    }
-
-    /**
-     * Update revenue chart based on filter selection
-     */
-    _updateRevenueChart(chartType) {
-        if (!this.charts.revenue) return;
-
-        const invoicedData = this.state.invoicedSalesData.filter(item => item.sales_type_name !== 'Total');
-        
-        let data, label;
-        if (chartType === 'revenue') {
-            data = invoicedData.map(item => item.invoiced_amount || 0);
-            label = 'Revenue by Sales Type';
-        } else if (chartType === 'volume') {
-            data = invoicedData.map(item => item.count || 0);
-            label = 'Volume by Sales Type';
+        } catch (error) {
+            console.error('Error creating trend chart:', error);
+            this._handleDashboardError(error, 'trend chart');
         }
-
-        // Update chart data
-        this.charts.revenue.data.datasets[0].data = data;
-        this.charts.revenue.data.datasets[0].label = label;
-        
-        // Update chart
-        this.charts.revenue.update('active');
-    }
-
-    /**
-     * Update funnel chart based on filter selection
-     */
-    _updateFunnelChart(funnelType) {
-        const funnelContainer = document.querySelector('.o_oe_sale_dashboard_17_container__funnel');
-        if (!funnelContainer) return;
-
-        const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-        const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-        const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
-
-        let quotationsValue, ordersValue, invoicedValue, maxValue;
-        
-        if (funnelType === 'amount') {
-            quotationsValue = quotationsTotal.amount || 0;
-            ordersValue = salesOrdersTotal.amount || 0;
-            invoicedValue = invoicedSalesTotal.invoiced_amount || 0;
-            maxValue = Math.max(quotationsValue, ordersValue, invoicedValue);
-        } else if (funnelType === 'count') {
-            quotationsValue = quotationsTotal.count || 0;
-            ordersValue = salesOrdersTotal.count || 0;
-            invoicedValue = invoicedSalesTotal.count || 0;
-            maxValue = Math.max(quotationsValue, ordersValue, invoicedValue);
-        }
-
-        funnelContainer.innerHTML = `
-            <div class="funnel-stage">
-                <div class="stage-info">
-                    <div class="stage-title">Quotations</div>
-                    <div class="stage-count">${quotationsTotal.count || 0} quotes</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-fill--quotations" style="width: 100%">
-                        ${funnelType === 'amount' ? this.formatNumber(quotationsValue) : quotationsValue}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="funnel-stage">
-                <div class="stage-info">
-                    <div class="stage-title">Sales Orders</div>
-                    <div class="stage-count">${salesOrdersTotal.count || 0} orders</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-fill--orders" style="width: ${this._calculateFunnelWidth(ordersValue, maxValue)}%">
-                        ${funnelType === 'amount' ? this.formatNumber(ordersValue) : ordersValue}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="funnel-stage">
-                <div class="stage-info">
-                    <div class="stage-title">Invoiced Sales</div>
-                    <div class="stage-count">${invoicedSalesTotal.count || 0} sales</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-fill--invoiced" style="width: ${this._calculateFunnelWidth(invoicedValue, maxValue)}%">
-                        ${funnelType === 'amount' ? this.formatNumber(invoicedValue) : invoicedValue}
-                    </div>
-                </div>
-            </div>
-        `;
-    }    /**
-     * Update trend chart based on period selection
-     */
-    _updateTrendChart(period) {
-        if (!this.charts.trend) return;
-
-        let labels, trendData;
-        
-        if (period === 'month') {
-            labels = this._generateMonthLabels();
-            // Generate monthly trend data based on actual data
-            const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-            const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-            const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
-            
-            trendData = {
-                quotations: this._generateRealisticTrendData(labels.length, quotationsTotal.amount || 0),
-                orders: this._generateRealisticTrendData(labels.length, salesOrdersTotal.amount || 0),
-                invoiced: this._generateRealisticTrendData(labels.length, invoicedSalesTotal.invoiced_amount || 0)
-            };
-        } else if (period === 'quarter') {
-            labels = this._generateQuarterLabels();
-            // Scale up for quarterly view
-            const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-            const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-            const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
-            
-            trendData = {
-                quotations: this._generateRealisticTrendData(labels.length, (quotationsTotal.amount || 0) * 3),
-                orders: this._generateRealisticTrendData(labels.length, (salesOrdersTotal.amount || 0) * 3),
-                invoiced: this._generateRealisticTrendData(labels.length, (invoicedSalesTotal.invoiced_amount || 0) * 3)
-            };
-        } else if (period === 'year') {
-            labels = this._generateYearLabels();
-            // Scale up for yearly view
-            const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-            const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-            const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
-            
-            trendData = {
-                quotations: this._generateRealisticTrendData(labels.length, (quotationsTotal.amount || 0) * 12),
-                orders: this._generateRealisticTrendData(labels.length, (salesOrdersTotal.amount || 0) * 12),
-                invoiced: this._generateRealisticTrendData(labels.length, (invoicedSalesTotal.invoiced_amount || 0) * 12)
-            };
-        }
-
-        // Update chart data
-        this.charts.trend.data.labels = labels;
-        this.charts.trend.data.datasets[0].data = trendData.quotations;
-        this.charts.trend.data.datasets[1].data = trendData.orders;
-        this.charts.trend.data.datasets[2].data = trendData.invoiced;
-        
-        // Update chart
-        this.charts.trend.update('active');
     }
 
     /**
@@ -2124,6 +1594,1064 @@ class OeSaleDashboard extends Component {
             console.warn('Could not load top performers data:', error);
             this.state.topAgentsData = [];
             this.state.topAgenciesData = [];
+        }
+    }
+
+    /**
+     * Enhanced error handling for dashboard rendering
+     */
+    _handleDashboardError(error, context = 'dashboard') {
+        console.error(`Dashboard Error in ${context}:`, error);
+        this.notification.add(
+            _t(`Error loading ${context} data. Please refresh the page.`), 
+            { type: 'warning', sticky: false }
+        );
+    }
+
+    /**
+     * Safe DOM manipulation with error handling
+     */
+    _safeQuerySelector(selector, container = document) {
+        try {
+            return container.querySelector(selector);
+        } catch (error) {
+            console.warn(`Failed to find element: ${selector}`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Initialize dashboard with comprehensive error handling
+     */
+    async _initializeDashboard() {
+        try {
+            // Add CSS classes for enhanced styling
+            const container = this._safeQuerySelector('.o_oe_sale_dashboard_17_container');
+            if (container) {
+                container.classList.add('dashboard-initialized');
+                container.style.visibility = 'visible';
+            }
+
+            // Load data with timeout protection
+            const loadingPromise = this._loadDashboardData();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Dashboard loading timeout')), 30000)
+            );
+
+            await Promise.race([loadingPromise, timeoutPromise]);
+            
+            // Initialize charts after data is loaded
+            await this._initializeCharts();
+            
+        } catch (error) {
+            this._handleDashboardError(error, 'initialization');
+            this.state.isLoading = false;
+        }
+    }
+
+    /**
+     * Enhanced chart initialization with error handling
+     */
+    async _initializeCharts() {
+        try {
+            // Wait for next tick to ensure DOM is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Initialize each chart with error handling
+            const chartInitPromises = [
+                this._createRevenueDistributionChart(),
+                this._createSalesTypeCountChart(),
+                this._createSalesTypeTotalChart(),
+                this._createDealFluctuationChart(),
+                this._createTrendChart()
+            ];
+
+            // Initialize charts in parallel but handle errors individually
+            await Promise.allSettled(chartInitPromises);
+            
+        } catch (error) {
+            this._handleDashboardError(error, 'charts');
+        }
+    }
+
+    /**
+     * Safe chart creation with canvas validation
+     */
+    _createChartSafely(canvasId, config) {
+        try {
+            const canvas = this._safeQuerySelector(`#${canvasId}`);
+            if (!canvas) {
+                console.warn(`Canvas element ${canvasId} not found`);
+                return null;
+            }
+
+            // Ensure canvas has proper dimensions
+            if (!canvas.width || !canvas.height) {
+                canvas.width = canvas.offsetWidth || 400;
+                canvas.height = canvas.offsetHeight || 350;
+            }
+
+            return new Chart(canvas, config);
+        } catch (error) {
+            console.error(`Failed to create chart ${canvasId}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Create sales type count distribution chart
+     */
+    _createSalesTypeCountChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeCountChart', 'pie');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type count chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Combine all sales data for count distribution
+            const combinedData = {};
+            
+            // Add quotations data
+            this.state.quotationsData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+            
+            // Add sales orders data
+            this.state.salesOrdersData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+            
+            // Add invoiced sales data
+            this.state.invoicedSalesData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+
+            const labels = Object.keys(combinedData);
+            const data = Object.values(combinedData);
+
+            if (labels.length === 0) {
+                labels.push('No Data Available');
+                data.push(1);
+            }
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Count by Sales Type',
+                    data: data,
+                    backgroundColor: this.chartColors.backgrounds,
+                    borderColor: this.chartColors.borders,
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return `${label}: ${value} deals (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 1000
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeCount) {
+                this.charts.salesTypeCount.destroy();
+            }
+
+            this.charts.salesTypeCount = this._createChartSafely('salesTypeCountChart', {
+                type: 'pie',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type count chart:', error);
+            this._handleDashboardError(error, 'sales type count chart');
+        }
+    }
+
+    /**
+     * Create sales type total amount distribution chart
+     */
+    _createSalesTypeTotalChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeTotalChart', 'bar');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type total chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Get invoiced sales data excluding totals
+            const invoicedData = this.state.invoicedSalesData.filter(item => 
+                item.sales_type_name !== 'Total'
+            );
+
+            if (invoicedData.length === 0) {
+                invoicedData.push({
+                    sales_type_name: 'No Data Available',
+                    amount: 0,
+                    sale_value: 0,
+                    invoiced_amount: 0
+                });
+            }
+
+            const chartData = {
+                labels: invoicedData.map(item => item.sales_type_name),
+                datasets: [
+                    {
+                        label: 'Total Amount',
+                        data: invoicedData.map(item => item.amount || 0),
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Sale Value',
+                        data: invoicedData.map(item => item.sale_value || 0),
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Revenue Realized',
+                        data: invoicedData.map(item => item.invoiced_amount || 0),
+                        backgroundColor: this.colorPalette.accent.background,
+                        borderColor: this.colorPalette.accent.border,
+                        borderWidth: 2
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = this.formatNumber(context.parsed.y);
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...options.scales,
+                    y: {
+                        ...options.scales.y,
+                        ticks: {
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
+                    }
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeTotal) {
+                this.charts.salesTypeTotal.destroy();
+            }
+
+            this.charts.salesTypeTotal = this._createChartSafely('salesTypeTotalChart', {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type total chart:', error);
+            this._handleDashboardError(error, 'sales type total chart');
+        }
+    }
+
+    /**
+     * Create deal fluctuation trend chart
+     */
+    _createDealFluctuationChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for deal fluctuation chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock monthly data for demonstration
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const quotationsData = [45, 52, 38, 65, 72, 58];
+            const salesOrdersData = [35, 42, 28, 48, 55, 45];
+            const invoicedData = [25, 32, 22, 38, 42, 35];
+
+            const chartData = {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Quotations',
+                        data: quotationsData,
+                        backgroundColor: this.colorPalette.info.background,
+                        borderColor: this.colorPalette.info.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Sales Orders',
+                        data: salesOrdersData,
+                        backgroundColor: this.colorPalette.warning.background,
+                        borderColor: this.colorPalette.warning.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Invoiced Sales',
+                        data: invoicedData,
+                        backgroundColor: this.colorPalette.success.background,
+                        borderColor: this.colorPalette.success.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                return `${label}: ${value} deals`;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.dealFluctuation) {
+                this.charts.dealFluctuation.destroy();
+            }
+
+            this.charts.dealFluctuation = this._createChartSafely('dealFluctuationChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating deal fluctuation chart:', error);
+            this._handleDashboardError(error, 'deal fluctuation chart');
+        }
+    }
+
+    /**
+     * Create sales performance trend chart
+     */
+    _createTrendChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('trendChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for trend chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock quarterly data
+            const quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'];
+            const revenueData = [125000, 145000, 138000, 165000, 155000];
+            const targetData = [130000, 140000, 150000, 160000, 170000];
+
+            const chartData = {
+                labels: quarters,
+                datasets: [
+                    {
+                        label: 'Actual Revenue',
+                        data: revenueData,
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Target Revenue',
+                        data: targetData,
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = this.formatNumber(context.parsed.y);
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...options.scales,
+                    y: {
+                        ...options.scales.y,
+                        ticks: {
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
+                    }
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.trend) {
+                this.charts.trend.destroy();
+            }
+
+            this.charts.trend = this._createChartSafely('trendChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating trend chart:', error);
+            this._handleDashboardError(error, 'trend chart');
+        }
+    }
+
+    /**
+     * Debug method to test chart controls
+     */
+    _debugChartControls() {
+        console.log('Chart Controls Debug:');
+        console.log('Revenue controls:', document.querySelectorAll('[data-chart]'));
+        console.log('Funnel controls:', document.querySelectorAll('[data-funnel]'));
+        console.log('Trend controls:', document.querySelectorAll('[data-period]'));
+        console.log('Charts object:', this.charts);
+    }
+
+    /**
+     * Create performance summary cards
+     */
+    _createPerformanceSummary() {
+        const performanceContainer = document.querySelector('.o_oe_sale_dashboard_17_container__performance');
+        if (!performanceContainer) {
+            console.warn('Performance container not found');
+            return;
+        }
+
+        // Calculate performance metrics
+        const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
+        const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
+        const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
+
+        // Calculate conversion rates
+        const quotationCount = quotationsTotal.count || 0;
+        const salesOrderCount = salesOrdersTotal.count || 0;
+        const invoicedCount = invoicedSalesTotal.count || 0;
+        
+        const quotationToOrderRate = quotationCount > 0 ? ((salesOrderCount / quotationCount) * 100).toFixed(1) : 0;
+        const orderToInvoiceRate = salesOrderCount > 0 ? ((invoicedCount / salesOrderCount) * 100).toFixed(1) : 0;
+        const overallConversionRate = quotationCount > 0 ? ((invoicedCount / quotationCount) * 100).toFixed(1) : 0;
+
+        // Calculate revenue metrics
+        const totalPipelineValue = (quotationsTotal.amount || 0) + (salesOrdersTotal.amount || 0);
+        const realizedRevenue = invoicedSalesTotal.invoiced_amount || 0;
+        const revenueRealizationRate = totalPipelineValue > 0 ? ((realizedRevenue / totalPipelineValue) * 100).toFixed(1) : 0;
+
+        // Create performance summary HTML using existing CSS classes
+        performanceContainer.innerHTML = `
+            <div class="performance-card performance-card--quotations">
+                <div class="performance-value">${overallConversionRate}%</div>
+                <div class="performance-label">Overall Conversion Rate</div>
+            </div>
+            
+            <div class="performance-card performance-card--orders">
+                <div class="performance-value">${quotationToOrderRate}%</div>
+                <div class="performance-label">Quote Success Rate</div>
+            </div>
+            
+            <div class="performance-card performance-card--invoiced">
+                <div class="performance-value">${orderToInvoiceRate}%</div>
+                <div class="performance-label">Invoice Completion</div>
+            </div>
+            
+            <div class="performance-card performance-card--quotations">
+                <div class="performance-value">${revenueRealizationRate}%</div>
+                <div class="performance-label">Revenue Realization</div>
+            </div>
+            
+            <div class="performance-card performance-card--orders">
+                <div class="performance-value">${this.formatDashboardValue(totalPipelineValue)}</div>
+                <div class="performance-label">Total Pipeline Value</div>
+            </div>
+            
+            <div class="performance-card performance-card--invoiced">
+                <div class="performance-value">${this.formatDashboardValue(realizedRevenue)}</div>
+                <div class="performance-label">Realized Revenue</div>
+            </div>
+        `;
+    }
+
+    /**
+     * Load top performing agents and agencies data
+     */
+    async _loadTopPerformersData() {
+        try {
+            // Load top 10 agents based on agent1_partner_id
+            const topAgents = await this.orm.call(
+                "sale.order",
+                "get_top_performers_data", 
+                [this.state.startDate, this.state.endDate, 'agent', 10]
+            );
+
+            // Load top 10 agencies based on broker_partner_id  
+            const topAgencies = await this.orm.call(
+                "sale.order", 
+                "get_top_performers_data",
+                [this.state.startDate, this.state.endDate, 'agency', 10]
+            );
+
+            this.state.topAgentsData = topAgents || [];
+            this.state.topAgenciesData = topAgencies || [];
+
+            console.log('Top Agents Data:', this.state.topAgentsData);
+            console.log('Top Agencies Data:', this.state.topAgenciesData);
+
+        } catch (error) {
+            console.warn('Could not load top performers data:', error);
+            this.state.topAgentsData = [];
+            this.state.topAgenciesData = [];
+        }
+    }
+
+    /**
+     * Enhanced error handling for dashboard rendering
+     */
+    _handleDashboardError(error, context = 'dashboard') {
+        console.error(`Dashboard Error in ${context}:`, error);
+        this.notification.add(
+            _t(`Error loading ${context} data. Please refresh the page.`), 
+            { type: 'warning', sticky: false }
+        );
+    }
+
+    /**
+     * Safe DOM manipulation with error handling
+     */
+    _safeQuerySelector(selector, container = document) {
+        try {
+            return container.querySelector(selector);
+        } catch (error) {
+            console.warn(`Failed to find element: ${selector}`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Initialize dashboard with comprehensive error handling
+     */
+    async _initializeDashboard() {
+        try {
+            // Add CSS classes for enhanced styling
+            const container = this._safeQuerySelector('.o_oe_sale_dashboard_17_container');
+            if (container) {
+                container.classList.add('dashboard-initialized');
+                container.style.visibility = 'visible';
+            }
+
+            // Load data with timeout protection
+            const loadingPromise = this._loadDashboardData();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Dashboard loading timeout')), 30000)
+            );
+
+            await Promise.race([loadingPromise, timeoutPromise]);
+            
+            // Initialize charts after data is loaded
+            await this._initializeCharts();
+            
+        } catch (error) {
+            this._handleDashboardError(error, 'initialization');
+            this.state.isLoading = false;
+        }
+    }
+
+    /**
+     * Enhanced chart initialization with error handling
+     */
+    async _initializeCharts() {
+        try {
+            // Wait for next tick to ensure DOM is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Initialize each chart with error handling
+            const chartInitPromises = [
+                this._createRevenueDistributionChart(),
+                this._createSalesTypeCountChart(),
+                this._createSalesTypeTotalChart(),
+                this._createDealFluctuationChart(),
+                this._createTrendChart()
+            ];
+
+            // Initialize charts in parallel but handle errors individually
+            await Promise.allSettled(chartInitPromises);
+            
+        } catch (error) {
+            this._handleDashboardError(error, 'charts');
+        }
+    }
+
+    /**
+     * Safe chart creation with canvas validation
+     */
+    _createChartSafely(canvasId, config) {
+        try {
+            const canvas = this._safeQuerySelector(`#${canvasId}`);
+            if (!canvas) {
+                console.warn(`Canvas element ${canvasId} not found`);
+                return null;
+            }
+
+            // Ensure canvas has proper dimensions
+            if (!canvas.width || !canvas.height) {
+                canvas.width = canvas.offsetWidth || 400;
+                canvas.height = canvas.offsetHeight || 350;
+            }
+
+            return new Chart(canvas, config);
+        } catch (error) {
+            console.error(`Failed to create chart ${canvasId}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Create sales type count distribution chart
+     */
+    _createSalesTypeCountChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeCountChart', 'pie');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type count chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Combine all sales data for count distribution
+            const combinedData = {};
+            
+            // Add quotations data
+            this.state.quotationsData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+            
+            // Add sales orders data
+            this.state.salesOrdersData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+            
+            // Add invoiced sales data
+            this.state.invoicedSalesData.forEach(item => {
+                if (item.sales_type_name !== 'Total') {
+                    combinedData[item.sales_type_name] = (combinedData[item.sales_type_name] || 0) + (item.count || 0);
+                }
+            });
+
+            const labels = Object.keys(combinedData);
+            const data = Object.values(combinedData);
+
+            if (labels.length === 0) {
+                labels.push('No Data Available');
+                data.push(1);
+            }
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Count by Sales Type',
+                    data: data,
+                    backgroundColor: this.chartColors.backgrounds,
+                    borderColor: this.chartColors.borders,
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return `${label}: ${value} deals (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 1000
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeCount) {
+                this.charts.salesTypeCount.destroy();
+            }
+
+            this.charts.salesTypeCount = this._createChartSafely('salesTypeCountChart', {
+                type: 'pie',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type count chart:', error);
+            this._handleDashboardError(error, 'sales type count chart');
+        }
+    }
+
+    /**
+     * Create sales type total amount distribution chart
+     */
+    _createSalesTypeTotalChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('salesTypeTotalChart', 'bar');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for sales type total chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Get invoiced sales data excluding totals
+            const invoicedData = this.state.invoicedSalesData.filter(item => 
+                item.sales_type_name !== 'Total'
+            );
+
+            if (invoicedData.length === 0) {
+                invoicedData.push({
+                    sales_type_name: 'No Data Available',
+                    amount: 0,
+                    sale_value: 0,
+                    invoiced_amount: 0
+                });
+            }
+
+            const chartData = {
+                labels: invoicedData.map(item => item.sales_type_name),
+                datasets: [
+                    {
+                        label: 'Total Amount',
+                        data: invoicedData.map(item => item.amount || 0),
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Sale Value',
+                        data: invoicedData.map(item => item.sale_value || 0),
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Revenue Realized',
+                        data: invoicedData.map(item => item.invoiced_amount || 0),
+                        backgroundColor: this.colorPalette.accent.background,
+                        borderColor: this.colorPalette.accent.border,
+                        borderWidth: 2
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = this.formatNumber(context.parsed.y);
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...options.scales,
+                    y: {
+                        ...options.scales.y,
+                        ticks: {
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
+                    }
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.salesTypeTotal) {
+                this.charts.salesTypeTotal.destroy();
+            }
+
+            this.charts.salesTypeTotal = this._createChartSafely('salesTypeTotalChart', {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating sales type total chart:', error);
+            this._handleDashboardError(error, 'sales type total chart');
+        }
+    }
+
+    /**
+     * Create deal fluctuation trend chart
+     */
+    _createDealFluctuationChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for deal fluctuation chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock monthly data for demonstration
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const quotationsData = [45, 52, 38, 65, 72, 58];
+            const salesOrdersData = [35, 42, 28, 48, 55, 45];
+            const invoicedData = [25, 32, 22, 38, 42, 35];
+
+            const chartData = {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Quotations',
+                        data: quotationsData,
+                        backgroundColor: this.colorPalette.info.background,
+                        borderColor: this.colorPalette.info.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Sales Orders',
+                        data: salesOrdersData,
+                        backgroundColor: this.colorPalette.warning.background,
+                        borderColor: this.colorPalette.warning.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Invoiced Sales',
+                        data: invoicedData,
+                        backgroundColor: this.colorPalette.success.background,
+                        borderColor: this.colorPalette.success.border,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                return `${label}: ${value} deals`;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.dealFluctuation) {
+                this.charts.dealFluctuation.destroy();
+            }
+
+            this.charts.dealFluctuation = this._createChartSafely('dealFluctuationChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating deal fluctuation chart:', error);
+            this._handleDashboardError(error, 'deal fluctuation chart');
+        }
+    }
+
+    /**
+     * Create sales performance trend chart
+     */
+    _createTrendChart() {
+        try {
+            const chartSetup = this._prepareChartCanvas('trendChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for trend chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
+
+            // Generate mock quarterly data
+            const quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'];
+            const revenueData = [125000, 145000, 138000, 165000, 155000];
+            const targetData = [130000, 140000, 150000, 160000, 170000];
+
+            const chartData = {
+                labels: quarters,
+                datasets: [
+                    {
+                        label: 'Actual Revenue',
+                        data: revenueData,
+                        backgroundColor: this.colorPalette.primary.background,
+                        borderColor: this.colorPalette.primary.border,
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Target Revenue',
+                        data: targetData,
+                        backgroundColor: this.colorPalette.secondary.background,
+                        borderColor: this.colorPalette.secondary.border,
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                ...options,
+                plugins: {
+                    ...options.plugins,
+                    tooltip: {
+                        ...options.plugins.tooltip,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label || '';
+                                const value = this.formatNumber(context.parsed.y);
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...options.scales,
+                    y: {
+                        ...options.scales.y,
+                        ticks: {
+                            ...options.scales.y.ticks,
+                            callback: (value) => this.formatDashboardValue(value)
+                        }
+                    }
+                }
+            };
+
+            // Clean up existing chart
+            if (this.charts.trend) {
+                this.charts.trend.destroy();
+            }
+
+            this.charts.trend = this._createChartSafely('trendChart', {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+
+        } catch (error) {
+            console.error('Error creating trend chart:', error);
+            this._handleDashboardError(error, 'trend chart');
         }
     }
 
