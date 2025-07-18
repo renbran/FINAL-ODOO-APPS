@@ -10,6 +10,8 @@ import { _t } from "@web/core/l10n/translation";
 const actionRegistry = registry.category("actions");
 
 class OeSaleDashboard extends Component {
+    static template = "oe_sale_dashboard_17.yearly_sales_dashboard_template";
+    
     setup() {
         super.setup();
         // Initialize state variables for date range and fetched data
@@ -1762,4 +1764,4 @@ class OeSaleDashboard extends Component {
 }
 
 // Register the component
-registry.category("actions").add("oe_sale_dashboard_17", OeSaleDashboard);
+registry.category("actions").add("oe_sale_dashboard_17_tag", OeSaleDashboard);
