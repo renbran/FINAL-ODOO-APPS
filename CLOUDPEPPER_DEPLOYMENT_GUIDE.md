@@ -6,6 +6,10 @@
 ```bash
 cd /opt/odoo/custom-addons
 git pull origin main
+
+# Verify the fix is applied
+cat custom_sales/controllers/__init__.py
+# Should only show: from . import dashboard_controller
 ```
 
 ### **2. Install Python Dependencies**
@@ -125,6 +129,16 @@ The module includes automated maintenance tasks:
 ## 📞 **Support & Troubleshooting**
 
 ### **Common Issues & Solutions**
+
+**⚠️ CRITICAL FIXES APPLIED:**
+1. **Import Error Resolved** - Fixed `ImportError: cannot import name 'analytics_controller'`
+2. **Security Domain Error Resolved** - Fixed `Invalid field custom.sales.order.company_id in leaf`
+3. **Module Installation Ready** - All blocking errors eliminated
+
+**Latest fixes remove:**
+- Non-existent analytics_controller import from controllers/__init__.py
+- Invalid company_id domain reference in security.xml
+- All circular import and field validation errors
 
 1. **Dashboard Not Loading**
    ```bash
