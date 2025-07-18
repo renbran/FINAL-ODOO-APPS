@@ -33,8 +33,10 @@
         'web.assets_backend': [
             'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
-            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
+        ],
+        'web.assets_qweb': [
+            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
     },
     'images': ['static/description/banner.gif'],
