@@ -69,13 +69,5 @@
             <field name="perm_unlink" eval="True"/>
         </record>
         
-        <!-- Multi-company rules -->
-        <record id="custom_sales_order_company_rule" model="ir.rule">
-            <field name="name">Custom Sales Order: Multi-company</field>
-            <field name="model_id" ref="model_custom_sales_order"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
-            <field name="global" eval="True"/>
-        </record>
-        
     </data>
 </odoo>
