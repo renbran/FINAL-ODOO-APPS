@@ -11,8 +11,8 @@
                 <field name="years_of_service" readonly="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_send_birthday_wish" type="object" string="Send Birthday Wish" class="oe_stat_button" icon="fa-birthday-cake" attrs="{'invisible': [('birthday', '=', False)]}"/>
-                <button name="action_send_anniversary_wish" type="object" string="Send Anniversary Wish" class="oe_stat_button" icon="fa-trophy" attrs="{'invisible': [('joining_date', '=', False)]}"/>
+                <button name="action_send_birthday_wish" type="object" string="Send Birthday Wish" class="oe_stat_button" icon="fa-birthday-cake" invisible="not birthday"/>
+                <button name="action_send_anniversary_wish" type="object" string="Send Anniversary Wish" class="oe_stat_button" icon="fa-trophy" invisible="not joining_date"/>
             </xpath>
         </field>
     </record>
