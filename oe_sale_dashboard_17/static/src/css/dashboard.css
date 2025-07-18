@@ -70,7 +70,7 @@
 
 /* Main Container */
 .o_oe_sale_dashboard_17_container {
-    background: linear-gradient(135deg, var(--brand-burgundy) 0%, var(--brand-redwine) 35%, var(--brand-burgundy-dark) 100%);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 35%, var(--bg-tertiary) 100%);
     min-height: 100vh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--text-primary);
@@ -256,6 +256,10 @@
 }
 
 /* Dashboard States */
+.o_oe_sale_dashboard_17_container {
+    visibility: visible !important;
+}
+
 .o_oe_sale_dashboard_17_container.dashboard-loading {
     pointer-events: none;
 }
@@ -1467,36 +1471,16 @@ tbody td {
 
 /* White text on burgundy/dark backgrounds - Universal fix */
 *[style*="background: linear-gradient"][style*="burgundy"],
-*[style*="background-color: var(--brand-burgundy)"],
-*[style*="background-color: var(--brand-redwine)"],
-*[style*="background-color: var(--primary-color)"],
-*[style*="background-color: var(--primary-dark)"] {
-    color: white !important;
-}
-
-/* Additional white text rules for burgundy backgrounds */
+/* Specific white text rules for burgundy backgrounds only */
 .chart-controls .active,
 thead th,
-.table-header,
-.table-header h2,
-.table-header .summary-item strong,
 tbody tr.total-row,
 tbody tr.total-row td,
 .status-badge--quotations,
 .status-badge--invoiced,
 .status-badge--agents,
-.status-badge--agencies,
-.kpi-change.positive,
-.performance-summary h3 {
+.status-badge--agencies {
     color: white !important;
-}
-
-/* Override any inherited colors on burgundy backgrounds */
-[class*="burgundy"] *,
-[class*="redwine"] *,
-[style*="burgundy"] *,
-[style*="redwine"] * {
-    color: inherit;
 }
 
 /* Specific overrides for elements that should remain burgundy text */
