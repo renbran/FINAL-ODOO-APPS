@@ -478,17 +478,20 @@ class OeSaleDashboard extends Component {
         
         // Wait for Chart.js to load and DOM to be ready
         this._waitForChartJS().then(() => {
+            // Create all chart visualizations
             this._createRevenueDistributionChart();
             this._createEnhancedFunnelChart();
             this._createTrendAnalysisChart();
-            this._createSalesTypePieCharts().then(() => {
-                this._createDealFluctuationChart().then(() => {
-                    this._createPerformanceSummary();
-                    
-                    // Add chart control event listeners
-                    this._setupChartControlListeners();
-                });
-            });
+            this._createDealFluctuationChart();
+            
+            // Create pie charts (async)
+            this._createSalesTypePieCharts();
+            
+            // Create performance summary
+            this._createPerformanceSummary();
+            
+            // Add chart control event listeners
+            this._setupChartControlListeners();
         });
     }
 
@@ -1458,7 +1461,7 @@ class OeSaleDashboard extends Component {
     /**
      * Create deal fluctuation chart showing trends
      */
-    async _createDealFluctuationChart() {
+    _createDealFluctuationChart() {
         try {
             const chartSetup = this._prepareChartCanvas('dealFluctuationChart', 'line');
             if (!chartSetup) {
@@ -1573,7 +1576,7 @@ class OeSaleDashboard extends Component {
      */
     _createPerformanceSummary() {
         try {
-            const summaryContainer = document.querySelector('.o_oe_sale_dashboard_17_container__performance-summary');
+            const summaryContainer = document.querySelector('.o_oe_sale_dashboard_17_container__performance');
             if (!summaryContainer) {
                 console.warn('Performance summary container not found');
                 return;
@@ -1587,7 +1590,7 @@ class OeSaleDashboard extends Component {
             const totalOpportunities = (quotationsTotal.count || 0) + (salesOrdersTotal.count || 0) + (invoicedSalesTotal.count || 0);
             const winRate = quotationsTotal.count > 0 ? ((invoicedSalesTotal.count / quotationsTotal.count) * 100).toFixed(1) : 0;
             const avgSalesCycle = '24'; // Placeholder
-            const topPerformer = this.state.topAgentsData.length > 0 ? this.state.topAgentsData[0].name : 'N/A';
+            const topPerformer = this.state.topAgentsData.length > 0 ? this.state.topAgentsData[0].partner_name : 'N/A';
 
             summaryContainer.innerHTML = `
                 <div class="performance-grid">
