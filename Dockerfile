@@ -38,3 +38,13 @@ EXPOSE 8069
 
 # Set the default command
 CMD ["odoo", "--addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons"]
+
+# Temporary directory fix
+RUN mkdir -p /var/odoo/osuspro/temp && \
+    chmod 755 /var/odoo/osuspro/temp && \
+    chown odoo:odoo /var/odoo/osuspro/temp
+
+# Set environment variables for temp directory
+ENV TMPDIR=/var/odoo/osuspro/temp
+ENV TMP=/var/odoo/osuspro/temp
+ENV TEMP=/var/odoo/osuspro/temp
