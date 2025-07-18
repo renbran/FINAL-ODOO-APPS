@@ -701,7 +701,7 @@
 
 .chart-controls button.active {
     background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-redwine));
-    color: var(--brand-light-gold);
+    color: white !important;
     border-color: var(--brand-gold);
     box-shadow: var(--shadow-burgundy);
 }
@@ -751,6 +751,7 @@
     background: linear-gradient(135deg, var(--brand-burgundy) 0%, var(--brand-redwine) 100%);
     border-bottom: 3px solid var(--brand-gold);
     position: relative;
+    color: white;
 }
 
 .table-header::after {
@@ -766,13 +767,19 @@
 .table-header h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: white;
+    color: white !important;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+/* Ensure all text in table headers is white */
+.table-header,
+.table-header *:not(.status-badge--orders) {
+    color: white !important;
 }
 
 /* Status Badges */
@@ -787,7 +794,7 @@
 
 .status-badge--quotations {
     background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-redwine));
-    color: white;
+    color: white !important;
     border: 1px solid var(--brand-lightgold);
 }
 
@@ -800,19 +807,19 @@
 
 .status-badge--invoiced {
     background: linear-gradient(135deg, var(--brand-redwine), var(--brand-burgundy));
-    color: white;
+    color: white !important;
     border: 1px solid var(--brand-gold);
 }
 
 .status-badge--agents {
     background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-redwine));
-    color: white;
+    color: white !important;
     border: 1px solid var(--brand-lightgold);
 }
 
 .status-badge--agencies {
     background: linear-gradient(135deg, var(--brand-redwine), var(--brand-burgundy));
-    color: white;
+    color: white !important;
     border: 1px solid var(--brand-gold);
 }
 
@@ -839,6 +846,17 @@
     font-weight: 700;
 }
 
+/* Summary items in table headers should have white text */
+.table-header .summary-item {
+    color: white !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.table-header .summary-item strong {
+    color: white !important;
+}
+
 /* Table Styling */
 .table-wrapper {
     overflow-x: auto;
@@ -854,7 +872,7 @@ table {
 
 thead th {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: white;
+    color: white !important;
     padding: 1rem;
     text-align: left;
     font-weight: 600;
@@ -876,12 +894,18 @@ tbody tr:hover {
 
 tbody tr.total-row {
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--warning-color) 100%);
-    color: white;
+    color: white !important;
     font-weight: 700;
 }
 
 tbody tr.total-row:hover {
     background: linear-gradient(135deg, var(--warning-color) 0%, var(--accent-color) 100%);
+}
+
+/* Ensure all text in total rows is white */
+tbody tr.total-row,
+tbody tr.total-row * {
+    color: white !important;
 }
 
 tbody td {
@@ -1439,4 +1463,47 @@ tbody td {
         -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
     }
+}
+
+/* White text on burgundy/dark backgrounds - Universal fix */
+*[style*="background: linear-gradient"][style*="burgundy"],
+*[style*="background-color: var(--brand-burgundy)"],
+*[style*="background-color: var(--brand-redwine)"],
+*[style*="background-color: var(--primary-color)"],
+*[style*="background-color: var(--primary-dark)"] {
+    color: white !important;
+}
+
+/* Additional white text rules for burgundy backgrounds */
+.chart-controls .active,
+thead th,
+.table-header,
+.table-header h2,
+.table-header .summary-item strong,
+tbody tr.total-row,
+tbody tr.total-row td,
+.status-badge--quotations,
+.status-badge--invoiced,
+.status-badge--agents,
+.status-badge--agencies,
+.kpi-change.positive,
+.performance-summary h3 {
+    color: white !important;
+}
+
+/* Override any inherited colors on burgundy backgrounds */
+[class*="burgundy"] *,
+[class*="redwine"] *,
+[style*="burgundy"] *,
+[style*="redwine"] * {
+    color: inherit;
+}
+
+/* Specific overrides for elements that should remain burgundy text */
+.status-badge--orders {
+    color: var(--brand-burgundy) !important;
+}
+
+.summary-item:not(.table-header .summary-item) {
+    color: var(--brand-burgundy) !important;
 }
