@@ -342,7 +342,7 @@
                 <!-- Summary by Sales Type (Primary, Exclusive, Secondary) -->
                 <div class="summary-table-container">
                     <div class="summary-table-header">
-                        <h3>📈 Deals by Sales Type & Stage</h3>
+                        <h3>📈 Deals by Sales Type &amp; Stage</h3>
                         <div class="summary-stats">
                             Total Pipeline: <strong t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
                         </div>

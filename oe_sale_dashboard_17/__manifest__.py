@@ -35,13 +35,16 @@
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
         ],
-        'web.assets_qweb': [
+        'web.assets_web': [
+            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
+        ],
+        'web.assets_web_dark': [
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
     },
     'images': ['static/description/banner.gif'],
     'installable': True,
-    'application': True,
+    'application': False,
     'auto_install': False,
     'license': 'AGPL-3',
 }
