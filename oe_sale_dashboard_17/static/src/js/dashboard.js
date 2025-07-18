@@ -490,6 +490,9 @@ class OeSaleDashboard extends Component {
             // Create performance summary
             this._createPerformanceSummary();
             
+            // Create comprehensive summary tables
+            this._createSummaryTables();
+            
             // Add chart control event listeners
             this._setupChartControlListeners();
         });
@@ -1687,6 +1690,172 @@ class OeSaleDashboard extends Component {
             console.error('Error creating performance summary:', error);
             this._handleDashboardError(error, 'performance summary');
         }
+    }
+
+    /**
+     * Create comprehensive summary tables for sales type and stage analysis
+     */
+    _createSummaryTables() {
+        try {
+            this._createSalesTypeSummaryTable();
+            this._createStageSummaryTable();
+            console.log('Summary tables created successfully');
+        } catch (error) {
+            console.error('Error creating summary tables:', error);
+            this._handleDashboardError(error, 'summary tables');
+        }
+    }
+
+    /**
+     * Create summary table showing each sales type across all stages
+     */
+    _createSalesTypeSummaryTable() {
+        const tbody = document.getElementById('sales-type-summary-tbody');
+        if (!tbody) {
+            console.warn('Sales type summary table body not found');
+            return;
+        }
+
+        // Get all unique sales types (excluding 'Total')
+        const salesTypes = new Set();
+        this.state.quotationsData.forEach(item => {
+            if (item.sales_type_name !== 'Total') {
+                salesTypes.add(item.sales_type_name);
+            }
+        });
+
+        let tableHTML = '';
+        
+        salesTypes.forEach(salesType => {
+            // Find data for this sales type in each stage
+            const quotationData = this.state.quotationsData.find(item => item.sales_type_name === salesType) || {};
+            const salesOrderData = this.state.salesOrdersData.find(item => item.sales_type_name === salesType) || {};
+            const invoicedData = this.state.invoicedSalesData.find(item => item.sales_type_name === salesType) || {};
+
+            // Calculate totals for this sales type
+            const totalCount = (quotationData.count || 0) + (salesOrderData.count || 0) + (invoicedData.count || 0);
+            const totalValue = (quotationData.amount || 0) + (salesOrderData.amount || 0) + (invoicedData.invoiced_amount || invoicedData.amount || 0);
+
+            tableHTML += `
+                <tr>
+                    <td class="sales-type-cell"><strong>${salesType}</strong></td>
+                    <td class="count-cell">${quotationData.count || 0}</td>
+                    <td class="amount-cell">${this.formatDashboardValue(quotationData.amount || 0)}</td>
+                    <td class="count-cell">${salesOrderData.count || 0}</td>
+                    <td class="amount-cell">${this.formatDashboardValue(salesOrderData.amount || 0)}</td>
+                    <td class="count-cell">${invoicedData.count || 0}</td>
+                    <td class="amount-cell invoiced-amount">${this.formatDashboardValue(invoicedData.invoiced_amount || invoicedData.amount || 0)}</td>
+                    <td class="count-cell total-count"><strong>${totalCount}</strong></td>
+                    <td class="amount-cell total-amount"><strong>${this.formatDashboardValue(totalValue)}</strong></td>
+                </tr>
+            `;
+        });
+
+        // Add totals row
+        const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
+        const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
+        const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
+
+        const grandTotalCount = (quotationsTotal.count || 0) + (salesOrdersTotal.count || 0) + (invoicedSalesTotal.count || 0);
+        const grandTotalValue = (quotationsTotal.amount || 0) + (salesOrdersTotal.amount || 0) + (invoicedSalesTotal.invoiced_amount || invoicedSalesTotal.amount || 0);
+
+        tableHTML += `
+            <tr class="total-row">
+                <td class="sales-type-cell"><strong>TOTAL</strong></td>
+                <td class="count-cell"><strong>${quotationsTotal.count || 0}</strong></td>
+                <td class="amount-cell"><strong>${this.formatDashboardValue(quotationsTotal.amount || 0)}</strong></td>
+                <td class="count-cell"><strong>${salesOrdersTotal.count || 0}</strong></td>
+                <td class="amount-cell"><strong>${this.formatDashboardValue(salesOrdersTotal.amount || 0)}</strong></td>
+                <td class="count-cell"><strong>${invoicedSalesTotal.count || 0}</strong></td>
+                <td class="amount-cell invoiced-amount"><strong>${this.formatDashboardValue(invoicedSalesTotal.invoiced_amount || invoicedSalesTotal.amount || 0)}</strong></td>
+                <td class="count-cell total-count grand-total"><strong>${grandTotalCount}</strong></td>
+                <td class="amount-cell total-amount grand-total"><strong>${this.formatDashboardValue(grandTotalValue)}</strong></td>
+            </tr>
+        `;
+
+        tbody.innerHTML = tableHTML;
+    }
+
+    /**
+     * Create summary table showing each stage with sales type breakdown
+     */
+    _createStageSummaryTable() {
+        const tbody = document.getElementById('stage-summary-tbody');
+        if (!tbody) {
+            console.warn('Stage summary table body not found');
+            return;
+        }
+
+        let tableHTML = '';
+
+        // Define stages and their data sources
+        const stages = [
+            {
+                name: 'Quotations',
+                icon: '📝',
+                data: this.state.quotationsData,
+                class: 'quotations-stage'
+            },
+            {
+                name: 'Sales Orders',
+                icon: '📋',
+                data: this.state.salesOrdersData,
+                class: 'orders-stage'
+            },
+            {
+                name: 'Invoiced Sales',
+                icon: '💰',
+                data: this.state.invoicedSalesData,
+                class: 'invoiced-stage'
+            }
+        ];
+
+        stages.forEach(stage => {
+            // Find data for each sales type in this stage
+            const primaryData = stage.data.find(item => item.sales_type_name === 'Primary Sales') || {};
+            const exclusiveData = stage.data.find(item => item.sales_type_name === 'Exclusive Sales') || {};
+            const secondaryData = stage.data.find(item => item.sales_type_name === 'Secondary Sales') || {};
+            const totalData = stage.data.find(item => item.sales_type_name === 'Total') || {};
+
+            // Calculate average deal size for this stage
+            const totalCount = totalData.count || 0;
+            const totalAmount = stage.name === 'Invoiced Sales' 
+                ? (totalData.invoiced_amount || totalData.amount || 0)
+                : (totalData.amount || 0);
+            const avgDealSize = totalCount > 0 ? (totalAmount / totalCount) : 0;
+
+            tableHTML += `
+                <tr class="${stage.class}">
+                    <td class="stage-cell">
+                        <span class="stage-icon">${stage.icon}</span>
+                        <strong>${stage.name}</strong>
+                    </td>
+                    <td class="amount-cell">
+                        <div class="cell-content">
+                            <span class="count">${primaryData.count || 0}</span>
+                            <span class="amount">${this.formatDashboardValue(stage.name === 'Invoiced Sales' ? (primaryData.invoiced_amount || primaryData.amount || 0) : (primaryData.amount || 0))}</span>
+                        </div>
+                    </td>
+                    <td class="amount-cell">
+                        <div class="cell-content">
+                            <span class="count">${exclusiveData.count || 0}</span>
+                            <span class="amount">${this.formatDashboardValue(stage.name === 'Invoiced Sales' ? (exclusiveData.invoiced_amount || exclusiveData.amount || 0) : (exclusiveData.amount || 0))}</span>
+                        </div>
+                    </td>
+                    <td class="amount-cell">
+                        <div class="cell-content">
+                            <span class="count">${secondaryData.count || 0}</span>
+                            <span class="amount">${this.formatDashboardValue(stage.name === 'Invoiced Sales' ? (secondaryData.invoiced_amount || secondaryData.amount || 0) : (secondaryData.amount || 0))}</span>
+                        </div>
+                    </td>
+                    <td class="count-cell stage-total"><strong>${totalCount}</strong></td>
+                    <td class="amount-cell stage-total"><strong>${this.formatDashboardValue(totalAmount)}</strong></td>
+                    <td class="amount-cell avg-deal-size">${this.formatDashboardValue(avgDealSize)}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = tableHTML;
     }
 
     /**

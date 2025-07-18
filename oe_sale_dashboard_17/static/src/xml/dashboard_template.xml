@@ -327,6 +327,114 @@
                 </div>
             </div>
 
+            <!-- Comprehensive Summary Tables -->
+            <div id="summary-tables-section" class="o_oe_sale_dashboard_17_container__summary-tables">
+                <div class="summary-section-header">
+                    <h2>
+                        📊 Sales Summary by Stage
+                        <span class="status-badge status-badge--summary">Analytics</span>
+                    </h2>
+                    <div class="summary-description">
+                        Complete breakdown of deals by sales type across all stages for the selected date range
+                    </div>
+                </div>
+
+                <!-- Summary by Sales Type (Primary, Exclusive, Secondary) -->
+                <div class="summary-table-container">
+                    <div class="summary-table-header">
+                        <h3>📈 Deals by Sales Type & Stage</h3>
+                        <div class="summary-stats">
+                            Total Pipeline: <strong t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Sales Type</th>
+                                    <th colspan="2">Quotations</th>
+                                    <th colspan="2">Sales Orders</th>
+                                    <th colspan="2">Invoiced Sales</th>
+                                    <th rowspan="2">Total Count</th>
+                                    <th rowspan="2">Total Value</th>
+                                </tr>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Amount</th>
+                                    <th>Count</th>
+                                    <th>Amount</th>
+                                    <th>Count</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-type-summary-tbody">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Summary by Stage (Quotations, Sales Orders, Invoiced) -->
+                <div class="summary-table-container">
+                    <div class="summary-table-header">
+                        <h3>🎯 Sales Pipeline Overview</h3>
+                        <div class="summary-stats">
+                            Conversion Rate: <strong t-esc="state.overallConversionRate || 0"/>%
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Pipeline Stage</th>
+                                    <th>Primary Sales</th>
+                                    <th>Exclusive Sales</th>
+                                    <th>Secondary Sales</th>
+                                    <th>Total Count</th>
+                                    <th>Total Amount</th>
+                                    <th>Avg. Deal Size</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stage-summary-tbody">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Summary -->
+                <div class="summary-table-container">
+                    <div class="summary-table-header">
+                        <h3>📊 Performance Metrics</h3>
+                        <div class="summary-stats">
+                            Period: <strong t-esc="state.startDate"/> to <strong t-esc="state.endDate"/>
+                        </div>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Pipeline Value</div>
+                            <div class="metric-value" t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
+                            <div class="metric-change">All active opportunities</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Revenue Realized</div>
+                            <div class="metric-value" t-esc="this.formatDashboardValue(state.realizedRevenue || 0)"/>
+                            <div class="metric-change">Invoiced sales only</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Win Rate</div>
+                            <div class="metric-value" t-esc="state.overallConversionRate || 0"/>%
+                            <div class="metric-change">Quote to Invoice</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Avg. Deal Size</div>
+                            <div class="metric-value" t-esc="this.formatDashboardValue(state.averageDealSize || 0)"/>
+                            <div class="metric-change">Per completed sale</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Performance Summary -->
             <div class="o_oe_sale_dashboard_17_container__performance" t-ref="performanceContainer">
                 <!-- Performance cards will be generated here -->
