@@ -35,8 +35,10 @@
         # Reports
         'report/report_action.xml',
         'report/bill_report_action.xml',
+        'report/payment_report_action.xml',
         'report/invoice_report.xml',
         'report/bill_report.xml',
+        'report/payment_report.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [
