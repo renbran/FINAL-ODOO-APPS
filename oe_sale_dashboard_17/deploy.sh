@@ -27,11 +27,37 @@ if [ -d "../var/assets" ]; then
 fi
 
 # Create missing directories if needed
-mkdir -p ./oe_sale_dashboard_17/static/src/js
-mkdir -p ./oe_sale_dashboard_17/static/src/css
-mkdir -p ./oe_sale_dashboard_17/static/src/xml
-mkdir -p ./oe_sale_dashboard_17/views
-mkdir -p ./oe_sale_dashboard_17/data
+directories=(
+    "./oe_sale_dashboard_17/static/src/js"
+    "./oe_sale_dashboard_17/static/src/css"
+    "./oe_sale_dashboard_17/static/src/xml"
+    "./oe_sale_dashboard_17/views"
+    "./oe_sale_dashboard_17/data"
+)
+
+for dir in "${directories[@]}"; do
+    mkdir -p "$dir"
+done
+
+# JavaScript syntax validation for production readiness
+echo "Validating JavaScript syntax..."
+# Check if node is available
+if command -v node &> /dev/null; then
+    # Simple JavaScript syntax validation
+    for jsfile in $(find ./oe_sale_dashboard_17 -name "*.js"); do
+        echo "Checking $jsfile..."
+        node --check "$jsfile"
+        if [ $? -ne 0 ]; then
+            echo "Syntax error in $jsfile. Please fix before deployment."
+            echo "Deployment preparation aborted."
+            exit 1
+        fi
+    done
+    echo "All JavaScript files passed syntax validation."
+else
+    echo "Node.js not found. Skipping JavaScript syntax validation."
+    echo "Recommend installing Node.js for syntax validation before production deployment."
+fi
 
 # Ensure correct permissions
 echo "Setting correct permissions..."
@@ -48,4 +74,12 @@ echo ""
 echo "If you encounter any issues:"
 echo "1. Check browser console for JavaScript errors"
 echo "2. Review Odoo server logs for Python errors"
+echo "3. Consult the documentation in oe_sale_dashboard_17/docs/"
+echo ""
+echo "Rollback procedure:"
+echo "If issues occur after deployment, restore from the backup:"
+echo "1. Stop Odoo server"
+echo "2. Run: rm -rf ./oe_sale_dashboard_17"
+echo "3. Run: cp -r $BACKUP_DIR ./oe_sale_dashboard_17"
+echo "4. Restart Odoo server"
 echo "3. Consult the documentation in oe_sale_dashboard_17/docs/"
