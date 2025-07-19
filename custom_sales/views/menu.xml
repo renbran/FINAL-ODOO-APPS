@@ -15,7 +15,7 @@
             name="Dashboard"
             parent="menu_custom_sales_root"
             sequence="1"
-            action="action_custom_sales_dashboard"/>
+            action="custom_sales.action_custom_sales_dashboard"/>
         
         <!-- Sales Orders Menu -->
         <menuitem 
@@ -29,21 +29,21 @@
             name="All Orders"
             parent="menu_custom_sales_orders"
             sequence="1"
-            action="action_custom_sales_order"/>
+            action="custom_sales.action_custom_sales_order"/>
             
         <menuitem 
             id="menu_custom_sales_orders_my"
             name="My Orders"
             parent="menu_custom_sales_orders"
             sequence="2"
-            action="action_custom_sales_order_my"/>
+            action="custom_sales.action_custom_sales_order_my"/>
             
         <menuitem 
             id="menu_custom_sales_orders_team"
             name="Team Orders"
             parent="menu_custom_sales_orders"
             sequence="3"
-            action="action_custom_sales_order_team"/>
+            action="custom_sales.action_custom_sales_order_team"/>
         
         <!-- Analytics Menu -->
         <menuitem 
@@ -57,14 +57,14 @@
             name="Sales Overview"
             parent="menu_custom_sales_analytics"
             sequence="1"
-            action="action_custom_sales_analytics"/>
+            action="custom_sales.action_custom_sales_analytics"/>
             
         <menuitem 
             id="menu_custom_sales_kpis"
             name="KPI Analysis"
             parent="menu_custom_sales_analytics"
             sequence="2"
-            action="action_custom_sales_kpi_analysis"/>
+            action="custom_sales.action_custom_sales_kpi_analysis"/>
         
         <!-- Reports Menu -->
         <menuitem 
@@ -78,14 +78,14 @@
             name="Dashboard Report"
             parent="menu_custom_sales_reports"
             sequence="1"
-            action="action_custom_sales_report_dashboard"/>
+            action="custom_sales.action_custom_sales_report_dashboard"/>
             
         <menuitem 
             id="menu_custom_sales_reports_detailed"
             name="Detailed Reports"
             parent="menu_custom_sales_reports"
             sequence="2"
-            action="action_custom_sales_report_detailed"/>
+            action="custom_sales.action_custom_sales_report_detailed"/>
         
         <!-- Configuration Menu -->
         <menuitem 
@@ -100,21 +100,21 @@
             name="Dashboard Config"
             parent="menu_custom_sales_config"
             sequence="1"
-            action="action_custom_sales_dashboard_config"/>
+            action="custom_sales.action_custom_sales_dashboard_config"/>
             
         <menuitem 
             id="menu_custom_sales_config_kpis"
             name="KPI Configuration"
             parent="menu_custom_sales_config"
             sequence="2"
-            action="action_custom_sales_kpi_config"/>
+            action="custom_sales.action_custom_sales_kpi_config"/>
             
         <menuitem 
             id="menu_custom_sales_config_charts"
             name="Chart Configuration"
             parent="menu_custom_sales_config"
             sequence="3"
-            action="action_custom_sales_chart_config"/>
+            action="custom_sales.action_custom_sales_chart_config"/>
         
     </data>
 </odoo>
