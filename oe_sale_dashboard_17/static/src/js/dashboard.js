@@ -864,6 +864,9 @@ class OeSaleDashboard extends Component {
      * @returns {Object} Object with labels and trendData
      */
     _generateTrendDataFromActualData() {
+        // Add debug log to confirm this function is being called
+        console.log('_generateTrendDataFromActualData is being executed - v1.7');
+        
         // Get date range from state
         const startDate = new Date(this.state.startDate);
         const endDate = new Date(this.state.endDate);
@@ -981,16 +984,26 @@ class OeSaleDashboard extends Component {
     }
     
     _createTrendAnalysisChart() {
-        const chartSetup = this._prepareChartCanvas('trendChart', 'line');
-        if (!chartSetup) {
-            console.warn('Failed to prepare canvas for trend chart');
-            return;
-        }
-        
-        const { ctx, options } = chartSetup;
+        try {
+            console.log('Creating trend analysis chart - v1.7');
+            
+            const chartSetup = this._prepareChartCanvas('trendChart', 'line');
+            if (!chartSetup) {
+                console.warn('Failed to prepare canvas for trend chart');
+                return;
+            }
+            
+            const { ctx, options } = chartSetup;
 
-        // Generate trend data based on current date range and actual data
-        const { labels, trendData } = this._generateTrendDataFromActualData();
+            // Check if function exists
+            if (typeof this._generateTrendDataFromActualData !== 'function') {
+                console.error('_generateTrendDataFromActualData is not defined!');
+                // Fallback to default empty data
+                return;
+            }
+
+            // Generate trend data based on current date range and actual data
+            const { labels, trendData } = this._generateTrendDataFromActualData();
 
         const chartData = {
             labels: labels,

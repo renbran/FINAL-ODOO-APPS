@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Executive Sales Dashboard',
-    'version': '17.0.0.1.6',
+    'version': '17.0.0.1.7',  # Bumped version to regenerate assets
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
     'description': """
