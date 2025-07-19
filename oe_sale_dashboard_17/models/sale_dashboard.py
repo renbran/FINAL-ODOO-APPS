@@ -1,6 +1,9 @@
-from odoo import models, api
+from odoo import models, api, fields
 from datetime import datetime, timedelta
 from collections import defaultdict
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class SaleDashboard(models.Model):

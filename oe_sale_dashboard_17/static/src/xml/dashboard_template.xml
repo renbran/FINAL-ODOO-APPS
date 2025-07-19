@@ -2,7 +2,11 @@
 <!-- This module is under copyright of 'OdooElevate' -->
 <templates id="template" xml:space="preserve">
     <t t-name="oe_sale_dashboard_17.yearly_sales_dashboard_template" owl="1">
-        <div t-ref="dashboard_root" class="o_oe_sale_dashboard_17_container dashboard-loading" style="overflow-y: auto; overflow-x: hidden; height: 100vh; padding-bottom: 2rem;">
+        <div t-ref="dashboard_root" class="o_oe_sale_dashboard_17_container dashboard-loading" style="overflow-y: auto !important; overflow-x: hidden; height: 100vh; padding-bottom: 3rem; position: relative; z-index: 1;">
+            <!-- Scroll to top button -->
+            <button id="scroll-to-top-btn" class="scroll-to-top-btn" title="Back to Top" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background-color: var(--brand-burgundy); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; display: none; cursor: pointer; box-shadow: var(--shadow-md);">
+                ↑
+            </button>
             
             <!-- Loading Overlay -->
             <div t-if="state.isLoading" class="loading-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">

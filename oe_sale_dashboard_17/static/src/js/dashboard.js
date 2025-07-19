@@ -329,7 +329,7 @@ class OeSaleDashboard extends Component {
         try {
             // Validate date range
             if (this.state.startDate > this.state.endDate) {
-                this.notification.add(_t("Start date cannot be later than end date"), { type: 'warning' } catch (error) { console.error('Caught error:', error); });
+                this.notification.add(_t("Start date cannot be later than end date"), { type: 'warning' });
                 this.state.isLoading = false;
                 return;
             }
@@ -2464,6 +2464,52 @@ class OeSaleDashboard extends Component {
         } catch (error) {
             console.error(`Failed to create chart ${canvasId}:`, error);
             return null;
+        }
+    }
+    
+    /**
+     * Add scroll-to-top functionality for better dashboard navigation
+     * This improves usability when the dashboard content is long
+     */
+    _addScrollToTopButton() {
+        try {
+            const scrollBtn = document.getElementById('scroll-to-top-btn');
+            if (!scrollBtn) {
+                console.warn('Scroll-to-top button not found in DOM');
+                return;
+            }
+            
+            const dashboard = document.querySelector('.o_oe_sale_dashboard_17_container');
+            if (!dashboard) {
+                console.warn('Dashboard container not found');
+                return;
+            }
+            
+            // Initial check in case page is already scrolled
+            if (dashboard.scrollTop > 300) {
+                scrollBtn.style.display = 'block';
+            }
+            
+            // Add scroll event listener to show/hide button
+            dashboard.addEventListener('scroll', () => {
+                if (dashboard.scrollTop > 300) {
+                    scrollBtn.style.display = 'block';
+                } else {
+                    scrollBtn.style.display = 'none';
+                }
+            });
+            
+            // Add click event to scroll back to top
+            scrollBtn.addEventListener('click', () => {
+                dashboard.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            console.log('Scroll-to-top functionality initialized');
+        } catch (error) {
+            console.warn('Scroll to top functionality not available:', error);
         }
     }
 }
