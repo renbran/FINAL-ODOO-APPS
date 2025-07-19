@@ -108,19 +108,101 @@
                                     return originalMethod.apply(this, arguments);
                                 } catch (error) {
                                     console.error('Error in ' + methodName + ':', error);
+                                    
+                                    // Attempt to show notification if this is a component with notification capability
+                                    if (this.notification && typeof this.notification.add === 'function') {
+                                        try {
+                                            this.notification.add(_t('An error occurred in the dashboard. Please try again or contact support.'), {
+                                                type: 'danger',
+                                                sticky: true
+                                            });
+                                        } catch (notifError) {
+                                            console.error('Failed to show notification:', notifError);
+                                        }
+                                    }
+                                    
                                     return null;
                                 }
                             };
                         }
                     }
 
+                    // Add safe DOM element access utility
+                    proto._safeGetElement = function(selector, errorMessage = 'Element not found', parent = document) {
+                        const element = (parent || document).querySelector(selector);
+                        if (!element) {
+                            console.warn(`${errorMessage}: ${selector}`);
+                            return null;
+                        }
+                        return element;
+                    };
+                    
+                    // Add chart.js availability check
+                    proto._ensureChartJsAvailable = async function() {
+                        if (typeof window.ensureChartJsAvailable === 'function') {
+                            try {
+                                return await window.ensureChartJsAvailable();
+                            } catch (error) {
+                                console.error('Chart.js availability check failed:', error);
+                                if (this.notification) {
+                                    this.notification.add(_t('Failed to load Chart.js library. Some visualizations may not be available.'), {
+                                        type: 'warning'
+                                    });
+                                }
+                                return false;
+                            }
+                        }
+                        
+                        // Fallback to simple check
+                        return typeof Chart !== 'undefined';
+                    };
+                    
+                    // Field validation utility
+                    proto._validateRequiredFields = async function(requiredFields) {
+                        if (!this.orm || typeof this.orm.call !== 'function') {
+                            console.error('ORM not available for field validation');
+                            return false;
+                        }
+                        
+                        requiredFields = requiredFields || ['booking_date', 'sale_value', 'amount_total'];
+                        const missingFields = [];
+                        
+                        try {
+                            const modelFields = await this.orm.call("sale.order", "fields_get");
+                            
+                            requiredFields.forEach(field => {
+                                if (!modelFields[field]) {
+                                    missingFields.push(field);
+                                    console.warn(`Required field not found: ${field}`);
+                                }
+                            });
+                            
+                            if (missingFields.length > 0 && this.notification) {
+                                this.notification.add(_t(`Some dashboard features may be limited. Missing fields: ${missingFields.join(', ')}`), { 
+                                    type: 'warning' 
+                                });
+                            }
+                            
+                            return missingFields.length === 0;
+                        } catch (error) {
+                            console.error('Field validation error:', error);
+                            return false;
+                        }
+                    };
+                    
                     // Wrap critical dashboard methods with try/catch for safety
                     // This ensures we don't have syntax errors from missing try/catch blocks
                     const methodsToWrap = [
+                        // Chart rendering methods
                         '_createTrendAnalysisChart', '_prepareChartCanvas', '_loadDashboardData',
                         '_renderSalesOverviewChart', '_renderTopSalesmenChart', '_renderSalesByRegionChart',
-                        '_renderSalesFunnelChart', '_renderChartWithAnimation', '_onWindowResize',
-                        'start', 'willStart', '_fetchData', '_renderData', '_onResize'
+                        '_renderSalesFunnelChart', '_renderChartWithAnimation', 
+                        
+                        // Core functionality
+                        'start', 'willStart', '_fetchData', '_renderData', 'mounted',
+                        
+                        // Event handlers
+                        '_onWindowResize', '_onResize', 'onDateChanged', 'onFilterChanged'
                     ];
 
                     methodsToWrap.forEach(function(methodName) {
@@ -128,8 +210,29 @@
                             wrapMethodWithTryCatch(proto, methodName);
                         }
                     });
-
-                    console.log('OSUS Executive Sales Dashboard compatibility layer loaded successfully with syntax error protection');
+                    
+                    // Patch the mounted method to include field validation
+                    const originalMounted = proto.mounted || function() {};
+                    proto.mounted = function() {
+                        try {
+                            // Run Chart.js availability check
+                            this._ensureChartJsAvailable().then(available => {
+                                if (!available) {
+                                    console.warn('Chart.js not available, some features will be limited');
+                                }
+                            });
+                            
+                            // Validate required fields
+                            this._validateRequiredFields();
+                            
+                            // Call original mounted
+                            return originalMounted.apply(this, arguments);
+                        } catch (error) {
+                            console.error('Error in patched mounted method:', error);
+                        }
+                    };
+                    
+                    console.log('OSUS Executive Sales Dashboard compatibility layer loaded successfully with enhanced protection');
                 }
             }, 100);
         });

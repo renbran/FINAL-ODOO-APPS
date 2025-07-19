@@ -1,6 +1,6 @@
 # OSUS Executive Sales Dashboard
 
-## Version 17.0.0.2.0
+## Version 17.0.0.3.0
 
 A beautiful, modern executive dashboard for Odoo 17 with advanced visualizations and business intelligence capabilities.
 
@@ -84,6 +84,13 @@ The `sale_value` field computation can be customized in the `sale_order.py` mode
 
 ## Recent Updates & Bug Fixes
 
+### v17.0.0.3.0
+- Added dynamic field validation and fallbacks for optional dependencies
+- Enhanced Chart.js loading with improved availability checks
+- Added safe DOM element access utilities to prevent null reference errors
+- Added comprehensive deployment and update scripts
+- Added detailed documentation for deployment and troubleshooting
+
 ### v17.0.0.2.0
 - Fixed JavaScript syntax error "Missing catch or finally after try"
 - Added automatic try/catch wrapper for all dashboard methods
@@ -108,6 +115,25 @@ The `sale_value` field computation can be customized in the `sale_order.py` mode
 - Initial implementation of the trend data generation method
 - Fixed Chart.js loading and initialization
 - Updated chart documentation
+
+## Deployment Instructions
+
+For detailed deployment instructions, see the [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md).
+
+### Quick Start
+
+1. **Verify Dependencies**
+   - The module works best with `osus_invoice_report` and `le_sale_type` but will adapt if they're not available
+
+2. **Installation**
+   - Copy the module to your Odoo addons directory
+   - Run deployment script: `./deploy.sh` (Linux/Mac) or `.\deploy.ps1` (Windows)
+   - Update the module in Odoo: `-u oe_sale_dashboard_17`
+
+3. **Troubleshooting**
+   - For common issues and solutions, see the [Issues Resolution Plan](./docs/ISSUES_RESOLUTION_PLAN.md)
+   - Check browser console for JavaScript errors
+   - Review server logs for Python errors
 
 ## Support
 

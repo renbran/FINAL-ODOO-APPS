@@ -1,5 +1,23 @@
 # Changelog for OSUS Executive Sales Dashboard
 
+## v17.0.0.3.0 (2025-07-20)
+
+### Major Improvements
+- **Field Validation**: Added dynamic field validation to work with or without optional dependencies
+- **DOM Safety**: Added safe DOM element access utilities to prevent null reference errors
+- **Chart.js Robustness**: Enhanced Chart.js loading with better fallback mechanisms
+- **Deployment Scripts**: Added comprehensive deployment and update scripts
+
+### Bug Fixes
+- **Missing Fields**: Added fallbacks for missing fields if dependency modules aren't installed
+- **DOM Access**: Fixed potential null reference errors when accessing DOM elements
+- **Chart Rendering**: Improved Chart.js availability checking before rendering
+
+### Technical Improvements
+- **Dependency Management**: Reduced hard dependencies on custom modules
+- **Field Mapping**: Added dynamic field mapping system for flexible field access
+- **Documentation**: Added comprehensive deployment guide and issue resolution documentation
+
 ## v17.0.0.2.0 (2025-07-20)
 
 ### Major Improvements

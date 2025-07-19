@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Executive Sales Dashboard',
-    'version': '17.0.0.2.0',  # Bumped version to fix JavaScript syntax errors
+    'version': '17.0.0.3.0',  # Bumped version to add deployment robustness improvements
     'category': 'Sales',
     'summary': 'Custom dashboard for yearly sales report.',
     'description': """
@@ -31,11 +31,12 @@
         'web.assets_backend': [
             # Primary CDN loading for Chart.js
             'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
-            # Module assets
+            # Module assets in proper loading order
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
-            'oe_sale_dashboard_17/static/src/js/chart.fallback.js', # Fallback script for Chart.js
-            'oe_sale_dashboard_17/static/src/js/dashboard.js',
-            'oe_sale_dashboard_17/static/src/js/compatibility.js', # Compatibility layer for method name changes
+            'oe_sale_dashboard_17/static/src/js/chart.fallback.js',    # Must load before any chart usage
+            'oe_sale_dashboard_17/static/src/js/field_mapping.js',     # Field validation and mapping
+            'oe_sale_dashboard_17/static/src/js/compatibility.js',     # Compatibility layer and error handling
+            'oe_sale_dashboard_17/static/src/js/dashboard.js',         # Main dashboard component
         ],
         'web.assets_web': [
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
