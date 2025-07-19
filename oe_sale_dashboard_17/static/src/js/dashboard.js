@@ -140,7 +140,8 @@ class OeSaleDashboard extends Component {
                 this._addScrollToTopButton();
             } catch (error) {
                 this._handleDashboardError(error, 'mount');
-            } catch (error) { console.error('Caught error:', error); }
+                console.error('Caught error:', error);
+            }
         });
     }
 
@@ -308,11 +309,11 @@ class OeSaleDashboard extends Component {
                     const amount = parseFloat(invoice.amount_total) || 0.0;
                     if (invoice.move_type === 'out_invoice') {
                         totalInvoicedAmount += amount;
-                    } catch (error) { console.error('Caught error:', error); } else if (invoice.move_type === 'out_refund') {
+                    } else if (invoice.move_type === 'out_refund') {
                         totalInvoicedAmount -= amount; // Subtract refunds
                     }
                 }
-            } catch (error) {
+            }  {
                 console.warn('Could not fetch invoice data, using sale order amounts as fallback:', error);
                 totalInvoicedAmount = invoicedOrders.amount_total;
             }
@@ -458,7 +459,7 @@ class OeSaleDashboard extends Component {
 
             this.notification.add(_t(`Executive dashboard updated for: ${this.state.startDate} to ${this.state.endDate}`), { type: 'success' });
 
-        } catch (error) {
+        }  {
             console.error("Error loading executive dashboard data:", error);
             this.notification.add(_t("Error loading executive dashboard data. Please check console for details."), { type: 'danger' });
         } finally {
@@ -628,7 +629,7 @@ class OeSaleDashboard extends Component {
             // Wait for DOM to be ready
             const canvas = document.getElementById(canvasId);
             if (!canvas) {
-                console.warn(`Canvas element with ID '${canvasId} catch (error) { console.error('Caught error:', error); }' not found in DOM`);
+                console.warn(`Canvas element with ID '${canvasId}' not found in DOM`);
                 return null;
             }
             
@@ -714,7 +715,7 @@ class OeSaleDashboard extends Component {
         }
         
         return { ctx, options: baseOptions };
-        } catch (error) {
+        }  {
             console.error(`Error preparing canvas ${canvasId}:`, error);
             return null;
         }
@@ -729,7 +730,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for revenue chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -795,7 +796,7 @@ class OeSaleDashboard extends Component {
             data: chartData,
             options: chartOptions
         });
-        } catch (error) {
+        }  {
             console.error('Error creating revenue chart:', error);
         }
     }
@@ -1006,7 +1007,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1120,7 +1121,7 @@ class OeSaleDashboard extends Component {
                 }
             }
         });
-        } catch (error) {
+        }  {
             console.error('Error creating trend analysis chart:', error);
             this.notification.add(_t('Failed to create trend analysis chart. Please check console for details.'), {
                 type: 'danger',
@@ -1147,7 +1148,7 @@ class OeSaleDashboard extends Component {
                 this._createSalesTypeCountChartWithData(distributionData.count_distribution);
                 this._createSalesTypeTotalChartWithData(distributionData.amount_distribution);
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
         } catch (error) {
             console.warn('Could not fetch sales type distribution from backend, using fallback:', error);
         }
@@ -1236,7 +1237,7 @@ class OeSaleDashboard extends Component {
             if (!canvas || typeof Chart === 'undefined') {
                 console.warn('Chart.js not available or salesTypeTotalChart canvas not found');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
 
         const ctx = canvas.getContext('2d');
         
@@ -1297,7 +1298,7 @@ class OeSaleDashboard extends Component {
             }
         });
 
-        } catch (error) {
+        }  {
             console.error('Error creating sales type total chart:', error);
             this._handleDashboardError(error, 'sales type total chart');
         }
@@ -1312,7 +1313,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type count chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1394,7 +1395,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating sales type count chart:', error);
             this._handleDashboardError(error, 'sales type count chart');
         }
@@ -1409,7 +1410,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type total chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1492,7 +1493,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating sales type total chart:', error);
             this._handleDashboardError(error, 'sales type total chart');
         }
@@ -1507,7 +1508,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for deal fluctuation chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1585,7 +1586,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating deal fluctuation chart:', error);
             this._handleDashboardError(error, 'deal fluctuation chart');
         }
@@ -1600,7 +1601,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1672,7 +1673,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating trend chart:', error);
             this._handleDashboardError(error, 'trend chart');
         }
@@ -1777,11 +1778,11 @@ class OeSaleDashboard extends Component {
             console.log('Top Agents Data:', this.state.topAgentsData);
             console.log('Top Agencies Data:', this.state.topAgenciesData);
 
-        } catch (error) {
+        }  {
             console.warn('Could not load top performers data:', error);
             this.state.topAgentsData = [];
             this.state.topAgenciesData = [];
-        } catch (error) { console.error('Caught error:', error); }
+        }
     }
 
     /**
@@ -1801,8 +1802,8 @@ class OeSaleDashboard extends Component {
     _safeQuerySelector(selector, container = document) {
         try {
             return container.querySelector(selector);
-        } catch (error) {
-            console.warn(`Failed to find element: ${selector} catch (error) { console.error('Caught error:', error); }`, error);
+        }  {
+            console.warn(`Failed to find element: ${selector}`, error);
             return null;
         }
     }
@@ -1817,7 +1818,7 @@ class OeSaleDashboard extends Component {
             if (container) {
                 container.classList.add('dashboard-initialized');
                 container.style.visibility = 'visible';
-            } catch (error) { console.error('Caught error:', error); }
+            }
 
             // Load data with timeout protection
             const loadingPromise = this._loadDashboardData();
@@ -1830,7 +1831,7 @@ class OeSaleDashboard extends Component {
             // Initialize charts after data is loaded
             await this._initializeCharts();
             
-        } catch (error) {
+        }  {
             this._handleDashboardError(error, 'initialization');
             this.state.isLoading = false;
         }
@@ -1866,7 +1867,7 @@ class OeSaleDashboard extends Component {
      */
     _createChartSafely(canvasId, config) {
         try {
-            const canvas = this._safeQuerySelector(`#${canvasId} catch (error) { console.error('Caught error:', error); }`);
+            const canvas = this._safeQuerySelector(`#${canvasId}`);
             if (!canvas) {
                 console.warn(`Canvas element ${canvasId} not found`);
                 return null;
@@ -1879,7 +1880,7 @@ class OeSaleDashboard extends Component {
             }
 
             return new Chart(canvas, config);
-        } catch (error) {
+        }  {
             console.error(`Failed to create chart ${canvasId}:`, error);
             return null;
         }
@@ -1894,7 +1895,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type count chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -1976,7 +1977,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating sales type count chart:', error);
             this._handleDashboardError(error, 'sales type count chart');
         }
@@ -1991,7 +1992,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type total chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -2074,7 +2075,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating sales type total chart:', error);
             this._handleDashboardError(error, 'sales type total chart');
         }
@@ -2089,7 +2090,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for deal fluctuation chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -2167,7 +2168,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating deal fluctuation chart:', error);
             this._handleDashboardError(error, 'deal fluctuation chart');
         }
@@ -2182,7 +2183,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            } catch (error) { console.error('Caught error:', error); }
+            }
             
             const { ctx, options } = chartSetup;
 
@@ -2254,7 +2255,7 @@ class OeSaleDashboard extends Component {
                 options: chartOptions
             });
 
-        } catch (error) {
+        }  {
             console.error('Error creating trend chart:', error);
             this._handleDashboardError(error, 'trend chart');
         }
@@ -2359,11 +2360,11 @@ class OeSaleDashboard extends Component {
             console.log('Top Agents Data:', this.state.topAgentsData);
             console.log('Top Agencies Data:', this.state.topAgenciesData);
 
-        } catch (error) {
+        }  {
             console.warn('Could not load top performers data:', error);
             this.state.topAgentsData = [];
             this.state.topAgenciesData = [];
-        } catch (error) { console.error('Caught error:', error); }
+        }
     }
 
     /**
@@ -2383,8 +2384,8 @@ class OeSaleDashboard extends Component {
     _safeQuerySelector(selector, container = document) {
         try {
             return container.querySelector(selector);
-        } catch (error) {
-            console.warn(`Failed to find element: ${selector} catch (error) { console.error('Caught error:', error); }`, error);
+        }  {
+            console.warn(`Failed to find element: ${selector}`, error);
             return null;
         }
     }
@@ -2399,7 +2400,7 @@ class OeSaleDashboard extends Component {
             if (container) {
                 container.classList.add('dashboard-initialized');
                 container.style.visibility = 'visible';
-            } catch (error) { console.error('Caught error:', error); }
+            }
 
             // Load data with timeout protection
             const loadingPromise = this._loadDashboardData();
@@ -2412,7 +2413,7 @@ class OeSaleDashboard extends Component {
             // Initialize charts after data is loaded
             await this._initializeCharts();
             
-        } catch (error) {
+        }  {
             this._handleDashboardError(error, 'initialization');
             this.state.isLoading = false;
         }
@@ -2448,7 +2449,7 @@ class OeSaleDashboard extends Component {
      */
     _createChartSafely(canvasId, config) {
         try {
-            const canvas = this._safeQuerySelector(`#${canvasId} catch (error) { console.error('Caught error:', error); }`);
+            const canvas = this._safeQuerySelector(`#${canvasId}`);
             if (!canvas) {
                 console.warn(`Canvas element ${canvasId} not found`);
                 return null;
@@ -2461,7 +2462,7 @@ class OeSaleDashboard extends Component {
             }
 
             return new Chart(canvas, config);
-        } catch (error) {
+        }  {
             console.error(`Failed to create chart ${canvasId}:`, error);
             return null;
         }
