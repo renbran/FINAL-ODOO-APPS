@@ -47,7 +47,7 @@ class CustomSalesDashboard extends Component {
                 dashboard_id: this.state.filters.dashboard_id,
                 date_from: this.state.filters.date_from,
                 date_to: this.state.filters.date_to
-            });
+            } catch (error) { console.error('Caught error:', error); });
             
             if (result.error) {
                 throw new Error(result.error);
@@ -99,7 +99,7 @@ class CustomSalesDashboard extends Component {
     
     async exportReport(format) {
         try {
-            const url = `/custom_sales/report/export?format=${format}&date_from=${this.state.filters.date_from || ''}&date_to=${this.state.filters.date_to || ''}`;
+            const url = `/custom_sales/report/export?format=${format} catch (error) { console.error('Caught error:', error); }&date_from=${this.state.filters.date_from || ''}&date_to=${this.state.filters.date_to || ''}`;
             window.open(url, '_blank');
             
             this.notification.add(`Report exported as ${format.toUpperCase()}`, { type: "success" });

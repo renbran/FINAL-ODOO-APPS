@@ -140,7 +140,7 @@ class OeSaleDashboard extends Component {
                 this._addScrollToTopButton();
             } catch (error) {
                 this._handleDashboardError(error, 'mount');
-            }
+            } catch (error) { console.error('Caught error:', error); }
         });
     }
 
@@ -308,7 +308,7 @@ class OeSaleDashboard extends Component {
                     const amount = parseFloat(invoice.amount_total) || 0.0;
                     if (invoice.move_type === 'out_invoice') {
                         totalInvoicedAmount += amount;
-                    } else if (invoice.move_type === 'out_refund') {
+                    } catch (error) { console.error('Caught error:', error); } else if (invoice.move_type === 'out_refund') {
                         totalInvoicedAmount -= amount; // Subtract refunds
                     }
                 }
@@ -329,7 +329,7 @@ class OeSaleDashboard extends Component {
         try {
             // Validate date range
             if (this.state.startDate > this.state.endDate) {
-                this.notification.add(_t("Start date cannot be later than end date"), { type: 'warning' });
+                this.notification.add(_t("Start date cannot be later than end date"), { type: 'warning' } catch (error) { console.error('Caught error:', error); });
                 this.state.isLoading = false;
                 return;
             }
@@ -497,9 +497,19 @@ class OeSaleDashboard extends Component {
      * Wait for Chart.js to be available
      */
     async _waitForChartJS() {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+            const maxAttempts = 50; // Maximum 5 seconds wait (50 * 100ms)
+            
             const checkChart = () => {
+                attempts++;
                 if (typeof Chart !== 'undefined') {
+                    console.log('Chart.js loaded successfully');
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    console.error('Chart.js failed to load after 5 seconds');
+                    // Resolve anyway to prevent dashboard from being completely blocked
+                    // but log error for debugging
                     resolve();
                 } else {
                     setTimeout(checkChart, 100);
@@ -618,7 +628,7 @@ class OeSaleDashboard extends Component {
             // Wait for DOM to be ready
             const canvas = document.getElementById(canvasId);
             if (!canvas) {
-                console.warn(`Canvas element with ID '${canvasId}' not found in DOM`);
+                console.warn(`Canvas element with ID '${canvasId} catch (error) { console.error('Caught error:', error); }' not found in DOM`);
                 return null;
             }
             
@@ -719,7 +729,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for revenue chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -937,7 +947,7 @@ class OeSaleDashboard extends Component {
         }
         
         // For demo purposes, generate some sample data if real data is empty
-        if (!this.state.quotationsData.length && !this.state.salesOrdersData.length) {
+        if ((!this.state.quotationsData || !this.state.quotationsData.length) && (!this.state.salesOrdersData || !this.state.salesOrdersData.length)) {
             // Generate random demo data
             for (let i = 0; i < labels.length; i++) {
                 quotationsValues[i] = Math.floor(Math.random() * 100) + 20;
@@ -949,10 +959,15 @@ class OeSaleDashboard extends Component {
             // This is a simplified approach - in a real implementation,
             // you'd want to match dates from your actual data to the intervals
             
+            // Safely access quotationsData and salesOrdersData with null checks
+            const quotationsData = this.state.quotationsData || [];
+            const salesOrdersData = this.state.salesOrdersData || [];
+            const invoicedSalesData = this.state.invoicedSalesData || [];
+            
             // Use Total aggregated values for a smoother trend line
-            const quotationsTotal = this.state.quotationsData.find(item => item.sales_type_name === 'Total') || {};
-            const salesOrdersTotal = this.state.salesOrdersData.find(item => item.sales_type_name === 'Total') || {};
-            const invoicedSalesTotal = this.state.invoicedSalesData.find(item => item.sales_type_name === 'Total') || {};
+            const quotationsTotal = quotationsData.find(item => item && item.sales_type_name === 'Total') || {};
+            const salesOrdersTotal = salesOrdersData.find(item => item && item.sales_type_name === 'Total') || {};
+            const invoicedSalesTotal = invoicedSalesData.find(item => item && item.sales_type_name === 'Total') || {};
             
             // Distribute values across the range using weighted distribution
             // This is a simple approach - in a real implementation, you might want to
@@ -991,7 +1006,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1004,6 +1019,18 @@ class OeSaleDashboard extends Component {
 
             // Generate trend data based on current date range and actual data
             const { labels, trendData } = this._generateTrendDataFromActualData();
+            
+            // Safety check for data
+            if (!labels || !trendData || !Array.isArray(labels)) {
+                console.error('Invalid trend data or labels');
+                return;
+            }
+            
+            // Cleanup existing chart to prevent memory leaks
+            if (this.charts && this.charts.trend) {
+                this.charts.trend.destroy();
+                this.charts.trend = null;
+            }
 
         const chartData = {
             labels: labels,
@@ -1093,6 +1120,14 @@ class OeSaleDashboard extends Component {
                 }
             }
         });
+        } catch (error) {
+            console.error('Error creating trend analysis chart:', error);
+            this.notification.add(_t('Failed to create trend analysis chart. Please check console for details.'), {
+                type: 'danger',
+                sticky: false,
+                title: _t('Chart Error')
+            });
+        }
     }
 
     /**
@@ -1112,7 +1147,7 @@ class OeSaleDashboard extends Component {
                 this._createSalesTypeCountChartWithData(distributionData.count_distribution);
                 this._createSalesTypeTotalChartWithData(distributionData.amount_distribution);
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
         } catch (error) {
             console.warn('Could not fetch sales type distribution from backend, using fallback:', error);
         }
@@ -1201,7 +1236,7 @@ class OeSaleDashboard extends Component {
             if (!canvas || typeof Chart === 'undefined') {
                 console.warn('Chart.js not available or salesTypeTotalChart canvas not found');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
 
         const ctx = canvas.getContext('2d');
         
@@ -1277,7 +1312,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type count chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1374,7 +1409,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type total chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1472,7 +1507,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for deal fluctuation chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1565,7 +1600,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1746,7 +1781,7 @@ class OeSaleDashboard extends Component {
             console.warn('Could not load top performers data:', error);
             this.state.topAgentsData = [];
             this.state.topAgenciesData = [];
-        }
+        } catch (error) { console.error('Caught error:', error); }
     }
 
     /**
@@ -1767,7 +1802,7 @@ class OeSaleDashboard extends Component {
         try {
             return container.querySelector(selector);
         } catch (error) {
-            console.warn(`Failed to find element: ${selector}`, error);
+            console.warn(`Failed to find element: ${selector} catch (error) { console.error('Caught error:', error); }`, error);
             return null;
         }
     }
@@ -1782,7 +1817,7 @@ class OeSaleDashboard extends Component {
             if (container) {
                 container.classList.add('dashboard-initialized');
                 container.style.visibility = 'visible';
-            }
+            } catch (error) { console.error('Caught error:', error); }
 
             // Load data with timeout protection
             const loadingPromise = this._loadDashboardData();
@@ -1823,7 +1858,7 @@ class OeSaleDashboard extends Component {
             
         } catch (error) {
             this._handleDashboardError(error, 'charts');
-        }
+        } catch (error) { console.error('Caught error:', error); }
     }
 
     /**
@@ -1831,7 +1866,7 @@ class OeSaleDashboard extends Component {
      */
     _createChartSafely(canvasId, config) {
         try {
-            const canvas = this._safeQuerySelector(`#${canvasId}`);
+            const canvas = this._safeQuerySelector(`#${canvasId} catch (error) { console.error('Caught error:', error); }`);
             if (!canvas) {
                 console.warn(`Canvas element ${canvasId} not found`);
                 return null;
@@ -1859,7 +1894,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type count chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -1956,7 +1991,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for sales type total chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -2054,7 +2089,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for deal fluctuation chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -2147,7 +2182,7 @@ class OeSaleDashboard extends Component {
             if (!chartSetup) {
                 console.warn('Failed to prepare canvas for trend chart');
                 return;
-            }
+            } catch (error) { console.error('Caught error:', error); }
             
             const { ctx, options } = chartSetup;
 
@@ -2328,7 +2363,7 @@ class OeSaleDashboard extends Component {
             console.warn('Could not load top performers data:', error);
             this.state.topAgentsData = [];
             this.state.topAgenciesData = [];
-        }
+        } catch (error) { console.error('Caught error:', error); }
     }
 
     /**
@@ -2349,7 +2384,7 @@ class OeSaleDashboard extends Component {
         try {
             return container.querySelector(selector);
         } catch (error) {
-            console.warn(`Failed to find element: ${selector}`, error);
+            console.warn(`Failed to find element: ${selector} catch (error) { console.error('Caught error:', error); }`, error);
             return null;
         }
     }
@@ -2364,7 +2399,7 @@ class OeSaleDashboard extends Component {
             if (container) {
                 container.classList.add('dashboard-initialized');
                 container.style.visibility = 'visible';
-            }
+            } catch (error) { console.error('Caught error:', error); }
 
             // Load data with timeout protection
             const loadingPromise = this._loadDashboardData();
@@ -2405,7 +2440,7 @@ class OeSaleDashboard extends Component {
             
         } catch (error) {
             this._handleDashboardError(error, 'charts');
-        }
+        } catch (error) { console.error('Caught error:', error); }
     }
 
     /**
@@ -2413,7 +2448,7 @@ class OeSaleDashboard extends Component {
      */
     _createChartSafely(canvasId, config) {
         try {
-            const canvas = this._safeQuerySelector(`#${canvasId}`);
+            const canvas = this._safeQuerySelector(`#${canvasId} catch (error) { console.error('Caught error:', error); }`);
             if (!canvas) {
                 console.warn(`Canvas element ${canvasId} not found`);
                 return null;

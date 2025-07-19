@@ -1,5 +1,7 @@
 # OSUS Executive Sales Dashboard
 
+## Version 17.0.0.2.0
+
 A beautiful, modern executive dashboard for Odoo 17 with advanced visualizations and business intelligence capabilities.
 
 This module is under copyright of 'OdooElevate'
@@ -79,6 +81,33 @@ The `sale_value` field computation can be customized in the `sale_order.py` mode
 - **Framework**: OWL Components
 - **Database**: PostgreSQL compatible
 - **License**: AGPL-3
+
+## Recent Updates & Bug Fixes
+
+### v17.0.0.2.0
+- Fixed JavaScript syntax error "Missing catch or finally after try"
+- Added automatic try/catch wrapper for all dashboard methods
+- Added enhanced error handling throughout the codebase
+- Fixed potential memory leaks from unhandled exceptions
+- Improved module stability and error resilience
+
+### v17.0.0.1.9
+- Added CDN fallback mechanism for Chart.js loading
+- Added compatibility layer to handle method name discrepancies
+- Fixed potential issues with chart creation methods
+- Added improved error handling and logging
+
+### v17.0.0.1.8
+- Fixed missing catch block for trend analysis chart creation
+- Added null checks for data access throughout the codebase
+- Added proper chart cleanup before creating new ones
+- Fixed safe array access with null checks
+- Added safety checks before accessing object properties
+
+### v17.0.0.1.7
+- Initial implementation of the trend data generation method
+- Fixed Chart.js loading and initialization
+- Updated chart documentation
 
 ## Support
 
