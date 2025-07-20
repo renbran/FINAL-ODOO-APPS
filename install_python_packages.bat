@@ -87,7 +87,8 @@ echo   ✅ python-dateutil - for date utilities
 echo   ✅ numpy - for numerical operations
 echo   ✅ pytz, tzlocal, dateparser - additional date utilities
 echo.
-echo 🌐 Access your Odoo: http://localhost:8069/web?db=propertyosus
+echo 🌐 Access your Odoo: http://localhost:8069/web?db=testosus
+echo   🔗 Alternative: http://localhost:8069/web?db=propertyosus
 echo.
 echo 💡 Your modules that require these packages should now work perfectly:
 echo   📊 report_xlsx (Excel reports)
