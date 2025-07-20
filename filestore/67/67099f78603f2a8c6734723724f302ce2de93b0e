@@ -1,0 +1,53 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:20250716T070640Z - 65590@vultr
+DTSTART:20250716T094500Z
+DTEND:20250716T104500Z
+ATTENDEE:MAILTO:salescompliance@osusproperties.com
+ATTENDEE:MAILTO:j.padilla@osusproperties.com j.padilla@osusproperties.com
+ATTENDEE:MAILTO:walid@osusproperties.com
+ATTENDEE:MAILTO:documentcontroller@osusproperties.com
+ATTENDEE:MAILTO:a.hamdan@osusproperties.com
+ATTENDEE:MAILTO:anita@osusproperties.com
+ATTENDEE:MAILTO:info@osusproperties.com
+ATTENDEE:MAILTO:a.khurshid@osusproperties.com
+ATTENDEE:MAILTO:c.bajao@osusproperties.com
+ATTENDEE:MAILTO:claudio.p@osusproperties.com
+ATTENDEE:MAILTO:dhanraj@osusproperties.com
+ATTENDEE:MAILTO:eldar@osusproperties.com
+ATTENDEE:MAILTO:faraaz@osusproperties.com
+ATTENDEE:MAILTO:h@osusproperties.com
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:j.varda@osusproperties.com
+ATTENDEE:MAILTO:maickel.faragalla@osusproperties.com
+ATTENDEE:MAILTO:nader@osusproperties.com
+ATTENDEE:MAILTO:Nsabbour@LMDUAE.com
+ATTENDEE:MAILTO:naveen@osusproperties.com
+ATTENDEE:MAILTO:r.anthony@osusproperties.com
+ATTENDEE:MAILTO:Sina.saeedi@lmduae.com
+ATTENDEE:MAILTO:victoria@osusproperties.com
+ATTENDEE:MAILTO:wsimon@lmduae.com
+ATTENDEE:MAILTO: safa@osusproperties.com
+ATTENDEE:MAILTO:r.sfeir@osusproperties.com
+ATTENDEE:MAILTO:alisar@osusproperties.com
+CREATED:20250716T070640Z
+DESCRIPTION:Hi Team\,\nJoin us for an *exclusive project briefing* on:\n•
+  Residential developments in *JVT*\n• *Fairmont Downtown* • *Premium 
+ ready offices in Business Bay* – now with *5% commission!*\nDon’t miss
+  this opportunity to get firsthand insights and updates directly from the 
+ Sol Properties team.\nWe look forward to seeing you there!
+DTSTAMP:20250716T070640Z
+LOCATION:Sol Properties Office\, Experience Center – Emaar Square\, Downt
+ own Dubai
+ORGANIZER;CN=JEROME PADILLA:MAILTO:j.padilla@osusproperties.com j.padilla@o
+ susproperties.com
+SUMMARY:Invitation from Sol Properties - Agent Briefing
+BEGIN:VALARM
+ACTION:AUDIO
+DESCRIPTION:Notification - 1 Days
+TRIGGER;related=START:P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,50 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:20250714T060249Z - 40503@vultr
+DTSTART:20250715T060000Z
+DTEND:20250715T070000Z
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:salescompliance@osusproperties.com
+ATTENDEE:MAILTO:walid@osusproperties.com
+ATTENDEE:MAILTO:documentcontroller@osusproperties.com
+ATTENDEE:MAILTO:a.hamdan@osusproperties.com
+ATTENDEE:MAILTO:alisar@osusproperties.com
+ATTENDEE:MAILTO:anita@osusproperties.com
+ATTENDEE:MAILTO:atabirara@LMDUAE.COM
+ATTENDEE:MAILTO:a.khurshid@osusproperties.com
+ATTENDEE:MAILTO:c.bajao@osusproperties.com
+ATTENDEE:MAILTO:claudio.p@osusproperties.com
+ATTENDEE:MAILTO:dhanraj@osusproperties.com
+ATTENDEE:MAILTO:eldar@osusproperties.com
+ATTENDEE:MAILTO:faraaz@osusproperties.com
+ATTENDEE:MAILTO:h@osusproperties.com
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:j.varda@osusproperties.com
+ATTENDEE:MAILTO:l.legisi@osusproperties.com
+ATTENDEE:MAILTO:maickel.faragalla@osusproperties.com
+ATTENDEE:MAILTO:nader@osusproperties.com
+ATTENDEE:MAILTO:Nsabbour@LMDUAE.com
+ATTENDEE:MAILTO:naveen@osusproperties.com
+ATTENDEE:MAILTO:rahul@osusproperties.com
+ATTENDEE:MAILTO:r.anthony@osusproperties.com
+ATTENDEE:MAILTO:r.sfeir@osusproperties.com
+ATTENDEE:MAILTO:t.shetty@osusproperties.com
+ATTENDEE:MAILTO:victoria@osusproperties.com
+CREATED:20250714T060249Z
+DESCRIPTION:Hi Team\,\nJust a quick reminder that our *agent briefing with 
+ H&H* is happening *tomorrow at 10:00 AM* in *OSUS HQ*.\nPlease be on time 
+ and come prepared—valuable updates and insights will be shared to help y
+ ou stay ahead!\nSee you all there.
+DTSTAMP:20250714T060249Z
+LOCATION:OSUS Headquarters
+ORGANIZER;CN=JEROME PADILLA:MAILTO:j.padilla@osusproperties.com
+SUMMARY:Reminder: Agent Briefing Tomorrow at 10AM with H&H
+BEGIN:VALARM
+ACTION:AUDIO
+DESCRIPTION:Notification - 2 Hours
+TRIGGER;related=START:PT2H
+END:VALARM
+END:VEVENT
+END:VCALENDAR

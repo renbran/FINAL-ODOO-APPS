@@ -1,0 +1,50 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:20250715T050329Z - 86447@vultr
+DTSTART:20250717T060000Z
+DTEND:20250717T080000Z
+ATTENDEE:MAILTO:salescompliance@osusproperties.com
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:walid@osusproperties.com
+ATTENDEE:MAILTO:documentcontroller@osusproperties.com
+ATTENDEE:MAILTO:a.hamdan@osusproperties.com
+ATTENDEE:MAILTO:alisar@osusproperties.com
+ATTENDEE:MAILTO:anita@osusproperties.com
+ATTENDEE:MAILTO:atabirara@LMDUAE.COM
+ATTENDEE:MAILTO:a.khurshid@osusproperties.com
+ATTENDEE:MAILTO:c.bajao@osusproperties.com
+ATTENDEE:MAILTO:claudio.p@osusproperties.com
+ATTENDEE:MAILTO:eldar@osusproperties.com
+ATTENDEE:MAILTO:h@osusproperties.com
+ATTENDEE:MAILTO:j.padilla@osusproperties.com
+ATTENDEE:MAILTO:j.varda@osusproperties.com
+ATTENDEE:MAILTO:maickel.faragalla@osusproperties.com
+ATTENDEE:MAILTO:nader@osusproperties.com
+ATTENDEE:MAILTO:Nsabbour@LMDUAE.com
+ATTENDEE:MAILTO:naveen@osusproperties.com
+ATTENDEE:MAILTO:rahul@osusproperties.com
+ATTENDEE:MAILTO:r.sfeir@osusproperties.com
+ATTENDEE:MAILTO:t.shetty@osusproperties.com
+ATTENDEE:MAILTO:victoria@osusproperties.com
+ATTENDEE:MAILTO:r.anthony@osusproperties.com
+ATTENDEE:MAILTO:faraaz@osusproperties.com
+ATTENDEE:MAILTO:dhanraj@osusproperties.com
+CREATED:20250715T050329Z
+DESCRIPTION:Hi Team\,\n*Clear your calendars\, fluff your chairs\, and prep
+  your questions –*\n*Gisele from Samana Developers* is crashing OSUS HQ 
+ with all the updates\, glam\, and signature *Samana-level energy* this *Th
+ ursday\, July 17 at 10:00 AM!* 🏗️💃\nSee you All!
+DTSTAMP:20250715T050329Z
+LOCATION:OSUS Headquarters
+ORGANIZER;CN=JEROME PADILLA:MAILTO:j.padilla@osusproperties.com
+SUMMARY:Upcoming Agent Briefing with Samana Developers – July 17 at OSUS 
+ HQ
+BEGIN:VALARM
+ACTION:AUDIO
+DESCRIPTION:Notification - 1 Days
+TRIGGER;related=START:P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR
