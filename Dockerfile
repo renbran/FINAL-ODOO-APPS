@@ -19,7 +19,11 @@ RUN pip3 install \
     Pillow \
     requests \
     python-dateutil \
-    reportlab
+    reportlab \
+    openpyxl \
+    pdfminer.six \
+    pandas \
+    moment
 
 # Create custom addons directory
 RUN mkdir -p /mnt/extra-addons

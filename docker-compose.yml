@@ -38,6 +38,7 @@ services:
       --db_password=odoo
       --logfile=/var/log/odoo/odoo.log
       --log-level=info
+      --without-demo=all
 
 volumes:
   odoo-web-data:
