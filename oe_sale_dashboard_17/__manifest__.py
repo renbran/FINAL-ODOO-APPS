@@ -24,6 +24,7 @@
     'depends': ['web', 'sale_management', 'osus_invoice_report', 'le_sale_type'],
     'data': [
         'data/sale_order_data.xml',
+        'views/sale_order_views.xml',
         'views/dashboard_views.xml',
     ],
     'assets': {
