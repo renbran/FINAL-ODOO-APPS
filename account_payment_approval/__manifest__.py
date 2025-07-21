@@ -35,12 +35,12 @@
     'depends': ['account'],
     'data': [
         'security/security.xml',
+        'reports/payment_voucher_report.xml',
+        'reports/payment_voucher_template.xml',
         'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
         'data/server_actions.xml',
-        'reports/payment_voucher_report.xml',
-        'reports/payment_voucher_template.xml',
     ],
     'assets': {
         'web.report_assets_common': [

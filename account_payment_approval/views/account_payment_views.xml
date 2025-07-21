@@ -43,13 +43,6 @@
                     <attribute name="readonly">state not in ['draft', 'rejected']</attribute>
                     <attribute name="required">1</attribute>
                 </field>
-                <xpath expr="//field" position="attributes">
-                    <attribute name="readonly">is_locked</attribute>
-                </xpath>
-                <!-- Exception for destination account - should be editable in draft/rejected -->
-                <field name="destination_account_id" position="attributes">
-                    <attribute name="readonly">state not in ['draft', 'rejected']</attribute>
-                </field>
                 <!-- Make memo/ref field more prominent for payment voucher -->
                 <field name="ref" position="attributes">
                     <attribute name="string">Memo/Purpose</attribute>
@@ -61,6 +54,10 @@
                         This memo will appear on the printed payment voucher
                     </div>
                 </field>
+                <!-- Apply readonly to all fields except destination_account_id and ref which are handled above -->
+                <xpath expr="//field[not(@name='destination_account_id') and not(@name='ref') and not(@name='is_approve_person') and not(@name='is_locked') and not(@name='authorized_approvers_display')]" position="attributes">
+                    <attribute name="readonly">is_locked</attribute>
+                </xpath>
             </field>
         </record>
 <!--        Inherit account.payment to add filters -->

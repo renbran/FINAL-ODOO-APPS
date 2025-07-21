@@ -325,6 +325,13 @@
                                     </p>
                                 </div>
                                 
+                                <!-- Computer Generated Disclaimer -->
+                                <div class="disclaimer-section">
+                                    <p class="disclaimer-text">
+                                        <strong>This is Computer generated report no signature and stamp required.</strong>
+                                    </p>
+                                </div>
+                                
                                 <div class="signature-section">
                                     <div class="signature-left">
                                         <h4>Authorized Signatory</h4>
@@ -361,6 +368,8 @@
                                 Thank you for your business • 
                                 <span t-if="o.company_id.phone">Confirm payment at <span t-field="o.company_id.phone"/></span>
                                 <span t-if="not o.company_id.phone">System Generated Payment Voucher</span>
+                                <br/>
+                                <em>This is Computer generated report no signature and stamp required.</em>
                             </div>
                         </div>
                     </div>
