@@ -25,7 +25,7 @@
     'depends': ['account', 'base'],
     'data': [
         'security/ir.model.access.csv',
-        'views/account_payment_views.xml',
+        'views/payment_account_views.xml',
         'reports/payment_voucher_report.xml',
         'reports/payment_voucher_template.xml',
     ],
