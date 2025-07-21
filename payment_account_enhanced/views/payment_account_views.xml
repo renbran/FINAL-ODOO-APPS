@@ -12,7 +12,7 @@
                             string="Print Voucher" 
                             type="object" 
                             class="btn-primary"
-                            states="posted"
+                            invisible="state != 'posted'"
                             icon="fa-print"/>
                 </xpath>
             </field>
