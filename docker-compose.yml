@@ -1,50 +1,42 @@
-version: '3.8'
-
+version: '3'
 services:
+  # Odoo service
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: odoo17_local_testing
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"  # Odoo web port
+      - "8072:8072"  # Odoo live chat port
+    volumes:
+      - ./:/mnt/extra-addons  # Mount all repository modules
+      - odoo-web-data:/var/lib/odoo  # For session data
+      - odoo-config:/etc/odoo  # For configuration
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+      - DB_PORT=5432
+      - POSTGRES_DB=postgres
+    restart: unless-stopped
+    command: ["odoo", "--dev=all", "-d", "odoo17_test", "--db-filter=odoo17_test"]
+
+  # PostgreSQL service
   db:
     image: postgres:15
+    container_name: odoo17_postgres
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
       - POSTGRES_DB=postgres
     volumes:
       - odoo-db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - odoo-network
-
-  odoo:
-    build: .
-    depends_on:
-      - db
-    ports:
-      - "8069:8069"
-    environment:
-      - HOST=db
-      - USER=odoo
-      - PASSWORD=odoo
-    volumes:
-      - odoo-web-data:/var/lib/odoo
-      - ./config:/etc/odoo
-      - ./logs:/var/log/odoo
-      - .:/mnt/extra-addons
-    networks:
-      - odoo-network
-    command: >
-      odoo 
-      --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
-      --db_host=db
-      --db_port=5432
-      --db_user=odoo
-      --db_password=odoo
-      --logfile=/var/log/odoo/odoo.log
-      --log-level=info
+    restart: unless-stopped
 
 volumes:
   odoo-web-data:
   odoo-db-data:
-
-networks:
-  odoo-network:
-    driver: bridge
+  odoo-config:

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# This module is under copyright of 'OdooElevate'
-
 from odoo import models, api, fields
 from datetime import datetime, timedelta
 from collections import defaultdict

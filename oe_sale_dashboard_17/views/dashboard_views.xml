@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This module is under copyright of 'OdooElevate' -->
 <odoo>
     
     <record id="action_yearly_sales_report_client" model="ir.actions.client">
