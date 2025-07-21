@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Security Group for Payment Approval -->
+        <record id="group_payment_approver" model="res.groups">
+            <field name="name">Payment Approver</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="comment">Users in this group can approve payments</field>
+        </record>
+
+        <!-- Security Group for Payment Manager -->
+        <record id="group_payment_manager" model="res.groups">
+            <field name="name">Payment Manager</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_approver'))]"/>
+            <field name="comment">Users in this group can manage payment approvals and print vouchers</field>
+        </record>
+
+    </data>
+</odoo>
