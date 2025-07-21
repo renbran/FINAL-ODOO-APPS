@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- Disable the problematic security rule -->
-    <record id="hide_menu_user.ir_ui_menu_rule_user" model="ir.rule">
-        <field name="active" eval="False"/>
-    </record>
-</odoo>

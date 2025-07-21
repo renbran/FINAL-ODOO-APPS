@@ -1,8 +1,0 @@
-<odoo>
-    <record id="om_dynamic_report_demo_1" model="om.dynamic.report">
-        <field name="name">Demo Dynamic Report</field>
-        <field name="report_type">pdf</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="filter_domain">[("active", "=", True)]</field>
-    </record>
-</odoo>
