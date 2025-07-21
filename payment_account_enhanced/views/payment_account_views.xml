@@ -17,17 +17,5 @@
                 </xpath>
             </field>
         </record>
-
-        <!-- Add Print Voucher button to payment tree action -->
-        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.tree.enhanced</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <attribute name="multi_edit">1</attribute>
-                </xpath>
-            </field>
-        </record>
     </data>
 </odoo>
