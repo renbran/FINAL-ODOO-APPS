@@ -1,9 +1,0 @@
-<odoo>
-    <record id="custom_sales_order_demo_1" model="sale.order">
-        <field name="name">SO-CUSTOM-001</field>
-        <field name="partner_id" ref="base.res_partner_1"/>
-        <field name="custom_field_1">Demo Field 1</field>
-        <field name="custom_field_2">123</field>
-        <field name="custom_field_3" ref="base.res_partner_2"/>
-    </record>
-</odoo>
