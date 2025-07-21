@@ -522,3 +522,31 @@ class AccountPayment(models.Model):
                 node.set('edit', "0" if self.state not in ['draft', 'rejected'] else "1")
             res['arch'] = etree.tostring(doc, encoding='unicode')
         return res
+
+    def get_voucher_title(self):
+        """Get the appropriate voucher title based on payment type"""
+        self.ensure_one()
+        if self.payment_type == 'inbound':
+            return 'CUSTOMER RECEIPT VOUCHER'
+        elif self.payment_type == 'outbound':
+            return 'VENDOR PAYMENT VOUCHER'
+        else:
+            return 'PAYMENT VOUCHER'
+    
+    def get_partner_label(self):
+        """Get the appropriate partner label based on payment type"""
+        self.ensure_one()
+        if self.payment_type == 'inbound':
+            return 'Customer:'
+        elif self.payment_type == 'outbound':
+            return 'Vendor:'
+        else:
+            return 'Partner:'
+    
+    def get_signature_label(self):
+        """Get the appropriate signature label for the third column"""
+        self.ensure_one()
+        if self.payment_type == 'inbound':
+            return 'Received By'
+        else:
+            return 'Authorized By'

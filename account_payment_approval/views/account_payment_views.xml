@@ -25,6 +25,10 @@
                     <button name="reject_transfer" string="Reject" type="object"
                             class="oe_highlight" 
                             visibility="is_approve_person and state == 'waiting_approval'"/>
+                    <button name="%(account_payment_approval.action_report_payment_voucher)d" 
+                            string="Print Voucher" type="action"
+                            class="btn-secondary"
+                            visibility="state != 'draft'"/>
                 </xpath>
                 <field name="partner_id" position="after">
                     <field name="is_approve_person" invisible="1"/>
@@ -33,9 +37,30 @@
                            invisible="state not in ['waiting_approval', 'approved', 'rejected']"
                            help="These users can approve this payment"/>
                 </field>
+                <!-- Make destination account visible and editable in draft/rejected states -->
+                <field name="destination_account_id" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="readonly">state not in ['draft', 'rejected']</attribute>
+                    <attribute name="required">1</attribute>
+                </field>
                 <xpath expr="//field" position="attributes">
                     <attribute name="readonly">is_locked</attribute>
                 </xpath>
+                <!-- Exception for destination account - should be editable in draft/rejected -->
+                <field name="destination_account_id" position="attributes">
+                    <attribute name="readonly">state not in ['draft', 'rejected']</attribute>
+                </field>
+                <!-- Make memo/ref field more prominent for payment voucher -->
+                <field name="ref" position="attributes">
+                    <attribute name="string">Memo/Purpose</attribute>
+                    <attribute name="placeholder">Enter the purpose or memo for this payment voucher...</attribute>
+                    <attribute name="readonly">state not in ['draft', 'rejected']</attribute>
+                </field>
+                <field name="ref" position="after">
+                    <div class="o_form_field_empty" style="color: #666; font-size: 11px; margin-top: 2px;">
+                        This memo will appear on the printed payment voucher
+                    </div>
+                </field>
             </field>
         </record>
 <!--        Inherit account.payment to add filters -->
