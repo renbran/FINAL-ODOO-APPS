@@ -47,7 +47,7 @@
                         <group string="Transparency Settings">
                             <field name="adaptive_transparency"/>
                             <field name="transparency_level" 
-                                   attrs="{'invisible': [('adaptive_transparency', '=', False)]}"/>
+                                   invisible="adaptive_transparency == False"/>
                         </group>
                     </group>
                     
