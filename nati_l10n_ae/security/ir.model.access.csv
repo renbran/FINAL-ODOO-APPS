@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_account_chart_template_user,account.chart.template.user,account.model_account_chart_template,account.group_account_user,1,0,0,0
-access_account_chart_template_manager,account.chart.template.manager,account.model_account_chart_template,account.group_account_manager,1,1,1,1

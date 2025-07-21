@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_contact_duplicate_user,contact.duplicate.user,model_contact_duplicate,base.group_user,1,1,1,1
-access_contact_merge_history_user,contact.merge.history.user,model_contact_merge_history,base.group_user,1,0,0,0
-access_contact_merge_wizard_user,contact.merge.wizard.user,model_contact_merge_wizard,base.group_user,1,1,1,1
