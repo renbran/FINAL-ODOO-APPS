@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# This module is under copyright of 'OdooElevate'
+
 {
     'name': 'OSUS Executive Sales Dashboard',
     'version': '17.0.0.1.6',
