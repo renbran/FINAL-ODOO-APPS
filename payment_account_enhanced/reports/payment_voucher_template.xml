@@ -84,7 +84,7 @@
                                         <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Reference:</th>
                                         <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.ref"/></td>
                                     </tr>
-                                    <tr t-if="hasattr(doc, 'actual_approver_id') and doc.actual_approver_id">
+                                    <tr t-if="doc._fields.get('actual_approver_id') and doc.actual_approver_id">
                                         <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Approved By:</th>
                                         <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.actual_approver_id.name"/></td>
                                     </tr>
@@ -119,7 +119,7 @@
                                             <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
                                                 Approved By:
                                             </h4>
-                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by and doc.state == 'posted'">
+                                            <t t-if="doc._fields.get('authorized_by') and doc.authorized_by and doc.state == 'posted'">
                                                 <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
                                                     <span t-field="doc.authorized_by"/>
                                                 </p>
@@ -152,7 +152,7 @@
                                             
                                             <!-- Name Field -->
                                             <div style="margin-bottom: 10px;">
-                                                <t t-if="hasattr(doc, 'received_by') and doc.received_by">
+                                                <t t-if="doc._fields.get('received_by') and doc.received_by">
                                                     <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
                                                         <span t-field="doc.received_by"/>
                                                     </p>
