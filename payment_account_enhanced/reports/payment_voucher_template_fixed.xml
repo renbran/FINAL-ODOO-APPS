@@ -1,243 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Payment Voucher Report Template - OSUS Style Optimized -->
+        <!-- Enhanced Payment Voucher Report Template - Edge-to-Edge Layout -->
         <template id="report_payment_voucher">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <div class="page" style="margin: 0; padding: 15mm; background: #ffffff; font-family: 'Arial', 'Helvetica', sans-serif; width: 210mm; min-height: 297mm; box-sizing: border-box;">
+                    <div class="page" style="margin: 0; padding: 0; background: #ffffff; font-family: 'Arial', 'Helvetica', sans-serif; width: 210mm; min-height: 297mm; box-sizing: border-box;">
                         
-                        <!-- Main Voucher Container - Optimized for A4 with 50% max height -->
-                        <div style="max-width: 180mm; max-height: 148.5mm; background: #fff; border: 2px solid #7C2439; box-shadow: 0 4px 12px rgba(124, 36, 57, 0.12); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto;">
+                        <!-- Main Voucher Container - Full A4 Width -->
+                        <div style="width: 100%; min-height: 297mm; background: #fff; display: flex; flex-direction: column; margin: 0;">
                             
-                            <!-- Header Section with Smart Spacing -->
-                            <div style="background: #7C2439; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; min-height: 65px; padding: 15px 20px;">
+                            <!-- Header Section - Edge to Edge with OSUS Branding -->
+                            <div style="background: linear-gradient(135deg, #7C2439 0%, #8B2A47 100%); color: #fff; width: 100%; min-height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 25mm; box-shadow: 0 4px 15px rgba(124, 36, 57, 0.3); position: relative; overflow: hidden;">
                                 
-                                <!-- Company Info with Auto Spacing -->
-                                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                    <!-- Reference at first line -->
-                                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+                                <!-- Decorative Elements -->
+                                <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; transform: rotate(45deg);"></div>
+                                <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                                
+                                <!-- Left: Company Information -->
+                                <div style="flex: 1; z-index: 2; position: relative;">
+                                    <!-- Voucher Reference at Top -->
+                                    <div style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                                         REF: <span t-field="doc.name"/>
                                     </div>
+                                    
                                     <!-- Company Details -->
-                                    <div style="font-size: 11px; line-height: 1.4; color: rgba(255, 255, 255, 0.95);">
-                                        <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px;">
+                                    <div style="font-size: 12px; line-height: 1.5; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+                                        <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 5px;">
                                             <span t-field="doc.company_id.name"/>
                                         </div>
-                                        <t t-if="doc.company_id.street">
-                                            <div style="margin-bottom: 2px;"><span t-field="doc.company_id.street"/></div>
-                                        </t>
-                                        <div style="margin-bottom: 2px;">
-                                            <t t-if="doc.company_id.city"><span t-field="doc.company_id.city"/></t>
-                                            <t t-if="doc.company_id.zip">, <span t-field="doc.company_id.zip"/></t>
+                                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                                            <t t-if="doc.company_id.street">
+                                                <div><span t-field="doc.company_id.street"/></div>
+                                            </t>
+                                            <div>
+                                                <t t-if="doc.company_id.city"><span t-field="doc.company_id.city"/></t>
+                                                <t t-if="doc.company_id.zip">, <span t-field="doc.company_id.zip"/></t>
+                                            </div>
+                                            <t t-if="doc.company_id.country_id">
+                                                <div><span t-field="doc.company_id.country_id.name"/></div>
+                                            </t>
+                                            <t t-if="doc.company_id.vat">
+                                                <div style="font-weight: 600;">VAT: <span t-field="doc.company_id.vat"/></div>
+                                            </t>
                                         </div>
-                                        <t t-if="doc.company_id.country_id">
-                                            <div style="margin-bottom: 2px;"><span t-field="doc.company_id.country_id.name"/></div>
-                                        </t>
-                                        <t t-if="doc.company_id.vat">
-                                            <div>VAT: <span t-field="doc.company_id.vat"/></div>
-                                        </t>
                                     </div>
                                 </div>
                                 
-                                <!-- OSUS Logo -->
-                                <div style="display: flex; align-items: center; margin-left: 15px;">
+                                <!-- Right: OSUS Logo -->
+                                <div style="display: flex; align-items: center; z-index: 2; position: relative;">
                                     <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" 
-                                         style="height: 40px; width: auto; max-width: 120px;" 
+                                         style="height: 50px; width: auto; max-width: 140px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));" 
                                          alt="OSUS Logo"/>
                                 </div>
                             </div>
                             
-                            <!-- Main Content Section with Responsive Spacing -->
-                            <div style="flex: 1; display: flex; flex-direction: column; padding: 18px 20px;">
+                            <!-- Main Content Section -->
+                            <div style="flex: 1; padding: 25mm; padding-top: 20mm; padding-bottom: 15mm;">
                 
-                                <!-- Voucher Title -->
-                                <h1 style="text-align: center; font-size: 22px; font-weight: 700; color: #7C2439; margin: 0 0 16px 0;">
-                                    <t t-if="doc.payment_type == 'outbound'">Payment Voucher</t>
-                                    <t t-elif="doc.payment_type == 'inbound'">Receipt Voucher</t>
-                                    <t t-else="">Payment Voucher</t>
-                                </h1>
+                                <!-- Voucher Title with Enhanced Typography -->
+                                <div style="text-align: center; margin-bottom: 25mm; position: relative;">
+                                    <h1 style="font-size: 28px; font-weight: 700; color: #7C2439; margin: 0; text-shadow: 0 1px 3px rgba(124, 36, 57, 0.1); position: relative;">
+                                        <t t-if="doc.payment_type == 'outbound'">PAYMENT VOUCHER</t>
+                                        <t t-elif="doc.payment_type == 'inbound'">RECEIPT VOUCHER</t>
+                                        <t t-else="">PAYMENT VOUCHER</t>
+                                    </h1>
+                                    <div style="width: 80px; height: 3px; background: linear-gradient(90deg, #BFA46F, #d4c195); margin: 8px auto; border-radius: 2px;"></div>
+                                </div>
                                 
-                                <!-- Details Table with Smart Spacing -->
-                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600; width: 35%;">Issued To:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <span t-field="doc.partner_id.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Number:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <span t-field="doc.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Date:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <span t-field="doc.date" t-options="{'widget': 'date', 'format': 'dd MMMM yyyy'}"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Address:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <t t-if="doc.partner_id.street or doc.partner_id.city">
-                                                <t t-if="doc.partner_id.street"><span t-field="doc.partner_id.street"/></t>
-                                                <t t-if="doc.partner_id.city">
-                                                    <t t-if="doc.partner_id.street">, </t>
-                                                    <span t-field="doc.partner_id.city"/>
-                                                </t>
-                                            </t>
-                                            <t t-else="">-</t>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Phone:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <t t-if="doc.partner_id.phone">
-                                                <span t-field="doc.partner_id.phone"/>
-                                            </t>
-                                            <t t-else="">-</t>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Bank Details:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <t t-if="doc.partner_bank_id">
-                                                <span t-field="doc.partner_bank_id.acc_number"/>
-                                                <t t-if="doc.partner_bank_id.acc_holder_name">
-                                                    (<span t-field="doc.partner_bank_id.acc_holder_name"/>)
-                                                </t>
-                                            </t>
-                                            <t t-else="">-</t>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Payment Method:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <span t-field="doc.journal_id.name"/>
-                                        </td>
-                                    </tr>
-                                    <!-- Conditional fields with proper spacing -->
-                                    <tr t-if="doc.ref">
-                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Reference:</th>
-                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                            <span t-field="doc.ref"/>
-                                        </td>
-                                    </tr>
-                                    <t t-if="hasattr(doc, 'actual_approver_id') and doc.actual_approver_id">
+                                <!-- Enhanced Details Table -->
+                                <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20mm;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <!-- Table Header -->
                                         <tr>
-                                            <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Approved By:</th>
-                                            <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                                <span t-field="doc.actual_approver_id.name"/>
+                                            <th colspan="2" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 12px 20px; font-size: 16px; font-weight: 600; color: #7C2439; border-bottom: 2px solid #7C2439; text-align: left;">
+                                                Payment Details
+                                            </th>
+                                        </tr>
+                                        
+                                        <!-- Table Rows with Enhanced Styling -->
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; width: 40%; background: #fafbfc;">Issued To:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <span t-field="doc.partner_id.name"/>
                                             </td>
                                         </tr>
-                                    </t>
-                                </table>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Voucher Number:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <span t-field="doc.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Date:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <span t-field="doc.date" t-options="{'widget': 'date', 'format': 'dd MMMM yyyy'}"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Address:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <t t-if="doc.partner_id.street or doc.partner_id.city">
+                                                    <t t-if="doc.partner_id.street"><span t-field="doc.partner_id.street"/></t>
+                                                    <t t-if="doc.partner_id.city">
+                                                        <t t-if="doc.partner_id.street">, </t>
+                                                        <span t-field="doc.partner_id.city"/>
+                                                    </t>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Phone:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <t t-if="doc.partner_id.phone">
+                                                    <span t-field="doc.partner_id.phone"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Bank Details:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <t t-if="doc.partner_bank_id">
+                                                    <span t-field="doc.partner_bank_id.acc_number"/>
+                                                    <t t-if="doc.partner_bank_id.acc_holder_name">
+                                                        (<span t-field="doc.partner_bank_id.acc_holder_name"/>)
+                                                    </t>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Payment Method:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <span t-field="doc.journal_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="doc.ref">
+                                            <th style="padding: 12px 20px; text-align: left; font-size: 14px; color: #7C2439; font-weight: 600; background: #fafbfc;">Reference:</th>
+                                            <td style="padding: 12px 20px; font-size: 14px; color: #333; font-weight: 500;">
+                                                <span t-field="doc.ref"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 
-                                <!-- Amount Section with Better Styling -->
-                                <div style="background: linear-gradient(135deg, #BFA46F 0%, #d4c195 100%); color: #fff; padding: 14px 20px; border-radius: 6px; text-align: center; margin: 12px 0;">
-                                    <p style="font-size: 24px; font-weight: 700; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-                                        Total Amount: <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                <!-- Enhanced Amount Section -->
+                                <div style="background: linear-gradient(135deg, #BFA46F 0%, #d4c195 50%, #BFA46F 100%); color: #fff; padding: 20px; border-radius: 10px; text-align: center; margin: 20mm 0; box-shadow: 0 6px 20px rgba(191, 164, 111, 0.3); position: relative; overflow: hidden;">
+                                    <!-- Decorative Elements -->
+                                    <div style="position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                                    <div style="position: absolute; bottom: -15px; left: -15px; width: 80px; height: 80px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                                    
+                                    <p style="font-size: 26px; font-weight: 700; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); position: relative; z-index: 2;">
+                                        TOTAL AMOUNT: <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                                     </p>
                                 </div>
                                 
                                 <!-- Authorization and Signature Sections -->
-                                <div style="margin-top: 16px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-                                    <!-- Left Section: Initiated By and Approved By -->
-                                    <div style="flex: 1; min-width: 250px;">
-                                        <!-- Initiated By Section -->
-                                        <div style="margin-bottom: 20px;">
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
-                                                Initiated By:
-                                            </h4>
-                                            <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                <span t-field="doc.create_uid.name"/>
-                                            </p>
-                                            <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
-                                                <span t-field="doc.create_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
-                                            </p>
+                                <div style="margin-top: 20mm;">
+                                    <h3 style="font-size: 18px; font-weight: 600; color: #7C2439; margin-bottom: 15mm; text-align: center; border-bottom: 2px solid #7C2439; padding-bottom: 5mm;">
+                                        AUTHORIZATION &amp; ACKNOWLEDGMENT
+                                    </h3>
+                                    
+                                    <div style="display: flex; justify-content: space-between; gap: 15mm; margin-bottom: 15mm;">
+                                        
+                                        <!-- Left Column: System Generated Signatures -->
+                                        <div style="flex: 1; max-width: 48%;">
+                                            <!-- Initiated By Section -->
+                                            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12mm; margin-bottom: 10mm; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                                <h4 style="font-size: 14px; font-weight: 600; color: #7C2439; margin: 0 0 6mm 0; border-bottom: 1px solid #7C2439; padding-bottom: 2mm;">
+                                                    INITIATED BY
+                                                </h4>
+                                                <div style="font-size: 12px; color: #333; line-height: 1.4;">
+                                                    <div style="font-weight: 600; margin-bottom: 2mm;">
+                                                        <span t-field="doc.create_uid.name"/>
+                                                    </div>
+                                                    <div style="color: #666; font-size: 11px;">
+                                                        <span t-field="doc.create_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Approved/Posted By Section -->
+                                            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12mm; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                                <h4 style="font-size: 14px; font-weight: 600; color: #7C2439; margin: 0 0 6mm 0; border-bottom: 1px solid #7C2439; padding-bottom: 2mm;">
+                                                    APPROVED BY
+                                                </h4>
+                                                <div style="font-size: 12px; color: #333; line-height: 1.4;">
+                                                    <t t-if="doc.state == 'posted'">
+                                                        <div style="font-weight: 600; margin-bottom: 2mm;">
+                                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by">
+                                                                <span t-field="doc.authorized_by"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span t-field="doc.write_uid.name"/>
+                                                            </t>
+                                                        </div>
+                                                        <div style="color: #666; font-size: 11px;">
+                                                            <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                                        </div>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <div style="color: #dc3545; font-weight: 600; font-style: italic;">
+                                                            Pending Approval
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </div>
                                         </div>
                                         
-                                        <!-- Approved By Section -->
-                                        <div style="margin-bottom: 12px;">
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
-                                                Approved By:
-                                            </h4>
-                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by and doc.state == 'posted'">
-                                                <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                    <span t-field="doc.authorized_by"/>
-                                                </p>
-                                                <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
-                                                    <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
-                                                </p>
-                                            </t>
-                                            <t t-else="">
-                                                <p style="font-size: 11px; color: #999; margin: 0; line-height: 1.3;">
-                                                    Pending Approval
-                                                </p>
-                                            </t>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Right Section: Received By with Signature -->
-                                    <div style="flex: 1; min-width: 250px;">
-                                        <div>
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
-                                                Received By:
-                                            </h4>
-                                            
-                                            <!-- Signature Line -->
-                                            <div style="margin-bottom: 12px; padding-top: 8px;">
-                                                <div style="border-top: 2px solid #333; width: 160px; margin-bottom: 4px;"></div>
-                                                <p style="font-size: 10px; color: #666; margin: 0; text-align: left; width: 160px;">
-                                                    Signature
-                                                </p>
-                                            </div>
-                                            
-                                            <!-- Name Field -->
-                                            <div style="margin-bottom: 8px;">
-                                                <t t-if="hasattr(doc, 'received_by') and doc.received_by">
-                                                    <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                        <span t-field="doc.received_by"/>
-                                                    </p>
-                                                </t>
-                                                <t t-else="">
-                                                    <div style="border-bottom: 1px solid #999; width: 160px; height: 16px; margin-bottom: 2px;"></div>
-                                                </t>
-                                                <p style="font-size: 10px; color: #666; margin: 0;">
-                                                    Full Name
-                                                </p>
-                                            </div>
-                                            
-                                            <!-- Date Field -->
-                                            <div style="margin-bottom: 8px;">
-                                                <div style="border-bottom: 1px solid #999; width: 110px; height: 16px; margin-bottom: 2px;"></div>
-                                                <p style="font-size: 10px; color: #666; margin: 0;">
-                                                    Date
-                                                </p>
-                                            </div>
-                                            
-                                            <!-- Mobile Field -->
-                                            <div>
-                                                <div style="border-bottom: 1px solid #999; width: 130px; height: 16px; margin-bottom: 2px;"></div>
-                                                <p style="font-size: 10px; color: #666; margin: 0;">
-                                                    Mobile
-                                                </p>
+                                        <!-- Right Column: Manual Signature Section -->
+                                        <div style="flex: 1; max-width: 48%;">
+                                            <div style="background: #fff; border: 2px solid #7C2439; border-radius: 6px; padding: 12mm; box-shadow: 0 4px 10px rgba(124, 36, 57, 0.1);">
+                                                <h4 style="font-size: 16px; font-weight: 700; color: #7C2439; margin: 0 0 10mm 0; text-align: center; border-bottom: 2px solid #7C2439; padding-bottom: 4mm;">
+                                                    RECEIVED BY
+                                                </h4>
+                                                
+                                                <!-- Signature Field -->
+                                                <div style="margin-bottom: 8mm;">
+                                                    <div style="border-top: 2px solid #333; width: 100%; margin-bottom: 3mm; height: 15mm;"></div>
+                                                    <label style="font-size: 11px; color: #666; font-weight: 600;">SIGNATURE</label>
+                                                </div>
+                                                
+                                                <!-- Full Name Field -->
+                                                <div style="margin-bottom: 8mm;">
+                                                    <div style="border-bottom: 1px solid #999; width: 100%; height: 8mm; margin-bottom: 2mm;"></div>
+                                                    <label style="font-size: 11px; color: #666; font-weight: 600;">FULL NAME</label>
+                                                </div>
+                                                
+                                                <!-- Date and Mobile in Same Row -->
+                                                <div style="display: flex; gap: 8mm; margin-bottom: 6mm;">
+                                                    <div style="flex: 1;">
+                                                        <div style="border-bottom: 1px solid #999; width: 100%; height: 8mm; margin-bottom: 2mm;"></div>
+                                                        <label style="font-size: 11px; color: #666; font-weight: 600;">DATE</label>
+                                                    </div>
+                                                    <div style="flex: 1;">
+                                                        <div style="border-bottom: 1px solid #999; width: 100%; height: 8mm; margin-bottom: 2mm;"></div>
+                                                        <label style="font-size: 11px; color: #666; font-weight: 600;">MOBILE NUMBER</label>
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
                                         </div>
+                                        
                                     </div>
                                 </div>
                                 
                             </div>
                             
-                            <!-- Footer with Smart Padding -->
-                            <div style="background: #7C2439; color: #fff; text-align: center; padding: 8px 16px; font-size: 11px; line-height: 1.2; margin-top: auto;">
-                                <span style="color: rgba(255, 255, 255, 0.95);">
-                                    Thank you for your business • Confirm payment at 
-                                    <t t-if="doc.company_id.phone"><span t-field="doc.company_id.phone"/></t>
-                                    <t t-else="">our office</t>
-                                </span>
+                            <!-- Enhanced Footer - Edge to Edge -->
+                            <div style="background: linear-gradient(135deg, #7C2439 0%, #8B2A47 100%); color: #fff; width: 100%; padding: 12mm 25mm; box-shadow: 0 -4px 15px rgba(124, 36, 57, 0.3); position: relative; overflow: hidden; margin-top: auto;">
+                                
+                                <!-- Decorative Elements -->
+                                <div style="position: absolute; top: -15px; left: -15px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                                <div style="position: absolute; bottom: -20px; right: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                                
+                                <div style="text-align: center; position: relative; z-index: 2;">
+                                    <p style="font-size: 13px; line-height: 1.4; margin: 0; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                        <span style="font-weight: 600;">Thank you for your business</span> • 
+                                        For payment confirmation, please contact: 
+                                        <t t-if="doc.company_id.phone">
+                                            <span style="font-weight: 700; color: #fff;" t-field="doc.company_id.phone"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span style="font-weight: 700; color: #fff;">our office</span>
+                                        </t>
+                                    </p>
+                                    <div style="margin-top: 3mm; font-size: 11px; color: rgba(255, 255, 255, 0.8);">
+                                        This is a computer-generated document. No physical signature or stamp required for system verification.
+                                    </div>
+                                </div>
+                                
                             </div>
                             
                         </div>
