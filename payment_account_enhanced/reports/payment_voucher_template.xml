@@ -89,6 +89,93 @@
                                     </p>
                                 </div>
                                 
+                                <!-- Authorization and Signature Sections -->
+                                <div style="margin-top: 20px; display: flex; justify-content: space-between; gap: 20px;">
+                                    <!-- Left Section: Initiated By and Approved By -->
+                                    <div style="flex: 1;">
+                                        <!-- Initiated By Section -->
+                                        <div style="margin-bottom: 25px;">
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                                Initiated By:
+                                            </h4>
+                                            <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                                <span t-field="doc.create_uid.name"/>
+                                            </p>
+                                            <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
+                                                <span t-field="doc.create_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Approved By Section -->
+                                        <div style="margin-bottom: 15px;">
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                                Approved By:
+                                            </h4>
+                                            <t t-if="hasattr(doc, 'approved_by') and doc.approved_by">
+                                                <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                                    <span t-field="doc.approved_by.name"/>
+                                                </p>
+                                                <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
+                                                    <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                                </p>
+                                            </t>
+                                            <t t-else="">
+                                                <p style="font-size: 11px; color: #999; margin: 0; line-height: 1.4;">
+                                                    Pending Approval
+                                                </p>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right Section: Received By with Signature -->
+                                    <div style="flex: 1;">
+                                        <div>
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                                Received By:
+                                            </h4>
+                                            
+                                            <!-- Signature Line -->
+                                            <div style="margin-bottom: 15px; padding-top: 10px;">
+                                                <div style="border-top: 2px solid #333; width: 180px; margin-bottom: 5px;"></div>
+                                                <p style="font-size: 10px; color: #666; margin: 0; text-align: center; width: 180px;">
+                                                    Signature
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Name Field -->
+                                            <div style="margin-bottom: 10px;">
+                                                <t t-if="doc.received_by">
+                                                    <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                                        <span t-field="doc.received_by"/>
+                                                    </p>
+                                                </t>
+                                                <t t-else="">
+                                                    <div style="border-bottom: 1px solid #999; width: 180px; height: 18px; margin-bottom: 3px;"></div>
+                                                </t>
+                                                <p style="font-size: 10px; color: #666; margin: 0;">
+                                                    Full Name
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Date Field -->
+                                            <div style="margin-bottom: 10px;">
+                                                <div style="border-bottom: 1px solid #999; width: 120px; height: 18px; margin-bottom: 3px;"></div>
+                                                <p style="font-size: 10px; color: #666; margin: 0;">
+                                                    Date
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Mobile Field -->
+                                            <div>
+                                                <div style="border-bottom: 1px solid #999; width: 140px; height: 18px; margin-bottom: 3px;"></div>
+                                                <p style="font-size: 10px; color: #666; margin: 0;">
+                                                    Mobile
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                             </div>
                             
                             <!-- Footer - No padding in corners, optimized -->

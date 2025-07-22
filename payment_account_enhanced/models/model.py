@@ -22,7 +22,7 @@ class AccountPayment(models.Model):
     
     received_by = fields.Char(
         string='Received By',
-        help="Person who received the payment"
+        help="Person who received the payment (manually filled)"
     )
     
     payment_description = fields.Text(
@@ -30,9 +30,12 @@ class AccountPayment(models.Model):
         help="Detailed description of the payment"
     )
     
-    authorization_code = fields.Char(
-        string='Authorization Code',
-        help="Authorization code for the payment"
+    # Authorization fields with computed logic
+    authorized_by = fields.Char(
+        string='Authorized By',
+        compute='_compute_authorized_by',
+        store=True,
+        help="Shows initiator or approver name with approval date"
     )
     
     remarks = fields.Text(
@@ -49,6 +52,22 @@ class AccountPayment(models.Model):
         readonly=True,
         help="Journal entries created by this payment"
     )
+    
+    @api.depends('state', 'create_uid', 'write_uid', 'write_date')
+    def _compute_authorized_by(self):
+        """Compute authorization field based on approval status"""
+        for record in self:
+            if hasattr(record, 'approved_by') and record.approved_by:
+                # If payment approval module is installed and payment is approved
+                approval_date = record.write_date.strftime('%d/%m/%Y %H:%M') if record.write_date else ''
+                record.authorized_by = f"{record.approved_by.name} - {approval_date}"
+            elif record.state in ['posted']:
+                # If posted but no specific approver, show creator
+                create_date = record.create_date.strftime('%d/%m/%Y %H:%M') if record.create_date else ''
+                record.authorized_by = f"Initiated by {record.create_uid.name} - {create_date}"
+            else:
+                # For draft or other states
+                record.authorized_by = f"Initiated by {record.create_uid.name if record.create_uid else 'System'}"
     
     @api.model
     def create(self, vals):

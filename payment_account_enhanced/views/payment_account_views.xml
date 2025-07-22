@@ -46,7 +46,6 @@
                 <!-- Add voucher fields after amount -->
                 <field name="amount" position="after">
                     <field name="name" string="Number" readonly="1"/>
-                    <field name="received_by" invisible="state in ['draft', 'cancelled']"/>
                     <field name="payment_description"/>
                 </field>
                 
@@ -78,9 +77,12 @@
                         <page string="Additional Information" name="additional_info">
                             <group>
                                 <group string="Authorization">
-                                    <field name="authorization_code"/>
+                                    <field name="authorized_by" readonly="1"/>
                                 </group>
-                                <group string="Notes">
+                                <group string="Manual Fields">
+                                    <field name="received_by" placeholder="Enter person who received payment..."/>
+                                </group>
+                                <group string="Notes" colspan="2">
                                     <field name="remarks" nolabel="1" placeholder="Additional remarks or memo..."/>
                                 </group>
                             </group>
