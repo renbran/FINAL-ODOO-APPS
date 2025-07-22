@@ -203,14 +203,8 @@
                                             
                                             <!-- Name Field -->
                                             <div style="margin-bottom: 8px;">
-                                                <t t-if="doc.received_by">
-                                                    <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                        <span t-esc="doc.received_by"/>
-                                                    </p>
-                                                </t>
-                                                <t t-else="">
-                                                    <div style="border-bottom: 1px solid #999; width: 160px; height: 16px; margin-bottom: 2px;"></div>
-                                                </t>
+                                                <!-- Always show empty signature line for physical signing -->
+                                                <div style="border-bottom: 1px solid #999; width: 160px; height: 16px; margin-bottom: 2px;"></div>
                                                 <p style="font-size: 10px; color: #666; margin: 0;">
                                                     Full Name
                                                 </p>
