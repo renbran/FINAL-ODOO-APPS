@@ -39,6 +39,16 @@ class AccountPayment(models.Model):
         help="Additional remarks or memo for the payment"
     )
     
+    # One2many field for journal items
+    line_ids = fields.One2many(
+        'account.move.line', 
+        'move_id', 
+        string='Journal Items',
+        related='move_id.line_ids',
+        readonly=True,
+        help="Journal entries created by this payment"
+    )
+    
     @api.model
     def create(self, vals):
         # Generate voucher number
@@ -48,7 +58,7 @@ class AccountPayment(models.Model):
     
     def action_print_voucher(self):
         """Print payment voucher"""
-        return self.env.ref('payment_voucher_enhanced.action_report_payment_voucher').report_action(self)
+        return self.env.ref('payment_account_enhanced.action_report_payment_voucher').report_action(self)
     
     @api.onchange('journal_id')
     def _onchange_journal_id_destination_account(self):

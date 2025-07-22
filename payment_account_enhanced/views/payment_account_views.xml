@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Add Print Voucher button to payment form -->
+        <!-- Enhanced Payment Tree View -->
+        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.tree.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <!-- Add voucher number after payment reference -->
+                <field name="name" position="after">
+                    <field name="voucher_number" optional="show"/>
+                </field>
+                <!-- Add destination account after journal -->
+                <field name="journal_id" position="after">
+                    <field name="destination_account_id" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Enhanced Payment Form View with Destination Account and Journal Items -->
         <record id="view_account_payment_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.form.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
+                <!-- Add Print Voucher button to header -->
                 <xpath expr="//header" position="inside">
                     <button name="action_print_voucher" 
                             string="Print Voucher" 
@@ -14,6 +32,60 @@
                             class="btn-primary"
                             invisible="state != 'posted'"
                             icon="fa-print"/>
+                </xpath>
+                
+                <!-- Add destination account field after journal -->
+                <field name="journal_id" position="after">
+                    <field name="destination_account_id" 
+                           string="Destination Account"
+                           options="{'no_create': True, 'no_create_edit': True}"
+                           invisible="state == 'posted'"
+                           domain="[('account_type', 'in', ['asset_receivable', 'liability_payable', 'asset_cash', 'liability_credit_card'])]"/>
+                </field>
+                
+                <!-- Add voucher fields after amount -->
+                <field name="amount" position="after">
+                    <field name="voucher_number" readonly="1"/>
+                    <field name="received_by" invisible="state in ['draft', 'cancelled']"/>
+                    <field name="payment_description"/>
+                </field>
+                
+                <!-- Add notebook with journal items after the main form content -->
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="Journal Items" name="journal_items">
+                            <field name="move_id" invisible="1"/>
+                            <field name="line_ids" 
+                                   widget="one2many_list" 
+                                   readonly="1"
+                                   context="{'default_move_id': move_id}">
+                                <tree string="Journal Items" editable="false" create="false" delete="false">
+                                    <field name="date"/>
+                                    <field name="account_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="partner_id" options="{'no_create': True}"/>
+                                    <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting"/>
+                                    <field name="debit" sum="Total Debit"/>
+                                    <field name="credit" sum="Total Credit"/>
+                                    <field name="amount_currency" groups="base.group_multi_currency"/>
+                                    <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
+                                    <field name="reconciled" invisible="1"/>
+                                    <field name="company_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Additional Information" name="additional_info">
+                            <group>
+                                <group string="Authorization">
+                                    <field name="authorization_code"/>
+                                </group>
+                                <group string="Notes">
+                                    <field name="remarks" nolabel="1" placeholder="Additional remarks or memo..."/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </xpath>
             </field>
         </record>

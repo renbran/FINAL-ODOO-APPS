@@ -24,6 +24,7 @@
     'website': 'https://yourcompany.com',
     'depends': ['account', 'base'],
     'data': [
+        'data/sequences.xml',
         'security/ir.model.access.csv',
         'views/payment_account_views.xml',
         'reports/payment_voucher_report.xml',
