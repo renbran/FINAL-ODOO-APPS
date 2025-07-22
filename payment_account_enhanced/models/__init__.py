@@ -1,2 +1,3 @@
-from . import account_payment
-from . import models
+# -*- coding: utf-8 -*-
+
+from . import model
