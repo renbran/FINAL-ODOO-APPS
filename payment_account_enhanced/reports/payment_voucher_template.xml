@@ -5,127 +5,153 @@
         <template id="report_payment_voucher">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <div class="page" style="margin: 0; padding: 0; background: #F5F5F5; font-family: 'Montserrat', sans-serif; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; box-sizing: border-box;">
+                    <div class="page" style="margin: 0; padding: 15mm; background: #ffffff; font-family: 'Arial', 'Helvetica', sans-serif; width: 210mm; min-height: 297mm; box-sizing: border-box;">
                         
-                        <!-- Main Voucher Container - No padding, maximize space -->
-                        <div style="width: 210mm; height: 148mm; background: #fff; border: 2px solid #7C2439; box-shadow: 0 8px 25px rgba(124, 36, 57, 0.15); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; margin: 0; padding: 0;">
+                        <!-- Main Voucher Container - Optimized for A4 with 50% max height -->
+                        <div style="max-width: 180mm; max-height: 148.5mm; background: #fff; border: 2px solid #7C2439; box-shadow: 0 4px 12px rgba(124, 36, 57, 0.12); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto;">
                             
-                            <!-- Header Section - Dynamic padding based on content -->
-                            <div style="background: #7C2439; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; min-height: 70px;">
-                                <!-- Dynamic padding calculation based on content -->
-                                <t t-set="company_lines" t-value="0"/>
-                                <t t-if="doc.company_id.street" t-set="company_lines" t-value="company_lines + 1"/>
-                                <t t-if="doc.company_id.city" t-set="company_lines" t-value="company_lines + 1"/>
-                                <t t-if="doc.company_id.country_id" t-set="company_lines" t-value="company_lines + 1"/>
-                                <t t-if="doc.company_id.vat" t-set="company_lines" t-value="company_lines + 1"/>
+                            <!-- Header Section with Smart Spacing -->
+                            <div style="background: #7C2439; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; min-height: 65px; padding: 15px 20px;">
                                 
-                                <!-- Base padding 12px + 3px per content line (max 24px) -->
-                                <t t-set="dynamic_padding" t-value="min(12 + (company_lines * 3), 24)"/>
-                                
-                                <div t-attf-style="display: flex; flex-direction: column; gap: 6px; flex: 1; padding: #{dynamic_padding}px 20px;">
-                                    <!-- Reference at first line with larger font -->
-                                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 2px;">
+                                <!-- Company Info with Auto Spacing -->
+                                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                    <!-- Reference at first line -->
+                                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">
                                         REF: <span t-field="doc.name"/>
                                     </div>
-                                    <div style="font-size: 11px; line-height: 1.3; color: rgba(255, 255, 255, 0.9);">
-                                        <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px;">
+                                    <!-- Company Details -->
+                                    <div style="font-size: 11px; line-height: 1.4; color: rgba(255, 255, 255, 0.95);">
+                                        <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px;">
                                             <span t-field="doc.company_id.name"/>
                                         </div>
-                                        <div t-if="doc.company_id.street" style="margin-bottom: 1px;"><span t-field="doc.company_id.street"/></div>
-                                        <div t-if="doc.company_id.city" style="margin-bottom: 1px;"><span t-field="doc.company_id.city"/></div>
-                                        <div t-if="doc.company_id.country_id" style="margin-bottom: 1px;"><span t-field="doc.company_id.country_id.name"/></div>
-                                        <div t-if="doc.company_id.vat">VAT: <span t-field="doc.company_id.vat"/></div>
+                                        <t t-if="doc.company_id.street">
+                                            <div style="margin-bottom: 2px;"><span t-field="doc.company_id.street"/></div>
+                                        </t>
+                                        <div style="margin-bottom: 2px;">
+                                            <t t-if="doc.company_id.city"><span t-field="doc.company_id.city"/></t>
+                                            <t t-if="doc.company_id.zip">, <span t-field="doc.company_id.zip"/></t>
+                                        </div>
+                                        <t t-if="doc.company_id.country_id">
+                                            <div style="margin-bottom: 2px;"><span t-field="doc.company_id.country_id.name"/></div>
+                                        </t>
+                                        <t t-if="doc.company_id.vat">
+                                            <div>VAT: <span t-field="doc.company_id.vat"/></div>
+                                        </t>
                                     </div>
                                 </div>
-                                <!-- OSUS Logo with dynamic padding -->
-                                <div t-attf-style="display: flex; align-items: center; padding: #{dynamic_padding}px 20px #{dynamic_padding}px 0;">
+                                
+                                <!-- OSUS Logo -->
+                                <div style="display: flex; align-items: center; margin-left: 15px;">
                                     <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" 
-                                         style="height: 45px; width: auto;" 
+                                         style="height: 40px; width: auto; max-width: 120px;" 
                                          alt="OSUS Logo"/>
                                 </div>
                             </div>
                             
-                            <!-- Main Content - Dynamic padding based on content density -->
-                            <div style="flex: 1; display: flex; flex-direction: column;">
-                                <!-- Calculate content density for spacing -->
-                                <t t-set="content_rows" t-value="8"/>  <!-- Base rows: partner, number, date, address, phone, bank, method -->
-                                <t t-if="doc.ref" t-set="content_rows" t-value="content_rows + 1"/>
-                                <t t-if="doc._fields.get('actual_approver_id') and doc.actual_approver_id" t-set="content_rows" t-value="content_rows + 1"/>
-                                
-                                <!-- Dynamic content padding: 12px base + extra space if less content -->
-                                <t t-set="content_padding" t-value="12 + (max(0, 9 - content_rows) * 2)"/>
-                                
-                                <div t-attf-style="padding: #{content_padding}px 20px;">
+                            <!-- Main Content Section with Responsive Spacing -->
+                            <div style="flex: 1; display: flex; flex-direction: column; padding: 18px 20px;">
                 
-                                <!-- Voucher Title - Responsive font size -->
-                                <h1 t-attf-style="text-align: center; font-size: #{22 if content_rows > 8 else 24}px; font-weight: 700; color: #7C2439; margin-bottom: #{15 if content_rows > 8 else 18}px; margin-top: 0;">
+                                <!-- Voucher Title -->
+                                <h1 style="text-align: center; font-size: 22px; font-weight: 700; color: #7C2439; margin: 0 0 16px 0;">
                                     <t t-if="doc.payment_type == 'outbound'">Payment Voucher</t>
-                                    <t t-if="doc.payment_type == 'inbound'">Receipt Voucher</t>
+                                    <t t-elif="doc.payment_type == 'inbound'">Receipt Voucher</t>
+                                    <t t-else="">Payment Voucher</t>
                                 </h1>
                                 
-                                <!-- Details Table - Dynamic row spacing -->
-                                <table t-attf-style="width: 100%; border-collapse: collapse; margin-bottom: #{15 if content_rows > 8 else 18}px; flex: 1;">
+                                <!-- Details Table with Smart Spacing -->
+                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
                                     <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Issued To:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.partner_id.name"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Number:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.name"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Date:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.date" t-options="{'widget': 'date', 'format': 'dd MMMM yyyy'}"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Address:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;">
-                                            <span t-if="doc.partner_id.street" t-field="doc.partner_id.street"/>
-                                            <span t-if="doc.partner_id.city">, <span t-field="doc.partner_id.city"/></span>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600; width: 35%;">Issued To:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-field="doc.partner_id.name"/>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Phone:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.partner_id.phone"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Bank Details:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;">
-                                            <span t-if="doc.partner_bank_id" t-field="doc.partner_bank_id.acc_number"/>
-                                            <span t-if="doc.partner_bank_id.acc_holder_name"> (<span t-field="doc.partner_bank_id.acc_holder_name"/>)</span>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Number:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-field="doc.name"/>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Payment Method:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.journal_id.name"/></td>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Date:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-field="doc.date" t-options="{'widget': 'date', 'format': 'dd MMMM yyyy'}"/>
+                                        </td>
                                     </tr>
+                                    <tr>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Address:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <t t-if="doc.partner_id.street or doc.partner_id.city">
+                                                <t t-if="doc.partner_id.street"><span t-field="doc.partner_id.street"/></t>
+                                                <t t-if="doc.partner_id.city">
+                                                    <t t-if="doc.partner_id.street">, </t>
+                                                    <span t-field="doc.partner_id.city"/>
+                                                </t>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Phone:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <t t-if="doc.partner_id.phone">
+                                                <span t-field="doc.partner_id.phone"/>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Bank Details:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <t t-if="doc.partner_bank_id">
+                                                <span t-field="doc.partner_bank_id.acc_number"/>
+                                                <t t-if="doc.partner_bank_id.acc_holder_name">
+                                                    (<span t-field="doc.partner_bank_id.acc_holder_name"/>)
+                                                </t>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Payment Method:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-field="doc.journal_id.name"/>
+                                        </td>
+                                    </tr>
+                                    <!-- Conditional fields with proper spacing -->
                                     <tr t-if="doc.ref">
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Reference:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.ref"/></td>
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Reference:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-field="doc.ref"/>
+                                        </td>
                                     </tr>
-                                    <tr t-if="doc._fields.get('actual_approver_id') and doc.actual_approver_id">
-                                        <th t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Approved By:</th>
-                                        <td t-attf-style="padding: #{6 if content_rows > 8 else 8}px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.actual_approver_id.name"/></td>
-                                    </tr>
+                                    <t t-if="hasattr(doc, 'actual_approver_id') and doc.actual_approver_id">
+                                        <tr>
+                                            <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Approved By:</th>
+                                            <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                                <span t-field="doc.actual_approver_id.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
                                 </table>
                                 
-                                <!-- Amount Section - Dynamic margin -->
-                                <div t-attf-style="background: linear-gradient(135deg, #BFA46F, #d4c195); color: #fff; padding: 15px; border-radius: 4px; text-align: center; margin-top: #{8 if content_rows > 8 else 12}px;">
-                                    <p style="font-size: 26px; font-weight: 700; margin: 0;">
+                                <!-- Amount Section with Better Styling -->
+                                <div style="background: linear-gradient(135deg, #BFA46F 0%, #d4c195 100%); color: #fff; padding: 14px 20px; border-radius: 6px; text-align: center; margin: 12px 0;">
+                                    <p style="font-size: 24px; font-weight: 700; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                         Total Amount: <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                                     </p>
                                 </div>
                                 
-                                <!-- Authorization and Signature Sections - Dynamic spacing -->
-                                <div t-attf-style="margin-top: #{15 if content_rows > 8 else 20}px; display: flex; justify-content: space-between; gap: 20px;">
+                                <!-- Authorization and Signature Sections -->
+                                <div style="margin-top: 16px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                                     <!-- Left Section: Initiated By and Approved By -->
-                                    <div style="flex: 1;">
+                                    <div style="flex: 1; min-width: 250px;">
                                         <!-- Initiated By Section -->
-                                        <div t-attf-style="margin-bottom: #{20 if content_rows > 8 else 25}px;">
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                        <div style="margin-bottom: 20px;">
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
                                                 Initiated By:
                                             </h4>
-                                            <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                            <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
                                                 <span t-field="doc.create_uid.name"/>
                                             </p>
                                             <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
@@ -134,12 +160,12 @@
                                         </div>
                                         
                                         <!-- Approved By Section -->
-                                        <div style="margin-bottom: 15px;">
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                        <div style="margin-bottom: 12px;">
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
                                                 Approved By:
                                             </h4>
-                                            <t t-if="doc._fields.get('authorized_by') and doc.authorized_by and doc.state == 'posted'">
-                                                <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by and doc.state == 'posted'">
+                                                <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
                                                     <span t-field="doc.authorized_by"/>
                                                 </p>
                                                 <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
@@ -147,7 +173,7 @@
                                                 </p>
                                             </t>
                                             <t t-else="">
-                                                <p style="font-size: 11px; color: #999; margin: 0; line-height: 1.4;">
+                                                <p style="font-size: 11px; color: #999; margin: 0; line-height: 1.3;">
                                                     Pending Approval
                                                 </p>
                                             </t>
@@ -155,29 +181,29 @@
                                     </div>
                                     
                                     <!-- Right Section: Received By with Signature -->
-                                    <div style="flex: 1;">
+                                    <div style="flex: 1; min-width: 250px;">
                                         <div>
-                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
+                                            <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
                                                 Received By:
                                             </h4>
                                             
                                             <!-- Signature Line -->
-                                            <div style="margin-bottom: 15px; padding-top: 10px;">
-                                                <div style="border-top: 2px solid #333; width: 180px; margin-bottom: 5px;"></div>
-                                                <p style="font-size: 10px; color: #666; margin: 0; text-align: center; width: 180px;">
+                                            <div style="margin-bottom: 12px; padding-top: 8px;">
+                                                <div style="border-top: 2px solid #333; width: 160px; margin-bottom: 4px;"></div>
+                                                <p style="font-size: 10px; color: #666; margin: 0; text-align: left; width: 160px;">
                                                     Signature
                                                 </p>
                                             </div>
                                             
                                             <!-- Name Field -->
-                                            <div style="margin-bottom: 10px;">
-                                                <t t-if="doc._fields.get('received_by') and doc.received_by">
-                                                    <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
+                                            <div style="margin-bottom: 8px;">
+                                                <t t-if="hasattr(doc, 'received_by') and doc.received_by">
+                                                    <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
                                                         <span t-field="doc.received_by"/>
                                                     </p>
                                                 </t>
                                                 <t t-else="">
-                                                    <div style="border-bottom: 1px solid #999; width: 180px; height: 18px; margin-bottom: 3px;"></div>
+                                                    <div style="border-bottom: 1px solid #999; width: 160px; height: 16px; margin-bottom: 2px;"></div>
                                                 </t>
                                                 <p style="font-size: 10px; color: #666; margin: 0;">
                                                     Full Name
@@ -185,8 +211,8 @@
                                             </div>
                                             
                                             <!-- Date Field -->
-                                            <div style="margin-bottom: 10px;">
-                                                <div style="border-bottom: 1px solid #999; width: 120px; height: 18px; margin-bottom: 3px;"></div>
+                                            <div style="margin-bottom: 8px;">
+                                                <div style="border-bottom: 1px solid #999; width: 110px; height: 16px; margin-bottom: 2px;"></div>
                                                 <p style="font-size: 10px; color: #666; margin: 0;">
                                                     Date
                                                 </p>
@@ -194,7 +220,7 @@
                                             
                                             <!-- Mobile Field -->
                                             <div>
-                                                <div style="border-bottom: 1px solid #999; width: 140px; height: 18px; margin-bottom: 3px;"></div>
+                                                <div style="border-bottom: 1px solid #999; width: 130px; height: 16px; margin-bottom: 2px;"></div>
                                                 <p style="font-size: 10px; color: #666; margin: 0;">
                                                     Mobile
                                                 </p>
@@ -205,9 +231,13 @@
                                 
                             </div>
                             
-                            <!-- Footer - Dynamic padding -->
-                            <div t-attf-style="background: #7C2439; color: #fff; text-align: center; padding: #{8 if content_rows > 8 else 10}px 16px; font-size: 11px; line-height: 1.3;">
-                                Thank you for your business • Confirm payment at <span t-if="doc.company_id.phone" t-field="doc.company_id.phone"/>
+                            <!-- Footer with Smart Padding -->
+                            <div style="background: #7C2439; color: #fff; text-align: center; padding: 8px 16px; font-size: 11px; line-height: 1.2; margin-top: auto;">
+                                <span style="color: rgba(255, 255, 255, 0.95);">
+                                    Thank you for your business • Confirm payment at 
+                                    <t t-if="doc.company_id.phone"><span t-field="doc.company_id.phone"/></t>
+                                    <t t-else="">our office</t>
+                                </span>
                             </div>
                             
                         </div>
@@ -215,11 +245,6 @@
                     </div>
                 </t>
             </t>
-        </template>
-        
-        <!-- Add Google Fonts for Montserrat -->
-        <template id="report_payment_voucher_assets" name="Payment Voucher Assets">
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
         </template>
         
     </data>
