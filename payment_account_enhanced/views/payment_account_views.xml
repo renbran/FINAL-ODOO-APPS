@@ -73,20 +73,6 @@
                                 </tree>
                             </field>
                         </page>
-                        
-                        <page string="Additional Information" name="additional_info">
-                            <group>
-                                <group string="Authorization">
-                                    <field name="authorized_by" readonly="1"/>
-                                </group>
-                                <group string="Manual Fields">
-                                    <field name="received_by" placeholder="Enter person who received payment..."/>
-                                </group>
-                                <group string="Notes" colspan="2">
-                                    <field name="remarks" nolabel="1" placeholder="Additional remarks or memo..."/>
-                                </group>
-                            </group>
-                        </page>
                     </notebook>
                 </xpath>
             </field>
