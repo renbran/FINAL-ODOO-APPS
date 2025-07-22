@@ -51,8 +51,8 @@
                                         <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.partner_id.name"/></td>
                                     </tr>
                                     <tr>
-                                        <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Voucher Number:</th>
-                                        <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.voucher_number"/></td>
+                                        <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Number:</th>
+                                        <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.name"/></td>
                                     </tr>
                                     <tr>
                                         <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Date:</th>

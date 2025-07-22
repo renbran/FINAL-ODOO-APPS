@@ -7,9 +7,9 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
-                <!-- Add voucher number after payment reference -->
-                <field name="name" position="after">
-                    <field name="voucher_number" optional="show"/>
+                <!-- Modify name field to show as Number -->
+                <field name="name" position="attributes">
+                    <attribute name="string">Number</attribute>
                 </field>
                 <!-- Add destination account after journal -->
                 <field name="journal_id" position="after">
@@ -45,7 +45,7 @@
                 
                 <!-- Add voucher fields after amount -->
                 <field name="amount" position="after">
-                    <field name="voucher_number" readonly="1"/>
+                    <field name="name" string="Number" readonly="1"/>
                     <field name="received_by" invisible="state in ['draft', 'cancelled']"/>
                     <field name="payment_description"/>
                 </field>

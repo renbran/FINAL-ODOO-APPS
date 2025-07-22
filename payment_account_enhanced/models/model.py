@@ -12,11 +12,12 @@ class AccountPayment(models.Model):
         help="Account where the payment will be posted"
     )
     
-    voucher_number = fields.Char(
-        string='Voucher Number',
+    # Override the name field to have a better label for voucher context
+    name = fields.Char(
+        string='Number',
         readonly=True,
         copy=False,
-        help="Unique voucher number for this payment"
+        help="Payment reference number"
     )
     
     received_by = fields.Char(
@@ -51,9 +52,7 @@ class AccountPayment(models.Model):
     
     @api.model
     def create(self, vals):
-        # Generate voucher number
-        if not vals.get('voucher_number'):
-            vals['voucher_number'] = self.env['ir.sequence'].next_by_code('payment.voucher') or _('New')
+        # The standard name field will be handled by the parent class
         return super(AccountPayment, self).create(vals)
     
     def action_print_voucher(self):
