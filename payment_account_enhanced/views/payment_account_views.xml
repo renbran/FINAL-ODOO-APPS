@@ -46,7 +46,7 @@
                 <!-- Add voucher fields after amount -->
                 <field name="amount" position="after">
                     <field name="name" string="Number" readonly="1"/>
-                    <field name="payment_description"/>
+                    <field name="payment_reference"/>
                 </field>
                 
                 <!-- Add notebook with journal items after the main form content -->

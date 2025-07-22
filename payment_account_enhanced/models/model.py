@@ -25,8 +25,8 @@ class AccountPayment(models.Model):
         help="Person who received the payment (manually filled)"
     )
     
-    payment_description = fields.Text(
-        string='Payment Description',
+    payment_reference = fields.Text(
+        string='Payment Reference',
         help="Detailed description of the payment"
     )
     
