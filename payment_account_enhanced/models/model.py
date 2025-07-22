@@ -25,11 +25,6 @@ class AccountPayment(models.Model):
         help="Person who received the payment (manually filled)"
     )
     
-    payment_reference = fields.Text(
-        string='Payment Reference',
-        help="Detailed description of the payment"
-    )
-    
     # Authorization fields with computed logic
     authorized_by = fields.Char(
         string='Authorized By',
