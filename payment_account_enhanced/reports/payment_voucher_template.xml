@@ -82,7 +82,7 @@
                                     </tr>
                                     <tr t-if="doc.payment_reference">
                                         <th style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #7C2439; font-weight: 600; width: 35%;">Payment Reference:</th>
-                                        <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.payment_reference"/></td>
+                                        <td style="padding: 8px 0; text-align: left; font-size: 14px; border-bottom: 1px solid #eee; color: #333;"><span t-field="doc.ref"/></td>
                                     </tr>
                                 </table>
                                 
