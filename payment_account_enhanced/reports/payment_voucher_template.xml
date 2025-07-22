@@ -1,36 +1,39 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- QWeb template for payment voucher (report only, no actions or paperformat here) -->
+        <!-- QWeb template for payment voucher (Odoo 17, CSS classes only) -->
         <template id="report_payment_voucher">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-set="ref_list" t-value="(o.ref or '').split(',')"/>
-                    <div class="page" style="margin:0; padding:0; width:210mm; height:297mm; font-family:'Helvetica Neue',Arial,sans-serif; color:#222;">
-                        <!-- HEADER -->
-                        <div style="margin:-8mm -8mm 0 -8mm; height:40mm; background:linear-gradient(135deg,#7C2439 0%,#8B2A47 100%); display:flex; align-items:center; justify-content:space-between; padding:0 15mm; color:#fff;">
-                            <div>
-                                <div style="font-size:18pt; font-weight:700;">RECEIPT VOUCHER</div>
-                                <div style="font-size:9.5pt;">OSUS REAL ESTATE BROKERAGE LLC</div>
+                    <div class="o_payment_voucher_container">
+                        <div class="o_payment_voucher_header">
+                            <div class="o_payment_voucher_header_left">
+                                <div class="o_payment_voucher_ref">
+                                    <strong>RECEIPT VOUCHER</strong>
+                                </div>
+                                <div class="o_payment_voucher_company">
+                                    OSUS REAL ESTATE BROKERAGE LLC
+                                </div>
                             </div>
-                            <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" style="height:18mm; filter:brightness(0) invert(1);"/>
+                            <div class="o_payment_voucher_header_right">
+                                <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" class="o_payment_voucher_logo"/>
+                            </div>
                         </div>
-                        <!-- BODY -->
-                        <div style="padding:6mm 8mm 0 8mm;">
-                            <table style="width:100%; border-collapse:collapse; font-size:9.5pt;">
-                                <tr><td style="width:28%; padding:2.4mm 0; font-weight:600;">Issued To</td><td t-field="o.partner_id.name"/></tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Voucher Number</td><td t-field="o.name"/></tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Date</td><td t-field="o.date" t-options='{"widget":"date","format":"dd MMMM yyyy"}'/></tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Address</td>
+                        <div class="o_payment_voucher_details">
+                            <table class="o_payment_voucher_table">
+                                <tr><th>Issued To</th><td t-field="o.partner_id.name"/></tr>
+                                <tr><th>Voucher Number</th><td t-field="o.name"/></tr>
+                                <tr><th>Date</th><td t-field="o.date" t-options='{"widget":"date","format":"dd MMMM yyyy"}'/></tr>
+                                <tr><th>Address</th>
                                     <td>
                                         <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></t>
                                         <t t-if="o.partner_id.street2"><br/><span t-field="o.partner_id.street2"/></t>
                                         <t t-if="o.partner_id.city"><br/><span t-field="o.partner_id.city"/></t>
                                     </td>
                                 </tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Phone</td><td><t t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></t></td></tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Bank Details</td>
+                                <tr><th>Phone</th><td><t t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></t></td></tr>
+                                <tr><th>Bank Details</th>
                                     <td>
                                         <t t-if="o.partner_bank_id">
                                             <span t-field="o.partner_bank_id.acc_number"/>
@@ -38,53 +41,62 @@
                                         </t>
                                     </td>
                                 </tr>
-                                <tr><td style="padding:2.4mm 0; font-weight:600;">Payment Method</td><td t-field="o.journal_id.name"/></tr>
+                                <tr><th>Payment Method</th><td t-field="o.journal_id.name"/></tr>
                                 <tr t-if="o.ref">
-                                    <td style="padding:2.4mm 0; font-weight:600;">Reference</td>
+                                    <th>Reference</th>
                                     <td>
-                                        <ul style="margin:0; padding-left:15px;">
+                                        <ul>
                                             <li t-foreach="ref_list" t-as="ref_line" t-esc="ref_line.strip()"/>
                                         </ul>
                                     </td>
                                 </tr>
                             </table>
-                            <!-- AMOUNT BLOCK -->
-                            <div style="margin:6mm 0; padding:5mm; background:linear-gradient(135deg,#BFA46F 0%,#d4c195 100%); color:#fff; text-align:center; border-radius:4px;">
-                                <div style="font-size:22pt; font-weight:700;">
-                                    <span t-field="o.amount" t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
-                                </div>
-                                <div style="font-size:11pt; margin-top:2mm;">
-                                    <span t-esc="o.currency_id.amount_to_text(o.amount)"/> only
-                                </div>
+                        </div>
+                        <div class="o_payment_voucher_amount">
+                            <span t-field="o.amount" t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
+                            <div style="font-size:11pt; margin-top:2mm;">
+                                <span t-esc="o.currency_id.amount_to_text(o.amount)"/> only
                             </div>
-                            <!-- AUTHORISATION & ACKNOWLEDGMENT -->
-                            <div style="display:flex; gap:6mm;">
-                                <div style="flex:1; border:1px solid #ccc; padding:4mm; text-align:center;">
-                                    <strong>INITIATED BY</strong><br/>
-                                    <span t-field="o.create_uid.name"/><br/>
-                                    <small t-field="o.create_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
-                                </div>
-                                <div style="flex:1; border:1px solid #ccc; padding:4mm; text-align:center;">
-                                    <strong>APPROVED BY</strong><br/>
-                                    <t t-if="o.state=='posted'">
-                                        <span t-field="o.write_uid.name"/><br/>
-                                        <small t-field="o.write_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
-                                    </t>
-                                    <t t-else=""><span style="color:#c00;">Pending Approval</span></t>
-                                </div>
-                                <div style="flex:1; border:1px solid #ccc; padding:4mm;">
-                                    <strong>RECEIVED BY</strong>
-                                    <div style="border-bottom:1px solid #333; height:8mm; margin:2mm 0;"></div>
-                                    <div style="font-size:8pt; display:flex; justify-content:space-between;">
-                                        <span>Signature</span><span>Date</span><span>Mobile</span>
+                        </div>
+                        <div class="o_payment_voucher_signatures">
+                            <div class="o_payment_voucher_signature_box">
+                                <div class="o_payment_voucher_signature_label">INITIATED BY</div>
+                                <div><span t-field="o.create_uid.name"/></div>
+                                <div class="o_payment_voucher_signature_date"><span t-field="o.create_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/></div>
+                            </div>
+                            <div class="o_payment_voucher_signature_box">
+                                <div class="o_payment_voucher_signature_label">APPROVED BY</div>
+                                <t t-if="o.state=='posted'">
+                                    <div><span t-field="o.write_uid.name"/></div>
+                                    <div class="o_payment_voucher_signature_date"><span t-field="o.write_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/></div>
+                                </t>
+                                <t t-else=""><div class="o_payment_voucher_pending">Pending Approval</div></t>
+                            </div>
+                            <div class="o_payment_voucher_signature_box o_payment_voucher_signature_manual">
+                                <div class="o_payment_voucher_signature_label">RECEIVED BY</div>
+                                <div class="o_payment_voucher_signature_line"></div>
+                                <div class="o_payment_voucher_signature_sublabel">SIGNATURE</div>
+                                <div class="o_payment_voucher_signature_line"></div>
+                                <div class="o_payment_voucher_signature_sublabel">FULL NAME</div>
+                                <div class="o_payment_voucher_signature_row">
+                                    <div>
+                                        <div class="o_payment_voucher_signature_line"></div>
+                                        <div class="o_payment_voucher_signature_sublabel">DATE</div>
+                                    </div>
+                                    <div>
+                                        <div class="o_payment_voucher_signature_line"></div>
+                                        <div class="o_payment_voucher_signature_sublabel">MOBILE NUMBER</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- FOOTER -->
-                        <div style="margin:8mm -8mm -8mm -8mm; padding:4mm 15mm; background:#7C2439; color:#fff; text-align:center; font-size:9pt;">
-                            Thank you for your business • For payment confirmation, please contact: 056 390 5772<br/>
-                            <em>This is a computer-generated document. No physical signature or stamp required for system verification.</em>
+                        <div class="o_payment_voucher_footer">
+                            <div>
+                                Thank you for your business • For payment confirmation, please contact: 056 390 5772
+                            </div>
+                            <div class="o_payment_voucher_footer_note">
+                                This is a computer-generated document. No physical signature or stamp required for system verification.
+                            </div>
                         </div>
                     </div>
                 </t>
