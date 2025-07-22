@@ -2,32 +2,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Paper format for edge-to-edge A4 -->
-        <record id="paperformat_payment_voucher_a4" model="report.paperformat">
-            <field name="name">Payment Voucher A4 Edge-to-Edge</field>
-            <field name="format">A4</field>
-            <field name="orientation">Portrait</field>
-            <field name="margin_top">8</field>
-            <field name="margin_bottom">8</field>
-            <field name="margin_left">8</field>
-            <field name="margin_right">8</field>
-            <field name="header_line" eval="False"/>
-            <field name="header_spacing">0</field>
-            <field name="dpi">90</field>
-        </record>
-
-        <!-- Report action: ensure report_name and report_file match template id -->
-        <record id="action_report_payment_voucher" model="ir.actions.report">
-            <field name="name">Payment Voucher</field>
-            <field name="model">account.payment</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">payment_account_enhanced.report_payment_voucher</field>
-            <field name="report_file">payment_account_enhanced.report_payment_voucher</field>
-            <field name="paperformat_id" ref="paperformat_payment_voucher_a4"/>
-            <field name="print_report_name">'Payment Voucher - %s' % (object.name)</field>
-        </record>
-
-        <!-- QWeb template for payment voucher -->
+        <!-- QWeb template for payment voucher (report only, no actions or paperformat here) -->
         <template id="report_payment_voucher">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
