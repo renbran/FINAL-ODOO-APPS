@@ -33,6 +33,9 @@
                            invisible="state not in ['waiting_approval', 'approved', 'rejected']"
                            help="These users can approve this payment"/>
                 </field>
+                <field name="journal_id" position="after">
+                    <field name="destination_account_id" attrs="{'invisible': [('journal_id','=',False)]}"/>
+                </field>
                 <xpath expr="//field" position="attributes">
                     <attribute name="readonly">is_locked</attribute>
                 </xpath>
