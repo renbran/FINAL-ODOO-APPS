@@ -43,10 +43,10 @@
                            domain="[('account_type', 'in', ['asset_receivable', 'liability_payable', 'asset_cash', 'liability_credit_card'])]"/>
                 </field>
                 
-                <!-- Add voucher fields after amount -->
-                <field name="amount" position="after">
-                    <field name="name" string="Number" readonly="1"/>
-                    <field name="payment_reference"/>
+                <!-- Add voucher fields in a separate group after partner selection -->
+                <field name="partner_id" position="after">
+                    <field name="name" string="Number" readonly="1" invisible="payment_type == 'inbound'"/>
+                    <field name="payment_reference" placeholder="Enter payment reference or description..."/>
                 </field>
                 
                 <!-- Add notebook with journal items after the main form content -->
