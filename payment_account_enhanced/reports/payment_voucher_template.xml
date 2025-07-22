@@ -1,123 +1,119 @@
 
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <!--
-      Payment Voucher Report Template
-      - Odoo 17 QWeb, BEM class naming, SCSS-ready, accessible, no inline styles
-      - All custom classes prefixed: o_payment_account_enhanced_voucher__*
-      - Ready for responsive and theming via SCSS
-    -->
-    <template id="report_receipt_voucher">
-      <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="o">
-          <!-- Helper: split reference string into bullet list -->
-          <t t-set="ref_list" t-value="(o.ref or '').split(',')"/>
+    <data>
+        <!-- Paper format for edge-to-edge A4 -->
+        <record id="paperformat_payment_voucher_a4" model="report.paperformat">
+            <field name="name">Payment Voucher A4 Edge-to-Edge</field>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">8</field>
+            <field name="margin_bottom">8</field>
+            <field name="margin_left">8</field>
+            <field name="margin_right">8</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
 
-          <div class="o_payment_account_enhanced_voucher o_report_page" role="region" aria-label="Payment Voucher">
-            <!-- Header -->
-            <header class="o_payment_account_enhanced_voucher__header">
-              <div class="o_payment_account_enhanced_voucher__header-left">
-                <h1 class="o_payment_account_enhanced_voucher__title">RECEIPT VOUCHER</h1>
-                <div class="o_payment_account_enhanced_voucher__company" t-esc="o.company_id.name"/>
-              </div>
-              <div class="o_payment_account_enhanced_voucher__header-right">
-                <img t-if="o.company_id.logo" t-att-src="o.company_id.logo" class="o_payment_account_enhanced_voucher__logo" alt="Company Logo"/>
-              </div>
-            </header>
+        <!-- Report action: ensure report_name and report_file match template id -->
+        <record id="action_report_payment_voucher" model="ir.actions.report">
+            <field name="name">Payment Voucher</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">payment_account_enhanced.report_payment_voucher</field>
+            <field name="report_file">payment_account_enhanced.report_payment_voucher</field>
+            <field name="paperformat_id" ref="paperformat_payment_voucher_a4"/>
+            <field name="print_report_name">'Payment Voucher - %s' % (object.name)</field>
+        </record>
 
-            <!-- Body -->
-            <main class="o_payment_account_enhanced_voucher__body">
-              <table class="o_payment_account_enhanced_voucher__table" aria-label="Payment Details">
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Issued To</th>
-                  <td t-field="o.partner_id.name"/>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Voucher Number</th>
-                  <td t-field="o.name"/>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Date</th>
-                  <td t-field="o.date" t-options='{"widget":"date","format":"dd MMMM yyyy"}'/>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Address</th>
-                  <td>
-                    <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></t>
-                    <t t-if="o.partner_id.street2"><br/><span t-field="o.partner_id.street2"/></t>
-                    <t t-if="o.partner_id.city"><br/><span t-field="o.partner_id.city"/></t>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Phone</th>
-                  <td><t t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></t></td>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Bank Details</th>
-                  <td>
-                    <t t-if="o.partner_bank_id">
-                      <span t-field="o.partner_bank_id.acc_number"/>
-                      <t t-if="o.partner_bank_id.bank_id"> (<span t-field="o.partner_bank_id.bank_id.name"/>)</t>
-                    </t>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Payment Method</th>
-                  <td t-field="o.journal_id.name"/>
-                </tr>
-                <tr t-if="o.ref">
-                  <th class="o_payment_account_enhanced_voucher__label" scope="row">Reference</th>
-                  <td>
-                    <ul class="o_payment_account_enhanced_voucher__ref-list">
-                      <li t-foreach="ref_list" t-as="ref_line" t-esc="ref_line.strip()"/>
-                    </ul>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Amount Block -->
-              <section class="o_payment_account_enhanced_voucher__amount-block" aria-label="Amount">
-                <div class="o_payment_account_enhanced_voucher__amount-value">
-                  <span t-field="o.amount" t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
-                </div>
-                <div class="o_payment_account_enhanced_voucher__amount-text">
-                  <span t-esc="o.currency_id.amount_to_text(o.amount)"/> only
-                </div>
-              </section>
-
-              <!-- Authorization & Acknowledgment -->
-              <section class="o_payment_account_enhanced_voucher__auth-row" aria-label="Authorization and Acknowledgment">
-                <div class="o_payment_account_enhanced_voucher__auth-block">
-                  <strong>INITIATED BY</strong><br/>
-                  <span t-field="o.create_uid.name"/><br/>
-                  <small t-field="o.create_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
-                </div>
-                <div class="o_payment_account_enhanced_voucher__auth-block">
-                  <strong>APPROVED BY</strong><br/>
-                  <t t-if="o.state=='posted'">
-                    <span t-field="o.write_uid.name"/><br/>
-                    <small t-field="o.write_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
-                  </t>
-                  <t t-else=""><span class="o_payment_account_enhanced_voucher__pending" aria-live="polite">Pending Approval</span></t>
-                </div>
-                <div class="o_payment_account_enhanced_voucher__auth-block">
-                  <strong>RECEIVED BY</strong>
-                  <div class="o_payment_account_enhanced_voucher__signature-line" aria-hidden="true"></div>
-                  <div class="o_payment_account_enhanced_voucher__signature-labels">
-                    <span>Signature</span><span>Date</span><span>Mobile</span>
-                  </div>
-                </div>
-              </section>
-            </main>
-
-            <!-- Footer -->
-            <footer class="o_payment_account_enhanced_voucher__footer">
-              <span t-esc="o.company_id.payment_voucher_footer or 'Thank you for your business • For payment confirmation, please contact: 056 390 5772'"/><br/>
-              <em>This is a computer-generated document. No physical signature or stamp required for system verification.</em>
-            </footer>
-          </div>
-        </t>
-      </t>
-    </template>
-  </data>
+        <!-- QWeb template for payment voucher -->
+        <template id="report_payment_voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="ref_list" t-value="(o.ref or '').split(',')"/>
+                    <div class="page" style="margin:0; padding:0; width:210mm; height:297mm; font-family:'Helvetica Neue',Arial,sans-serif; color:#222;">
+                        <!-- HEADER -->
+                        <div style="margin:-8mm -8mm 0 -8mm; height:40mm; background:linear-gradient(135deg,#7C2439 0%,#8B2A47 100%); display:flex; align-items:center; justify-content:space-between; padding:0 15mm; color:#fff;">
+                            <div>
+                                <div style="font-size:18pt; font-weight:700;">RECEIPT VOUCHER</div>
+                                <div style="font-size:9.5pt;">OSUS REAL ESTATE BROKERAGE LLC</div>
+                            </div>
+                            <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" style="height:18mm; filter:brightness(0) invert(1);"/>
+                        </div>
+                        <!-- BODY -->
+                        <div style="padding:6mm 8mm 0 8mm;">
+                            <table style="width:100%; border-collapse:collapse; font-size:9.5pt;">
+                                <tr><td style="width:28%; padding:2.4mm 0; font-weight:600;">Issued To</td><td t-field="o.partner_id.name"/></tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Voucher Number</td><td t-field="o.name"/></tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Date</td><td t-field="o.date" t-options='{"widget":"date","format":"dd MMMM yyyy"}'/></tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Address</td>
+                                    <td>
+                                        <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></t>
+                                        <t t-if="o.partner_id.street2"><br/><span t-field="o.partner_id.street2"/></t>
+                                        <t t-if="o.partner_id.city"><br/><span t-field="o.partner_id.city"/></t>
+                                    </td>
+                                </tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Phone</td><td><t t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></t></td></tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Bank Details</td>
+                                    <td>
+                                        <t t-if="o.partner_bank_id">
+                                            <span t-field="o.partner_bank_id.acc_number"/>
+                                            <t t-if="o.partner_bank_id.bank_id"> (<span t-field="o.partner_bank_id.bank_id.name"/>)</t>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr><td style="padding:2.4mm 0; font-weight:600;">Payment Method</td><td t-field="o.journal_id.name"/></tr>
+                                <tr t-if="o.ref">
+                                    <td style="padding:2.4mm 0; font-weight:600;">Reference</td>
+                                    <td>
+                                        <ul style="margin:0; padding-left:15px;">
+                                            <li t-foreach="ref_list" t-as="ref_line" t-esc="ref_line.strip()"/>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- AMOUNT BLOCK -->
+                            <div style="margin:6mm 0; padding:5mm; background:linear-gradient(135deg,#BFA46F 0%,#d4c195 100%); color:#fff; text-align:center; border-radius:4px;">
+                                <div style="font-size:22pt; font-weight:700;">
+                                    <span t-field="o.amount" t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
+                                </div>
+                                <div style="font-size:11pt; margin-top:2mm;">
+                                    <span t-esc="o.currency_id.amount_to_text(o.amount)"/> only
+                                </div>
+                            </div>
+                            <!-- AUTHORISATION & ACKNOWLEDGMENT -->
+                            <div style="display:flex; gap:6mm;">
+                                <div style="flex:1; border:1px solid #ccc; padding:4mm; text-align:center;">
+                                    <strong>INITIATED BY</strong><br/>
+                                    <span t-field="o.create_uid.name"/><br/>
+                                    <small t-field="o.create_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
+                                </div>
+                                <div style="flex:1; border:1px solid #ccc; padding:4mm; text-align:center;">
+                                    <strong>APPROVED BY</strong><br/>
+                                    <t t-if="o.state=='posted'">
+                                        <span t-field="o.write_uid.name"/><br/>
+                                        <small t-field="o.write_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/>
+                                    </t>
+                                    <t t-else=""><span style="color:#c00;">Pending Approval</span></t>
+                                </div>
+                                <div style="flex:1; border:1px solid #ccc; padding:4mm;">
+                                    <strong>RECEIVED BY</strong>
+                                    <div style="border-bottom:1px solid #333; height:8mm; margin:2mm 0;"></div>
+                                    <div style="font-size:8pt; display:flex; justify-content:space-between;">
+                                        <span>Signature</span><span>Date</span><span>Mobile</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- FOOTER -->
+                        <div style="margin:8mm -8mm -8mm -8mm; padding:4mm 15mm; background:#7C2439; color:#fff; text-align:center; font-size:9pt;">
+                            Thank you for your business • For payment confirmation, please contact: 056 390 5772<br/>
+                            <em>This is a computer-generated document. No physical signature or stamp required for system verification.</em>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
 </odoo>
