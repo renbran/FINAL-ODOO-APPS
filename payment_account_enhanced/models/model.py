@@ -35,7 +35,15 @@ class AccountPayment(models.Model):
         string='Authorized By',
         compute='_compute_authorized_by',
         store=True,
-        help="Shows initiator or approver name with approval date"
+        help="Shows the name of the person who approved and posted the payment"
+    )
+    
+    # Field to store actual approver user
+    actual_approver_id = fields.Many2one(
+        'res.users',
+        string='Approved By',
+        help="User who actually approved and posted the payment",
+        readonly=True
     )
     
     remarks = fields.Text(
@@ -53,21 +61,19 @@ class AccountPayment(models.Model):
         help="Journal entries created by this payment"
     )
     
-    @api.depends('state', 'create_uid', 'write_uid', 'write_date')
+    @api.depends('state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):
-        """Compute authorization field based on approval status"""
+        """Compute authorization field showing who approved and posted the payment"""
         for record in self:
-            if hasattr(record, 'approved_by') and record.approved_by:
-                # If payment approval module is installed and payment is approved
-                approval_date = record.write_date.strftime('%d/%m/%Y %H:%M') if record.write_date else ''
-                record.authorized_by = f"{record.approved_by.name} - {approval_date}"
-            elif record.state in ['posted']:
-                # If posted but no specific approver, show creator
-                create_date = record.create_date.strftime('%d/%m/%Y %H:%M') if record.create_date else ''
-                record.authorized_by = f"Initiated by {record.create_uid.name} - {create_date}"
+            if record.actual_approver_id:
+                # Show the actual approver who approved and posted the entry
+                record.authorized_by = record.actual_approver_id.name
+            elif record.state in ['posted'] and record.write_uid:
+                # If posted but no specific approver, show who posted it
+                record.authorized_by = record.write_uid.name
             else:
-                # For draft or other states
-                record.authorized_by = f"Initiated by {record.create_uid.name if record.create_uid else 'System'}"
+                # For draft or other states, show who initiated
+                record.authorized_by = record.create_uid.name if record.create_uid else 'System'
     
     @api.model
     def create(self, vals):
@@ -77,6 +83,13 @@ class AccountPayment(models.Model):
     def action_print_voucher(self):
         """Print payment voucher"""
         return self.env.ref('payment_account_enhanced.action_report_payment_voucher').report_action(self)
+    
+    def write(self, vals):
+        """Override write to track the approver when payment is posted"""
+        # If state is being changed to 'posted', track who is posting it
+        if vals.get('state') == 'posted' and not self.actual_approver_id:
+            vals['actual_approver_id'] = self.env.user.id
+        return super(AccountPayment, self).write(vals)
     
     @api.onchange('journal_id')
     def _onchange_journal_id_destination_account(self):

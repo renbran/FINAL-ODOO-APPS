@@ -115,9 +115,9 @@
                                             <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
                                                 Approved By:
                                             </h4>
-                                            <t t-if="hasattr(doc, 'approved_by') and doc.approved_by">
+                                            <t t-if="doc.authorized_by and doc.state == 'posted'">
                                                 <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.4;">
-                                                    <span t-field="doc.approved_by.name"/>
+                                                    <span t-field="doc.authorized_by"/>
                                                 </p>
                                                 <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
                                                     <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
