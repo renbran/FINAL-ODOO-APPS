@@ -125,14 +125,12 @@
                                             <span t-field="doc.ref"/>
                                         </td>
                                     </tr>
-                                    <t t-if="hasattr(doc, 'actual_approver_id') and doc.actual_approver_id">
-                                        <tr>
-                                            <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Approved By:</th>
-                                            <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
-                                                <span t-field="doc.actual_approver_id.name"/>
-                                            </td>
-                                        </tr>
-                                    </t>
+                                    <tr t-if="doc.state == 'posted' and doc.authorized_by">
+                                        <th style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #7C2439; font-weight: 600;">Authorized By:</th>
+                                        <td style="padding: 7px 0; text-align: left; font-size: 13px; border-bottom: 1px solid #e5e5e5; color: #333;">
+                                            <span t-esc="doc.authorized_by"/>
+                                        </td>
+                                    </tr>
                                 </table>
                                 
                                 <!-- Amount Section with Better Styling -->
@@ -162,11 +160,19 @@
                                         <!-- Approved By Section -->
                                         <div style="margin-bottom: 12px;">
                                             <h4 style="font-size: 12px; font-weight: 600; color: #7C2439; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">
-                                                Approved By:
+                                                Authorized By:
                                             </h4>
-                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by and doc.state == 'posted'">
+                                            <t t-if="doc.state == 'posted' and doc.authorized_by">
                                                 <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                    <span t-field="doc.authorized_by"/>
+                                                    <span t-esc="doc.authorized_by"/>
+                                                </p>
+                                                <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
+                                                    <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                                </p>
+                                            </t>
+                                            <t t-elif="doc.state == 'posted'">
+                                                <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
+                                                    <span t-field="doc.write_uid.name"/>
                                                 </p>
                                                 <p style="font-size: 10px; color: #666; margin: 2px 0 0 0;">
                                                     <span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
@@ -174,7 +180,7 @@
                                             </t>
                                             <t t-else="">
                                                 <p style="font-size: 11px; color: #999; margin: 0; line-height: 1.3;">
-                                                    Pending Approval
+                                                    Pending Authorization
                                                 </p>
                                             </t>
                                         </div>
@@ -197,9 +203,9 @@
                                             
                                             <!-- Name Field -->
                                             <div style="margin-bottom: 8px;">
-                                                <t t-if="hasattr(doc, 'received_by') and doc.received_by">
+                                                <t t-if="doc.received_by">
                                                     <p style="font-size: 11px; color: #333; margin: 0; line-height: 1.3;">
-                                                        <span t-field="doc.received_by"/>
+                                                        <span t-esc="doc.received_by"/>
                                                     </p>
                                                 </t>
                                                 <t t-else="">
