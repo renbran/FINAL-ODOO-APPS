@@ -1,228 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-<<<<<<< HEAD
-        <!-- QWeb template for payment voucher (Odoo 17, CSS classes only) -->
-        <template id="report_payment_voucher">
-            <t t-call="web.html_container">
-                <t t-foreach="docs" t-as="o">
-                    <t t-set="ref_list" t-value="(o.ref or '').split(',')"/>
-                    <div class="o_payment_voucher_container">
-                        <div class="o_payment_voucher_header">
-                            <div class="o_payment_voucher_header_left">
-                                <div class="o_payment_voucher_ref">
-                                    <strong>RECEIPT VOUCHER</strong>
-                                </div>
-                                <div class="o_payment_voucher_company">
-                                    OSUS REAL ESTATE BROKERAGE LLC
-                                </div>
-                            </div>
-                            <div class="o_payment_voucher_header_right">
-                                <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" class="o_payment_voucher_logo"/>
-                            </div>
-                        </div>
-                        <div class="o_payment_voucher_details">
-                            <table class="o_payment_voucher_table">
-                                <tr><th>Issued To</th><td t-field="o.partner_id.name"/></tr>
-                                <tr><th>Voucher Number</th><td t-field="o.name"/></tr>
-                                <tr><th>Date</th><td t-field="o.date" t-options='{"widget":"date","format":"dd MMMM yyyy"}'/></tr>
-                                <tr><th>Address</th>
-                                    <td>
-                                        <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></t>
-                                        <t t-if="o.partner_id.street2"><br/><span t-field="o.partner_id.street2"/></t>
-                                        <t t-if="o.partner_id.city"><br/><span t-field="o.partner_id.city"/></t>
-                                    </td>
-                                </tr>
-                                <tr><th>Phone</th><td><t t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></t></td></tr>
-                                <tr><th>Bank Details</th>
-                                    <td>
-                                        <t t-if="o.partner_bank_id">
-                                            <span t-field="o.partner_bank_id.acc_number"/>
-                                            <t t-if="o.partner_bank_id.bank_id"> (<span t-field="o.partner_bank_id.bank_id.name"/>)</t>
-                                        </t>
-                                    </td>
-                                </tr>
-                                <tr><th>Payment Method</th><td t-field="o.journal_id.name"/></tr>
-                                <tr t-if="o.ref">
-                                    <th>Reference</th>
-                                    <td>
-                                        <ul>
-                                            <li t-foreach="ref_list" t-as="ref_line" t-esc="ref_line.strip()"/>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="o_payment_voucher_amount">
-                            <span t-field="o.amount" t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
-                            <div style="font-size:11pt; margin-top:2mm;">
-                                <span t-esc="o.currency_id.amount_to_text(o.amount)"/> only
-                            </div>
-                        </div>
-                        <div class="o_payment_voucher_signatures">
-                            <div class="o_payment_voucher_signature_box">
-                                <div class="o_payment_voucher_signature_label">INITIATED BY</div>
-                                <div><span t-field="o.create_uid.name"/></div>
-                                <div class="o_payment_voucher_signature_date"><span t-field="o.create_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/></div>
-                            </div>
-                            <div class="o_payment_voucher_signature_box">
-                                <div class="o_payment_voucher_signature_label">APPROVED BY</div>
-                                <t t-if="o.state=='posted'">
-                                    <div><span t-field="o.write_uid.name"/></div>
-                                    <div class="o_payment_voucher_signature_date"><span t-field="o.write_date" t-options='{"widget":"datetime","format":"dd/MM/yyyy HH:mm"}'/></div>
-                                </t>
-                                <t t-else=""><div class="o_payment_voucher_pending">Pending Approval</div></t>
-                            </div>
-                            <div class="o_payment_voucher_signature_box o_payment_voucher_signature_manual">
-                                <div class="o_payment_voucher_signature_label">RECEIVED BY</div>
-                                <div class="o_payment_voucher_signature_line"></div>
-                                <div class="o_payment_voucher_signature_sublabel">SIGNATURE</div>
-                                <div class="o_payment_voucher_signature_line"></div>
-                                <div class="o_payment_voucher_signature_sublabel">FULL NAME</div>
-                                <div class="o_payment_voucher_signature_row">
-                                    <div>
-                                        <div class="o_payment_voucher_signature_line"></div>
-                                        <div class="o_payment_voucher_signature_sublabel">DATE</div>
-                                    </div>
-                                    <div>
-                                        <div class="o_payment_voucher_signature_line"></div>
-                                        <div class="o_payment_voucher_signature_sublabel">MOBILE NUMBER</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="o_payment_voucher_footer">
-                            <div>
-                                Thank you for your business • For payment confirmation, please contact: 056 390 5772
-                            </div>
-                            <div class="o_payment_voucher_footer_note">
-                                This is a computer-generated document. No physical signature or stamp required for system verification.
-                            </div>
-                        </div>
-=======
+        <!-- Odoo 17-compliant Payment Voucher QWeb Template (printable, no inline styles) -->
         <template id="report_payment_voucher">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <div class="page" style="font-size: 11px;">
-                        <!-- Compact Header -->
-                        <div class="row mb-2">
-                            <div class="col-4">
-                                <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)" 
-                                     style="max-height: 40px; max-width: 100px;" alt="Company Logo"/>
+                    <t t-call="web.external_layout">
+                        <div class="o_payment_voucher_container">
+                            <div class="o_payment_voucher_header">
+                                <div class="o_payment_voucher_header_left">
+                                    <div class="o_payment_voucher_ref">
+                                        <strong>REF:</strong> <span t-field="doc.name"/>
+                                    </div>
+                                    <div class="o_payment_voucher_company">
+                                        <span t-field="doc.company_id.name"/>
+                                        <t t-if="doc.company_id.street">
+                                            <div><span t-field="doc.company_id.street"/></div>
+                                        </t>
+                                        <t t-if="doc.company_id.city or doc.company_id.zip">
+                                            <div>
+                                                <t t-if="doc.company_id.city"><span t-field="doc.company_id.city"/></t>
+                                                <t t-if="doc.company_id.zip">, <span t-field="doc.company_id.zip"/></t>
+                                            </div>
+                                        </t>
+                                        <t t-if="doc.company_id.country_id">
+                                            <div><span t-field="doc.company_id.country_id.name"/></div>
+                                        </t>
+                                        <t t-if="doc.company_id.vat">
+                                            <div><strong>VAT:</strong> <span t-field="doc.company_id.vat"/></div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="o_payment_voucher_header_right">
+                                    <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" alt="OSUS Logo" class="o_payment_voucher_logo"/>
+                                </div>
                             </div>
-                            <div class="col-8 text-right">
-                                <h4 class="mb-0" style="font-size: 16px; font-weight: bold;">
-                                    <span t-if="doc.payment_type == 'outbound'">PAYMENT VOUCHER</span>
-                                    <span t-if="doc.payment_type == 'inbound'">RECEIPT VOUCHER</span>
-                                </h4>
-                                <small class="text-muted">
-                                    <div><span t-field="doc.company_id.name"/></div>
-                                    <div t-if="doc.company_id.phone">Tel: <span t-field="doc.company_id.phone"/></div>
-                                </small>
+                            <div class="o_payment_voucher_title">
+                                <h2>
+                                    <t t-if="doc.payment_type == 'outbound'">PAYMENT VOUCHER</t>
+                                    <t t-elif="doc.payment_type == 'inbound'">RECEIPT VOUCHER</t>
+                                    <t t-else="">PAYMENT VOUCHER</t>
+                                </h2>
                             </div>
-                        </div>
-                        
-                        <!-- Voucher Details in Two Columns -->
-                        <div class="row" style="border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; background-color: #f8f9fa;">
-                            <div class="col-6">
-                                <table class="table-sm" style="width: 100%; font-size: 10px;">
-                                    <tr><td style="width: 35%;"><b>Voucher No:</b></td><td><span t-field="doc.voucher_number"/></td></tr>
-                                    <tr><td><b>Date:</b></td><td><span t-field="doc.date" t-options="{'widget': 'date'}"/></td></tr>
-                                    <tr><td><b>Method:</b></td><td><span t-field="doc.payment_method_line_id.name"/></td></tr>
-                                </table>
-                            </div>
-                            <div class="col-6">
-                                <table class="table-sm" style="width: 100%; font-size: 10px;">
-                                    <tr><td style="width: 30%;"><b>Ref:</b></td><td><span t-field="doc.ref"/></td></tr>
-                                    <tr t-if="doc.authorization_code"><td><b>Auth:</b></td><td><span t-field="doc.authorization_code"/></td></tr>
-                                    <tr><td><b>Status:</b></td>
+                            <div class="o_payment_voucher_details">
+                                <table class="o_payment_voucher_table">
+                                    <tr>
+                                        <th>Issued To</th>
+                                        <td><span t-field="doc.partner_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Voucher Number</th>
+                                        <td><span t-field="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <td><span t-field="doc.date" t-options="{'widget': 'date', 'format': 'dd MMMM yyyy'}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Address</th>
                                         <td>
-                                            <span t-if="doc.state == 'draft'" style="background: #6c757d; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">Draft</span>
-                                            <span t-if="doc.state == 'posted'" style="background: #28a745; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">Posted</span>
-                                            <span t-if="doc.state == 'cancelled'" style="background: #dc3545; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">Cancelled</span>
+                                            <t t-if="doc.partner_id.street or doc.partner_id.city">
+                                                <t t-if="doc.partner_id.street"><span t-field="doc.partner_id.street"/></t>
+                                                <t t-if="doc.partner_id.city">
+                                                    <t t-if="doc.partner_id.street">, </t>
+                                                    <span t-field="doc.partner_id.city"/>
+                                                </t>
+                                            </t>
+                                            <t t-else="">-</t>
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone</th>
+                                        <td>
+                                            <t t-if="doc.partner_id.phone">
+                                                <span t-field="doc.partner_id.phone"/>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Bank Details</th>
+                                        <td>
+                                            <t t-if="doc.partner_bank_id">
+                                                <span t-field="doc.partner_bank_id.acc_number"/>
+                                                <t t-if="doc.partner_bank_id.acc_holder_name">
+                                                    (<span t-field="doc.partner_bank_id.acc_holder_name"/>)
+                                                </t>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Payment Method</th>
+                                        <td><span t-field="doc.journal_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="doc.ref">
+                                        <th>Reference</th>
+                                        <td><span t-field="doc.ref"/></td>
                                     </tr>
                                 </table>
                             </div>
-                        </div>
-                        
-                        <!-- Partner Info (Compact) -->
-                        <div class="row mb-2" t-if="not doc.is_internal_transfer">
-                            <div class="col-12">
-                                <div style="border: 1px solid #ddd; padding: 6px; font-size: 10px;">
-                                    <b>
-                                        <span t-if="doc.payment_type == 'outbound'">Pay To: </span>
-                                        <span t-if="doc.payment_type == 'inbound'">Received From: </span>
-                                    </b>
-                                    <span t-field="doc.partner_id.name" style="font-weight: bold;"/>
-                                    <span t-if="doc.partner_id.street"> | <span t-field="doc.partner_id.street"/></span>
-                                    <span t-if="doc.partner_id.phone"> | Tel: <span t-field="doc.partner_id.phone"/></span>
+                            <div class="o_payment_voucher_amount">
+                                <strong>TOTAL AMOUNT:</strong> <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </div>
+                            <div class="o_payment_voucher_signatures">
+                                <div class="o_payment_voucher_signature_box">
+                                    <div class="o_payment_voucher_signature_label">INITIATED BY</div>
+                                    <div><span t-field="doc.create_uid.name"/></div>
+                                    <div class="o_payment_voucher_signature_date"><span t-field="doc.create_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/></div>
+                                </div>
+                                <div class="o_payment_voucher_signature_box">
+                                    <div class="o_payment_voucher_signature_label">APPROVED BY</div>
+                                    <t t-if="doc.state == 'posted'">
+                                        <div>
+                                            <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by">
+                                                <span t-field="doc.authorized_by"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="doc.write_uid.name"/>
+                                            </t>
+                                        </div>
+                                        <div class="o_payment_voucher_signature_date"><span t-field="doc.write_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/></div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="o_payment_voucher_pending">Pending Approval</div>
+                                    </t>
+                                </div>
+                                <div class="o_payment_voucher_signature_box o_payment_voucher_signature_manual">
+                                    <div class="o_payment_voucher_signature_label">RECEIVED BY</div>
+                                    <div class="o_payment_voucher_signature_line"></div>
+                                    <div class="o_payment_voucher_signature_sublabel">SIGNATURE</div>
+                                    <div class="o_payment_voucher_signature_line"></div>
+                                    <div class="o_payment_voucher_signature_sublabel">FULL NAME</div>
+                                    <div class="o_payment_voucher_signature_row">
+                                        <div>
+                                            <div class="o_payment_voucher_signature_line"></div>
+                                            <div class="o_payment_voucher_signature_sublabel">DATE</div>
+                                        </div>
+                                        <div>
+                                            <div class="o_payment_voucher_signature_line"></div>
+                                            <div class="o_payment_voucher_signature_sublabel">MOBILE NUMBER</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_payment_voucher_footer">
+                                <div>
+                                    <span>Thank you for your business</span> •
+                                    For payment confirmation, please contact:
+                                    <t t-if="doc.company_id.phone">
+                                        <span t-field="doc.company_id.phone"/>
+                                    </t>
+                                    <t t-else="">our office</t>
+                                </div>
+                                <div class="o_payment_voucher_footer_note">
+                                    This is a computer-generated document. No physical signature or stamp required for system verification.
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Payment Details Table -->
-                        <table class="table table-bordered table-sm" style="margin-bottom: 8px;">
-                            <thead style="background-color: #343a40; color: white; font-size: 10px;">
-                                <tr>
-                                    <th style="padding: 4px;">Description</th>
-                                    <th style="padding: 4px; text-align: right; width: 25%;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody style="font-size: 10px;">
-                                <tr>
-                                    <td style="padding: 4px;">
-                                        <span t-if="doc.payment_description" t-field="doc.payment_description"/>
-                                        <span t-else="">
-                                            <span t-if="doc.payment_type == 'outbound'">Payment</span>
-                                            <span t-if="doc.payment_type == 'inbound'">Receipt</span>
-                                            <span t-if="doc.partner_id and not doc.is_internal_transfer"> - <span t-field="doc.partner_id.name"/></span>
-                                            <span t-if="doc.is_internal_transfer"> - Internal Transfer</span>
-                                        </span>
-                                    </td>
-                                    <td style="padding: 4px; text-align: right; font-weight: bold;">
-                                        <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot style="background-color: #f8f9fa; font-weight: bold; font-size: 11px;">
-                                <tr>
-                                    <th style="padding: 4px;">TOTAL AMOUNT</th>
-                                    <th style="padding: 4px; text-align: right;">
-                                        <span t-field="doc.amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        
-                        <!-- Additional Info in Columns -->
-                        <div class="row" style="font-size: 10px;">
-                            <div class="col-6">
-                                <table class="table-sm" style="width: 100%;">
-                                    <tr><td style="width: 30%;"><b>Journal:</b></td><td><span t-field="doc.journal_id.name"/></td></tr>
-                                    <tr t-if="doc.destination_account_id"><td><b>Account:</b></td><td><span t-field="doc.destination_account_id.code"/> - <span t-field="doc.destination_account_id.name"/></td></tr>
-                                    <tr t-if="doc.partner_bank_id"><td><b>Bank:</b></td><td><span t-field="doc.partner_bank_id.acc_number"/></td></tr>
-                                </table>
-                            </div>
-                            <div class="col-6">
-                                <table class="table-sm" style="width: 100%;">
-                                    <tr t-if="doc.received_by"><td style="width: 30%;"><b>Received By:</b></td><td><span t-field="doc.received_by"/></td></tr>
-                                    <tr t-if="doc.received_by"><td><b>Signature:</b></td><td>____________________</td></tr>
-                                    <tr t-if="not doc.received_by"><td><b>Prepared By:</b></td><td><span t-esc="user.name"/></td></tr>
-                                    <tr><td><b>Print Time:</b></td><td><span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M')"/></td></tr>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Footer -->
-                        <div style="margin-top: 10px; text-align: center; border-top: 1px solid #ddd; padding-top: 5px;">
-                            <small class="text-muted" style="font-size: 9px;">
-                                This is a computer generated voucher. No signature required.
-                                <span t-if="doc.company_id.website"> | <span t-field="doc.company_id.website"/></span>
-                            </small>
-                        </div>
->>>>>>> df3776f23c70d8392ffc74b64a8b82cb92048c30
-                    </div>
+                    </t>
                 </t>
             </t>
         </template>
