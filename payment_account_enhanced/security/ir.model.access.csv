@@ -1,2 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+<<<<<<< HEAD
 access_account_payment_enhanced_user,account.payment.enhanced.user,account.model_account_payment,base.group_user,1,1,1,1
+=======
+access_account_payment_user,account.payment.user,account.model_account_payment,base.group_user,1,1,1,0
+access_account_payment_manager,account.payment.manager,account.model_account_payment,account.group_account_manager,1,1,1,1
+>>>>>>> df3776f23c70d8392ffc74b64a8b82cb92048c30

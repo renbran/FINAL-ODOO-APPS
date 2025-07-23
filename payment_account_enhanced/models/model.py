@@ -12,16 +12,25 @@ class AccountPayment(models.Model):
         help="Account where the payment will be posted"
     )
     
+<<<<<<< HEAD
     # Override the name field to have a better label for voucher context
     name = fields.Char(
         string='Number',
         readonly=True,
         copy=False,
         help="Payment reference number"
+=======
+    voucher_number = fields.Char(
+        string='Voucher Number',
+        readonly=True,
+        copy=False,
+        help="Unique voucher number for this payment"
+>>>>>>> df3776f23c70d8392ffc74b64a8b82cb92048c30
     )
     
     received_by = fields.Char(
         string='Received By',
+<<<<<<< HEAD
         help="Person who received the payment (manually filled)"
     )
     
@@ -73,10 +82,31 @@ class AccountPayment(models.Model):
     @api.model
     def create(self, vals):
         # The standard name field will be handled by the parent class
+=======
+        help="Person who received the payment"
+    )
+    
+    payment_description = fields.Text(
+        string='Payment Description',
+        help="Detailed description of the payment"
+    )
+    
+    authorization_code = fields.Char(
+        string='Authorization Code',
+        help="Authorization code for the payment"
+    )
+    
+    @api.model
+    def create(self, vals):
+        # Generate voucher number
+        if not vals.get('voucher_number'):
+            vals['voucher_number'] = self.env['ir.sequence'].next_by_code('payment.voucher') or _('New')
+>>>>>>> df3776f23c70d8392ffc74b64a8b82cb92048c30
         return super(AccountPayment, self).create(vals)
     
     def action_print_voucher(self):
         """Print payment voucher"""
+<<<<<<< HEAD
         return self.env.ref('payment_account_enhanced.action_report_payment_voucher').report_action(self)
     
     def write(self, vals):
@@ -85,6 +115,9 @@ class AccountPayment(models.Model):
         if vals.get('state') == 'posted' and not self.actual_approver_id:
             vals['actual_approver_id'] = self.env.user.id
         return super(AccountPayment, self).write(vals)
+=======
+        return self.env.ref('payment_voucher_enhanced.action_report_payment_voucher').report_action(self)
+>>>>>>> df3776f23c70d8392ffc74b64a8b82cb92048c30
     
     @api.onchange('journal_id')
     def _onchange_journal_id_destination_account(self):
