@@ -16,12 +16,12 @@
                             type="object" 
                             class="btn-primary"
                             icon="fa-print"
-                            attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            invisible="{'invisible': [('state', '=', 'draft')]}"/>
                     <button name="action_validate_and_post" 
                             string="Validate &amp; Post" 
                             type="object" 
                             class="btn-success"
-                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            invisible="{'invisible': [('state', '!=', 'draft')]}"/>
                 </xpath>
                 
                 <!-- Enhanced Information Section -->
@@ -35,18 +35,18 @@
                 <xpath expr="//field[@name='currency_id']" position="after">
                     <field name="authorized_by" 
                            readonly="1" 
-                           attrs="{'invisible': [('state', '!=', 'posted')]}"
+                           invisible="{'invisible': [('state', '!=', 'posted')]}"
                            string="Authorized By"/>
                     <field name="actual_approver_id" 
                            readonly="1" 
-                           attrs="{'invisible': [('state', '!=', 'posted')]}"
+                           invisible="{'invisible': [('state', '!=', 'posted')]}"
                            string="Approved By"/>
                 </xpath>
                 
                 <!-- Destination Account Field -->
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="destination_account_id" 
-                           attrs="{'required': [('state', '=', 'draft')], 'readonly': [('state', '!=', 'draft')]}"
+                           invisible="{'required': [('state', '=', 'draft')], 'readonly': [('state', '!=', 'draft')]}"
                            domain="[('company_id', '=', company_id)]"/>
                 </xpath>
                 
