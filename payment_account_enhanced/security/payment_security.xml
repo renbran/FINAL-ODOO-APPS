@@ -5,13 +5,13 @@
         <!-- Enhanced Payment Security Groups -->
         <record id="group_payment_voucher_manager" model="res.groups">
             <field name="name">Payment Voucher Manager</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Can approve high-value payments and manage voucher settings</field>
         </record>
         
         <record id="group_payment_voucher_user" model="res.groups">
             <field name="name">Payment Voucher User</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Can create and view payment vouchers</field>
         </record>
         
