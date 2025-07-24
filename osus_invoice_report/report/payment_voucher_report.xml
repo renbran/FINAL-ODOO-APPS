@@ -8,10 +8,11 @@
                         <!-- Custom CSS for the voucher -->
                         <style>
                             .voucher-header {
-                                background: linear-gradient(135deg, #8B4A6B, #A0566F);
+                                background: linear-gradient(135deg, #6B2B47, #8B1538);
                                 color: white;
                                 padding: 15px;
                                 margin: -15px -15px 20px -15px;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                             }
                             .voucher-title {
                                 text-align: center;
@@ -19,6 +20,7 @@
                                 font-weight: bold;
                                 letter-spacing: 2px;
                                 margin-bottom: 0;
+                                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
                             }
                             .voucher-subtitle {
                                 text-align: center;
@@ -26,29 +28,36 @@
                                 margin: 5px 0 0 0;
                             }
                             .company-info {
-                                font-size: 12px;
-                                line-height: 1.2;
+                                font-size: 13px;
+                                line-height: 1.3;
+                                font-weight: 500;
+                                text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
                             }
                             .field-label {
-                                color: #8B4A6B;
+                                color: #6b0632ff;
                                 font-weight: bold;
                                 font-size: 14px;
                                 margin-bottom: 5px;
                             }
                             .field-value {
-                                border-bottom: 1px solid #ccc;
-                                padding-bottom: 2px;
+                                border-bottom: 2px solid #333;
+                                padding-bottom: 3px;
                                 margin-bottom: 15px;
                                 min-height: 20px;
+                                color: #000;
+                                font-weight: 500;
+                                font-size: 13px;
                             }
                             .amount-section {
-                                background: linear-gradient(135deg, #D4AF37, #B8941F);
+                                background: linear-gradient(135deg, #b19024ff, #8B6F00);
                                 color: white;
                                 padding: 15px;
                                 text-align: center;
                                 margin: 20px 0;
                                 font-size: 18px;
                                 font-weight: bold;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.81);
+                                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.76);
                             }
                             .signature-section {
                                 margin-top: 40px;
@@ -59,23 +68,32 @@
                                 margin-bottom: 10px;
                             }
                             .signature-line {
-                                border-bottom: 1px solid #000;
+                                border-bottom: 2px solid #000;
                                 margin-bottom: 5px;
                                 height: 30px;
                             }
                             .footer-note {
-                                background: #8B4A6B;
+                                background: linear-gradient(135deg, #6B2B47, #8B1538);
                                 color: white;
                                 text-align: center;
-                                padding: 10px;
-                                font-size: 12px;
+                                padding: 12px;
+                                font-size: 13px;
+                                font-weight: 500;
                                 margin: 20px -15px -15px -15px;
+                                box-shadow: 0 -2px 4px rgba(0,0,0,0.3);
+                                text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
                             }
                             .creator-info {
-                                font-size: 11px;
-                                color: #666;
+                                font-size: 12px;
+                                color: #333;
                                 margin-top: 5px;
                                 font-style: italic;
+                                font-weight: 500;
+                            }
+                            .authorized-name {
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #000;
                             }
                         </style>
 
@@ -180,7 +198,7 @@
                                         <div class="signature-line"></div>
                                         <strong>Authorized:</strong>
                                         <br/>
-                                        <div style="margin-top: 8px; font-size: 12px;">
+                                        <div class="authorized-name" style="margin-top: 8px;">
                                             <span t-field="o.create_uid.name"/>
                                         </div>
                                         <div class="creator-info">
