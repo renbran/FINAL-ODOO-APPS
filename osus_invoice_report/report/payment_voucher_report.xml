@@ -95,6 +95,26 @@
                                 font-weight: bold;
                                 color: #000;
                             }
+                            .signature-initials {
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #6B2B47;
+                                font-style: italic;
+                                margin-top: 10px;
+                                margin-bottom: 5px;
+                                letter-spacing: 1px;
+                                max-height: 60px;
+                                overflow: hidden;
+                            }
+                            .user-signature {
+                                font-family: cursive, 'Brush Script MT', fantasy;
+                                font-size: 16px;
+                                color: #6B2B47;
+                                margin-top: 5px;
+                                margin-bottom: 5px;
+                                max-height: 50px;
+                                overflow: hidden;
+                            }
                         </style>
 
                         <!-- Header Section -->
@@ -195,6 +215,25 @@
                             <div class="row">
                                 <div class="col-6">
                                     <div class="signature-box">
+                                        <!-- User's actual signature or initials -->
+                                        <t t-if="o.create_uid.signature">
+                                            <div class="user-signature">
+                                                <span t-field="o.create_uid.signature" t-options='{"widget": "html"}'/>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="signature-initials">
+                                                <t t-set="creator_name" t-value="o.create_uid.name or ''"/>
+                                                <t t-set="name_parts" t-value="creator_name.split()"/>
+                                                <t t-if="len(name_parts) >= 2">
+                                                    <span t-esc="name_parts[0][:1] + name_parts[-1][:1]"/>
+                                                </t>
+                                                <t t-elif="len(name_parts) == 1 and name_parts[0]">
+                                                    <span t-esc="name_parts[0][:2]"/>
+                                                </t>
+                                                <t t-else="">--</t>
+                                            </div>
+                                        </t>
                                         <div class="signature-line"></div>
                                         <strong>Authorized:</strong>
                                         <br/>
