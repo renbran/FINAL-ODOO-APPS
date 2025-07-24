@@ -1,0 +1,251 @@
+<template id="report_kyc_form_fixed">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout">
+                <div class="page kyc-form">
+
+                    <style>
+                        .kyc-form {
+                            font-family: Arial, sans-serif;
+                            font-size: 15px;
+                            line-height: 1.7;
+                            color: #000;
+                        }
+                        .kyc-header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                        .kyc-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            letter-spacing: 1px;
+                        }
+                        .kyc-subtitle {
+                            font-size: 18px;
+                            margin: 6px 0;
+                        }
+                        .kyc-confidential {
+                            font-size: 14px;
+                            color: #555;
+                        }
+                        .section-title {
+                            background-color: #f3f3f3;
+                            padding: 8px 10px;
+                            font-weight: bold;
+                            font-size: 16px;
+                            margin: 28px 0 16px 0;
+                        }
+                        table.info-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 18px;
+                        }
+                        table.info-table td {
+                            padding: 7px 0;
+                            vertical-align: bottom;
+                        }
+                        .form-value {
+                            font-family: "Courier New", Courier, monospace;
+                            border-bottom: 1px solid #000;
+                            display: inline-block;
+                            min-width: 220px;
+                            padding: 0 6px 0 4px;
+                        }
+                        .full-width {
+                            width: 100%;
+                        }
+                        .checkbox-group {
+                            margin: 18px 0;
+                        }
+                        .checkbox-item {
+                            display: inline-block;
+                            margin-right: 26px;
+                            margin-bottom: 8px;
+                            font-size: 15px;
+                        }
+                        .notes {
+                            font-size: 12px;
+                            line-height: 1.5;
+                            margin: 30px 0 20px 0;
+                        }
+                        .declaration {
+                            font-size: 13px;
+                            line-height: 1.5;
+                            margin-top: 30px;
+                        }
+                        .signature-section {
+                            margin-top: 50px;
+                        }
+                        .signature-box {
+                            display: inline-block;
+                            width: 220px;
+                            border-bottom: 1px solid #000;
+                            margin-top: 34px;
+                            height: 0;
+                        }
+                    </style>
+
+                    <!-- Header -->
+                    <div class="kyc-header">
+                        <div class="kyc-title">KYC FORM</div>
+                        <div class="kyc-subtitle">PROPERTY PURCHASE (INDIVIDUAL)</div>
+                        <div class="kyc-confidential">STRICTLY CONFIDENTIAL</div>
+                    </div>
+
+                    <!-- NAME OF PURCHASER -->
+                    <div class="section-title">NAME OF PURCHASER</div>
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 20%;">Full name</td>
+                            <td><span class="form-value full-width"><t t-esc="o.name or ''"/></span></td>
+                        </tr>
+                        <tr>
+                            <td>Aliases (if any)</td>
+                            <td><span class="form-value full-width">_____________________________</span></td>
+                        </tr>
+                        <tr>
+                            <td>Current Residential Address</td>
+                            <td>
+                                <span class="form-value full-width">
+                                    <t t-esc="o.street or ''"/> <t t-esc="o.street2 or ''"/>
+                                    <t t-esc="o.city or ''"/> <t t-esc="o.state_id.name or ''"/>
+                                    <t t-esc="o.country_id.name or ''"/>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 33%;">Email Address: <span class="form-value"><t t-esc="o.email or ''"/></span></td>
+                            <td style="width: 33%;">Telephone No.: <span class="form-value"><t t-esc="o.phone or ''"/></span></td>
+                            <td style="width: 34%;">Mobile No.: <span class="form-value"><t t-esc="o.mobile or ''"/></span></td>
+                        </tr>
+                    </table>
+
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 33%;">Date of Birth (dd/mm/yyyy): <span class="form-value">___/___/_______</span></td>
+                            <td style="width: 33%;">Place of Birth: <span class="form-value">__________________</span></td>
+                            <td style="width: 34%;">Gender: ☐ Female ☐ Male</td>
+                        </tr>
+                    </table>
+
+                    <!-- CITIZENSHIP -->
+                    <div class="section-title">CITIZENSHIP</div>
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 33%;">Nationality: <span class="form-value"><t t-esc="o.country_id.name or ''"/></span></td>
+                            <td style="width: 33%;">Passport No.: <span class="form-value">__________________</span></td>
+                            <td style="width: 34%;">Country of Issue: <span class="form-value">__________________</span></td>
+                        </tr>
+                        <tr>
+                            <td>Issue Date (dd/mm/yyyy): <span class="form-value">___/___/_______</span></td>
+                            <td colspan="2">Expiry Date (dd/mm/yyyy): <span class="form-value">___/___/_______</span></td>
+                        </tr>
+                    </table>
+
+                    <!-- SOURCE OF FUNDS -->
+                    <div class="section-title">SOURCE OF FUNDS (Please check all that apply)</div>
+                    <div class="checkbox-group">
+                        <span class="checkbox-item">☐ Employment Income</span>
+                        <span class="checkbox-item">☐ Sale of Investment or Properties</span>
+                        <span class="checkbox-item">☐ Business Income</span>
+                        <span class="checkbox-item">☐ Savings</span>
+                        <span class="checkbox-item">☐ Other: <span class="form-value" style="min-width:160px"/></span>
+                    </div>
+
+                    <!-- UAE RESIDENCY -->
+                    <div class="section-title">UAE RESIDENCY (if applicable)</div>
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 33%;">Residency Visa No.: <span class="form-value">__________________</span></td>
+                            <td style="width: 33%;">Emirates ID No.: <span class="form-value">__________________</span></td>
+                            <td style="width: 34%;">Expiry Date (dd/mm/yyyy): <span class="form-value">___/___/_______</span></td>
+                        </tr>
+                    </table>
+
+                    <!-- EMPLOYMENT -->
+                    <div class="section-title">EMPLOYMENT</div>
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 33%;">Occupation: <span class="form-value"><t t-esc="o.function or ''"/></span></td>
+                            <td style="width: 67%;">Years in Present Role: <span class="form-value">____</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Employer / Establishment Name: <span class="form-value full-width"><t t-esc="o.parent_id.name if o.parent_id else ''"/></span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Employer / Establishment Address: <span class="form-value full-width">_____________________________</span></td>
+                        </tr>
+                    </table>
+
+                    <!-- SOURCE OF WEALTH -->
+                    <div class="section-title">SOURCE OF WEALTH (Please check all that apply)</div>
+                    <div class="checkbox-group">
+                        <span class="checkbox-item">☐ Employment Income</span>
+                        <span class="checkbox-item">☐ Sale of Investment or Properties</span>
+                        <span class="checkbox-item">☐ Business Income</span>
+                        <span class="checkbox-item">☐ Savings</span>
+                        <span class="checkbox-item">☐ Inheritance</span>
+                        <span class="checkbox-item">☐ Other: <span class="form-value" style="min-width:160px"/></span>
+                    </div>
+
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 50%;">Annual Income: <span class="form-value">__________________</span></td>
+                            <td/>
+                        </tr>
+                    </table>
+
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 50%;">
+                                Purpose of Purchase:
+                                ☐ End Use ☐ Savings ☐ Other: <span class="form-value" style="min-width:120px"/>
+                            </td>
+                            <td/>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                Payment Method:
+                                ☐ Cash ☐ Cheque ☐ Bank Transfer ☐ Mortgage ☐ Crypto ☐ Other: <span class="form-value" style="min-width:120px"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="form-row" style="margin-top:18px;">
+                        Are you current / former Politically Exposed Person?
+                        ☐ Yes ☐ No ☐ Other: <span class="form-value" style="min-width:120px"/>
+                    </div>
+
+                    <!-- NOTES -->
+                    <div class="notes">
+                        <strong>Note:</strong><br/>
+                        1. If the Property / Unit is owned in joint names each names customer must complete a separate form.<br/>
+                        2. If the Property / Unit is owned by a company/legal entity, each Ultimate Beneficial Owner (i.e. any individual who owns 25% or more of the ultimate holding company) must complete separate form. Also, a separate checklist will be issued for the legal owner of the Property / Unit.<br/>
+                        3. If a person is acting on behalf of the owner, a separate form must be completed.<br/>
+                        4. Following the initial checks, we may be required to ask further documentation.
+                    </div>
+
+                    <!-- DECLARATION -->
+                    <div class="declaration">
+                        <strong>Declaration:</strong><br/>
+                        I hereby certify that the information in this KYC Form is true to the best of my knowledge, information and belief, and I agree to promptly notify OSUS REAL ESTATE of any material changes to the information contained in this form.
+                    </div>
+
+                    <!-- SIGNATURE -->
+                    <div class="signature-section">
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="width:33%;">Signature: <div class="signature-box"/></td>
+                                <td style="width:33%;">Date: <div class="signature-box"/></td>
+                                <td style="width:34%;">Signed at: <div class="signature-box"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>  <!-- web.external_layout -->
+        </t>      <!-- t-foreach -->
+    </t>          <!-- web.html_container -->
+</template>
