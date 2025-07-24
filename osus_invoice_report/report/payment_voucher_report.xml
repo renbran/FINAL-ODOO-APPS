@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_payment_voucher_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Custom CSS for the voucher -->
+                        <style>
+                            .voucher-header {
+                                background: linear-gradient(135deg, #8B4A6B, #A0566F);
+                                color: white;
+                                padding: 15px;
+                                margin: -15px -15px 20px -15px;
+                            }
+                            .voucher-title {
+                                text-align: center;
+                                font-size: 28px;
+                                font-weight: bold;
+                                letter-spacing: 2px;
+                                margin-bottom: 0;
+                            }
+                            .voucher-subtitle {
+                                text-align: center;
+                                font-size: 16px;
+                                margin: 5px 0 0 0;
+                            }
+                            .company-info {
+                                font-size: 12px;
+                                line-height: 1.2;
+                            }
+                            .field-label {
+                                color: #8B4A6B;
+                                font-weight: bold;
+                                font-size: 14px;
+                                margin-bottom: 5px;
+                            }
+                            .field-value {
+                                border-bottom: 1px solid #ccc;
+                                padding-bottom: 2px;
+                                margin-bottom: 15px;
+                                min-height: 20px;
+                            }
+                            .amount-section {
+                                background: linear-gradient(135deg, #D4AF37, #B8941F);
+                                color: white;
+                                padding: 15px;
+                                text-align: center;
+                                margin: 20px 0;
+                                font-size: 18px;
+                                font-weight: bold;
+                            }
+                            .signature-section {
+                                margin-top: 40px;
+                            }
+                            .signature-box {
+                                text-align: center;
+                                padding: 10px;
+                                margin-bottom: 10px;
+                            }
+                            .signature-line {
+                                border-bottom: 1px solid #000;
+                                margin-bottom: 5px;
+                                height: 30px;
+                            }
+                            .footer-note {
+                                background: #8B4A6B;
+                                color: white;
+                                text-align: center;
+                                padding: 10px;
+                                font-size: 12px;
+                                margin: 20px -15px -15px -15px;
+                            }
+                        </style>
+
+                        <!-- Header Section -->
+                        <div class="voucher-header">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="company-info">
+                                        <strong>OSUS REAL ESTATE BROKERAGE LLC</strong><br/>
+                                        Single Tower<br/>
+                                        Business Bay<br/>
+                                        29th Floor<br/>
+                                        Dubai<br/>
+                                        United Arab Emirates
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h2 class="voucher-title">
+                                        <t t-if="o.payment_type == 'inbound'">Receipt</t>
+                                        <t t-else="">Voucher</t>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-6">
+                                <!-- Issue To Section -->
+                                <div class="field-label">Issue to:</div>
+                                <div class="field-value">
+                                    <span t-field="o.partner_id.name"/>
+                                </div>
+
+                                <!-- Phone Section -->
+                                <div class="field-label">Phone</div>
+                                <div class="field-value">
+                                    <span t-field="o.partner_id.mobile"/>
+                                    <t t-if="not o.partner_id.mobile">-</t>
+                                </div>
+
+                                <!-- Payment Method Section -->
+                                <div class="field-label">Payment Method</div>
+                                <div class="field-value">
+                                    <span t-field="o.journal_id.name"/>
+                                </div>
+
+                                <!-- Related Invoice Section -->
+                                <div class="field-label">Related invoice</div>
+                                <div class="field-value">
+                                    <t t-if="o.reconciled_invoice_ids">
+                                        <t t-foreach="o.reconciled_invoice_ids" t-as="inv">
+                                            <span t-field="inv.name"/>
+                                            <t t-if="not inv_last">, </t>
+                                        </t>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-6">
+                                <!-- Date Section -->
+                                <div class="field-label">Date:</div>
+                                <div class="field-value">
+                                    <span t-field="o.date" t-options='{"widget": "date"}'/>
+                                </div>
+
+                                <!-- Remarks Section -->
+                                <div class="field-label">Remarks</div>
+                                <div class="field-value" style="min-height: 60px;">
+                                    <span t-field="o.ref"/>
+                                    <t t-if="not o.ref">-</t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount in Words Section -->
+                        <div class="field-label">Amount in words</div>
+                        <div class="field-value" style="min-height: 30px;">
+                            <span t-esc="o._get_amount_in_words()"/>
+                        </div>
+
+                        <!-- Total Price Section -->
+                        <div class="amount-section">
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Total Price:</strong>
+                                </div>
+                                <div class="col-6">
+                                    <span t-field="o.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div class="signature-section">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="signature-box">
+                                        <div class="signature-line"></div>
+                                        <strong>Authorized :</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="signature-box">
+                                        <div class="signature-line"></div>
+                                        <strong>
+                                            <t t-if="o.payment_type == 'inbound'">Received by</t>
+                                            <t t-else="">Paid to</t>
+                                        </strong>
+                                        <br/>
+                                        <div style="margin-top: 10px;">
+                                            <span style="display: inline-block; width: 50px;">name</span>
+                                            <span style="display: inline-block; width: 100px; border-bottom: 1px solid #000; margin: 0 20px;"></span>
+                                            <span>Mob #:</span>
+                                            <span style="display: inline-block; width: 100px; border-bottom: 1px solid #000; margin-left: 10px;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="footer-note">
+                            Thank you for your business • Confirm payment at 0563905772
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
