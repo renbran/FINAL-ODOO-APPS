@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import base64
 import qrcode
 from io import BytesIO
@@ -42,6 +42,75 @@ class AccountMove(models.Model):
         except ValueError as e:
             _logger.warning("Custom receipt report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(self)
+
+    @api.model
+    def action_bulk_print_invoices(self):
+        """
+        Print multiple invoices in bulk as a single PDF file.
+        Called from list view action.
+        """
+        active_ids = self.env.context.get('active_ids', [])
+        if not active_ids:
+            raise UserError(_("Please select at least one invoice to print."))
+        
+        invoices = self.browse(active_ids)
+        
+        # Filter only customer invoices
+        customer_invoices = invoices.filtered(lambda inv: inv.move_type == 'out_invoice')
+        if not customer_invoices:
+            raise UserError(_("Please select at least one customer invoice."))
+        
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_invoice_bulk').report_action(customer_invoices)
+        except ValueError as e:
+            _logger.warning("Custom bulk invoice report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(customer_invoices)
+
+    @api.model
+    def action_bulk_print_bills(self):
+        """
+        Print multiple bills in bulk as a single PDF file.
+        Called from list view action.
+        """
+        active_ids = self.env.context.get('active_ids', [])
+        if not active_ids:
+            raise UserError(_("Please select at least one bill to print."))
+        
+        bills = self.browse(active_ids)
+        
+        # Filter only vendor bills
+        vendor_bills = bills.filtered(lambda bill: bill.move_type == 'in_invoice')
+        if not vendor_bills:
+            raise UserError(_("Please select at least one vendor bill."))
+        
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_bill_bulk').report_action(vendor_bills)
+        except ValueError as e:
+            _logger.warning("Custom bulk bill report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(vendor_bills)
+
+    @api.model
+    def action_bulk_print_mixed(self):
+        """
+        Print multiple documents (invoices, bills, credit notes) in bulk as a single PDF file.
+        Called from list view action.
+        """
+        active_ids = self.env.context.get('active_ids', [])
+        if not active_ids:
+            raise UserError(_("Please select at least one document to print."))
+        
+        documents = self.browse(active_ids)
+        
+        # Filter only posted documents
+        posted_documents = documents.filtered(lambda doc: doc.state == 'posted')
+        if not posted_documents:
+            raise UserError(_("Please select at least one posted document."))
+        
+        try:
+            return self.env.ref('osus_invoice_report.action_report_osus_mixed_bulk').report_action(posted_documents)
+        except ValueError as e:
+            _logger.warning("Custom bulk mixed report not found: %s. Using standard report as fallback.", str(e))
+            return self.env.ref('account.account_invoices').report_action(posted_documents)
 
     # Deal Information Fields
     booking_date = fields.Date(string='Booking Date', help="Date when the property booking was confirmed")

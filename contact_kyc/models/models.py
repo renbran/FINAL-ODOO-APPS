@@ -72,6 +72,12 @@ class ResPartner(models.Model):
     )
 
     # Financial Information
+    x_currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        default=lambda self: self.env.company.currency_id,
+        help="Currency for financial amounts"
+    )
     x_source_of_funds = fields.Many2many(
         'kyc.source.funds',
         'partner_source_funds_rel',
@@ -90,7 +96,7 @@ class ResPartner(models.Model):
     )
     x_annual_income = fields.Monetary(
         string='Annual Income',
-        currency_field='currency_id',
+        currency_field='x_currency_id',
         help="Annual income amount"
     )
     x_purpose_of_purchase = fields.Selection([
