@@ -186,6 +186,9 @@
                                         <div class="creator-info">
                                             Created: <span t-field="o.create_date" t-options='{"widget": "datetime", "format": "dd/MM/yyyy HH:mm"}'/>
                                         </div>
+                                        <div class="creator-info">
+                                            Printed: <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M')"/>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-6">
