@@ -71,6 +71,12 @@
                                 font-size: 12px;
                                 margin: 20px -15px -15px -15px;
                             }
+                            .creator-info {
+                                font-size: 11px;
+                                color: #666;
+                                margin-top: 5px;
+                                font-style: italic;
+                            }
                         </style>
 
                         <!-- Header Section -->
@@ -172,7 +178,14 @@
                                 <div class="col-6">
                                     <div class="signature-box">
                                         <div class="signature-line"></div>
-                                        <strong>Authorized :</strong>
+                                        <strong>Authorized:</strong>
+                                        <br/>
+                                        <div style="margin-top: 8px; font-size: 12px;">
+                                            <span t-field="o.create_uid.name"/>
+                                        </div>
+                                        <div class="creator-info">
+                                            Created: <span t-field="o.create_date" t-options='{"widget": "datetime", "format": "dd/MM/yyyy HH:mm"}'/>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-6">
