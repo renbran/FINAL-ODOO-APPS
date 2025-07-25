@@ -2,10 +2,62 @@
 
 from odoo import models, fields, api
 from num2words import num2words
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class PaymentReportExtension(models.Model):
     _inherit = 'account.payment'
+    
+    # Override name field to ensure it's always visible and properly labeled
+    name = fields.Char(
+        string='Reference Number',
+        required=True,
+        readonly=False,
+        copy=False,
+        default='/',
+        help="Payment/Receipt reference number that will appear on the voucher"
+    )
+    
+    @api.model
+    def create(self, vals):
+        """Override create to ensure name field is always populated"""
+        # Ensure name field gets a value if not provided
+        if not vals.get('name') or vals.get('name') == '/':
+            if vals.get('payment_type') == 'inbound':
+                vals['name'] = self.env['ir.sequence'].next_by_code('receipt.voucher.reference') or '/'
+            else:
+                vals['name'] = self.env['ir.sequence'].next_by_code('payment.voucher.reference') or '/'
+        return super().create(vals)
+    
+    @api.model
+    def _fix_missing_payment_references(self):
+        """Fix payments that don't have proper reference numbers"""
+        _logger.info("Fixing missing payment reference numbers...")
+        
+        # Find payments with missing or default reference numbers
+        payments_to_fix = self.search([
+            '|',
+            ('name', '=', '/'),
+            ('name', '=', False)
+        ])
+        
+        for payment in payments_to_fix:
+            try:
+                if payment.payment_type == 'inbound':
+                    new_name = self.env['ir.sequence'].next_by_code('receipt.voucher.reference')
+                else:
+                    new_name = self.env['ir.sequence'].next_by_code('payment.voucher.reference')
+                
+                if new_name:
+                    payment.name = new_name
+                    _logger.info(f"Fixed payment {payment.id}: {new_name}")
+            except Exception as e:
+                _logger.error(f"Error fixing payment {payment.id}: {str(e)}")
+        
+        _logger.info(f"Fixed {len(payments_to_fix)} payment reference numbers")
+        return True
     
     def _get_amount_in_words(self):
         """Convert the amount to words"""

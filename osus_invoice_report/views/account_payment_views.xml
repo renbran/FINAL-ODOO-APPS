@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Account Payment Form View Enhancement -->
+    <!-- Account Payment Form View Enhancement - Simplified Approach -->
     <record id="view_account_payment_form_inherit_osus" model="ir.ui.view">
         <field name="name">account.payment.form.osus.voucher</field>
         <field name="model">account.payment</field>
@@ -16,52 +16,25 @@
                         icon="fa-print"/>
             </xpath>
             
-            <!-- Modify payment reference field to be always visible -->
-            <field name="partner_id" position="after">
+            <!-- Force name field to be always visible -->
+            <xpath expr="//field[@name='name']" position="replace">
                 <field name="name" 
                        string="Reference Number" 
+                       required="1"
                        readonly="0"
                        help="Payment/Receipt reference number that will appear on the voucher"/>
-                <field name="ref" 
-                       string="Payment Reference"
-                       placeholder="Enter payment reference or memo..."
-                       help="Additional reference information"/>
-            </field>
+            </xpath>
             
-            <!-- Add notebook with journal items after the main form content -->
+            <!-- Enhance ref field if it exists -->
+            <xpath expr="//field[@name='ref']" position="attributes">
+                <attribute name="string">Payment Memo</attribute>
+                <attribute name="placeholder">Enter additional payment reference or memo...</attribute>
+            </xpath>
+            
+            <!-- Add notebook for additional information -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
-                    <page string="Journal Items" name="journal_items">
-                        <field name="move_id" invisible="1"/>
-                        <field name="line_ids" 
-                               widget="one2many_list" 
-                               readonly="1" 
-                               context="{'default_move_id': move_id}">
-                            <tree string="Journal Items" 
-                                  editable="false" 
-                                  create="false" 
-                                  delete="false">
-                                <field name="date"/>
-                                <field name="account_id" options="{'no_create': True}"/>
-                                <field name="name"/>
-                                <field name="partner_id" options="{'no_create': True}"/>
-                                <field name="analytic_distribution" 
-                                       widget="analytic_distribution" 
-                                       groups="analytic.group_analytic_accounting"/>
-                                <field name="debit" sum="Total Debit"/>
-                                <field name="credit" sum="Total Credit"/>
-                                <field name="amount_currency" groups="base.group_multi_currency"/>
-                                <field name="currency_id" 
-                                       groups="base.group_multi_currency" 
-                                       options="{'no_create': True}"/>
-                                <field name="reconciled" invisible="1"/>
-                                <field name="company_id" invisible="1"/>
-                            </tree>
-                        </field>
-                    </page>
-                    
-                    <!-- Add Voucher Preview Tab -->
-                    <page string="Voucher Preview" name="voucher_preview">
+                    <page string="Voucher Details" name="voucher_details">
                         <group string="Voucher Information">
                             <group>
                                 <field name="name" string="Voucher Number" readonly="1"/>
@@ -95,35 +68,16 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_tree"/>
         <field name="arch" type="xml">
-            <!-- Make reference number always visible in tree view -->
-            <field name="name" position="attributes">
+            <!-- Ensure reference number is visible in tree view -->
+            <xpath expr="//field[@name='name']" position="attributes">
                 <attribute name="string">Reference Number</attribute>
                 <attribute name="optional">show</attribute>
-            </field>
+            </xpath>
             
-            <!-- Add voucher memo field after date -->
-            <field name="date" position="after">
+            <!-- Add payment memo after date if date exists -->
+            <xpath expr="//field[@name='date']" position="after">
                 <field name="ref" string="Payment Memo" optional="hide"/>
-            </field>
-        </field>
-    </record>
-
-    <!-- Account Payment Search View Enhancement -->
-    <record id="view_account_payment_search_inherit_osus" model="ir.ui.view">
-        <field name="name">account.payment.search.osus.voucher</field>
-        <field name="model">account.payment</field>
-        <field name="inherit_id" ref="account.view_account_payment_search"/>
-        <field name="arch" type="xml">
-            <!-- Add search by reference number -->
-            <field name="name" position="attributes">
-                <attribute name="string">Reference Number</attribute>
-                <attribute name="filter_domain">[('name', 'ilike', self)]</attribute>
-            </field>
-            
-            <!-- Add search by payment reference -->
-            <field name="name" position="after">
-                <field name="ref" string="Payment Reference"/>
-            </field>
+            </xpath>
         </field>
     </record>
 </odoo>

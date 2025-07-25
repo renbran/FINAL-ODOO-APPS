@@ -48,6 +48,7 @@
         
         # Data
         'data/report_paperformat.xml',
+        'data/payment_sequences.xml',
         
         # Views
         'views/account_move_views.xml',
