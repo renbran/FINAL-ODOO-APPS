@@ -172,6 +172,12 @@ class AccountMove(models.Model):
         tracking=True,
         help="The specific property unit in this deal"
     )
+    property_type_id = fields.Many2one(
+        'product.category',
+        string='Property Type',
+        tracking=True,
+        help="The type/category of the property (e.g., Villa, Apartment, Commercial)"
+    )
 
     # Computed fields for enhanced tree view
     is_property_deal = fields.Boolean(
