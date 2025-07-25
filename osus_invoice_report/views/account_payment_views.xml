@@ -16,15 +16,6 @@
                         icon="fa-print"/>
             </xpath>
             
-            <!-- Add destination account field after journal -->
-            <field name="journal_id" position="after">
-                <field name="destination_account_id" 
-                       string="Destination Account" 
-                       options="{'no_create': True, 'no_create_edit': True}" 
-                       invisible="state == 'posted'" 
-                       domain="[('account_type', 'in', ['asset_receivable', 'liability_payable', 'asset_cash', 'liability_credit_card'])]"/>
-            </field>
-            
             <!-- Modify payment reference field to be always visible -->
             <field name="partner_id" position="after">
                 <field name="name" 
