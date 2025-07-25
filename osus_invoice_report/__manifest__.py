@@ -53,6 +53,7 @@
         # Views
         'views/account_move_views.xml',
         'views/account_payment_views.xml',
+        'views/payment_fix_menu.xml',
         'views/sale_order_views.xml',
         'views/portal_templates.xml',
         'views/bulk_print_menus.xml',
