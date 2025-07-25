@@ -151,3 +151,16 @@ class PaymentReportExtension(models.Model):
                 return f"Receipt for {doc_info['count']} documents"
             else:
                 return f"Payment for {doc_info['count']} documents"
+
+    def action_print_voucher(self):
+        """
+        Print the payment voucher using the custom OSUS template.
+        This method is called from the 'Print Voucher' button.
+        """
+        self.ensure_one()
+        try:
+            return self.env.ref('osus_invoice_report.action_report_payment_voucher').report_action(self)
+        except ValueError as e:
+            # If custom report is not found, use a fallback or show error
+            from odoo.exceptions import UserError
+            raise UserError(f"Payment voucher report not found: {str(e)}")
