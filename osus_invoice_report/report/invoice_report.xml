@@ -12,20 +12,11 @@
                             <!-- QR Code and Vendor Details -->
                             <div class="row mb-2" style="margin-top: 10px; margin-bottom: 15px;">
                                 <div class="col-6">
-                                    <!-- QR Code Section -->
+                                    <!-- QR Code Section - Removed for bulk printing compatibility -->
                                     <div style="display: flex; align-items: flex-start;">
-                                        <t t-if="o.qr_in_report == True">
-                                            <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: white;">
-                                                <img t-att-src="'data:image/png;base64,' + o.qr_image.decode('utf-8')" 
-                                                     style="max-width: 90px; max-height: 90px; width: auto; height: auto;" 
-                                                     alt="QR Code" t-if="o.qr_image"/>
-                                            </div>
-                                        </t>
-                                        <t t-if="not o.qr_in_report or not o.qr_image">
-                                            <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                                <span style="color: #800020; font-weight: bold; font-size: 11px;">QR Code</span>
-                                            </div>
-                                        </t>
+                                        <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                            <span style="color: #800020; font-weight: bold; font-size: 11px;">INVOICE</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -68,7 +59,7 @@
                                 <div class="col-4 text-center">
                                     <div style="font-size: 14px;">
                                         <strong style="color: #800020;">Due Date:</strong> 
-                                        <span style="color: #000;" t-out="format_uk_date(o.invoice_date_due)"/>
+                                        <span style="color: #000;" t-out="format_uk_date(o.invoice_date_due or o.date)"/>
                                     </div>
                                 </div>
                                 <div class="col-4 text-end">

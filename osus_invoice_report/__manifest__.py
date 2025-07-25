@@ -1,10 +1,10 @@
 {
-    'name': 'OSUS Invoice Report - Enhanced with Bulk Printing',
-    'version': '17.0.2.0.0',
-    'summary': 'Professional UAE Tax Invoice Reports with Bulk Printing for Real Estate Commission',
+    'name': 'OSUS Invoice Report - Enhanced with Bulk Printing & Smart Payment Vouchers',
+    'version': '17.0.3.0.0',
+    'summary': 'Professional UAE Tax Invoice Reports with Bulk Printing & Intelligent Payment Vouchers',
     'description': '''
-        Professional Tax Invoice Reports with Bulk Printing
-        ==================================================
+        Professional Tax Invoice Reports with Advanced Features
+        =====================================================
         - UAE VAT compliant invoice layout
         - Real estate commission specific fields
         - UK date format support
@@ -13,8 +13,8 @@
         - Multi-company support
         - Inheritance-safe implementation
         
-        NEW: Bulk Printing Features
-        ===========================
+        Bulk Printing Features
+        =====================
         - Bulk print multiple customer invoices in single PDF
         - Bulk print multiple vendor bills in single PDF
         - Bulk print mixed documents (invoices, bills, credit notes)
@@ -23,6 +23,17 @@
         - Dedicated bulk print menu structure
         - Document count and total amount summaries
         - Error handling and validation
+        
+        NEW: Smart Payment Voucher Enhancements
+        =====================================
+        - Intelligent document type detection (bills vs invoices)
+        - Dynamic label generation ("Related bill" vs "Related invoice")
+        - Multiple document support with detailed tables
+        - Payment status indicators (full/partial payment)
+        - Remaining balance calculations
+        - Enhanced document reference formatting
+        - Professional summary sections
+        - Automatic reconciliation analysis
     ''',
     'category': 'Accounting/Accounting',
     'author': 'OSUS Real Estate',
@@ -40,6 +51,7 @@
         
         # Views
         'views/account_move_views.xml',
+        'views/account_payment_views.xml',
         'views/sale_order_views.xml',
         'views/portal_templates.xml',
         'views/bulk_print_menus.xml',
@@ -52,6 +64,7 @@
         'report/bill_report.xml',
         'report/payment_voucher_report.xml',
         'report/bulk_report.xml',
+        'report/simple_test_report.xml',
     ],
     'assets': {
         'web.assets_backend': [
