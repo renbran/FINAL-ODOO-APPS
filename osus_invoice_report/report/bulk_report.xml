@@ -238,13 +238,13 @@
                                     <span t-esc="format_number(o.amount_untaxed)"/> <span t-field="o.currency_id.name"/>
                                 </td>
                             </tr>
-                            <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+                            <t t-if="o.amount_tax > 0">
                                 <tr>
                                     <td style="padding: 5px 10px; font-weight: bold; color: #800020;">
-                                        <span t-esc="amount_by_group[0] if len(amount_by_group) > 0 else ''"/>:
+                                        Tax (5%):
                                     </td>
                                     <td style="padding: 5px 10px; text-align: right; font-weight: bold;">
-                                        <span t-esc="format_number(amount_by_group[1] if len(amount_by_group) > 1 else 0)"/> <span t-field="o.currency_id.name"/>
+                                        <span t-esc="format_number(o.amount_tax)"/> <span t-field="o.currency_id.name"/>
                                     </td>
                                 </tr>
                             </t>
