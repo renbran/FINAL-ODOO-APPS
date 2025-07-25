@@ -217,7 +217,9 @@
                                     <tbody>
                                         <t t-foreach="doc_info['documents']" t-as="doc">
                                             <tr>
-                                                <td style="padding: 6px; border: 1px solid #ddd;" t-esc="doc.name"/>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">
+                                                    <span t-esc="doc.name"/>
+                                                </td>
                                                 <td style="padding: 6px; border: 1px solid #ddd;">
                                                     <t t-if="doc.move_type == 'out_invoice'">Customer Invoice</t>
                                                     <t t-elif="doc.move_type == 'in_invoice'">Vendor Bill</t>

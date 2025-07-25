@@ -35,8 +35,12 @@
                             <tbody>
                                 <t t-foreach="docs" t-as="doc">
                                     <tr style="border-bottom: 1px solid #ddd;">
-                                        <td style="border: 1px solid #ddd; padding: 8px;" t-esc="doc.name"/>
-                                        <td style="border: 1px solid #ddd; padding: 8px;" t-esc="doc.partner_id.name"/>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">
+                                            <span t-esc="doc.name"/>
+                                        </td>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">
+                                            <span t-esc="doc.partner_id.name"/>
+                                        </td>
                                         <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
                                             <t t-esc="'{:,.2f}'.format(doc.amount_total)"/> <t t-esc="doc.currency_id.name"/>
                                         </td>
@@ -185,7 +189,9 @@
                                     <t t-if="o.invoice_payment_term_id">
                                         <tr>
                                             <td style="padding: 3px 10px; font-weight: bold; color: #800020;">Payment Terms:</td>
-                                            <td style="padding: 3px 0; font-weight: bold;" t-field="o.invoice_payment_term_id.name"/>
+                                            <td style="padding: 3px 0; font-weight: bold;">
+                                                <span t-field="o.invoice_payment_term_id.name"/>
+                                            </td>
                                         </tr>
                                     </t>
                                 </table>
@@ -206,8 +212,12 @@
                         <tbody>
                             <t t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="line">
                                 <tr>
-                                    <td style="border: 1px solid #ddd; padding: 8px;" t-field="line.name"/>
-                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;" t-field="line.quantity"/>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                                        <span t-field="line.quantity"/>
+                                    </td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
                                         <span t-esc="format_number(line.price_unit)"/>
                                     </td>
@@ -325,7 +335,9 @@
                             <tbody>
                                 <t t-foreach="docs" t-as="doc">
                                     <tr style="border-bottom: 1px solid #ddd;">
-                                        <td style="border: 1px solid #ddd; padding: 8px;" t-esc="doc.name"/>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">
+                                            <span t-esc="doc.name"/>
+                                        </td>
                                         <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                                             <t t-if="doc.move_type == 'out_invoice'">Invoice</t>
                                             <t t-elif="doc.move_type == 'in_invoice'">Bill</t>
@@ -333,7 +345,9 @@
                                             <t t-elif="doc.move_type == 'in_refund'">Vendor Credit</t>
                                             <t t-else=""><t t-esc="doc.move_type"/></t>
                                         </td>
-                                        <td style="border: 1px solid #ddd; padding: 8px;" t-esc="doc.partner_id.name"/>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">
+                                            <span t-esc="doc.partner_id.name"/>
+                                        </td>
                                         <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
                                             <t t-esc="'{:,.2f}'.format(doc.amount_total)"/> <t t-esc="doc.currency_id.name"/>
                                         </td>
