@@ -64,6 +64,7 @@
         'report/bill_report.xml',
         'report/payment_voucher_report.xml',
         'report/bulk_report.xml',
+        'report/simple_test_report.xml',
     ],
     'assets': {
         'web.assets_backend': [
