@@ -110,8 +110,8 @@
                 <attribute name="optional">show</attribute>
             </field>
             
-            <!-- Add voucher type indicator -->
-            <field name="payment_type" position="after">
+            <!-- Add voucher memo field after date -->
+            <field name="date" position="after">
                 <field name="ref" string="Payment Memo" optional="hide"/>
             </field>
         </field>
