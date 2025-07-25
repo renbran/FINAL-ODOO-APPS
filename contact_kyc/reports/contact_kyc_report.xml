@@ -118,7 +118,6 @@
                                             <span class="kyc-value"><t t-esc="o.x_place_of_birth or ''"/></span>
                                         </div>
                                     </div>
-                                    </div>
                                 </div>
 
                                 <!-- Citizenship -->
