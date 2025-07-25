@@ -135,6 +135,9 @@
                                         <t t-if="o.payment_type == 'inbound'">Receipt</t>
                                         <t t-else="">Voucher</t>
                                     </h2>
+                                    <div class="voucher-subtitle">
+                                        <strong>Reference: <span t-field="o.name"/></strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
