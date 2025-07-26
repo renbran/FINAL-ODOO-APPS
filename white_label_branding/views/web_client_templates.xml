@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Override web client bootstrap template -->
+    <template id="webclient_bootstrap_inherit" inherit_id="web.webclient_bootstrap">
+        <xpath expr="//title" position="replace">
+            <title t-esc="title or (request.env.company.white_label_name if request.env.company.replace_odoo_branding else 'Odoo')"/>
+        </xpath>
+        
+        <!-- Add company branding data to page -->
+        <xpath expr="//head" position="inside">
+            <meta name="company-name" t-att-content="request.env.company.white_label_name"/>
+            <meta name="replace-odoo-branding" t-att-content="'true' if request.env.company.replace_odoo_branding else 'false'"/>
+        </xpath>
+    </template>
+    
+    <!-- Override login page template -->
+    <template id="login_inherit" inherit_id="web.login">
+        <xpath expr="//div[hasclass('oe_single_form_footer')]" position="replace">
+            <div class="oe_single_form_footer">
+                <t t-if="request.env.company.replace_odoo_branding">
+                    Powered by <span t-esc="request.env.company.white_label_name or request.env.company.name"/>
+                </t>
+                <t t-else="">
+                    Powered by <a href="https://www.odoo.com" target="_blank">Odoo</a>
+                </t>
+            </div>
+        </xpath>
+    </template>
+    
+    <!-- Override database selector -->
+    <template id="database_selector_inherit" inherit_id="web.database_selector">
+        <xpath expr="//div[hasclass('list-group-item')]//small" position="replace">
+            <t t-if="request.env.company.replace_odoo_branding">
+                <small class="text-muted">
+                    Powered by <span t-esc="request.env.company.white_label_name or 'Your Company'"/>
+                </small>
+            </t>
+            <t t-else="">
+                <small class="text-muted">Powered by Odoo</small>
+            </t>
+        </xpath>
+    </template>
+    
+</odoo>
+                        </tr>
+                        <!-- CONTENT -->
+                        <tr>
+                            <td style="text-align: left;">
+                                <h2 style="color: #875A7B; margin: 0px;">Welcome to {{ object.company_id.white_label_name or object.company_id.name }}!</h2>
+                                <br/>
+                                <p>You have been invited to access your account.</p>
+                                <br/>
+                                <div style="margin: 16px 0px 16px 0px;">
+                                    <a t-attf-href="{{ object.signup_url }}" 
+                                       style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                        Accept Invitation
+                                    </a>
+                                </div>
+                                <br/>
+                                <p>If you have any questions, please contact us.</p>
+                                <br/>
+                                <p>Thank you,<br/>{{ object.company_id.white_label_name or object.company_id.name }} Team</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td></tr>
+            <!-- POWERED BY -->
+            <tr><td align="center" style="min-height: 16px; color: white; font-size: 10px;">
+                Powered by {{ object.company_id.white_label_name or object.company_id.name }}
+            </td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

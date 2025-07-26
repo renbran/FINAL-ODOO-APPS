@@ -1,0 +1,22 @@
+/* Hide Odoo branding elements */
+.o_main_navbar .o_menu_brand {
+    display: none !important;
+}
+
+/* Hide powered by in various locations */
+.oe_powered_by,
+.o_footer .o_footer_copyright a[href*="odoo.com"],
+.powered_by_odoo {
+    display: none !important;
+}
+
+/* Custom branding styles */
+.white_label_branding {
+    font-weight: bold;
+    color: #875A7B;
+}
+
+/* Hide database manager Odoo references */
+.database_block .list-group-item small {
+    display: none;
+}

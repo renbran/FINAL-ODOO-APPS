@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Override portal layout template -->
+    <template id="portal_layout_inherit" inherit_id="portal.portal_layout">
+        <xpath expr="//footer//div[hasclass('text-muted')]" position="replace">
+            <div class="text-muted text-center">
+                <t t-if="request.env.company.replace_odoo_branding">
+                    Powered by <span t-esc="request.env.company.white_label_name or request.env.company.name"/>
+                </t>
+                <t t-else="">
+                    Powered by <a href="https://www.odoo.com" target="_blank">Odoo</a>
+                </t>
+            </div>
+        </xpath>
+        
+        <!-- Add branding meta tags -->
+        <xpath expr="//head" position="inside">
+            <meta name="company-name" t-att-content="request.env.company.white_label_name"/>
+            <meta name="replace-odoo-branding" t-att-content="'true' if request.env.company.replace_odoo_branding else 'false'"/>
+        </xpath>
+    </template>
+    
+    <!-- Override portal breadcrumb template -->
+    <template id="portal_breadcrumb_inherit" inherit_id="portal.portal_breadcrumb">
+        <xpath expr="//ol[hasclass('breadcrumb')]//a[contains(@href, '/my')]" position="attributes">
+            <attribute name="title" t-attf="#{request.env.company.white_label_name or request.env.company.name} Portal"/>
+        </xpath>
+    </template>
+    
+    <!-- Override portal my home template -->
+    <template id="portal_my_home_inherit" inherit_id="portal.portal_my_home">
+        <xpath expr="//h3" position="replace">
+            <h3>Welcome to <span t-esc="request.env.company.white_label_name or request.env.company.name"/> Portal</h3>
+        </xpath>
+    </template>
+    
+</odoo>
+            </div>
+        </field>
+    </record>
+    
+</odoo>

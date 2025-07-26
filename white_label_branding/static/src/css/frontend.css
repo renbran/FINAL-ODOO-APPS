@@ -1,0 +1,46 @@
+/* Frontend branding overrides */
+.o_footer_copyright a[href*="odoo.com"] {
+    display: none !important;
+}
+
+.o_footer .o_footer_copyright .o_footer_copyright_name::after {
+    content: none !important;
+}
+
+/* Hide website builder Odoo references */
+.o_website_preview .o_footer a[href*="odoo.com"] {
+    display: none !important;
+}
+
+/* Replace footer copyright text */
+.o_footer_copyright_name {
+    visibility: hidden;
+}
+
+.o_footer_copyright_name::before {
+    content: "© " attr(data-company-name);
+    visibility: visible;
+}
+
+/* Hide website powered by */
+.o_website_footer .small,
+.o_website_footer a[href*="odoo.com"] {
+    display: none !important;
+}
+
+/* Hide all Odoo.com links */
+a[href*="odoo.com"]:not([href*="your-domain.com"]) {
+    display: none !important;
+}
+
+/* Hide powered by text */
+*:contains("Powered by Odoo") {
+    display: none !important;
+}
+
+/* Generic branding replacement */
+.o_brand,
+.oe_logo,
+.o_main_navbar .navbar-brand {
+    font-family: inherit !important;
+}

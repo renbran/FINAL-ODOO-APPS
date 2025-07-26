@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.white.label</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <div name="integration" position="after">
+                <div class="app_settings_block" data-string="White Label Branding" string="White Label Branding" data-key="white_label_branding">
+                    <h2>Branding Settings</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="replace_odoo_branding"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="replace_odoo_branding"/>
+                                <div class="text-muted">
+                                    Replace all Odoo branding with your company branding
+                                </div>
+                                <div class="content-group" invisible="replace_odoo_branding == False">
+                                    <div class="mt16">
+                                        <label for="white_label_name" class="o_light_label"/>
+                                        <field name="white_label_name" placeholder="Your Company Name" class="o_light_label"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+</odoo>

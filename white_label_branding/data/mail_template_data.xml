@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Custom digest template without Odoo branding -->
+        <record id="digest_template_custom" model="mail.template">
+            <field name="name">Custom Company Digest</field>
+            <field name="subject">{{ object.company_id.white_label_name or object.company_id.name }} - Weekly Summary</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <div style="margin: 0px; padding: 0px; background-color: #875A7B;">
+        <div style="margin: 0px; padding: 0px;">
+            <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #875A7B; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                <tr>
+                    <td align="center">
+                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                            <tbody>
+                                <!-- HEADER -->
+                                <tr>
+                                    <td align="center" style="min-height: 50px; padding-bottom: 20px;">
+                                        <h2 style="color: #875A7B;">{{ object.company_id.white_label_name or object.company_id.name }}</h2>
+                                        <p>Weekly Business Summary</p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- CONTENT -->
+                                <tr>
+                                    <td style="padding-bottom: 20px;">
+                                        {{ object.digest_content }}
+                                    </td>
+                                </tr>
+                                
+                                <!-- FOOTER -->
+                                <tr>
+                                    <td align="center" style="padding-top: 20px; border-top: 1px solid #e5e5e5;">
+                                        <small style="color: #999;">
+                                            Powered by {{ object.company_id.white_label_name or object.company_id.name }}
+                                        </small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

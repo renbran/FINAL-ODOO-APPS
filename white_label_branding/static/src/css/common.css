@@ -1,0 +1,30 @@
+/* Common branding overrides for both backend and frontend */
+
+/* Hide all Odoo.com links except allowed domains */
+a[href*="odoo.com"]:not([href*="your-domain.com"]) {
+    display: none !important;
+}
+
+/* Hide marketing links and powered by text */
+.o_powered_by,
+.o_footer_powered_by,
+.powered_by_odoo {
+    display: none !important;
+}
+
+/* Generic branding replacement */
+.o_brand,
+.oe_logo,
+.o_main_navbar .navbar-brand {
+    font-family: inherit !important;
+}
+
+/* Hide specific Odoo branding elements */
+.o_footer .o_footer_copyright .o_footer_copyright_name[href*="odoo.com"] {
+    display: none !important;
+}
+
+/* Replace document title dynamically */
+.o_web_client {
+    --brand-name: var(--company-name, "Your Company");
+}
