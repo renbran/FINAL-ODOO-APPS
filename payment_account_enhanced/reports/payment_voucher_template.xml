@@ -493,6 +493,12 @@
                                                 </span>
                                             </div>
                                         </t>
+                                        <t t-if="doc.remarks">
+                                            <div class="osus-detail-row">
+                                                <span class="osus-detail-label">Remarks</span>
+                                                <span class="osus-detail-value"><span t-field="doc.remarks"/></span>
+                                            </div>
+                                        </t>
                                     </div>
                                 </div>
                                 
@@ -519,7 +525,7 @@
                                             <div class="osus-signature-title">Approved By</div>
                                             <t t-if="doc.state == 'posted'">
                                                 <div class="osus-signature-name">
-                                                    <t t-if="hasattr(doc, 'authorized_by') and doc.authorized_by">
+                                                    <t t-if="doc.authorized_by">
                                                         <span t-field="doc.authorized_by"/>
                                                     </t>
                                                     <t t-else="">
@@ -558,14 +564,25 @@
                             <!-- Footer -->
                             <div class="osus-voucher-footer">
                                 <div class="osus-footer-message">
-                                    Thank you for your business • For payment confirmation, please contact: 
+                                    <t t-if="doc.company_id.voucher_footer_message">
+                                        <span t-field="doc.company_id.voucher_footer_message"/>
+                                    </t>
+                                    <t t-else="">
+                                        Thank you for your business
+                                    </t>
+                                    • For payment confirmation, please contact: 
                                     <t t-if="doc.company_id.phone">
                                         <span t-field="doc.company_id.phone"/>
                                     </t>
                                     <t t-else="">our office</t>
                                 </div>
                                 <div class="osus-footer-note">
-                                    This is a computer-generated document. No physical signature or stamp required for system verification.
+                                    <t t-if="doc.company_id.voucher_terms">
+                                        <span t-field="doc.company_id.voucher_terms"/>
+                                    </t>
+                                    <t t-else="">
+                                        This is a computer-generated document. No physical signature or stamp required for system verification.
+                                    </t>
                                 </div>
                             </div>
                         </div>
@@ -603,24 +620,5 @@
             <field name="paperformat_id" ref="payment_account_enhanced.paperformat_osus_voucher"/>
         </record>
 
-        <!-- Enhanced Account Payment Model -->
-        <record id="view_account_payment_form_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.form.enhanced</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <button name="action_print_osus_voucher" 
-                            string="Print OSUS Voucher" 
-                            type="object" 
-                            class="btn-primary"
-                            options="{'invisible': [('state', '=', 'draft')]}"/>
-                </xpath>
-                <xpath expr="//field[@name='ref']" position="after">
-                    <field name="remarks" placeholder="Additional remarks or memo for this payment"/>
-                    <field name="authorized_by" readonly="1" options="{'invisible': [('state', '!=', 'posted')]}"/>
-                </xpath>
-            </field>
-        </record>
     </data>
 </odoo>
