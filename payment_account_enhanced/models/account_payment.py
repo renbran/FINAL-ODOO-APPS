@@ -195,38 +195,94 @@ class ResCompany(models.Model):
     """Enhanced company model for OSUS branding"""
     _inherit = 'res.company'
     
+    # Use computed fields to avoid database column issues during initial setup
     voucher_footer_message = fields.Text(
         string='Voucher Footer Message',
         default='Thank you for your business',
         required=False,
-        help="Custom message to display in payment voucher footer"
+        help="Custom message to display in payment voucher footer",
+        compute='_compute_voucher_footer_message',
+        store=True,
+        readonly=False
     )
     
     voucher_terms = fields.Text(
         string='Voucher Terms',
         default='This is a computer-generated document. No physical signature or stamp required for system verification.',
         required=False,
-        help="Terms and conditions to display in payment voucher"
+        help="Terms and conditions to display in payment voucher",
+        compute='_compute_voucher_terms',
+        store=True,
+        readonly=False
     )
     
     use_osus_branding = fields.Boolean(
         string='Use OSUS Branding',
         default=True,
         required=False,
-        help="Apply OSUS brand guidelines to reports and vouchers"
+        help="Apply OSUS brand guidelines to reports and vouchers",
+        compute='_compute_use_osus_branding',
+        store=True,
+        readonly=False
     )
+    
+    @api.depends()
+    def _compute_voucher_footer_message(self):
+        """Compute voucher footer message with safe fallback"""
+        for company in self:
+            try:
+                if hasattr(company, '_origin') and hasattr(company._origin, 'voucher_footer_message'):
+                    company.voucher_footer_message = company._origin.voucher_footer_message or 'Thank you for your business'
+                else:
+                    company.voucher_footer_message = 'Thank you for your business'
+            except:
+                company.voucher_footer_message = 'Thank you for your business'
+    
+    @api.depends()
+    def _compute_voucher_terms(self):
+        """Compute voucher terms with safe fallback"""
+        for company in self:
+            try:
+                if hasattr(company, '_origin') and hasattr(company._origin, 'voucher_terms'):
+                    company.voucher_terms = company._origin.voucher_terms or 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+                else:
+                    company.voucher_terms = 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+            except:
+                company.voucher_terms = 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+    
+    @api.depends()
+    def _compute_use_osus_branding(self):
+        """Compute OSUS branding flag with safe fallback"""
+        for company in self:
+            try:
+                if hasattr(company, '_origin') and hasattr(company._origin, 'use_osus_branding'):
+                    company.use_osus_branding = company._origin.use_osus_branding if company._origin.use_osus_branding is not None else True
+                else:
+                    company.use_osus_branding = True
+            except:
+                company.use_osus_branding = True
     
     @api.model
     def _init_company_branding_fields(self):
         """Initialize branding fields if they don't exist"""
-        companies = self.search([])
-        for company in companies:
-            if not company.voucher_footer_message:
-                company.voucher_footer_message = 'Thank you for your business'
-            if not company.voucher_terms:
-                company.voucher_terms = 'This is a computer-generated document. No physical signature or stamp required for system verification.'
-            if company.use_osus_branding is None:
-                company.use_osus_branding = True
+        try:
+            companies = self.search([])
+            for company in companies:
+                vals = {}
+                if not company.voucher_footer_message:
+                    vals['voucher_footer_message'] = 'Thank you for your business'
+                if not company.voucher_terms:
+                    vals['voucher_terms'] = 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+                if company.use_osus_branding is None:
+                    vals['use_osus_branding'] = True
+                
+                if vals:
+                    company.write(vals)
+        except Exception as e:
+            # Log the error but don't fail module installation
+            import logging
+            _logger = logging.getLogger(__name__)
+            _logger.warning(f"Could not initialize company branding fields: {e}")
     
     def get_voucher_footer_message(self):
         """Get voucher footer message with fallback"""
