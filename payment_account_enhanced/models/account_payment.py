@@ -198,17 +198,53 @@ class ResCompany(models.Model):
     voucher_footer_message = fields.Text(
         string='Voucher Footer Message',
         default='Thank you for your business',
+        required=False,
         help="Custom message to display in payment voucher footer"
     )
     
     voucher_terms = fields.Text(
         string='Voucher Terms',
         default='This is a computer-generated document. No physical signature or stamp required for system verification.',
+        required=False,
         help="Terms and conditions to display in payment voucher"
     )
     
     use_osus_branding = fields.Boolean(
         string='Use OSUS Branding',
         default=True,
+        required=False,
         help="Apply OSUS brand guidelines to reports and vouchers"
     )
+    
+    @api.model
+    def _init_company_branding_fields(self):
+        """Initialize branding fields if they don't exist"""
+        companies = self.search([])
+        for company in companies:
+            if not company.voucher_footer_message:
+                company.voucher_footer_message = 'Thank you for your business'
+            if not company.voucher_terms:
+                company.voucher_terms = 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+            if company.use_osus_branding is None:
+                company.use_osus_branding = True
+    
+    def get_voucher_footer_message(self):
+        """Get voucher footer message with fallback"""
+        try:
+            return self.voucher_footer_message or 'Thank you for your business'
+        except:
+            return 'Thank you for your business'
+    
+    def get_voucher_terms(self):
+        """Get voucher terms with fallback"""
+        try:
+            return self.voucher_terms or 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+        except:
+            return 'This is a computer-generated document. No physical signature or stamp required for system verification.'
+    
+    def get_use_osus_branding(self):
+        """Get OSUS branding flag with fallback"""
+        try:
+            return self.use_osus_branding if self.use_osus_branding is not None else True
+        except:
+            return True

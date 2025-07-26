@@ -62,6 +62,7 @@
     'auto_install': False,
     'application': False,
     'sequence': 1,
+    'post_init_hook': 'post_init_hook',
     'price': 199.99,
     'currency': 'USD',
 }
