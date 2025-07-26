@@ -60,7 +60,7 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='amount']" position="after">
+                <xpath expr="//tree" position="inside">
                     <field name="authorized_by" optional="hide"/>
                     <field name="remarks" optional="hide"/>
                 </xpath>
