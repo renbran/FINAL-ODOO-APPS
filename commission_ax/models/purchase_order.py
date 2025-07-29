@@ -24,6 +24,12 @@ class PurchaseOrder(models.Model):
         store=True,
         help="Indicates if this is a commission-related purchase order"
     )
+    
+    # Add description field for compatibility
+    description = fields.Text(
+        string="Description",
+        help="Internal description for this purchase order"
+    )
 
     @api.depends('origin_so_id')
     def _compute_is_commission_po(self):
