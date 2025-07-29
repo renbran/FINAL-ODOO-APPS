@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
             <!-- Add commission fields in the main form -->
-            <xpath expr="//field[@name='partner_ref']" position="after">
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="origin_so_id" readonly="1" 
                        invisible="not is_commission_po"
                        options="{'no_create': True, 'no_open': True}"/>
@@ -38,7 +38,7 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_ref']" position="after">
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="origin_so_id" optional="hide"/>
                 <field name="is_commission_po" optional="hide"/>
             </xpath>
@@ -53,7 +53,6 @@
             <search string="Purchase Orders">
                 <field name="name" string="Purchase Order"/>
                 <field name="partner_id"/>
-                <field name="partner_ref"/>
                 <field name="origin_so_id" string="Origin Sale Order"/>
                 
                 <filter string="Commission POs" name="commission_pos" 

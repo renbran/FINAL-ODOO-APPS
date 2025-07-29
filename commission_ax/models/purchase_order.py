@@ -24,12 +24,6 @@ class PurchaseOrder(models.Model):
         store=True,
         help="Indicates if this is a commission-related purchase order"
     )
-    
-    # Add description field for compatibility
-    description = fields.Text(
-        string="Description",
-        help="Internal description for this purchase order"
-    )
 
     @api.depends('origin_so_id')
     def _compute_is_commission_po(self):
@@ -39,29 +33,20 @@ class PurchaseOrder(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Override create to populate vendor reference from sale order."""
+        """Override create to handle commission purchase orders."""
         for vals in vals_list:
             # If this is a commission PO with an origin sale order
             if vals.get('origin_so_id'):
                 sale_order = self.env['sale.order'].browse(vals['origin_so_id'])
-                if sale_order.exists() and sale_order.client_order_ref:
-                    # Set vendor reference to the customer reference from sale order
-                    vals['partner_ref'] = sale_order.client_order_ref
+                if sale_order.exists():
                     _logger.info(
-                        f"Setting vendor reference '{sale_order.client_order_ref}' "
-                        f"for commission PO from SO: {sale_order.name}"
+                        f"Creating commission PO from SO: {sale_order.name}"
                     )
         
         return super(PurchaseOrder, self).create(vals_list)
 
     def write(self, vals):
-        """Override write to handle vendor reference updates."""
-        # If origin_so_id is being updated, update vendor reference accordingly
-        if 'origin_so_id' in vals and vals['origin_so_id']:
-            sale_order = self.env['sale.order'].browse(vals['origin_so_id'])
-            if sale_order.exists() and sale_order.client_order_ref:
-                vals['partner_ref'] = sale_order.client_order_ref
-        
+        """Override write to handle commission purchase order updates."""
         return super(PurchaseOrder, self).write(vals)
 
     def action_view_origin_sale_order(self):
