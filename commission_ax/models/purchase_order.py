@@ -8,6 +8,10 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     # Commission-related fields for purchase orders
+    description = fields.Text(
+        string="Description",
+        help="Additional description for the purchase order"
+    )
     origin_so_id = fields.Many2one(
         'sale.order', 
         string="Origin Sale Order",
