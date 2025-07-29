@@ -31,6 +31,16 @@
                 <xpath expr="//field[@name='client_order_ref']" position="after">
                     <field name="commission_status" widget="statusbar" statusbar_visible="draft,calculated,confirmed"/>
                 </xpath>
+                
+                <!-- Add smart button for commission purchase orders -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object" name="action_view_commission_pos" 
+                            class="oe_stat_button" icon="fa-shopping-cart"
+                            attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                        <field name="purchase_order_count" widget="statinfo" 
+                               string="Commission POs"/>
+                    </button>
+                </xpath>
 
                 <!-- Add commission section as a new page in notebook -->
                 <xpath expr="//notebook" position="inside">

@@ -248,7 +248,8 @@ class SaleOrder(models.Model):
         if amount <= 0:
             raise UserError("Commission amount must be greater than zero")
         
-        return {
+        # Prepare base values
+        vals = {
             'partner_id': partner.id,
             'date_order': fields.Date.today(),
             'currency_id': self.currency_id.id,
@@ -266,6 +267,73 @@ class SaleOrder(models.Model):
                 'taxes_id': [(6, 0, product.supplier_taxes_id.ids)],
             })]
         }
+        
+        # Add vendor reference from customer reference if available
+        if self.client_order_ref:
+            vals['partner_ref'] = self.client_order_ref
+            _logger.info(
+                f"Adding vendor reference '{self.client_order_ref}' to commission PO for {partner.name}"
+            )
+        
+        return vals
+
+    def _get_all_commission_partners(self):
+        """Get all commission partner IDs from this sale order."""
+        self.ensure_one()
+        partner_ids = []
+        
+        # Legacy commission partners
+        if self.consultant_id:
+            partner_ids.append(self.consultant_id.id)
+        if self.manager_id:
+            partner_ids.append(self.manager_id.id)
+        if self.director_id:
+            partner_ids.append(self.director_id.id)
+        if self.second_agent_id:
+            partner_ids.append(self.second_agent_id.id)
+        
+        # External commission partners
+        if self.broker_partner_id:
+            partner_ids.append(self.broker_partner_id.id)
+        if self.referrer_partner_id:
+            partner_ids.append(self.referrer_partner_id.id)
+        if self.cashback_partner_id:
+            partner_ids.append(self.cashback_partner_id.id)
+        if self.other_external_partner_id:
+            partner_ids.append(self.other_external_partner_id.id)
+        
+        # Internal commission partners
+        if self.agent1_partner_id:
+            partner_ids.append(self.agent1_partner_id.id)
+        if self.agent2_partner_id:
+            partner_ids.append(self.agent2_partner_id.id)
+        if self.manager_partner_id:
+            partner_ids.append(self.manager_partner_id.id)
+        if self.director_partner_id:
+            partner_ids.append(self.director_partner_id.id)
+        
+        return list(set(partner_ids))  # Remove duplicates
+
+    def action_view_commission_pos(self):
+        """Action to view commission purchase orders."""
+        self.ensure_one()
+        action = self.env.ref('purchase.purchase_form_action').read()[0]
+        
+        if self.purchase_order_count == 1:
+            action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
+            action['res_id'] = self.purchase_order_ids[0].id
+        else:
+            action['domain'] = [('id', 'in', self.purchase_order_ids.ids)]
+            action['context'] = {
+                'default_origin_so_id': self.id,
+                'search_default_commission_pos': 1,
+            }
+        
+        action['context'].update({
+            'create': False,  # Don't allow creating POs from this view
+        })
+        
+        return action
 
     def _get_commission_entries(self):
         """Get all commission entries that need purchase orders."""
