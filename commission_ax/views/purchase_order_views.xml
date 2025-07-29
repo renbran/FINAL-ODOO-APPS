@@ -45,27 +45,33 @@
         </field>
     </record>
 
-    <!-- Commission Purchase Orders Filter -->
-    <record id="view_purchase_order_filter_commission" model="ir.ui.view">
-        <field name="name">purchase.order.filter.commission</field>
+    <!-- Commission Purchase Orders Filter - Define our own search view -->
+    <record id="view_purchase_order_search_commission" model="ir.ui.view">
+        <field name="name">purchase.order.search.commission</field>
         <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='draft']" position="after">
-                <separator/>
+            <search string="Purchase Orders">
+                <field name="name" string="Purchase Order"/>
+                <field name="partner_id"/>
+                <field name="partner_ref"/>
+                <field name="origin_so_id" string="Origin Sale Order"/>
+                
                 <filter string="Commission POs" name="commission_pos" 
                         domain="[('is_commission_po', '=', True)]"/>
                 <filter string="Regular POs" name="regular_pos" 
                         domain="[('is_commission_po', '=', False)]"/>
-            </xpath>
-            <xpath expr="//group[@name='group_by']" position="inside">
-                <filter string="Commission Type" name="group_by_commission_type" 
-                        domain="[]" 
-                        context="{'group_by': 'is_commission_po'}"/>
-                <filter string="Origin Sale Order" name="group_by_origin_so" 
-                        domain="[('origin_so_id', '!=', False)]" 
-                        context="{'group_by': 'origin_so_id'}"/>
-            </xpath>
+                
+                <group expand="0" string="Group By">
+                    <filter string="Commission Type" name="group_by_commission_type" 
+                            domain="[]" 
+                            context="{'group_by': 'is_commission_po'}"/>
+                    <filter string="Origin Sale Order" name="group_by_origin_so" 
+                            domain="[('origin_so_id', '!=', False)]" 
+                            context="{'group_by': 'origin_so_id'}"/>
+                    <filter string="Vendor" name="group_by_vendor" 
+                            context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
         </field>
     </record>
 </odoo>
