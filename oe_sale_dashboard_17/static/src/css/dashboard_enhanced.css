@@ -1,0 +1,67 @@
+/* Sales Dashboard Enhanced Styles */
+
+/* Override for better dashboard appearance */
+.o_content .sales_dashboard_container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 100px);
+}
+
+/* Header improvements */
+.sales_dashboard_container .dashboard_header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+}
+
+/* Enhanced KPI cards */
+.sales_dashboard_container .kpi_card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    border-top: 4px solid #007bff;
+}
+
+.sales_dashboard_container .kpi_card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Chart container improvements */
+.sales_dashboard_container .chart_container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+/* Loading indicator */
+.sales_dashboard_container .loading_indicator {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+}
+
+.sales_dashboard_container .loading_indicator i {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sales_dashboard_container {
+        padding: 15px;
+    }
+    
+    .sales_dashboard_container .dashboard_header {
+        padding: 20px;
+        text-align: center;
+    }
+}
