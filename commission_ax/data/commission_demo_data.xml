@@ -7,7 +7,6 @@
             <field name="email">broker@demo.com</field>
             <field name="is_company">True</field>
             <field name="supplier_rank">1</field>
-            <field name="category_id" eval="[(4, ref('base.res_partner_category_15'))]"/>
         </record>
 
         <record id="demo_referrer_partner" model="res.partner">
@@ -15,7 +14,6 @@
             <field name="email">referrer@demo.com</field>
             <field name="is_company">True</field>
             <field name="supplier_rank">1</field>
-            <field name="category_id" eval="[(4, ref('base.res_partner_category_15'))]"/>
         </record>
 
         <record id="demo_agent1_partner" model="res.partner">
