@@ -183,11 +183,147 @@ class SalesDashboard extends Component {
         });
     }
 
-    renderCharts() {
+    async renderCharts() {
+        // Ensure Chart.js is available before rendering
+        if (typeof Chart === 'undefined') {
+            if (window.ensureChartJsAvailable) {
+                try {
+                    await window.ensureChartJsAvailable();
+                } catch (error) {
+                    console.error('Chart.js not available, using fallback charts');
+                    this.renderFallbackCharts();
+                    return;
+                }
+            } else {
+                console.error('Chart.js not available and no fallback mechanism found');
+                return;
+            }
+        }
+        
         this.renderMonthlyTrendChart();
         this.renderSalesStateChart();
         this.renderTopCustomersChart();
         this.renderSalesTeamChart();
+    }
+
+    renderFallbackCharts() {
+        // Use SimpleChart as fallback
+        if (window.SimpleChart) {
+            this.renderSimpleCharts();
+        } else {
+            // Show message about charts not being available
+            const chartContainers = [
+                'monthly_trend_chart',
+                'sales_state_chart', 
+                'top_customers_chart',
+                'sales_team_chart'
+            ];
+            
+            chartContainers.forEach(id => {
+                const canvas = document.getElementById(id);
+                if (canvas) {
+                    const parent = canvas.parentElement;
+                    parent.innerHTML = '<div class="alert alert-info">Chart visualization not available</div>';
+                }
+            });
+        }
+    }
+
+    renderSimpleCharts() {
+        // Implement simple chart rendering using SimpleChart
+        try {
+            this.renderSimpleMonthlyTrendChart();
+            this.renderSimpleSalesStateChart();
+            this.renderSimpleTopCustomersChart();
+            this.renderSimpleSalesTeamChart();
+        } catch (error) {
+            console.error('Error rendering simple charts:', error);
+        }
+    }
+
+    renderSimpleMonthlyTrendChart() {
+        const canvas = document.getElementById('monthly_trend_chart');
+        if (!canvas || !this.state.data.monthly.labels) return;
+
+        const ctx = canvas.getContext('2d');
+        const data = this.state.data.monthly;
+        
+        new SimpleChart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels || [],
+                datasets: [
+                    {
+                        label: 'Quotations',
+                        data: (data.quotations || []).map(q => q.amount || 0),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)'
+                    }
+                ]
+            }
+        });
+    }
+
+    renderSimpleSalesStateChart() {
+        const canvas = document.getElementById('sales_state_chart');
+        if (!canvas || !this.state.data.byState.labels) return;
+
+        const ctx = canvas.getContext('2d');
+        const data = this.state.data.byState;
+        
+        new SimpleChart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    data: data.counts || [],
+                    backgroundColor: [
+                        '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'
+                    ]
+                }]
+            }
+        });
+    }
+
+    renderSimpleTopCustomersChart() {
+        const canvas = document.getElementById('top_customers_chart');
+        if (!canvas || !this.state.data.topCustomers.labels) return;
+
+        const ctx = canvas.getContext('2d');
+        // Create a simple bar chart representation
+        ctx.fillStyle = '#007bff';
+        const data = this.state.data.topCustomers;
+        const maxValue = Math.max(...(data.amounts || [1]));
+        
+        (data.amounts || []).forEach((amount, index) => {
+            const barHeight = (amount / maxValue) * (canvas.height - 40);
+            const barWidth = (canvas.width - 40) / data.amounts.length - 10;
+            const x = 20 + index * (barWidth + 10);
+            const y = canvas.height - 20 - barHeight;
+            
+            ctx.fillRect(x, y, barWidth, barHeight);
+        });
+    }
+
+    renderSimpleSalesTeamChart() {
+        const canvas = document.getElementById('sales_team_chart');
+        if (!canvas || !this.state.data.salesTeam.labels) return;
+
+        const ctx = canvas.getContext('2d');
+        const data = this.state.data.salesTeam;
+        
+        new SimpleChart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    data: data.amounts || [],
+                    backgroundColor: [
+                        '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8'
+                    ]
+                }]
+            }
+        });
     }
 
     renderMonthlyTrendChart() {

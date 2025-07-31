@@ -77,12 +77,15 @@
         console.error('All Chart.js fallback sources failed to load');
         
         // Add a custom notification to the DOM
-        const container = document.querySelector('.o_oe_sale_dashboard_17_container');
+        const container = document.querySelector('.o_oe_sale_dashboard_17_container') || 
+                         document.querySelector('.sales_dashboard_container') ||
+                         document.body;
         if (container) {
             const alert = document.createElement('div');
             alert.className = 'alert alert-warning';
-            alert.textContent = 'Failed to load Chart.js library. Some visualizations may not be available.';
-            container.prepend(alert);
+            alert.style.margin = '10px';
+            alert.innerHTML = '<strong>Warning:</strong> Failed to load Chart.js library. Some visualizations may not be available.';
+            container.insertBefore(alert, container.firstChild);
         }
     }
     
