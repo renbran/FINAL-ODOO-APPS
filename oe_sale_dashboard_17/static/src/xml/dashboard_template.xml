@@ -52,67 +52,48 @@
                 </div>
             </div>
 
-            <!-- Executive KPI Cards -->
+            <!-- Executive KPI Cards with Enhanced Visibility -->
             <div id="kpi-section" class="o_oe_sale_dashboard_17_container__kpi-grid" t-ref="kpiContainer">
-                <!-- Total Pipeline Value KPI -->
+                <!-- Total Quotations KPI -->
                 <div class="kpi-card kpi-card--primary">
-                    <div class="kpi-icon icon-pipeline"></div>
+                    <div class="kpi-icon icon-quotations">💼</div>
                     <div class="kpi-content">
-                        <div class="kpi-label">Total Pipeline Value</div>
-                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.totalPipelineValue || 0)"/>
-                        <div class="kpi-change positive">+12.5% vs last month</div>
-                    </div>
-                </div>
-
-                <!-- Active Quotations KPI -->
-                <div class="kpi-card kpi-card--secondary">
-                    <div class="kpi-icon icon-quotations"></div>
-                    <div class="kpi-content">
-                        <div class="kpi-label">Active Quotations</div>
-                        <div class="kpi-value" t-esc="state.quotationsData.find(item => item.sales_type_name === 'Total')?.count || 0"/>
-                        <div class="kpi-change positive">+8.3% vs last month</div>
+                        <div class="kpi-label">Total Quotations</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalQuotations.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalQuotations.count + ' orders'"/>
                     </div>
                 </div>
 
                 <!-- Sales Orders KPI -->
-                <div class="kpi-card kpi-card--accent">
-                    <div class="kpi-icon icon-orders"></div>
+                <div class="kpi-card kpi-card--secondary">
+                    <div class="kpi-icon icon-orders">📈</div>
                     <div class="kpi-content">
-                        <div class="kpi-label">Sales Orders</div>
-                        <div class="kpi-value" t-esc="state.salesOrdersData.find(item => item.sales_type_name === 'Total')?.count || 0"/>
-                        <div class="kpi-change positive">+15.7% vs last month</div>
+                        <div class="kpi-label">Confirmed Sales</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalSalesOrders.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalSalesOrders.count + ' orders'"/>
                     </div>
                 </div>
 
                 <!-- Revenue Realized KPI -->
-                <div class="kpi-card kpi-card--success">
-                    <div class="kpi-icon icon-revenue"></div>
+                <div class="kpi-card kpi-card--accent">
+                    <div class="kpi-icon icon-revenue">💰</div>
                     <div class="kpi-content">
-                        <div class="kpi-label">Revenue Realized</div>
-                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.realizedRevenue || 0)"/>
-                        <div class="kpi-change positive">+22.1% vs last month</div>
+                        <div class="kpi-label">Revenue Invoiced</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalInvoiced.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalInvoiced.count + ' invoiced'"/>
                     </div>
                 </div>
 
                 <!-- Conversion Rate KPI -->
-                <div class="kpi-card kpi-card--info">
-                    <div class="kpi-icon icon-conversion"></div>
+                <div class="kpi-card kpi-card--success">
+                    <div class="kpi-icon icon-conversion">🎯</div>
                     <div class="kpi-content">
-                        <div class="kpi-label">Overall Conversion Rate</div>
-                        <div class="kpi-value" t-esc="(state.overallConversionRate || 0) + '%'"/>
-                        <div class="kpi-change positive">+3.2% vs last month</div>
+                        <div class="kpi-label">Conversion Rate</div>
+                        <div class="kpi-value" t-esc="state.summaryData.conversionRate"/>
+                        <div class="kpi-subvalue">Quote to Sale</div>
                     </div>
                 </div>
-
-                <!-- Average Deal Size KPI -->
-                <div class="kpi-card kpi-card--warning">
-                    <div class="kpi-icon icon-deal-size"></div>
-                    <div class="kpi-content">
-                        <div class="kpi-label">Average Deal Size</div>
-                        <div class="kpi-value" t-esc="this.formatDashboardValue(state.averageDealSize || 0)"/>
-                        <div class="kpi-change negative">-2.4% vs last month</div>
-                    </div>
-                </div>
+            </div>
             </div>
 
             <!-- Enhanced Category Summary Section -->
