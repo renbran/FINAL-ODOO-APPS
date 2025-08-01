@@ -16,38 +16,40 @@ class SaleDashboard(models.Model):
 
     @api.model
     def _get_safe_date_field(self):
-        """Get the appropriate date field - booking_date if available, otherwise date_order"""
+        """Get the appropriate date field - prioritize booking_date (from osus_invoice_report), otherwise date_order"""
         return 'booking_date' if self._check_field_exists('booking_date') else 'date_order'
 
     @api.model
     def _get_safe_amount_field(self, record):
-        """Get the best available amount field value"""
+        """Get the best available amount field value - prioritize sale_value, then amount_total"""
+        # Priority 1: sale_value (from osus_invoice_report module)
         if self._check_field_exists('sale_value') and record.get('sale_value'):
             return record['sale_value']
+        # Priority 2: amount_total (standard Odoo field)
         return record.get('amount_total', 0)
 
     @api.model
-    def format_dashboard_value(self, value):
+    def format_dashboard_value(self, value, currency_code='AED'):
         """
-        Format large numbers for dashboard display with K/M/B suffixes
-        Enhanced with better rounding and formatting
+        Format large numbers for dashboard display with K/M/B suffixes in AED currency
+        Enhanced with proper currency formatting for UAE market
         """
         if not value or value == 0:
-            return "0"
+            return "AED 0"
         
         abs_value = abs(value)
         
         if abs_value >= 1_000_000_000:
             formatted = round(value / 1_000_000_000, 2)
-            return f"{formatted} B"
+            return f"AED {formatted:,.2f} B"
         elif abs_value >= 1_000_000:
             formatted = round(value / 1_000_000, 2)
-            return f"{formatted} M"
+            return f"AED {formatted:,.2f} M"
         elif abs_value >= 1_000:
-            formatted = round(value / 1_000)
-            return f"{formatted:.0f} K"
+            formatted = round(value / 1_000, 1)
+            return f"AED {formatted:,.1f} K"
         else:
-            return f"{round(value):.0f}"
+            return f"AED {value:,.0f}"
 
     @api.model
     def get_dashboard_summary_data(self, start_date, end_date, sales_type_ids=None):
@@ -129,13 +131,23 @@ class SaleDashboard(models.Model):
             # Calculate pipeline velocity
             total_summary['pipeline_velocity'] = self._calculate_pipeline_velocity(start_date, end_date, sales_type_ids)
             
+            # Add formatted values for dashboard display
+            total_summary['formatted_draft_amount'] = self.format_dashboard_value(total_summary['draft_amount'])
+            total_summary['formatted_sales_order_amount'] = self.format_dashboard_value(total_summary['sales_order_amount'])
+            total_summary['formatted_invoice_amount'] = self.format_dashboard_value(total_summary['invoice_amount'])
+            total_summary['formatted_total_amount'] = self.format_dashboard_value(total_summary['total_amount'])
+            total_summary['formatted_avg_deal_size'] = self.format_dashboard_value(total_summary['avg_deal_size'])
+            
             return {
                 'categories': summary_data,
                 'totals': total_summary,
                 'metadata': {
                     'date_field_used': date_field,
                     'has_sales_types': self._check_field_exists('sale_order_type_id'),
-                    'has_sale_value': self._check_field_exists('sale_value')
+                    'has_sale_value': self._check_field_exists('sale_value'),
+                    'has_booking_date': self._check_field_exists('booking_date'),
+                    'has_agent1_fields': self._check_field_exists('agent1_partner_id') and self._check_field_exists('agent1_amount'),
+                    'has_broker_fields': self._check_field_exists('broker_partner_id') and self._check_field_exists('broker_amount')
                 }
             }
             
@@ -190,12 +202,16 @@ class SaleDashboard(models.Model):
             return {
                 'draft_count': draft_count,
                 'draft_amount': draft_amount,
+                'formatted_draft_amount': self.format_dashboard_value(draft_amount),
                 'sales_order_count': so_count,
                 'sales_order_amount': so_amount,
+                'formatted_sales_order_amount': self.format_dashboard_value(so_amount),
                 'invoice_count': invoice_count,
                 'invoice_amount': invoice_amount,
+                'formatted_invoice_amount': self.format_dashboard_value(invoice_amount),
                 'total_count': draft_count + so_count + invoice_count,
                 'total_amount': category_total,
+                'formatted_total_amount': self.format_dashboard_value(category_total),
                 'category_name': category_name
             }
             

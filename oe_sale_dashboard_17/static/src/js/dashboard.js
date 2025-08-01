@@ -407,25 +407,25 @@ class OeSaleDashboard extends Component {
     _processDashboardData(dashboardData) {
         const totals = dashboardData.totals || {};
         
-        // Update summary data
+        // Update summary data - use backend formatted values when available
         this.state.summaryData = {
             totalQuotations: {
                 count: totals.draft_count || 0,
                 amount: totals.draft_amount || 0,
-                formatted: this._formatCurrency(totals.draft_amount || 0)
+                formatted: totals.formatted_draft_amount || this._formatCurrency(totals.draft_amount || 0)
             },
             totalSalesOrders: {
                 count: totals.sales_order_count || 0,
                 amount: totals.sales_order_amount || 0,
-                formatted: this._formatCurrency(totals.sales_order_amount || 0)
+                formatted: totals.formatted_sales_order_amount || this._formatCurrency(totals.sales_order_amount || 0)
             },
             totalInvoiced: {
                 count: totals.invoice_count || 0,
                 amount: totals.invoice_amount || 0,
-                formatted: this._formatCurrency(totals.invoice_amount || 0)
+                formatted: totals.formatted_invoice_amount || this._formatCurrency(totals.invoice_amount || 0)
             },
             conversionRate: totals.conversion_rate ? totals.conversion_rate.toFixed(1) + '%' : '0%',
-            avgDealSize: this._formatCurrency(totals.avg_deal_size || 0),
+            avgDealSize: totals.formatted_avg_deal_size || this._formatCurrency(totals.avg_deal_size || 0),
             revenueGrowth: totals.revenue_growth ? totals.revenue_growth.toFixed(1) + '%' : '0%',
             pipelineVelocity: totals.pipeline_velocity ? totals.pipeline_velocity.toFixed(1) + ' days' : '0 days',
             categories: dashboardData.categories || {}
@@ -607,7 +607,7 @@ class OeSaleDashboard extends Component {
                         sales_type_name: categoryName,
                         count: categoryData.draft_count,
                         amount: categoryData.draft_amount,
-                        formatted_amount: this._formatCurrency(categoryData.draft_amount)
+                        formatted_amount: categoryData.formatted_draft_amount || this._formatCurrency(categoryData.draft_amount)
                     });
                 }
                 
@@ -617,7 +617,7 @@ class OeSaleDashboard extends Component {
                         sales_type_name: categoryName,
                         count: categoryData.sales_order_count,
                         amount: categoryData.sales_order_amount,
-                        formatted_amount: this._formatCurrency(categoryData.sales_order_amount)
+                        formatted_amount: categoryData.formatted_sales_order_amount || this._formatCurrency(categoryData.sales_order_amount)
                     });
                 }
                 
@@ -627,7 +627,7 @@ class OeSaleDashboard extends Component {
                         sales_type_name: categoryName,
                         count: categoryData.invoice_count,
                         amount: categoryData.invoice_amount,
-                        formatted_amount: this._formatCurrency(categoryData.invoice_amount)
+                        formatted_amount: categoryData.formatted_invoice_amount || this._formatCurrency(categoryData.invoice_amount)
                     });
                 }
             }
@@ -815,17 +815,17 @@ class OeSaleDashboard extends Component {
     
     // Utility methods
     _formatCurrency(value) {
-        if (!value && value !== 0) return '$0';
+        if (!value && value !== 0) return 'AED 0';
         
         const absValue = Math.abs(value);
         if (absValue >= 1000000000) {
-            return '$' + (value / 1000000000).toFixed(1) + 'B';
+            return 'AED ' + (value / 1000000000).toFixed(1) + 'B';
         } else if (absValue >= 1000000) {
-            return '$' + (value / 1000000).toFixed(1) + 'M';
+            return 'AED ' + (value / 1000000).toFixed(1) + 'M';
         } else if (absValue >= 1000) {
-            return '$' + (value / 1000).toFixed(0) + 'K';
+            return 'AED ' + (value / 1000).toFixed(0) + 'K';
         } else {
-            return '$' + value.toFixed(0);
+            return 'AED ' + value.toLocaleString('en-AE', {maximumFractionDigits: 0});
         }
     }
     
