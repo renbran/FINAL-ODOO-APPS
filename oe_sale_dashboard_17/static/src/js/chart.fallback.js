@@ -4,20 +4,27 @@
  * This script provides a fallback mechanism for Chart.js when the CDN fails to load.
  * It will attempt to dynamically load Chart.js from alternative CDNs if the primary one fails.
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @since Odoo 17.0
  */
 
 (function() {
+    // Global status tracking
     window.chartJsFallbackStatus = {
         loaded: false,
         loading: false,
         error: null,
-        source: null
+        source: null,
+        fallbackAttempted: false
     };
     
+    // Check if Chart is already loaded
+    function isChartLoaded() {
+        return typeof Chart !== 'undefined' && Chart.Chart;
+    }
+    
     // Don't run if Chart is already defined
-    if (typeof Chart !== 'undefined') {
+    if (isChartLoaded()) {
         console.log('Chart.js already loaded, skipping fallback');
         window.chartJsFallbackStatus.loaded = true;
         window.chartJsFallbackStatus.source = 'primary';
@@ -28,9 +35,9 @@
     
     // List of alternative CDNs to try in order
     const alternativeSources = [
-        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js',
-        'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js',
-        // Add more fallback sources if needed
+        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js',
+        'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+        'https://unpkg.com/chart.js@3.9.1/dist/chart.min.js'
     ];
     
     /**
@@ -43,10 +50,19 @@
             const script = document.createElement('script');
             script.src = url;
             script.async = true;
+            script.crossOrigin = 'anonymous';
             
             script.onload = () => {
-                console.log(`Successfully loaded Chart.js from ${url}`);
-                resolve();
+                // Verify Chart.js actually loaded correctly
+                if (isChartLoaded()) {
+                    console.log(`Successfully loaded Chart.js from ${url}`);
+                    window.chartJsFallbackStatus.loaded = true;
+                    window.chartJsFallbackStatus.source = url;
+                    resolve();
+                } else {
+                    console.warn(`Script loaded from ${url} but Chart.js not available`);
+                    reject(new Error('Chart.js not available after script load'));
+                }
             };
             
             script.onerror = () => {
