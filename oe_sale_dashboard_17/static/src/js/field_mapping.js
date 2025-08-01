@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * Field Mapping and Validation for Dashboard
  * 
@@ -9,17 +11,16 @@
  * @since Odoo 17.0.0.2.0
  */
 
-odoo.define('oe_sale_dashboard_17.field_mapping', function (require) {
-    'use strict';
+import { registry } from "@web/core/registry";
+
+var fieldMapping = {
+    // Default mappings
+    booking_date: 'date_order',
+    sale_value: 'amount_total',
     
-    var fieldMapping = {
-        // Default mappings
-        booking_date: 'date_order',
-        sale_value: 'amount_total',
-        
-        // Track which fields are available
-        _available: {}
-    };
+    // Track which fields are available
+    _available: {}
+};
     
     /**
      * Initialize field mapping based on available fields
@@ -123,14 +124,16 @@ odoo.define('oe_sale_dashboard_17.field_mapping', function (require) {
         return fields;
     }
     
-    return {
-        initFieldMapping: initFieldMapping,
-        getFieldName: getFieldName,
-        buildDateDomain: buildDateDomain,
-        buildSaleTypeDomain: buildSaleTypeDomain,
-        getAmountFields: getAmountFields,
-        isFieldAvailable: function(fieldName) {
-            return !!fieldMapping._available[fieldName];
-        }
+    // Export the functions
+    export {
+        initFieldMapping,
+        getFieldName,
+        buildDateDomain,
+        buildSaleTypeDomain,
+        getAmountFields
     };
-});
+    
+    // Export isFieldAvailable function
+    export function isFieldAvailable(fieldName) {
+        return !!fieldMapping._available[fieldName];
+    }
