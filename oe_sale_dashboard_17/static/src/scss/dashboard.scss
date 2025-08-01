@@ -11,33 +11,48 @@ body {
     overflow-x: hidden;
 }
 
-// Color Variables
+// Color Variables - OSUS Branding
 :root {
-    --o-oe-primary: #1e40af;
-    --o-oe-secondary: #059669;
-    --o-oe-accent: #7c3aed;
+    // OSUS Brand Colors
+    --brand-burgundy: #800020;
+    --brand-gold: #FFD700;
+    --brand-light-gold: #FFF8DC;
+    --brand-white: #FFFFFF;
+    --brand-cream: #F5F5DC;
+    
+    // Primary color scheme based on OSUS branding
+    --o-oe-primary: #800020;
+    --o-oe-secondary: #FFD700;
+    --o-oe-accent: #8B0000;
     --o-oe-warning: #f59e0b;
     --o-oe-danger: #dc2626;
     --o-oe-info: #0ea5e9;
     --o-oe-success: #10b981;
-    --o-oe-dark: #1f2937;
-    --o-oe-light: #f8fafc;
+    --o-oe-dark: #800020;
+    --o-oe-light: #FFF8DC;
     --o-oe-border: #e5e7eb;
-    --o-oe-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --o-oe-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --o-oe-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --o-oe-gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --o-oe-gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    --o-oe-gradient-info: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    --o-oe-shadow: 0 4px 6px -1px rgba(128, 0, 32, 0.1);
+    --o-oe-shadow-lg: 0 10px 15px -3px rgba(128, 0, 32, 0.1);
+    
+    // OSUS Brand Gradients
+    --o-oe-gradient-primary: linear-gradient(135deg, #800020 0%, #A0002A 100%);
+    --o-oe-gradient-success: linear-gradient(135deg, #FFD700 0%, #FFF8DC 100%);
+    --o-oe-gradient-warning: linear-gradient(135deg, #800020 0%, #FFD700 100%);
+    --o-oe-gradient-info: linear-gradient(135deg, #FFF8DC 0%, #FFD700 100%);
+    
+    // Text colors for better contrast
+    --text-on-burgundy: #FFFFFF;
+    --text-on-gold: #800020;
+    --text-on-light: #800020;
 }
 
 // Main Container
 .o_oe_sale_dashboard_17_container {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--o-oe-gradient-primary);
     min-height: 100vh;
     padding: 2rem;
-    color: var(--o-oe-dark);
+    color: var(--text-on-burgundy);
     
     // Enhanced Scrolling Support
     overflow-y: auto;
@@ -45,29 +60,29 @@ body {
     height: 100vh;
     box-sizing: border-box;
     
-    // Custom Scrollbar Styling
+    // Custom Scrollbar Styling with OSUS branding
     &::-webkit-scrollbar {
         width: 8px;
     }
     
     &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 215, 0, 0.1); // Gold tint
         border-radius: 4px;
     }
     
     &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--brand-gold);
         border-radius: 4px;
         transition: background 0.3s ease;
         
         &:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: #DAA520; // Darker gold on hover
         }
     }
     
     // Firefox scrollbar styling
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+    scrollbar-color: var(--brand-gold) rgba(255, 215, 0, 0.1);
 
     @media (max-width: 768px) {
         padding: 1rem;
@@ -83,13 +98,17 @@ body {
     &__header {
         text-align: center;
         margin-bottom: 3rem;
-        color: white;
+        color: var(--brand-white);
         
         h1 {
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, var(--brand-white), var(--brand-light-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             
             @media (max-width: 768px) {
                 font-size: 2rem;
