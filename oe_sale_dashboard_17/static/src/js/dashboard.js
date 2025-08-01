@@ -39,14 +39,20 @@ class OeSaleDashboard extends Component {
                 conversionRate: '0%',
                 avgDealSize: '$0',
                 revenueGrowth: '0%',
-                pipelineVelocity: '0 days'
+                pipelineVelocity: '0 days',
+                categories: {} // Initialize categories to prevent template errors
             },
             categoriesData: {},
             monthlyFluctuationData: { labels: [], quotations: [], sales_orders: [], invoiced_sales: [] },
             salesTypeDistribution: { count_distribution: {}, amount_distribution: {} },
             topAgentsData: [],
             topAgenciesData: [],
-            recentOrders: []
+            recentOrders: [],
+            // Additional data arrays expected by template
+            quotationsData: [],
+            salesOrdersData: [],
+            invoicesData: [],
+            rankingData: []
         });
         
         // Initialize dashboard on mount
@@ -166,8 +172,14 @@ class OeSaleDashboard extends Component {
             pipelineVelocity: totals.pipeline_velocity ? totals.pipeline_velocity.toFixed(1) + ' days' : '0 days'
         };
         
-        // Store categories data for charts
+        // Store categories data for charts and template
         this.state.categoriesData = dashboardData.categories || {};
+        
+        // Also store categories in summaryData for template compatibility
+        if (!this.state.summaryData.categories) {
+            this.state.summaryData.categories = {};
+        }
+        this.state.summaryData.categories = dashboardData.categories || {};
         
         console.log('Processed dashboard data:', this.state.summaryData);
     }
