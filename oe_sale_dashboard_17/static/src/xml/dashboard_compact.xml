@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="oe_sale_dashboard_17.DashboardCompact" owl="1">
+        <div class="osus_executive_dashboard">
+            <div class="dashboard-header">
+                <h1>OSUS Executive Sales Dashboard</h1>
+                <div class="currency-indicator">
+                    <i class="fa fa-coins"/> All amounts in AED
+                </div>
+                
+                <!-- Filters Section -->
+                <div class="dashboard-filters mt-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="filter-group">
+                                <label>Date Range:</label>
+                                <div class="date-inputs">
+                                    <input type="date" class="form-control" t-model="state.dateRange.start" t-on-change="loadDashboard"/>
+                                    <span>to</span>
+                                    <input type="date" class="form-control" t-model="state.dateRange.end" t-on-change="loadDashboard"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="filter-group">
+                                <label>Sales Types:</label>
+                                <div class="sales-type-filter">
+                                    <div t-if="state.availableSalesTypes.length === 0" class="no-types">
+                                        No sales types available
+                                    </div>
+                                    <div t-else="" class="sales-type-checkboxes">
+                                        <div t-foreach="state.availableSalesTypes" t-as="salesType" t-key="salesType.id" 
+                                             class="sales-type-item">
+                                            <input type="checkbox" 
+                                                   t-att-id="'sales_type_' + salesType.id"
+                                                   t-att-value="salesType.id"
+                                                   t-att-checked="state.selectedSalesTypes.includes(salesType.id)"
+                                                   t-on-change="onSalesTypeChange"/>
+                                            <label t-att-for="'sales_type_' + salesType.id" t-esc="salesType.name"/>
+                                        </div>
+                                        <button t-if="state.selectedSalesTypes.length > 0" 
+                                                class="btn btn-sm btn-secondary clear-filter"
+                                                t-on-click="clearSalesTypeFilter">
+                                            <i class="fa fa-times"/> Clear Filter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="dashboard-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p>Loading dashboard data...</p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-else="" class="dashboard-content">
+                <!-- Tab Navigation -->
+                <div class="nav nav-tabs dashboard-tabs">
+                    <button t-att-class="state.currentTab === 'overview' ? 'nav-link active' : 'nav-link'"
+                            t-on-click="() => setActiveTab('overview')">
+                        <i class="fa fa-chart-line"/> Overview
+                    </button>
+                    <button t-att-class="state.currentTab === 'projects' ? 'nav-link active' : 'nav-link'"
+                            t-on-click="() => setActiveTab('projects')">
+                        <i class="fa fa-project-diagram"/> Projects
+                    </button>
+                    <button t-att-class="state.currentTab === 'agents' ? 'nav-link active' : 'nav-link'"
+                            t-on-click="() => setActiveTab('agents')">
+                        <i class="fa fa-users"/> Agents
+                    </button>
+                    <button t-att-class="state.currentTab === 'invoicing' ? 'nav-link active' : 'nav-link'"
+                            t-on-click="() => setActiveTab('invoicing')">
+                        <i class="fa fa-file-invoice"/> Invoicing
+                    </button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div t-if="state.currentTab === 'overview'" class="tab-content">
+                    <div class="kpi-section">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fa fa-chart-line"/>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 t-esc="formatCurrency(state.data.total_sales)"/>
+                                <p>Total Sales</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fa fa-calendar-month"/>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 t-esc="formatCurrency(state.data.monthly_sales)"/>
+                                <p>Monthly Sales</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 t-esc="state.data.total_customers"/>
+                                <p>Total Customers</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">
+                                <i class="fa fa-shopping-cart"/>
+                            </div>
+                            <div class="kpi-content">
+                                <h3 t-esc="state.data.monthly_orders"/>
+                                <p>Monthly Orders</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <h4>Monthly Sales Trend</h4>
+                            <canvas id="monthlyChart"/>
+                        </div>
+                        <div class="chart-container">
+                            <h4>Sales by Type</h4>
+                            <canvas id="salesTypeChart"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Tab -->
+                <div t-if="state.currentTab === 'projects'" class="tab-content">
+                    <div class="charts-section">
+                        <div class="chart-container full-width">
+                            <h4>Project Analysis</h4>
+                            <canvas id="projectChart"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agents Tab -->
+                <div t-if="state.currentTab === 'agents'" class="tab-content">
+                    <div class="charts-section">
+                        <div class="chart-container full-width">
+                            <h4>Agent Performance Ranking</h4>
+                            <canvas id="agentChart"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoicing Tab -->
+                <div t-if="state.currentTab === 'invoicing'" class="tab-content">
+                    <div class="charts-section">
+                        <div class="chart-container full-width">
+                            <h4>Invoice Status Distribution</h4>
+                            <canvas id="invoiceChart"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="oe_sale_dashboard_17.ExecutiveDashboard">
+        <div class="osus_executive_dashboard_container">
+            <!-- Loading Indicator -->
+            <div class="loading_indicator" t-if="state.loading">
+                <i class="fa fa-spinner fa-spin fa-3x"></i>
+                <p>Loading executive dashboard data...</p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard_content" t-if="!state.loading">
+                <!-- Header Section -->
+                <div class="dashboard_header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="fa fa-dashboard"></i> OSUS Executive Sales Dashboard</h2>
+                            <p>Comprehensive sales analytics with AED currency support</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="dashboard_filters">
+                                <div class="form-group">
+                                    <label>Date Range:</label>
+                                    <div class="input-group">
+                                        <input type="date" id="start_date" class="form-control" t-model="state.dateRange.start"/>
+                                        <input type="date" id="end_date" class="form-control" t-model="state.dateRange.end"/>
+                                        <button class="btn btn-primary" id="refresh_dashboard" t-on-click="refreshAllData">
+                                            <i class="fa fa-refresh"></i> Refresh
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sales Type Filter -->
+                                <div class="form-group mt-2">
+                                    <label><i class="fa fa-filter"></i> Sales Types:</label>
+                                    <div class="sales_type_filter">
+                                        <div t-if="state.availableSalesTypes.length === 0" class="text-muted">
+                                            <em>No sales types available</em>
+                                        </div>
+                                        <div t-else="" class="sales_type_checkboxes">
+                                            <div class="row">
+                                                <div t-foreach="state.availableSalesTypes" t-as="salesType" t-key="salesType.id" 
+                                                     class="col-md-6 sales_type_item">
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="checkbox" class="form-check-input"
+                                                               t-att-id="'sales_type_' + salesType.id"
+                                                               t-att-value="salesType.id"
+                                                               t-att-checked="state.selectedSalesTypes.includes(salesType.id)"
+                                                               t-on-change="onSalesTypeChange"/>
+                                                        <label class="form-check-label" 
+                                                               t-att-for="'sales_type_' + salesType.id" 
+                                                               t-esc="salesType.name"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="state.selectedSalesTypes.length > 0" class="filter_actions mt-2">
+                                                <button class="btn btn-secondary btn-sm clear_filter"
+                                                        t-on-click="clearSalesTypeFilter">
+                                                    <i class="fa fa-times"/> Clear Filter (<t t-esc="state.selectedSalesTypes.length"/> selected)
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Section -->
+                <div class="kpi_section mb-4">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="kpi_card quotations">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-file-text-o"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="total_quotations"><t t-esc="state.data.kpis.total_quotations or 0"/></h3>
+                                    <p>Total Quotations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="kpi_card orders">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="total_orders"><t t-esc="state.data.kpis.total_orders or 0"/></h3>
+                                    <p>Sales Orders</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="kpi_card invoiced">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="total_invoiced"><t t-esc="state.data.kpis.total_invoiced or 0"/></h3>
+                                    <p>Invoiced Sales</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="kpi_card revenue">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="total_amount"><t t-esc="state.data.kpis.total_amount or '0 AED'"/></h3>
+                                    <p>Total Revenue</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="kpi_card invoiced_revenue">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="invoiced_amount"><t t-esc="state.data.kpis.invoiced_amount or '0 AED'"/></h3>
+                                    <p>Invoiced Revenue</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="kpi_card conversion">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-percent"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="conversion_rate"><t t-esc="(state.data.kpis.conversion_rate or 0) + '%'"/></h3>
+                                    <p>Conversion Rate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="dashboard_tabs">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link dashboard-tab active" data-tab="overview" href="#">
+                                <i class="fa fa-line-chart"></i> Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dashboard-tab" data-tab="projects" href="#">
+                                <i class="fa fa-folder-open"></i> Project Analysis
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dashboard-tab" data-tab="agents" href="#">
+                                <i class="fa fa-users"></i> Agent Ranking
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dashboard-tab" data-tab="invoicing" href="#">
+                                <i class="fa fa-file-invoice"></i> Invoice Status
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content mt-4">
+                    <!-- Overview Tab -->
+                    <div id="overview-content" class="tab-content-pane">
+                        <div class="row">
+                            <!-- Monthly Trend Chart -->
+                            <div class="col-md-8">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-line-chart"></i> Monthly Sales Trend</h4>
+                                        <p>Track sales performance over time in AED</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 400px;">
+                                        <canvas id="monthly_trend_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sales by State Chart -->
+                            <div class="col-md-4">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-pie-chart"></i> Sales by State</h4>
+                                        <p>Distribution of sales stages</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 400px;">
+                                        <canvas id="sales_state_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <!-- Top Customers Chart -->
+                            <div class="col-md-12">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-trophy"></i> Top Customers</h4>
+                                        <p>Best performing customers by revenue in AED</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 300px;">
+                                        <canvas id="top_customers_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Analysis Tab -->
+                    <div id="projects-content" class="tab-content-pane" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-folder-open"></i> Sales by Project</h4>
+                                        <p>Project performance analysis in AED</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 500px;">
+                                        <canvas id="project_analysis_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agent Ranking Tab -->
+                    <div id="agents-content" class="tab-content-pane" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-users"></i> Agent Performance Ranking</h4>
+                                        <p>Sales agent performance metrics and rankings</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 500px;">
+                                        <canvas id="agent_ranking_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Status Tab -->
+                    <div id="invoicing-content" class="tab-content-pane" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart_container">
+                                    <div class="chart_header">
+                                        <h4><i class="fa fa-file-invoice"></i> Invoice Status Distribution</h4>
+                                        <p>Current invoicing status breakdown</p>
+                                    </div>
+                                    <div class="chart_body" style="height: 400px;">
+                                        <canvas id="invoice_status_chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="invoice_metrics">
+                                    <h4><i class="fa fa-bar-chart"></i> Invoice Metrics</h4>
+                                    <div class="metric_cards">
+                                        <div class="metric_card">
+                                            <div class="metric_label">Total Orders</div>
+                                            <div class="metric_value" id="invoice_total_orders">0</div>
+                                        </div>
+                                        <div class="metric_card">
+                                            <div class="metric_label">Invoicing Rate</div>
+                                            <div class="metric_value" id="invoicing_rate">0%</div>
+                                        </div>
+                                        <div class="metric_card">
+                                            <div class="metric_label">Pending Amount</div>
+                                            <div class="metric_value" id="pending_amount">0 AED</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -30,6 +30,7 @@
         'security/ir.model.access.csv',
         'views/dashboard_views.xml',
         'views/dashboard_menu.xml',
+        'views/dashboard_enhanced_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -42,13 +43,18 @@
             'oe_sale_dashboard_17/static/src/js/field_mapping.js',
             'oe_sale_dashboard_17/static/src/js/compatibility.js',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
+            'oe_sale_dashboard_17/static/src/js/dashboard_enhanced.js',
+            'oe_sale_dashboard_17/static/src/js/dashboard_compact.js',
             
             # Templates
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
+            'oe_sale_dashboard_17/static/src/xml/dashboard_enhanced.xml',
+            'oe_sale_dashboard_17/static/src/xml/dashboard_compact.xml',
             
             # Styles
             'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
+            'oe_sale_dashboard_17/static/src/css/dashboard_enhanced.css',
         ],
     },
     'demo': [],

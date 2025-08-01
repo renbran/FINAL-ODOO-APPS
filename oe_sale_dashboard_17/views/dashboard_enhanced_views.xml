@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Enhanced Executive Sales Dashboard Action -->
+        <record id="action_osus_executive_sales_dashboard" model="ir.actions.client">
+            <field name="name">OSUS Executive Sales Dashboard</field>
+            <field name="tag">osus_executive_sales_dashboard</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Compact Executive Sales Dashboard Action -->
+        <record id="action_osus_compact_sales_dashboard" model="ir.actions.client">
+            <field name="name">OSUS Compact Sales Dashboard</field>
+            <field name="tag">osus_sales_dashboard_compact</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Enhanced Dashboard Menu Item -->
+        <menuitem id="menu_osus_executive_sales_dashboard"
+                  name="Executive Dashboard"
+                  parent="sale.sale_menu_root"
+                  action="action_osus_executive_sales_dashboard"
+                  sequence="5"/>
+
+        <!-- Compact Dashboard Menu Item -->
+        <menuitem id="menu_osus_compact_sales_dashboard"
+                  name="Compact Dashboard"
+                  parent="sale.sale_menu_root"
+                  action="action_osus_compact_sales_dashboard"
+                  sequence="6"/>
+
+        <!-- Alternative Menu under Reporting -->
+        <menuitem id="menu_osus_executive_dashboard_reporting"
+                  name="Executive Sales Dashboard"
+                  parent="sale.menu_sale_report"
+                  action="action_osus_executive_sales_dashboard"
+                  sequence="1"/>
+
+        <!-- Alternative Compact Menu under Reporting -->
+        <menuitem id="menu_osus_compact_dashboard_reporting"
+                  name="Compact Sales Dashboard"
+                  parent="sale.menu_sale_report"
+                  action="action_osus_compact_sales_dashboard"
+                  sequence="2"/>
+
+    </data>
+</odoo>
