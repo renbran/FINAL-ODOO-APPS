@@ -36,11 +36,16 @@ class OeSaleDashboard extends Component {
                 totalQuotations: { count: 0, amount: 0, formatted: '$0' },
                 totalSalesOrders: { count: 0, amount: 0, formatted: '$0' },
                 totalInvoiced: { count: 0, amount: 0, formatted: '$0' },
-                conversionRate: '0%'
+                conversionRate: '0%',
+                avgDealSize: '$0',
+                revenueGrowth: '0%',
+                pipelineVelocity: '0 days'
             },
-            quotationsData: [],
-            salesOrdersData: [],
-            invoicedSalesData: [],
+            categoriesData: {},
+            monthlyFluctuationData: { labels: [], quotations: [], sales_orders: [], invoiced_sales: [] },
+            salesTypeDistribution: { count_distribution: {}, amount_distribution: {} },
+            topAgentsData: [],
+            topAgenciesData: [],
             recentOrders: []
         });
         
@@ -65,6 +70,9 @@ class OeSaleDashboard extends Component {
             
             // Load dashboard data
             await this._loadDashboardData();
+            
+            // Load top performers data
+            await this._loadTopPerformersData();
             
         } catch (error) {
             console.error('Dashboard initialization failed:', error);
@@ -101,62 +109,27 @@ class OeSaleDashboard extends Component {
         try {
             console.log('Loading dashboard data...');
             
-            // Build date domain using the correct date field
-            const dateDomain = buildDateDomain(this.state.startDate, this.state.endDate);
-            
-            // Get available fields for reading
-            const baseFields = ['id', 'name', 'partner_id', 'state'];
-            const amountField = getFieldName('amount_total'); // Will fallback to 'amount_total'
-            const saleValueField = isFieldAvailable('sale_value') ? 'sale_value' : null;
-            const dateField = getFieldName('booking_date'); // Will fallback to 'date_order'
-            
-            const readFields = [...baseFields, amountField];
-            if (saleValueField) readFields.push(saleValueField);
-            if (dateField !== 'date_order') readFields.push(dateField);
-            
-            console.log('Using fields for data loading:', readFields);
-            console.log('Date domain:', dateDomain);
-            
-            // Load quotations (draft and sent states)
-            const quotationsDomain = [
-                ...dateDomain,
-                ['state', 'in', ['draft', 'sent']]
-            ];
-            
-            console.log('Loading quotations with domain:', quotationsDomain);
-            const quotations = await this.orm.searchRead(
+            // Use the Python backend methods instead of direct ORM calls
+            const dashboardData = await this.orm.call(
                 'sale.order',
-                quotationsDomain,
-                readFields,
-                { limit: false }
+                'get_dashboard_summary_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
             );
-            console.log('Loaded quotations:', quotations.length, quotations);
             
-            // Load sales orders (confirmed state)
-            const salesOrdersDomain = [
-                ...dateDomain,
-                ['state', '=', 'sale']
-            ];
+            console.log('Dashboard data from backend:', dashboardData);
             
-            console.log('Loading sales orders with domain:', salesOrdersDomain);
-            const salesOrdersFields = [...readFields, 'invoice_status'];
-            const salesOrders = await this.orm.searchRead(
-                'sale.order',
-                salesOrdersDomain,
-                salesOrdersFields,
-                { limit: false }
-            );
-            console.log('Loaded sales orders:', salesOrders.length, salesOrders);
+            if (dashboardData.error) {
+                throw new Error(dashboardData.error);
+            }
             
-            // Filter invoiced orders
-            const invoicedOrders = salesOrders.filter(order => order.invoice_status === 'invoiced');
-            console.log('Invoiced orders:', invoicedOrders.length);
+            // Process the backend data
+            this._processDashboardData(dashboardData);
             
-            // Calculate summary data
-            this._calculateSummaryData(quotations, salesOrders, invoicedOrders);
+            // Load additional chart data
+            await this._loadChartData();
             
-            // Load recent orders for display
-            await this._loadRecentOrders(dateDomain);
+            // Load recent orders
+            await this._loadRecentOrdersFromBackend();
             
             console.log('Dashboard data loaded successfully');
             console.log('Summary data:', this.state.summaryData);
@@ -167,70 +140,173 @@ class OeSaleDashboard extends Component {
         }
     }
     
-    _calculateSummaryData(quotations, salesOrders, invoicedOrders) {
-        // Get the best available amount field
-        const amountField = isFieldAvailable('sale_value') ? 'sale_value' : 'amount_total';
-        console.log('Using amount field for calculations:', amountField);
+    _processDashboardData(dashboardData) {
+        const totals = dashboardData.totals || {};
         
-        // Calculate quotations totals
-        const quotationsTotal = quotations.reduce((sum, q) => {
-            const amount = q[amountField] || q.amount_total || 0;
-            return sum + amount;
-        }, 0);
-        const quotationsCount = quotations.length;
-        
-        // Calculate sales orders totals
-        const salesOrdersTotal = salesOrders.reduce((sum, s) => {
-            const amount = s[amountField] || s.amount_total || 0;
-            return sum + amount;
-        }, 0);
-        const salesOrdersCount = salesOrders.length;
-        
-        // Calculate invoiced totals
-        const invoicedTotal = invoicedOrders.reduce((sum, i) => {
-            const amount = i[amountField] || i.amount_total || 0;
-            return sum + amount;
-        }, 0);
-        const invoicedCount = invoicedOrders.length;
-        
-        // Calculate conversion rate
-        const conversionRate = quotationsCount > 0 
-            ? ((salesOrdersCount / quotationsCount) * 100).toFixed(1) + '%'
-            : '0%';
-        
-        console.log('Calculated totals:', {
-            quotations: { count: quotationsCount, total: quotationsTotal },
-            salesOrders: { count: salesOrdersCount, total: salesOrdersTotal },
-            invoiced: { count: invoicedCount, total: invoicedTotal },
-            conversionRate
-        });
-        
-        // Update state
+        // Update summary data using backend calculations
         this.state.summaryData = {
             totalQuotations: {
-                count: quotationsCount,
-                amount: quotationsTotal,
-                formatted: this._formatCurrency(quotationsTotal)
+                count: totals.draft_count || 0,
+                amount: totals.draft_amount || 0,
+                formatted: this._formatCurrency(totals.draft_amount || 0)
             },
             totalSalesOrders: {
-                count: salesOrdersCount,
-                amount: salesOrdersTotal,
-                formatted: this._formatCurrency(salesOrdersTotal)
+                count: totals.sales_order_count || 0,
+                amount: totals.sales_order_amount || 0,
+                formatted: this._formatCurrency(totals.sales_order_amount || 0)
             },
             totalInvoiced: {
-                count: invoicedCount,
-                amount: invoicedTotal,
-                formatted: this._formatCurrency(invoicedTotal)
+                count: totals.invoice_count || 0,
+                amount: totals.invoice_amount || 0,
+                formatted: this._formatCurrency(totals.invoice_amount || 0)
             },
-            conversionRate: conversionRate
+            conversionRate: totals.conversion_rate ? totals.conversion_rate.toFixed(1) + '%' : '0%',
+            avgDealSize: this._formatCurrency(totals.avg_deal_size || 0),
+            revenueGrowth: totals.revenue_growth ? totals.revenue_growth.toFixed(1) + '%' : '0%',
+            pipelineVelocity: totals.pipeline_velocity ? totals.pipeline_velocity.toFixed(1) + ' days' : '0 days'
         };
         
-        // Store detailed data for charts
-        this.state.quotationsData = quotations;
-        this.state.salesOrdersData = salesOrders;
-        this.state.invoicedSalesData = invoicedOrders;
+        // Store categories data for charts
+        this.state.categoriesData = dashboardData.categories || {};
         
-        console.log('Updated state.summaryData:', this.state.summaryData);
+        console.log('Processed dashboard data:', this.state.summaryData);
+    }
+    
+    async _loadChartData() {
+        try {
+            // Load monthly fluctuation data for line charts
+            const monthlyData = await this.orm.call(
+                'sale.order',
+                'get_monthly_fluctuation_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            
+            this.state.monthlyFluctuationData = monthlyData;
+            
+            // Load sales type distribution for pie charts
+            const distributionData = await this.orm.call(
+                'sale.order',
+                'get_sales_type_distribution',
+                [this.state.startDate, this.state.endDate]
+            );
+            
+            this.state.salesTypeDistribution = distributionData;
+            
+            console.log('Chart data loaded:', { monthlyData, distributionData });
+            
+        } catch (error) {
+            console.warn('Error loading chart data:', error);
+            this.state.monthlyFluctuationData = { labels: [], quotations: [], sales_orders: [], invoiced_sales: [] };
+            this.state.salesTypeDistribution = { count_distribution: {}, amount_distribution: {} };
+        }
+    }
+    
+    async _loadRecentOrdersFromBackend() {
+        try {
+            // Load recent orders using proper field mapping
+            const dateField = getFieldName('booking_date');
+            const amountField = isFieldAvailable('sale_value') ? 'sale_value' : 'amount_total';
+            
+            const dateDomain = buildDateDomain(this.state.startDate, this.state.endDate);
+            
+            const recentOrdersFields = ['name', 'partner_id', dateField, amountField, 'state'];
+            
+            console.log('Loading recent orders with fields:', recentOrdersFields);
+            
+            const recentOrders = await this.orm.searchRead(
+                'sale.order',
+                dateDomain,
+                recentOrdersFields,
+                { 
+                    limit: 10, 
+                    order: `${dateField} desc` 
+                }
+            );
+            
+            // Format the recent orders data
+            this.state.recentOrders = recentOrders.map(order => ({
+                id: order.id,
+                name: order.name,
+                partner_name: order.partner_id ? order.partner_id[1] : 'Unknown Customer',
+                date: this._formatDate(order[dateField]),
+                amount_formatted: this._formatCurrency(order[amountField] || 0),
+                status_text: this._getStatusText(order.state),
+                status_class: this._getStatusClass(order.state)
+            }));
+            
+            console.log('Loaded recent orders:', this.state.recentOrders.length);
+            
+        } catch (error) {
+            console.warn('Could not load recent orders:', error);
+            this.state.recentOrders = [];
+        }
+    }
+    
+    async _loadTopPerformersData() {
+        try {
+            // Check if commission fields are available before loading
+            const hasAgentFields = isFieldAvailable('agent1_partner_id') && isFieldAvailable('agent1_amount');
+            const hasBrokerFields = isFieldAvailable('broker_partner_id') && isFieldAvailable('broker_amount');
+            
+            console.log('Commission fields availability:', { 
+                agent1_partner_id: isFieldAvailable('agent1_partner_id'),
+                agent1_amount: isFieldAvailable('agent1_amount'),
+                broker_partner_id: isFieldAvailable('broker_partner_id'), 
+                broker_amount: isFieldAvailable('broker_amount')
+            });
+            
+            let topAgents = [];
+            let topAgencies = [];
+            
+            // Load top agents if fields are available
+            if (hasAgentFields) {
+                topAgents = await this.orm.call(
+                    'sale.order',
+                    'get_top_performers_data',
+                    [this.state.startDate, this.state.endDate, 'agent', 10]
+                );
+                console.log('Agent data loaded using agent1_partner_id field');
+            } else {
+                console.warn('Agent fields not available - skipping agent rankings');
+            }
+            
+            // Load top agencies if fields are available
+            if (hasBrokerFields) {
+                topAgencies = await this.orm.call(
+                    'sale.order',
+                    'get_top_performers_data',
+                    [this.state.startDate, this.state.endDate, 'agency', 10]
+                );
+                console.log('Agency data loaded using broker_partner_id field');
+            } else {
+                console.warn('Broker fields not available - skipping agency rankings');
+            }
+            
+            this.state.topAgentsData = topAgents || [];
+            this.state.topAgenciesData = topAgencies || [];
+            
+            console.log('Top performers loaded:', { 
+                agents: topAgents.length, 
+                agencies: topAgencies.length,
+                agentSample: topAgents.length > 0 ? topAgents[0] : null,
+                agencySample: topAgencies.length > 0 ? topAgencies[0] : null
+            });
+            
+            // Debug: Log agent1+partner field usage
+            if (topAgents.length > 0) {
+                console.log('Agent ranking using agent1_partner_id and agent1_amount fields');
+                console.log('Sample agent data:', topAgents[0]);
+            }
+            if (topAgencies.length > 0) {
+                console.log('Agency ranking using broker_partner_id and broker_amount fields');
+                console.log('Sample agency data:', topAgencies[0]);
+            }
+            
+        } catch (error) {
+            console.warn('Error loading top performers:', error);
+            this.state.topAgentsData = [];
+            this.state.topAgenciesData = [];
+        }
     }
     
     async _loadRecentOrders(dateDomain) {
@@ -286,6 +362,11 @@ class OeSaleDashboard extends Component {
         }
     }
     
+    formatDashboardValue(value) {
+        // This method is called from template, so keep it accessible
+        return this._formatCurrency(value);
+    }
+    
     _formatDate(dateValue) {
         if (!dateValue) return '';
         const date = new Date(dateValue);
@@ -335,6 +416,7 @@ class OeSaleDashboard extends Component {
         try {
             this.state.isLoading = true;
             await this._loadDashboardData();
+            await this._loadTopPerformersData();
             this.notification.add(_t("Dashboard updated successfully"), { type: 'success' });
         } catch (error) {
             console.error('Error reloading dashboard:', error);

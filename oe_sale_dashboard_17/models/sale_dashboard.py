@@ -16,8 +16,8 @@ class SaleDashboard(models.Model):
 
     @api.model
     def _get_safe_date_field(self):
-        """Get the appropriate date field - booking_date if available, otherwise create_date"""
-        return 'booking_date' if self._check_field_exists('booking_date') else 'create_date'
+        """Get the appropriate date field - booking_date if available, otherwise date_order"""
+        return 'booking_date' if self._check_field_exists('booking_date') else 'date_order'
 
     @api.model
     def _get_safe_amount_field(self, record):
@@ -331,6 +331,9 @@ class SaleDashboard(models.Model):
             start_dt = datetime.strptime(start_date, '%Y-%m-%d')
             end_dt = datetime.strptime(end_date, '%Y-%m-%d')
             
+            # Get the safe date field
+            date_field = self._get_safe_date_field()
+            
             # Generate monthly buckets
             monthly_data = defaultdict(lambda: {
                 'quotations': {'count': 0, 'amount': 0},
@@ -352,56 +355,66 @@ class SaleDashboard(models.Model):
             
             # Base domain for filtering
             base_domain = [
-                ('booking_date', '>=', start_date),
-                ('booking_date', '<=', end_date),
+                (date_field, '>=', start_date),
+                (date_field, '<=', end_date),
                 ('state', '!=', 'cancel')  # Exclude cancelled orders
             ]
             
-            if sales_type_ids:
+            # Only add sales type filter if the field exists
+            if sales_type_ids and self._check_field_exists('sale_order_type_id'):
                 base_domain.append(('sale_order_type_id', 'in', sales_type_ids))
+            
+            # Fields to read with safe checking
+            fields_to_read = [date_field, 'amount_total', 'state', 'invoice_status']
+            if self._check_field_exists('sale_value'):
+                fields_to_read.append('sale_value')
             
             # Get quotations (draft, sent)
             quotation_domain = base_domain + [('state', 'in', ['draft', 'sent'])]
-            quotations = self.search_read(quotation_domain, ['booking_date', 'amount_total', 'sale_value'])
+            quotations = self.search_read(quotation_domain, fields_to_read)
             
             for quote in quotations:
-                if quote['booking_date']:
-                    month_key = quote['booking_date'].strftime('%Y-%m')
+                if quote[date_field]:
+                    month_key = quote[date_field].strftime('%Y-%m')
                     if month_key in monthly_data:
                         monthly_data[month_key]['quotations']['count'] += 1
-                        monthly_data[month_key]['quotations']['amount'] += quote['sale_value'] or quote['amount_total'] or 0
+                        amount = self._get_safe_amount_field(quote)
+                        monthly_data[month_key]['quotations']['amount'] += amount
             
             # Get sales orders (confirmed but not invoiced)
             sales_order_domain = base_domain + [
                 ('state', '=', 'sale'),
                 ('invoice_status', 'in', ['to invoice', 'no', 'upselling'])
             ]
-            sales_orders = self.search_read(sales_order_domain, ['booking_date', 'amount_total', 'sale_value'])
+            sales_orders = self.search_read(sales_order_domain, fields_to_read)
             
             for order in sales_orders:
-                if order['booking_date']:
-                    month_key = order['booking_date'].strftime('%Y-%m')
+                if order[date_field]:
+                    month_key = order[date_field].strftime('%Y-%m')
                     if month_key in monthly_data:
                         monthly_data[month_key]['sales_orders']['count'] += 1
-                        monthly_data[month_key]['sales_orders']['amount'] += order['sale_value'] or order['amount_total'] or 0
+                        amount = self._get_safe_amount_field(order)
+                        monthly_data[month_key]['sales_orders']['amount'] += amount
             
             # Get invoiced sales
             invoiced_domain = base_domain + [
                 ('state', '=', 'sale'),
                 ('invoice_status', '=', 'invoiced')
             ]
-            invoiced_orders = self.search_read(invoiced_domain, ['booking_date', 'amount_total', 'sale_value', 'name'])
+            # Add name field for invoiced amount calculation
+            invoiced_fields = fields_to_read + ['name']
+            invoiced_orders = self.search_read(invoiced_domain, invoiced_fields)
             
             # Get actual invoiced amounts
             for order in invoiced_orders:
-                if order['booking_date']:
-                    month_key = order['booking_date'].strftime('%Y-%m')
+                if order[date_field]:
+                    month_key = order[date_field].strftime('%Y-%m')
                     if month_key in monthly_data:
                         monthly_data[month_key]['invoiced_sales']['count'] += 1
                         
                         # Try to get actual invoiced amount
                         invoiced_amount = self._get_actual_invoiced_amount(order['name'])
-                        amount = invoiced_amount or order['sale_value'] or order['amount_total'] or 0
+                        amount = invoiced_amount or self._get_safe_amount_field(order)
                         monthly_data[month_key]['invoiced_sales']['amount'] += amount
             
             # Convert to chart format
@@ -468,12 +481,23 @@ class SaleDashboard(models.Model):
         Returns count and amount distribution by sales type
         """
         try:
+            # Get the safe date field
+            date_field = self._get_safe_date_field()
+            
             # Base domain excluding cancelled orders
             base_domain = [
-                ('booking_date', '>=', start_date),
-                ('booking_date', '<=', end_date),
+                (date_field, '>=', start_date),
+                (date_field, '<=', end_date),
                 ('state', '!=', 'cancel')
             ]
+            
+            # Check if sales type field exists
+            if not self._check_field_exists('sale_order_type_id'):
+                return {
+                    'count_distribution': {'All Sales': 1},
+                    'amount_distribution': {'All Sales': 0},
+                    'message': 'Sales types not available in this instance'
+                }
             
             # Get all sales types
             sales_types = self.env['sale.order.type'].search([])
@@ -481,11 +505,16 @@ class SaleDashboard(models.Model):
             count_distribution = {}
             amount_distribution = {}
             
+            # Fields to read with safe checking
+            fields_to_read = ['state', 'invoice_status', 'amount_total', 'name']
+            if self._check_field_exists('sale_value'):
+                fields_to_read.append('sale_value')
+            
             for sales_type in sales_types:
                 type_domain = base_domain + [('sale_order_type_id', '=', sales_type.id)]
                 
                 # Get all orders for this type
-                orders = self.search_read(type_domain, ['state', 'invoice_status', 'amount_total', 'sale_value', 'name'])
+                orders = self.search_read(type_domain, fields_to_read)
                 
                 total_count = len(orders)
                 total_amount = 0.0
@@ -494,9 +523,9 @@ class SaleDashboard(models.Model):
                     # For invoiced orders, try to get actual invoiced amount
                     if order['state'] == 'sale' and order['invoice_status'] == 'invoiced':
                         invoiced_amount = self._get_actual_invoiced_amount(order['name'])
-                        amount = invoiced_amount or order['sale_value'] or order['amount_total'] or 0
+                        amount = invoiced_amount or self._get_safe_amount_field(order)
                     else:
-                        amount = order['sale_value'] or order['amount_total'] or 0
+                        amount = self._get_safe_amount_field(order)
                     
                     total_amount += amount
                 
@@ -510,6 +539,7 @@ class SaleDashboard(models.Model):
             }
             
         except Exception as e:
+            _logger.error(f"Error in get_sales_type_distribution: {str(e)}")
             return {
                 'count_distribution': {},
                 'amount_distribution': {},
@@ -529,34 +559,49 @@ class SaleDashboard(models.Model):
             List of top performers with their metrics
         """
         try:
+            # Get the safe date field
+            date_field = self._get_safe_date_field()
+            
             # Determine field names based on performer type
             if performer_type == 'agent':
                 partner_field = 'agent1_partner_id'
                 amount_field = 'agent1_amount'
+                _logger.info(f"Using agent fields: partner={partner_field}, amount={amount_field}")
             elif performer_type == 'agency':
                 partner_field = 'broker_partner_id'
                 amount_field = 'broker_amount'
+                _logger.info(f"Using agency fields: partner={partner_field}, amount={amount_field}")
             else:
+                _logger.warning(f"Unknown performer_type: {performer_type}")
+                return []
+
+            # Check if the required fields exist
+            if not self._check_field_exists(partner_field) or not self._check_field_exists(amount_field):
+                _logger.warning(f"Required fields for {performer_type} not found: {partner_field}, {amount_field}")
                 return []
 
             # Base domain for filtering
             base_domain = [
-                ('booking_date', '>=', start_date),
-                ('booking_date', '<=', end_date),
+                (date_field, '>=', start_date),
+                (date_field, '<=', end_date),
                 ('state', '!=', 'cancel'),  # Exclude cancelled orders
                 (partner_field, '!=', False)  # Must have agent/broker assigned
             ]
 
             # Get all orders with the specified criteria  
             # Include all necessary fields for comprehensive ranking
-            orders = self.search_read(base_domain, [
-                partner_field, 'amount_total', 'sale_value', amount_field, 
-                'state', 'invoice_status', 'name', 'booking_date'
-            ])
+            fields_to_read = [
+                partner_field, 'amount_total', amount_field, 
+                'state', 'invoice_status', 'name', date_field
+            ]
+            
+            # Add sale_value if available
+            if self._check_field_exists('sale_value'):
+                fields_to_read.append('sale_value')
+                
+            orders = self.search_read(base_domain, fields_to_read)
             
             # Debug logging
-            import logging
-            _logger = logging.getLogger(__name__)
             _logger.info(f"Found {len(orders)} orders for {performer_type} ranking")
             if orders:
                 _logger.info(f"Sample order fields: {list(orders[0].keys())}")
@@ -596,7 +641,7 @@ class SaleDashboard(models.Model):
                     }
                 
                 # Get values with proper fallbacks and validation
-                sales_value = float(order.get('sale_value') or order.get('amount_total') or 0.0)
+                sales_value = self._get_safe_amount_field(order)
                 commission_value = float(order.get(amount_field) or 0.0)
                 
                 # Debug logging for first few records

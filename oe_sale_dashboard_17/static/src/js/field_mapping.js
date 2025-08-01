@@ -26,6 +26,17 @@ var fieldMapping = {
     total_external_commission_amount: 'total_external_commission_amount', 
     total_internal_commission_amount: 'total_internal_commission_amount',
     
+    // Agent and broker fields from commission_ax
+    agent1_partner_id: 'agent1_partner_id',
+    agent1_amount: 'agent1_amount',
+    agent1_commission_type: 'agent1_commission_type',
+    agent1_rate: 'agent1_rate',
+    
+    broker_partner_id: 'broker_partner_id',
+    broker_amount: 'broker_amount',
+    broker_commission_type: 'broker_commission_type',
+    broker_rate: 'broker_rate',
+    
     // Sales type from le_sale_type module
     sale_order_type_id: 'sale_order_type_id', // le_sale_type.field_sale_order__sale_order_type_id
     
