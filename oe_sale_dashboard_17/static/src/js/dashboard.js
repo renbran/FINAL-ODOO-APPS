@@ -55,6 +55,8 @@ class OeSaleDashboard extends Component {
             this.state.isLoading = true;
             this.state.hasError = false;
             
+            console.log('Initializing dashboard...');
+            
             // Initialize field mapping
             await initFieldMapping(this.orm);
             
@@ -97,8 +99,23 @@ class OeSaleDashboard extends Component {
     
     async _loadDashboardData() {
         try {
+            console.log('Loading dashboard data...');
+            
             // Build date domain using the correct date field
             const dateDomain = buildDateDomain(this.state.startDate, this.state.endDate);
+            
+            // Get available fields for reading
+            const baseFields = ['id', 'name', 'partner_id', 'state'];
+            const amountField = getFieldName('amount_total'); // Will fallback to 'amount_total'
+            const saleValueField = isFieldAvailable('sale_value') ? 'sale_value' : null;
+            const dateField = getFieldName('booking_date'); // Will fallback to 'date_order'
+            
+            const readFields = [...baseFields, amountField];
+            if (saleValueField) readFields.push(saleValueField);
+            if (dateField !== 'date_order') readFields.push(dateField);
+            
+            console.log('Using fields for data loading:', readFields);
+            console.log('Date domain:', dateDomain);
             
             // Load quotations (draft and sent states)
             const quotationsDomain = [
@@ -106,12 +123,14 @@ class OeSaleDashboard extends Component {
                 ['state', 'in', ['draft', 'sent']]
             ];
             
+            console.log('Loading quotations with domain:', quotationsDomain);
             const quotations = await this.orm.searchRead(
                 'sale.order',
                 quotationsDomain,
-                ['id', 'name', 'partner_id', 'amount_total', 'sale_value', 'state'],
+                readFields,
                 { limit: false }
             );
+            console.log('Loaded quotations:', quotations.length, quotations);
             
             // Load sales orders (confirmed state)
             const salesOrdersDomain = [
@@ -119,15 +138,19 @@ class OeSaleDashboard extends Component {
                 ['state', '=', 'sale']
             ];
             
+            console.log('Loading sales orders with domain:', salesOrdersDomain);
+            const salesOrdersFields = [...readFields, 'invoice_status'];
             const salesOrders = await this.orm.searchRead(
                 'sale.order',
                 salesOrdersDomain,
-                ['id', 'name', 'partner_id', 'amount_total', 'sale_value', 'state', 'invoice_status'],
+                salesOrdersFields,
                 { limit: false }
             );
+            console.log('Loaded sales orders:', salesOrders.length, salesOrders);
             
             // Filter invoiced orders
             const invoicedOrders = salesOrders.filter(order => order.invoice_status === 'invoiced');
+            console.log('Invoiced orders:', invoicedOrders.length);
             
             // Calculate summary data
             this._calculateSummaryData(quotations, salesOrders, invoicedOrders);
@@ -136,6 +159,7 @@ class OeSaleDashboard extends Component {
             await this._loadRecentOrders(dateDomain);
             
             console.log('Dashboard data loaded successfully');
+            console.log('Summary data:', this.state.summaryData);
             
         } catch (error) {
             console.error('Error loading dashboard data:', error);
@@ -144,22 +168,42 @@ class OeSaleDashboard extends Component {
     }
     
     _calculateSummaryData(quotations, salesOrders, invoicedOrders) {
+        // Get the best available amount field
+        const amountField = isFieldAvailable('sale_value') ? 'sale_value' : 'amount_total';
+        console.log('Using amount field for calculations:', amountField);
+        
         // Calculate quotations totals
-        const quotationsTotal = quotations.reduce((sum, q) => sum + (q.amount_total || 0), 0);
+        const quotationsTotal = quotations.reduce((sum, q) => {
+            const amount = q[amountField] || q.amount_total || 0;
+            return sum + amount;
+        }, 0);
         const quotationsCount = quotations.length;
         
         // Calculate sales orders totals
-        const salesOrdersTotal = salesOrders.reduce((sum, s) => sum + (s.amount_total || 0), 0);
+        const salesOrdersTotal = salesOrders.reduce((sum, s) => {
+            const amount = s[amountField] || s.amount_total || 0;
+            return sum + amount;
+        }, 0);
         const salesOrdersCount = salesOrders.length;
         
         // Calculate invoiced totals
-        const invoicedTotal = invoicedOrders.reduce((sum, i) => sum + (i.amount_total || 0), 0);
+        const invoicedTotal = invoicedOrders.reduce((sum, i) => {
+            const amount = i[amountField] || i.amount_total || 0;
+            return sum + amount;
+        }, 0);
         const invoicedCount = invoicedOrders.length;
         
         // Calculate conversion rate
         const conversionRate = quotationsCount > 0 
             ? ((salesOrdersCount / quotationsCount) * 100).toFixed(1) + '%'
             : '0%';
+        
+        console.log('Calculated totals:', {
+            quotations: { count: quotationsCount, total: quotationsTotal },
+            salesOrders: { count: salesOrdersCount, total: salesOrdersTotal },
+            invoiced: { count: invoicedCount, total: invoicedTotal },
+            conversionRate
+        });
         
         // Update state
         this.state.summaryData = {
@@ -185,32 +229,44 @@ class OeSaleDashboard extends Component {
         this.state.quotationsData = quotations;
         this.state.salesOrdersData = salesOrders;
         this.state.invoicedSalesData = invoicedOrders;
+        
+        console.log('Updated state.summaryData:', this.state.summaryData);
     }
     
     async _loadRecentOrders(dateDomain) {
         try {
+            const dateField = getFieldName('booking_date');
+            const amountField = isFieldAvailable('sale_value') ? 'sale_value' : 'amount_total';
+            
+            const recentOrdersFields = ['name', 'partner_id', dateField, amountField, 'state'];
+            
+            console.log('Loading recent orders with fields:', recentOrdersFields);
+            
             const recentOrders = await this.orm.searchRead(
                 'sale.order',
                 dateDomain,
-                ['name', 'partner_id', getFieldName('booking_date'), 'amount_total', 'state'],
+                recentOrdersFields,
                 { 
                     limit: 10, 
-                    order: `${getFieldName('booking_date')} desc` 
+                    order: `${dateField} desc` 
                 }
             );
             
+            // Format the recent orders data
             this.state.recentOrders = recentOrders.map(order => ({
                 id: order.id,
                 name: order.name,
-                partner_name: order.partner_id[1],
-                date: this._formatDate(order[getFieldName('booking_date')]),
-                amount_formatted: this._formatCurrency(order.amount_total),
+                partner_name: order.partner_id ? order.partner_id[1] : 'Unknown Customer',
+                date: this._formatDate(order[dateField]),
+                amount_formatted: this._formatCurrency(order[amountField] || 0),
                 status_text: this._getStatusText(order.state),
                 status_class: this._getStatusClass(order.state)
             }));
             
+            console.log('Loaded recent orders:', this.state.recentOrders.length);
+            
         } catch (error) {
-            console.error('Error loading recent orders:', error);
+            console.warn('Could not load recent orders:', error);
             this.state.recentOrders = [];
         }
     }
@@ -290,6 +346,6 @@ class OeSaleDashboard extends Component {
 }
 
 // Register the component
-registry.category("actions").add("sales_dashboard_action", OeSaleDashboard);
+registry.category("actions").add("oe_sale_dashboard_17_action", OeSaleDashboard);
 
 export default OeSaleDashboard;

@@ -47,10 +47,11 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Enhanced merged assets with best practices
-            'oe_sale_dashboard_17/static/src/css/dashboard_merged.css',
-            'oe_sale_dashboard_17/static/src/js/dashboard_merged.js',
-            'oe_sale_dashboard_17/static/src/xml/dashboard_merged_template.xml',
+            # OSUS Enhanced Dashboard Assets
+            'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
+            'oe_sale_dashboard_17/static/src/js/field_mapping.js',
+            'oe_sale_dashboard_17/static/src/js/dashboard.js',
+            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
     },
     'images': ['static/description/banner.gif'],
