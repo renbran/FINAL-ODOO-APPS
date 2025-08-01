@@ -232,11 +232,17 @@ class OeSaleDashboard extends Component {
                 categories: {}
             },
             categoriesData: {},
+            categoryNames: [],
             monthlyFluctuationData: { labels: [], quotations: [], sales_orders: [], invoiced_sales: [] },
             salesTypeDistribution: { count_distribution: {}, amount_distribution: {} },
             topAgentsData: [],
             topAgenciesData: [],
-            recentOrders: []
+            recentOrders: [],
+            // Additional arrays needed by template
+            rankingData: [],
+            quotationsData: [],
+            salesOrdersData: [],
+            invoicedSalesData: []
         });
         
         // Initialize dashboard on mount
@@ -333,6 +339,15 @@ class OeSaleDashboard extends Component {
             // Load additional chart data
             await this._loadChartData();
             
+            // Load ranking and detailed data arrays
+            await this._loadRankingData();
+            
+            // Load separated data arrays for template
+            this._populateDataArrays();
+            
+            // Load top performers data
+            await this._loadTopPerformersData();
+            
             // Load recent orders
             await this._loadRecentOrders();
             
@@ -418,6 +433,9 @@ class OeSaleDashboard extends Component {
         
         // Store categories data for charts
         this.state.categoriesData = dashboardData.categories || {};
+        
+        // Populate category names for safe template iteration
+        this.state.categoryNames = Object.keys(dashboardData.categories || {});
         
         console.log('Processed dashboard data:', this.state.summaryData);
     }
@@ -557,6 +575,62 @@ class OeSaleDashboard extends Component {
         } catch (error) {
             console.warn('Could not load recent orders:', error);
             this.state.recentOrders = [];
+        }
+    }
+    
+    async _loadRankingData() {
+        try {
+            // Load sales type ranking data if available
+            const rankingData = await this.orm.call(
+                'sale.order',
+                'get_sales_type_ranking_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            this.state.rankingData = rankingData || [];
+        } catch (error) {
+            console.warn('Ranking data not available:', error);
+            this.state.rankingData = [];
+        }
+    }
+    
+    _populateDataArrays() {
+        // Populate arrays from categoriesData for template
+        this.state.quotationsData = [];
+        this.state.salesOrdersData = [];
+        this.state.invoicedSalesData = [];
+        
+        if (this.state.categoriesData && typeof this.state.categoriesData === 'object') {
+            for (const [categoryName, categoryData] of Object.entries(this.state.categoriesData)) {
+                // Add quotations data
+                if (categoryData.draft_count > 0) {
+                    this.state.quotationsData.push({
+                        sales_type_name: categoryName,
+                        count: categoryData.draft_count,
+                        amount: categoryData.draft_amount,
+                        formatted_amount: this._formatCurrency(categoryData.draft_amount)
+                    });
+                }
+                
+                // Add sales orders data
+                if (categoryData.sales_order_count > 0) {
+                    this.state.salesOrdersData.push({
+                        sales_type_name: categoryName,
+                        count: categoryData.sales_order_count,
+                        amount: categoryData.sales_order_amount,
+                        formatted_amount: this._formatCurrency(categoryData.sales_order_amount)
+                    });
+                }
+                
+                // Add invoiced sales data
+                if (categoryData.invoice_count > 0) {
+                    this.state.invoicedSalesData.push({
+                        sales_type_name: categoryName,
+                        count: categoryData.invoice_count,
+                        amount: categoryData.invoice_amount,
+                        formatted_amount: this._formatCurrency(categoryData.invoice_amount)
+                    });
+                }
+            }
         }
     }
     

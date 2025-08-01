@@ -104,7 +104,7 @@
                 
                 <!-- Category Cards -->
                 <div class="category-cards-grid">
-                    <t t-if="state.summaryData and state.summaryData.categories" t-foreach="Object.keys(state.summaryData.categories)" t-as="categoryName" t-key="categoryName">
+                    <t t-foreach="state.categoryNames || []" t-as="categoryName" t-key="categoryName">
                         <div class="category-card">
                             <div class="category-header">
                                 <h4 t-esc="categoryName"/>
