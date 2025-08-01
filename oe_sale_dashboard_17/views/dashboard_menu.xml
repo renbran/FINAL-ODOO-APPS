@@ -11,6 +11,6 @@
         id="menu_sales_dashboard_executive" 
         name="Executive Dashboard" 
         parent="menu_sales_dashboard_main"
-        action="action_sales_dashboard_view"
+        action="action_sales_dashboard"
         sequence="10"/>
 </odoo>
