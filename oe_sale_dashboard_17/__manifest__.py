@@ -35,6 +35,9 @@
     'author': 'RENBRAN - Production Enhanced',
     'website': 'WWW.TACHIMAO.COM',
     'depends': ['web', 'sale_management', 'le_sale_type'],
+    'external_dependencies': {
+        'python': [],
+    },
     'data': [
         'views/dashboard_views.xml',
     ],
@@ -46,10 +49,16 @@
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
+        'web.qunit_suite_tests': [
+            'oe_sale_dashboard_17/static/tests/**/*.js',
+        ],
     },
     'images': ['static/description/banner.gif'],
     'installable': True,
     'application': False,
     'auto_install': False,
     'license': 'AGPL-3',
+    'price': 0.0,
+    'currency': 'USD',
+    'support': 'WWW.TACHIMAO.COM',
 }
