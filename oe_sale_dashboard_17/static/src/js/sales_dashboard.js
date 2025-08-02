@@ -42,7 +42,6 @@ export class SalesDashboard extends Component {
             });
         }
     }
-    }
 
     getDefaultStartDate() {
         const date = new Date();
