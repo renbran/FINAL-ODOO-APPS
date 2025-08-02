@@ -191,21 +191,64 @@ function getAmountFields(recordType = 'default') {
 }
 
 /**
- * Get the appropriate amount field based on order state
- * @param {string} state - The order state ('draft', 'sale', 'done')
- * @returns {string} - The field name to use for amount calculation
+ * Get amount field based on order state
+ * @param {string} state - Order state ('draft', 'sale', 'invoiced')
+ * @returns {string} Field name to use for amount
  */
 function getAmountFieldForState(state) {
     switch (state) {
         case 'draft':
-            return 'amount_total'; // Use amount_total for quotations
+        case 'sent':
+            return 'amount_total';
         case 'sale':
-            return 'amount_total'; // Use amount_total for confirmed deals
-        case 'done':
-            // For invoiced deals, prefer invoice_amount if available
-            return fieldMapping._available.invoice_amount ? 'invoice_amount' : 'amount_total';
+            return 'amount_total';
+        case 'invoiced':
+            return 'invoice_amount';
         default:
             return 'amount_total';
+    }
+}
+
+/**
+ * Get state-specific field mapping
+ * @param {string} recordType - Type of record ('draft', 'sale', 'invoice')
+ * @returns {Object} Field mapping for the record type
+ */
+function getStateSpecificMapping(recordType) {
+    const baseMapping = {
+        booking_date: 'booking_date',
+        date_order: 'date_order',
+        sale_order_type_id: 'sale_order_type_id',
+        state: 'state',
+        invoice_status: 'invoice_status'
+    };
+
+    switch (recordType) {
+        case 'draft':
+            return {
+                ...baseMapping,
+                amount_field: 'amount_total',
+                primary_amount: 'amount_total'
+            };
+        case 'sale':
+            return {
+                ...baseMapping,
+                amount_field: 'amount_total',
+                primary_amount: 'amount_total'
+            };
+        case 'invoice':
+            return {
+                ...baseMapping,
+                amount_field: 'invoice_amount',
+                primary_amount: 'invoice_amount',
+                fallback_amount: 'amount_total'
+            };
+        default:
+            return {
+                ...baseMapping,
+                amount_field: 'amount_total',
+                primary_amount: 'amount_total'
+            };
     }
 }
 
@@ -226,5 +269,6 @@ export {
     buildSaleTypeDomain,
     getAmountFields,
     getAmountFieldForState,
+    getStateSpecificMapping,
     isFieldAvailable
 };

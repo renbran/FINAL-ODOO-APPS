@@ -87,6 +87,37 @@ class SaleDashboard(models.Model):
             return []
 
     @api.model
+    def _get_ranking_data(self, orders, rank_by='amount_total'):
+        """Get ranking data from orders using amount_total and price_unit"""
+        ranking_data = []
+        
+        try:
+            for order in orders:
+                # Use amount_total for primary ranking
+                amount = self._get_safe_amount_field(order)
+                
+                # Include price_unit for additional ranking insights if available
+                price_unit = order.get('price_unit', 0) if self._check_field_exists('price_unit') else 0
+                
+                ranking_data.append({
+                    'id': order.get('id'),
+                    'name': order.get('name', ''),
+                    'partner_name': order.get('partner_id', ['', ''])[1] if isinstance(order.get('partner_id'), list) else '',
+                    'amount_total': amount,
+                    'price_unit': price_unit,
+                    'ranking_score': amount + (price_unit * 0.1)  # Weight price_unit as 10% of total
+                })
+            
+            # Sort by ranking score (amount_total + weighted price_unit)
+            ranking_data.sort(key=lambda x: x['ranking_score'], reverse=True)
+            
+            return ranking_data
+            
+        except Exception as e:
+            _logger.error(f"Error in _get_ranking_data: {str(e)}")
+            return []
+
+    @api.model
     def get_dashboard_summary_data(self, start_date, end_date, sales_type_ids=None):
         """
         Get comprehensive dashboard summary data filtered by date and sales type
