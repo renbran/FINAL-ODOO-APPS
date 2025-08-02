@@ -1,10 +1,12 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, useState, useEffect, onMounted } from "@odoo/owl";
+import { Component, useState, onMounted } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
-class SalesDashboard extends Component {
+export class SalesDashboard extends Component {
+    static template = "oe_sale_dashboard_17.SalesDashboard";
+
     setup() {
         this.rpc = useService("rpc");
         this.notification = useService("notification");
@@ -25,9 +27,21 @@ class SalesDashboard extends Component {
         });
 
         onMounted(() => {
-            this.loadDashboardData();
-            this.setupEventListeners();
+            this.initializeDashboard();
         });
+    }
+
+    async initializeDashboard() {
+        try {
+            await this.loadDashboardData();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('Error initializing dashboard:', error);
+            this.notification.add('Error initializing dashboard', {
+                type: 'danger'
+            });
+        }
+    }
     }
 
     getDefaultStartDate() {
@@ -506,7 +520,5 @@ class SalesDashboard extends Component {
     }
 }
 
-SalesDashboard.template = "oe_sale_dashboard_17.SalesDashboard";
-
-// Register the component
+// Register the component with the action registry
 registry.category("actions").add("sales_dashboard", SalesDashboard);
