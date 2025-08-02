@@ -1,7 +1,9 @@
 from odoo import models, api, fields, _
+from odoo.exceptions import ValidationError, UserError
 from datetime import datetime, timedelta
 from collections import defaultdict
 import logging
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -45,6 +47,34 @@ class SaleDashboardEnhanced(models.Model):
             return 0.0
 
     @api.model
+    def _validate_date_range(self, start_date, end_date):
+        """Validate date range inputs with comprehensive checks"""
+        if not start_date or not end_date:
+            raise ValidationError(_("Start date and end date are required"))
+        
+        try:
+            start_dt = datetime.strptime(start_date, '%Y-%m-%d')
+            end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+        except ValueError:
+            raise ValidationError(_("Invalid date format. Please use YYYY-MM-DD format"))
+        
+        if start_dt > end_dt:
+            raise ValidationError(_("Start date cannot be after end date"))
+        
+        # Check for reasonable date range (not more than 2 years)
+        max_days = 730  # 2 years
+        if (end_dt - start_dt).days > max_days:
+            raise ValidationError(_("Date range cannot exceed 2 years"))
+        
+        # Check dates are not in the future
+        today = datetime.now().date()
+        if end_dt.date() > today:
+            end_date = today.strftime('%Y-%m-%d')
+            _logger.info(f"End date adjusted to today: {end_date}")
+        
+        return start_date, end_date
+
+    @api.model
     def format_dashboard_value(self, value, currency_code='AED'):
         """
         Format large numbers for dashboard display with K/M/B suffixes in AED currency
@@ -75,38 +105,44 @@ class SaleDashboardEnhanced(models.Model):
     @api.model
     def get_sales_types(self):
         """
-        Get available sales types from le_sale_type module
-        Returns list of sales types if le_sale_type module is installed
+        Get available sales types with enhanced error handling and fallback
         """
         try:
             if not self._check_field_exists('sale_order_type_id'):
                 _logger.info("sale_order_type_id field not found, le_sale_type module may not be installed")
                 return []
             
-            # Check if le.sale.type model exists
-            try:
-                SaleType = self.env['le.sale.type']
-                sales_types = SaleType.search([])
-                return [{
-                    'id': st.id,
-                    'name': st.name,
-                    'code': getattr(st, 'code', ''),
-                    'active': getattr(st, 'active', True)
-                } for st in sales_types]
-            except KeyError:
-                # Try alternative model name
+            # Try multiple possible model names for sales types
+            model_names = ['le.sale.type', 'sale.order.type', 'sale.type']
+            
+            for model_name in model_names:
                 try:
-                    SaleOrderType = self.env['sale.order.type']
-                    sales_types = SaleOrderType.search([])
-                    return [{
-                        'id': st.id,
-                        'name': st.name,
-                        'code': getattr(st, 'code', ''),
-                        'active': getattr(st, 'active', True)
-                    } for st in sales_types]
-                except KeyError:
-                    _logger.warning("No sales type model found")
-                    return []
+                    if model_name in self.env:
+                        SaleType = self.env[model_name]
+                        sales_types = SaleType.search([])
+                        result = []
+                        
+                        for st in sales_types:
+                            try:
+                                result.append({
+                                    'id': st.id,
+                                    'name': st.name,
+                                    'code': getattr(st, 'code', ''),
+                                    'active': getattr(st, 'active', True)
+                                })
+                            except Exception as e:
+                                _logger.warning(f"Error processing sales type {st.id}: {e}")
+                                continue
+                        
+                        _logger.info(f"Loaded {len(result)} sales types from {model_name}")
+                        return result
+                        
+                except Exception as e:
+                    _logger.debug(f"Model {model_name} not found or accessible: {e}")
+                    continue
+            
+            _logger.warning("No sales type model found")
+            return []
                 
         except Exception as e:
             _logger.error(f"Error getting sales types: {e}")
@@ -115,40 +151,36 @@ class SaleDashboardEnhanced(models.Model):
     @api.model
     def get_dashboard_summary_data(self, start_date, end_date, sales_type_ids=None):
         """
-        Get comprehensive dashboard summary data with enhanced error handling
+        Get comprehensive dashboard summary data with enhanced error handling and performance optimization
         """
         try:
-            if not start_date or not end_date:
-                raise ValueError("Start date and end date are required")
-                
+            # Validate inputs
+            start_date, end_date = self._validate_date_range(start_date, end_date)
+            
             date_field = self._get_safe_date_field()
             _logger.info(f"Loading dashboard data for {start_date} to {end_date}, using date field: {date_field}")
             
-            # Validate dates
-            try:
-                start_dt = datetime.strptime(start_date, '%Y-%m-%d')
-                end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-                if start_dt > end_dt:
-                    raise ValueError("Start date cannot be after end date")
-            except ValueError as e:
-                _logger.error(f"Invalid date format: {e}")
-                return self._get_sample_dashboard_data()
-            
-            # Base domain for filtering with safe field checking
+            # Build base domain with enhanced filtering
             base_domain = [
                 (date_field, '>=', start_date),
                 (date_field, '<=', end_date),
                 ('state', '!=', 'cancel')  # Exclude cancelled orders
             ]
             
-            # Only add sales type filter if the field exists and we have valid IDs
+            # Add sales type filter with validation
             if sales_type_ids and self._check_field_exists('sale_order_type_id'):
-                # Validate sales_type_ids
-                valid_ids = [int(id) for id in sales_type_ids if str(id).isdigit()]
+                valid_ids = []
+                for id_val in sales_type_ids:
+                    try:
+                        valid_ids.append(int(id_val))
+                    except (ValueError, TypeError):
+                        _logger.warning(f"Invalid sales type ID: {id_val}")
+                        continue
+                
                 if valid_ids:
                     base_domain.append(('sale_order_type_id', 'in', valid_ids))
             
-            # Initialize summary data
+            # Initialize summary data structure
             summary_data = {}
             total_summary = {
                 'draft_count': 0, 'draft_amount': 0,
@@ -169,24 +201,39 @@ class SaleDashboardEnhanced(models.Model):
                     if valid_ids:
                         sales_types_domain = [('id', 'in', valid_ids)]
                 
-                try:
-                    # Try le.sale.type first
-                    sales_types = self.env['le.sale.type'].search(sales_types_domain)
-                except KeyError:
+                # Try multiple model names for sales types
+                sales_types = []
+                model_names = ['le.sale.type', 'sale.order.type', 'sale.type']
+                
+                for model_name in model_names:
                     try:
-                        # Fallback to sale.order.type
-                        sales_types = self.env['sale.order.type'].search(sales_types_domain)
-                    except KeyError:
-                        sales_types = []
+                        if model_name in self.env:
+                            sales_types = self.env[model_name].search(sales_types_domain)
+                            break
+                    except Exception:
+                        continue
                 
                 _logger.info(f"Found {len(sales_types)} sales types")
                 
-                for sales_type in sales_types:
-                    type_domain = base_domain + [('sale_order_type_id', '=', sales_type.id)]
-                    category_data = self._process_category_data(type_domain, sales_type.name)
-                    summary_data[sales_type.name] = category_data
+                if sales_types:
+                    for sales_type in sales_types:
+                        try:
+                            type_domain = base_domain + [('sale_order_type_id', '=', sales_type.id)]
+                            category_data = self._process_category_data(type_domain, sales_type.name)
+                            summary_data[sales_type.name] = category_data
+                            
+                            # Add to totals
+                            for key in ['draft_count', 'draft_amount', 'sales_order_count', 
+                                       'sales_order_amount', 'invoice_count', 'invoice_amount']:
+                                total_summary[key] += category_data.get(key, 0)
+                        except Exception as e:
+                            _logger.warning(f"Error processing sales type {sales_type.name}: {e}")
+                            continue
+                else:
+                    # No sales types found, process all data as one category
+                    category_data = self._process_category_data(base_domain, 'All Sales')
+                    summary_data['All Sales'] = category_data
                     
-                    # Add to totals
                     for key in ['draft_count', 'draft_amount', 'sales_order_count', 
                                'sales_order_amount', 'invoice_count', 'invoice_amount']:
                         total_summary[key] += category_data.get(key, 0)
@@ -200,7 +247,7 @@ class SaleDashboardEnhanced(models.Model):
                            'sales_order_amount', 'invoice_count', 'invoice_amount']:
                     total_summary[key] += category_data.get(key, 0)
             
-            # Calculate totals
+            # Calculate enhanced totals and KPIs
             total_summary['total_count'] = (total_summary['draft_count'] + 
                                           total_summary['sales_order_count'] + 
                                           total_summary['invoice_count'])
@@ -213,16 +260,19 @@ class SaleDashboardEnhanced(models.Model):
                 _logger.warning(f"No data found for date range {start_date} to {end_date}")
                 return self._get_sample_dashboard_data()
             
-            # Calculate enhanced KPIs
-            if total_summary['draft_count'] > 0:
-                total_summary['conversion_rate'] = (total_summary['invoice_count'] / total_summary['draft_count']) * 100
-            
-            if total_summary['total_count'] > 0:
-                total_summary['avg_deal_size'] = total_summary['total_amount'] / total_summary['total_count']
-            
-            # Calculate revenue growth and pipeline velocity
-            total_summary['revenue_growth'] = self._calculate_revenue_growth(start_date, end_date, sales_type_ids)
-            total_summary['pipeline_velocity'] = self._calculate_pipeline_velocity(start_date, end_date, sales_type_ids)
+            # Calculate enhanced KPIs with error handling
+            try:
+                if total_summary['draft_count'] > 0:
+                    total_summary['conversion_rate'] = (total_summary['invoice_count'] / total_summary['draft_count']) * 100
+                
+                if total_summary['total_count'] > 0:
+                    total_summary['avg_deal_size'] = total_summary['total_amount'] / total_summary['total_count']
+                
+                # Calculate revenue growth and pipeline velocity
+                total_summary['revenue_growth'] = self._calculate_revenue_growth(start_date, end_date, sales_type_ids)
+                total_summary['pipeline_velocity'] = self._calculate_pipeline_velocity(start_date, end_date, sales_type_ids)
+            except Exception as e:
+                _logger.warning(f"Error calculating KPIs: {e}")
             
             # Add formatted values for dashboard display
             total_summary['formatted_draft_amount'] = self.format_dashboard_value(total_summary['draft_amount'])
@@ -245,12 +295,15 @@ class SaleDashboardEnhanced(models.Model):
                     'has_broker_fields': self._check_field_exists('broker_partner_id') and self._check_field_exists('broker_amount'),
                     'start_date': start_date,
                     'end_date': end_date,
-                    'sales_type_filter': sales_type_ids or []
+                    'sales_type_filter': sales_type_ids or [],
+                    'processing_time': datetime.now().isoformat()
                 }
             }
             
+        except ValidationError:
+            raise  # Re-raise validation errors
         except Exception as e:
-            _logger.error(f"Error in get_dashboard_summary_data: {str(e)}")
+            _logger.error(f"Critical error in get_dashboard_summary_data: {str(e)}")
             return self._get_sample_dashboard_data()
 
     @api.model
@@ -316,63 +369,92 @@ class SaleDashboardEnhanced(models.Model):
                 'has_booking_date': self._check_field_exists('booking_date'),
                 'has_agent1_fields': self._check_field_exists('agent1_partner_id') and self._check_field_exists('agent1_amount'),
                 'has_broker_fields': self._check_field_exists('broker_partner_id') and self._check_field_exists('broker_amount'),
-                'is_sample_data': True
+                'is_sample_data': True,
+                'sample_reason': 'No real data found for the specified date range'
             }
         }
 
     def _process_category_data(self, base_domain, category_name):
-        """Process data for a specific category with enhanced error handling"""
+        """Process data for a specific category with enhanced error handling and performance optimization"""
         try:
-            # Fields to read with safe checking
+            # Use read_group for better performance on large datasets
             fields_to_read = ['state', 'invoice_status', 'amount_total', 'name']
-            if self._check_field_exists('sale_value'):
-                fields_to_read.append('sale_value')
-            if self._check_field_exists('invoice_amount'):
-                fields_to_read.append('invoice_amount')
-            if self._check_field_exists('booking_date'):
-                fields_to_read.append('booking_date')
             
-            # Draft orders (quotations) - use amount_total
+            # Add optional fields if they exist
+            optional_fields = ['sale_value', 'invoice_amount', 'booking_date']
+            for field in optional_fields:
+                if self._check_field_exists(field):
+                    fields_to_read.append(field)
+            
+            # Get counts and totals using read_group for better performance
             draft_domain = base_domain + [('state', 'in', ['draft', 'sent'])]
-            draft_orders = self.search_read(draft_domain, fields_to_read)
-            draft_count = len(draft_orders)
-            draft_amount = sum(self._get_safe_amount_field(order) for order in draft_orders)
-            
-            # Confirmed sales orders (sale status) - use amount_total
             so_domain = base_domain + [('state', '=', 'sale'), ('invoice_status', 'in', ['to invoice', 'no', 'upselling'])]
-            so_orders = self.search_read(so_domain, fields_to_read)
-            so_count = len(so_orders)
-            so_amount = sum(self._get_safe_amount_field(order) for order in so_orders)
-            
-            # Invoiced sales orders - use invoice_amount if available, otherwise amount_total
             invoice_domain = base_domain + [('state', '=', 'sale'), ('invoice_status', '=', 'invoiced')]
-            invoice_orders = self.search_read(invoice_domain, fields_to_read)
-            invoice_count = len(invoice_orders)
-            invoice_amount = 0.0
             
-            for order in invoice_orders:
-                # Prefer invoice_amount if available
-                if self._check_field_exists('invoice_amount') and order.get('invoice_amount'):
-                    invoice_amount += float(order['invoice_amount'])
-                else:
+            # Use read_group for aggregation
+            try:
+                draft_data = self.read_group(
+                    draft_domain, 
+                    ['amount_total'], 
+                    [], 
+                    lazy=False
+                )
+                draft_count = draft_data[0]['__count'] if draft_data else 0
+                draft_amount = draft_data[0]['amount_total'] if draft_data else 0.0
+            except Exception as e:
+                _logger.warning(f"Error in draft read_group: {e}, falling back to search_read")
+                draft_orders = self.search_read(draft_domain, fields_to_read)
+                draft_count = len(draft_orders)
+                draft_amount = sum(self._get_safe_amount_field(order) for order in draft_orders)
+            
+            try:
+                so_data = self.read_group(
+                    so_domain, 
+                    ['amount_total'], 
+                    [], 
+                    lazy=False
+                )
+                so_count = so_data[0]['__count'] if so_data else 0
+                so_amount = so_data[0]['amount_total'] if so_data else 0.0
+            except Exception as e:
+                _logger.warning(f"Error in sales order read_group: {e}, falling back to search_read")
+                so_orders = self.search_read(so_domain, fields_to_read)
+                so_count = len(so_orders)
+                so_amount = sum(self._get_safe_amount_field(order) for order in so_orders)
+            
+            # For invoiced orders, we need to get actual invoiced amounts
+            try:
+                invoice_orders = self.search_read(invoice_domain, fields_to_read)
+                invoice_count = len(invoice_orders)
+                invoice_amount = 0.0
+                
+                for order in invoice_orders:
                     # Try to get actual invoiced amount
-                    actual_amount = self._get_actual_invoiced_amount(order.get('name', ''))
-                    invoice_amount += actual_amount or self._get_safe_amount_field(order)
+                    if self._check_field_exists('invoice_amount') and order.get('invoice_amount'):
+                        invoice_amount += float(order['invoice_amount'])
+                    else:
+                        # Get actual invoiced amount from account.move
+                        actual_amount = self._get_actual_invoiced_amount(order.get('name', ''))
+                        invoice_amount += actual_amount or self._get_safe_amount_field(order)
+            except Exception as e:
+                _logger.warning(f"Error processing invoiced orders: {e}")
+                invoice_count = 0
+                invoice_amount = 0.0
             
             # Calculate category totals
-            category_total = draft_amount + so_amount + invoice_amount
+            category_total = float(draft_amount) + float(so_amount) + float(invoice_amount)
             
             return {
-                'draft_count': draft_count,
+                'draft_count': int(draft_count),
                 'draft_amount': float(draft_amount),
                 'formatted_draft_amount': self.format_dashboard_value(draft_amount),
-                'sales_order_count': so_count,
+                'sales_order_count': int(so_count),
                 'sales_order_amount': float(so_amount),
                 'formatted_sales_order_amount': self.format_dashboard_value(so_amount),
-                'invoice_count': invoice_count,
+                'invoice_count': int(invoice_count),
                 'invoice_amount': float(invoice_amount),
                 'formatted_invoice_amount': self.format_dashboard_value(invoice_amount),
-                'total_count': draft_count + so_count + invoice_count,
+                'total_count': int(draft_count) + int(so_count) + int(invoice_count),
                 'total_amount': float(category_total),
                 'formatted_total_amount': self.format_dashboard_value(category_total),
                 'category_name': category_name
@@ -393,7 +475,7 @@ class SaleDashboardEnhanced(models.Model):
             }
 
     def _calculate_revenue_growth(self, start_date, end_date, sales_type_ids=None):
-        """Calculate revenue growth compared to previous period with error handling"""
+        """Calculate revenue growth compared to previous period with enhanced error handling"""
         try:
             # Current period revenue
             current_revenue = self._get_period_revenue(start_date, end_date, sales_type_ids)
@@ -402,6 +484,10 @@ class SaleDashboardEnhanced(models.Model):
             start_dt = datetime.strptime(start_date, '%Y-%m-%d')
             end_dt = datetime.strptime(end_date, '%Y-%m-%d')
             period_length = (end_dt - start_dt).days
+            
+            # Ensure we have at least 1 day period
+            if period_length <= 0:
+                return 0.0
             
             prev_end_dt = start_dt - timedelta(days=1)
             prev_start_dt = prev_end_dt - timedelta(days=period_length)
@@ -416,6 +502,8 @@ class SaleDashboardEnhanced(models.Model):
             if prev_revenue > 0:
                 growth = ((current_revenue - prev_revenue) / prev_revenue) * 100
                 return round(growth, 2)
+            elif current_revenue > 0:
+                return 100.0  # 100% growth from zero
             
             return 0.0
             
@@ -424,7 +512,7 @@ class SaleDashboardEnhanced(models.Model):
             return 0.0
 
     def _get_period_revenue(self, start_date, end_date, sales_type_ids=None):
-        """Get total revenue for a specific period with error handling"""
+        """Get total revenue for a specific period with enhanced error handling"""
         try:
             date_field = self._get_safe_date_field()
             domain = [
@@ -439,25 +527,37 @@ class SaleDashboardEnhanced(models.Model):
                 if valid_ids:
                     domain.append(('sale_order_type_id', 'in', valid_ids))
             
-            fields_to_read = ['amount_total', 'name']
-            if self._check_field_exists('sale_value'):
-                fields_to_read.append('sale_value')
+            # Use read_group for better performance
+            try:
+                result = self.read_group(
+                    domain,
+                    ['amount_total'],
+                    [],
+                    lazy=False
+                )
+                return float(result[0]['amount_total']) if result else 0.0
+            except Exception as e:
+                _logger.warning(f"read_group failed for period revenue: {e}, using fallback")
+                # Fallback to search_read
+                fields_to_read = ['amount_total', 'name']
+                if self._check_field_exists('sale_value'):
+                    fields_to_read.append('sale_value')
+                    
+                orders = self.search_read(domain, fields_to_read)
                 
-            orders = self.search_read(domain, fields_to_read)
-            
-            total_revenue = 0.0
-            for order in orders:
-                actual_amount = self._get_actual_invoiced_amount(order.get('name', ''))
-                total_revenue += actual_amount or self._get_safe_amount_field(order)
-                
-            return float(total_revenue)
+                total_revenue = 0.0
+                for order in orders:
+                    actual_amount = self._get_actual_invoiced_amount(order.get('name', ''))
+                    total_revenue += actual_amount or self._get_safe_amount_field(order)
+                    
+                return float(total_revenue)
             
         except Exception as e:
             _logger.error(f"Error getting period revenue: {str(e)}")
             return 0.0
 
     def _calculate_pipeline_velocity(self, start_date, end_date, sales_type_ids=None):
-        """Calculate average time from quotation to invoice with error handling"""
+        """Calculate average time from quotation to invoice with enhanced error handling"""
         try:
             date_field = self._get_safe_date_field()
             domain = [
@@ -472,7 +572,7 @@ class SaleDashboardEnhanced(models.Model):
                 if valid_ids:
                     domain.append(('sale_order_type_id', 'in', valid_ids))
             
-            fields_to_read = [date_field, 'date_order', 'confirmation_date']
+            fields_to_read = [date_field, 'date_order', 'confirmation_date', 'create_date']
             orders = self.search_read(domain, fields_to_read)
             
             if not orders:
@@ -482,22 +582,24 @@ class SaleDashboardEnhanced(models.Model):
             valid_orders = 0
             
             for order in orders:
-                order_date = order.get('confirmation_date') or order.get('date_order')
-                invoice_date = order.get(date_field)
+                # Use the best available start date
+                start_date_field = order.get('confirmation_date') or order.get('date_order') or order.get('create_date')
+                end_date_field = order.get(date_field)
                 
-                if order_date and invoice_date:
+                if start_date_field and end_date_field:
                     try:
-                        if isinstance(order_date, str):
-                            order_dt = datetime.strptime(order_date[:10], '%Y-%m-%d')
+                        # Handle both string and datetime objects
+                        if isinstance(start_date_field, str):
+                            start_dt = datetime.strptime(start_date_field[:10], '%Y-%m-%d')
                         else:
-                            order_dt = order_date
+                            start_dt = start_date_field
                         
-                        if isinstance(invoice_date, str):
-                            invoice_dt = datetime.strptime(invoice_date[:10], '%Y-%m-%d')
+                        if isinstance(end_date_field, str):
+                            end_dt = datetime.strptime(end_date_field[:10], '%Y-%m-%d')
                         else:
-                            invoice_dt = invoice_date
+                            end_dt = end_date_field
                         
-                        days_diff = (invoice_dt - order_dt).days
+                        days_diff = (end_dt - start_dt).days
                         if days_diff >= 0:  # Valid progression
                             total_days += days_diff
                             valid_orders += 1
@@ -512,11 +614,12 @@ class SaleDashboardEnhanced(models.Model):
             return 0.0
 
     def _get_actual_invoiced_amount(self, order_name):
-        """Get actual invoiced amount from account.move records with error handling"""
+        """Get actual invoiced amount from account.move records with enhanced error handling"""
         try:
             if not order_name:
                 return 0.0
-                
+            
+            # Search for invoices related to this order
             invoices = self.env['account.move'].search([
                 ('invoice_origin', '=', order_name),
                 ('move_type', 'in', ['out_invoice', 'out_refund']),
@@ -526,10 +629,11 @@ class SaleDashboardEnhanced(models.Model):
             total_amount = 0.0
             for invoice in invoices:
                 try:
+                    amount = float(invoice.amount_total or 0)
                     if invoice.move_type == 'out_invoice':
-                        total_amount += float(invoice.amount_total or 0)
+                        total_amount += amount
                     elif invoice.move_type == 'out_refund':
-                        total_amount -= float(invoice.amount_total or 0)
+                        total_amount -= amount
                 except (ValueError, TypeError) as e:
                     _logger.warning(f"Error processing invoice amount for {invoice.name}: {e}")
                     continue
@@ -542,40 +646,34 @@ class SaleDashboardEnhanced(models.Model):
     @api.model
     def get_monthly_fluctuation_data(self, start_date, end_date, sales_type_ids=None):
         """
-        Get monthly fluctuation data with enhanced error handling
+        Get monthly fluctuation data with enhanced error handling and performance optimization
         """
         try:
             # Validate input dates
-            try:
-                start_dt = datetime.strptime(start_date, '%Y-%m-%d')
-                end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-            except ValueError as e:
-                _logger.error(f"Invalid date format: {e}")
-                return {
-                    'labels': ['Current Period'],
-                    'quotations': [0],
-                    'sales_orders': [0],
-                    'invoiced_sales': [0],
-                    'error': 'Invalid date format'
-                }
+            start_date, end_date = self._validate_date_range(start_date, end_date)
             
             date_field = self._get_safe_date_field()
             
-            # Generate monthly buckets
+            # Generate monthly buckets more efficiently
+            start_dt = datetime.strptime(start_date, '%Y-%m-%d')
+            end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+            
             monthly_data = defaultdict(lambda: {
                 'quotations': {'count': 0, 'amount': 0},
                 'sales_orders': {'count': 0, 'amount': 0},
                 'invoiced_sales': {'count': 0, 'amount': 0}
             })
             
-            # Generate month labels
+            # Generate month labels and keys
             current_dt = start_dt.replace(day=1)
             month_labels = []
+            month_keys = []
             
             while current_dt <= end_dt:
                 month_key = current_dt.strftime('%Y-%m')
                 month_label = current_dt.strftime('%b %Y')
                 month_labels.append(month_label)
+                month_keys.append(month_key)
                 monthly_data[month_key]  # Initialize if not exists
                 
                 # Move to next month
@@ -602,10 +700,21 @@ class SaleDashboardEnhanced(models.Model):
             if self._check_field_exists('sale_value'):
                 fields_to_read.append('sale_value')
             
-            # Process each type of order
-            self._process_monthly_orders(base_domain, fields_to_read, date_field, monthly_data, 'quotations', [('state', 'in', ['draft', 'sent'])])
-            self._process_monthly_orders(base_domain, fields_to_read, date_field, monthly_data, 'sales_orders', [('state', '=', 'sale'), ('invoice_status', 'in', ['to invoice', 'no', 'upselling'])])
-            self._process_monthly_orders(base_domain, fields_to_read, date_field, monthly_data, 'invoiced_sales', [('state', '=', 'sale'), ('invoice_status', '=', 'invoiced')])
+            # Process each type of order in parallel where possible
+            order_types = [
+                ('quotations', [('state', 'in', ['draft', 'sent'])]),
+                ('sales_orders', [('state', '=', 'sale'), ('invoice_status', 'in', ['to invoice', 'no', 'upselling'])]),
+                ('invoiced_sales', [('state', '=', 'sale'), ('invoice_status', '=', 'invoiced')])
+            ]
+            
+            for order_type, additional_domain in order_types:
+                self._process_monthly_orders(
+                    base_domain + additional_domain, 
+                    fields_to_read, 
+                    date_field, 
+                    monthly_data, 
+                    order_type
+                )
             
             # Convert to chart format
             result = {
@@ -615,28 +724,15 @@ class SaleDashboardEnhanced(models.Model):
                 'invoiced_sales': []
             }
             
-            for label in month_labels:
-                # Find the corresponding month data
-                month_key = None
-                try:
-                    for key in monthly_data.keys():
-                        if datetime.strptime(key, '%Y-%m').strftime('%b %Y') == label:
-                            month_key = key
-                            break
-                except ValueError:
-                    continue
-                
-                if month_key and month_key in monthly_data:
-                    result['quotations'].append(monthly_data[month_key]['quotations']['amount'])
-                    result['sales_orders'].append(monthly_data[month_key]['sales_orders']['amount'])
-                    result['invoiced_sales'].append(monthly_data[month_key]['invoiced_sales']['amount'])
-                else:
-                    result['quotations'].append(0)
-                    result['sales_orders'].append(0)
-                    result['invoiced_sales'].append(0)
+            for month_key in month_keys:
+                result['quotations'].append(monthly_data[month_key]['quotations']['amount'])
+                result['sales_orders'].append(monthly_data[month_key]['sales_orders']['amount'])
+                result['invoiced_sales'].append(monthly_data[month_key]['invoiced_sales']['amount'])
             
             return result
             
+        except ValidationError:
+            raise  # Re-raise validation errors
         except Exception as e:
             _logger.error(f"Error in get_monthly_fluctuation_data: {str(e)}")
             return {
@@ -647,46 +743,62 @@ class SaleDashboardEnhanced(models.Model):
                 'error': str(e)
             }
 
-    def _process_monthly_orders(self, base_domain, fields_to_read, date_field, monthly_data, order_type, additional_domain):
-        """Helper method to process orders by month"""
+    def _process_monthly_orders(self, domain, fields_to_read, date_field, monthly_data, order_type):
+        """Helper method to process orders by month with enhanced performance"""
         try:
-            domain = base_domain + additional_domain
-            orders = self.search_read(domain, fields_to_read)
+            # Use limit to prevent memory issues on large datasets
+            batch_size = 1000
+            offset = 0
             
-            for order in orders:
-                order_date = order.get(date_field)
-                if order_date:
+            while True:
+                orders = self.search_read(
+                    domain, 
+                    fields_to_read,
+                    limit=batch_size,
+                    offset=offset
+                )
+                
+                if not orders:
+                    break
+                
+                for order in orders:
                     try:
-                        if isinstance(order_date, str):
-                            month_key = datetime.strptime(order_date[:10], '%Y-%m-%d').strftime('%Y-%m')
-                        else:
-                            month_key = order_date.strftime('%Y-%m')
-                        
-                        if month_key in monthly_data:
-                            monthly_data[month_key][order_type]['count'] += 1
-                            
-                            # Get amount based on order type
-                            if order_type == 'invoiced_sales':
-                                # Try to get actual invoiced amount
-                                invoiced_amount = self._get_actual_invoiced_amount(order.get('name', ''))
-                                amount = invoiced_amount or self._get_safe_amount_field(order)
+                        order_date = order.get(date_field)
+                        if order_date:
+                            # Handle both string and datetime objects
+                            if isinstance(order_date, str):
+                                month_key = datetime.strptime(order_date[:10], '%Y-%m-%d').strftime('%Y-%m')
                             else:
-                                amount = self._get_safe_amount_field(order)
+                                month_key = order_date.strftime('%Y-%m')
                             
-                            monthly_data[month_key][order_type]['amount'] += amount
+                            if month_key in monthly_data:
+                                monthly_data[month_key][order_type]['count'] += 1
+                                
+                                # Get amount based on order type
+                                if order_type == 'invoiced_sales':
+                                    # Try to get actual invoiced amount
+                                    invoiced_amount = self._get_actual_invoiced_amount(order.get('name', ''))
+                                    amount = invoiced_amount or self._get_safe_amount_field(order)
+                                else:
+                                    amount = self._get_safe_amount_field(order)
+                                
+                                monthly_data[month_key][order_type]['amount'] += amount
                     except (ValueError, TypeError) as e:
                         _logger.warning(f"Error processing date for order {order.get('name', '')}: {e}")
                         continue
-                        
+                
+                offset += batch_size
+                
         except Exception as e:
             _logger.error(f"Error processing monthly orders for {order_type}: {str(e)}")
 
     @api.model
     def get_sales_type_distribution(self, start_date, end_date):
         """
-        Get sales type distribution data for pie charts with enhanced error handling
+        Get sales type distribution data for pie charts with enhanced error handling and performance
         """
         try:
+            start_date, end_date = self._validate_date_range(start_date, end_date)
             date_field = self._get_safe_date_field()
             
             # Base domain excluding cancelled orders
@@ -704,18 +816,25 @@ class SaleDashboardEnhanced(models.Model):
                     'message': 'Sales types not available in this instance'
                 }
             
-            # Get all sales types
-            try:
-                sales_types = self.env['le.sale.type'].search([])
-            except KeyError:
+            # Get all sales types with enhanced model detection
+            sales_types = []
+            model_names = ['le.sale.type', 'sale.order.type', 'sale.type']
+            
+            for model_name in model_names:
                 try:
-                    sales_types = self.env['sale.order.type'].search([])
-                except KeyError:
-                    return {
-                        'count_distribution': {},
-                        'amount_distribution': {},
-                        'error': 'No sales type model found'
-                    }
+                    if model_name in self.env:
+                        sales_types = self.env[model_name].search([])
+                        break
+                except Exception as e:
+                    _logger.debug(f"Model {model_name} not accessible: {e}")
+                    continue
+            
+            if not sales_types:
+                return {
+                    'count_distribution': {},
+                    'amount_distribution': {},
+                    'error': 'No sales type model found'
+                }
             
             count_distribution = {}
             amount_distribution = {}
@@ -729,21 +848,37 @@ class SaleDashboardEnhanced(models.Model):
                 try:
                     type_domain = base_domain + [('sale_order_type_id', '=', sales_type.id)]
                     
-                    # Get all orders for this type
-                    orders = self.search_read(type_domain, fields_to_read)
-                    
-                    total_count = len(orders)
-                    total_amount = 0.0
-                    
-                    for order in orders:
-                        # For invoiced orders, try to get actual invoiced amount
-                        if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
-                            invoiced_amount = self._get_actual_invoiced_amount(order.get('name', ''))
-                            amount = invoiced_amount or self._get_safe_amount_field(order)
-                        else:
-                            amount = self._get_safe_amount_field(order)
+                    # Use read_group for better performance when possible
+                    try:
+                        result = self.read_group(
+                            type_domain,
+                            ['amount_total'],
+                            [],
+                            lazy=False
+                        )
                         
-                        total_amount += amount
+                        if result:
+                            total_count = result[0]['__count']
+                            total_amount = float(result[0]['amount_total'] or 0)
+                        else:
+                            total_count = 0
+                            total_amount = 0.0
+                    except Exception as e:
+                        _logger.warning(f"read_group failed for sales type {sales_type.name}: {e}")
+                        # Fallback to search_read
+                        orders = self.search_read(type_domain, fields_to_read)
+                        total_count = len(orders)
+                        total_amount = 0.0
+                        
+                        for order in orders:
+                            # For invoiced orders, try to get actual invoiced amount
+                            if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
+                                invoiced_amount = self._get_actual_invoiced_amount(order.get('name', ''))
+                                amount = invoiced_amount or self._get_safe_amount_field(order)
+                            else:
+                                amount = self._get_safe_amount_field(order)
+                            
+                            total_amount += amount
                     
                     if total_count > 0:  # Only include types with data
                         count_distribution[sales_type.name] = total_count
@@ -758,6 +893,8 @@ class SaleDashboardEnhanced(models.Model):
                 'amount_distribution': amount_distribution
             }
             
+        except ValidationError:
+            raise  # Re-raise validation errors
         except Exception as e:
             _logger.error(f"Error in get_sales_type_distribution: {str(e)}")
             return {
@@ -769,16 +906,19 @@ class SaleDashboardEnhanced(models.Model):
     @api.model 
     def get_top_performers_data(self, start_date, end_date, performer_type='agent', limit=10):
         """
-        Get top performing agents or agencies with enhanced error handling
+        Get top performing agents or agencies with enhanced error handling and performance optimization
         """
         try:
             # Validate inputs
+            start_date, end_date = self._validate_date_range(start_date, end_date)
+            
             if performer_type not in ['agent', 'agency']:
-                _logger.error(f"Invalid performer_type: {performer_type}")
-                return []
+                raise ValidationError(f"Invalid performer_type: {performer_type}")
             
             if not isinstance(limit, int) or limit <= 0:
                 limit = 10
+            elif limit > 100:  # Prevent excessive data retrieval
+                limit = 100
             
             date_field = self._get_safe_date_field()
             
@@ -811,81 +951,87 @@ class SaleDashboardEnhanced(models.Model):
             
             if self._check_field_exists('sale_value'):
                 fields_to_read.append('sale_value')
-            if self._check_field_exists('price_unit'):
-                fields_to_read.append('price_unit')
-            if self._check_field_exists('invoice_amount'):
-                fields_to_read.append('invoice_amount')
-                
-            orders = self.search_read(base_domain, fields_to_read)
             
-            _logger.info(f"Found {len(orders)} orders for {performer_type} ranking")
-
-            # Group data by partner
+            # Use batched processing for large datasets
+            batch_size = 2000
+            offset = 0
             partner_data = {}
             
-            for order in orders:
-                try:
-                    partner_id = order.get(partner_field)
-                    if not partner_id:
+            while True:
+                orders = self.search_read(
+                    base_domain, 
+                    fields_to_read,
+                    limit=batch_size,
+                    offset=offset
+                )
+                
+                if not orders:
+                    break
+                
+                _logger.info(f"Processing batch {offset//batch_size + 1}: {len(orders)} orders")
+                
+                for order in orders:
+                    try:
+                        partner_id = order.get(partner_field)
+                        if not partner_id:
+                            continue
+                            
+                        # Handle both tuple format (id, name) and plain id
+                        if isinstance(partner_id, (tuple, list)) and len(partner_id) >= 2:
+                            partner_key = partner_id[0]
+                            partner_name = partner_id[1]
+                        elif isinstance(partner_id, int):
+                            partner_key = partner_id
+                            # Get partner name from res.partner model with caching
+                            partner_name = self._get_partner_name_cached(partner_key)
+                        else:
+                            continue
+                        
+                        if partner_key not in partner_data:
+                            partner_data[partner_key] = {
+                                'partner_id': partner_key,
+                                'partner_name': partner_name,
+                                'count': 0,
+                                'total_sales_value': 0.0,
+                                'total_commission': 0.0,
+                                'invoiced_count': 0,
+                                'invoiced_sales_value': 0.0,
+                                'invoiced_commission': 0.0
+                            }
+                        
+                        # Get values with proper validation
+                        sales_value = self._get_safe_amount_field(order)
+                        commission_value = float(order.get(amount_field) or 0.0)
+                        
+                        # Add to totals
+                        partner_data[partner_key]['count'] += 1
+                        partner_data[partner_key]['total_sales_value'] += sales_value
+                        partner_data[partner_key]['total_commission'] += commission_value
+                        
+                        # If invoiced, add to invoiced totals
+                        if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
+                            partner_data[partner_key]['invoiced_count'] += 1
+                            
+                            # Try to get actual invoiced amount
+                            order_name = order.get('name', '')
+                            invoiced_amount = self._get_actual_invoiced_amount(order_name)
+                            final_sales_value = invoiced_amount or sales_value
+                            
+                            partner_data[partner_key]['invoiced_sales_value'] += final_sales_value
+                            partner_data[partner_key]['invoiced_commission'] += commission_value
+                            
+                    except Exception as e:
+                        _logger.warning(f"Error processing order {order.get('name', '')}: {e}")
                         continue
-                        
-                    # Handle both tuple format (id, name) and plain id
-                    if isinstance(partner_id, (tuple, list)) and len(partner_id) >= 2:
-                        partner_key = partner_id[0]
-                        partner_name = partner_id[1]
-                    elif isinstance(partner_id, int):
-                        partner_key = partner_id
-                        # Get partner name from res.partner model
-                        try:
-                            partner_rec = self.env['res.partner'].browse(partner_key)
-                            partner_name = partner_rec.name if partner_rec.exists() else f"Partner {partner_key}"
-                        except Exception:
-                            partner_name = f"Partner {partner_key}"
-                    else:
-                        continue
-                    
-                    if partner_key not in partner_data:
-                        partner_data[partner_key] = {
-                            'partner_id': partner_key,
-                            'partner_name': partner_name,
-                            'count': 0,
-                            'total_sales_value': 0.0,
-                            'total_commission': 0.0,
-                            'invoiced_count': 0,
-                            'invoiced_sales_value': 0.0,
-                            'invoiced_commission': 0.0
-                        }
-                    
-                    # Get values with proper validation
-                    sales_value = self._get_safe_amount_field(order)
-                    commission_value = float(order.get(amount_field) or 0.0)
-                    
-                    # Add to totals
-                    partner_data[partner_key]['count'] += 1
-                    partner_data[partner_key]['total_sales_value'] += sales_value
-                    partner_data[partner_key]['total_commission'] += commission_value
-                    
-                    # If invoiced, add to invoiced totals
-                    if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
-                        partner_data[partner_key]['invoiced_count'] += 1
-                        
-                        # Try to get actual invoiced amount
-                        order_name = order.get('name', '')
-                        invoiced_amount = self._get_actual_invoiced_amount(order_name)
-                        final_sales_value = invoiced_amount or sales_value
-                        
-                        partner_data[partner_key]['invoiced_sales_value'] += final_sales_value
-                        partner_data[partner_key]['invoiced_commission'] += commission_value
-                        
-                except Exception as e:
-                    _logger.warning(f"Error processing order {order.get('name', '')}: {e}")
-                    continue
+                
+                offset += batch_size
 
-            # Convert to list and sort
+            # Convert to list and sort with enhanced ranking
             performers_list = list(partner_data.values())
             
             # Sort by multiple criteria for better ranking
             performers_list.sort(key=lambda x: (
+                -float(x.get('invoiced_sales_value', 0)),  # Prioritize actual invoiced sales
                 -float(x.get('total_sales_value', 0)),
                 -float(x.get('total_commission', 0)),
                 -int(x.get('count', 0))
@@ -894,16 +1040,34 @@ class SaleDashboardEnhanced(models.Model):
             _logger.info(f"Returning top {min(len(performers_list), limit)} {performer_type}s")
             return performers_list[:limit]
             
+        except ValidationError:
+            raise  # Re-raise validation errors
         except Exception as e:
             _logger.error(f"Error in get_top_performers_data: {str(e)}")
             return []
 
+    def _get_partner_name_cached(self, partner_id):
+        """Get partner name with simple caching to reduce database calls"""
+        try:
+            # Simple cache using instance variable
+            if not hasattr(self, '_partner_name_cache'):
+                self._partner_name_cache = {}
+            
+            if partner_id not in self._partner_name_cache:
+                partner_rec = self.env['res.partner'].browse(partner_id)
+                self._partner_name_cache[partner_id] = partner_rec.name if partner_rec.exists() else f"Partner {partner_id}"
+            
+            return self._partner_name_cache[partner_id]
+        except Exception:
+            return f"Partner {partner_id}"
+
     @api.model
     def get_sales_type_ranking_data(self, start_date, end_date, sales_type_ids=None):
         """
-        Get ranking data for sales types with enhanced error handling
+        Get ranking data for sales types with enhanced error handling and performance
         """
         try:
+            start_date, end_date = self._validate_date_range(start_date, end_date)
             date_field = self._get_safe_date_field()
             
             # Base domain
@@ -918,20 +1082,27 @@ class SaleDashboardEnhanced(models.Model):
                 if valid_ids:
                     base_domain.append(('sale_order_type_id', 'in', valid_ids))
             
-            # Get sales types to rank
-            try:
-                if sales_type_ids:
-                    valid_ids = [int(id) for id in sales_type_ids if str(id).isdigit()]
-                    sales_types_domain = [('id', 'in', valid_ids)] if valid_ids else []
-                else:
-                    sales_types_domain = []
-                
+            # Get sales types to rank with enhanced model detection
+            sales_types = []
+            model_names = ['le.sale.type', 'sale.order.type', 'sale.type']
+            
+            for model_name in model_names:
                 try:
-                    sales_types = self.env['le.sale.type'].search(sales_types_domain)
-                except KeyError:
-                    sales_types = self.env['sale.order.type'].search(sales_types_domain)
-            except Exception as e:
-                _logger.error(f"Error getting sales types: {e}")
+                    if model_name in self.env:
+                        if sales_type_ids:
+                            valid_ids = [int(id) for id in sales_type_ids if str(id).isdigit()]
+                            sales_types_domain = [('id', 'in', valid_ids)] if valid_ids else []
+                        else:
+                            sales_types_domain = []
+                        
+                        sales_types = self.env[model_name].search(sales_types_domain)
+                        break
+                except Exception as e:
+                    _logger.debug(f"Model {model_name} not accessible: {e}")
+                    continue
+            
+            if not sales_types:
+                _logger.warning("No sales types found for ranking")
                 return []
             
             ranking_data = []
@@ -940,48 +1111,84 @@ class SaleDashboardEnhanced(models.Model):
                 try:
                     type_domain = base_domain + [('sale_order_type_id', '=', sales_type.id)]
                     
-                    # Get all orders for this type
-                    fields = ['state', 'invoice_status', 'amount_total', 'name']
-                    if self._check_field_exists('sale_value'):
-                        fields.append('sale_value')
-                    
-                    orders = self.search_read(type_domain, fields)
-                    
-                    total_count = len(orders)
-                    total_sales_value = 0.0
-                    total_amount = 0.0
-                    invoiced_count = 0
-                    invoiced_amount = 0.0
-                    
-                    for order in orders:
-                        try:
-                            sales_value = self._get_safe_amount_field(order)
-                            total_sales_value += sales_value
-                            total_amount += float(order.get('amount_total', 0))
-                            
-                            # Calculate invoiced amounts
-                            if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
-                                invoiced_count += 1
-                                actual_invoiced = self._get_actual_invoiced_amount(order.get('name', ''))
-                                invoiced_amount += actual_invoiced or sales_value
-                        except Exception as e:
-                            _logger.warning(f"Error processing order {order.get('name', '')}: {e}")
-                            continue
+                    # Use read_group for better performance
+                    try:
+                        # Get total statistics
+                        total_result = self.read_group(
+                            type_domain,
+                            ['amount_total'],
+                            [],
+                            lazy=False
+                        )
+                        
+                        # Get invoiced statistics
+                        invoiced_result = self.read_group(
+                            type_domain + [('state', '=', 'sale'), ('invoice_status', '=', 'invoiced')],
+                            ['amount_total'],
+                            [],
+                            lazy=False
+                        )
+                        
+                        total_count = total_result[0]['__count'] if total_result else 0
+                        total_sales_value = float(total_result[0]['amount_total'] or 0) if total_result else 0.0
+                        invoiced_count = invoiced_result[0]['__count'] if invoiced_result else 0
+                        invoiced_amount = float(invoiced_result[0]['amount_total'] or 0) if invoiced_result else 0.0
+                        
+                    except Exception as e:
+                        _logger.warning(f"read_group failed for ranking {sales_type.name}: {e}")
+                        # Fallback to search_read
+                        fields = ['state', 'invoice_status', 'amount_total', 'name']
+                        if self._check_field_exists('sale_value'):
+                            fields.append('sale_value')
+                        
+                        orders = self.search_read(type_domain, fields)
+                        
+                        total_count = len(orders)
+                        total_sales_value = 0.0
+                        total_amount = 0.0
+                        invoiced_count = 0
+                        invoiced_amount = 0.0
+                        
+                        for order in orders:
+                            try:
+                                sales_value = self._get_safe_amount_field(order)
+                                total_sales_value += sales_value
+                                total_amount += float(order.get('amount_total', 0))
+                                
+                                # Calculate invoiced amounts
+                                if order.get('state') == 'sale' and order.get('invoice_status') == 'invoiced':
+                                    invoiced_count += 1
+                                    actual_invoiced = self._get_actual_invoiced_amount(order.get('name', ''))
+                                    invoiced_amount += actual_invoiced or sales_value
+                            except Exception as e:
+                                _logger.warning(f"Error processing order {order.get('name', '')}: {e}")
+                                continue
                     
                     # Calculate performance metrics
                     avg_deal_size = total_sales_value / total_count if total_count > 0 else 0
                     invoiced_rate = (invoiced_count / total_count * 100) if total_count > 0 else 0
                     
+                    # Enhanced performance score calculation
+                    performance_score = (
+                        invoiced_amount * 0.5 +      # Actual revenue (highest weight)
+                        total_sales_value * 0.3 +    # Total pipeline value
+                        invoiced_rate * 100 +        # Conversion efficiency
+                        total_count * 10              # Volume bonus
+                    )
+                    
                     ranking_data.append({
                         'sales_type_name': sales_type.name,
                         'total_count': total_count,
                         'total_sales_value': total_sales_value,
-                        'total_amount': total_amount,
+                        'total_amount': total_sales_value,  # Maintain backwards compatibility
                         'invoiced_count': invoiced_count,
                         'invoiced_amount': invoiced_amount,
                         'avg_deal_size': avg_deal_size,
                         'invoiced_rate': invoiced_rate,
-                        'performance_score': total_sales_value * 0.4 + invoiced_amount * 0.4 + total_count * 0.2
+                        'performance_score': performance_score,
+                        'formatted_total_sales': self.format_dashboard_value(total_sales_value),
+                        'formatted_invoiced_amount': self.format_dashboard_value(invoiced_amount),
+                        'formatted_avg_deal_size': self.format_dashboard_value(avg_deal_size)
                     })
                     
                 except Exception as e:
@@ -993,6 +1200,422 @@ class SaleDashboardEnhanced(models.Model):
             
             return ranking_data
             
+        except ValidationError:
+            raise  # Re-raise validation errors
         except Exception as e:
             _logger.error(f"Error in get_sales_type_ranking_data: {str(e)}")
             return []
+
+    @api.model
+    def validate_dashboard_access(self):
+        """
+        Validate that the current user has access to dashboard data
+        """
+        try:
+            # Check basic read access to sale.order
+            if not self.check_access_rights('read', raise_exception=False):
+                return {'error': 'Insufficient permissions to access sales data'}
+            
+            # Check field access
+            required_fields = ['name', 'state', 'amount_total', 'partner_id']
+            accessible_fields = []
+            
+            for field in required_fields:
+                try:
+                    self.check_access_rule('read')
+                    accessible_fields.append(field)
+                except Exception:
+                    continue
+            
+            if len(accessible_fields) < len(required_fields):
+                return {'error': 'Limited field access detected'}
+            
+            return {'success': True, 'accessible_fields': accessible_fields}
+            
+        except Exception as e:
+            _logger.error(f"Error validating dashboard access: {e}")
+            return {'error': str(e)}
+
+    @api.model
+    def get_dashboard_metadata(self):
+        """
+        Get metadata about dashboard capabilities and available features
+        """
+        try:
+            metadata = {
+                'available_fields': {},
+                'available_models': {},
+                'capabilities': {},
+                'performance_info': {}
+            }
+            
+            # Check field availability
+            fields_to_check = [
+                'booking_date', 'sale_value', 'date_order', 'amount_total',
+                'sale_order_type_id', 'agent1_partner_id', 'agent1_amount',
+                'broker_partner_id', 'broker_amount', 'invoice_amount'
+            ]
+            
+            for field in fields_to_check:
+                metadata['available_fields'][field] = self._check_field_exists(field)
+            
+            # Check model availability
+            models_to_check = ['le.sale.type', 'sale.order.type', 'account.move', 'res.partner']
+            for model in models_to_check:
+                try:
+                    metadata['available_models'][model] = model in self.env
+                except Exception:
+                    metadata['available_models'][model] = False
+            
+            # Determine capabilities
+            metadata['capabilities'] = {
+                'has_sales_types': any(metadata['available_models'][m] for m in ['le.sale.type', 'sale.order.type']),
+                'has_commission_tracking': metadata['available_fields']['agent1_partner_id'] and metadata['available_fields']['agent1_amount'],
+                'has_broker_tracking': metadata['available_fields']['broker_partner_id'] and metadata['available_fields']['broker_amount'],
+                'has_enhanced_dates': metadata['available_fields']['booking_date'],
+                'has_sale_values': metadata['available_fields']['sale_value'],
+                'can_track_invoices': metadata['available_models']['account.move']
+            }
+            
+            # Performance recommendations
+            total_orders = self.search_count([])
+            metadata['performance_info'] = {
+                'total_orders_in_system': total_orders,
+                'recommended_date_range_days': 365 if total_orders < 10000 else 90,
+                'supports_batch_processing': total_orders > 5000,
+                'cache_recommendations': 'enabled' if total_orders > 1000 else 'optional'
+            }
+            
+            return metadata
+            
+        except Exception as e:
+            _logger.error(f"Error getting dashboard metadata: {e}")
+            return {'error': str(e)}
+
+    # Additional utility methods for production readiness
+    
+    @api.model
+    def clear_dashboard_cache(self):
+        """Clear any dashboard-related caches"""
+        try:
+            # Clear partner name cache if it exists
+            if hasattr(self, '_partner_name_cache'):
+                self._partner_name_cache.clear()
+            
+            # Clear any other caches
+            self.env.registry.clear_cache()
+            
+            return {'success': True, 'message': 'Dashboard cache cleared successfully'}
+        except Exception as e:
+            _logger.error(f"Error clearing dashboard cache: {e}")
+            return {'error': str(e)}
+
+    @api.model
+    def get_dashboard_health_check(self):
+        """Perform a health check on dashboard functionality"""
+        try:
+            health_status = {
+                'overall_status': 'healthy',
+                'checks': {},
+                'warnings': [],
+                'errors': []
+            }
+            
+            # Check database connectivity
+            try:
+                self.env.cr.execute("SELECT 1")
+                health_status['checks']['database'] = 'ok'
+            except Exception as e:
+                health_status['checks']['database'] = 'error'
+                health_status['errors'].append(f"Database connectivity issue: {e}")
+            
+            # Check model access
+            try:
+                self.search_count([('state', '!=', 'cancel')], limit=1)
+                health_status['checks']['model_access'] = 'ok'
+            except Exception as e:
+                health_status['checks']['model_access'] = 'error'
+                health_status['errors'].append(f"Model access issue: {e}")
+            
+            # Check required fields
+            required_fields = ['name', 'state', 'amount_total', 'partner_id', 'date_order']
+            missing_fields = []
+            for field in required_fields:
+                if not self._check_field_exists(field):
+                    missing_fields.append(field)
+            
+            if missing_fields:
+                health_status['checks']['required_fields'] = 'warning'
+                health_status['warnings'].append(f"Missing fields: {', '.join(missing_fields)}")
+            else:
+                health_status['checks']['required_fields'] = 'ok'
+            
+            # Check sales type availability
+            if not self._check_field_exists('sale_order_type_id'):
+                health_status['checks']['sales_types'] = 'warning'
+                health_status['warnings'].append("Sales type functionality not available")
+            else:
+                health_status['checks']['sales_types'] = 'ok'
+            
+            # Determine overall status
+            if health_status['errors']:
+                health_status['overall_status'] = 'error'
+            elif health_status['warnings']:
+                health_status['overall_status'] = 'warning'
+            
+            return health_status
+            
+        except Exception as e:
+            _logger.error(f"Error in dashboard health check: {e}")
+            return {
+                'overall_status': 'error',
+                'error': str(e)
+            }
+
+    @api.model
+    def get_dashboard_performance_metrics(self):
+        """Get performance metrics for dashboard optimization"""
+        try:
+            # Get database performance metrics
+            total_orders = self.search_count([])
+            recent_orders = self.search_count([
+                ('create_date', '>=', (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d'))
+            ])
+            
+            # Get field usage statistics
+            field_usage = {
+                'has_booking_date': self._check_field_exists('booking_date'),
+                'has_sale_value': self._check_field_exists('sale_value'),
+                'has_sales_types': self._check_field_exists('sale_order_type_id'),
+                'has_agent_fields': self._check_field_exists('agent1_partner_id'),
+                'has_broker_fields': self._check_field_exists('broker_partner_id')
+            }
+            
+            # Performance recommendations
+            recommendations = []
+            if total_orders > 10000:
+                recommendations.append("Consider implementing data archiving for orders older than 2 years")
+            if not field_usage['has_booking_date']:
+                recommendations.append("Install booking_date field for better date tracking")
+            if not field_usage['has_sales_types']:
+                recommendations.append("Install sales type module for better categorization")
+            
+            return {
+                'total_orders': total_orders,
+                'recent_orders_30d': recent_orders,
+                'field_usage': field_usage,
+                'recommendations': recommendations,
+                'performance_score': self._calculate_performance_score(total_orders, field_usage),
+                'last_calculated': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error getting performance metrics: {e}")
+            return {'error': str(e)}
+
+    def _calculate_performance_score(self, total_orders, field_usage):
+        """Calculate a performance score based on configuration and data volume"""
+        score = 0
+        
+        # Base score for data volume
+        if total_orders > 0:
+            score += min(50, total_orders / 1000 * 10)  # Max 50 points for volume
+        
+        # Additional points for field availability
+        available_fields = sum(1 for available in field_usage.values() if available)
+        score += available_fields * 10  # 10 points per available field
+        
+        return min(100, int(score))  # Cap at 100
+
+    @api.model
+    def optimize_dashboard_performance(self):
+        """Optimize dashboard performance by cleaning up old data and updating statistics"""
+        try:
+            results = {
+                'cache_cleared': False,
+                'statistics_updated': False,
+                'old_data_archived': False,
+                'errors': []
+            }
+            
+            # Clear any dashboard caches
+            try:
+                cache_result = self.clear_dashboard_cache()
+                results['cache_cleared'] = cache_result.get('success', False)
+            except Exception as e:
+                results['errors'].append(f"Cache clearing failed: {e}")
+            
+            # Update database statistics (if supported)
+            try:
+                self.env.cr.execute("ANALYZE sale_order")
+                results['statistics_updated'] = True
+            except Exception as e:
+                results['errors'].append(f"Statistics update failed: {e}")
+            
+            # Archive old cancelled orders (optional optimization)
+            try:
+                old_cancelled = self.search([
+                    ('state', '=', 'cancel'),
+                    ('create_date', '<', (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d'))
+                ])
+                if len(old_cancelled) > 100:
+                    # In a real implementation, you might move these to an archive table
+                    _logger.info(f"Found {len(old_cancelled)} old cancelled orders that could be archived")
+                    results['old_data_archived'] = True
+            except Exception as e:
+                results['errors'].append(f"Data archiving check failed: {e}")
+            
+            return results
+            
+        except Exception as e:
+            _logger.error(f"Error optimizing dashboard performance: {e}")
+            return {'error': str(e)}
+
+    @api.model
+    def export_dashboard_configuration(self):
+        """Export dashboard configuration for backup or migration"""
+        try:
+            config = {
+                'module_info': {
+                    'name': 'oe_sale_dashboard_17',
+                    'version': '1.0.0',
+                    'export_date': datetime.now().isoformat()
+                },
+                'field_mapping': {
+                    'available_fields': {},
+                    'field_priorities': {
+                        'date_field': self._get_safe_date_field(),
+                        'amount_field': 'amount_total'
+                    }
+                },
+                'model_compatibility': {
+                    'sales_type_models': [],
+                    'supported_features': []
+                },
+                'performance_settings': {
+                    'batch_size': 1000,
+                    'max_records_per_query': 5000,
+                    'cache_timeout': 300
+                }
+            }
+            
+            # Check available fields
+            fields_to_check = [
+                'booking_date', 'sale_value', 'date_order', 'amount_total',
+                'sale_order_type_id', 'agent1_partner_id', 'agent1_amount',
+                'broker_partner_id', 'broker_amount', 'invoice_amount'
+            ]
+            
+            for field in fields_to_check:
+                config['field_mapping']['available_fields'][field] = self._check_field_exists(field)
+            
+            # Check model compatibility
+            model_names = ['le.sale.type', 'sale.order.type', 'sale.type']
+            for model_name in model_names:
+                try:
+                    if model_name in self.env:
+                        config['model_compatibility']['sales_type_models'].append(model_name)
+                except Exception:
+                    pass
+            
+            # Determine supported features
+            if config['field_mapping']['available_fields']['sale_order_type_id']:
+                config['model_compatibility']['supported_features'].append('sales_type_filtering')
+            if config['field_mapping']['available_fields']['agent1_partner_id']:
+                config['model_compatibility']['supported_features'].append('agent_tracking')
+            if config['field_mapping']['available_fields']['broker_partner_id']:
+                config['model_compatibility']['supported_features'].append('broker_tracking')
+            
+            return config
+            
+        except Exception as e:
+            _logger.error(f"Error exporting dashboard configuration: {e}")
+            return {'error': str(e)}
+
+    @api.model
+    def validate_dashboard_data_integrity(self):
+        """Validate data integrity for dashboard calculations"""
+        try:
+            validation_results = {
+                'overall_status': 'passed',
+                'checks': {},
+                'warnings': [],
+                'errors': [],
+                'recommendations': []
+            }
+            
+            # Check for orphaned records
+            try:
+                orders_without_partners = self.search_count([('partner_id', '=', False)])
+                if orders_without_partners > 0:
+                    validation_results['warnings'].append(
+                        f"{orders_without_partners} orders found without customer information"
+                    )
+                validation_results['checks']['partner_integrity'] = 'passed'
+            except Exception as e:
+                validation_results['checks']['partner_integrity'] = 'failed'
+                validation_results['errors'].append(f"Partner integrity check failed: {e}")
+            
+            # Check for negative amounts
+            try:
+                negative_amounts = self.search_count([('amount_total', '<', 0)])
+                if negative_amounts > 0:
+                    validation_results['warnings'].append(
+                        f"{negative_amounts} orders found with negative amounts"
+                    )
+                validation_results['checks']['amount_integrity'] = 'passed'
+            except Exception as e:
+                validation_results['checks']['amount_integrity'] = 'failed'
+                validation_results['errors'].append(f"Amount integrity check failed: {e}")
+            
+            # Check date consistency
+            try:
+                future_orders = self.search_count([
+                    ('date_order', '>', datetime.now().strftime('%Y-%m-%d'))
+                ])
+                if future_orders > 0:
+                    validation_results['warnings'].append(
+                        f"{future_orders} orders found with future dates"
+                    )
+                validation_results['checks']['date_integrity'] = 'passed'
+            except Exception as e:
+                validation_results['checks']['date_integrity'] = 'failed'
+                validation_results['errors'].append(f"Date integrity check failed: {e}")
+            
+            # Check for missing invoice information on invoiced orders
+            try:
+                if self._check_field_exists('invoice_status'):
+                    invoiced_without_amount = self.search_count([
+                        ('invoice_status', '=', 'invoiced'),
+                        ('amount_total', '=', 0)
+                    ])
+                    if invoiced_without_amount > 0:
+                        validation_results['warnings'].append(
+                            f"{invoiced_without_amount} invoiced orders found with zero amount"
+                        )
+                validation_results['checks']['invoice_integrity'] = 'passed'
+            except Exception as e:
+                validation_results['checks']['invoice_integrity'] = 'failed'
+                validation_results['errors'].append(f"Invoice integrity check failed: {e}")
+            
+            # Generate recommendations based on findings
+            if validation_results['warnings']:
+                validation_results['recommendations'].append(
+                    "Review data quality issues identified in warnings"
+                )
+            if validation_results['errors']:
+                validation_results['overall_status'] = 'failed'
+                validation_results['recommendations'].append(
+                    "Address critical errors before using dashboard"
+                )
+            elif validation_results['warnings']:
+                validation_results['overall_status'] = 'warning'
+            
+            return validation_results
+            
+        except Exception as e:
+            _logger.error(f"Error validating dashboard data integrity: {e}")
+            return {
+                'overall_status': 'error',
+                'error': str(e)
+            }

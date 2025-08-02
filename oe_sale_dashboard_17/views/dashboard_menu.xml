@@ -2,28 +2,36 @@
 <odoo>
     <data>
         
-        <!-- Dashboard Client Action -->
-        <record id="action_sales_dashboard" model="ir.actions.client">
-            <field name="name">Executive Sales Dashboard</field>
-            <field name="tag">oe_sale_dashboard_17_action</field>
-            <field name="target">current</field>
-            <field name="context">{}</field>
-        </record>
-
-        <!-- Main Menu Item -->
-        <menuitem id="menu_sales_dashboard_main"
+        <!-- Main Dashboard Menu Item -->
+        <menuitem id="menu_sale_dashboard_root"
                   name="Sales Dashboard"
                   parent="sale.sale_menu_root"
-                  action="action_sales_dashboard"
                   sequence="1"
-                  groups="sales_team.group_sale_manager,sales_team.group_sale_salesman"/>
+                  action="action_sale_dashboard"
+                  groups="sales_team.group_sale_salesman"/>
 
-        <!-- Alternative Menu for Reports Section -->
-        <menuitem id="menu_sales_dashboard_reports"
-                  name="Executive Dashboard"
+        <!-- Dashboard Configuration Submenu -->
+        <menuitem id="menu_sale_dashboard_config"
+                  name="Dashboard Configuration"
+                  parent="sale.menu_sale_config"
+                  sequence="10"
+                  action="action_dashboard_config"
+                  groups="sales_team.group_sale_manager"/>
+
+        <!-- Dashboard Reports Submenu -->
+        <menuitem id="menu_sale_dashboard_reports"
+                  name="Dashboard Reports"
                   parent="sale.menu_sale_report"
-                  action="action_sales_dashboard"
                   sequence="1"
+                  action="action_sale_dashboard"
+                  groups="sales_team.group_sale_salesman"/>
+
+        <!-- Quick Access from Sales Menu -->
+        <menuitem id="menu_sale_dashboard_quick"
+                  name="Executive Dashboard"
+                  parent="sale.sale_menu_root"
+                  sequence="0"
+                  action="action_sale_dashboard"
                   groups="sales_team.group_sale_manager"/>
 
     </data>
