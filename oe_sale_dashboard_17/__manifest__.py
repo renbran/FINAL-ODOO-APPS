@@ -34,12 +34,14 @@
     """,
     'author': 'RENBRAN - Production Enhanced',
     'website': 'WWW.TACHIMAO.COM',
-    'depends': ['web', 'sale_management'],
+    'depends': ['web', 'sale_management', 'le_sale_type'],
     'data': [
         'views/dashboard_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
+            ('include', 'web._assets_helpers'),
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js',
             'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',

@@ -1,0 +1,72 @@
+{
+  "test_summary": {
+    "total_tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "warnings": 0,
+    "timestamp": "2025-08-02T08:05:31.665159"
+  },
+  "test_results": [
+    {
+      "test": "Manifest Dependencies",
+      "status": "PASS",
+      "details": "le_sale_type found in dependencies",
+      "timestamp": "2025-08-02T08:05:31.567165"
+    },
+    {
+      "test": "Backend get_sales_types Method",
+      "status": "PASS",
+      "details": "get_sales_types method found",
+      "timestamp": "2025-08-02T08:05:31.578682"
+    },
+    {
+      "test": "Backend le.sale.type Usage",
+      "status": "PASS",
+      "details": "le.sale.type model reference found",
+      "timestamp": "2025-08-02T08:05:31.578908"
+    },
+    {
+      "test": "Field Mapping buildSaleTypeDomain",
+      "status": "PASS",
+      "details": "buildSaleTypeDomain function found",
+      "timestamp": "2025-08-02T08:05:31.621603"
+    },
+    {
+      "test": "Field Mapping Logging",
+      "status": "PASS",
+      "details": "le_sale_type module logging found",
+      "timestamp": "2025-08-02T08:05:31.621847"
+    },
+    {
+      "test": "Frontend Sales Types Integration",
+      "status": "PASS",
+      "details": "Updated _loadSalesTypes method found",
+      "timestamp": "2025-08-02T08:05:31.664268"
+    },
+    {
+      "test": "Frontend Fallback Mechanism",
+      "status": "PASS",
+      "details": "Fallback mechanism found",
+      "timestamp": "2025-08-02T08:05:31.664520"
+    },
+    {
+      "test": "File Structure Integrity",
+      "status": "PASS",
+      "details": "All integration files found",
+      "timestamp": "2025-08-02T08:05:31.664698"
+    },
+    {
+      "test": "Backend Logging Consistency",
+      "status": "PASS",
+      "details": "Proper logging usage found",
+      "timestamp": "2025-08-02T08:05:31.664908"
+    },
+    {
+      "test": "Frontend Error Handling",
+      "status": "PASS",
+      "details": "Proper error handling found",
+      "timestamp": "2025-08-02T08:05:31.665094"
+    }
+  ],
+  "errors": []
+}

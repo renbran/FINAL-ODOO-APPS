@@ -104,6 +104,13 @@ async function initFieldMapping(orm) {
             fieldMapping.sale_value = 'amount_total';
         }
         
+        // Check sale_order_type_id from le_sale_type module
+        if (fieldMapping._available.sale_order_type_id) {
+            console.log('sale_order_type_id field found from le_sale_type module');
+        } else {
+            console.warn('sale_order_type_id field not found, le_sale_type module may not be installed');
+        }
+        
         return fieldMapping;
     } catch (error) {
         console.error('Error initializing field mapping:', error);
@@ -142,6 +149,10 @@ function buildDateDomain(startDate, endDate) {
 function buildSaleTypeDomain(saleTypeId) {
     if (saleTypeId && fieldMapping._available.sale_order_type_id) {
         return [['sale_order_type_id', '=', saleTypeId]];
+    }
+    // If sale_order_type_id is not available, return empty domain
+    if (saleTypeId && !fieldMapping._available.sale_order_type_id) {
+        console.warn('sale_order_type_id field not available, le_sale_type module may not be installed');
     }
     return [];
 }

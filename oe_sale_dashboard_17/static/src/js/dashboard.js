@@ -207,10 +207,11 @@ class OeSaleDashboard extends Component {
         };
         
         // Initialize state
+        // Set reasonable default date range (last 90 days to today)
         const today = new Date().toISOString().split('T')[0];
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        const startDate = ninetyDaysAgo.toISOString().split('T')[0];
         
         this.state = useState({
             startDate: startDate,
@@ -220,13 +221,14 @@ class OeSaleDashboard extends Component {
             isLoading: true,
             hasError: false,
             errorMessage: '',
-            // Dashboard data
+            showSampleDataWarning: false,
+            // Dashboard data with AED currency defaults
             summaryData: {
-                totalQuotations: { count: 0, amount: 0, formatted: '$0' },
-                totalSalesOrders: { count: 0, amount: 0, formatted: '$0' },
-                totalInvoiced: { count: 0, amount: 0, formatted: '$0' },
+                totalQuotations: { count: 0, amount: 0, formatted: 'AED 0' },
+                totalSalesOrders: { count: 0, amount: 0, formatted: 'AED 0' },
+                totalInvoiced: { count: 0, amount: 0, formatted: 'AED 0' },
                 conversionRate: '0%',
-                avgDealSize: '$0',
+                avgDealSize: 'AED 0',
                 revenueGrowth: '0%',
                 pipelineVelocity: '0 days',
                 categories: {}
@@ -294,16 +296,29 @@ class OeSaleDashboard extends Component {
     async _loadSalesTypes() {
         try {
             if (this.fieldMapping.isFieldAvailable('sale_order_type_id')) {
-                const salesTypes = await this.orm.searchRead(
-                    'sale.order.type',
-                    [],
-                    ['id', 'name'],
-                    { limit: 100 }
+                // Use the new backend method to get sales types from le_sale_type module
+                const salesTypes = await this.orm.call(
+                    'sale.order',
+                    'get_sales_types',
+                    []
                 );
                 this.state.salesTypes = salesTypes;
-                console.log('Loaded sales types:', salesTypes.length);
+                console.log('Loaded sales types from le_sale_type module:', salesTypes.length);
+                
+                // If no sales types found, try fallback
+                if (salesTypes.length === 0) {
+                    console.log('No sales types found, trying fallback search...');
+                    const fallbackTypes = await this.orm.searchRead(
+                        'sale.order.type',
+                        [],
+                        ['id', 'name'],
+                        { limit: 100 }
+                    );
+                    this.state.salesTypes = fallbackTypes;
+                    console.log('Fallback sales types loaded:', fallbackTypes.length);
+                }
             } else {
-                console.log('Sales types not available, using default functionality');
+                console.log('sale_order_type_id field not available, le_sale_type module may not be installed');
                 this.state.salesTypes = [];
             }
         } catch (error) {
@@ -314,7 +329,8 @@ class OeSaleDashboard extends Component {
     
     async _loadDashboardData() {
         try {
-            console.log('Loading dashboard data...');
+            console.log('Loading dashboard data for date range:', this.state.startDate, 'to', this.state.endDate);
+            console.log('Selected sales types:', this.state.selectedSalesTypes);
             
             // Try to use backend methods first, fallback to direct queries
             let dashboardData;
@@ -324,6 +340,7 @@ class OeSaleDashboard extends Component {
                     'get_dashboard_summary_data',
                     [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
                 );
+                console.log('Backend data received:', dashboardData);
             } catch (backendError) {
                 console.warn('Backend method not available, using fallback:', backendError);
                 dashboardData = await this._loadDashboardDataFallback();
@@ -331,6 +348,21 @@ class OeSaleDashboard extends Component {
             
             if (dashboardData.error) {
                 throw new Error(dashboardData.error);
+            }
+            
+            // Validate and ensure data structure
+            if (!dashboardData.totals) {
+                console.warn('No totals data received, initializing empty structure');
+                dashboardData = {
+                    totals: {
+                        draft_count: 0, draft_amount: 0,
+                        sales_order_count: 0, sales_order_amount: 0,
+                        invoice_count: 0, invoice_amount: 0,
+                        conversion_rate: 0, avg_deal_size: 0,
+                        revenue_growth: 0, pipeline_velocity: 0
+                    },
+                    categories: {}
+                };
             }
             
             // Process the data
@@ -351,11 +383,18 @@ class OeSaleDashboard extends Component {
             // Load recent orders
             await this._loadRecentOrders();
             
-            console.log('Dashboard data loaded successfully');
+            console.log('Dashboard data loaded successfully:', this.state.summaryData);
             
         } catch (error) {
             console.error('Error loading dashboard data:', error);
-            throw error;
+            this.state.hasError = true;
+            this.state.errorMessage = error.message || 'Failed to load dashboard data';
+            
+            // Show notification to user
+            this.notification.add(
+                _t("Failed to load dashboard data: %s", error.message),
+                { type: 'danger' }
+            );
         }
     }
     
@@ -407,6 +446,18 @@ class OeSaleDashboard extends Component {
     _processDashboardData(dashboardData) {
         const totals = dashboardData.totals || {};
         
+        // Check if this is sample data
+        if (dashboardData.metadata && dashboardData.metadata.is_sample_data) {
+            console.log('Using sample dashboard data for demonstration');
+            this.state.showSampleDataWarning = true;
+            this.notification.add(
+                _t("Using sample data for demonstration. No sales data found for selected date range."),
+                { type: 'info' }
+            );
+        } else {
+            this.state.showSampleDataWarning = false;
+        }
+        
         // Update summary data - use backend formatted values when available
         this.state.summaryData = {
             totalQuotations: {
@@ -438,6 +489,7 @@ class OeSaleDashboard extends Component {
         this.state.categoryNames = Object.keys(dashboardData.categories || {});
         
         console.log('Processed dashboard data:', this.state.summaryData);
+        console.log('Categories data:', this.state.categoriesData);
     }
     
     async _loadChartData() {
@@ -891,6 +943,11 @@ class OeSaleDashboard extends Component {
         } finally {
             this.state.isLoading = false;
         }
+    }
+
+    closeSampleDataBanner() {
+        this.state.showSampleDataWarning = false;
+        console.log('Sample data warning banner closed');
     }
 }
 

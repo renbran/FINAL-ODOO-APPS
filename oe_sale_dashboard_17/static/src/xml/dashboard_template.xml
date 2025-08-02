@@ -52,6 +52,18 @@
                 </div>
             </div>
 
+            <!-- Sample Data Warning Banner (only shown when using sample data) -->
+            <div t-if="state.showSampleDataWarning" class="sample-data-banner">
+                <div class="banner-content">
+                    <div class="banner-icon">ℹ️</div>
+                    <div class="banner-text">
+                        <strong>Sample Data Display</strong>
+                        <p>No sales data found for the selected date range. Showing sample data for demonstration purposes.</p>
+                    </div>
+                    <button class="banner-close" t-on-click="closeSampleDataBanner">✕</button>
+                </div>
+            </div>
+
             <!-- Executive KPI Cards with Enhanced Visibility -->
             <div id="kpi-section" class="o_oe_sale_dashboard_17_container__kpi-grid" t-ref="kpiContainer">
                 <!-- Total Quotations KPI -->
