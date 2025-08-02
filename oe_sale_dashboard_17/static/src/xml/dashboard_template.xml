@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="oe_sale_dashboard_17.yearly_sales_dashboard_template">
+        <div class="o_oe_sale_dashboard_17_container" t-att-class="state.isLoading ? 'dashboard-loading' : ''">
+            
+            <!-- Loading Overlay -->
+            <div t-if="state.isLoading" class="loading-overlay">
+                <div class="loading-indicator">
+                    <div class="spinner"></div>
+                    <span>Loading Dashboard Data...</span>
+                </div>
+            </div>
+
+            <!-- Sample Data Warning Banner -->
+            <div t-if="state.showSampleDataWarning" class="alert alert-info alert-dismissible fade show" role="alert" style="margin: 1rem; border-left: 4px solid #17a2b8;">
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-info-circle me-2" style="font-size: 1.2rem;"></i>
+                    <div class="flex-grow-1">
+                        <strong>Sample Data Mode:</strong> 
+                        No sales data found for the selected date range. Displaying sample data for demonstration purposes.
+                    </div>
+                    <button type="button" class="btn-close" t-on-click="closeSampleDataBanner" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div t-if="state.hasError and !state.isLoading" class="alert alert-danger" role="alert" style="margin: 1rem;">
+                <h4 class="alert-heading">Dashboard Error</h4>
+                <p t-esc="state.errorMessage"></p>
+                <hr/>
+                <p class="mb-0">Please contact your system administrator or try refreshing the page.</p>
+            </div>
+
+            <!-- Main Dashboard Content -->
+            <div t-if="!state.hasError">
+                
+                <!-- Header Section -->
+                <div class="o_oe_sale_dashboard_17_container__header">
+                    <h1>Executive Sales Dashboard</h1>
+                    <p class="subtitle">Real-time sales performance and analytics</p>
+                </div>
+
+                <!-- Controls Section -->
+                <div class="o_oe_sale_dashboard_17_container__controls">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        
+                        <!-- Date Range Controls -->
+                        <div class="date-group">
+                            <label for="startDate">Start Date</label>
+                            <input 
+                                type="date" 
+                                id="startDate" 
+                                t-model="state.startDate" 
+                                t-on-change="onStartDateChange"
+                                class="form-control"/>
+                        </div>
+                        
+                        <div class="date-group">
+                            <label for="endDate">End Date</label>
+                            <input 
+                                type="date" 
+                                id="endDate" 
+                                t-model="state.endDate" 
+                                t-on-change="onEndDateChange"
+                                class="form-control"/>
+                        </div>
+
+                        <!-- Sales Type Filter -->
+                        <div class="filter-group" t-if="state.salesTypes.length > 0">
+                            <label for="salesTypeFilter">Filter by Sales Type</label>
+                            <select 
+                                id="salesTypeFilter" 
+                                multiple="multiple"
+                                t-on-change="onSalesTypeFilterChange"
+                                class="form-control sales-type-filter">
+                                <t t-foreach="state.salesTypes" t-as="salesType" t-key="salesType.id">
+                                    <option t-att-value="salesType.id" t-esc="salesType.name"/>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="o_oe_sale_dashboard_17_container__kpi-grid">
+                    
+                    <!-- Total Quotations KPI -->
+                    <div class="kpi-card kpi-card--warning">
+                        <div class="kpi-icon">📋</div>
+                        <div class="kpi-label">Total Quotations</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalQuotations.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalQuotations.count + ' quotes'"/>
+                    </div>
+
+                    <!-- Sales Orders KPI -->
+                    <div class="kpi-card kpi-card--info">
+                        <div class="kpi-icon">📊</div>
+                        <div class="kpi-label">Sales Orders</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalSalesOrders.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalSalesOrders.count + ' orders'"/>
+                    </div>
+
+                    <!-- Invoiced Sales KPI -->
+                    <div class="kpi-card kpi-card--success">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-label">Invoiced Sales</div>
+                        <div class="kpi-value" t-esc="state.summaryData.totalInvoiced.formatted"/>
+                        <div class="kpi-subvalue" t-esc="state.summaryData.totalInvoiced.count + ' invoiced'"/>
+                    </div>
+
+                    <!-- Conversion Rate KPI -->
+                    <div class="kpi-card kpi-card--primary">
+                        <div class="kpi-icon">🎯</div>
+                        <div class="kpi-label">Conversion Rate</div>
+                        <div class="kpi-value" t-esc="state.summaryData.conversionRate"/>
+                        <div class="kpi-subvalue">Quote to Invoice</div>
+                    </div>
+
+                    <!-- Average Deal Size KPI -->
+                    <div class="kpi-card kpi-card--accent">
+                        <div class="kpi-icon">💎</div>
+                        <div class="kpi-label">Average Deal Size</div>
+                        <div class="kpi-value" t-esc="state.summaryData.avgDealSize"/>
+                        <div class="kpi-subvalue">Per Transaction</div>
+                    </div>
+
+                    <!-- Revenue Growth KPI -->
+                    <div class="kpi-card kpi-card--secondary">
+                        <div class="kpi-icon">📈</div>
+                        <div class="kpi-label">Revenue Growth</div>
+                        <div class="kpi-value" t-esc="state.summaryData.revenueGrowth"/>
+                        <div class="kpi-subvalue">vs Previous Period</div>
+                    </div>
+
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-container" style="padding: 0 1rem;">
+                    
+                    <!-- Sales Trends Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Sales Trends Over Time</h3>
+                            <p class="chart-subtitle">Monthly fluctuation in quotations, sales orders, and invoiced sales</p>
+                        </div>
+                        <div class="chart-canvas">
+                            <canvas id="trendsLineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Two-column chart layout -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Sales by Category Chart -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Revenue by Category</h3>
+                                    <p class="chart-subtitle">Distribution of revenue across sales types</p>
+                                </div>
+                                <div class="chart-canvas" style="height: 350px;">
+                                    <canvas id="enhancedPieChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <!-- Status Distribution Chart -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Orders by Status</h3>
+                                    <p class="chart-subtitle">Count of orders in each stage</p>
+                                </div>
+                                <div class="chart-canvas" style="height: 350px;">
+                                    <canvas id="comparisonBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Performers Section -->
+                <div class="o_oe_sale_dashboard_17_container__top-performers">
+                    
+                    <!-- Top Agents Table -->
+                    <div t-if="state.topAgentsData.length > 0" class="o_oe_sale_dashboard_17_container__table-section">
+                        <div class="table-header">
+                            <h2>
+                                🏆 Top Sales Agents
+                                <span class="status-badge status-badge--agents">Active</span>
+                            </h2>
+                            <div class="table-summary">
+                                <div class="summary-item">
+                                    Total Agents: <strong t-esc="state.topAgentsData.length"/>
+                                </div>
+                                <div class="summary-item">
+                                    Top Agent Sales: <strong t-esc="formatDashboardValue(state.topAgentsData[0]?.total_sales_value || 0)"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Agent Name</th>
+                                        <th>Sales Count</th>
+                                        <th>Total Sales Value</th>
+                                        <th>Total Commission</th>
+                                        <th>Invoiced Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.topAgentsData" t-as="agent" t-key="agent.partner_id">
+                                        <tr>
+                                            <td class="rank-cell">
+                                                <span class="rank-badge" t-esc="agent_index + 1"/>
+                                            </td>
+                                            <td class="name-cell" t-esc="agent.partner_name"/>
+                                            <td class="count-cell" t-esc="agent.count"/>
+                                            <td class="amount-cell" t-esc="formatDashboardValue(agent.total_sales_value)"/>
+                                            <td class="amount-cell commission-cell" t-esc="formatDashboardValue(agent.total_commission)"/>
+                                            <td class="amount-cell" t-esc="formatDashboardValue(agent.invoiced_sales_value)"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Agencies Table -->
+                    <div t-if="state.topAgenciesData.length > 0" class="o_oe_sale_dashboard_17_container__table-section">
+                        <div class="table-header">
+                            <h2>
+                                🏢 Top Agencies
+                                <span class="status-badge status-badge--agencies">Active</span>
+                            </h2>
+                            <div class="table-summary">
+                                <div class="summary-item">
+                                    Total Agencies: <strong t-esc="state.topAgenciesData.length"/>
+                                </div>
+                                <div class="summary-item">
+                                    Top Agency Sales: <strong t-esc="formatDashboardValue(state.topAgenciesData[0]?.total_sales_value || 0)"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Agency Name</th>
+                                        <th>Sales Count</th>
+                                        <th>Total Sales Value</th>
+                                        <th>Total Commission</th>
+                                        <th>Invoiced Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.topAgenciesData" t-as="agency" t-key="agency.partner_id">
+                                        <tr>
+                                            <td class="rank-cell">
+                                                <span class="rank-badge" t-esc="agency_index + 1"/>
+                                            </td>
+                                            <td class="name-cell" t-esc="agency.partner_name"/>
+                                            <td class="count-cell" t-esc="agency.count"/>
+                                            <td class="amount-cell" t-esc="formatDashboardValue(agency.total_sales_value)"/>
+                                            <td class="amount-cell commission-cell" t-esc="formatDashboardValue(agency.total_commission)"/>
+                                            <td class="amount-cell" t-esc="formatDashboardValue(agency.invoiced_sales_value)"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sales Type Performance Table -->
+                    <div t-if="state.categoryNames.length > 0" class="o_oe_sale_dashboard_17_container__table-section">
+                        <div class="table-header">
+                            <h2>📊 Sales Performance by Category</h2>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Quotations</th>
+                                        <th>Sales Orders</th>
+                                        <th>Invoiced</th>
+                                        <th>Total Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.categoryNames" t-as="categoryName" t-key="categoryName">
+                                        <t t-set="categoryData" t-value="state.categoriesData[categoryName]"/>
+                                        <tr>
+                                            <td class="name-cell" t-esc="categoryName"/>
+                                            <td class="count-cell">
+                                                <span t-esc="categoryData.draft_count"/> 
+                                                (<span t-esc="categoryData.formatted_draft_amount"/>)
+                                            </td>
+                                            <td class="count-cell">
+                                                <span t-esc="categoryData.sales_order_count"/> 
+                                                (<span t-esc="categoryData.formatted_sales_order_amount"/>)
+                                            </td>
+                                            <td class="count-cell">
+                                                <span t-esc="categoryData.invoice_count"/> 
+                                                (<span t-esc="categoryData.formatted_invoice_amount"/>)
+                                            </td>
+                                            <td class="amount-cell" t-esc="categoryData.formatted_total_amount"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Table -->
+                    <div t-if="state.recentOrders.length > 0" class="o_oe_sale_dashboard_17_container__table-section">
+                        <div class="table-header">
+                            <h2>📅 Recent Orders</h2>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order Number</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.recentOrders" t-as="order" t-key="order.id">
+                                        <tr>
+                                            <td class="name-cell" t-esc="order.name"/>
+                                            <td t-esc="order.partner_name"/>
+                                            <td t-esc="order.date"/>
+                                            <td class="amount-cell" t-esc="order.amount_formatted"/>
+                                            <td>
+                                                <span t-att-class="'badge badge-' + order.status_class" 
+                                                      t-esc="order.status_text"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- No Data State -->
+                    <div t-if="state.topAgentsData.length === 0 and state.topAgenciesData.length === 0 and state.categoryNames.length === 0" 
+                         class="o_oe_sale_dashboard_17_container__table-section">
+                        <div class="no-data">
+                            <div class="no-data-icon">📊</div>
+                            <h3>No Performance Data Available</h3>
+                            <p>No sales performance data found for the selected date range and filters.</p>
+                            <p>Try adjusting your date range or removing filters to see more data.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Scroll to Top Button -->
+            <button class="scroll-to-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+                    title="Scroll to top">
+                ↑
+            </button>
+
+        </div>
+    </t>
+</templates>

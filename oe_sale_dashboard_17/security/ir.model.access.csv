@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_order_dashboard_manager,sale.order.dashboard.manager,sale.model_sale_order,sales_team.group_sale_manager,1,1,1,1
+access_sale_order_dashboard_user,sale.order.dashboard.user,sale.model_sale_order,sales_team.group_sale_salesman,1,0,0,0
+access_sale_order_dashboard_public,sale.order.dashboard.public,sale.model_sale_order,base.group_public,1,0,0,0

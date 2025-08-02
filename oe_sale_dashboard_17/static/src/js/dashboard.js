@@ -1,5 +1,5 @@
 /** @odoo-module **/
-/* This module is under copyright of 'OdooElevate' */
+/* Enhanced Sales Dashboard Module for Production */
 
 import { registry } from "@web/core/registry";
 import { Component, useState, onMounted, onWillUnmount, useRef } from "@odoo/owl";
@@ -7,7 +7,7 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 /**
- * Field Mapping and Validation
+ * Enhanced Field Mapping with Better Error Handling
  */
 class FieldMapping {
     constructor() {
@@ -45,7 +45,7 @@ class FieldMapping {
             const fieldsToCheck = [
                 'booking_date', 'sale_value', 'date_order', 'amount_total', 
                 'sale_order_type_id', 'agent1_partner_id', 'agent1_amount',
-                'broker_partner_id', 'broker_amount'
+                'broker_partner_id', 'broker_amount', 'invoice_amount'
             ];
             
             const fields = await orm.call('sale.order', 'fields_get', [fieldsToCheck]);
@@ -91,12 +91,14 @@ class FieldMapping {
 }
 
 /**
- * Chart.js Fallback and Management
+ * Enhanced Chart Manager with Better Error Handling
  */
 class ChartManager {
     constructor() {
         this.charts = {};
         this.isChartJsReady = false;
+        this.loadingAttempts = 0;
+        this.maxLoadingAttempts = 3;
     }
 
     async ensureChartJs() {
@@ -105,10 +107,18 @@ class ChartManager {
             return true;
         }
 
+        if (this.loadingAttempts >= this.maxLoadingAttempts) {
+            console.error('Max Chart.js loading attempts reached');
+            return false;
+        }
+
+        this.loadingAttempts++;
+
         // Try fallback sources
         const fallbackSources = [
             'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js',
-            'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js'
+            'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js',
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js'
         ];
 
         for (const source of fallbackSources) {
@@ -116,11 +126,11 @@ class ChartManager {
                 await this.loadScript(source);
                 if (typeof Chart !== 'undefined') {
                     this.isChartJsReady = true;
-                    console.log(`Chart.js loaded from ${source}`);
+                    console.log(`Chart.js loaded successfully from ${source}`);
                     return true;
                 }
             } catch (error) {
-                console.warn(`Failed to load Chart.js from ${source}`);
+                console.warn(`Failed to load Chart.js from ${source}:`, error);
             }
         }
 
@@ -135,13 +145,14 @@ class ChartManager {
             script.async = true;
             script.onload = resolve;
             script.onerror = reject;
+            script.timeout = 10000; // 10 second timeout
             document.head.appendChild(script);
         });
     }
 
     createChart(canvasId, config) {
         if (!this.isChartJsReady) {
-            console.warn('Chart.js not available');
+            console.warn('Chart.js not available, skipping chart creation for:', canvasId);
             return null;
         }
 
@@ -158,6 +169,7 @@ class ChartManager {
             }
 
             this.charts[canvasId] = new Chart(canvas, config);
+            console.log(`Chart ${canvasId} created successfully`);
             return this.charts[canvasId];
         } catch (error) {
             console.error(`Error creating chart ${canvasId}:`, error);
@@ -167,8 +179,13 @@ class ChartManager {
 
     destroyChart(canvasId) {
         if (this.charts[canvasId]) {
-            this.charts[canvasId].destroy();
-            delete this.charts[canvasId];
+            try {
+                this.charts[canvasId].destroy();
+                delete this.charts[canvasId];
+                console.log(`Chart ${canvasId} destroyed`);
+            } catch (error) {
+                console.error(`Error destroying chart ${canvasId}:`, error);
+            }
         }
     }
 
@@ -180,7 +197,7 @@ class ChartManager {
 }
 
 /**
- * Main Dashboard Component
+ * Enhanced Dashboard Component
  */
 class OeSaleDashboard extends Component {
     static template = "oe_sale_dashboard_17.yearly_sales_dashboard_template";
@@ -196,7 +213,7 @@ class OeSaleDashboard extends Component {
         this.fieldMapping = new FieldMapping();
         this.chartManager = new ChartManager();
         
-        // Color palette
+        // Color palette for charts
         this.colorPalette = {
             primary: { background: 'rgba(139, 0, 0, 0.8)', border: 'rgba(139, 0, 0, 1)' },
             secondary: { background: 'rgba(114, 47, 55, 0.8)', border: 'rgba(114, 47, 55, 1)' },
@@ -206,8 +223,7 @@ class OeSaleDashboard extends Component {
             info: { background: 'rgba(59, 130, 246, 0.8)', border: 'rgba(59, 130, 246, 1)' }
         };
         
-        // Initialize state
-        // Set reasonable default date range (last 90 days to today)
+        // Initialize state with reasonable defaults
         const today = new Date().toISOString().split('T')[0];
         const ninetyDaysAgo = new Date();
         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
@@ -222,7 +238,8 @@ class OeSaleDashboard extends Component {
             hasError: false,
             errorMessage: '',
             showSampleDataWarning: false,
-            // Dashboard data with AED currency defaults
+            
+            // Enhanced dashboard data structure
             summaryData: {
                 totalQuotations: { count: 0, amount: 0, formatted: 'AED 0' },
                 totalSalesOrders: { count: 0, amount: 0, formatted: 'AED 0' },
@@ -230,17 +247,24 @@ class OeSaleDashboard extends Component {
                 conversionRate: '0%',
                 avgDealSize: 'AED 0',
                 revenueGrowth: '0%',
-                pipelineVelocity: '0 days',
-                categories: {}
+                pipelineVelocity: '0 days'
             },
+            
             categoriesData: {},
             categoryNames: [],
-            monthlyFluctuationData: { labels: [], quotations: [], sales_orders: [], invoiced_sales: [] },
-            salesTypeDistribution: { count_distribution: {}, amount_distribution: {} },
+            monthlyFluctuationData: { 
+                labels: [], 
+                quotations: [], 
+                sales_orders: [], 
+                invoiced_sales: [] 
+            },
+            salesTypeDistribution: { 
+                count_distribution: {}, 
+                amount_distribution: {} 
+            },
             topAgentsData: [],
             topAgenciesData: [],
             recentOrders: [],
-            // Additional arrays needed by template
             rankingData: [],
             quotationsData: [],
             salesOrdersData: [],
@@ -262,31 +286,38 @@ class OeSaleDashboard extends Component {
         try {
             this.state.isLoading = true;
             this.state.hasError = false;
+            this.state.errorMessage = '';
             
-            console.log('Initializing dashboard...');
+            console.log('Initializing enhanced dashboard...');
             
             // Initialize field mapping
             await this.fieldMapping.initialize(this.orm);
             
             // Ensure Chart.js is available
-            await this.chartManager.ensureChartJs();
+            const chartReady = await this.chartManager.ensureChartJs();
+            if (!chartReady) {
+                console.warn('Charts will not be available - Chart.js failed to load');
+            }
             
-            // Load sales types if available
+            // Load sales types
             await this._loadSalesTypes();
             
             // Load dashboard data
             await this._loadDashboardData();
             
-            // Load top performers data
-            await this._loadTopPerformersData();
+            // Create charts after a delay to ensure DOM is ready
+            setTimeout(() => {
+                if (this.chartManager.isChartJsReady) {
+                    this._createCharts();
+                }
+            }, 200);
             
-            // Create charts after a short delay to ensure DOM is ready
-            setTimeout(() => this._createCharts(), 100);
+            console.log('Dashboard initialization completed successfully');
             
         } catch (error) {
             console.error('Dashboard initialization failed:', error);
             this.state.hasError = true;
-            this.state.errorMessage = 'Failed to initialize dashboard: ' + error.message;
+            this.state.errorMessage = `Failed to initialize dashboard: ${error.message}`;
             this.notification.add(_t("Failed to load dashboard"), { type: 'danger' });
         } finally {
             this.state.isLoading = false;
@@ -296,29 +327,35 @@ class OeSaleDashboard extends Component {
     async _loadSalesTypes() {
         try {
             if (this.fieldMapping.isFieldAvailable('sale_order_type_id')) {
-                // Use the new backend method to get sales types from le_sale_type module
+                console.log('Loading sales types...');
+                
+                // Try using the backend method first
                 const salesTypes = await this.orm.call(
                     'sale.order',
                     'get_sales_types',
                     []
                 );
-                this.state.salesTypes = salesTypes;
-                console.log('Loaded sales types from le_sale_type module:', salesTypes.length);
+                this.state.salesTypes = salesTypes || [];
+                console.log('Loaded sales types:', salesTypes.length);
                 
                 // If no sales types found, try fallback
                 if (salesTypes.length === 0) {
                     console.log('No sales types found, trying fallback search...');
-                    const fallbackTypes = await this.orm.searchRead(
-                        'sale.order.type',
-                        [],
-                        ['id', 'name'],
-                        { limit: 100 }
-                    );
-                    this.state.salesTypes = fallbackTypes;
-                    console.log('Fallback sales types loaded:', fallbackTypes.length);
+                    try {
+                        const fallbackTypes = await this.orm.searchRead(
+                            'sale.order.type',
+                            [],
+                            ['id', 'name'],
+                            { limit: 100 }
+                        );
+                        this.state.salesTypes = fallbackTypes;
+                        console.log('Fallback sales types loaded:', fallbackTypes.length);
+                    } catch (fallbackError) {
+                        console.warn('Fallback sales types search failed:', fallbackError);
+                    }
                 }
             } else {
-                console.log('sale_order_type_id field not available, le_sale_type module may not be installed');
+                console.log('sale_order_type_id field not available');
                 this.state.salesTypes = [];
             }
         } catch (error) {
@@ -330,9 +367,8 @@ class OeSaleDashboard extends Component {
     async _loadDashboardData() {
         try {
             console.log('Loading dashboard data for date range:', this.state.startDate, 'to', this.state.endDate);
-            console.log('Selected sales types:', this.state.selectedSalesTypes);
             
-            // Try to use backend methods first, fallback to direct queries
+            // Try to use backend methods first
             let dashboardData;
             try {
                 dashboardData = await this.orm.call(
@@ -350,47 +386,20 @@ class OeSaleDashboard extends Component {
                 throw new Error(dashboardData.error);
             }
             
-            // Validate and ensure data structure
-            if (!dashboardData.totals) {
-                console.warn('No totals data received, initializing empty structure');
-                dashboardData = {
-                    totals: {
-                        draft_count: 0, draft_amount: 0,
-                        sales_order_count: 0, sales_order_amount: 0,
-                        invoice_count: 0, invoice_amount: 0,
-                        conversion_rate: 0, avg_deal_size: 0,
-                        revenue_growth: 0, pipeline_velocity: 0
-                    },
-                    categories: {}
-                };
-            }
-            
             // Process the data
             this._processDashboardData(dashboardData);
             
-            // Load additional chart data
+            // Load additional data
             await this._loadChartData();
-            
-            // Load ranking and detailed data arrays
-            await this._loadRankingData();
-            
-            // Load separated data arrays for template
-            this._populateDataArrays();
-            
-            // Load top performers data
             await this._loadTopPerformersData();
-            
-            // Load recent orders
             await this._loadRecentOrders();
             
-            console.log('Dashboard data loaded successfully:', this.state.summaryData);
+            console.log('Dashboard data loaded successfully');
             
         } catch (error) {
             console.error('Error loading dashboard data:', error);
             this.state.hasError = true;
             this.state.errorMessage = error.message || 'Failed to load dashboard data';
-            
-            // Show notification to user
             this.notification.add(
                 _t("Failed to load dashboard data: %s", error.message),
                 { type: 'danger' }
@@ -399,48 +408,62 @@ class OeSaleDashboard extends Component {
     }
     
     async _loadDashboardDataFallback() {
-        // Fallback implementation using direct ORM queries
+        console.log('Using fallback dashboard data loading...');
+        
+        // Build domain for filtering
         const dateDomain = this.fieldMapping.buildDateDomain(this.state.startDate, this.state.endDate);
         
-        // Load quotations (draft and sent states)
-        const quotations = await this.orm.searchRead(
-            'sale.order',
-            [...dateDomain, ['state', 'in', ['draft', 'sent']]],
-            ['id', 'amount_total', 'state'],
-            { limit: false }
-        );
-        
-        // Load sales orders (confirmed state)
-        const salesOrders = await this.orm.searchRead(
-            'sale.order',
-            [...dateDomain, ['state', '=', 'sale']],
-            ['id', 'amount_total', 'state', 'invoice_status'],
-            { limit: false }
-        );
-        
-        // Filter invoiced orders
-        const invoicedOrders = salesOrders.filter(order => order.invoice_status === 'invoiced');
-        
-        // Calculate totals
-        const quotationsTotal = quotations.reduce((sum, q) => sum + (q.amount_total || 0), 0);
-        const salesOrdersTotal = salesOrders.reduce((sum, s) => sum + (s.amount_total || 0), 0);
-        const invoicedTotal = invoicedOrders.reduce((sum, i) => sum + (i.amount_total || 0), 0);
-        
-        return {
-            totals: {
-                draft_count: quotations.length,
-                draft_amount: quotationsTotal,
-                sales_order_count: salesOrders.length,
-                sales_order_amount: salesOrdersTotal,
-                invoice_count: invoicedOrders.length,
-                invoice_amount: invoicedTotal,
-                conversion_rate: quotations.length > 0 ? (salesOrders.length / quotations.length) * 100 : 0,
-                avg_deal_size: salesOrders.length > 0 ? salesOrdersTotal / salesOrders.length : 0,
-                revenue_growth: 0, // Would need historical data
-                pipeline_velocity: 0 // Would need date calculations
-            },
-            categories: {} // Would need additional queries for categories
-        };
+        try {
+            // Load quotations (draft and sent states)
+            const quotations = await this.orm.searchRead(
+                'sale.order',
+                [...dateDomain, ['state', 'in', ['draft', 'sent']]],
+                ['id', 'amount_total', 'state'],
+                { limit: false }
+            );
+            
+            // Load sales orders (confirmed state)
+            const salesOrders = await this.orm.searchRead(
+                'sale.order',
+                [...dateDomain, ['state', '=', 'sale']],
+                ['id', 'amount_total', 'state', 'invoice_status'],
+                { limit: false }
+            );
+            
+            // Filter invoiced orders
+            const invoicedOrders = salesOrders.filter(order => order.invoice_status === 'invoiced');
+            
+            // Calculate totals
+            const quotationsTotal = quotations.reduce((sum, q) => sum + (q.amount_total || 0), 0);
+            const salesOrdersTotal = salesOrders.reduce((sum, s) => sum + (s.amount_total || 0), 0);
+            const invoicedTotal = invoicedOrders.reduce((sum, i) => sum + (i.amount_total || 0), 0);
+            
+            return {
+                totals: {
+                    draft_count: quotations.length,
+                    draft_amount: quotationsTotal,
+                    sales_order_count: salesOrders.length,
+                    sales_order_amount: salesOrdersTotal,
+                    invoice_count: invoicedOrders.length,
+                    invoice_amount: invoicedTotal,
+                    conversion_rate: quotations.length > 0 ? (salesOrders.length / quotations.length) * 100 : 0,
+                    avg_deal_size: salesOrders.length > 0 ? salesOrdersTotal / salesOrders.length : 0,
+                    revenue_growth: 0,
+                    pipeline_velocity: 0
+                },
+                categories: {}
+            };
+        } catch (error) {
+            console.error('Fallback data loading failed:', error);
+            return {
+                totals: {
+                    draft_count: 0, draft_amount: 0, sales_order_count: 0,
+                    sales_order_amount: 0, invoice_count: 0, invoice_amount: 0,
+                    conversion_rate: 0, avg_deal_size: 0, revenue_growth: 0, pipeline_velocity: 0
+                },
+                categories: {}
+            };
+        }
     }
     
     _processDashboardData(dashboardData) {
@@ -458,7 +481,7 @@ class OeSaleDashboard extends Component {
             this.state.showSampleDataWarning = false;
         }
         
-        // Update summary data - use backend formatted values when available
+        // Update summary data
         this.state.summaryData = {
             totalQuotations: {
                 count: totals.draft_count || 0,
@@ -478,14 +501,11 @@ class OeSaleDashboard extends Component {
             conversionRate: totals.conversion_rate ? totals.conversion_rate.toFixed(1) + '%' : '0%',
             avgDealSize: totals.formatted_avg_deal_size || this._formatCurrency(totals.avg_deal_size || 0),
             revenueGrowth: totals.revenue_growth ? totals.revenue_growth.toFixed(1) + '%' : '0%',
-            pipelineVelocity: totals.pipeline_velocity ? totals.pipeline_velocity.toFixed(1) + ' days' : '0 days',
-            categories: dashboardData.categories || {}
+            pipelineVelocity: totals.pipeline_velocity ? totals.pipeline_velocity.toFixed(1) + ' days' : '0 days'
         };
         
-        // Store categories data for charts
+        // Store categories data
         this.state.categoriesData = dashboardData.categories || {};
-        
-        // Populate category names for safe template iteration
         this.state.categoryNames = Object.keys(dashboardData.categories || {});
         
         console.log('Processed dashboard data:', this.state.summaryData);
@@ -494,7 +514,7 @@ class OeSaleDashboard extends Component {
     
     async _loadChartData() {
         try {
-            // Try to load monthly fluctuation data
+            // Load monthly fluctuation data
             try {
                 const monthlyData = await this.orm.call(
                     'sale.order',
@@ -507,7 +527,7 @@ class OeSaleDashboard extends Component {
                 this.state.monthlyFluctuationData = this._generateMockTrendData();
             }
             
-            // Try to load sales type distribution
+            // Load sales type distribution
             try {
                 const distributionData = await this.orm.call(
                     'sale.order',
@@ -569,6 +589,7 @@ class OeSaleDashboard extends Component {
                         [this.state.startDate, this.state.endDate, 'agent', 10]
                     );
                     this.state.topAgentsData = topAgents || [];
+                    console.log('Loaded top agents:', this.state.topAgentsData.length);
                 } catch (error) {
                     console.warn('Top agents data not available:', error);
                     this.state.topAgentsData = [];
@@ -585,6 +606,7 @@ class OeSaleDashboard extends Component {
                         [this.state.startDate, this.state.endDate, 'agency', 10]
                     );
                     this.state.topAgenciesData = topAgencies || [];
+                    console.log('Loaded top agencies:', this.state.topAgenciesData.length);
                 } catch (error) {
                     console.warn('Top agencies data not available:', error);
                     this.state.topAgenciesData = [];
@@ -630,68 +652,13 @@ class OeSaleDashboard extends Component {
         }
     }
     
-    async _loadRankingData() {
-        try {
-            // Load sales type ranking data if available
-            const rankingData = await this.orm.call(
-                'sale.order',
-                'get_sales_type_ranking_data',
-                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
-            );
-            this.state.rankingData = rankingData || [];
-        } catch (error) {
-            console.warn('Ranking data not available:', error);
-            this.state.rankingData = [];
-        }
-    }
-    
-    _populateDataArrays() {
-        // Populate arrays from categoriesData for template
-        this.state.quotationsData = [];
-        this.state.salesOrdersData = [];
-        this.state.invoicedSalesData = [];
-        
-        if (this.state.categoriesData && typeof this.state.categoriesData === 'object') {
-            for (const [categoryName, categoryData] of Object.entries(this.state.categoriesData)) {
-                // Add quotations data
-                if (categoryData.draft_count > 0) {
-                    this.state.quotationsData.push({
-                        sales_type_name: categoryName,
-                        count: categoryData.draft_count,
-                        amount: categoryData.draft_amount,
-                        formatted_amount: categoryData.formatted_draft_amount || this._formatCurrency(categoryData.draft_amount)
-                    });
-                }
-                
-                // Add sales orders data
-                if (categoryData.sales_order_count > 0) {
-                    this.state.salesOrdersData.push({
-                        sales_type_name: categoryName,
-                        count: categoryData.sales_order_count,
-                        amount: categoryData.sales_order_amount,
-                        formatted_amount: categoryData.formatted_sales_order_amount || this._formatCurrency(categoryData.sales_order_amount)
-                    });
-                }
-                
-                // Add invoiced sales data
-                if (categoryData.invoice_count > 0) {
-                    this.state.invoicedSalesData.push({
-                        sales_type_name: categoryName,
-                        count: categoryData.invoice_count,
-                        amount: categoryData.invoice_amount,
-                        formatted_amount: categoryData.formatted_invoice_amount || this._formatCurrency(categoryData.invoice_amount)
-                    });
-                }
-            }
-        }
-    }
-    
     _createCharts() {
         if (!this.chartManager.isChartJsReady) {
             console.warn('Chart.js not ready, skipping chart creation');
             return;
         }
         
+        console.log('Creating charts...');
         this._createTrendChart();
         this._createCategoryChart();
         this._createStatusChart();
@@ -760,7 +727,10 @@ class OeSaleDashboard extends Component {
         const labels = Object.keys(categories);
         const data = labels.map(label => categories[label]?.total_amount || 0);
         
-        if (labels.length === 0) return;
+        if (labels.length === 0) {
+            console.log('No category data for pie chart');
+            return;
+        }
         
         const config = {
             type: 'doughnut',
@@ -933,12 +903,22 @@ class OeSaleDashboard extends Component {
     async _reloadDashboard() {
         try {
             this.state.isLoading = true;
+            this.state.hasError = false;
+            
             await this._loadDashboardData();
-            await this._loadTopPerformersData();
-            this._createCharts(); // Recreate charts with new data
+            
+            // Recreate charts with new data
+            setTimeout(() => {
+                if (this.chartManager.isChartJsReady) {
+                    this._createCharts();
+                }
+            }, 100);
+            
             this.notification.add(_t("Dashboard updated successfully"), { type: 'success' });
         } catch (error) {
             console.error('Error reloading dashboard:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message;
             this.notification.add(_t("Failed to update dashboard"), { type: 'danger' });
         } finally {
             this.state.isLoading = false;
