@@ -113,7 +113,7 @@ class ChartManager {
 /**
  * Complete Sales Dashboard Component
  */
-class CompleteSalesDashboard extends Component {
+export class SalesDashboard extends Component {
     static template = "oe_sale_dashboard_17.yearly_sales_dashboard_template";
     
     setup() {
@@ -451,3 +451,532 @@ class CompleteSalesDashboard extends Component {
                     this.state.topAgenciesData = [];
                 }
             }
+        } catch (error) {
+            console.error('Error loading top performers data:', error);
+        }
+    }
+
+    /**
+     * Set date range and refresh dashboard
+     */
+    async setDateRange(range) {
+        const today = new Date();
+        let startDate;
+        
+        switch (range) {
+            case '7days':
+                startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+            case '30days':
+                startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+            case '90days':
+                startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+                break;
+            case '1year':
+                startDate = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+                break;
+            default:
+                startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+        }
+        
+        this.state.startDate = startDate.toISOString().split('T')[0];
+        this.state.endDate = today.toISOString().split('T')[0];
+        
+        await this.refreshDashboard();
+    }
+
+    /**
+     * Refresh dashboard data
+     */
+    async refreshDashboard() {
+        try {
+            this.state.isLoading = true;
+            this.state.hasError = false;
+            this.state.errorMessage = '';
+
+            console.log(`Refreshing dashboard for ${this.state.startDate} to ${this.state.endDate}`);
+
+            // Load all dashboard data
+            await this._loadSummaryData();
+            await this._loadMonthlyFluctuationData();
+            await this._loadSalesTypeDistribution();
+            await this._loadTopPerformersData();
+
+            this.notification.add(_t('Dashboard refreshed successfully'), {
+                type: 'success'
+            });
+
+        } catch (error) {
+            console.error('Error refreshing dashboard:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message || 'Unknown error occurred';
+            
+            this.notification.add(_t('Error refreshing dashboard: %s', error.message), {
+                type: 'danger'
+            });
+        } finally {
+            this.state.isLoading = false;
+        }
+    }
+
+    /**
+     * Load summary data from backend
+     */
+    async _loadSummaryData() {
+        try {
+            console.log('Loading summary data for date range:', this.state.startDate, 'to', this.state.endDate);
+            
+            const dashboardData = await this.orm.call(
+                'sale.order',
+                'get_dashboard_summary_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            
+            console.log('Backend summary data received:', dashboardData);
+            
+            if (dashboardData.error) {
+                throw new Error(dashboardData.error);
+            }
+            
+            this._processDashboardData(dashboardData);
+            
+        } catch (error) {
+            console.error('Error loading summary data:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load monthly fluctuation data
+     */
+    async _loadMonthlyFluctuationData() {
+        try {
+            const monthlyData = await this.orm.call(
+                'sale.order',
+                'get_monthly_fluctuation_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            this.state.monthlyFluctuationData = monthlyData;
+            
+        } catch (error) {
+            console.warn('Error loading monthly fluctuation data:', error);
+            this.state.monthlyFluctuationData = this._generateMockTrendData();
+        }
+    }
+
+    /**
+     * Load sales type distribution data
+     */
+    async _loadSalesTypeDistribution() {
+        try {
+            const distributionData = await this.orm.call(
+                'sale.order',
+                'get_sales_type_distribution',
+                [this.state.startDate, this.state.endDate]
+            );
+            this.state.salesTypeDistribution = distributionData;
+            
+        } catch (error) {
+            console.warn('Error loading sales type distribution:', error);
+            this.state.salesTypeDistribution = { count_distribution: {}, amount_distribution: {} };
+        }
+    }
+
+    /**
+     * Format currency values for display
+     */
+    formatCurrency(amount) {
+        if (!amount && amount !== 0) return 'AED 0';
+        return new Intl.NumberFormat('en-AE', {
+            style: 'currency',
+            currency: 'AED',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
+    /**
+     * Format large numbers with K/M/B suffixes
+     */
+    formatNumber(value) {
+        if (!value && value !== 0) return '0';
+        
+        const absValue = Math.abs(value);
+        if (absValue >= 1_000_000_000) {
+            return (value / 1_000_000_000).toFixed(1) + 'B';
+        } else if (absValue >= 1_000_000) {
+            return (value / 1_000_000).toFixed(1) + 'M';
+        } else if (absValue >= 1_000) {
+            return (value / 1_000).toFixed(1) + 'K';
+        }
+        return value.toString();
+    }
+
+    /**
+     * Format percentage values
+     */
+    formatPercentage(value) {
+        if (!value && value !== 0) return '0.0%';
+        return `${parseFloat(value).toFixed(1)}%`;
+    }
+
+    /**
+     * Export dashboard data to Excel/CSV
+     */
+    async exportDashboardData() {
+        try {
+            this.state.isExporting = true;
+            const result = await this.orm.call(
+                'sale.order',
+                'export_dashboard_configuration',
+                []
+            );
+            
+            if (result.error) {
+                this.notification.add(_t('Export failed: %s', result.error), {
+                    type: 'danger'
+                });
+            } else {
+                this.notification.add(_t('Dashboard data exported successfully'), {
+                    type: 'success'
+                });
+            }
+        } catch (error) {
+            console.error('Export error:', error);
+            this.notification.add(_t('Export failed: %s', error.message), {
+                type: 'danger'
+            });
+        } finally {
+            this.state.isExporting = false;
+        }
+    }
+
+    /**
+     * Test data availability and show diagnostic information
+     */
+    async testDataAvailability() {
+        try {
+            this.state.isTestingData = true;
+            const result = await this.orm.call(
+                'sale.order',
+                'test_data_availability',
+                []
+            );
+            
+            if (result.error) {
+                this.notification.add(_t('Data test failed: %s', result.error), {
+                    type: 'danger'
+                });
+            } else {
+                // Show diagnostic information
+                const message = _t(`Data Test Results:
+                    • Total Orders: %s
+                    • Non-cancelled: %s
+                    • Recent (90 days): %s
+                    • Date field: %s
+                    • States: %s`, 
+                    result.total_orders,
+                    result.non_cancelled_orders,
+                    result.recent_orders_90days,
+                    result.date_field_used,
+                    JSON.stringify(result.states_distribution)
+                );
+                
+                this.notification.add(message, {
+                    type: 'info',
+                    title: _t('Data Availability Test'),
+                    sticky: true
+                });
+                
+                console.log('Data availability test results:', result);
+            }
+        } catch (error) {
+            console.error('Data test error:', error);
+            this.notification.add(_t('Data test failed: %s', error.message), {
+                type: 'danger'
+            });
+        } finally {
+            this.state.isTestingData = false;
+        }
+    }
+
+    /**
+     * Toggle auto-refresh functionality
+     */
+    toggleAutoRefresh() {
+        if (this.state.autoRefreshEnabled) {
+            this.stopAutoRefresh();
+        } else {
+            this.startAutoRefresh();
+        }
+    }
+
+    /**
+     * Start auto-refresh with interval
+     */
+    startAutoRefresh() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
+
+        const intervalMinutes = 5; // Refresh every 5 minutes
+        this.autoRefreshInterval = setInterval(() => {
+            if (!this.state.isLoading) {
+                console.log('Auto-refreshing dashboard...');
+                this.refreshDashboard();
+            }
+        }, intervalMinutes * 60 * 1000);
+
+        this.state.autoRefreshEnabled = true;
+        this.notification.add(_t('Auto-refresh enabled (every %s minutes)', intervalMinutes), {
+            type: 'info'
+        });
+    }
+
+    /**
+     * Stop auto-refresh
+     */
+    stopAutoRefresh() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+        }
+        this.state.autoRefreshEnabled = false;
+        this.notification.add(_t('Auto-refresh disabled'), {
+            type: 'info'
+        });
+    }
+
+    /**
+     * Get CSS class for performance indicators
+     */
+    getPerformanceClass(value) {
+        if (!value && value !== 0) return 'neutral';
+        const numValue = parseFloat(value);
+        if (numValue > 0) return 'positive';
+        if (numValue < 0) return 'negative';
+        return 'neutral';
+    }
+
+    /**
+     * Get icon for trend indicators
+     */
+    getTrendIcon(value) {
+        if (!value && value !== 0) return '➡️';
+        const numValue = parseFloat(value);
+        if (numValue > 0) return '📈';
+        if (numValue < 0) return '📉';
+        return '➡️';
+    }
+
+    /**
+     * Handle component cleanup
+     */
+    destroy() {
+        this.stopAutoRefresh();
+        this.chartManager.destroyAllCharts();
+        super.destroy();
+    }
+}
+
+// Register the main dashboard component
+registry.category("actions").add("oe_sale_dashboard_17.dashboard_action", SalesDashboard);
+
+/**
+ * Sales Dashboard Widget for embedding in other views
+ */
+export class SalesDashboardWidget extends Component {
+    static template = "oe_sale_dashboard_17.SalesDashboardWidget";
+    static props = {
+        record: Object,
+        name: String,
+        readonly: { type: Boolean, optional: true },
+    };
+
+    setup() {
+        this.orm = useService("orm");
+        this.notification = useService("notification");
+        
+        this.state = useState({
+            kpis: {},
+            isLoading: false,
+            lastUpdated: null
+        });
+
+        onMounted(async () => {
+            await this.loadWidgetData();
+        });
+    }
+
+    async loadWidgetData() {
+        this.state.isLoading = true;
+        try {
+            const endDate = new Date().toISOString().split('T')[0];
+            const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            const data = await this.orm.call(
+                'sale.order',
+                'get_dashboard_summary_data',
+                [startDate, endDate]
+            );
+            
+            if (data.totals) {
+                this.state.kpis = {
+                    totalRevenue: data.totals.total_amount || 0,
+                    totalOrders: data.totals.total_count || 0,
+                    avgDealSize: data.totals.avg_deal_size || 0,
+                    conversionRate: data.totals.conversion_rate || 0
+                };
+            }
+            
+            this.state.lastUpdated = new Date().toLocaleTimeString();
+        } catch (error) {
+            console.error('Error loading widget data:', error);
+        } finally {
+            this.state.isLoading = false;
+        }
+    }
+
+    formatCurrency(amount) {
+        if (!amount && amount !== 0) return 'AED 0';
+        return new Intl.NumberFormat('en-AE', {
+            style: 'currency',
+            currency: 'AED',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+}
+
+// Register the widget component
+registry.category("fields").add("sales_dashboard_widget", SalesDashboardWidget);
+
+/**
+ * Performance Metrics Component for detailed analytics
+ */
+export class PerformanceMetrics extends Component {
+    static template = "oe_sale_dashboard_17.PerformanceMetrics";
+    
+    setup() {
+        this.orm = useService("orm");
+        this.state = useState({
+            metrics: {},
+            isLoading: false
+        });
+    }
+
+    async loadMetrics() {
+        this.state.isLoading = true;
+        try {
+            const metrics = await this.orm.call(
+                'sale.order',
+                'get_dashboard_performance_metrics',
+                []
+            );
+            this.state.metrics = metrics;
+        } catch (error) {
+            console.error('Error loading performance metrics:', error);
+        } finally {
+            this.state.isLoading = false;
+        }
+    }
+}
+
+// Utility functions for chart management
+export const ChartUtils = {
+    defaultColors: [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+    ],
+
+    getChartConfig(type, data, options = {}) {
+        const baseConfig = {
+            type: type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                ...options
+            }
+        };
+
+        // Add type-specific configurations
+        if (type === 'line') {
+            baseConfig.options.scales = {
+                x: {
+                    display: true,
+                    grid: { display: false }
+                },
+                y: {
+                    display: true,
+                    beginAtZero: true
+                }
+            };
+        }
+
+        return baseConfig;
+    },
+
+    formatChartData(labels, datasets) {
+        return {
+            labels: labels,
+            datasets: datasets.map((dataset, index) => ({
+                ...dataset,
+                backgroundColor: dataset.backgroundColor || this.defaultColors[index % this.defaultColors.length],
+                borderColor: dataset.borderColor || this.defaultColors[index % this.defaultColors.length],
+                borderWidth: dataset.borderWidth || 2
+            }))
+        };
+    }
+};
+
+// Auto-refresh manager
+export const AutoRefreshManager = {
+    intervals: new Map(),
+
+    start(componentId, callback, intervalMinutes = 5) {
+        this.stop(componentId);
+        const interval = setInterval(callback, intervalMinutes * 60 * 1000);
+        this.intervals.set(componentId, interval);
+        console.log(`Auto-refresh started for ${componentId} (${intervalMinutes} minutes)`);
+    },
+
+    stop(componentId) {
+        const interval = this.intervals.get(componentId);
+        if (interval) {
+            clearInterval(interval);
+            this.intervals.delete(componentId);
+            console.log(`Auto-refresh stopped for ${componentId}`);
+        }
+    },
+
+    stopAll() {
+        this.intervals.forEach((interval, componentId) => {
+            clearInterval(interval);
+            console.log(`Auto-refresh stopped for ${componentId}`);
+        });
+        this.intervals.clear();
+    }
+};
+
+// Export all components and utilities
+export {
+    SalesDashboard,
+    SalesDashboardWidget,
+    PerformanceMetrics,
+    ChartManager,
+    ChartUtils,
+    AutoRefreshManager
+};
