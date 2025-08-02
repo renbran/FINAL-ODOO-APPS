@@ -1,97 +1,13 @@
 /** @odoo-module **/
-/* Enhanced Sales Dashboard Module for Production */
+/* Complete Production-Ready Sales Dashboard for Odoo 17 */
 
 import { registry } from "@web/core/registry";
-import { Component, useState, onMounted, onWillUnmount, useRef } from "@odoo/owl";
+import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 /**
- * Enhanced Field Mapping with Better Error Handling
- */
-class FieldMapping {
-    constructor() {
-        this.fieldMapping = {
-            // Date fields - prefer booking_date if available
-            booking_date: 'booking_date',
-            date_order: 'date_order',
-            
-            // Amount fields - prefer sale_value if available  
-            sale_value: 'sale_value',
-            amount_total: 'amount_total',
-            amount_untaxed: 'amount_untaxed',
-            
-            // Commission fields
-            agent1_partner_id: 'agent1_partner_id',
-            agent1_amount: 'agent1_amount',
-            broker_partner_id: 'broker_partner_id',
-            broker_amount: 'broker_amount',
-            
-            // Sales type field
-            sale_order_type_id: 'sale_order_type_id',
-            
-            // Track available fields
-            _available: {}
-        };
-    }
-
-    async initialize(orm) {
-        if (!orm) {
-            console.error('ORM service not available for field mapping');
-            return;
-        }
-        
-        try {
-            const fieldsToCheck = [
-                'booking_date', 'sale_value', 'date_order', 'amount_total', 
-                'sale_order_type_id', 'agent1_partner_id', 'agent1_amount',
-                'broker_partner_id', 'broker_amount', 'invoice_amount'
-            ];
-            
-            const fields = await orm.call('sale.order', 'fields_get', [fieldsToCheck]);
-            
-            // Update available fields
-            fieldsToCheck.forEach(field => {
-                this.fieldMapping._available[field] = !!fields[field];
-            });
-            
-            console.log('Dashboard field availability:', this.fieldMapping._available);
-            
-            // Set fallbacks
-            if (!this.fieldMapping._available.booking_date) {
-                console.warn('booking_date not found, using date_order as fallback');
-                this.fieldMapping.booking_date = 'date_order';
-            }
-            
-            if (!this.fieldMapping._available.sale_value) {
-                console.warn('sale_value not found, using amount_total as fallback');
-                this.fieldMapping.sale_value = 'amount_total';
-            }
-            
-        } catch (error) {
-            console.error('Error initializing field mapping:', error);
-        }
-    }
-
-    getFieldName(fieldName) {
-        return this.fieldMapping[fieldName] || fieldName;
-    }
-
-    isFieldAvailable(fieldName) {
-        return !!this.fieldMapping._available[fieldName];
-    }
-
-    buildDateDomain(startDate, endDate) {
-        const dateField = this.getFieldName('booking_date');
-        return [
-            [dateField, '>=', startDate],
-            [dateField, '<=', endDate]
-        ];
-    }
-}
-
-/**
- * Enhanced Chart Manager with Better Error Handling
+ * Enhanced Chart Manager with robust error handling
  */
 class ChartManager {
     constructor() {
@@ -114,7 +30,6 @@ class ChartManager {
 
         this.loadingAttempts++;
 
-        // Try fallback sources
         const fallbackSources = [
             'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js',
             'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js',
@@ -145,7 +60,7 @@ class ChartManager {
             script.async = true;
             script.onload = resolve;
             script.onerror = reject;
-            script.timeout = 10000; // 10 second timeout
+            script.timeout = 10000;
             document.head.appendChild(script);
         });
     }
@@ -163,7 +78,6 @@ class ChartManager {
         }
 
         try {
-            // Destroy existing chart if any
             if (this.charts[canvasId]) {
                 this.charts[canvasId].destroy();
             }
@@ -197,9 +111,9 @@ class ChartManager {
 }
 
 /**
- * Enhanced Dashboard Component
+ * Complete Sales Dashboard Component
  */
-class OeSaleDashboard extends Component {
+class CompleteSalesDashboard extends Component {
     static template = "oe_sale_dashboard_17.yearly_sales_dashboard_template";
     
     setup() {
@@ -209,11 +123,10 @@ class OeSaleDashboard extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         
-        // Initialize managers
-        this.fieldMapping = new FieldMapping();
+        // Initialize chart manager
         this.chartManager = new ChartManager();
         
-        // Color palette for charts
+        // Color palette for consistent styling
         this.colorPalette = {
             primary: { background: 'rgba(139, 0, 0, 0.8)', border: 'rgba(139, 0, 0, 1)' },
             secondary: { background: 'rgba(114, 47, 55, 0.8)', border: 'rgba(114, 47, 55, 1)' },
@@ -265,10 +178,7 @@ class OeSaleDashboard extends Component {
             topAgentsData: [],
             topAgenciesData: [],
             recentOrders: [],
-            rankingData: [],
-            quotationsData: [],
-            salesOrdersData: [],
-            invoicedSalesData: []
+            fieldMapping: {}
         });
         
         // Initialize dashboard on mount
@@ -288,10 +198,10 @@ class OeSaleDashboard extends Component {
             this.state.hasError = false;
             this.state.errorMessage = '';
             
-            console.log('Initializing enhanced dashboard...');
+            console.log('Initializing complete dashboard...');
             
-            // Initialize field mapping
-            await this.fieldMapping.initialize(this.orm);
+            // Get field mapping from backend
+            await this._loadFieldMapping();
             
             // Ensure Chart.js is available
             const chartReady = await this.chartManager.ensureChartJs();
@@ -310,7 +220,7 @@ class OeSaleDashboard extends Component {
                 if (this.chartManager.isChartJsReady) {
                     this._createCharts();
                 }
-            }, 200);
+            }, 300);
             
             console.log('Dashboard initialization completed successfully');
             
@@ -323,41 +233,37 @@ class OeSaleDashboard extends Component {
             this.state.isLoading = false;
         }
     }
+
+    async _loadFieldMapping() {
+        try {
+            const fieldMapping = await this.orm.call(
+                'sale.order',
+                'get_field_mapping',
+                []
+            );
+            this.state.fieldMapping = fieldMapping;
+            console.log('Field mapping loaded:', fieldMapping);
+        } catch (error) {
+            console.warn('Could not load field mapping:', error);
+            this.state.fieldMapping = {
+                date_field: 'date_order',
+                amount_field: 'amount_total',
+                sales_type_field: null,
+                available_fields: {}
+            };
+        }
+    }
     
     async _loadSalesTypes() {
         try {
-            if (this.fieldMapping.isFieldAvailable('sale_order_type_id')) {
-                console.log('Loading sales types...');
-                
-                // Try using the backend method first
-                const salesTypes = await this.orm.call(
-                    'sale.order',
-                    'get_sales_types',
-                    []
-                );
-                this.state.salesTypes = salesTypes || [];
-                console.log('Loaded sales types:', salesTypes.length);
-                
-                // If no sales types found, try fallback
-                if (salesTypes.length === 0) {
-                    console.log('No sales types found, trying fallback search...');
-                    try {
-                        const fallbackTypes = await this.orm.searchRead(
-                            'sale.order.type',
-                            [],
-                            ['id', 'name'],
-                            { limit: 100 }
-                        );
-                        this.state.salesTypes = fallbackTypes;
-                        console.log('Fallback sales types loaded:', fallbackTypes.length);
-                    } catch (fallbackError) {
-                        console.warn('Fallback sales types search failed:', fallbackError);
-                    }
-                }
-            } else {
-                console.log('sale_order_type_id field not available');
-                this.state.salesTypes = [];
-            }
+            console.log('Loading sales types...');
+            const salesTypes = await this.orm.call(
+                'sale.order',
+                'get_sales_types',
+                []
+            );
+            this.state.salesTypes = salesTypes || [];
+            console.log('Loaded sales types:', salesTypes.length);
         } catch (error) {
             console.warn('Could not load sales types:', error);
             this.state.salesTypes = [];
@@ -368,50 +274,30 @@ class OeSaleDashboard extends Component {
         try {
             console.log('Loading dashboard data for date range:', this.state.startDate, 'to', this.state.endDate);
             
-            // Try to use backend methods first
-            let dashboardData;
-            try {
-                dashboardData = await this.orm.call(
-                    'sale.order',
-                    'get_dashboard_summary_data',
-                    [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
-                );
-                console.log('Backend data received:', dashboardData);
-                
-                // Check if the backend returned an error
-                if (dashboardData.error) {
-                    console.warn('Backend returned error, using fallback:', dashboardData.error);
-                    throw new Error(dashboardData.error);
-                }
-                
-            } catch (backendError) {
-                console.warn('Backend method failed, using fallback:', backendError);
-                
-                // Try the test data availability method first to understand what's available
-                try {
-                    const testResult = await this.orm.call('sale.order', 'test_data_availability', []);
-                    console.log('Data availability test:', testResult);
-                    
-                    if (testResult.non_cancelled_orders > 0) {
-                        console.log('Found orders in system, attempting fallback data loading...');
-                        dashboardData = await this._loadDashboardDataFallback();
-                    } else {
-                        console.log('No orders found in system, using sample data');
-                        dashboardData = this._generateSampleData();
-                    }
-                } catch (testError) {
-                    console.warn('Test method also failed, using fallback:', testError);
-                    dashboardData = await this._loadDashboardDataFallback();
-                }
+            // Load main dashboard data
+            const dashboardData = await this.orm.call(
+                'sale.order',
+                'get_dashboard_summary_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            
+            console.log('Backend data received:', dashboardData);
+            
+            // Check if the backend returned an error
+            if (dashboardData.error) {
+                console.warn('Backend returned error:', dashboardData.error);
+                throw new Error(dashboardData.error);
             }
             
             // Process the data
             this._processDashboardData(dashboardData);
             
-            // Load additional data
-            await this._loadChartData();
-            await this._loadTopPerformersData();
-            await this._loadRecentOrders();
+            // Load additional data in parallel
+            await Promise.allSettled([
+                this._loadChartData(),
+                this._loadTopPerformersData(),
+                this._loadRecentOrders()
+            ]);
             
             console.log('Dashboard data loaded successfully');
             
@@ -423,65 +309,6 @@ class OeSaleDashboard extends Component {
                 _t("Failed to load dashboard data: %s", error.message),
                 { type: 'danger' }
             );
-        }
-    }
-    
-    async _loadDashboardDataFallback() {
-        console.log('Using fallback dashboard data loading...');
-        
-        // Build domain for filtering
-        const dateDomain = this.fieldMapping.buildDateDomain(this.state.startDate, this.state.endDate);
-        
-        try {
-            // Load quotations (draft and sent states)
-            const quotations = await this.orm.searchRead(
-                'sale.order',
-                [...dateDomain, ['state', 'in', ['draft', 'sent']]],
-                ['id', 'amount_total', 'state'],
-                { limit: false }
-            );
-            
-            // Load sales orders (confirmed state)
-            const salesOrders = await this.orm.searchRead(
-                'sale.order',
-                [...dateDomain, ['state', '=', 'sale']],
-                ['id', 'amount_total', 'state', 'invoice_status'],
-                { limit: false }
-            );
-            
-            // Filter invoiced orders
-            const invoicedOrders = salesOrders.filter(order => order.invoice_status === 'invoiced');
-            
-            // Calculate totals
-            const quotationsTotal = quotations.reduce((sum, q) => sum + (q.amount_total || 0), 0);
-            const salesOrdersTotal = salesOrders.reduce((sum, s) => sum + (s.amount_total || 0), 0);
-            const invoicedTotal = invoicedOrders.reduce((sum, i) => sum + (i.amount_total || 0), 0);
-            
-            return {
-                totals: {
-                    draft_count: quotations.length,
-                    draft_amount: quotationsTotal,
-                    sales_order_count: salesOrders.length,
-                    sales_order_amount: salesOrdersTotal,
-                    invoice_count: invoicedOrders.length,
-                    invoice_amount: invoicedTotal,
-                    conversion_rate: quotations.length > 0 ? (salesOrders.length / quotations.length) * 100 : 0,
-                    avg_deal_size: salesOrders.length > 0 ? salesOrdersTotal / salesOrders.length : 0,
-                    revenue_growth: 0,
-                    pipeline_velocity: 0
-                },
-                categories: {}
-            };
-        } catch (error) {
-            console.error('Fallback data loading failed:', error);
-            return {
-                totals: {
-                    draft_count: 0, draft_amount: 0, sales_order_count: 0,
-                    sales_order_amount: 0, invoice_count: 0, invoice_amount: 0,
-                    conversion_rate: 0, avg_deal_size: 0, revenue_growth: 0, pipeline_velocity: 0
-                },
-                categories: {}
-            };
         }
     }
     
@@ -500,7 +327,7 @@ class OeSaleDashboard extends Component {
             this.state.showSampleDataWarning = false;
         }
         
-        // Update summary data
+        // Update summary data with proper formatting
         this.state.summaryData = {
             totalQuotations: {
                 count: totals.draft_count || 0,
@@ -534,33 +361,26 @@ class OeSaleDashboard extends Component {
     async _loadChartData() {
         try {
             // Load monthly fluctuation data
-            try {
-                const monthlyData = await this.orm.call(
-                    'sale.order',
-                    'get_monthly_fluctuation_data',
-                    [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
-                );
-                this.state.monthlyFluctuationData = monthlyData;
-            } catch (error) {
-                console.warn('Monthly fluctuation data not available:', error);
-                this.state.monthlyFluctuationData = this._generateMockTrendData();
-            }
+            const monthlyData = await this.orm.call(
+                'sale.order',
+                'get_monthly_fluctuation_data',
+                [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
+            );
+            this.state.monthlyFluctuationData = monthlyData;
             
             // Load sales type distribution
-            try {
-                const distributionData = await this.orm.call(
-                    'sale.order',
-                    'get_sales_type_distribution',
-                    [this.state.startDate, this.state.endDate]
-                );
-                this.state.salesTypeDistribution = distributionData;
-            } catch (error) {
-                console.warn('Sales type distribution not available:', error);
-                this.state.salesTypeDistribution = { count_distribution: {}, amount_distribution: {} };
-            }
+            const distributionData = await this.orm.call(
+                'sale.order',
+                'get_sales_type_distribution',
+                [this.state.startDate, this.state.endDate]
+            );
+            this.state.salesTypeDistribution = distributionData;
             
         } catch (error) {
             console.warn('Error loading chart data:', error);
+            // Use fallback data
+            this.state.monthlyFluctuationData = this._generateMockTrendData();
+            this.state.salesTypeDistribution = { count_distribution: {}, amount_distribution: {} };
         }
     }
     
@@ -599,8 +419,8 @@ class OeSaleDashboard extends Component {
     async _loadTopPerformersData() {
         try {
             // Load top agents if fields are available
-            if (this.fieldMapping.isFieldAvailable('agent1_partner_id') && 
-                this.fieldMapping.isFieldAvailable('agent1_amount')) {
+            if (this.state.fieldMapping.available_fields?.agent1_partner_id && 
+                this.state.fieldMapping.available_fields?.agent1_amount) {
                 try {
                     const topAgents = await this.orm.call(
                         'sale.order',
@@ -616,8 +436,8 @@ class OeSaleDashboard extends Component {
             }
             
             // Load top agencies if fields are available
-            if (this.fieldMapping.isFieldAvailable('broker_partner_id') && 
-                this.fieldMapping.isFieldAvailable('broker_amount')) {
+            if (this.state.fieldMapping.available_fields?.broker_partner_id && 
+                this.state.fieldMapping.available_fields?.broker_amount) {
                 try {
                     const topAgencies = await this.orm.call(
                         'sale.order',
@@ -631,517 +451,3 @@ class OeSaleDashboard extends Component {
                     this.state.topAgenciesData = [];
                 }
             }
-            
-        } catch (error) {
-            console.warn('Error loading top performers:', error);
-            this.state.topAgentsData = [];
-            this.state.topAgenciesData = [];
-        }
-    }
-    
-    async _loadRecentOrders() {
-        try {
-            const dateDomain = this.fieldMapping.buildDateDomain(this.state.startDate, this.state.endDate);
-            const dateField = this.fieldMapping.getFieldName('booking_date');
-            const amountField = this.fieldMapping.isFieldAvailable('sale_value') ? 'sale_value' : 'amount_total';
-            
-            const recentOrders = await this.orm.searchRead(
-                'sale.order',
-                dateDomain,
-                ['name', 'partner_id', dateField, amountField, 'state'],
-                { 
-                    limit: 10, 
-                    order: `${dateField} desc` 
-                }
-            );
-            
-            this.state.recentOrders = recentOrders.map(order => ({
-                id: order.id,
-                name: order.name,
-                partner_name: order.partner_id ? order.partner_id[1] : 'Unknown Customer',
-                date: this._formatDate(order[dateField]),
-                amount_formatted: this._formatCurrency(order[amountField] || 0),
-                status_text: this._getStatusText(order.state),
-                status_class: this._getStatusClass(order.state)
-            }));
-            
-        } catch (error) {
-            console.warn('Could not load recent orders:', error);
-            this.state.recentOrders = [];
-        }
-    }
-    
-    _createCharts() {
-        if (!this.chartManager.isChartJsReady) {
-            console.warn('Chart.js not ready, skipping chart creation');
-            return;
-        }
-        
-        console.log('Creating charts...');
-        this._createTrendChart();
-        this._createCategoryChart();
-        this._createStatusChart();
-    }
-    
-    _createTrendChart() {
-        const config = {
-            type: 'line',
-            data: {
-                labels: this.state.monthlyFluctuationData.labels || [],
-                datasets: [
-                    {
-                        label: 'Quotations',
-                        data: this.state.monthlyFluctuationData.quotations || [],
-                        borderColor: this.colorPalette.primary.border,
-                        backgroundColor: this.colorPalette.primary.background,
-                        tension: 0.4,
-                        fill: false
-                    },
-                    {
-                        label: 'Sales Orders',
-                        data: this.state.monthlyFluctuationData.sales_orders || [],
-                        borderColor: this.colorPalette.secondary.border,
-                        backgroundColor: this.colorPalette.secondary.background,
-                        tension: 0.4,
-                        fill: false
-                    },
-                    {
-                        label: 'Invoiced Sales',
-                        data: this.state.monthlyFluctuationData.invoiced_sales || [],
-                        borderColor: this.colorPalette.success.border,
-                        backgroundColor: this.colorPalette.success.background,
-                        tension: 0.4,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Sales Trends Over Time'
-                    },
-                    legend: {
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: (value) => this._formatCurrency(value)
-                        }
-                    }
-                }
-            }
-        };
-        
-        this.chartManager.createChart('trendsLineChart', config);
-    }
-    
-    _createCategoryChart() {
-        const categories = this.state.categoriesData;
-        const labels = Object.keys(categories);
-        const data = labels.map(label => categories[label]?.total_amount || 0);
-        
-        if (labels.length === 0) {
-            console.log('No category data for pie chart');
-            return;
-        }
-        
-        const config = {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: [
-                        this.colorPalette.primary.background,
-                        this.colorPalette.secondary.background,
-                        this.colorPalette.accent.background,
-                        this.colorPalette.success.background,
-                        this.colorPalette.warning.background,
-                        this.colorPalette.info.background
-                    ],
-                    borderColor: [
-                        this.colorPalette.primary.border,
-                        this.colorPalette.secondary.border,
-                        this.colorPalette.accent.border,
-                        this.colorPalette.success.border,
-                        this.colorPalette.warning.border,
-                        this.colorPalette.info.border
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Revenue by Category'
-                    },
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const value = context.parsed;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${context.label}: ${this._formatCurrency(value)} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        
-        this.chartManager.createChart('enhancedPieChart', config);
-    }
-    
-    _createStatusChart() {
-        const totals = this.state.summaryData;
-        
-        const config = {
-            type: 'bar',
-            data: {
-                labels: ['Quotations', 'Sales Orders', 'Invoiced'],
-                datasets: [{
-                    label: 'Count',
-                    data: [
-                        totals.totalQuotations.count,
-                        totals.totalSalesOrders.count,
-                        totals.totalInvoiced.count
-                    ],
-                    backgroundColor: [
-                        this.colorPalette.warning.background,
-                        this.colorPalette.info.background,
-                        this.colorPalette.success.background
-                    ],
-                    borderColor: [
-                        this.colorPalette.warning.border,
-                        this.colorPalette.info.border,
-                        this.colorPalette.success.border
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Orders by Status'
-                    },
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-        
-        this.chartManager.createChart('comparisonBarChart', config);
-    }
-    
-    // Utility methods
-    _formatCurrency(value) {
-        if (!value && value !== 0) return 'AED 0';
-        
-        const absValue = Math.abs(value);
-        if (absValue >= 1000000000) {
-            return 'AED ' + (value / 1000000000).toFixed(1) + 'B';
-        } else if (absValue >= 1000000) {
-            return 'AED ' + (value / 1000000).toFixed(1) + 'M';
-        } else if (absValue >= 1000) {
-            return 'AED ' + (value / 1000).toFixed(0) + 'K';
-        } else {
-            return 'AED ' + value.toLocaleString('en-AE', {maximumFractionDigits: 0});
-        }
-    }
-    
-    formatDashboardValue(value) {
-        return this._formatCurrency(value);
-    }
-    
-    _formatDate(dateValue) {
-        if (!dateValue) return '';
-        const date = new Date(dateValue);
-        return date.toLocaleDateString();
-    }
-    
-    _getStatusText(state) {
-        const statusMap = {
-            'draft': 'Draft',
-            'sent': 'Quotation Sent',
-            'sale': 'Sales Order',
-            'done': 'Locked',
-            'cancel': 'Cancelled'
-        };
-        return statusMap[state] || state;
-    }
-    
-    _getStatusClass(state) {
-        const classMap = {
-            'draft': 'secondary',
-            'sent': 'info',
-            'sale': 'success',
-            'done': 'primary',
-            'cancel': 'danger'
-        };
-        return classMap[state] || 'secondary';
-    }
-    
-    // Event handlers
-    async onStartDateChange(event) {
-        this.state.startDate = event.target.value;
-        await this._reloadDashboard();
-    }
-    
-    async onEndDateChange(event) {
-        this.state.endDate = event.target.value;
-        await this._reloadDashboard();
-    }
-    
-    async onSalesTypeFilterChange(event) {
-        const selectedOptions = Array.from(event.target.selectedOptions);
-        this.state.selectedSalesTypes = selectedOptions.map(option => parseInt(option.value));
-        await this._reloadDashboard();
-    }
-    
-    async _reloadDashboard() {
-        try {
-            this.state.isLoading = true;
-            this.state.hasError = false;
-            
-            await this._loadDashboardData();
-            
-            // Recreate charts with new data
-            setTimeout(() => {
-                if (this.chartManager.isChartJsReady) {
-                    this._createCharts();
-                }
-            }, 100);
-            
-            this.notification.add(_t("Dashboard updated successfully"), { type: 'success' });
-        } catch (error) {
-            console.error('Error reloading dashboard:', error);
-            this.state.hasError = true;
-            this.state.errorMessage = error.message;
-            this.notification.add(_t("Failed to update dashboard"), { type: 'danger' });
-        } finally {
-            this.state.isLoading = false;
-        }
-    }
-
-    closeSampleDataBanner() {
-        this.state.showSampleDataWarning = false;
-        console.log('Sample data warning banner closed');
-    }
-
-    // Date range filter methods
-    setDateRange(range) {
-        const today = new Date();
-        let startDate;
-
-        switch (range) {
-            case '7days':
-                startDate = new Date();
-                startDate.setDate(today.getDate() - 7);
-                break;
-            case '30days':
-                startDate = new Date();
-                startDate.setDate(today.getDate() - 30);
-                break;
-            case '90days':
-                startDate = new Date();
-                startDate.setDate(today.getDate() - 90);
-                break;
-            case 'year':
-                startDate = new Date();
-                startDate.setFullYear(today.getFullYear() - 1);
-                break;
-            default:
-                startDate = new Date();
-                startDate.setDate(today.getDate() - 90);
-        }
-
-        this.state.startDate = startDate.toISOString().split('T')[0];
-        this.state.endDate = today.toISOString().split('T')[0];
-
-        console.log(`Date range set to: ${this.state.startDate} - ${this.state.endDate}`);
-        this._reloadDashboard();
-    }
-
-    refreshDashboard() {
-        console.log('Manual dashboard refresh triggered');
-        this._reloadDashboard();
-    }
-
-    // Export functionality
-    async exportDashboardData() {
-        try {
-            console.log('Exporting dashboard data...');
-            
-            const exportData = {
-                dateRange: {
-                    start: this.state.startDate,
-                    end: this.state.endDate
-                },
-                summary: this.state.summaryData,
-                salesTypes: this.state.selectedSalesTypes,
-                exportedAt: new Date().toISOString()
-            };
-
-            // Create and download JSON file
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `sales_dashboard_${this.state.startDate}_to_${this.state.endDate}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            this.notification.add(_t("Dashboard data exported successfully"), { type: 'success' });
-        } catch (error) {
-            console.error('Error exporting dashboard data:', error);
-            this.notification.add(_t("Failed to export dashboard data"), { type: 'danger' });
-        }
-    }
-
-    // Auto-refresh functionality
-    enableAutoRefresh(intervalMinutes = 5) {
-        if (this.autoRefreshInterval) {
-            clearInterval(this.autoRefreshInterval);
-        }
-
-        this.state.autoRefresh = true;
-        this.autoRefreshInterval = setInterval(() => {
-            console.log('Auto-refreshing dashboard...');
-            this._reloadDashboard();
-        }, intervalMinutes * 60 * 1000);
-
-        this.notification.add(_t("Auto-refresh enabled (%s minutes)", intervalMinutes), { type: 'info' });
-    }
-
-    disableAutoRefresh() {
-        if (this.autoRefreshInterval) {
-            clearInterval(this.autoRefreshInterval);
-            this.autoRefreshInterval = null;
-        }
-        
-        this.state.autoRefresh = false;
-        this.notification.add(_t("Auto-refresh disabled"), { type: 'info' });
-    }
-
-    // Sales type filter functionality
-    onSalesTypeChange(event) {
-        const selectedValues = Array.from(event.target.selectedOptions, option => option.value);
-        this.state.selectedSalesTypes = selectedValues;
-        console.log('Sales types filter changed:', selectedValues);
-        this._reloadDashboard();
-    }
-
-    // Clean up on component destruction
-    willUnmount() {
-        super.willUnmount();
-        if (this.autoRefreshInterval) {
-            clearInterval(this.autoRefreshInterval);
-        }
-        this.chartManager.destroyAllCharts();
-    }
-
-    // Debug method to test data availability
-    async testDataAvailability() {
-        try {
-            console.log('Testing data availability...');
-            const testResult = await this.orm.call('sale.order', 'test_data_availability', []);
-            console.log('Data availability test result:', testResult);
-            
-            let message = `Data Availability Test Results:\n`;
-            message += `• Total Orders: ${testResult.total_orders || 0}\n`;
-            message += `• Non-cancelled Orders: ${testResult.non_cancelled_orders || 0}\n`;
-            message += `• Recent Orders (90 days): ${testResult.recent_orders_90days || 0}\n`;
-            message += `• Date field used: ${testResult.date_field_used || 'unknown'}\n`;
-            
-            if (testResult.states_distribution) {
-                message += `• States distribution:\n`;
-                Object.entries(testResult.states_distribution).forEach(([state, count]) => {
-                    message += `  - ${state}: ${count}\n`;
-                });
-            }
-            
-            if (testResult.error) {
-                message += `• Error: ${testResult.error}\n`;
-            }
-            
-            this.notification.add(message, { 
-                type: testResult.error ? 'danger' : 'info',
-                sticky: true 
-            });
-        } catch (error) {
-            console.error('Error testing data availability:', error);
-            this.notification.add(_t("Error testing data availability: %s", error.message), { type: 'danger' });
-        }
-    }
-
-    // Generate sample data as fallback
-    _generateSampleData() {
-        console.log('Generating sample data for demonstration');
-        return {
-            totals: {
-                draft_count: 15,
-                draft_amount: 245000,
-                sales_order_count: 8,
-                sales_order_amount: 128000,
-                invoice_count: 5,
-                invoice_amount: 85000,
-                conversion_rate: 53.3,
-                avg_deal_size: 16000,
-                revenue_growth: 12.5,
-                pipeline_velocity: 14
-            },
-            categories: {
-                'Retail Sales': {
-                    draft_count: 8,
-                    draft_amount: 120000,
-                    sales_order_count: 4,
-                    sales_order_amount: 68000,
-                    invoice_count: 3,
-                    invoice_amount: 45000
-                },
-                'Wholesale': {
-                    draft_count: 7,
-                    draft_amount: 125000,
-                    sales_order_count: 4,
-                    sales_order_amount: 60000,
-                    invoice_count: 2,
-                    invoice_amount: 40000
-                }
-            },
-            metadata: {
-                is_sample_data: true,
-                sample_reason: 'No real sales data found in the system'
-            }
-        };
-    }
-}
-
-// Register the component
-registry.category("actions").add("oe_sale_dashboard_17_action", OeSaleDashboard);
-
-export default OeSaleDashboard;
