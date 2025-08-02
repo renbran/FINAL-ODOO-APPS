@@ -28,11 +28,10 @@
             <field name="model_id" ref="sale.model_sale_order"/>
             <field name="state">code</field>
             <field name="code">
-                # This server action can be used for backend data processing if needed
-                action = {
-                    'type': 'ir.actions.client',
-                    'tag': 'oe_sale_dashboard_17_action',
-                }
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'oe_sale_dashboard_17_action',
+}
             </field>
         </record>
 
