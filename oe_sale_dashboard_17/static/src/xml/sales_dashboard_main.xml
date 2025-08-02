@@ -4,7 +4,7 @@
         <div class="o_oe_sale_dashboard_17_container sales_dashboard_container">
             <!-- Loading Indicator -->
             <div class="loading_indicator" t-if="state.loading">
-                <i class="fa fa-spinner fa-spin fa-3x"></i>
+                <i class="fa fa-spinner fa-spin fa-3x" title="Loading spinner"></i>
                 <p>Loading dashboard data...</p>
             </div>
 
@@ -25,7 +25,7 @@
                                         <input type="date" id="start_date" class="form-control" t-model="state.dateRange.start"/>
                                         <input type="date" id="end_date" class="form-control" t-model="state.dateRange.end"/>
                                         <button class="btn btn-primary" id="refresh_dashboard" t-on-click="refreshData">
-                                            <i class="fa fa-refresh"></i> Refresh
+                                            <i class="fa fa-refresh" title="Refresh dashboard"></i> Refresh
                                         </button>
                                     </div>
                                 </div>
@@ -40,7 +40,7 @@
                         <div class="col-md-3">
                             <div class="kpi_card">
                                 <div class="kpi_icon">
-                                    <i class="fa fa-file-text-o"></i>
+                                    <i class="fa fa-file-text-o" title="Total Quotations Icon"></i>
                                 </div>
                                 <div class="kpi_content">
                                     <h3 id="total_quotations"><t t-esc="state.data.performance.total_quotations or 0"/></h3>
@@ -51,7 +51,7 @@
                         <div class="col-md-3">
                             <div class="kpi_card">
                                 <div class="kpi_icon">
-                                    <i class="fa fa-shopping-cart"></i>
+                                    <i class="fa fa-shopping-cart" title="Sales Orders Icon"></i>
                                 </div>
                                 <div class="kpi_content">
                                     <h3 id="total_orders"><t t-esc="state.data.performance.total_orders or 0"/></h3>
@@ -62,7 +62,7 @@
                         <div class="col-md-3">
                             <div class="kpi_card">
                                 <div class="kpi_icon">
-                                    <i class="fa fa-check-circle"></i>
+                                    <i class="fa fa-check-circle" title="Invoiced Sales Icon"></i>
                                 </div>
                                 <div class="kpi_content">
                                     <h3 id="total_invoiced"><t t-esc="state.data.performance.total_invoiced or 0"/></h3>
@@ -73,7 +73,7 @@
                         <div class="col-md-3">
                             <div class="kpi_card">
                                 <div class="kpi_icon">
-                                    <i class="fa fa-money"></i>
+                                    <i class="fa fa-money" title="Total Revenue Icon"></i>
                                 </div>
                                 <div class="kpi_content">
                                     <h3 id="total_amount"><t t-esc="state.data.performance.total_amount or '0'"/></h3>

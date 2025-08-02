@@ -39,7 +39,7 @@
                                         <div class="col-md-3">
                                             <div class="kpi_card">
                                                 <div class="kpi_icon">
-                                                    <i class="fa fa-file-text-o"></i>
+                                                    <i class="fa fa-file-text-o" title="Total Quotations Icon"></i>
                                                 </div>
                                                 <div class="kpi_content">
                                                     <h3 id="total_quotations">0</h3>
@@ -50,7 +50,7 @@
                                         <div class="col-md-3">
                                             <div class="kpi_card">
                                                 <div class="kpi_icon">
-                                                    <i class="fa fa-shopping-cart"></i>
+                                                    <i class="fa fa-shopping-cart" title="Sales Orders Icon"></i>
                                                 </div>
                                                 <div class="kpi_content">
                                                     <h3 id="total_orders">0</h3>
@@ -61,7 +61,7 @@
                                         <div class="col-md-3">
                                             <div class="kpi_card">
                                                 <div class="kpi_icon">
-                                                    <i class="fa fa-check-circle"></i>
+                                                    <i class="fa fa-check-circle" title="Invoiced Sales Icon"></i>
                                                 </div>
                                                 <div class="kpi_content">
                                                     <h3 id="total_invoiced">0</h3>
@@ -72,7 +72,7 @@
                                         <div class="col-md-3">
                                             <div class="kpi_card">
                                                 <div class="kpi_icon">
-                                                    <i class="fa fa-money"></i>
+                                                    <i class="fa fa-money" title="Total Revenue Icon"></i>
                                                 </div>
                                                 <div class="kpi_content">
                                                     <h3 id="total_amount">0</h3>
