@@ -57,7 +57,7 @@
                                 <field name="amount_total" readonly="1"/>
                             </group>
                             <group string="Dashboard Features">
-                                <label for="dashboard_features" string="Available Features"/>
+                                <div class="o_form_label">Available Features</div>
                                 <div name="dashboard_features">
                                     <p>• Real-time sales analytics</p>
                                     <p>• Performance tracking</p>
