@@ -71,24 +71,24 @@
                             <page string="Field Mapping">
                                 <group>
                                     <group string="Date Fields">
-                                        <label string="Booking Date Available" colspan="2"/>
-                                        <label string="Date Order Available" colspan="2"/>
+                                        <div class="o_form_label">Booking Date Available</div>
+                                        <div class="o_form_label">Date Order Available</div>
                                     </group>
                                     <group string="Amount Fields">
-                                        <label string="Sale Value Available" colspan="2"/>
-                                        <label string="Amount Total Available" colspan="2"/>
+                                        <div class="o_form_label">Sale Value Available</div>
+                                        <div class="o_form_label">Amount Total Available</div>
                                     </group>
                                 </group>
                             </page>
                             <page string="Performance">
                                 <group>
                                     <group string="Database Performance">
-                                        <label string="Total Orders" colspan="2"/>
-                                        <label string="Recent Orders" colspan="2"/>
-                                        <label string="Performance Score" colspan="2"/>
+                                        <div class="o_form_label">Total Orders</div>
+                                        <div class="o_form_label">Recent Orders</div>
+                                        <div class="o_form_label">Performance Score</div>
                                     </group>
                                     <group string="Recommendations">
-                                        <label string="Optimization Tips" colspan="2"/>
+                                        <div class="o_form_label">Optimization Tips</div>
                                     </group>
                                 </group>
                             </page>

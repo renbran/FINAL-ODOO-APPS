@@ -60,20 +60,23 @@ For support and customization, please contact your Odoo implementation specialis
     'depends': [
         'base',
         'sale',
-        'account',
+        'sales_team',
         'web'
     ],
     'data': [
         'security/ir.model.access.csv',
         'views/dashboard_views.xml',
-        'views/dashboard_menu.xml'
+        'views/dashboard_menu.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'oe_sale_dashboard_17/static/src/js/dashboard.js',
-            'oe_sale_dashboard_17/static/src/css/dashboard.scss',
-            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml'
-        ]
+            'oe_sale_dashboard_17/static/src/css/dashboard.css',
+            'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
+        ],
+        'web.qunit_suite_tests': [
+            'oe_sale_dashboard_17/static/tests/**/*.js',
+        ],
     },
     'external_dependencies': {
         'javascript': [
@@ -86,14 +89,6 @@ For support and customization, please contact your Odoo implementation specialis
     ],
     'installable': True,
     'auto_install': False,
-    'application': True,
-    'price': 0.00,
-    'currency': 'EUR',
-    'pre_init_hook': 'pre_init_hook',
-    'post_init_hook': 'post_init_hook',
-    'uninstall_hook': 'uninstall_hook',
-    'bootstrap': True,
-    'cloc_exclude': [
-        'static/lib/**/*'
-    ]
+    'application': False,
+    'license': 'LGPL-3',
 }
