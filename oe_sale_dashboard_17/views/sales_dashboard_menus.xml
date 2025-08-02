@@ -6,13 +6,13 @@
                   name="Sales Dashboard"
                   parent="sale.sale_menu_root"
                   sequence="1"
-                  action="action_sales_dashboard"/>
+                  action="oe_sale_dashboard_17_action"/>
 
         <!-- Dashboard Submenu -->
         <menuitem id="sales_dashboard_sub_menu"
                   name="Dashboard"
                   parent="sales_dashboard_main_menu"
                   sequence="1"
-                  action="action_sales_dashboard"/>
+                  action="oe_sale_dashboard_17_action"/>
     </data>
 </odoo>
