@@ -35,7 +35,6 @@ Features:
     ],
     'data': [
         'security/ir.model.access.csv',
-        'views/assets.xml',
         'views/sales_dashboard_views.xml',
         'views/sales_dashboard_menus.xml',
     ],
