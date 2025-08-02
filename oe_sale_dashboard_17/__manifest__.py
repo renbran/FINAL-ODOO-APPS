@@ -1,58 +1,26 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Enhanced Sales Dashboard 17',
-    'version': '1.0.0',
+    'name': 'Sales Dashboard 17',
+    'version': '17.0.1.0.0',
     'category': 'Sales',
-    'sequence': 10,
-    'summary': 'Production-ready comprehensive sales dashboard with advanced analytics',
+    'summary': 'Comprehensive sales dashboard with analytics',
     'description': """
-Enhanced Sales Dashboard for Odoo 17
-====================================
+Sales Dashboard for Odoo 17
+===========================
 
-This module provides a comprehensive, production-ready sales dashboard with advanced analytics and reporting capabilities.
-
-Key Features:
-* Real-time sales performance tracking
-* Advanced KPI calculations (conversion rates, pipeline velocity, revenue growth)
-* Interactive charts and visualizations
-* Top performers ranking (agents and agencies)
-* Sales type categorization and filtering
-* Enhanced error handling and data validation
-* Export functionality
-* Auto-refresh capabilities
-* Mobile-responsive design
-* Sample data fallback for demonstration
-
-Technical Features:
-* Optimized database queries with batching
-* Field existence validation for cross-module compatibility
-* Multiple sales type model support (le.sale.type, sale.order.type)
-* Comprehensive error handling and logging
-* Performance monitoring and health checks
-* Data integrity validation
-* Cache management
-* Production-ready architecture
-
-Compatibility:
-* Odoo 17.0+
-* Works with standard sale module
-* Compatible with custom sales type modules
-* Supports commission tracking modules
-* Handles booking date fields from custom modules
+Production-ready sales dashboard with:
+- Real-time KPI tracking
+- Interactive charts and visualizations  
+- Field compatibility (booking_date, sale_value)
+- Sales type filtering
+- Top performers tracking
+- Export functionality
+- Mobile responsive design
 
 Installation:
-1. Copy module to your addons directory
-2. Update apps list
-3. Install the module
-4. Navigate to Sales > Dashboard to access
-
-Requirements:
-* sale module (auto-installed)
-* Chart.js (loaded from CDN)
-* FontAwesome icons (recommended)
-
-Support:
-For support and customization, please contact your Odoo implementation specialist.
+1. Install from Apps menu
+2. Go to Sales > Sales Dashboard
+3. Use Test Data button to verify
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
@@ -74,24 +42,8 @@ For support and customization, please contact your Odoo implementation specialis
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
-        'web.qunit_suite_tests': [
-            'oe_sale_dashboard_17/static/tests/**/*.js',
-        ],
     },
-    'external_dependencies': {
-        'javascript': [
-            'Chart.js'  # Loaded from CDN
-        ]
-    },
-    'images': [
-        'static/description/icon.png',
-        'static/description/dashboard_screenshot.png'
-    ],
     'installable': True,
     'auto_install': False,
-    'application': False,
-    'license': 'LGPL-3',
-    'pre_init_hook': 'pre_init_hook',
-    'post_init_hook': 'post_init_hook',
-    'uninstall_hook': 'uninstall_hook',
+    'application': True,
 }
