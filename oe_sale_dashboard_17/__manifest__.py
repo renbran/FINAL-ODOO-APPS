@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.0.5',
+    'version': '17.0.1.0.6',
     'category': 'Sales',
     'summary': 'Advanced Sales Dashboard with Analytics and Visual Reports',
     'description': """
@@ -35,6 +35,7 @@ Features:
     ],
     'data': [
         'security/ir.model.access.csv',
+        'views/assets.xml',
         'views/sales_dashboard_views.xml',
         'views/sales_dashboard_menus.xml',
     ],
