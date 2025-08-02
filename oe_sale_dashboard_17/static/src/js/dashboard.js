@@ -377,13 +377,32 @@ class OeSaleDashboard extends Component {
                     [this.state.startDate, this.state.endDate, this.state.selectedSalesTypes]
                 );
                 console.log('Backend data received:', dashboardData);
+                
+                // Check if the backend returned an error
+                if (dashboardData.error) {
+                    console.warn('Backend returned error, using fallback:', dashboardData.error);
+                    throw new Error(dashboardData.error);
+                }
+                
             } catch (backendError) {
-                console.warn('Backend method not available, using fallback:', backendError);
-                dashboardData = await this._loadDashboardDataFallback();
-            }
-            
-            if (dashboardData.error) {
-                throw new Error(dashboardData.error);
+                console.warn('Backend method failed, using fallback:', backendError);
+                
+                // Try the test data availability method first to understand what's available
+                try {
+                    const testResult = await this.orm.call('sale.order', 'test_data_availability', []);
+                    console.log('Data availability test:', testResult);
+                    
+                    if (testResult.non_cancelled_orders > 0) {
+                        console.log('Found orders in system, attempting fallback data loading...');
+                        dashboardData = await this._loadDashboardDataFallback();
+                    } else {
+                        console.log('No orders found in system, using sample data');
+                        dashboardData = this._generateSampleData();
+                    }
+                } catch (testError) {
+                    console.warn('Test method also failed, using fallback:', testError);
+                    dashboardData = await this._loadDashboardDataFallback();
+                }
             }
             
             // Process the data
@@ -928,6 +947,197 @@ class OeSaleDashboard extends Component {
     closeSampleDataBanner() {
         this.state.showSampleDataWarning = false;
         console.log('Sample data warning banner closed');
+    }
+
+    // Date range filter methods
+    setDateRange(range) {
+        const today = new Date();
+        let startDate;
+
+        switch (range) {
+            case '7days':
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 7);
+                break;
+            case '30days':
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 30);
+                break;
+            case '90days':
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 90);
+                break;
+            case 'year':
+                startDate = new Date();
+                startDate.setFullYear(today.getFullYear() - 1);
+                break;
+            default:
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 90);
+        }
+
+        this.state.startDate = startDate.toISOString().split('T')[0];
+        this.state.endDate = today.toISOString().split('T')[0];
+
+        console.log(`Date range set to: ${this.state.startDate} - ${this.state.endDate}`);
+        this._reloadDashboard();
+    }
+
+    refreshDashboard() {
+        console.log('Manual dashboard refresh triggered');
+        this._reloadDashboard();
+    }
+
+    // Export functionality
+    async exportDashboardData() {
+        try {
+            console.log('Exporting dashboard data...');
+            
+            const exportData = {
+                dateRange: {
+                    start: this.state.startDate,
+                    end: this.state.endDate
+                },
+                summary: this.state.summaryData,
+                salesTypes: this.state.selectedSalesTypes,
+                exportedAt: new Date().toISOString()
+            };
+
+            // Create and download JSON file
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `sales_dashboard_${this.state.startDate}_to_${this.state.endDate}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            this.notification.add(_t("Dashboard data exported successfully"), { type: 'success' });
+        } catch (error) {
+            console.error('Error exporting dashboard data:', error);
+            this.notification.add(_t("Failed to export dashboard data"), { type: 'danger' });
+        }
+    }
+
+    // Auto-refresh functionality
+    enableAutoRefresh(intervalMinutes = 5) {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
+
+        this.state.autoRefresh = true;
+        this.autoRefreshInterval = setInterval(() => {
+            console.log('Auto-refreshing dashboard...');
+            this._reloadDashboard();
+        }, intervalMinutes * 60 * 1000);
+
+        this.notification.add(_t("Auto-refresh enabled (%s minutes)", intervalMinutes), { type: 'info' });
+    }
+
+    disableAutoRefresh() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+        }
+        
+        this.state.autoRefresh = false;
+        this.notification.add(_t("Auto-refresh disabled"), { type: 'info' });
+    }
+
+    // Sales type filter functionality
+    onSalesTypeChange(event) {
+        const selectedValues = Array.from(event.target.selectedOptions, option => option.value);
+        this.state.selectedSalesTypes = selectedValues;
+        console.log('Sales types filter changed:', selectedValues);
+        this._reloadDashboard();
+    }
+
+    // Clean up on component destruction
+    willUnmount() {
+        super.willUnmount();
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
+        this.chartManager.destroyAllCharts();
+    }
+
+    // Debug method to test data availability
+    async testDataAvailability() {
+        try {
+            console.log('Testing data availability...');
+            const testResult = await this.orm.call('sale.order', 'test_data_availability', []);
+            console.log('Data availability test result:', testResult);
+            
+            let message = `Data Availability Test Results:\n`;
+            message += `• Total Orders: ${testResult.total_orders || 0}\n`;
+            message += `• Non-cancelled Orders: ${testResult.non_cancelled_orders || 0}\n`;
+            message += `• Recent Orders (90 days): ${testResult.recent_orders_90days || 0}\n`;
+            message += `• Date field used: ${testResult.date_field_used || 'unknown'}\n`;
+            
+            if (testResult.states_distribution) {
+                message += `• States distribution:\n`;
+                Object.entries(testResult.states_distribution).forEach(([state, count]) => {
+                    message += `  - ${state}: ${count}\n`;
+                });
+            }
+            
+            if (testResult.error) {
+                message += `• Error: ${testResult.error}\n`;
+            }
+            
+            this.notification.add(message, { 
+                type: testResult.error ? 'danger' : 'info',
+                sticky: true 
+            });
+        } catch (error) {
+            console.error('Error testing data availability:', error);
+            this.notification.add(_t("Error testing data availability: %s", error.message), { type: 'danger' });
+        }
+    }
+
+    // Generate sample data as fallback
+    _generateSampleData() {
+        console.log('Generating sample data for demonstration');
+        return {
+            totals: {
+                draft_count: 15,
+                draft_amount: 245000,
+                sales_order_count: 8,
+                sales_order_amount: 128000,
+                invoice_count: 5,
+                invoice_amount: 85000,
+                conversion_rate: 53.3,
+                avg_deal_size: 16000,
+                revenue_growth: 12.5,
+                pipeline_velocity: 14
+            },
+            categories: {
+                'Retail Sales': {
+                    draft_count: 8,
+                    draft_amount: 120000,
+                    sales_order_count: 4,
+                    sales_order_amount: 68000,
+                    invoice_count: 3,
+                    invoice_amount: 45000
+                },
+                'Wholesale': {
+                    draft_count: 7,
+                    draft_amount: 125000,
+                    sales_order_count: 4,
+                    sales_order_amount: 60000,
+                    invoice_count: 2,
+                    invoice_amount: 40000
+                }
+            },
+            metadata: {
+                is_sample_data: true,
+                sample_reason: 'No real sales data found in the system'
+            }
+        };
     }
 }
 

@@ -28,6 +28,40 @@ class SaleDashboardEnhanced(models.Model):
         return 'date_order'
 
     @api.model
+    def test_data_availability(self):
+        """Test method to check what data is available in the system"""
+        try:
+            # Check total orders
+            total_orders = self.search_count([])
+            non_cancelled = self.search_count([('state', '!=', 'cancel')])
+            
+            # Check date distribution
+            date_field = self._get_safe_date_field()
+            recent_orders = self.search_count([
+                (date_field, '>=', (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')),
+                ('state', '!=', 'cancel')
+            ])
+            
+            # Check states
+            states_data = self.read_group(
+                [('state', '!=', 'cancel')],
+                ['state'],
+                ['state'],
+                lazy=False
+            )
+            
+            return {
+                'total_orders': total_orders,
+                'non_cancelled_orders': non_cancelled,
+                'recent_orders_90days': recent_orders,
+                'date_field_used': date_field,
+                'states_distribution': {item['state']: item['state_count'] for item in states_data},
+                'test_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+        except Exception as e:
+            return {'error': str(e), 'test_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+    @api.model
     def _get_safe_amount_field(self, record):
         """Get the best available amount field value with proper error handling"""
         try:
@@ -257,7 +291,28 @@ class SaleDashboardEnhanced(models.Model):
             
             # Check if we have any data at all
             if total_summary['total_count'] == 0:
+                # Before falling back to sample data, check if there are ANY sale orders in the system
+                all_orders_count = self.search_count([('state', '!=', 'cancel')])
                 _logger.warning(f"No data found for date range {start_date} to {end_date}")
+                _logger.warning(f"Total non-cancelled orders in system: {all_orders_count}")
+                
+                if all_orders_count > 0:
+                    # There are orders in the system, but none in the date range
+                    # Try expanding the date range to see if data exists
+                    expanded_start = datetime.strptime(start_date, '%Y-%m-%d') - timedelta(days=365)
+                    expanded_domain = [
+                        (date_field, '>=', expanded_start.strftime('%Y-%m-%d')),
+                        ('state', '!=', 'cancel')
+                    ]
+                    expanded_count = self.search_count(expanded_domain)
+                    _logger.warning(f"Orders in expanded date range (last year): {expanded_count}")
+                    
+                    if expanded_count > 0:
+                        # Show sample data but indicate it's due to date range
+                        sample_data = self._get_sample_dashboard_data()
+                        sample_data['metadata']['sample_reason'] = f'No orders found in date range {start_date} to {end_date}. Found {expanded_count} orders in expanded range.'
+                        return sample_data
+                
                 return self._get_sample_dashboard_data()
             
             # Calculate enhanced KPIs with error handling
