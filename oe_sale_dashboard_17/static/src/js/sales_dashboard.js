@@ -520,4 +520,12 @@ export class SalesDashboard extends Component {
 }
 
 // Register the component with the action registry
+console.log('[Sales Dashboard] Registering sales_dashboard component...');
 registry.category("actions").add("sales_dashboard", SalesDashboard);
+
+// Also register with the action ID for direct access
+console.log('[Sales Dashboard] Registering oe_sale_dashboard_17_action component...');
+registry.category("actions").add("oe_sale_dashboard_17_action", SalesDashboard);
+
+console.log('[Sales Dashboard] Component registration complete. Available actions:', 
+    Object.keys(registry.category("actions").content));
