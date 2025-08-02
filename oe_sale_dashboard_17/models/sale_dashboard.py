@@ -21,12 +21,18 @@ class SaleDashboard(models.Model):
 
     @api.model
     def _get_safe_amount_field(self, record):
-        """Get the best available amount field value - prioritize sale_value, then amount_total"""
-        # Priority 1: sale_value (from osus_invoice_report module)
+        """Get the best available amount field value - prioritize amount_total for rankings"""
+        # Priority 1: amount_total (for consistent ranking)
+        amount_total = record.get('amount_total', 0)
+        if amount_total:
+            return amount_total
+            
+        # Priority 2: sale_value (from osus_invoice_report module) as fallback
         if self._check_field_exists('sale_value') and record.get('sale_value'):
             return record['sale_value']
-        # Priority 2: amount_total (standard Odoo field)
-        return record.get('amount_total', 0)
+            
+        # Fallback: return 0 if no amount found
+        return 0
 
     @api.model
     def format_dashboard_value(self, value, currency_code='AED'):
@@ -266,31 +272,39 @@ class SaleDashboard(models.Model):
         """Process data for a specific category with enhanced error handling"""
         try:
             # Fields to read with safe checking
-            fields_to_read = ['state', 'invoice_status', 'amount_total', 'name']
+            fields_to_read = ['state', 'invoice_status', 'amount_total', 'name', 'price_unit']
             if self._check_field_exists('sale_value'):
                 fields_to_read.append('sale_value')
+            if self._check_field_exists('invoice_amount'):
+                fields_to_read.append('invoice_amount')
+            if self._check_field_exists('booking_date'):
+                fields_to_read.append('booking_date')
             
-            # Draft orders (quotations)
+            # Draft orders (quotations) - use amount_total
             draft_domain = base_domain + [('state', 'in', ['draft', 'sent'])]
             draft_orders = self.search_read(draft_domain, fields_to_read)
             draft_count = len(draft_orders)
-            draft_amount = sum(self._get_safe_amount_field(order) for order in draft_orders)
+            draft_amount = sum(order.get('amount_total', 0) for order in draft_orders)
             
-            # Confirmed sales orders (not yet invoiced)
+            # Confirmed sales orders (sale status) - use amount_total
             so_domain = base_domain + [('state', '=', 'sale'), ('invoice_status', 'in', ['to invoice', 'no', 'upselling'])]
             so_orders = self.search_read(so_domain, fields_to_read)
             so_count = len(so_orders)
-            so_amount = sum(self._get_safe_amount_field(order) for order in so_orders)
+            so_amount = sum(order.get('amount_total', 0) for order in so_orders)
             
-            # Invoiced sales orders
+            # Invoiced sales orders - use invoice_amount if available, otherwise amount_total
             invoice_domain = base_domain + [('state', '=', 'sale'), ('invoice_status', '=', 'invoiced')]
             invoice_orders = self.search_read(invoice_domain, fields_to_read)
             invoice_count = len(invoice_orders)
             invoice_amount = 0
             
             for order in invoice_orders:
-                actual_amount = self._get_actual_invoiced_amount(order['name'])
-                invoice_amount += actual_amount or self._get_safe_amount_field(order)
+                # Prefer invoice_amount if available, otherwise use actual invoiced amount or amount_total
+                if self._check_field_exists('invoice_amount') and order.get('invoice_amount'):
+                    invoice_amount += order['invoice_amount']
+                else:
+                    actual_amount = self._get_actual_invoiced_amount(order['name'])
+                    invoice_amount += actual_amount or order.get('amount_total', 0)
             
             # Calculate category totals
             category_total = draft_amount + so_amount + invoice_amount
@@ -710,6 +724,14 @@ class SaleDashboard(models.Model):
             # Add sale_value if available
             if self._check_field_exists('sale_value'):
                 fields_to_read.append('sale_value')
+                
+            # Add price_unit for ranking calculations
+            if self._check_field_exists('price_unit'):
+                fields_to_read.append('price_unit')
+                
+            # Add invoice_amount if available
+            if self._check_field_exists('invoice_amount'):
+                fields_to_read.append('invoice_amount')
                 
             orders = self.search_read(base_domain, fields_to_read)
             

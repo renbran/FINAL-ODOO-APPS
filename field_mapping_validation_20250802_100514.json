@@ -1,0 +1,141 @@
+{
+  "validation_summary": {
+    "total_tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "warnings": 0,
+    "success_rate": 100.0,
+    "timestamp": "2025-08-02T10:05:14.518683"
+  },
+  "test_results": [
+    {
+      "test": "booking_date Field Mapping",
+      "status": "PASS",
+      "details": "booking_date correctly mapped",
+      "timestamp": "2025-08-02T10:05:14.488688"
+    },
+    {
+      "test": "sale_order_type_id Field Mapping",
+      "status": "PASS",
+      "details": "sale_order_type_id correctly mapped",
+      "timestamp": "2025-08-02T10:05:14.489192"
+    },
+    {
+      "test": "Amount Fields Mapping",
+      "status": "PASS",
+      "details": "amount_total and price_unit correctly mapped",
+      "timestamp": "2025-08-02T10:05:14.489465"
+    },
+    {
+      "test": "Invoice Amount Mapping",
+      "status": "PASS",
+      "details": "invoice_amount correctly mapped",
+      "timestamp": "2025-08-02T10:05:14.489687"
+    },
+    {
+      "test": "Amount Field State Function",
+      "status": "PASS",
+      "details": "getAmountFieldForState function found",
+      "timestamp": "2025-08-02T10:05:14.489960"
+    },
+    {
+      "test": "Backend booking_date Usage",
+      "status": "PASS",
+      "details": "booking_date usage in backend confirmed",
+      "timestamp": "2025-08-02T10:05:14.516154"
+    },
+    {
+      "test": "Draft State Filtering",
+      "status": "PASS",
+      "details": "Draft/quotation state filtering confirmed",
+      "timestamp": "2025-08-02T10:05:14.516410"
+    },
+    {
+      "test": "Sale State Filtering",
+      "status": "PASS",
+      "details": "Sale state filtering confirmed",
+      "timestamp": "2025-08-02T10:05:14.516485"
+    },
+    {
+      "test": "Invoice Status Filtering",
+      "status": "PASS",
+      "details": "Invoice status filtering confirmed",
+      "timestamp": "2025-08-02T10:05:14.516542"
+    },
+    {
+      "test": "amount_total Usage",
+      "status": "PASS",
+      "details": "amount_total field usage confirmed",
+      "timestamp": "2025-08-02T10:05:14.516595"
+    },
+    {
+      "test": "invoice_amount Preference",
+      "status": "PASS",
+      "details": "invoice_amount field preference confirmed",
+      "timestamp": "2025-08-02T10:05:14.516646"
+    },
+    {
+      "test": "price_unit Ranking Usage",
+      "status": "PASS",
+      "details": "price_unit usage for ranking confirmed",
+      "timestamp": "2025-08-02T10:05:14.516707"
+    },
+    {
+      "test": "Amount Field Priority",
+      "status": "PASS",
+      "details": "amount_total correctly prioritized",
+      "timestamp": "2025-08-02T10:05:14.517150"
+    },
+    {
+      "test": "Draft Orders Amount Logic",
+      "status": "PASS",
+      "details": "Draft orders use amount_total",
+      "timestamp": "2025-08-02T10:05:14.517369"
+    },
+    {
+      "test": "Sale Orders Amount Logic",
+      "status": "PASS",
+      "details": "Sale orders use amount_total",
+      "timestamp": "2025-08-02T10:05:14.517501"
+    },
+    {
+      "test": "Invoice Orders Amount Logic",
+      "status": "PASS",
+      "details": "Invoice orders prefer invoice_amount",
+      "timestamp": "2025-08-02T10:05:14.517637"
+    },
+    {
+      "test": "Date Field Priority",
+      "status": "PASS",
+      "details": "booking_date prioritized over date_order",
+      "timestamp": "2025-08-02T10:05:14.517860"
+    },
+    {
+      "test": "Date Range Filtering",
+      "status": "PASS",
+      "details": "Date range filtering uses correct field",
+      "timestamp": "2025-08-02T10:05:14.518003"
+    },
+    {
+      "test": "Sales Type Filtering",
+      "status": "PASS",
+      "details": "sale_order_type_id filtering implemented",
+      "timestamp": "2025-08-02T10:05:14.518160"
+    },
+    {
+      "test": "Sales Type Field Check",
+      "status": "PASS",
+      "details": "sale_order_type_id field existence check implemented",
+      "timestamp": "2025-08-02T10:05:14.518368"
+    }
+  ],
+  "errors": [],
+  "field_mapping_status": {
+    "booking_date_priority": "IMPLEMENTED",
+    "sale_order_type_id_filtering": "IMPLEMENTED",
+    "amount_total_ranking": "IMPLEMENTED",
+    "price_unit_ranking": "IMPLEMENTED",
+    "state_based_filtering": "IMPLEMENTED",
+    "invoice_amount_preference": "IMPLEMENTED"
+  }
+}

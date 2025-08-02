@@ -20,6 +20,10 @@ var fieldMapping = {
     sale_value: 'sale_value',     // osus_invoice_report.field_sale_order__sale_value
     amount_total: 'amount_total', // sale.field_sale_order__amount_total
     amount_untaxed: 'amount_untaxed', // sale.field_sale_order__amount_untaxed
+    price_unit: 'price_unit',     // For rankings calculation
+    
+    // Invoice specific fields
+    invoice_amount: 'invoice_amount', // For invoiced deals
     
     // Commission fields from commission_ax module
     total_commission_amount: 'total_commission_amount',
@@ -69,8 +73,8 @@ async function initFieldMapping(orm) {
     try {
         // Check which fields exist in sale.order model
         const fieldsToCheck = [
-            'booking_date', 'sale_value', 'date_order', 'amount_total', 'amount_untaxed',
-            'sale_order_type_id', 'deal_id', 'buyer_id', 'project_id', 'unit_id',
+            'booking_date', 'sale_value', 'date_order', 'amount_total', 'amount_untaxed', 'price_unit',
+            'invoice_amount', 'sale_order_type_id', 'deal_id', 'buyer_id', 'project_id', 'unit_id',
             'total_commission_amount', 'total_external_commission_amount', 'total_internal_commission_amount'
         ];
         
@@ -158,11 +162,17 @@ function buildSaleTypeDomain(saleTypeId) {
 }
 
 /**
- * Build a field list for amount calculations
+ * Build a field list for amount calculations based on record type
+ * @param {string} recordType - Type of record ('draft', 'sale', 'invoice')
  * @returns {Array} - Field list to include in queries
  */
-function getAmountFields() {
-    const fields = ['amount_total'];
+function getAmountFields(recordType = 'default') {
+    const fields = ['amount_total']; // Always include amount_total as base
+    
+    // Add specific fields based on record type
+    if (recordType === 'invoice' && fieldMapping._available.invoice_amount) {
+        fields.push('invoice_amount');
+    }
     
     if (fieldMapping._available.sale_value) {
         fields.push('sale_value');
@@ -170,11 +180,33 @@ function getAmountFields() {
     if (fieldMapping._available.amount_untaxed) {
         fields.push('amount_untaxed');
     }
+    if (fieldMapping._available.price_unit) {
+        fields.push('price_unit');
+    }
     if (fieldMapping._available.total_commission_amount) {
         fields.push('total_commission_amount');
     }
     
     return fields;
+}
+
+/**
+ * Get the appropriate amount field based on order state
+ * @param {string} state - The order state ('draft', 'sale', 'done')
+ * @returns {string} - The field name to use for amount calculation
+ */
+function getAmountFieldForState(state) {
+    switch (state) {
+        case 'draft':
+            return 'amount_total'; // Use amount_total for quotations
+        case 'sale':
+            return 'amount_total'; // Use amount_total for confirmed deals
+        case 'done':
+            // For invoiced deals, prefer invoice_amount if available
+            return fieldMapping._available.invoice_amount ? 'invoice_amount' : 'amount_total';
+        default:
+            return 'amount_total';
+    }
 }
 
 /**
@@ -193,5 +225,6 @@ export {
     buildDateDomain,
     buildSaleTypeDomain,
     getAmountFields,
+    getAmountFieldForState,
     isFieldAvailable
 };

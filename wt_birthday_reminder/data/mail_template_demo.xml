@@ -1,170 +1,502 @@
 <?xml version="1.0"?>
-<odoo><data noupdate="1">
-    <!-- Mail Template for a reminder to others -->
+<odoo>
+    <data noupdate="1">
+        <!-- Enhanced Mail Template for Birthday Wish -->
+        <record id="mail_template_birthday_wish" model="mail.template">
+            <field name="name">Enhanced Birthday Wish</field>
+            <field name="model_id" ref="wt_birthday_reminder.model_hr_employee"/>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="email_from">{{ (object.company_id.email) }}</field>
+            <field name="subject">🎉 Happy Birthday {{ object.name }}! - OSUS Properties</field>
+            <field name="email_to">{{ (object.work_email) }}</field>
+            <field name="body_html" type="html">
+                <![CDATA[
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+                    <meta name="x-apple-disable-message-reformatting">
+                    <link href="https://fonts.googleapis.com/css?family=Work+Sans:ital,wght@0,400;0,500;0,700" rel="stylesheet">
+                    <title>Enhanced Birthday Greetings</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            font-family: 'Work Sans', Arial, Helvetica, sans-serif;
+                        }
+                        .birthday-name {
+                            font-size: 42px;
+                            font-weight: 700;
+                            color: #ffffff;
+                            text-align: center;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                            letter-spacing: 2px;
+                            margin: 20px 0;
+                            text-transform: uppercase;
+                            background: linear-gradient(45deg, #ffffff, #ffd700);
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                            background-clip: text;
+                            text-stroke: 1px #ffffff;
+                        }
+                        .name-container {
+                            background: rgba(255,255,255,0.1);
+                            border-radius: 15px;
+                            padding: 25px;
+                            margin: 20px auto;
+                            max-width: 500px;
+                            backdrop-filter: blur(10px);
+                            border: 2px solid rgba(255,255,255,0.2);
+                            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                        }
+                        .decorative-border {
+                            border: 3px solid #ffd700;
+                            border-radius: 20px;
+                            padding: 15px;
+                            background: rgba(255,215,0,0.1);
+                        }
+                        @keyframes bounce {
+                            0%, 20%, 50%, 80%, 100% {
+                                transform: translateY(0);
+                            }
+                            40% {
+                                transform: translateY(-10px);
+                            }
+                            60% {
+                                transform: translateY(-5px);
+                            }
+                        }
+                        @keyframes sparkle {
+                            0%, 100% {
+                                opacity: 1;
+                                transform: scale(1);
+                            }
+                            50% {
+                                opacity: 0.5;
+                                transform: scale(1.2);
+                            }
+                        }
+                        @media screen and (max-width: 620px) {
+                            .birthday-name {
+                                font-size: 28px;
+                                letter-spacing: 1px;
+                            }
+                            .name-container {
+                                margin: 15px 20px;
+                                padding: 20px;
+                            }
+                        }
+                        .sparkle-animation {
+                            animation: sparkle 1.5s ease-in-out infinite;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <table class="pc-project-body" style="table-layout: fixed; width: 100%; min-width: 600px; background-color: #a9d9ff;" bgcolor="#a9d9ff" border="0" cellspacing="0" cellpadding="0" role="presentation" width="100%">
+                        <tbody>
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table class="pc-project-container" align="center" style="width: 600px; max-width: 600px;" border="0" cellpadding="0" cellspacing="0" role="presentation" width="600">
+                                        <tbody>
+                                            <tr style="height: 924.033px;">
+                                                <td class="pc-w620-padding-0-0-0-0" style="padding: 20px 0px 20px 0px;" align="left" valign="top">
+                                                    
+                                                    <!-- Header Section with Logo -->
+                                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td valign="top">
+                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td class="pc-w620-spacing-0-0-0-0" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                    <table style="border-collapse: separate; border-spacing: 0px;" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td valign="top" class="pc-w620-padding-0-0-0-0" style="border-bottom: 1px solid #417CD6; background-color: #f1ffff; padding: 15px 0;" bgcolor="#f1ffff">
+                                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                                        <tbody>
+                                                                                                            <tr>
+                                                                                                                <td class="pc-w620-valign-middle pc-w620-halign-center" align="center" valign="middle">
+                                                                                                                    <!-- Small Logo Branding -->
+                                                                                                                    <a href="https://osusproperties.com" target="_blank" style="text-decoration: none; display: inline-block;">
+                                                                                                                        <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" 
+                                                                                                                             alt="OSUS Properties" 
+                                                                                                                             width="120" 
+                                                                                                                             height="40" 
+                                                                                                                             style="display: block; outline: 0; line-height: 100%; width: 120px; height: auto; max-width: 120px; border: 0; opacity: 0.8;">
+                                                                                                                    </a>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </tbody>
+                                                                                                    </table>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
 
-    <record id="mail_template_birthday_reminder" model="mail.template">
-        <field name="name">Birthday Reminder</field>
-        <field name="model_id" ref="wt_birthday_reminder.model_hr_employee"/>
-        <field name="partner_to">{{object.id}}</field>
-        <field name="email_from">{{ (object.company_id.email) }}</field>
-        <field name="subject">Today is {{ object.name }} Birthday.</field>
-        <field name="email_to">{{ (object.work_email) }}</field>
-        <field name="body_html" type="html">
-            <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
-                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 24px; background-color: white; color: #454748; border-collapse:separate;">
-                    <tbody>
-                        <!-- HEADER -->
-                        <tr>
-                            <td align="center" style="min-width: 590px;">
-                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: white; padding: 0; border-collapse:separate;">
-                                    <tr><td valign="middle">
-                                        <span style="font-size: 10px;">Birthday Wishes</span><br/>
-                                        <span style="font-size: 20px; font-weight: bold;" t-out="object.name"></span>
-                                    </td><td valign="middle" align="right">
-                                        <img t-attf-src="/logo.png?company={{ object.company_id.id }}" style="padding: 0px; margin: 0px; height: 48px;" t-att-alt="object.company_id.name"/>
-                                    </td></tr>
-                                    <tr><td colspan="2" style="text-align:center;">
-                                        <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:4px 0px 32px 0px;"/>
-                                    </td></tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <!-- CONTENT -->
-                        <tr>
-                            <td style="min-width: 590px;">
-                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <!-- Main Content Section -->
+                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                        <tbody>
+                                                            <tr style="height: 580px;">
+                                                                <td valign="top">
+                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td class="pc-w620-spacing-0-0-0-0" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td valign="top" class="pc-w620-padding-0-0-30-0" style="padding: 0px 0px 50px 0px; background-color: #510710;" bgcolor="#510710">
+                                                                                                    
+                                                                                                    <!-- Birthday Image -->
+                                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                                        <tbody>
+                                                                                                            <tr>
+                                                                                                                <td class="pc-w620-spacing-0-0-20-0" align="center" valign="top" style="padding: 0px 0px 20px 0px;">
+                                                                                                                    <img src="https://cloudfilesdm.com/postcards/image-172969713055515-76aacb73.png" class="pc-w620-radius-none pc-w620-width-100pc pc-w620-height-auto shadow" width="600" height="100" style="display: block; outline: 0; line-height: 100%; width: 600px; height: auto; max-width: 100%; border: 0; box-shadow: #44050d 0px 8px 16px;">
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </tbody>
+                                                                                                    </table>
+
+                                                                                                    <!-- Enhanced Name Section -->
+                                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                                        <tbody>
+                                                                                                            <tr>
+                                                                                                                <td align="center" valign="top" style="padding: 10px 30px 30px 30px;">
+                                                                                                                    <div class="name-container">
+                                                                                                                        <div class="decorative-border">
+                                                                                                                            <div class="birthday-name">
+                                                                                                                                <t t-out="object.name or 'Dear Colleague'"/>
+                                                                                                                            </div>
+                                                                                                                            <div style="text-align: center; color: #ffd700; font-size: 16px; font-weight: 500; margin-top: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                                                                                                                                ✨ Celebrating You Today ✨
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </tbody>
+                                                                                                    </table>
+
+                                                                                                    <!-- Company Logo (Moved from middle) -->
+                                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                                        <tbody>
+                                                                                                            <tr>
+                                                                                                                <td class="pc-w620-spacing-16-30-16-30" align="center" valign="top" style="padding: 15px 30px;">
+                                                                                                                    <div style="font-size: 12px; color: #ffffff; opacity: 0.7; text-align: center; font-style: italic;">
+                                                                                                                        Brought to you by <t t-out="object.company_id.name or 'OSUS Properties'"/>
+                                                                                                                    </div>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </tbody>
+                                                                                                    </table>
+
+                                                                                                    <!-- Birthday Message -->
+                                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                                        <tbody>
+                                                                                                            <tr>
+                                                                                                                <td align="center" valign="top">
+                                                                                                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" align="center">
+                                                                                                                        <tbody>
+                                                                                                                            <tr>
+                                                                                                                                <td valign="top" align="center">
+                                                                                                                                    <div style="text-decoration: none;">
+                                                                                                                                        <div style="font-size:15px; line-height:21px; text-align:center; color:#ffffff; font-family:'Work Sans', Arial, Helvetica, sans-serif; letter-spacing:-0.2px;">
+                                                                                                                                            <div style="font-family:'Work Sans', Arial, Helvetica, sans-serif;">
+                                                                                                                                                <span style="font-family: 'Work Sans', Arial, Helvetica, sans-serif; font-weight: 400; font-size: 15px; line-height: 21px;">
+                                                                                                                                                    Hi <strong><t t-out="object.name or 'Dear Colleague'"/></strong>,<br/><br/>
+                                                                                                                                                    Wishing you a day filled with joy, laughter, and countless blessings from <t t-out="object.company_id.name or 'OSUS Properties'"/>.<br/><br/>
+                                                                                                                                                    Birthdays are more than just milestones — they're a beautiful reminder of how far you've come, the lives you've touched, and the purpose that continues to guide you.<br/><br/>
+                                                                                                                                                    You are one of our most valuable team members, and on your precious day we wish nothing but good luck and a successful year ahead.<br/><br/>
+                                                                                                                                                    May this new chapter bring you renewed strength, wisdom, and peace.<br/>
+                                                                                                                                                    Here's to new beginnings, lasting success, and a heart full of gratitude and grace.<br/><br/>
+                                                                                                                                                    Party Hard, Stay Safe! 🎉<br/><br/>
+                                                                                                                                                    Best Wishes,<br/>
+                                                                                                                                                    <t t-out="object.company_id.name or 'OSUS Properties'"/>
+                                                                                                                                                </span>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </td>
+                                                                                                                            </tr>
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </tbody>
+                                                                                                    </table>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- Birthday Design Section -->
+                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation" style="margin-top: 0.516542px;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td valign="top" class="pc-w520-padding-30-30-30-30 pc-w620-padding-35-35-35-35" style="background: linear-gradient(135deg, #510710 0%, #800020 50%, #a0002a 100%); padding: 40px;" bgcolor="#510710">
+                                                                    
+                                                                    <!-- CTA Button Section (Moved to top) -->
+                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td align="center" valign="top" style="padding: 20px 40px;">
+                                                                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="min-width: 100%;">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td align="center" style="font-weight: 500;">
+                                                                                                    <a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" style="text-decoration: none; border-radius: 50px; border: 2px solid #ffd700; padding: 15px 30px; font-size: 16px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%); color: #800020; display: inline-block; text-align: center; line-height: 1.5; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); text-transform: uppercase; letter-spacing: 1px;">
+                                                                                                        🎉 Send Birthday Greetings Here 🎉
+                                                                                                    </a>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                    
+                                                                    <!-- Birthday Elements Container -->
+                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td align="center" valign="top" style="padding: 20px 0;">
+                                                                                    
+                                                                                    <!-- Birthday Cake ASCII Art -->
+                                                                                    <div style="font-family: 'Courier New', monospace; font-size: 24px; color: #ffd700; text-align: center; line-height: 1.2; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                                                                                        🕯️🎂🕯️<br>
+                                                                                        <span style="font-size: 18px; color: #ffffff;">Make a wish!</span>
+                                                                                    </div>
+
+                                                                                    <!-- Birthday Balloons -->
+                                                                                    <div style="text-align: center; margin: 20px 0; font-size: 32px;">
+                                                                                        🎈🎈🎈🎈🎈
+                                                                                    </div>
+
+                                                                                    <!-- Birthday Quote -->
+                                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td align="center" style="padding: 30px 20px;">
+                                                                                                    <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; border: 2px solid rgba(255,215,0,0.3); backdrop-filter: blur(10px);">
+                                                                                                        <div style="font-size: 20px; color: #ffd700; text-align: center; font-weight: 600; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                                                                                                            "Another Year of Blessings"
+                                                                                                        </div>
+                                                                                                        <div style="font-size: 16px; color: #ffffff; text-align: center; line-height: 1.6; font-style: italic;">
+                                                                                                            Every birthday is a gift. Every day is an opportunity.<br>
+                                                                                                            Every moment is a blessing to celebrate life! 🌟
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+
+                                                                                    <!-- Birthday Gifts -->
+                                                                                    <div style="text-align: center; margin: 25px 0; font-size: 28px;">
+                                                                                        🎁 🎊 🎉 🎁
+                                                                                    </div>
+
+                                                                                    <!-- Confetti Animation -->
+                                                                                    <div style="text-align: center; margin: 20px 0;">
+                                                                                        <div style="display: inline-block; animation: bounce 2s infinite; font-size: 20px; margin: 0 5px;">🎊</div>
+                                                                                        <div style="display: inline-block; animation: bounce 2s infinite 0.2s; font-size: 20px; margin: 0 5px;">✨</div>
+                                                                                        <div style="display: inline-block; animation: bounce 2s infinite 0.4s; font-size: 20px; margin: 0 5px;">🎉</div>
+                                                                                        <div style="display: inline-block; animation: bounce 2s infinite 0.6s; font-size: 20px; margin: 0 5px;">✨</div>
+                                                                                        <div style="display: inline-block; animation: bounce 2s infinite 0.8s; font-size: 20px; margin: 0 5px;">🎊</div>
+                                                                                    </div>
+
+                                                                                    <!-- Birthday Stars -->
+                                                                                    <div style="text-align: center; margin: 30px 0; font-size: 24px; color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                                                                                        ⭐ ✨ 🌟 ✨ ⭐
+                                                                                    </div>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- Footer Section (CTA Removed) -->
+                                                    <table width="594.267" border="0" cellspacing="0" cellpadding="0" role="presentation" style="width: 594.267px;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td valign="top" class="pc-w520-padding-15-25-15-25 pc-w620-padding-15-30-15-30" style="padding: 15px 40px; background-color: #800020; width: 594.267px;" bgcolor="#800020" width="594.267">
+                                                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="min-width: 100%;">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td valign="top" class="pc-w620-align-center" align="center" style="font-weight: 400; text-align: center; color: #ffffff; font-size: 14px; line-height: 1.5;">
+                                                                                    <div style="opacity: 0.8;">
+                                                                                        <t t-out="object.company_id.name or 'OSUS Properties'"/> - Wishing you happiness always! 🌟<br/>
+                                                                                        <div style="margin-top: 10px; font-size: 12px;">
+                                                                                            <t t-if="object.company_id.phone" t-out="object.company_id.phone"/>
+                                                                                            <t t-if="object.company_id.email">
+                                                                                                | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.email"/>
+                                                                                            </t>
+                                                                                            <t t-if="object.company_id.website">
+                                                                                                | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.website"/>
+                                                                                            </t>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+                ]]>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.lang}}</field>
+        </record>
+
+        <!-- Enhanced Mail Template for Birthday Reminder to Others -->
+        <record id="mail_template_birthday_reminder" model="mail.template">
+            <field name="name">Enhanced Birthday Reminder</field>
+            <field name="model_id" ref="wt_birthday_reminder.model_hr_employee"/>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="email_from">{{ (object.company_id.email) }}</field>
+            <field name="subject">🎉 Today is {{ object.name }}'s Birthday - Let's Celebrate!</field>
+            <field name="email_to">{{ (object.work_email) }}</field>
+            <field name="body_html" type="html">
+                <![CDATA[
+                <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #a9d9ff; font-family:'Work Sans', Arial, Helvetica, sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                    <tr>
+                        <td align="center">
+                            <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 24px; background-color: white; color: #454748; border-collapse:separate; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <tbody>
+                                    <!-- HEADER -->
                                     <tr>
-                                        <td valign="top" style="font-size: 13px;">
-                                            <div>
-                                            <div class="text-center">
-                                                <img src="/wt_birthday_reminder/static/src/img/warlock_technologies.gif" class="img" style="width: 23%;"/>
-                                            </div>
-                                            </div>
-                                            <br/>
-                                            <div>
-                                                Hi Warlock Family,<br/><br/>
-                                                Today is<strong> <t t-out="object.name or ''"></t> </strong>Birthday.<br/><br/>
-                                                give him best wishes on his birthday.<br/><br/>
-                                                Kind Regards,<br/>
-                                                <t t-out="object.company_id.name or ''"></t>
+                                        <td align="center" style="min-width: 590px;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: white; padding: 0; border-collapse:separate;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <span style="font-size: 12px; color: #800020; font-weight: 600;">🎉 Birthday Celebration Alert</span><br/>
+                                                        <span style="font-size: 24px; font-weight: bold; color: #510710;" t-out="object.name"></span>
+                                                    </td>
+                                                    <td valign="middle" align="right">
+                                                        <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" style="padding: 0px; margin: 0px; height: 48px;" alt="OSUS Properties"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="text-align:center;">
+                                                        <hr width="100%" style="background: linear-gradient(to right, #510710, #ffd700, #510710); border: none; height: 2px; margin: 16px 0px 24px 0px;"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- CONTENT -->
+                                    <tr>
+                                        <td style="min-width: 590px;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                <tr>
+                                                    <td valign="top" style="font-size: 15px; line-height: 1.6;">
+                                                        <div style="text-align: center; margin-bottom: 30px;">
+                                                            <div style="font-size: 48px; margin-bottom: 20px;">🎂🎈🎉</div>
+                                                        </div>
+                                                        
+                                                        <div style="background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 15px; padding: 25px; border: 2px solid #ffd700; margin-bottom: 20px;">
+                                                            <div style="text-align: center;">
+                                                                <div style="font-size: 20px; color: #800020; font-weight: 600; margin-bottom: 15px;">
+                                                                    🌟 Birthday Celebration Time! 🌟
+                                                                </div>
+                                                                <div style="color: #510710; font-size: 16px; line-height: 1.6;">
+                                                                    Hi <t t-out="object.company_id.name or 'Team'"/> Family,<br/><br/>
+                                                                    Today is <strong style="color: #800020; font-size: 18px;"><t t-out="object.name or ''"/></strong>'s special day! 🎉<br/><br/>
+                                                                    Let's come together to make this birthday memorable by sending warm wishes and celebrating our amazing colleague.<br/><br/>
+                                                                    <div style="background: rgba(255, 215, 0, 0.1); border-radius: 10px; padding: 15px; margin: 20px 0; border-left: 4px solid #ffd700;">
+                                                                        <em style="color: #800020;">"Birthdays are nature's way of telling us to eat more cake and spread more joy!" 🍰</em>
+                                                                    </div>
+                                                                    Please take a moment to send your birthday greetings and make <t t-out="object.name or ''"/>'s day extra special!<br/><br/>
+                                                                    <div style="text-align: center; margin: 25px 0;">
+                                                                        <a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%); color: #800020; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); text-transform: uppercase; letter-spacing: 1px;">
+                                                                            🎁 Send Birthday Wishes 🎁
+                                                                        </a>
+                                                                    </div>
+                                                                    Kind Regards,<br/>
+                                                                    <strong style="color: #800020;"><t t-out="object.company_id.name or 'OSUS Properties'"/></strong>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- FOOTER -->
+                                    <tr>
+                                        <td align="center" style="min-width: 590px; padding: 0 8px 0 8px; font-size:11px;">
+                                            <hr width="100%" style="background: linear-gradient(to right, #510710, #ffd700, #510710); border: none; height: 1px; margin: 16px 0px 4px 0px;"/>
+                                            <b style="color: #800020;" t-out="object.company_id.name or 'OSUS Properties'"></b><br/>
+                                            <div style="color: #666666; margin-top: 8px;">
+                                                <t t-out="object.company_id.phone or ''"></t>
+                                                <t t-if="object.company_id.email">
+                                                    | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #666666;" t-out="object.company_id.email or ''"></a>
+                                                </t>
+                                                <t t-if="object.company_id.website">
+                                                    | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #666666;" t-out="object.company_id.website or ''"></a>
+                                                </t>
                                             </div>
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <!-- FOOTER -->
-                        <tr>
-                            <td align="center" style="min-width: 590px; padding: 0 8px 0 8px; font-size:11px;">
-                                <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
-                                <b t-out="object.company_id.name or ''"></b><br/>
-                                <div style="color: #999999;">
-                                    <t t-out="object.company_id.phone or ''"></t>
-                                    <t t-if="object.company_id.email">
-                                        | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #999999;" t-out="object.company_id.email or ''"></a>
-                                    </t>
-                                    <t t-if="object.company_id.website">
-                                        | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #999999;" t-out="object.company_id.website or ''">http://www.warlocktechnologies.com</a>
-                                    </t>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- POWERED BY -->
+                    <tr>
+                        <td align="center" style="min-width: 590px; padding: 20px 0;">
+                            <div style="color: #666666; font-size: 12px;">
+                                Powered by <a target="_blank" href="https://osusproperties.com" style="color: #800020; text-decoration: none; font-weight: 600;">OSUS Properties</a> - Celebrating Every Milestone 🌟
+                            </div>
+                        </td>
+                    </tr>
                 </table>
-                </td></tr>
-                <!-- POWERED BY -->
-                <tr><td align="center" style="min-width: 590px;">
-                    Powered by <a target="_blank" href="https://www.warlocktechnologies.com?utm_source=db&amp;utm_medium=email" style="color: #875A7B;">Warlock Technologies Pvt. Ltd</a>
-                </td></tr>
-            </table>
-        </field>
-        <field name="auto_delete" eval="True"/>
-        <field name="lang">{{object.lang}}</field>
-    </record>
+                ]]>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.lang}}</field>
+        </record>
 
-
-
-    <!-- Mail Template for a birthda person -->
-
-    <record id="mail_template_birthday_wish" model="mail.template">
-        <field name="name">Birthday Wish</field>
-        <field name="model_id" ref="wt_birthday_reminder.model_hr_employee"/>
-        <field name="partner_to">{{object.id}}</field>
-        <field name="email_from">{{ (object.company_id.email) }}</field>
-        <field name="subject">{{ object.name }}: Birthday wishes from Warlock Technologies Pvt. Ltd.</field>
-        <field name="email_to">{{ (object.work_email) }}</field>
-        <field name="body_html" type="html">
-<table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
-<table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 24px; background-color: white; color: #454748; border-collapse:separate;">
-<tbody>
-    <!-- HEADER -->
-    <tr>
-        <td align="center" style="min-width: 590px;">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: white; padding: 0; border-collapse:separate;">
-                <tr><td valign="middle">
-                    <span style="font-size: 10px;">Birthday Wishes</span><br/>
-                    <span style="font-size: 20px; font-weight: bold;" t-out="object.name"></span>
-                </td><td valign="middle" align="right">
-                    <img t-attf-src="/logo.png?company={{ object.company_id.id }}" style="padding: 0px; margin: 0px; height: 48px;" t-att-alt="object.company_id.name"/>
-                </td></tr>
-                <tr><td colspan="2" style="text-align:center;">
-                    <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:4px 0px 32px 0px;"/>
-                </td></tr>
-            </table>
-        </td>
-    </tr>
-    <!-- CONTENT -->
-    <tr>
-        <td style="min-width: 590px;">
-            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
-                <tr>
-                    <td valign="top" style="font-size: 13px;">
-                        <div>
-                        <div class="text-center">
-                            <img src="/wt_birthday_reminder/static/src/img/warlock_technologies.gif" class="img" style="width: 23%;"/>
-                        </div>
-                        </div>
-                        <br/>
-                        <div>
-                            Hi <strong><t t-out="object.name or ''"></t></strong>,<br/><br/>
-                            Wish you very Happy Birthday from <t t-out="object.company_id.name or ''"></t>.
-                            You are one of the most valuable employee of <t t-out="object.company_id.name or ''"></t><t t-out="object.user_id.name or ''"></t> On your precious day we wish nothing but the all good luck and success full year ahead.<br/>
-                            Party Hard Stay Safe.<br/><br/>
-                            Best Wishes<br/>
-                            <t t-out="object.company_id.name or ''"></t>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <!-- FOOTER -->
-    <tr>
-        <td align="center" style="min-width: 590px; padding: 0 8px 0 8px; font-size:11px;">
-            <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
-            <b t-out="object.company_id.name or ''"></b><br/>
-            <div style="color: #999999;">
-                <t t-out="object.company_id.phone or ''"></t>
-                <t t-if="object.company_id.email">
-                    | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #999999;" t-out="object.company_id.email or ''"></a>
-                </t>
-                <t t-if="object.company_id.website">
-                    | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #999999;" t-out="object.company_id.website or ''">http://www.warlocktechnologies.com</a>
-                </t>
-            </div>
-        </td>
-    </tr>
-</tbody>
-</table>
-</td></tr>
-<!-- POWERED BY -->
-<tr><td align="center" style="min-width: 590px;">
-    Powered by <a target="_blank" href="https://www.warlocktechnologies.com?utm_source=db&amp;utm_medium=email" style="color: #875A7B;">Warlock Technologies Pvt. Ltd</a>
-</td></tr>
-</table>
-        </field>
-        <field name="auto_delete" eval="True"/>
-        <field name="lang">{{object.lang}}</field>
-    </record>
-
-</data></odoo>
+    </data>
+</odoo>
