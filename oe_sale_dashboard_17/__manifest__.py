@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.0.1',
+    'version': '17.0.1.0.2',
     'category': 'Sales',
     'summary': 'Advanced Sales Dashboard with Analytics and Visual Reports',
     'description': """
