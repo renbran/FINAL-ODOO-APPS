@@ -14,10 +14,6 @@
         - Sales type analysis and filtering
         - Commission tracking integration
         - Mobile-responsive design
-        - Export capabilities
-        
-        This module provides comprehensive sales analytics and reporting
-        for executives and sales managers.
         
         Compatible with:
         - le_sale_type module (for sales type categorization)
@@ -34,10 +30,6 @@
         'account',
         'web',
     ],
-    'external_dependencies': {
-        'python': [],
-        'bin': []
-    },
     'data': [
         'security/ir.model.access.csv',
         'views/dashboard_views.xml',
@@ -49,18 +41,9 @@
             'oe_sale_dashboard_17/static/src/css/dashboard.scss',
             'oe_sale_dashboard_17/static/src/xml/dashboard_template.xml',
         ],
-        'web.assets_frontend': [],
     },
     'installable': True,
     'auto_install': False,
     'application': True,
     'sequence': 10,
-    'images': [
-        'static/description/banner.png',
-        'static/description/icon.png',
-    ],
-    'demo': [],
-    'test': [],
-    'post_init_hook': None,
-    'uninstall_hook': None,
 }

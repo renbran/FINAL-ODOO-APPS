@@ -2,12 +2,10 @@
 <odoo>
     <data>
         
-        <!-- Dashboard Action -->
+        <!-- Dashboard Client Action -->
         <record id="action_sales_dashboard" model="ir.actions.client">
             <field name="name">Executive Sales Dashboard</field>
             <field name="tag">oe_sale_dashboard_17_action</field>
-            <field name="res_model">sale.order</field>
-            <field name="view_mode">dashboard</field>
             <field name="target">current</field>
             <field name="context">{}</field>
         </record>

@@ -22,33 +22,5 @@
             </field>
         </record>
 
-        <!-- Action Server for Dashboard Data -->
-        <record id="action_dashboard_data" model="ir.actions.server">
-            <field name="name">Dashboard Data</field>
-            <field name="model_id" ref="sale.model_sale_order"/>
-            <field name="state">code</field>
-            <field name="code">
-action = {
-    'type': 'ir.actions.client',
-    'tag': 'oe_sale_dashboard_17_action',
-}
-            </field>
-        </record>
-
-        <!-- Window Action for Dashboard -->
-        <record id="action_sales_dashboard_window" model="ir.actions.act_window">
-            <field name="name">Sales Dashboard</field>
-            <field name="res_model">sale.order</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="view_sales_dashboard"/>
-            <field name="target">current</field>
-            <field name="context">{
-                'dashboard_mode': True,
-                'create': False,
-                'edit': False,
-                'delete': False
-            }</field>
-        </record>
-
     </data>
 </odoo>
