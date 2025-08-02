@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
         <!-- Enhanced Mail Template for Birthday Wish -->
         <record id="mail_template_birthday_wish" model="mail.template">
             <field name="name">Enhanced Birthday Wish</field>
@@ -182,7 +182,75 @@
                                                                                                                             <div class="birthday-name">
                                                                                                                                 <t t-out="object.name or 'Dear Colleague'"/>
                                                                                                                             </div>
-                                                                                                                            <div style="text-align: center; color: #ffd700; font-size: 16px; font-weight: 500; margin-top: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                                                                                                                            <div style="text-align: center; margin-bottom: 30px;">
+                                                            <div style="font-size: 48px; margin-bottom: 20px;">🎂🎈🎉</div>
+                                                        </div>
+                                                        
+                                                        <div style="background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 15px; padding: 25px; border: 2px solid #ffd700; margin-bottom: 20px;">
+                                                            <div style="text-align: center;">
+                                                                <div style="font-size: 20px; color: #800020; font-weight: 600; margin-bottom: 15px;">
+                                                                    🌟 Birthday Celebration Time! 🌟
+                                                                </div>
+                                                                <div style="color: #510710; font-size: 16px; line-height: 1.6;">
+                                                                    Hi <t t-out="object.company_id.name or 'Team'"/> Family,<br/><br/>
+                                                                    Today is <strong style="color: #800020; font-size: 18px;"><t t-out="object.name or ''"/></strong>'s special day! 🎉<br/><br/>
+                                                                    Let's come together to make this birthday memorable by sending warm wishes and celebrating our amazing colleague.<br/><br/>
+                                                                    <div style="background: rgba(255, 215, 0, 0.1); border-radius: 10px; padding: 15px; margin: 20px 0; border-left: 4px solid #ffd700;">
+                                                                        <em style="color: #800020;">"Birthdays are nature's way of telling us to eat more cake and spread more joy!" 🍰</em>
+                                                                    </div>
+                                                                    Please take a moment to send your birthday greetings and make <t t-out="object.name or ''"/>'s day extra special!<br/><br/>
+                                                                    <div style="text-align: center; margin: 25px 0;">
+                                                                        <a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%); color: #800020; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); text-transform: uppercase; letter-spacing: 1px;">
+                                                                            🎁 Send Birthday Wishes 🎁
+                                                                        </a>
+                                                                    </div>
+                                                                    Kind Regards,<br/>
+                                                                    <strong style="color: #800020;"><t t-out="object.company_id.name or 'OSUS Properties'"/></strong>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- FOOTER -->
+                                    <tr>
+                                        <td align="center" style="min-width: 590px; padding: 0 8px 0 8px; font-size:11px;">
+                                            <hr width="100%" style="background: linear-gradient(to right, #510710, #ffd700, #510710); border: none; height: 1px; margin: 16px 0px 4px 0px;"/>
+                                            <b style="color: #800020;" t-out="object.company_id.name or 'OSUS Properties'"></b><br/>
+                                            <div style="color: #666666; margin-top: 8px;">
+                                                <t t-out="object.company_id.phone or ''"></t>
+                                                <t t-if="object.company_id.email">
+                                                    | <a t-attf-href="'mailto:%s' % {{object.company_id.email}}" style="text-decoration:none; color: #666666;" t-out="object.company_id.email or ''"></a>
+                                                </t>
+                                                <t t-if="object.company_id.website">
+                                                    | <a t-attf-href="'%s' % {{object.company_id.website}}" style="text-decoration:none; color: #666666;" t-out="object.company_id.website or ''"></a>
+                                                </t>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- POWERED BY -->
+                    <tr>
+                        <td align="center" style="min-width: 590px; padding: 20px 0;">
+                            <div style="color: #666666; font-size: 12px;">
+                                Powered by <a target="_blank" href="https://osusproperties.com" style="color: #800020; text-decoration: none; font-weight: 600;">OSUS Properties</a> - Celebrating Every Milestone 🌟
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                ]]>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.lang}}</field>
+        </record>
+
+    </data>
+</odoo>: center; color: #ffd700; font-size: 16px; font-weight: 500; margin-top: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
                                                                                                                                 ✨ Celebrating You Today ✨
                                                                                                                             </div>
                                                                                                                         </div>
@@ -287,7 +355,7 @@
                                                                                     
                                                                                     <!-- Birthday Cake ASCII Art -->
                                                                                     <div style="font-family: 'Courier New', monospace; font-size: 24px; color: #ffd700; text-align: center; line-height: 1.2; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-                                                                                        🕯️🎂🕯️<br>
+                                                                                        🕯️🎂🕯️<br/>
                                                                                         <span style="font-size: 18px; color: #ffffff;">Make a wish!</span>
                                                                                     </div>
 
@@ -306,7 +374,7 @@
                                                                                                             "Another Year of Blessings"
                                                                                                         </div>
                                                                                                         <div style="font-size: 16px; color: #ffffff; text-align: center; line-height: 1.6; font-style: italic;">
-                                                                                                            Every birthday is a gift. Every day is an opportunity.<br>
+                                                                                                            Every birthday is a gift. Every day is an opportunity.<br/>
                                                                                                             Every moment is a blessing to celebrate life! 🌟
                                                                                                         </div>
                                                                                                     </div>
@@ -343,7 +411,7 @@
                                                         </tbody>
                                                     </table>
 
-                                                    <!-- Footer Section (CTA Removed) -->
+                                                    <!-- Footer Section -->
                                                     <table width="594.267" border="0" cellspacing="0" cellpadding="0" role="presentation" style="width: 594.267px;">
                                                         <tbody>
                                                             <tr>
@@ -357,10 +425,10 @@
                                                                                         <div style="margin-top: 10px; font-size: 12px;">
                                                                                             <t t-if="object.company_id.phone" t-out="object.company_id.phone"/>
                                                                                             <t t-if="object.company_id.email">
-                                                                                                | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.email"/>
+                                                                                                | <a t-attf-href="'mailto:%s' % {{object.company_id.email}}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.email"/>
                                                                                             </t>
                                                                                             <t t-if="object.company_id.website">
-                                                                                                | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.website"/>
+                                                                                                | <a t-attf-href="'%s' % {{object.company_id.website}}" style="text-decoration:none; color: #ffffff;" t-out="object.company_id.website"/>
                                                                                             </t>
                                                                                         </div>
                                                                                     </div>
@@ -471,10 +539,10 @@
                                             <div style="color: #666666; margin-top: 8px;">
                                                 <t t-out="object.company_id.phone or ''"></t>
                                                 <t t-if="object.company_id.email">
-                                                    | <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" style="text-decoration:none; color: #666666;" t-out="object.company_id.email or ''"></a>
+                                                    | <a t-attf-href="'mailto:%s' % {{object.company_id.email}}" style="text-decoration:none; color: #666666;" t-out="object.company_id.email or ''"></a>
                                                 </t>
                                                 <t t-if="object.company_id.website">
-                                                    | <a t-attf-href="'%s' % {{ object.company_id.website }}" style="text-decoration:none; color: #666666;" t-out="object.company_id.website or ''"></a>
+                                                    | <a t-attf-href="'%s' % {{object.company_id.website}}" style="text-decoration:none; color: #666666;" t-out="object.company_id.website or ''"></a>
                                                 </t>
                                             </div>
                                         </td>
