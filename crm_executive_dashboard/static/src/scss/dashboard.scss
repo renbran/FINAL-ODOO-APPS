@@ -1,0 +1,822 @@
+// Import variables
+@import 'variables';
+
+// Main Dashboard Container
+.o_crm_executive_dashboard {
+    padding: 24px;
+    background: var(--bs-body-bg);
+    min-height: 100vh;
+    position: relative;
+
+    // Loading Overlay
+    .o_loading_overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        border-radius: $card-border-radius;
+
+        .fa-spinner {
+            color: $primary-color;
+        }
+    }
+
+    // Dashboard Header
+    .o_dashboard_header {
+        background: white;
+        padding: 24px;
+        border-radius: $card-border-radius;
+        box-shadow: $card-shadow;
+        margin-bottom: 24px;
+        border: 1px solid var(--bs-border-color);
+
+        .o_dashboard_title {
+            h2 {
+                color: var(--bs-heading-color);
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            p {
+                font-size: 1rem;
+                margin-bottom: 0;
+            }
+        }
+
+        .o_dashboard_controls {
+            .btn {
+                border-radius: 8px;
+                font-weight: 500;
+                transition: $transition-base;
+
+                &:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+                }
+
+                &.active {
+                    background-color: $primary-color;
+                    border-color: $primary-color;
+                    color: white;
+                }
+            }
+        }
+
+        .o_dashboard_filters {
+            .form-label {
+                font-weight: 500;
+                color: var(--bs-gray-700);
+                margin-bottom: 8px;
+            }
+
+            .form-control, .form-select {
+                border-radius: 8px;
+                border: 1px solid var(--bs-border-color);
+                transition: $transition-base;
+
+                &:focus {
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+                }
+            }
+
+            .input-group-text {
+                background: var(--bs-gray-50);
+                border-color: var(--bs-border-color);
+                color: var(--bs-gray-600);
+            }
+        }
+    }
+
+    // KPI Cards Section
+    .o_kpi_section {
+        .o_kpi_card {
+            background: white;
+            border-radius: $card-border-radius;
+            box-shadow: $card-shadow;
+            border: 1px solid var(--bs-border-color);
+            padding: 24px;
+            height: 100%;
+            transition: $transition-slow;
+            position: relative;
+            overflow: hidden;
+
+            &:hover {
+                box-shadow: $card-shadow-hover;
+                transform: translateY(-2px);
+            }
+
+            // Gradient backgrounds for different KPI types
+            &.o_kpi_leads {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+
+                .o_kpi_icon i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+            }
+
+            &.o_kpi_opportunities {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+
+                .o_kpi_icon i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+            }
+
+            &.o_kpi_revenue {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+
+                .o_kpi_icon i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+            }
+
+            &.o_kpi_conversion {
+                background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+                color: white;
+
+                .o_kpi_icon i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+            }
+
+            // Standard white cards for secondary KPIs
+            &.o_kpi_expected, &.o_kpi_deal_size, &.o_kpi_won, &.o_kpi_lost {
+                border-left: 4px solid $primary-color;
+            }
+
+            .o_kpi_icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                margin-bottom: 16px;
+
+                i {
+                    font-size: 24px;
+                    color: $primary-color;
+                }
+            }
+
+            .o_kpi_content, .o_kpi_content_only {
+                h3, h4 {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                    line-height: 1.2;
+                }
+
+                h4 {
+                    font-size: 1.5rem;
+                    color: var(--bs-heading-color);
+                }
+
+                p {
+                    font-size: 0.875rem;
+                    margin-bottom: 12px;
+                    opacity: 0.9;
+                    font-weight: 500;
+                }
+
+                .o_kpi_trend {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+
+                    i {
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            // Decorative elements
+            &::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            }
+        }
+    }
+
+    // Charts Section
+    .o_charts_section {
+        .o_chart_container {
+            background: white;
+            border-radius: $card-border-radius;
+            box-shadow: $card-shadow;
+            border: 1px solid var(--bs-border-color);
+            overflow: hidden;
+            height: 100%;
+            transition: $transition-base;
+
+            &:hover {
+                box-shadow: $card-shadow-hover;
+            }
+
+            .o_chart_header {
+                padding: 20px 24px 16px;
+                border-bottom: 1px solid var(--bs-border-color);
+                background: var(--bs-gray-50);
+
+                h4 {
+                    margin-bottom: 4px;
+                    font-weight: 600;
+                    color: var(--bs-heading-color);
+                    display: flex;
+                    align-items: center;
+                }
+
+                p {
+                    margin-bottom: 0;
+                    font-size: 0.875rem;
+                }
+            }
+
+            .o_chart_body {
+                padding: 24px;
+                position: relative;
+
+                canvas {
+                    max-width: 100%;
+                    height: auto !important;
+                }
+            }
+        }
+    }
+
+    // Action Items Section
+    .o_action_items_section {
+        .o_action_card {
+            background: white;
+            border-radius: $card-border-radius;
+            box-shadow: $card-shadow;
+            border: 1px solid var(--bs-border-color);
+            overflow: hidden;
+            height: 100%;
+
+            .o_card_header {
+                padding: 20px 24px;
+                border-bottom: 1px solid var(--bs-border-color);
+                background: var(--bs-gray-50);
+
+                h4 {
+                    margin-bottom: 0;
+                    font-weight: 600;
+                    color: var(--bs-heading-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+            }
+
+            .o_card_body {
+                padding: 24px;
+
+                .table {
+                    margin-bottom: 0;
+
+                    th {
+                        font-weight: 600;
+                        color: var(--bs-gray-700);
+                        border-bottom: 2px solid var(--bs-border-color);
+                        font-size: 0.875rem;
+                    }
+
+                    td {
+                        vertical-align: middle;
+                        border-bottom: 1px solid var(--bs-border-color);
+                        font-size: 0.875rem;
+                    }
+
+                    tr {
+                        transition: $transition-base;
+
+                        &:hover {
+                            background-color: var(--bs-gray-50);
+                        }
+
+                        &.cursor-pointer {
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                .o_performers_list {
+                    .o_performer_item {
+                        padding: 12px 16px;
+                        border-radius: 8px;
+                        transition: $transition-base;
+
+                        &:hover {
+                            background-color: var(--bs-gray-50);
+                        }
+
+                        .o_performer_avatar img {
+                            border: 2px solid var(--bs-border-color);
+                        }
+
+                        .o_performer_info {
+                            h6 {
+                                color: var(--bs-heading-color);
+                                font-weight: 600;
+                            }
+                        }
+
+                        .o_performer_rank {
+                            .badge {
+                                font-size: 0.75rem;
+                                padding: 6px 8px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Footer Stats
+    .o_dashboard_footer {
+        background: white;
+        border-radius: $card-border-radius;
+        box-shadow: $card-shadow;
+        border: 1px solid var(--bs-border-color);
+        padding: 24px;
+
+        .o_footer_stat {
+            padding: 16px;
+            border-radius: 8px;
+            transition: $transition-base;
+
+            &:hover {
+                background-color: var(--bs-gray-50);
+                transform: translateY(-2px);
+            }
+
+            i {
+                margin-bottom: 8px;
+            }
+
+            h5 {
+                font-weight: 700;
+                color: var(--bs-heading-color);
+                margin-bottom: 4px;
+            }
+
+            p {
+                margin-bottom: 0;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+        }
+    }
+
+    // Responsive Design
+    @media (max-width: $mobile) {
+        padding: 16px;
+
+        .o_dashboard_header {
+            padding: 16px;
+
+            .o_dashboard_title h2 {
+                font-size: 1.5rem;
+            }
+
+            .o_dashboard_controls {
+                flex-direction: column;
+                gap: 8px !important;
+
+                .btn {
+                    width: 100%;
+                }
+            }
+
+            .o_dashboard_filters {
+                .row {
+                    .col-md-4 {
+                        margin-bottom: 16px;
+                    }
+                }
+            }
+        }
+
+        .o_kpi_section {
+            .o_kpi_card {
+                padding: 16px;
+                margin-bottom: 16px;
+
+                .o_kpi_content h3 {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+
+        .o_charts_section {
+            .o_chart_container {
+                margin-bottom: 16px;
+
+                .o_chart_header {
+                    padding: 16px;
+
+                    h4 {
+                        font-size: 1.1rem;
+                    }
+                }
+
+                .o_chart_body {
+                    padding: 16px;
+                }
+            }
+        }
+
+        .o_action_items_section {
+            .o_action_card {
+                margin-bottom: 16px;
+
+                .o_card_header {
+                    padding: 16px;
+
+                    h4 {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 8px;
+
+                        .btn {
+                            align-self: flex-end;
+                        }
+                    }
+                }
+
+                .o_card_body {
+                    padding: 16px;
+
+                    .table-responsive {
+                        font-size: 0.75rem;
+                    }
+                }
+            }
+        }
+
+        .o_dashboard_footer {
+            padding: 16px;
+
+            .o_footer_stat {
+                margin-bottom: 16px;
+                text-align: center !important;
+            }
+        }
+    }
+
+    @media (max-width: $tablet) {
+        .o_charts_section {
+            .o_chart_container {
+                .o_chart_body canvas {
+                    height: 250px !important;
+                }
+            }
+        }
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    .o_crm_executive_dashboard {
+        background: var(--bs-dark);
+
+        .o_dashboard_header,
+        .o_charts_section .o_chart_container,
+        .o_action_items_section .o_action_card,
+        .o_dashboard_footer {
+            background: var(--bs-gray-800);
+            border-color: var(--bs-gray-700);
+        }
+
+        .o_kpi_section .o_kpi_card {
+            &:not(.o_kpi_leads):not(.o_kpi_opportunities):not(.o_kpi_revenue):not(.o_kpi_conversion) {
+                background: var(--bs-gray-800);
+                border-color: var(--bs-gray-700);
+            }
+        }
+
+        .o_chart_header,
+        .o_card_header {
+            background: var(--bs-gray-700);
+            border-color: var(--bs-gray-600);
+        }
+    }
+}
+
+// Agent Metrics Section
+.o_agent_metrics_section {
+    .o_dashboard_card {
+        background: white;
+        border: 1px solid var(--bs-border-color);
+        border-radius: $card-border-radius;
+        box-shadow: $card-shadow;
+        transition: $transition-base;
+        height: 100%;
+
+        &:hover {
+            box-shadow: $card-hover-shadow;
+            transform: translateY(-2px);
+        }
+
+        .o_card_header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--bs-border-color);
+            border-radius: $card-border-radius $card-border-radius 0 0;
+
+            .card-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--bs-heading-color);
+                margin-bottom: 0;
+
+                i {
+                    margin-right: 8px;
+                }
+            }
+
+            small {
+                font-size: 0.85rem;
+                color: var(--bs-secondary);
+            }
+        }
+
+        .o_card_body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+
+            // Custom scrollbar
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 3px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 3px;
+
+                &:hover {
+                    background: #a1a1a1;
+                }
+            }
+        }
+    }
+
+    // Agent Item Styling
+    .o_agent_item {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            border-color: var(--bs-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateX(4px);
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .o_agent_avatar {
+            .rounded-circle {
+                width: 45px;
+                height: 45px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 16px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .o_agent_info {
+            flex: 1;
+
+            h6 {
+                font-weight: 600;
+                margin-bottom: 4px;
+                color: var(--bs-heading-color);
+            }
+
+            small {
+                font-size: 0.85rem;
+
+                i {
+                    margin-right: 4px;
+                }
+
+                &.text-success {
+                    color: var(--bs-success) !important;
+                }
+
+                &.text-warning {
+                    color: var(--bs-warning) !important;
+                }
+
+                &.text-info {
+                    color: var(--bs-info) !important;
+                }
+
+                &.text-danger {
+                    color: var(--bs-danger) !important;
+                }
+            }
+        }
+
+        .o_agent_rank {
+            .badge {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+                font-weight: bold;
+            }
+        }
+    }
+
+    // Quick Stats for Fast/Slow sections
+    .o_quick_stats,
+    .o_slow_stats {
+        .bg-light {
+            background-color: #f8f9fa !important;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: #e9ecef !important;
+                border-color: var(--bs-primary);
+            }
+        }
+
+        .fw-bold {
+            font-weight: 600;
+            color: var(--bs-heading-color);
+        }
+
+        .text-success {
+            color: var(--bs-success) !important;
+        }
+
+        .text-danger {
+            color: var(--bs-danger) !important;
+        }
+
+        .text-muted {
+            color: var(--bs-secondary) !important;
+        }
+    }
+
+    // Empty state styling
+    .text-center.text-muted {
+        padding: 40px 20px;
+
+        i {
+            color: #dee2e6;
+            margin-bottom: 16px;
+        }
+
+        p {
+            color: var(--bs-secondary);
+            font-size: 0.95rem;
+        }
+    }
+
+    // Responsive design for agent metrics
+    @media (max-width: $mobile-breakpoint) {
+        .o_dashboard_card {
+            margin-bottom: 20px;
+
+            .o_card_body {
+                padding: 16px;
+                max-height: 300px;
+            }
+        }
+
+        .o_agent_item {
+            padding: 10px;
+
+            .o_agent_avatar .rounded-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .o_agent_info {
+                h6 {
+                    font-size: 0.95rem;
+                }
+
+                small {
+                    font-size: 0.8rem;
+                }
+            }
+
+            .o_agent_rank .badge {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+        }
+
+        .o_quick_stats,
+        .o_slow_stats {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: $tablet-breakpoint) {
+        .row.g-4 {
+            gap: 1rem !important;
+        }
+
+        .o_dashboard_card .o_card_header {
+            padding: 12px 16px;
+
+            .card-title {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    // Animation for loading states
+    .o_agent_item {
+        animation: slideInLeft 0.3s ease-out;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    // Color coding for different agent types
+    .o_agents_list .o_agent_item:nth-child(1) .o_agent_rank .badge {
+        background: linear-gradient(45deg, #FFD700, #FFA500) !important;
+        color: white;
+    }
+
+    .o_agents_list .o_agent_item:nth-child(2) .o_agent_rank .badge {
+        background: linear-gradient(45deg, #C0C0C0, #A0A0A0) !important;
+        color: white;
+    }
+
+    .o_agents_list .o_agent_item:nth-child(3) .o_agent_rank .badge {
+        background: linear-gradient(45deg, #CD7F32, #B87333) !important;
+        color: white;
+    }
+}
+
+// Print styles
+@media print {
+    .o_crm_executive_dashboard {
+        .o_dashboard_controls {
+            display: none !important;
+        }
+
+        .o_loading_overlay {
+            display: none !important;
+        }
+
+        .o_charts_section {
+            page-break-inside: avoid;
+        }
+
+        .o_action_items_section {
+            page-break-before: always;
+        }
+    }
+}
