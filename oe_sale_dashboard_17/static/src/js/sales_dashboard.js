@@ -161,8 +161,18 @@ export class SalesDashboard extends Component {
 
     async loadDashboardData() {
         try {
-            console.log('[Sales Dashboard] Loading all dashboard data...');
+            console.log('[Sales Dashboard] Loading all dashboard data with date range:', {
+                start: this.state.dateRange.start,
+                end: this.state.dateRange.end
+            });
             this.state.loading = true;
+            
+            // Ensure we have valid date range
+            if (!this.state.dateRange.start || !this.state.dateRange.end) {
+                console.warn('[Sales Dashboard] Invalid date range, using defaults');
+                this.state.dateRange.start = this.getDefaultStartDate();
+                this.state.dateRange.end = this.getDefaultEndDate();
+            }
             
             const promises = [
                 this.loadPerformanceData(),
@@ -172,7 +182,15 @@ export class SalesDashboard extends Component {
                 this.loadTeamData()
             ];
 
-            await Promise.all(promises);
+            const results = await Promise.allSettled(promises);
+            
+            // Log any failed promises
+            results.forEach((result, index) => {
+                const methodNames = ['Performance', 'Monthly', 'State', 'Customers', 'Team'];
+                if (result.status === 'rejected') {
+                    console.error(`[Sales Dashboard] ${methodNames[index]} data loading failed:`, result.reason);
+                }
+            });
             
             console.log('[Sales Dashboard] All data loaded:', this.state.data);
             
@@ -199,62 +217,16 @@ export class SalesDashboard extends Component {
     }
 
     validateDataStructure() {
-        console.log('[Sales Dashboard] Validating data structure...');
+        console.log('[Sales Dashboard] Validating and enhancing data structure...');
         
-        // Ensure monthly data has required structure
-        if (!this.state.data.monthly.labels) {
-            console.warn('[Sales Dashboard] Missing monthly labels, using defaults');
-            this.state.data.monthly = {
-                labels: ['Jan', 'Feb', 'Mar'],
-                quotations: [{amount: 0}, {amount: 0}, {amount: 0}],
-                sales_orders: [{amount: 0}, {amount: 0}, {amount: 0}],
-                invoiced_sales: [{amount: 0}, {amount: 0}, {amount: 0}]
-            };
+        // Initialize data structure if missing
+        if (!this.state.data) {
+            this.state.data = {};
         }
         
-        // Ensure state data has required structure
-        if (!this.state.data.byState.labels) {
-            console.warn('[Sales Dashboard] Missing state labels, using defaults');
-            this.state.data.byState = {
-                labels: ['Draft', 'Sale', 'Done'],
-                counts: [0, 0, 0]
-            };
-        }
-        
-        // Ensure customers data has required structure
-        if (!this.state.data.topCustomers.labels) {
-            console.warn('[Sales Dashboard] Missing customer labels, using defaults');
-            this.state.data.topCustomers = {
-                labels: ['No customers found'],
-                amounts: [0]
-            };
-        }
-        
-        // Ensure team data has required structure
-        if (!this.state.data.salesTeam.labels) {
-            console.warn('[Sales Dashboard] Missing team labels, using defaults');
-            this.state.data.salesTeam = {
-                labels: ['Unassigned'],
-                amounts: [0]
-            };
-        }
-        
-        console.log('[Sales Dashboard] Data structure validation complete');
-    }
-
-    async loadPerformanceData() {
-        try {
-            console.log('[Sales Dashboard] Loading performance data...');
-            const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_performance_data", {
-                model: 'sale.order',
-                method: 'get_sales_performance_data',
-                args: [this.state.dateRange.start, this.state.dateRange.end],
-                kwargs: {}
-            });
-            console.log('[Sales Dashboard] Performance data received:', result);
-            this.state.data.performance = result;
-        } catch (error) {
-            console.error('Error loading performance data:', error);
+        // Validate performance data
+        if (!this.state.data.performance || typeof this.state.data.performance !== 'object') {
+            console.warn('[Sales Dashboard] Invalid performance data structure, initializing defaults');
             this.state.data.performance = {
                 total_quotations: 0,
                 total_orders: 0,
@@ -262,11 +234,120 @@ export class SalesDashboard extends Component {
                 total_amount: 0
             };
         }
+        
+        // Ensure all performance values are numbers
+        ['total_quotations', 'total_orders', 'total_invoiced', 'total_amount'].forEach(key => {
+            if (this.state.data.performance[key] === undefined || 
+                this.state.data.performance[key] === null ||
+                isNaN(Number(this.state.data.performance[key]))) {
+                console.warn(`[Sales Dashboard] Invalid ${key} value, setting to 0`);
+                this.state.data.performance[key] = 0;
+            } else {
+                this.state.data.performance[key] = Number(this.state.data.performance[key]);
+            }
+        });
+        
+        // Validate monthly data
+        if (!Array.isArray(this.state.data.monthly)) {
+            console.warn('[Sales Dashboard] Invalid monthly data, initializing as empty array');
+            this.state.data.monthly = [];
+        }
+        
+        // Validate chart data structures
+        const chartDataDefaults = {
+            byState: { labels: ['Draft', 'Sale', 'Done'], counts: [0, 0, 0] },
+            topCustomers: { labels: [], amounts: [] },
+            salesTeam: { labels: ['Sales Team'], amounts: [0] }
+        };
+        
+        Object.entries(chartDataDefaults).forEach(([chartKey, defaultData]) => {
+            if (!this.state.data[chartKey] || typeof this.state.data[chartKey] !== 'object') {
+                console.warn(`[Sales Dashboard] Invalid ${chartKey} data, using defaults`);
+                this.state.data[chartKey] = { ...defaultData };
+                return;
+            }
+            
+            // Validate arrays within chart data
+            Object.entries(defaultData).forEach(([arrayKey, defaultArray]) => {
+                if (!Array.isArray(this.state.data[chartKey][arrayKey])) {
+                    console.warn(`[Sales Dashboard] Invalid ${chartKey}.${arrayKey}, using default`);
+                    this.state.data[chartKey][arrayKey] = [...defaultArray];
+                }
+            });
+            
+            // Ensure arrays are same length for paired data
+            if (chartKey !== 'monthly') {
+                const keys = Object.keys(this.state.data[chartKey]);
+                if (keys.length === 2) {
+                    const [key1, key2] = keys;
+                    const len1 = this.state.data[chartKey][key1].length;
+                    const len2 = this.state.data[chartKey][key2].length;
+                    
+                    if (len1 !== len2) {
+                        console.warn(`[Sales Dashboard] Array length mismatch in ${chartKey}: ${key1}(${len1}) vs ${key2}(${len2})`);
+                        const minLength = Math.min(len1, len2);
+                        this.state.data[chartKey][key1] = this.state.data[chartKey][key1].slice(0, minLength);
+                        this.state.data[chartKey][key2] = this.state.data[chartKey][key2].slice(0, minLength);
+                    }
+                }
+            }
+        });
+        
+        console.log('[Sales Dashboard] Data structure validation complete:', {
+            performanceKeys: Object.keys(this.state.data.performance).length,
+            monthlyEntries: this.state.data.monthly.length,
+            stateLabels: this.state.data.byState?.labels?.length || 0,
+            customerLabels: this.state.data.topCustomers?.labels?.length || 0,
+            teamLabels: this.state.data.salesTeam?.labels?.length || 0
+        });
+    }
+
+    async loadPerformanceData() {
+        try {
+            console.log('[Sales Dashboard] Loading performance data with date range:', {
+                start: this.state.dateRange.start,
+                end: this.state.dateRange.end
+            });
+            
+            const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_performance_data", {
+                model: 'sale.order',
+                method: 'get_sales_performance_data',
+                args: [this.state.dateRange.start, this.state.dateRange.end],
+                kwargs: {}
+            });
+            console.log('[Sales Dashboard] Performance data received:', result);
+            
+            // Ensure we have valid data structure
+            this.state.data.performance = {
+                total_quotations: result.total_quotations || 0,
+                total_orders: result.total_orders || 0,
+                total_invoiced: result.total_invoiced || 0,
+                total_amount: result.total_amount || 0,
+                performance_indicator: result.performance_indicator || 'neutral'
+            };
+            
+        } catch (error) {
+            console.error('Error loading performance data:', error);
+            this.notification.add('Failed to load performance data: ' + error.message, {
+                type: 'warning'
+            });
+            this.state.data.performance = {
+                total_quotations: 0,
+                total_orders: 0,
+                total_invoiced: 0,
+                total_amount: 0,
+                performance_indicator: 'neutral'
+            };
+        }
     }
 
     async loadMonthlyData() {
         try {
-            console.log('[Sales Dashboard] Loading monthly data...');
+            console.log('[Sales Dashboard] Loading monthly data with date range:', {
+                start: this.state.dateRange.start,
+                end: this.state.dateRange.end
+            });
+            
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_monthly_fluctuation_data", {
                 model: 'sale.order',
                 method: 'get_monthly_fluctuation_data',
@@ -274,9 +355,28 @@ export class SalesDashboard extends Component {
                 kwargs: {}
             });
             console.log('[Sales Dashboard] Monthly data received:', result);
-            this.state.data.monthly = result;
+            
+            // Ensure proper data structure
+            this.state.data.monthly = {
+                labels: result.labels || [],
+                quotations: result.quotations || [],
+                sales_orders: result.sales_orders || [],
+                invoiced_sales: result.invoiced_sales || []
+            };
+            
+            // Log data validation
+            console.log('[Sales Dashboard] Monthly data validation:', {
+                labelsCount: this.state.data.monthly.labels.length,
+                quotationsCount: this.state.data.monthly.quotations.length,
+                salesOrdersCount: this.state.data.monthly.sales_orders.length,
+                invoicedSalesCount: this.state.data.monthly.invoiced_sales.length
+            });
+            
         } catch (error) {
             console.error('Error loading monthly data:', error);
+            this.notification.add('Failed to load monthly trends: ' + error.message, {
+                type: 'warning'
+            });
             this.state.data.monthly = {
                 labels: [],
                 quotations: [],
@@ -287,18 +387,66 @@ export class SalesDashboard extends Component {
     }
 
     async loadStateData() {
+        console.log('[Sales Dashboard] Loading state/regional data...');
+        
         try {
-            console.log('[Sales Dashboard] Loading state data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_by_state_data", {
                 model: 'sale.order',
                 method: 'get_sales_by_state_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end],
                 kwargs: {}
             });
+            
             console.log('[Sales Dashboard] State data received:', result);
+            
+            // Validate data structure
+            if (!result || typeof result !== 'object') {
+                console.warn('[Sales Dashboard] Invalid state data structure, using defaults');
+                this.state.data.byState = {
+                    labels: ['Draft', 'Sale', 'Done'],
+                    counts: [0, 0, 0]
+                };
+                return;
+            }
+            
+            // Ensure required properties exist
+            if (!result.labels || !Array.isArray(result.labels)) {
+                console.warn('[Sales Dashboard] Missing or invalid labels in state data');
+                result.labels = ['Draft', 'Sale', 'Done'];
+            }
+            
+            if (!result.counts || !Array.isArray(result.counts)) {
+                console.warn('[Sales Dashboard] Missing or invalid counts in state data');
+                result.counts = new Array(result.labels.length).fill(0);
+            }
+            
+            // Ensure arrays are same length
+            if (result.labels.length !== result.counts.length) {
+                console.warn('[Sales Dashboard] Label/count array length mismatch, padding with zeros');
+                const maxLength = Math.max(result.labels.length, result.counts.length);
+                while (result.labels.length < maxLength) result.labels.push('Unknown');
+                while (result.counts.length < maxLength) result.counts.push(0);
+            }
+            
+            // Validate numeric values
+            result.counts = result.counts.map((count, index) => {
+                const numCount = Number(count) || 0;
+                if (isNaN(numCount)) {
+                    console.warn(`[Sales Dashboard] Invalid count at index ${index}:`, count);
+                    return 0;
+                }
+                return numCount;
+            });
+            
             this.state.data.byState = result;
+            console.log('[Sales Dashboard] Processed state data:', this.state.data.byState);
+            
         } catch (error) {
-            console.error('Error loading state data:', error);
+            console.error('[Sales Dashboard] Error loading state data:', error);
+            this.notification.add(`Failed to load regional data: ${error.message}`, {
+                type: 'danger'
+            });
+            // Set safe default data
             this.state.data.byState = {
                 labels: ['Draft', 'Sale', 'Done'],
                 counts: [0, 0, 0]
@@ -307,18 +455,75 @@ export class SalesDashboard extends Component {
     }
 
     async loadCustomersData() {
+        console.log('[Sales Dashboard] Loading top customers data...');
+        
         try {
-            console.log('[Sales Dashboard] Loading customers data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_top_customers_data", {
                 model: 'sale.order',
                 method: 'get_top_customers_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end, 10],
                 kwargs: {}
             });
+            
             console.log('[Sales Dashboard] Customers data received:', result);
+            
+            // Validate data structure
+            if (!result || typeof result !== 'object') {
+                console.warn('[Sales Dashboard] Invalid customers data structure, using defaults');
+                this.state.data.topCustomers = {
+                    labels: ['Customer 1', 'Customer 2'],
+                    amounts: [0, 0]
+                };
+                return;
+            }
+            
+            // Ensure required properties exist
+            if (!result.labels || !Array.isArray(result.labels)) {
+                console.warn('[Sales Dashboard] Missing or invalid labels in customers data');
+                result.labels = ['Customer 1', 'Customer 2'];
+            }
+            
+            if (!result.amounts || !Array.isArray(result.amounts)) {
+                console.warn('[Sales Dashboard] Missing or invalid amounts in customers data');
+                result.amounts = [0, 0];
+            }
+            
+            // Ensure arrays are same length
+            if (result.labels.length !== result.amounts.length) {
+                console.warn('[Sales Dashboard] Customer label/amount array length mismatch');
+                const minLength = Math.min(result.labels.length, result.amounts.length);
+                result.labels = result.labels.slice(0, minLength);
+                result.amounts = result.amounts.slice(0, minLength);
+            }
+            
+            // Validate and convert amounts to numbers
+            result.amounts = result.amounts.map((amount, index) => {
+                const numAmount = Number(amount) || 0;
+                if (isNaN(numAmount)) {
+                    console.warn(`[Sales Dashboard] Invalid amount at index ${index}:`, amount);
+                    return 0;
+                }
+                return numAmount;
+            });
+            
+            // Ensure customer names are strings
+            result.labels = result.labels.map((label, index) => {
+                if (typeof label !== 'string') {
+                    console.warn(`[Sales Dashboard] Invalid customer name at index ${index}:`, label);
+                    return `Customer ${index + 1}`;
+                }
+                return label.trim() || `Customer ${index + 1}`;
+            });
+            
             this.state.data.topCustomers = result;
+            console.log('[Sales Dashboard] Processed customers data:', this.state.data.topCustomers.labels.length, 'customers');
+            
         } catch (error) {
-            console.error('Error loading customers data:', error);
+            console.error('[Sales Dashboard] Error loading customers data:', error);
+            this.notification.add(`Failed to load customer data: ${error.message}`, {
+                type: 'danger'
+            });
+            // Set safe default data
             this.state.data.topCustomers = {
                 labels: ['Customer 1', 'Customer 2'],
                 amounts: [0, 0]
@@ -327,18 +532,75 @@ export class SalesDashboard extends Component {
     }
 
     async loadTeamData() {
+        console.log('[Sales Dashboard] Loading sales team performance data...');
+        
         try {
-            console.log('[Sales Dashboard] Loading team data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_team_performance", {
                 model: 'sale.order',
                 method: 'get_sales_team_performance',
                 args: [this.state.dateRange.start, this.state.dateRange.end],
                 kwargs: {}
             });
+            
             console.log('[Sales Dashboard] Team data received:', result);
+            
+            // Validate data structure
+            if (!result || typeof result !== 'object') {
+                console.warn('[Sales Dashboard] Invalid team data structure, using defaults');
+                this.state.data.salesTeam = {
+                    labels: ['Sales Team'],
+                    amounts: [0]
+                };
+                return;
+            }
+            
+            // Ensure required properties exist
+            if (!result.labels || !Array.isArray(result.labels)) {
+                console.warn('[Sales Dashboard] Missing or invalid labels in team data');
+                result.labels = ['Sales Team'];
+            }
+            
+            if (!result.amounts || !Array.isArray(result.amounts)) {
+                console.warn('[Sales Dashboard] Missing or invalid amounts in team data');
+                result.amounts = [0];
+            }
+            
+            // Ensure arrays are same length
+            if (result.labels.length !== result.amounts.length) {
+                console.warn('[Sales Dashboard] Team label/amount array length mismatch');
+                const minLength = Math.min(result.labels.length, result.amounts.length);
+                result.labels = result.labels.slice(0, minLength);
+                result.amounts = result.amounts.slice(0, minLength);
+            }
+            
+            // Validate and convert amounts to numbers
+            result.amounts = result.amounts.map((amount, index) => {
+                const numAmount = Number(amount) || 0;
+                if (isNaN(numAmount)) {
+                    console.warn(`[Sales Dashboard] Invalid team amount at index ${index}:`, amount);
+                    return 0;
+                }
+                return numAmount;
+            });
+            
+            // Ensure team names are strings
+            result.labels = result.labels.map((label, index) => {
+                if (typeof label !== 'string') {
+                    console.warn(`[Sales Dashboard] Invalid team name at index ${index}:`, label);
+                    return `Team ${index + 1}`;
+                }
+                return label.trim() || `Team ${index + 1}`;
+            });
+            
             this.state.data.salesTeam = result;
+            console.log('[Sales Dashboard] Processed team data:', this.state.data.salesTeam.labels.length, 'teams');
+            
         } catch (error) {
-            console.error('Error loading team data:', error);
+            console.error('[Sales Dashboard] Error loading team data:', error);
+            this.notification.add(`Failed to load team performance data: ${error.message}`, {
+                type: 'danger'
+            });
+            // Set safe default data
             this.state.data.salesTeam = {
                 labels: ['Sales Team'],
                 amounts: [0]
@@ -346,8 +608,177 @@ export class SalesDashboard extends Component {
         }
     }
 
+    // Handle category-based filtering for dashboard data
+    async applyFiltersByCategory(category = null) {
+        console.log('[Sales Dashboard] Applying category filters:', category);
+        
+        if (!category) {
+            // No specific category, load all data
+            console.log('[Sales Dashboard] No category filter, loading all data');
+            await this.loadDashboardData();
+            return;
+        }
+        
+        try {
+            // Apply category-specific filters to data loading
+            const categoryFilters = {
+                'quotations': 'draft',
+                'orders': 'sale',
+                'invoiced': 'done',
+                'all': null
+            };
+            
+            const stateFilter = categoryFilters[category.toLowerCase()] || null;
+            console.log('[Sales Dashboard] Category state filter:', stateFilter);
+            
+            // Load data with category filter
+            const dateRange = this.validateDateRange();
+            
+            // Load performance data with category filter
+            const performanceResult = await this.orm.call(
+                'sale.order',
+                'get_sales_performance_data',
+                [dateRange.start, dateRange.end],
+                { state_filter: stateFilter }
+            );
+            
+            console.log('[Sales Dashboard] Category-filtered performance data:', performanceResult);
+            this.state.data.performance = performanceResult || {};
+            
+            // Update KPIs and charts based on filtered data
+            this.updateKPIs();
+            await this.renderCharts();
+            
+            this.notification.add(`Dashboard filtered by category: ${category}`, {
+                type: 'info'
+            });
+            
+        } catch (error) {
+            console.error('[Sales Dashboard] Error applying category filters:', error);
+            this.notification.add(`Failed to apply ${category} filter: ${error.message}`, {
+                type: 'warning'
+            });
+            // Fallback to loading all data
+            await this.loadDashboardData();
+        }
+    }
+
+    // Validate date range inputs
+    validateDateRange() {
+        const today = new Date().toISOString().split('T')[0];
+        const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        // Validate start date
+        if (!this.state.dateRange.start || this.state.dateRange.start === '') {
+            console.warn('[Sales Dashboard] Invalid start date, using default');
+            this.state.dateRange.start = oneYearAgo;
+        }
+        
+        // Validate end date
+        if (!this.state.dateRange.end || this.state.dateRange.end === '') {
+            console.warn('[Sales Dashboard] Invalid end date, using default');
+            this.state.dateRange.end = today;
+        }
+        
+        // Ensure start date is not after end date
+        if (new Date(this.state.dateRange.start) > new Date(this.state.dateRange.end)) {
+            console.warn('[Sales Dashboard] Start date after end date, swapping');
+            const temp = this.state.dateRange.start;
+            this.state.dateRange.start = this.state.dateRange.end;
+            this.state.dateRange.end = temp;
+        }
+        
+        // Ensure dates are not in the future
+        if (new Date(this.state.dateRange.start) > new Date(today)) {
+            console.warn('[Sales Dashboard] Start date in future, using today');
+            this.state.dateRange.start = today;
+        }
+        
+        if (new Date(this.state.dateRange.end) > new Date(today)) {
+            console.warn('[Sales Dashboard] End date in future, using today');
+            this.state.dateRange.end = today;
+        }
+        
+        console.log('[Sales Dashboard] Validated date range:', this.state.dateRange);
+        
+        return {
+            isValid: true,
+            start: this.state.dateRange.start,
+            end: this.state.dateRange.end
+        };
+    }
+
+    // Enhanced data validation method
+    validateAndSanitizeData() {
+        console.log('[Sales Dashboard] Validating and sanitizing all data...');
+        
+        // Validate performance data
+        if (!this.state.data.performance) {
+            this.state.data.performance = {};
+        }
+        
+        // Ensure all KPI values are numbers
+        const performanceDefaults = {
+            total_quotations: 0,
+            total_orders: 0,
+            total_invoiced: 0,
+            total_amount: 0,
+            quotation_count: 0,
+            sales_order_count: 0,
+            invoice_count: 0
+        };
+        
+        for (const [key, defaultValue] of Object.entries(performanceDefaults)) {
+            if (this.state.data.performance[key] === undefined || 
+                this.state.data.performance[key] === null ||
+                isNaN(Number(this.state.data.performance[key]))) {
+                this.state.data.performance[key] = defaultValue;
+            } else {
+                this.state.data.performance[key] = Number(this.state.data.performance[key]);
+            }
+        }
+        
+        // Validate monthly data
+        if (!this.state.data.monthly || !Array.isArray(this.state.data.monthly)) {
+            this.state.data.monthly = [];
+        }
+        
+        // Validate chart data structures
+        const chartDefaults = {
+            byState: { labels: ['Draft', 'Sale', 'Done'], counts: [0, 0, 0] },
+            topCustomers: { labels: [], amounts: [] },
+            salesTeam: { labels: ['Sales Team'], amounts: [0] }
+        };
+        
+        for (const [chartKey, defaultData] of Object.entries(chartDefaults)) {
+            if (!this.state.data[chartKey] || typeof this.state.data[chartKey] !== 'object') {
+                this.state.data[chartKey] = { ...defaultData };
+                continue;
+            }
+            
+            // Validate labels and amounts/counts arrays
+            const dataKeys = Object.keys(defaultData);
+            for (const dataKey of dataKeys) {
+                if (!Array.isArray(this.state.data[chartKey][dataKey])) {
+                    this.state.data[chartKey][dataKey] = [...defaultData[dataKey]];
+                }
+            }
+        }
+        
+        console.log('[Sales Dashboard] Data validation complete:', {
+            performance: Object.keys(this.state.data.performance).length,
+            monthly: this.state.data.monthly.length,
+            stateLabels: this.state.data.byState.labels.length,
+            customerLabels: this.state.data.topCustomers.labels.length,
+            teamLabels: this.state.data.salesTeam.labels.length
+        });
+    }
+
     updateKPIs() {
         console.log('[Sales Dashboard] Updating KPIs with data:', this.state.data.performance);
+        
+        // Ensure data is validated first
+        this.validateAndSanitizeData();
         
         // Since we're using QWeb templates with reactive state, 
         // we just need to ensure the state data is properly formatted
@@ -856,29 +1287,52 @@ export class SalesDashboard extends Component {
     }
 
     async refreshData() {
-        console.log('[Sales Dashboard] Refreshing data with filters:', {
-            startDate: this.state.dateRange.start,
-            endDate: this.state.dateRange.end
-        });
+        console.log('[Sales Dashboard] Refreshing data with current filters...');
         
         // Update date range from inputs if they exist
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         
+        let dateChanged = false;
+        
         if (startDateInput && startDateInput.value) {
-            this.state.dateRange.start = startDateInput.value;
+            if (this.state.dateRange.start !== startDateInput.value) {
+                this.state.dateRange.start = startDateInput.value;
+                dateChanged = true;
+            }
         }
         if (endDateInput && endDateInput.value) {
-            this.state.dateRange.end = endDateInput.value;
+            if (this.state.dateRange.end !== endDateInput.value) {
+                this.state.dateRange.end = endDateInput.value;
+                dateChanged = true;
+            }
         }
         
-        console.log('[Sales Dashboard] Updated date range:', this.state.dateRange);
+        console.log('[Sales Dashboard] Date range for refresh:', {
+            start: this.state.dateRange.start,
+            end: this.state.dateRange.end,
+            dateChanged: dateChanged
+        });
+        
+        // Validate date range
+        if (this.state.dateRange.start > this.state.dateRange.end) {
+            this.notification.add('Start date cannot be after end date', {
+                type: 'warning'
+            });
+            return;
+        }
         
         // Test backend connectivity first
-        await this.testBackendConnectivity();
+        const isConnected = await this.testBackendConnectivity();
+        if (!isConnected) {
+            console.error('[Sales Dashboard] Cannot refresh - backend not available');
+            return;
+        }
         
+        // Reload all data with new filters
         await this.loadDashboardData();
-        this.notification.add('Dashboard refreshed successfully', {
+        
+        this.notification.add('Dashboard refreshed successfully with filtered data', {
             type: 'success'
         });
     }
