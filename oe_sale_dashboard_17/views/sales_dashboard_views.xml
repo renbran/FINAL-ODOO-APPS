@@ -22,6 +22,7 @@
                             <input type="date" id="start_date" class="form-control"/>
                             <input type="date" id="end_date" class="form-control"/>
                             <button class="btn btn-primary" id="refresh_dashboard">Refresh</button>
+                            <button class="btn btn-info" id="test_backend">Test Backend</button>
                         </div>
                     </div>
                 </div>
