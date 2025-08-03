@@ -141,31 +141,45 @@ export class SalesDashboard extends Component {
 
     async loadPerformanceData() {
         try {
+            console.log('[Sales Dashboard] Loading performance data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_performance_data", {
                 model: 'sale.order',
                 method: 'get_sales_performance_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end],
                 kwargs: {}
             });
+            console.log('[Sales Dashboard] Performance data received:', result);
             this.state.data.performance = result;
         } catch (error) {
             console.error('Error loading performance data:', error);
-            this.state.data.performance = {};
+            this.state.data.performance = {
+                total_quotations: 0,
+                total_orders: 0,
+                total_invoiced: 0,
+                total_amount: 0
+            };
         }
     }
 
     async loadMonthlyData() {
         try {
+            console.log('[Sales Dashboard] Loading monthly data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_monthly_fluctuation_data", {
                 model: 'sale.order',
                 method: 'get_monthly_fluctuation_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end, null],
                 kwargs: {}
             });
+            console.log('[Sales Dashboard] Monthly data received:', result);
             this.state.data.monthly = result;
         } catch (error) {
             console.error('Error loading monthly data:', error);
-            this.state.data.monthly = {};
+            this.state.data.monthly = {
+                labels: [],
+                quotations: [],
+                sales_orders: [],
+                invoiced_sales: []
+            };
         }
     }
 
@@ -215,19 +229,26 @@ export class SalesDashboard extends Component {
     }
 
     updateKPIs() {
-        const performance = this.state.data.performance;
+        console.log('[Sales Dashboard] Updating KPIs with data:', this.state.data.performance);
+        
+        const performance = this.state.data.performance || {};
         
         const elements = {
-            'total_quotations': performance.total_quotations || 0,
-            'total_orders': performance.total_orders || 0,
-            'total_invoiced': performance.total_invoiced || 0,
-            'total_amount': performance.total_amount || '0'
+            'total_quotations': performance.total_quotations || performance.draft_count || 0,
+            'total_orders': performance.total_orders || performance.sales_order_count || 0,
+            'total_invoiced': performance.total_invoiced || performance.invoice_count || 0,
+            'total_amount': this.formatCurrency(performance.total_amount || 0)
         };
+
+        console.log('[Sales Dashboard] KPI elements to update:', elements);
 
         Object.entries(elements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
+                console.log(`[Sales Dashboard] Updated ${id} with value:`, value);
+            } else {
+                console.warn(`[Sales Dashboard] Element ${id} not found in DOM`);
             }
         });
     }
@@ -278,24 +299,46 @@ export class SalesDashboard extends Component {
 
     renderFallbackMonthlyTrend() {
         const canvas = document.getElementById('monthly_trend_chart');
-        if (!canvas || !this.state.data.charts.monthly_trend) return;
+        if (!canvas || !this.state.data.monthly || !this.state.data.monthly.labels) return;
         
-        const data = this.state.data.charts.monthly_trend;
-        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        const data = this.state.data.monthly;
+        const quotationAmounts = (data.quotations || []).map(q => q.amount || 0);
+        const salesAmounts = (data.sales_orders || []).map(s => s.amount || 0);
+        const invoicedAmounts = (data.invoiced_sales || []).map(i => i.amount || 0);
+        
+        const allAmounts = [...quotationAmounts, ...salesAmounts, ...invoicedAmounts];
+        const maxValue = Math.max(...allAmounts, 1);
         
         const chartHTML = `
             <div class="fallback-chart">
                 <h4>Monthly Sales Trend</h4>
-                <div class="chart-bars">
-                    ${data.map(item => {
-                        const height = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
-                        return `
-                            <div class="chart-bar" style="height: ${height}%">
-                                <div class="bar-value">${this.formatCurrency(item.amount || 0)}</div>
-                                <div class="bar-label">${item.month}</div>
-                            </div>
-                        `;
-                    }).join('')}
+                <div class="chart-lines">
+                    <div class="trend-legend">
+                        <span style="color: ${this.brandColors.primary}">● Quotations</span>
+                        <span style="color: ${this.brandColors.gold}">● Sales Orders</span>
+                        <span style="color: ${this.brandColors.success}">● Invoiced Sales</span>
+                    </div>
+                    <div class="chart-bars">
+                        ${(data.labels || []).map((label, index) => {
+                            const quotationAmount = quotationAmounts[index] || 0;
+                            const salesAmount = salesAmounts[index] || 0;
+                            const invoicedAmount = invoicedAmounts[index] || 0;
+                            const quotationHeight = maxValue ? (quotationAmount / maxValue) * 100 : 0;
+                            const salesHeight = maxValue ? (salesAmount / maxValue) * 100 : 0;
+                            const invoicedHeight = maxValue ? (invoicedAmount / maxValue) * 100 : 0;
+                            
+                            return `
+                                <div class="chart-group">
+                                    <div class="bar-group">
+                                        <div class="chart-bar" style="height: ${quotationHeight}%; background-color: ${this.brandColors.primary};" title="Quotations: ${this.formatCurrency(quotationAmount)}"></div>
+                                        <div class="chart-bar" style="height: ${salesHeight}%; background-color: ${this.brandColors.gold};" title="Sales Orders: ${this.formatCurrency(salesAmount)}"></div>
+                                        <div class="chart-bar" style="height: ${invoicedHeight}%; background-color: ${this.brandColors.success};" title="Invoiced: ${this.formatCurrency(invoicedAmount)}"></div>
+                                    </div>
+                                    <div class="bar-label">${label}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
                 </div>
             </div>
         `;
@@ -305,21 +348,24 @@ export class SalesDashboard extends Component {
 
     renderFallbackSalesState() {
         const canvas = document.getElementById('sales_state_chart');
-        if (!canvas || !this.state.data.charts.sales_state) return;
+        if (!canvas || !this.state.data.byState || !this.state.data.byState.labels) return;
         
-        const data = this.state.data.charts.sales_state;
-        const total = data.reduce((sum, item) => sum + (item.count || 0), 0);
+        const data = this.state.data.byState;
+        const counts = data.counts || [];
+        const labels = data.labels || [];
+        const total = counts.reduce((sum, count) => sum + (count || 0), 0);
         
         const chartHTML = `
             <div class="fallback-chart">
                 <h4>Sales by State</h4>
                 <div class="chart-pie">
-                    ${data.map((item, index) => {
-                        const percentage = total ? ((item.count || 0) / total * 100).toFixed(1) : 0;
+                    ${labels.map((label, index) => {
+                        const count = counts[index] || 0;
+                        const percentage = total ? ((count / total) * 100).toFixed(1) : 0;
                         return `
                             <div class="pie-item" style="border-left-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}">
-                                <span class="pie-label">${item.state}</span>
-                                <span class="pie-value">${item.count} (${percentage}%)</span>
+                                <span class="pie-label">${label}</span>
+                                <span class="pie-value">${count} (${percentage}%)</span>
                             </div>
                         `;
                     }).join('')}
@@ -332,23 +378,26 @@ export class SalesDashboard extends Component {
 
     renderFallbackTopCustomers() {
         const canvas = document.getElementById('top_customers_chart');
-        if (!canvas || !this.state.data.charts.top_customers) return;
+        if (!canvas || !this.state.data.topCustomers || !this.state.data.topCustomers.labels) return;
         
-        const data = this.state.data.charts.top_customers;
-        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        const data = this.state.data.topCustomers;
+        const amounts = data.amounts || [];
+        const labels = data.labels || [];
+        const maxValue = Math.max(...amounts, 1);
         
         const chartHTML = `
             <div class="fallback-chart">
                 <h4>Top Customers</h4>
                 <div class="chart-horizontal-bars">
-                    ${data.map((item, index) => {
-                        const width = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
+                    ${labels.map((customer, index) => {
+                        const amount = amounts[index] || 0;
+                        const width = maxValue ? ((amount / maxValue) * 100) : 0;
                         return `
                             <div class="horizontal-bar-item">
-                                <div class="bar-label">${item.customer}</div>
+                                <div class="bar-label">${customer}</div>
                                 <div class="bar-container">
                                     <div class="bar-fill" style="width: ${width}%; background-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}"></div>
-                                    <span class="bar-value">${this.formatCurrency(item.amount || 0)}</span>
+                                    <span class="bar-value">${this.formatCurrency(amount)}</span>
                                 </div>
                             </div>
                         `;
@@ -362,21 +411,24 @@ export class SalesDashboard extends Component {
 
     renderFallbackSalesTeam() {
         const canvas = document.getElementById('sales_team_chart');
-        if (!canvas || !this.state.data.charts.sales_team) return;
+        if (!canvas || !this.state.data.salesTeam || !this.state.data.salesTeam.labels) return;
         
-        const data = this.state.data.charts.sales_team;
-        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        const data = this.state.data.salesTeam;
+        const amounts = data.amounts || [];
+        const labels = data.labels || [];
+        const maxValue = Math.max(...amounts, 1);
         
         const chartHTML = `
             <div class="fallback-chart">
                 <h4>Sales Team Performance</h4>
                 <div class="chart-bars">
-                    ${data.map((item, index) => {
-                        const height = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
+                    ${labels.map((salesperson, index) => {
+                        const amount = amounts[index] || 0;
+                        const height = maxValue ? ((amount / maxValue) * 100) : 0;
                         return `
                             <div class="chart-bar" style="height: ${height}%; background-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}">
-                                <div class="bar-value">${this.formatCurrency(item.amount || 0)}</div>
-                                <div class="bar-label">${item.salesperson}</div>
+                                <div class="bar-value">${this.formatCurrency(amount)}</div>
+                                <div class="bar-label">${salesperson}</div>
                             </div>
                         `;
                     }).join('')}
@@ -653,6 +705,24 @@ export class SalesDashboard extends Component {
     }
 
     async refreshData() {
+        console.log('[Sales Dashboard] Refreshing data with filters:', {
+            startDate: this.state.dateRange.start,
+            endDate: this.state.dateRange.end
+        });
+        
+        // Update date range from inputs if they exist
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        
+        if (startDateInput && startDateInput.value) {
+            this.state.dateRange.start = startDateInput.value;
+        }
+        if (endDateInput && endDateInput.value) {
+            this.state.dateRange.end = endDateInput.value;
+        }
+        
+        console.log('[Sales Dashboard] Updated date range:', this.state.dateRange);
+        
         await this.loadDashboardData();
         this.notification.add('Dashboard refreshed successfully', {
             type: 'success'

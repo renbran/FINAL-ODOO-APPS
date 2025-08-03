@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.3.0',
+    'version': '17.0.1.4.0',
     'category': 'Sales',
     'summary': 'Enhanced Sales Dashboard with Custom Branding (#800020 Maroon Theme)',
     'description': """
