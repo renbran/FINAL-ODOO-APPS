@@ -43,7 +43,7 @@
                                     <i class="fa fa-file-text-o" title="Total Quotations Icon"></i>
                                 </div>
                                 <div class="kpi_content">
-                                    <h3 id="total_quotations"><t t-esc="state.data.performance.total_quotations or 0"/></h3>
+                                    <h3 id="total_quotations"><t t-esc="formatNumber(state.data.performance.total_quotations)"/></h3>
                                     <p>Total Quotations</p>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@
                                     <i class="fa fa-shopping-cart" title="Sales Orders Icon"></i>
                                 </div>
                                 <div class="kpi_content">
-                                    <h3 id="total_orders"><t t-esc="state.data.performance.total_orders or 0"/></h3>
+                                    <h3 id="total_orders"><t t-esc="formatNumber(state.data.performance.total_orders)"/></h3>
                                     <p>Sales Orders</p>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                                     <i class="fa fa-check-circle" title="Invoiced Sales Icon"></i>
                                 </div>
                                 <div class="kpi_content">
-                                    <h3 id="total_invoiced"><t t-esc="state.data.performance.total_invoiced or 0"/></h3>
+                                    <h3 id="total_invoiced"><t t-esc="formatNumber(state.data.performance.total_invoiced)"/></h3>
                                     <p>Invoiced Sales</p>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                                     <i class="fa fa-money" title="Total Revenue Icon"></i>
                                 </div>
                                 <div class="kpi_content">
-                                    <h3 id="total_amount"><t t-esc="state.data.performance.total_amount or '0'"/></h3>
+                                    <h3 id="total_amount"><t t-esc="formatCurrency(state.data.performance.total_amount)"/></h3>
                                     <p>Total Revenue</p>
                                 </div>
                             </div>

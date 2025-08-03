@@ -69,7 +69,10 @@ export class SalesDashboard extends Component {
 
         onMounted(() => {
             console.log('[Sales Dashboard] Component mounted, setting up...');
-            this.initializeDashboard();
+            // Use setTimeout to ensure DOM is fully rendered
+            setTimeout(() => {
+                this.initializeDashboard();
+            }, 100);
         });
     }
 
@@ -106,14 +109,17 @@ export class SalesDashboard extends Component {
                     'total_amount'
                 ];
                 
-                const allExist = elements.every(id => document.getElementById(id));
+                const foundElements = elements.filter(id => document.getElementById(id));
+                const allExist = foundElements.length === elements.length;
+                
+                console.log(`[Sales Dashboard] DOM Check - Found ${foundElements.length}/${elements.length} elements:`, foundElements);
                 
                 if (allExist) {
                     console.log('[Sales Dashboard] All DOM elements found');
                     resolve();
                 } else {
-                    console.log('[Sales Dashboard] Waiting for DOM elements...');
-                    setTimeout(checkDOM, 100);
+                    console.log('[Sales Dashboard] Still waiting for DOM elements...');
+                    setTimeout(checkDOM, 200);
                 }
             };
             checkDOM();
@@ -343,16 +349,27 @@ export class SalesDashboard extends Component {
     updateKPIs() {
         console.log('[Sales Dashboard] Updating KPIs with data:', this.state.data.performance);
         
+        // Since we're using QWeb templates with reactive state, 
+        // we just need to ensure the state data is properly formatted
         const performance = this.state.data.performance || {};
         
-        const elements = {
-            'total_quotations': performance.total_quotations || performance.draft_count || 0,
-            'total_orders': performance.total_orders || performance.sales_order_count || 0,
-            'total_invoiced': performance.total_invoiced || performance.invoice_count || 0,
-            'total_amount': this.formatCurrency(performance.total_amount || 0)
+        // Update state data to trigger reactive updates
+        this.state.data.performance = {
+            total_quotations: performance.total_quotations || performance.draft_count || 0,
+            total_orders: performance.total_orders || performance.sales_order_count || 0,
+            total_invoiced: performance.total_invoiced || performance.invoice_count || 0,
+            total_amount: performance.total_amount || 0
         };
 
-        console.log('[Sales Dashboard] KPI elements to update:', elements);
+        console.log('[Sales Dashboard] Updated KPI state data:', this.state.data.performance);
+        
+        // Also update DOM elements for backward compatibility with fallback charts
+        const elements = {
+            'total_quotations': this.formatNumber(this.state.data.performance.total_quotations),
+            'total_orders': this.formatNumber(this.state.data.performance.total_orders),
+            'total_invoiced': this.formatNumber(this.state.data.performance.total_invoiced),
+            'total_amount': this.formatCurrency(this.state.data.performance.total_amount)
+        };
 
         Object.entries(elements).forEach(([id, value]) => {
             const element = document.getElementById(id);
@@ -424,7 +441,10 @@ export class SalesDashboard extends Component {
 
     renderFallbackMonthlyTrend() {
         const canvas = document.getElementById('monthly_trend_chart');
-        if (!canvas || !this.state.data.monthly || !this.state.data.monthly.labels) return;
+        if (!canvas || !this.state.data.monthly || !this.state.data.monthly.labels) {
+            console.warn('[Sales Dashboard] Monthly trend chart canvas not found or no data');
+            return;
+        }
         
         const data = this.state.data.monthly;
         const quotationAmounts = (data.quotations || []).map(q => q.amount || 0);
@@ -436,7 +456,6 @@ export class SalesDashboard extends Component {
         
         const chartHTML = `
             <div class="fallback-chart">
-                <h4>Monthly Sales Trend</h4>
                 <div class="chart-lines">
                     <div class="trend-legend">
                         <span style="color: ${this.brandColors.primary}">● Quotations</span>
@@ -468,7 +487,14 @@ export class SalesDashboard extends Component {
             </div>
         `;
         
-        canvas.parentElement.innerHTML = chartHTML;
+        // Find the chart container and replace its content
+        const chartContainer = canvas.closest('.chart_container, .chart_body') || canvas.parentElement;
+        if (chartContainer) {
+            chartContainer.innerHTML = chartHTML;
+            console.log('[Sales Dashboard] Rendered fallback monthly trend chart');
+        } else {
+            console.warn('[Sales Dashboard] Could not find chart container for monthly trend');
+        }
     }
 
     renderFallbackSalesState() {
@@ -878,12 +904,12 @@ export class SalesDashboard extends Component {
     }
 
     formatCurrency(amount) {
-        if (!amount && amount !== 0) return '0';
+        if (!amount && amount !== 0) return '$0';
         
         // Convert to number if it's a string
         const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
         
-        if (isNaN(numAmount)) return '0';
+        if (isNaN(numAmount)) return '$0';
         
         // Format with currency symbol and commas
         return new Intl.NumberFormat('en-US', {
@@ -892,6 +918,18 @@ export class SalesDashboard extends Component {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(numAmount);
+    }
+
+    formatNumber(value) {
+        if (!value && value !== 0) return '0';
+        
+        // Convert to number if it's a string
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        
+        if (isNaN(numValue)) return '0';
+        
+        // Format with commas for thousands
+        return new Intl.NumberFormat('en-US').format(numValue);
     }
 }
 
