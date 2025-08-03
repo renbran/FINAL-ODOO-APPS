@@ -7,47 +7,40 @@
             <field name="tag">sales_dashboard</field>
         </record>
 
-        <!-- Sales Dashboard View -->
-        <record id="view_sales_dashboard" model="ir.ui.view">
-            <field name="name">sales.dashboard.view</field>
-            <field name="model">sale.order</field>
-            <field name="arch" type="xml">
-                <kanban class="oe_background_grey sales_dashboard_main" create="false" edit="false">
-                    <field name="id"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div class="sales_dashboard_container">
-                                <!-- Header Section -->
-                                <div class="dashboard_header">
-                                    <div class="dashboard_title">
-                                        <h2>Sales Dashboard</h2>
-                                        <p>Real-time sales analytics and performance metrics</p>
-                                    </div>
-                                    <div class="dashboard_filters">
-                                        <div class="filter_group">
-                                            <span class="o_form_label">Date Range:</span>
-                                            <input type="date" id="start_date" class="form-control"/>
-                                            <input type="date" id="end_date" class="form-control"/>
-                                            <button class="btn btn-primary" id="refresh_dashboard">Refresh</button>
-                                        </div>
-                                    </div>
-                                </div>
+        <!-- Sales Dashboard View Template -->
+        <template id="view_sales_dashboard" name="Sales Dashboard">
+            <div class="sales_dashboard_container">
+                <!-- Header Section -->
+                <div class="dashboard_header">
+                    <div class="dashboard_title">
+                        <h2>Sales Dashboard</h2>
+                        <p>Real-time sales analytics and performance metrics</p>
+                    </div>
+                    <div class="dashboard_filters">
+                        <div class="filter_group">
+                            <span class="o_form_label">Date Range:</span>
+                            <input type="date" id="start_date" class="form-control"/>
+                            <input type="date" id="end_date" class="form-control"/>
+                            <button class="btn btn-primary" id="refresh_dashboard">Refresh</button>
+                        </div>
+                    </div>
+                </div>
 
-                                <!-- KPI Cards Section -->
-                                <div class="kpi_section">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="kpi_card">
-                                                <div class="kpi_icon">
-                                                    <i class="fa fa-file-text-o" title="Total Quotations Icon"></i>
-                                                </div>
-                                                <div class="kpi_content">
-                                                    <h3 id="total_quotations">0</h3>
-                                                    <p>Total Quotations</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
+                <!-- KPI Cards Section -->
+                <div class="kpi_section">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="kpi_card">
+                                <div class="kpi_icon">
+                                    <i class="fa fa-file-text-o" title="Total Quotations Icon"></i>
+                                </div>
+                                <div class="kpi_content">
+                                    <h3 id="total_quotations">0</h3>
+                                    <p>Total Quotations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                                             <div class="kpi_card">
                                                 <div class="kpi_icon">
                                                     <i class="fa fa-shopping-cart" title="Sales Orders Icon"></i>
@@ -149,10 +142,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </t>
-                    </templates>
-                </kanban>
-            </field>
-        </record>
+                        </div>
+                    </div>
+                </template>
     </data>
 </odoo>
