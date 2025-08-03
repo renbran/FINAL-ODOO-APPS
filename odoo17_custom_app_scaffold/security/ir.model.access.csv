@@ -1,0 +1,5 @@
+﻿id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_webhook_mapping_manager,webhook.mapping.manager,model_webhook_mapping,sales_team.group_sale_manager,1,1,1,1
+access_webhook_mapping_user,webhook.mapping.user,model_webhook_mapping,sales_team.group_sale_salesman,1,0,0,0
+access_webhook_field_mapping_manager,webhook.field.mapping.manager,model_webhook_field_mapping,sales_team.group_sale_manager,1,1,1,1
+access_webhook_field_mapping_user,webhook.field.mapping.user,model_webhook_field_mapping,sales_team.group_sale_salesman,1,0,0,0
