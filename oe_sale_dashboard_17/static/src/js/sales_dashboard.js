@@ -7,6 +7,42 @@ import { useService } from "@web/core/utils/hooks";
 export class SalesDashboard extends Component {
     static template = "oe_sale_dashboard_17.SalesDashboard";
 
+    // Brand color palette
+    brandColors = {
+        primary: '#800020',           // Deep Maroon/Burgundy
+        gold: '#FFD700',             // Light Gold
+        lightGold: '#FFF8DC',        // Light Gold Background
+        darkGold: '#B8860B',         // Dark Gold
+        white: '#FFFFFF',            // Pure White
+        accent: '#A0522D',           // Sienna (complementary)
+        success: '#228B22',          // Forest Green
+        warning: '#FF8C00',          // Dark Orange
+        danger: '#DC143C',           // Crimson
+        
+        // Chart color arrays
+        chartColors: [
+            '#800020',  // Primary
+            '#FFD700',  // Gold
+            '#A0522D',  // Accent
+            '#228B22',  // Success
+            '#FF8C00',  // Warning
+            '#DC143C',  // Danger
+            '#B8860B',  // Dark Gold
+            '#8B4513'   // Saddle Brown
+        ],
+        
+        chartBackgrounds: [
+            'rgba(128, 0, 32, 0.2)',   // Primary transparent
+            'rgba(255, 215, 0, 0.2)',  // Gold transparent
+            'rgba(160, 82, 45, 0.2)',  // Accent transparent
+            'rgba(34, 139, 34, 0.2)',  // Success transparent
+            'rgba(255, 140, 0, 0.2)',  // Warning transparent
+            'rgba(220, 20, 60, 0.2)',  // Danger transparent
+            'rgba(184, 134, 11, 0.2)', // Dark Gold transparent
+            'rgba(139, 69, 19, 0.2)'   // Saddle Brown transparent
+        ]
+    };
+
     setup() {
         this.rpc = useService("rpc");
         this.notification = useService("notification");
@@ -280,9 +316,8 @@ export class SalesDashboard extends Component {
                 <div class="chart-pie">
                     ${data.map((item, index) => {
                         const percentage = total ? ((item.count || 0) / total * 100).toFixed(1) : 0;
-                        const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'];
                         return `
-                            <div class="pie-item" style="border-left-color: ${colors[index % colors.length]}">
+                            <div class="pie-item" style="border-left-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}">
                                 <span class="pie-label">${item.state}</span>
                                 <span class="pie-value">${item.count} (${percentage}%)</span>
                             </div>
@@ -306,13 +341,13 @@ export class SalesDashboard extends Component {
             <div class="fallback-chart">
                 <h4>Top Customers</h4>
                 <div class="chart-horizontal-bars">
-                    ${data.map(item => {
+                    ${data.map((item, index) => {
                         const width = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
                         return `
                             <div class="horizontal-bar-item">
                                 <div class="bar-label">${item.customer}</div>
                                 <div class="bar-container">
-                                    <div class="bar-fill" style="width: ${width}%"></div>
+                                    <div class="bar-fill" style="width: ${width}%; background-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}"></div>
                                     <span class="bar-value">${this.formatCurrency(item.amount || 0)}</span>
                                 </div>
                             </div>
@@ -336,10 +371,10 @@ export class SalesDashboard extends Component {
             <div class="fallback-chart">
                 <h4>Sales Team Performance</h4>
                 <div class="chart-bars">
-                    ${data.map(item => {
+                    ${data.map((item, index) => {
                         const height = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
                         return `
-                            <div class="chart-bar" style="height: ${height}%">
+                            <div class="chart-bar" style="height: ${height}%; background-color: ${this.brandColors.chartColors[index % this.brandColors.chartColors.length]}">
                                 <div class="bar-value">${this.formatCurrency(item.amount || 0)}</div>
                                 <div class="bar-label">${item.salesperson}</div>
                             </div>
@@ -470,22 +505,25 @@ export class SalesDashboard extends Component {
                     {
                         label: 'Quotations',
                         data: (data.quotations || []).map(q => q.amount || 0),
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderColor: this.brandColors.primary,
+                        backgroundColor: this.brandColors.chartBackgrounds[0],
+                        borderWidth: 3,
                         tension: 0.4
                     },
                     {
                         label: 'Sales Orders',
                         data: (data.sales_orders || []).map(s => s.amount || 0),
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        borderColor: this.brandColors.gold,
+                        backgroundColor: this.brandColors.chartBackgrounds[1],
+                        borderWidth: 3,
                         tension: 0.4
                     },
                     {
                         label: 'Invoiced Sales',
                         data: (data.invoiced_sales || []).map(i => i.amount || 0),
-                        borderColor: '#ffc107',
-                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        borderColor: this.brandColors.success,
+                        backgroundColor: this.brandColors.chartBackgrounds[3],
+                        borderWidth: 3,
                         tension: 0.4
                     }
                 ]
@@ -524,13 +562,9 @@ export class SalesDashboard extends Component {
                 labels: data.labels || [],
                 datasets: [{
                     data: data.counts || [],
-                    backgroundColor: [
-                        '#007bff',
-                        '#28a745',
-                        '#ffc107',
-                        '#dc3545',
-                        '#6c757d'
-                    ]
+                    backgroundColor: this.brandColors.chartColors,
+                    borderColor: this.brandColors.white,
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -563,7 +597,9 @@ export class SalesDashboard extends Component {
                 datasets: [{
                     label: 'Sales Amount',
                     data: data.amounts || [],
-                    backgroundColor: '#007bff'
+                    backgroundColor: this.brandColors.chartColors,
+                    borderColor: this.brandColors.primary,
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -600,14 +636,9 @@ export class SalesDashboard extends Component {
                 labels: data.labels || [],
                 datasets: [{
                     data: data.amounts || [],
-                    backgroundColor: [
-                        '#007bff',
-                        '#28a745',
-                        '#ffc107',
-                        '#dc3545',
-                        '#6c757d',
-                        '#17a2b8'
-                    ]
+                    backgroundColor: this.brandColors.chartColors,
+                    borderColor: this.brandColors.white,
+                    borderWidth: 3
                 }]
             },
             options: {

@@ -1,29 +1,38 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.2.0',
+    'version': '17.0.1.3.0',
     'category': 'Sales',
-    'summary': 'Advanced Sales Dashboard with Analytics and Visual Reports',
+    'summary': 'Enhanced Sales Dashboard with Custom Branding (#800020 Maroon Theme)',
     'description': """
-Sales Dashboard for Odoo 17
-===========================
+Sales Dashboard for Odoo 17 - Custom Branded Edition
+====================================================
 
-This module provides a comprehensive sales dashboard with:
-* Visual analytics and charts
-* Monthly fluctuation data
-* Sales performance metrics
-* Deal analysis and forecasting
-* Mobile-responsive design
-* Real-time data updates
+This module provides a comprehensive sales dashboard with custom branding:
+* Visual analytics with #800020 maroon primary color theme
+* Interactive Chart.js visualizations with brand color palette  
+* Monthly fluctuation data with white fonts and light gold accents
+* Sales performance metrics with professional styling
+* Deal analysis and forecasting with accessibility compliance
+* Mobile-responsive design optimized for brand presentation
+* Real-time data updates with validated field mappings
 
 Features:
 ---------
-* Interactive charts and graphs
-* Sales pipeline visualization
-* Performance KPIs
-* Monthly/quarterly reports
-* Export capabilities
-* Multi-currency support
+* Interactive charts with custom brand colors
+* Sales pipeline visualization in maroon/gold theme
+* Performance KPIs with white text contrast
+* Monthly/quarterly reports with professional styling
+* Export capabilities with brand consistency
+* Multi-currency support with enhanced formatting
+
+Custom Branding:
+----------------
+* Primary: #800020 (Deep Maroon/Burgundy)
+* Accent: #FFD700 (Light Gold)  
+* Text: White fonts for optimal readability
+* Charts: Brand-specific color schemes
+* Accessibility: WCAG compliant contrast ratios
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',

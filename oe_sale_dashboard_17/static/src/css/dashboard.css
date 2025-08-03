@@ -1,13 +1,32 @@
-/* Sales Dashboard Enhanced Styles */
+/* Sales Dashboard Enhanced Styles - Custom Branding */
+
+/* Custom Brand Colors */
+:root {
+    --brand-primary: #800020;        /* Deep Maroon/Burgundy */
+    --brand-gold: #FFD700;           /* Light Gold */
+    --brand-light-gold: #FFF8DC;     /* Light Gold Background */
+    --brand-dark-gold: #B8860B;      /* Dark Gold */
+    --brand-white: #FFFFFF;          /* Pure White */
+    --brand-light-gray: #F5F5F5;     /* Light Gray */
+    --brand-dark: #2C1810;           /* Dark Brown */
+    --brand-accent: #A0522D;         /* Sienna (complementary) */
+    --brand-success: #228B22;        /* Forest Green */
+    --brand-warning: #FF8C00;        /* Dark Orange */
+    --brand-danger: #DC143C;         /* Crimson */
+    --brand-shadow: 0 4px 12px rgba(128, 0, 32, 0.15);
+    --brand-gradient: linear-gradient(135deg, #800020 0%, #A0522D 50%, #FFD700 100%);
+    --brand-card-gradient: linear-gradient(135deg, #800020 0%, #8B0000 100%);
+}
 
 /* Main container visibility improvements */
 .o_oe_sale_dashboard_17_container {
-    background: #f8f9fa;
+    background: var(--brand-gradient);
     min-height: 100vh;
     padding: 20px;
     visibility: visible !important;
     opacity: 1 !important;
     display: block !important;
+    color: var(--brand-white);
 }
 
 .o_oe_sale_dashboard_17_container .sales_dashboard_container {
@@ -21,11 +40,12 @@
     visibility: visible !important;
     opacity: 1 !important;
     display: block !important;
-    background: white;
+    background: var(--brand-white);
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 25px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--brand-shadow);
+    border: 2px solid var(--brand-light-gold);
 }
 
 .chart_container canvas {
@@ -39,34 +59,63 @@
 /* Override for better dashboard appearance */
 .o_content .sales_dashboard_container {
     padding: 20px;
-    background-color: #f8f9fa;
+    background: var(--brand-gradient);
     min-height: calc(100vh - 100px);
 }
 
 /* Header improvements */
 .sales_dashboard_container .dashboard_header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
+    background: var(--brand-card-gradient);
+    color: var(--brand-white);
     padding: 30px;
     border-radius: 15px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+    box-shadow: var(--brand-shadow);
+    border: 3px solid var(--brand-gold);
+}
+
+.dashboard_header h1 {
+    color: var(--brand-white) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard_header h2 {
+    color: var(--brand-light-gold) !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Enhanced KPI cards */
 .sales_dashboard_container .kpi_card {
-    background: white;
+    background: var(--brand-white);
     border-radius: 15px;
     padding: 25px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--brand-shadow);
     text-align: center;
     transition: all 0.3s ease;
-    border-top: 4px solid #007bff;
+    border-top: 4px solid var(--brand-primary);
+    border-left: 2px solid var(--brand-gold);
 }
 
 .sales_dashboard_container .kpi_card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 15px 35px rgba(128, 0, 32, 0.25);
+    border-top: 4px solid var(--brand-gold);
+}
+
+.kpi_card h3 {
+    color: var(--brand-primary) !important;
+    font-weight: bold;
+    font-size: 2em;
+}
+
+.kpi_card p {
+    color: var(--brand-dark) !important;
+    font-weight: 600;
+}
+
+.kpi_icon i {
+    color: var(--brand-primary) !important;
+    font-size: 2.5em !important;
 }
 
 /* Chart container improvements */
@@ -85,20 +134,23 @@
     color: #6c757d;
 }
 
-/* Fallback Chart Styles */
+/* Fallback Chart Styles - Custom Branding */
 .fallback-chart {
     padding: 20px;
-    background: white;
+    background: var(--brand-white);
     border-radius: 10px;
     height: 100%;
+    border: 2px solid var(--brand-light-gold);
+    box-shadow: var(--brand-shadow);
 }
 
 .fallback-chart h4 {
     margin: 0 0 20px 0;
-    color: #667eea;
+    color: var(--brand-primary);
     text-align: center;
     font-size: 1.2em;
     font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(128, 0, 32, 0.1);
 }
 
 /* Bar Charts */
@@ -108,23 +160,24 @@
     justify-content: space-around;
     height: 250px;
     padding: 20px 0;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--brand-light-gold);
     margin-bottom: 10px;
 }
 
 .chart-bar {
     position: relative;
     width: 40px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--brand-gradient);
     border-radius: 4px 4px 0 0;
     margin: 0 5px;
     min-height: 5px;
     transition: all 0.3s ease;
+    border: 1px solid var(--brand-gold);
 }
 
 .chart-bar:hover {
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(128, 0, 32, 0.3);
 }
 
 .chart-bar .bar-value {
@@ -134,8 +187,11 @@
     transform: translateX(-50%);
     font-size: 10px;
     font-weight: 600;
-    color: #495057;
+    color: var(--brand-primary);
     white-space: nowrap;
+    background: var(--brand-light-gold);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .chart-bar .bar-label {
@@ -144,11 +200,12 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 10px;
-    color: #6c757d;
+    color: var(--brand-dark);
     white-space: nowrap;
     max-width: 60px;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 600;
 }
 
 /* Horizontal Bar Charts */
@@ -164,21 +221,22 @@
 .horizontal-bar-item .bar-label {
     font-size: 12px;
     font-weight: 600;
-    color: #495057;
+    color: var(--brand-primary);
     margin-bottom: 5px;
 }
 
 .bar-container {
     position: relative;
     height: 25px;
-    background: #e9ecef;
+    background: var(--brand-light-gold);
     border-radius: 12px;
     overflow: hidden;
+    border: 1px solid var(--brand-gold);
 }
 
 .bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: var(--brand-gradient);
     border-radius: 12px;
     transition: width 0.8s ease;
 }
@@ -190,7 +248,11 @@
     transform: translateY(-50%);
     font-size: 11px;
     font-weight: 600;
-    color: #495057;
+    color: var(--brand-primary);
+    background: var(--brand-white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--brand-gold);
 }
 
 /* Pie Chart Fallback */
@@ -206,25 +268,27 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 15px;
-    background: #f8f9fa;
+    background: var(--brand-light-gold);
     border-radius: 8px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--brand-primary);
     transition: all 0.3s ease;
+    border: 1px solid var(--brand-gold);
 }
 
 .pie-item:hover {
-    background: #e9ecef;
+    background: var(--brand-gold);
     transform: translateX(5px);
+    box-shadow: var(--brand-shadow);
 }
 
 .pie-label {
     font-weight: 600;
-    color: #495057;
+    color: var(--brand-primary);
 }
 
 .pie-value {
     font-weight: 500;
-    color: #667eea;
+    color: var(--brand-dark);
 }
 
 /* Responsive Design */
