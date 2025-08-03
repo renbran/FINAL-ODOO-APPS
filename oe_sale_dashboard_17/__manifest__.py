@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.1.0',
+    'version': '17.0.1.2.0',
     'category': 'Sales',
     'summary': 'Advanced Sales Dashboard with Analytics and Visual Reports',
     'description': """
@@ -40,6 +40,8 @@ Features:
     ],
     'assets': {
         'web.assets_backend': [
+            ('include', 'web._assets_helpers'),
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
             'oe_sale_dashboard_17/static/src/scss/dashboard.scss',
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/xml/sales_dashboard_main.xml',

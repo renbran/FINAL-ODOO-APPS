@@ -197,49 +197,159 @@ export class SalesDashboard extends Component {
     }
 
     async renderCharts() {
-        // Ensure Chart.js is available before rendering
-        if (typeof Chart === 'undefined') {
-            if (window.ensureChartJsAvailable) {
-                try {
-                    await window.ensureChartJsAvailable();
-                } catch (error) {
-                    console.error('Chart.js not available, using fallback charts');
-                    this.renderFallbackCharts();
-                    return;
-                }
-            } else {
-                console.error('Chart.js not available and no fallback mechanism found');
-                return;
+        // Wait for Chart.js to be available with timeout
+        let chartReady = false;
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        while (!chartReady && attempts < maxAttempts) {
+            if (typeof Chart !== 'undefined') {
+                chartReady = true;
+                console.log('[Sales Dashboard] Chart.js loaded successfully');
+                break;
             }
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
         
-        this.renderMonthlyTrendChart();
-        this.renderSalesStateChart();
-        this.renderTopCustomersChart();
-        this.renderSalesTeamChart();
+        if (!chartReady) {
+            console.warn('[Sales Dashboard] Chart.js not available after timeout, using fallback');
+            this.renderFallbackCharts();
+            return;
+        }
+        
+        try {
+            this.renderMonthlyTrendChart();
+            this.renderSalesStateChart();
+            this.renderTopCustomersChart();
+            this.renderSalesTeamChart();
+            console.log('[Sales Dashboard] All charts rendered successfully');
+        } catch (error) {
+            console.error('[Sales Dashboard] Error rendering charts:', error);
+            this.renderFallbackCharts();
+        }
     }
 
     renderFallbackCharts() {
-        // Use SimpleChart as fallback
-        if (window.SimpleChart) {
-            this.renderSimpleCharts();
-        } else {
-            // Show message about charts not being available
-            const chartContainers = [
-                'monthly_trend_chart',
-                'sales_state_chart', 
-                'top_customers_chart',
-                'sales_team_chart'
-            ];
-            
-            chartContainers.forEach(id => {
-                const canvas = document.getElementById(id);
-                if (canvas) {
-                    const parent = canvas.parentElement;
-                    parent.innerHTML = '<div class="alert alert-info">Chart visualization not available</div>';
-                }
-            });
-        }
+        console.log('[Sales Dashboard] Rendering fallback charts...');
+        
+        // Create simple HTML-based charts
+        this.renderFallbackMonthlyTrend();
+        this.renderFallbackSalesState();
+        this.renderFallbackTopCustomers();
+        this.renderFallbackSalesTeam();
+    }
+
+    renderFallbackMonthlyTrend() {
+        const canvas = document.getElementById('monthly_trend_chart');
+        if (!canvas || !this.state.data.charts.monthly_trend) return;
+        
+        const data = this.state.data.charts.monthly_trend;
+        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        
+        const chartHTML = `
+            <div class="fallback-chart">
+                <h4>Monthly Sales Trend</h4>
+                <div class="chart-bars">
+                    ${data.map(item => {
+                        const height = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
+                        return `
+                            <div class="chart-bar" style="height: ${height}%">
+                                <div class="bar-value">${this.formatCurrency(item.amount || 0)}</div>
+                                <div class="bar-label">${item.month}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        
+        canvas.parentElement.innerHTML = chartHTML;
+    }
+
+    renderFallbackSalesState() {
+        const canvas = document.getElementById('sales_state_chart');
+        if (!canvas || !this.state.data.charts.sales_state) return;
+        
+        const data = this.state.data.charts.sales_state;
+        const total = data.reduce((sum, item) => sum + (item.count || 0), 0);
+        
+        const chartHTML = `
+            <div class="fallback-chart">
+                <h4>Sales by State</h4>
+                <div class="chart-pie">
+                    ${data.map((item, index) => {
+                        const percentage = total ? ((item.count || 0) / total * 100).toFixed(1) : 0;
+                        const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'];
+                        return `
+                            <div class="pie-item" style="border-left-color: ${colors[index % colors.length]}">
+                                <span class="pie-label">${item.state}</span>
+                                <span class="pie-value">${item.count} (${percentage}%)</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        
+        canvas.parentElement.innerHTML = chartHTML;
+    }
+
+    renderFallbackTopCustomers() {
+        const canvas = document.getElementById('top_customers_chart');
+        if (!canvas || !this.state.data.charts.top_customers) return;
+        
+        const data = this.state.data.charts.top_customers;
+        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        
+        const chartHTML = `
+            <div class="fallback-chart">
+                <h4>Top Customers</h4>
+                <div class="chart-horizontal-bars">
+                    ${data.map(item => {
+                        const width = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
+                        return `
+                            <div class="horizontal-bar-item">
+                                <div class="bar-label">${item.customer}</div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: ${width}%"></div>
+                                    <span class="bar-value">${this.formatCurrency(item.amount || 0)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        
+        canvas.parentElement.innerHTML = chartHTML;
+    }
+
+    renderFallbackSalesTeam() {
+        const canvas = document.getElementById('sales_team_chart');
+        if (!canvas || !this.state.data.charts.sales_team) return;
+        
+        const data = this.state.data.charts.sales_team;
+        const maxValue = Math.max(...data.map(item => item.amount || 0));
+        
+        const chartHTML = `
+            <div class="fallback-chart">
+                <h4>Sales Team Performance</h4>
+                <div class="chart-bars">
+                    ${data.map(item => {
+                        const height = maxValue ? ((item.amount || 0) / maxValue) * 100 : 0;
+                        return `
+                            <div class="chart-bar" style="height: ${height}%">
+                                <div class="bar-value">${this.formatCurrency(item.amount || 0)}</div>
+                                <div class="bar-label">${item.salesperson}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        
+        canvas.parentElement.innerHTML = chartHTML;
     }
 
     renderSimpleCharts() {
@@ -516,6 +626,23 @@ export class SalesDashboard extends Component {
         this.notification.add('Dashboard refreshed successfully', {
             type: 'success'
         });
+    }
+
+    formatCurrency(amount) {
+        if (!amount && amount !== 0) return '0';
+        
+        // Convert to number if it's a string
+        const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+        
+        if (isNaN(numAmount)) return '0';
+        
+        // Format with currency symbol and commas
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(numAmount);
     }
 }
 
