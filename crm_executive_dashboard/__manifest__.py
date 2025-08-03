@@ -16,10 +16,19 @@
         - Customer acquisition and retention metrics
         - Sales performance trends and forecasting
         - Team productivity and conversion analytics
+        - Agent performance tracking with partner_id integration
+        - Lead quality analysis and response time metrics
         - Interactive charts with modern Chart.js
         - Mobile-responsive design
         - Real-time data updates
         - Export capabilities for reports
+        
+        Agent Performance Features:
+        - Top agents with leads in progress
+        - Most converted leads analysis
+        - Junked leads tracking with reasons
+        - Fast/slow response time identification
+        - Lead update frequency monitoring
         
         Technical Features:
         - Built with Odoo 17 OWL framework
@@ -27,6 +36,7 @@
         - Responsive CSS with Bootstrap integration
         - Optimized for performance
         - Comprehensive security model
+        - RESTful API endpoints
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
