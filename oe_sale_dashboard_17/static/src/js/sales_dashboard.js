@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, useState, onMounted } from "@odoo/owl";
+import { Component, useState, onMounted, onWillStart } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class SalesDashboard extends Component {
@@ -62,21 +62,62 @@ export class SalesDashboard extends Component {
             }
         });
 
+        onWillStart(async () => {
+            console.log('[Sales Dashboard] Component starting...');
+            await this.loadDashboardData();
+        });
+
         onMounted(() => {
+            console.log('[Sales Dashboard] Component mounted, setting up...');
             this.initializeDashboard();
         });
     }
 
     async initializeDashboard() {
         try {
-            await this.loadDashboardData();
+            console.log('[Sales Dashboard] Initializing dashboard...');
+            
+            // Wait for DOM to be ready
+            await this.waitForDOM();
+            
             this.setupEventListeners();
+            await this.loadDashboardData();
+            
+            console.log('[Sales Dashboard] Dashboard initialization complete');
         } catch (error) {
             console.error('Error initializing dashboard:', error);
-            this.notification.add('Error initializing dashboard', {
+            this.notification.add('Error initializing dashboard: ' + error.message, {
                 type: 'danger'
             });
         }
+    }
+
+    async waitForDOM() {
+        return new Promise((resolve) => {
+            const checkDOM = () => {
+                const elements = [
+                    'monthly_trend_chart',
+                    'sales_state_chart', 
+                    'top_customers_chart',
+                    'sales_team_chart',
+                    'total_quotations',
+                    'total_orders',
+                    'total_invoiced',
+                    'total_amount'
+                ];
+                
+                const allExist = elements.every(id => document.getElementById(id));
+                
+                if (allExist) {
+                    console.log('[Sales Dashboard] All DOM elements found');
+                    resolve();
+                } else {
+                    console.log('[Sales Dashboard] Waiting for DOM elements...');
+                    setTimeout(checkDOM, 100);
+                }
+            };
+            checkDOM();
+        });
     }
 
     getDefaultStartDate() {
@@ -114,6 +155,7 @@ export class SalesDashboard extends Component {
 
     async loadDashboardData() {
         try {
+            console.log('[Sales Dashboard] Loading all dashboard data...');
             this.state.loading = true;
             
             const promises = [
@@ -126,17 +168,72 @@ export class SalesDashboard extends Component {
 
             await Promise.all(promises);
             
+            console.log('[Sales Dashboard] All data loaded:', this.state.data);
+            
+            // Validate data structure
+            this.validateDataStructure();
+            
+            // Update UI
             this.updateKPIs();
-            this.renderCharts();
+            await this.renderCharts();
+            
+            console.log('[Sales Dashboard] Dashboard data loading complete');
             
         } catch (error) {
             console.error('Error loading dashboard data:', error);
-            this.notification.add('Error loading dashboard data', {
+            this.notification.add('Error loading dashboard data: ' + error.message, {
                 type: 'danger'
             });
+            
+            // Try to render with fallback data anyway
+            await this.renderCharts();
         } finally {
             this.state.loading = false;
         }
+    }
+
+    validateDataStructure() {
+        console.log('[Sales Dashboard] Validating data structure...');
+        
+        // Ensure monthly data has required structure
+        if (!this.state.data.monthly.labels) {
+            console.warn('[Sales Dashboard] Missing monthly labels, using defaults');
+            this.state.data.monthly = {
+                labels: ['Jan', 'Feb', 'Mar'],
+                quotations: [{amount: 0}, {amount: 0}, {amount: 0}],
+                sales_orders: [{amount: 0}, {amount: 0}, {amount: 0}],
+                invoiced_sales: [{amount: 0}, {amount: 0}, {amount: 0}]
+            };
+        }
+        
+        // Ensure state data has required structure
+        if (!this.state.data.byState.labels) {
+            console.warn('[Sales Dashboard] Missing state labels, using defaults');
+            this.state.data.byState = {
+                labels: ['Draft', 'Sale', 'Done'],
+                counts: [0, 0, 0]
+            };
+        }
+        
+        // Ensure customers data has required structure
+        if (!this.state.data.topCustomers.labels) {
+            console.warn('[Sales Dashboard] Missing customer labels, using defaults');
+            this.state.data.topCustomers = {
+                labels: ['No customers found'],
+                amounts: [0]
+            };
+        }
+        
+        // Ensure team data has required structure
+        if (!this.state.data.salesTeam.labels) {
+            console.warn('[Sales Dashboard] Missing team labels, using defaults');
+            this.state.data.salesTeam = {
+                labels: ['Unassigned'],
+                amounts: [0]
+            };
+        }
+        
+        console.log('[Sales Dashboard] Data structure validation complete');
     }
 
     async loadPerformanceData() {
@@ -185,46 +282,61 @@ export class SalesDashboard extends Component {
 
     async loadStateData() {
         try {
+            console.log('[Sales Dashboard] Loading state data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_by_state_data", {
                 model: 'sale.order',
                 method: 'get_sales_by_state_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end],
                 kwargs: {}
             });
+            console.log('[Sales Dashboard] State data received:', result);
             this.state.data.byState = result;
         } catch (error) {
             console.error('Error loading state data:', error);
-            this.state.data.byState = {};
+            this.state.data.byState = {
+                labels: ['Draft', 'Sale', 'Done'],
+                counts: [0, 0, 0]
+            };
         }
     }
 
     async loadCustomersData() {
         try {
+            console.log('[Sales Dashboard] Loading customers data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_top_customers_data", {
                 model: 'sale.order',
                 method: 'get_top_customers_data',
                 args: [this.state.dateRange.start, this.state.dateRange.end, 10],
                 kwargs: {}
             });
+            console.log('[Sales Dashboard] Customers data received:', result);
             this.state.data.topCustomers = result;
         } catch (error) {
             console.error('Error loading customers data:', error);
-            this.state.data.topCustomers = {};
+            this.state.data.topCustomers = {
+                labels: ['Customer 1', 'Customer 2'],
+                amounts: [0, 0]
+            };
         }
     }
 
     async loadTeamData() {
         try {
+            console.log('[Sales Dashboard] Loading team data...');
             const result = await this.rpc("/web/dataset/call_kw/sale.order/get_sales_team_performance", {
                 model: 'sale.order',
                 method: 'get_sales_team_performance',
                 args: [this.state.dateRange.start, this.state.dateRange.end],
                 kwargs: {}
             });
+            console.log('[Sales Dashboard] Team data received:', result);
             this.state.data.salesTeam = result;
         } catch (error) {
             console.error('Error loading team data:', error);
-            this.state.data.salesTeam = {};
+            this.state.data.salesTeam = {
+                labels: ['Sales Team'],
+                amounts: [0]
+            };
         }
     }
 
@@ -254,47 +366,60 @@ export class SalesDashboard extends Component {
     }
 
     async renderCharts() {
-        // Wait for Chart.js to be available with timeout
+        console.log('[Sales Dashboard] Starting chart rendering...');
+        
+        // Always try fallback charts first to ensure something renders
+        console.log('[Sales Dashboard] Rendering fallback charts as primary method...');
+        this.renderFallbackCharts();
+        
+        // Then try Chart.js if available
         let chartReady = false;
         let attempts = 0;
-        const maxAttempts = 50; // 5 seconds max wait
+        const maxAttempts = 30; // 3 seconds max wait
         
         while (!chartReady && attempts < maxAttempts) {
             if (typeof Chart !== 'undefined') {
                 chartReady = true;
-                console.log('[Sales Dashboard] Chart.js loaded successfully');
+                console.log('[Sales Dashboard] Chart.js loaded, attempting Chart.js rendering...');
                 break;
             }
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
         
-        if (!chartReady) {
-            console.warn('[Sales Dashboard] Chart.js not available after timeout, using fallback');
-            this.renderFallbackCharts();
-            return;
+        if (chartReady) {
+            try {
+                this.renderMonthlyTrendChart();
+                this.renderSalesStateChart();
+                this.renderTopCustomersChart();
+                this.renderSalesTeamChart();
+                console.log('[Sales Dashboard] Chart.js charts rendered successfully');
+            } catch (error) {
+                console.error('[Sales Dashboard] Error rendering Chart.js charts:', error);
+                console.log('[Sales Dashboard] Fallback charts remain active');
+            }
+        } else {
+            console.warn('[Sales Dashboard] Chart.js not available, using fallback charts only');
         }
         
-        try {
-            this.renderMonthlyTrendChart();
-            this.renderSalesStateChart();
-            this.renderTopCustomersChart();
-            this.renderSalesTeamChart();
-            console.log('[Sales Dashboard] All charts rendered successfully');
-        } catch (error) {
-            console.error('[Sales Dashboard] Error rendering charts:', error);
-            this.renderFallbackCharts();
-        }
+        console.log('[Sales Dashboard] Chart rendering complete');
     }
 
     renderFallbackCharts() {
-        console.log('[Sales Dashboard] Rendering fallback charts...');
+        console.log('[Sales Dashboard] Rendering fallback charts with data:', {
+            monthly: this.state.data.monthly,
+            byState: this.state.data.byState,
+            topCustomers: this.state.data.topCustomers,
+            salesTeam: this.state.data.salesTeam
+        });
         
         // Create simple HTML-based charts
         this.renderFallbackMonthlyTrend();
         this.renderFallbackSalesState();
         this.renderFallbackTopCustomers();
         this.renderFallbackSalesTeam();
+        
+        console.log('[Sales Dashboard] Fallback charts rendering complete');
     }
 
     renderFallbackMonthlyTrend() {
@@ -723,10 +848,33 @@ export class SalesDashboard extends Component {
         
         console.log('[Sales Dashboard] Updated date range:', this.state.dateRange);
         
+        // Test backend connectivity first
+        await this.testBackendConnectivity();
+        
         await this.loadDashboardData();
         this.notification.add('Dashboard refreshed successfully', {
             type: 'success'
         });
+    }
+
+    async testBackendConnectivity() {
+        try {
+            console.log('[Sales Dashboard] Testing backend connectivity...');
+            const result = await this.rpc("/web/dataset/call_kw/sale.order/search_count", {
+                model: 'sale.order',
+                method: 'search_count',
+                args: [[]],
+                kwargs: {}
+            });
+            console.log('[Sales Dashboard] Backend connectivity test passed. Total sale orders:', result);
+            return true;
+        } catch (error) {
+            console.error('[Sales Dashboard] Backend connectivity test failed:', error);
+            this.notification.add('Backend connection failed: ' + error.message, {
+                type: 'danger'
+            });
+            return false;
+        }
     }
 
     formatCurrency(amount) {
