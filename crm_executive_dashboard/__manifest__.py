@@ -52,6 +52,7 @@
         'security/ir.model.access.csv',
         'views/assets.xml',
         'views/crm_executive_dashboard_views.xml',
+        'views/crm_strategic_dashboard_views.xml',
         'views/menus.xml',
         'data/crm_dashboard_data.xml',
     ],
@@ -59,6 +60,7 @@
         'web.assets_backend': [
             'crm_executive_dashboard/static/src/scss/**/*.scss',
             'crm_executive_dashboard/static/src/js/**/*.js',
+            'crm_executive_dashboard/static/src/xml/**/*.xml',
         ],
         'web.qunit_suite_tests': [
             'crm_executive_dashboard/static/tests/**/*.js',
@@ -74,4 +76,5 @@
     'license': 'LGPL-3',
     'price': 0.00,
     'currency': 'USD',
+}
 }
