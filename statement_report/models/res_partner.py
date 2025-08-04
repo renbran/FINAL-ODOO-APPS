@@ -297,6 +297,8 @@ class Partner(models.Model):
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
                 'aging_buckets': aging_buckets,
+                'report_timestamp': datetime.now().strftime('%d-%b-%Y at %I:%M %p'),
+                'report_timezone': datetime.now().strftime('%z'),
             }
             report = self.env[
                 'ir.actions.report'
@@ -366,6 +368,8 @@ class Partner(models.Model):
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
                 'aging_buckets': aging_buckets,
+                'report_timestamp': datetime.now().strftime('%d-%b-%Y at %I:%M %p'),
+                'report_timezone': datetime.now().strftime('%z'),
             }
             return self.env.ref('statement_report.res_partner_action'
                                 ).report_action(self, data=data)
@@ -1007,6 +1011,8 @@ class Partner(models.Model):
                 'total': amount[0]['total'],
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
+                'report_timestamp': datetime.now().strftime('%d-%b-%Y at %I:%M %p'),
+                'report_timezone': datetime.now().strftime('%z'),
             }
             return self.env.ref(
                 'statement_report.res_partner_action').report_action(
@@ -1041,6 +1047,8 @@ class Partner(models.Model):
                 'total': amount[0]['total'],
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
+                'report_timestamp': datetime.now().strftime('%d-%b-%Y at %I:%M %p'),
+                'report_timezone': datetime.now().strftime('%z'),
             }
             report = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
                 'statement_report.res_partner_action', self, data=data)

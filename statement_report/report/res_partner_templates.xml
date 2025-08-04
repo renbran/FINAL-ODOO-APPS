@@ -1,113 +1,474 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!-- Statement report template-->
+    <!-- Statement report template -->
     <template id="res_partner_statement_report_template">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
-                <!-- Import datetime for date formatting -->
-                <t t-set="datetime" t-value="datetime"/>
-                <div page="page">
-                    <h3>Payment Statement Report</h3>
-                </div><br/>
-                <table border="0">
-                    <tr><t t-esc="customer"/></tr><br/><br/>
-                    <tr><t t-if="street"> <t t-esc="street"/></t></tr><br/>
-                    <tr><t t-if="street2"> <t t-esc="street2"/></t></tr><br/>
-                    <tr><t t-if="city"> <t t-esc="city"/></t></tr><br/>
-                    <tr><t t-if="state"> <t t-esc="state"/></t></tr><br/>
-                </table>
-                <br/><br/>
-                <table class="table" style="align-items: center;">
-                    <thead>
+                <div class="page">
+                    <h3 style="text-align: center; color: #800020; font-weight: bold; margin-bottom: 30px;">
+                        Payment Statement Report
+                    </h3>
+                </div>
+                
+                <!-- Customer Information Section -->
+                <div style="margin-bottom: 30px;">
+                    <table style="width: 100%; border: none;">
                         <tr>
-                            <th>Date</th>
-                            <th>Invoice/Bill Number</th>
-                            <th>Reference</th>
-                            <th>Due Date</th>
-                            <th>Invoices/Debit</th>
-                            <th>Balance</th>
+                            <td style="font-weight: bold; font-size: 16px; color: #800020;">
+                                <t t-esc="customer"/>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="my_data" t-as="line">
+                        <t t-if="street">
                             <tr>
-                                <!-- Date with DD-MMM-YYYY format -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_date">
-                                        <t t-set="date_value" t-value="line['invoice_date']"/>
-                                    </t>
-                                </td>
-                                
-                                <!-- Invoice Number with conditional color for overdue -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_overdue_text">
-                                        <t t-set="text_value" t-value="line['name']"/>
-                                        <t t-set="due_date" t-value="line['invoice_date_due']"/>
-                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
-                                    </t>
-                                </td>
-                                
-                                <!-- Reference with conditional color for overdue -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_overdue_text">
-                                        <t t-set="text_value" t-value="line['ref'] or ''"/>
-                                        <t t-set="due_date" t-value="line['invoice_date_due']"/>
-                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
-                                    </t>
-                                </td>
-                                
-                                <!-- Due Date with DD-MMM-YYYY format and conditional color -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_overdue_date">
-                                        <t t-set="date_value" t-value="line['invoice_date_due']"/>
-                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
-                                    </t>
-                                </td>
-                                
-                                <!-- Invoice Amount with professional number formatting -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_overdue_currency">
-                                        <t t-set="amount_value" t-value="line['sub_total']"/>
-                                        <t t-set="currency_symbol" t-value="currency"/>
-                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
-                                    </t>
-                                </td>
-                                
-                                <!-- Balance with professional number formatting -->
-                                <td align="center">
-                                    <t t-call="statement_report.format_overdue_currency">
-                                        <t t-set="amount_value" t-value="line['balance']"/>
-                                        <t t-set="currency_symbol" t-value="currency"/>
-                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
-                                    </t>
+                                <td style="padding-top: 5px;">
+                                    <t t-esc="street"/>
                                 </td>
                             </tr>
                         </t>
-                    </tbody>
-                </table>
-                <br/>
-                <t t-if="total">
-                    <div class="clearfix" name="so_total_summary">
-                        <div id="total" class="row" name="total">
-                            <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
-                                <table class="table table-sm">
-                                    <tbody>
-                                        <tr>
-                                            <td>Total Amount:</td>
-                                            <td>
-                                                <t t-call="statement_report.format_currency">
-                                                    <t t-set="amount_value" t-value="total"/>
-                                                    <t t-set="currency_symbol" t-value="currency"/>
-                                                </t>
+                        <t t-if="street2">
+                            <tr>
+                                <td style="padding-top: 5px;">
+                                    <t t-esc="street2"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-if="city">
+                            <tr>
+                                <td style="padding-top: 5px;">
+                                    <t t-esc="city"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-if="state">
+                            <tr>
+                                <td style="padding-top: 5px;">
+                                    <t t-esc="state"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+
+                <!-- Aging Analysis Section -->
+                <t t-if="aging_buckets">
+                    <div class="clearfix" name="aging_summary" style="page-break-inside: avoid; margin-bottom: 40px;">
+                        <!-- Header -->
+                        <h4 style="text-align: center; 
+                                   background: linear-gradient(135deg, #800020 0%, #4B0082 50%, #800020 100%); 
+                                   color: white; 
+                                   padding: 15px; 
+                                   border-radius: 8px; 
+                                   margin-bottom: 20px; 
+                                   font-weight: bold; 
+                                   text-transform: uppercase; 
+                                   letter-spacing: 2px;
+                                   box-shadow: 0 4px 8px rgba(128, 0, 32, 0.3);">
+                            📊 AGING ANALYSIS SUMMARY
+                        </h4>
+                        
+                        <!-- Clean Aging Buckets Table -->
+                        <div style="border-radius: 12px;
+                                   padding: 3px;
+                                   margin-bottom: 15px;
+                                   box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+                            
+                            <table style="width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 2px solid #800020;">
+                                <!-- Headers Row -->
+                                <thead>
+                                    <tr>
+                                        <th style="background: #800020; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 12px;
+                                                   border-right: 1px solid #ddd;">
+                                            CURRENT<br/>
+                                            <small style="font-size: 10px;">(0-30 days)</small>
+                                        </th>
+                                        <th style="background: #800020; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 12px;
+                                                   border-right: 1px solid #ddd;">
+                                            PAST DUE<br/>
+                                            <small style="font-size: 10px;">(31-60 days)</small>
+                                        </th>
+                                        <th style="background: #800020; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 12px;
+                                                   border-right: 1px solid #ddd;">
+                                            OVERDUE<br/>
+                                            <small style="font-size: 10px;">(61-90 days)</small>
+                                        </th>
+                                        <th style="background: #800020; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 12px;
+                                                   border-right: 1px solid #ddd;">
+                                            CRITICAL<br/>
+                                            <small style="font-size: 10px;">(91-120 days)</small>
+                                        </th>
+                                        <th style="background: #800020; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 12px;
+                                                   border-right: 1px solid #ddd;">
+                                            VERY OVERDUE<br/>
+                                            <small style="font-size: 10px;">(120+ days)</small>
+                                        </th>
+                                        <th style="background: #000000; 
+                                                   color: white; 
+                                                   padding: 12px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold;
+                                                   font-size: 13px;">
+                                            TOTAL OUTSTANDING
+                                        </th>
+                                    </tr>
+                                </thead>
+                                
+                                <!-- Values Row -->
+                                <tbody style="background: white;">
+                                    <tr style="background: white;">
+                                        <td style="background: white; 
+                                                   color: #333; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 14px;
+                                                   border-right: 1px solid #ddd;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="current_val" t-value="float(aging_buckets.get('current', 0))"/>
+                                            <t t-set="formatted_current" t-value="'{:,.2f}'.format(current_val)"/>
+                                            <t t-set="clean_current" t-value="formatted_current.rstrip('0').rstrip('.') if '.' in formatted_current else formatted_current"/>
+                                            <t t-esc="currency"/><t t-esc="clean_current"/>
+                                        </td>
+                                        <td style="background: white; 
+                                                   color: #333; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 14px;
+                                                   border-right: 1px solid #ddd;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="days30_val" t-value="float(aging_buckets.get('days_30', 0))"/>
+                                            <t t-set="formatted_days30" t-value="'{:,.2f}'.format(days30_val)"/>
+                                            <t t-set="clean_days30" t-value="formatted_days30.rstrip('0').rstrip('.') if '.' in formatted_days30 else formatted_days30"/>
+                                            <t t-esc="currency"/><t t-esc="clean_days30"/>
+                                        </td>
+                                        <td style="background: white; 
+                                                   color: #333; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 14px;
+                                                   border-right: 1px solid #ddd;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="days60_val" t-value="float(aging_buckets.get('days_60', 0))"/>
+                                            <t t-set="formatted_days60" t-value="'{:,.2f}'.format(days60_val)"/>
+                                            <t t-set="clean_days60" t-value="formatted_days60.rstrip('0').rstrip('.') if '.' in formatted_days60 else formatted_days60"/>
+                                            <t t-esc="currency"/><t t-esc="clean_days60"/>
+                                        </td>
+                                        <td style="background: white; 
+                                                   color: #333; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 14px;
+                                                   border-right: 1px solid #ddd;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="days90_val" t-value="float(aging_buckets.get('days_90', 0))"/>
+                                            <t t-set="formatted_days90" t-value="'{:,.2f}'.format(days90_val)"/>
+                                            <t t-set="clean_days90" t-value="formatted_days90.rstrip('0').rstrip('.') if '.' in formatted_days90 else formatted_days90"/>
+                                            <t t-esc="currency"/><t t-esc="clean_days90"/>
+                                        </td>
+                                        <td style="background: white; 
+                                                   color: #333; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 14px;
+                                                   border-right: 1px solid #ddd;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="days120_val" t-value="float(aging_buckets.get('days_120', 0))"/>
+                                            <t t-set="formatted_days120" t-value="'{:,.2f}'.format(days120_val)"/>
+                                            <t t-set="clean_days120" t-value="formatted_days120.rstrip('0').rstrip('.') if '.' in formatted_days120 else formatted_days120"/>
+                                            <t t-esc="currency"/><t t-esc="clean_days120"/>
+                                        </td>
+                                        <td style="background: #000000; 
+                                                   color: white; 
+                                                   padding: 18px 8px; 
+                                                   text-align: center; 
+                                                   font-weight: bold; 
+                                                   font-size: 16px;
+                                                   border-bottom: 1px solid #ddd;">
+                                            <t t-set="total_val" t-value="float(aging_buckets.get('total', 0))"/>
+                                            <t t-set="formatted_total" t-value="'{:,.2f}'.format(total_val)"/>
+                                            <t t-set="clean_total" t-value="formatted_total.rstrip('0').rstrip('.') if '.' in formatted_total else formatted_total"/>
+                                            <t t-esc="currency"/><t t-esc="clean_total"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                
+                                <!-- Percentage Distribution Row -->
+                                <t t-if="aging_buckets.get('total', 0) > 0">
+                                    <tbody style="background: white;">
+                                        <tr style="background: white;">
+                                            <t t-set="total_aging" t-value="aging_buckets.get('total', 0)"/>
+                                            <td style="background: white; 
+                                                       color: #666; 
+                                                       padding: 10px 8px; 
+                                                       text-align: center; 
+                                                       font-size: 11px; 
+                                                       font-weight: bold;
+                                                       border-right: 1px solid #ddd;">
+                                                <t t-esc="'{:.1f}%'.format((aging_buckets.get('current', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                            </td>
+                                            <td style="background: white; 
+                                                       color: #666; 
+                                                       padding: 10px 8px; 
+                                                       text-align: center; 
+                                                       font-size: 11px; 
+                                                       font-weight: bold;
+                                                       border-right: 1px solid #ddd;">
+                                                <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_30', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                            </td>
+                                            <td style="background: white; 
+                                                       color: #666; 
+                                                       padding: 10px 8px; 
+                                                       text-align: center; 
+                                                       font-size: 11px; 
+                                                       font-weight: bold;
+                                                       border-right: 1px solid #ddd;">
+                                                <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_60', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                            </td>
+                                            <td style="background: white; 
+                                                       color: #666; 
+                                                       padding: 10px 8px; 
+                                                       text-align: center; 
+                                                       font-size: 11px; 
+                                                       font-weight: bold;
+                                                       border-right: 1px solid #ddd;">
+                                                <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_90', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                            </td>
+                                            <td style="background: white; 
+                                                       color: #666; 
+                                                       padding: 10px 8px; 
+                                                   text-align: center; 
+                                                       font-size: 11px; 
+                                                       font-weight: bold;
+                                                       border-right: 1px solid #ddd;">
+                                                <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_120', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                            </td>
+                                            <td style="background: #000000; 
+                                                       color: white; 
+                                                       padding: 10px 8px; 
+                                                       text-align: center; 
+                                                       font-weight: bold; 
+                                                       font-size: 12px;">
+                                                100.0%
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Total Balance:</td>
-                                            <td>
-                                                <t t-call="statement_report.format_currency">
-                                                    <t t-set="amount_value" t-value="balance"/>
-                                                    <t t-set="currency_symbol" t-value="currency"/>
+                                    </tbody>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Invoice Details Section -->
+                <div style="margin-top: 30px;">
+                    <!-- Header -->
+                    <h4 style="text-align: center; 
+                               background: #800020; 
+                               color: white; 
+                               padding: 15px; 
+                               border-radius: 8px; 
+                               margin-bottom: 20px; 
+                               font-weight: bold; 
+                               text-transform: uppercase; 
+                               letter-spacing: 2px;
+                               box-shadow: 0 4px 8px rgba(128, 0, 32, 0.3);">
+                        📋 INVOICE DETAILS
+                    </h4>
+                    
+                    <table class="table table-bordered" style="width: 100%; border-collapse: collapse; border: 2px solid #800020;">
+                        <thead>
+                            <tr style="background: #800020; color: white;">
+                                <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd;">
+                                    Date
+                                </th>
+                                <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd;">
+                                    Invoice/Bill Number
+                                </th>
+                                <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd;">
+                                    Reference
+                                </th>
+                                <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd;">
+                                    Due Date
+                                </th>
+                                <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd;">
+                                    Invoices/Debit
+                                </th>
+                                <th style="padding: 12px; text-align: center; font-weight: bold;">
+                                    Balance
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="my_data" t-as="line">
+                                <tr style="background: white;">
+                                    <!-- Date Column -->
+                                    <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                        <t t-if="line['invoice_date']">
+                                            <t t-set="date_obj" t-value="line['invoice_date']"/>
+                                            <t t-if="hasattr(date_obj, 'strftime')">
+                                                <t t-esc="date_obj.strftime('%d-%b-%Y')"/>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-set="date_str" t-value="str(date_obj)[:10]"/>
+                                                <t t-if="'-' in date_str and len(date_str) == 10">
+                                                    <t t-set="date_parts" t-value="date_str.split('-')"/>
+                                                    <t t-set="month_names" t-value="['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']"/>
+                                                    <t t-set="month_idx" t-value="int(date_parts[1]) - 1"/>
+                                                    <t t-esc="date_parts[2]"/>-<t t-esc="month_names[month_idx]"/>-<t t-esc="date_parts[0]"/>
                                                 </t>
+                                                <t t-else="">
+                                                    <t t-esc="date_obj"/>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </td>
+                                    
+                                    <!-- Invoice Number Column -->
+                                    <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
+                                            <t t-esc="line['name']"/>
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Reference Column -->
+                                    <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
+                                            <t t-esc="line['ref'] or ''"/>
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Due Date Column -->
+                                    <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                        <t t-if="line['invoice_date_due']">
+                                            <t t-set="due_date_obj" t-value="line['invoice_date_due']"/>
+                                            <t t-set="is_overdue" t-value="str(due_date_obj) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                            <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
+                                                <t t-if="hasattr(due_date_obj, 'strftime')">
+                                                    <t t-esc="due_date_obj.strftime('%d-%b-%Y')"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-set="due_date_str" t-value="str(due_date_obj)[:10]"/>
+                                                    <t t-if="'-' in due_date_str and len(due_date_str) == 10">
+                                                        <t t-set="due_date_parts" t-value="due_date_str.split('-')"/>
+                                                        <t t-set="month_names" t-value="['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']"/>
+                                                        <t t-set="due_month_idx" t-value="int(due_date_parts[1]) - 1"/>
+                                                        <t t-esc="due_date_parts[2]"/>-<t t-esc="month_names[due_month_idx]"/>-<t t-esc="due_date_parts[0]"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <t t-esc="due_date_obj"/>
+                                                    </t>
+                                                </t>
+                                            </span>
+                                        </t>
+                                    </td>
+                                    
+                                    <!-- Invoice Amount Column -->
+                                    <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; font-weight: bold;">
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
+                                            <t t-set="amount_val" t-value="float(line['sub_total'] or 0)"/>
+                                            <t t-set="formatted_amount" t-value="'{:,.2f}'.format(amount_val)"/>
+                                            <t t-set="clean_amount" t-value="formatted_amount.rstrip('0').rstrip('.') if '.' in formatted_amount else formatted_amount"/>
+                                            <t t-esc="currency"/><t t-esc="clean_amount"/>
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Balance Column -->
+                                    <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd; font-weight: bold;">
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #800020;'">
+                                            <t t-set="balance_val" t-value="float(line['balance'] or 0)"/>
+                                            <t t-set="formatted_balance" t-value="'{:,.2f}'.format(balance_val)"/>
+                                            <t t-set="clean_balance" t-value="formatted_balance.rstrip('0').rstrip('.') if '.' in formatted_balance else formatted_balance"/>
+                                            <t t-esc="currency"/><t t-esc="clean_balance"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Summary Section -->
+                <t t-if="total">
+                    <div class="clearfix" name="so_total_summary" style="margin-top: 30px;">
+                        <!-- Header -->
+                        <h4 style="text-align: center; 
+                                   background: #800020; 
+                                   color: white; 
+                                   padding: 15px; 
+                                   border-radius: 8px; 
+                                   margin-bottom: 20px; 
+                                   font-weight: bold; 
+                                   text-transform: uppercase; 
+                                   letter-spacing: 2px;
+                                   box-shadow: 0 4px 8px rgba(128, 0, 32, 0.3);">
+                            💰 TOTALS SUMMARY
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-6 ms-auto">
+                                <table class="table table-sm" style="border: 2px solid #800020; border-radius: 8px; overflow: hidden; background: white;">
+                                    <thead>
+                                        <tr style="background: #800020; color: white;">
+                                            <th style="padding: 12px; font-weight: bold; color: white; border-right: 1px solid #ddd;">
+                                                Description
+                                            </th>
+                                            <th style="padding: 12px; font-weight: bold; color: white; text-align: right;">
+                                                Amount
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="background: white;">
+                                        <tr style="background: white;">
+                                            <td style="padding: 12px; font-weight: bold; color: #333; background: white; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                                Total Amount:
+                                            </td>
+                                            <td style="padding: 12px; font-weight: bold; text-align: right; background: white; border-bottom: 1px solid #ddd;">
+                                                <t t-set="total_val" t-value="float(total or 0)"/>
+                                                <t t-set="formatted_total" t-value="'{:,.2f}'.format(total_val)"/>
+                                                <t t-set="clean_total" t-value="formatted_total.rstrip('0').rstrip('.') if '.' in formatted_total else formatted_total"/>
+                                                <t t-esc="currency"/><t t-esc="clean_total"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background: white;">
+                                            <td style="padding: 12px; font-weight: bold; color: #333; background: white; border-right: 1px solid #ddd;">
+                                                Total Balance:
+                                            </td>
+                                            <td style="padding: 12px; font-weight: bold; text-align: right; font-size: 16px; color: #800020; background: white;">
+                                                <t t-set="balance_val" t-value="float(balance or 0)"/>
+                                                <t t-set="formatted_balance" t-value="'{:,.2f}'.format(balance_val)"/>
+                                                <t t-set="clean_balance" t-value="formatted_balance.rstrip('0').rstrip('.') if '.' in formatted_balance else formatted_balance"/>
+                                                <t t-esc="currency"/><t t-esc="clean_balance"/>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -116,230 +477,33 @@
                         </div>
                     </div>
                 </t>
-                
-                <!-- Enhanced Aging Buckets Summary -->
-                <t t-if="aging_buckets">
-                    <br/><br/>
-                    <div class="clearfix" name="aging_summary" style="page-break-inside: avoid;">
-                        <h4 style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                   color: white; padding: 12px; border-radius: 5px; margin-bottom: 15px; 
-                                   font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                            📊 AGING ANALYSIS SUMMARY
-                        </h4>
-                        
-                        <!-- Aging Buckets Table -->
-                        <table class="table table-bordered" style="margin-top: 15px; border: 2px solid #dee2e6;">
-                            <thead>
-                                <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
-                                        Current<br/><small>(0-30 days)</small>
-                                    </th>
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
-                                        Past Due<br/><small>(31-60 days)</small>
-                                    </th>
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
-                                        Overdue<br/><small>(61-90 days)</small>
-                                    </th>
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
-                                        Critical<br/><small>(91-120 days)</small>
-                                    </th>
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
-                                        Very Overdue<br/><small>(120+ days)</small>
-                                    </th>
-                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; 
-                                                                   background-color: #ffc107; color: #212529;">
-                                        Total Outstanding
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
-                                                                    background-color: #d4edda; font-weight: bold; font-size: 14px;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('current', 0))"/>
-                                    </td>
-                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
-                                                                    background-color: #fff3cd; font-weight: bold; font-size: 14px;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_30', 0))"/>
-                                    </td>
-                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
-                                                                    background-color: #fdeaa7; font-weight: bold; font-size: 14px;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_60', 0))"/>
-                                    </td>
-                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
-                                                                    background-color: #f8d7da; font-weight: bold; font-size: 14px;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_90', 0))"/>
-                                    </td>
-                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
-                                                                    background-color: #f5c6cb; font-weight: bold; font-size: 14px;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_120', 0))"/>
-                                    </td>
-                                    <td class="text-center" style="padding: 15px; border: 2px solid #ffc107; 
-                                                                    background-color: #fff3cd; font-weight: bold; font-size: 16px; color: #212529;">
-                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('total', 0))"/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                        <!-- Aging Percentages Row -->
-                        <t t-if="aging_buckets.get('total', 0) > 0">
-                            <table class="table" style="margin-top: 10px;">
-                                <thead>
-                                    <tr style="background-color: #f1f3f4;">
-                                        <th colspan="6" class="text-center" style="padding: 8px; font-weight: bold; color: #495057;">
-                                            Percentage Distribution
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <t t-set="total_aging" t-value="aging_buckets.get('total', 0)"/>
-                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
-                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('current', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
-                                        </td>
-                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
-                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_30', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
-                                        </td>
-                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
-                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_60', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
-                                        </td>
-                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
-                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_90', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
-                                        </td>
-                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
-                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_120', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
-                                        </td>
-                                        <td class="text-center" style="padding: 8px; font-weight: bold; background-color: #e9ecef;">
-                                            100.0%
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </t>
-                        
-                        <!-- Risk Assessment Summary -->
-                        <t t-set="days_90_plus" t-value="aging_buckets.get('days_90', 0) + aging_buckets.get('days_120', 0)"/>
-                        <t t-if="days_90_plus > 0">
-                            <div style="margin-top: 15px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
-                                <strong style="color: #721c24;">⚠️ Risk Assessment:</strong>
-                                <span t-esc="currency"/><span t-esc="'{:,.2f}'.format(days_90_plus)"/> 
-                                (<span t-esc="'{:.1f}%'.format((days_90_plus / aging_buckets.get('total', 1) * 100))"/>)
-                                is overdue by more than 90 days and requires immediate attention.
-                            </div>
-                        </t>
-                    </div>
-                </t>
-            </t>
-        </t>
-    </template>
 
-    <!-- Date Formatting Template: DD-MMM-YYYY -->
-    <template id="format_date">
-        <t t-if="date_value and str(date_value) != 'False'">
-            <t t-if="hasattr(date_value, 'strftime')">
-                <t t-esc="date_value.strftime('%d-%b-%Y')"/>
+                <!-- Footer with Timestamp -->
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #800020;">
+                    <table style="width: 100%; border: none;">
+                        <tr>
+                            <td style="width: 50%; text-align: left; vertical-align: bottom;">
+                                <div style="font-size: 12px; color: #666;">
+                                    <strong style="color: #800020;">Statement Details:</strong><br/>
+                                    This statement shows all outstanding invoices<br/>
+                                    and their aging analysis as of the report date.
+                                </div>
+                            </td>
+                            <td style="width: 50%; text-align: right; vertical-align: bottom;">
+                                <div style="font-size: 12px; color: #666;">
+                                    <strong style="color: #800020;">Report Generated:</strong><br/>
+                                    <span style="font-weight: bold; color: #333;">
+                                        <t t-esc="report_timestamp"/>
+                                    </span><br/>
+                                    <span style="font-size: 10px; color: #999;">
+                                        System Time (UTC<t t-esc="report_timezone"/>)
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </t>
-            <t t-elif="'-' in str(date_value)">
-                <t t-set="date_parts" t-value="str(date_value)[:10].split('-')"/>
-                <t t-if="len(date_parts) == 3">
-                    <t t-set="year" t-value="date_parts[0]"/>
-                    <t t-set="month" t-value="date_parts[1]"/>
-                    <t t-set="day" t-value="date_parts[2]"/>
-                    <t t-set="month_names" t-value="['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']"/>
-                    <t t-set="month_idx" t-value="int(month) - 1"/>
-                    <t t-if="month_idx >= 0 and month_idx &lt; 12">
-                        <t t-esc="day"/>-<t t-esc="month_names[month_idx]"/>-<t t-esc="year"/>
-                    </t>
-                    <t t-else="">
-                        <t t-esc="date_value"/>
-                    </t>
-                </t>
-                <t t-else="">
-                    <t t-esc="date_value"/>
-                </t>
-            </t>
-            <t t-else="">
-                <t t-esc="date_value"/>
-            </t>
-        </t>
-    </template>
-
-    <!-- Professional Number/Currency Formatting Template -->
-    <template id="format_currency">
-        <t t-if="amount_value != False">
-            <t t-set="num_value" t-value="float(amount_value or 0)"/>
-            <t t-set="formatted_num" t-value="'{:,.2f}'.format(num_value)"/>
-            <!-- Remove trailing zeros after decimal point -->
-            <t t-if="'.' in formatted_num">
-                <t t-set="parts" t-value="formatted_num.split('.')"/>
-                <t t-set="decimal_part" t-value="parts[1].rstrip('0')"/>
-                <t t-if="decimal_part">
-                    <t t-set="clean_amount" t-value="parts[0] + '.' + decimal_part"/>
-                </t>
-                <t t-else="">
-                    <t t-set="clean_amount" t-value="parts[0]"/>
-                </t>
-            </t>
-            <t t-else="">
-                <t t-set="clean_amount" t-value="formatted_num"/>
-            </t>
-            <t t-esc="currency_symbol or ''"/><t t-esc="clean_amount"/>
-        </t>
-        <t t-else="">
-            <t t-esc="currency_symbol or ''"/>0
-        </t>
-    </template>
-
-    <!-- Overdue Text Formatting Template -->
-    <template id="format_overdue_text">
-        <t t-if="is_overdue">
-            <span style="color: #dc3545; font-weight: 500;">
-                <t t-esc="text_value or ''"/>
-            </span>
-        </t>
-        <t t-else="">
-            <span style="color: #000000;">
-                <t t-esc="text_value or ''"/>
-            </span>
-        </t>
-    </template>
-
-    <!-- Overdue Date Formatting Template -->
-    <template id="format_overdue_date">
-        <t t-if="is_overdue">
-            <span style="color: #dc3545; font-weight: 500;">
-                <t t-call="statement_report.format_date">
-                    <t t-set="date_value" t-value="date_value"/>
-                </t>
-            </span>
-        </t>
-        <t t-else="">
-            <span style="color: #000000;">
-                <t t-call="statement_report.format_date">
-                    <t t-set="date_value" t-value="date_value"/>
-                </t>
-            </span>
-        </t>
-    </template>
-
-    <!-- Overdue Currency Formatting Template -->
-    <template id="format_overdue_currency">
-        <t t-if="is_overdue">
-            <span style="color: #dc3545; font-weight: 500;">
-                <t t-call="statement_report.format_currency">
-                    <t t-set="amount_value" t-value="amount_value"/>
-                    <t t-set="currency_symbol" t-value="currency_symbol"/>
-                </t>
-            </span>
-        </t>
-        <t t-else="">
-            <span style="color: #000000;">
-                <t t-call="statement_report.format_currency">
-                    <t t-set="amount_value" t-value="amount_value"/>
-                    <t t-set="currency_symbol" t-value="currency_symbol"/>
-                </t>
-            </span>
         </t>
     </template>
 </odoo>
