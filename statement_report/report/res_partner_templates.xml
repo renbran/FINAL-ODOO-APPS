@@ -332,10 +332,10 @@
                                     <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
                                         <t t-if="line['invoice_date']">
                                             <t t-set="date_obj" t-value="line['invoice_date']"/>
-                                            <t t-if="hasattr(date_obj, 'strftime')">
+                                            <t t-if="date_obj and hasattr(date_obj, 'strftime')">
                                                 <t t-esc="date_obj.strftime('%d-%b-%Y')"/>
                                             </t>
-                                            <t t-else="">
+                                            <t t-elif="date_obj">
                                                 <t t-set="date_str" t-value="str(date_obj)[:10]"/>
                                                 <t t-if="'-' in date_str and len(date_str) == 10">
                                                     <t t-set="date_parts" t-value="date_str.split('-')"/>
@@ -352,7 +352,7 @@
                                     
                                     <!-- Invoice Number Column -->
                                     <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and line.get('invoice_date_due') != False and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
                                         <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
                                             <t t-esc="line['name']"/>
                                         </span>
@@ -360,7 +360,7 @@
                                     
                                     <!-- Reference Column -->
                                     <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and line.get('invoice_date_due') != False and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
                                         <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
                                             <t t-esc="line['ref'] or ''"/>
                                         </span>
@@ -370,12 +370,12 @@
                                     <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
                                         <t t-if="line['invoice_date_due']">
                                             <t t-set="due_date_obj" t-value="line['invoice_date_due']"/>
-                                            <t t-set="is_overdue" t-value="str(due_date_obj) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                            <t t-set="is_overdue" t-value="due_date_obj and str(due_date_obj) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
                                             <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
-                                                <t t-if="hasattr(due_date_obj, 'strftime')">
+                                                <t t-if="due_date_obj and hasattr(due_date_obj, 'strftime')">
                                                     <t t-esc="due_date_obj.strftime('%d-%b-%Y')"/>
                                                 </t>
-                                                <t t-else="">
+                                                <t t-elif="due_date_obj">
                                                     <t t-set="due_date_str" t-value="str(due_date_obj)[:10]"/>
                                                     <t t-if="'-' in due_date_str and len(due_date_str) == 10">
                                                         <t t-set="due_date_parts" t-value="due_date_str.split('-')"/>
@@ -393,7 +393,7 @@
                                     
                                     <!-- Invoice Amount Column -->
                                     <td style="padding: 10px; text-align: center; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; font-weight: bold;">
-                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and line.get('invoice_date_due') != False and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
                                         <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #000000;'">
                                             <t t-set="amount_val" t-value="float(line['sub_total'] or 0)"/>
                                             <t t-set="formatted_amount" t-value="'{:,.2f}'.format(amount_val)"/>
@@ -404,7 +404,7 @@
                                     
                                     <!-- Balance Column -->
                                     <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd; font-weight: bold;">
-                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
+                                        <t t-set="is_overdue" t-value="line.get('invoice_date_due') and line.get('invoice_date_due') != False and str(line.get('invoice_date_due')) &lt; str(datetime.date.today()) if 'datetime' in globals() else False"/>
                                         <span t-att-style="'color: #dc3545; font-weight: 500;' if is_overdue else 'color: #800020;'">
                                             <t t-set="balance_val" t-value="float(line['balance'] or 0)"/>
                                             <t t-set="formatted_balance" t-value="'{:,.2f}'.format(balance_val)"/>
