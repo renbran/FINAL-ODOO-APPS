@@ -11,16 +11,4 @@
         <field name="binding_model_id" ref="model_res_partner"/>
         <field name="binding_type">report</field>
     </record>
-
-    <!-- Action for statement XLSX report-->
-    <record id="res_partner_action_xlsx" model="ir.actions.report">
-        <field name="name">Statement Report XLSX</field>
-        <field name="model">res.partner</field>
-        <field name="report_type">xlsx</field>
-        <field name="report_name">statement_report.res_partner_xlsx</field>
-        <field name="report_file">statement_report.res_partner_xlsx</field>
-        <field name="print_report_name">'Statement Report XLSX- %s' %(object.name)</field>
-        <field name="binding_model_id" ref="model_res_partner"/>
-        <field name="binding_type">report</field>
-    </record>
 </odoo>

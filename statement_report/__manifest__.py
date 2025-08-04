@@ -32,7 +32,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
-    'depends': ['base', 'account', 'contacts', 'report_xlsx'],
+    'depends': ['base', 'account', 'contacts'],
     'external_dependencies': {
         'python': ['xlsxwriter'],
     },

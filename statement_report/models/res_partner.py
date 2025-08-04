@@ -22,12 +22,13 @@
 import base64
 import io
 import json
+from datetime import date, datetime
 try:
     import xlsxwriter
     HAS_XLSXWRITER = True
 except ImportError:
     HAS_XLSXWRITER = False
-from odoo import fields, models
+from odoo import fields, models, api
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import date_utils
 
@@ -48,6 +49,70 @@ class Partner(models.Model):
         'res.currency',
         default=lambda self: self.env.company.currency_id.id,
         help="currency related to Customer or Vendor"
+    )
+    
+    # Customer aging fields
+    customer_aging_current = fields.Monetary(
+        string='Current (0-30)',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    customer_aging_30 = fields.Monetary(
+        string='31-60 Days',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    customer_aging_60 = fields.Monetary(
+        string='61-90 Days',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    customer_aging_90 = fields.Monetary(
+        string='91-120 Days',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    customer_aging_120 = fields.Monetary(
+        string='120+ Days',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    customer_aging_total = fields.Monetary(
+        string='Total Due',
+        compute='_compute_customer_aging',
+        currency_field='currency_id'
+    )
+    
+    # Supplier aging fields
+    supplier_aging_current = fields.Monetary(
+        string='Current (0-30)',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
+    )
+    supplier_aging_30 = fields.Monetary(
+        string='31-60 Days',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
+    )
+    supplier_aging_60 = fields.Monetary(
+        string='61-90 Days',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
+    )
+    supplier_aging_90 = fields.Monetary(
+        string='91-120 Days',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
+    )
+    supplier_aging_120 = fields.Monetary(
+        string='120+ Days',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
+    )
+    supplier_aging_total = fields.Monetary(
+        string='Total Due',
+        compute='_compute_supplier_aging',
+        currency_field='currency_id'
     )
 
     def _compute_customer_report_ids(self):
@@ -72,7 +137,7 @@ class Partner(models.Model):
 
     def main_query(self):
         """Return select query"""
-        query = """SELECT name , invoice_date, invoice_date_due,
+        query = """SELECT name, ref, invoice_date, invoice_date_due,
                     amount_total_signed AS sub_total,
                     amount_residual_signed AS amount_due ,
                     amount_residual AS balance
@@ -90,6 +155,73 @@ class Partner(models.Model):
                 AND company_id = '%s' """ % (self.id, self.env.company.id)
         return amount_query
 
+    @api.depends('property_account_receivable_id')
+    def _compute_customer_aging(self):
+        """Compute customer aging buckets"""
+        for partner in self:
+            aging_data = partner.calculate_aging_buckets('out_invoice')
+            partner.customer_aging_current = aging_data.get('current', 0)
+            partner.customer_aging_30 = aging_data.get('30_days', 0)
+            partner.customer_aging_60 = aging_data.get('60_days', 0)
+            partner.customer_aging_90 = aging_data.get('90_days', 0)
+            partner.customer_aging_120 = aging_data.get('120_days', 0)
+            partner.customer_aging_total = aging_data.get('total', 0)
+
+    @api.depends('property_account_payable_id')
+    def _compute_supplier_aging(self):
+        """Compute supplier aging buckets"""
+        for partner in self:
+            aging_data = partner.calculate_aging_buckets('in_invoice')
+            partner.supplier_aging_current = aging_data.get('current', 0)
+            partner.supplier_aging_30 = aging_data.get('30_days', 0)
+            partner.supplier_aging_60 = aging_data.get('60_days', 0)
+            partner.supplier_aging_90 = aging_data.get('90_days', 0)
+            partner.supplier_aging_120 = aging_data.get('120_days', 0)
+            partner.supplier_aging_total = aging_data.get('total', 0)
+
+    def calculate_aging_buckets(self, move_type='out_invoice'):
+        """Calculate aging buckets for receivables (0-30, 31-60, 61-90, 91-120, 120+)"""
+        today = date.today()
+        
+        aging_query = """
+            SELECT 
+                CASE 
+                    WHEN (CURRENT_DATE - invoice_date_due) <= 30 THEN 'current'
+                    WHEN (CURRENT_DATE - invoice_date_due) BETWEEN 31 AND 60 THEN 'days_30'
+                    WHEN (CURRENT_DATE - invoice_date_due) BETWEEN 61 AND 90 THEN 'days_60'
+                    WHEN (CURRENT_DATE - invoice_date_due) BETWEEN 91 AND 120 THEN 'days_90'
+                    ELSE 'days_120'
+                END as bucket,
+                SUM(amount_residual) as amount
+            FROM account_move 
+            WHERE payment_state != 'paid' 
+                AND state = 'posted' 
+                AND partner_id = %s
+                AND company_id = %s
+                AND move_type = %s
+            GROUP BY bucket
+        """
+        
+        self.env.cr.execute(aging_query, (self.id, self.env.company.id, move_type))
+        aging_data = self.env.cr.dictfetchall()
+        
+        # Initialize buckets with zero values
+        buckets = {
+            'current': 0.0,
+            'days_30': 0.0,
+            'days_60': 0.0,
+            'days_90': 0.0,
+            'days_120': 0.0,
+            'total': 0.0
+        }
+        
+        # Fill buckets with actual data
+        for row in aging_data:
+            buckets[row['bucket']] = row['amount']
+            buckets['total'] += row['amount']
+        
+        return buckets
+
     def action_share_pdf(self):
         """ Action for sharing customer pdf report"""
         if self.customer_report_ids:
@@ -102,6 +234,9 @@ class Partner(models.Model):
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
 
+            # Calculate aging buckets
+            aging_buckets = self.calculate_aging_buckets('out_invoice')
+
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -113,6 +248,7 @@ class Partner(models.Model):
                 'total': amount[0]['total'],
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
+                'aging_buckets': aging_buckets,
             }
             report = self.env[
                 'ir.actions.report'
@@ -163,6 +299,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Calculate aging buckets
+            aging_buckets = self.calculate_aging_buckets('out_invoice')
+            
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -174,6 +314,7 @@ class Partner(models.Model):
                 'total': amount[0]['total'],
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
+                'aging_buckets': aging_buckets,
             }
             return self.env.ref('statement_report.res_partner_action'
                                 ).report_action(self, data=data)
@@ -196,6 +337,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Calculate aging buckets
+            aging_buckets = self.calculate_aging_buckets('out_invoice')
+            
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -207,9 +352,18 @@ class Partner(models.Model):
                 'total': amount[0]['total'],
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
+                'aging_buckets': aging_buckets,
             }
-            # Use the proper report reference
-            return self.env.ref('statement_report.res_partner_action_xlsx').report_action(self, data=data)
+            return {
+                'type': 'ir.actions.report',
+                'data': {
+                    'model': 'res.partner',
+                    'options': json.dumps(data, default=date_utils.json_default),
+                    'output_format': 'xlsx',
+                    'report_name': 'Customer_Statement_Report'
+                },
+                'report_type': 'xlsx',
+            }
         else:
             raise ValidationError('There is no statement to print')
 
@@ -282,6 +436,34 @@ class Partner(models.Model):
         sheet.write(row + 4, column + 1, 'Balance Due: ', cell_format)
         sheet.merge_range(row + 4, column + 3, row + 4, column + 4,
                           remain_balance, txt)
+        
+        # Add aging buckets section
+        if 'aging_buckets' in data:
+            aging = data['aging_buckets']
+            currency = data['currency']
+            
+            # Aging header
+            sheet.write(row + 7, column + 1, 'AGING SUMMARY', 
+                       workbook.add_format({'font_size': '16px', 'bold': True, 
+                                           'bg_color': '#E6E6FA', 'border': 1}))
+            
+            # Aging bucket headers
+            aging_row = row + 9
+            sheet.write(aging_row, column + 1, 'Current (0-30)', cell_format_with_color)
+            sheet.write(aging_row, column + 3, '31-60 Days', cell_format_with_color)
+            sheet.write(aging_row, column + 5, '61-90 Days', cell_format_with_color)
+            sheet.write(aging_row, column + 7, '91-120 Days', cell_format_with_color)
+            sheet.write(aging_row, column + 9, '120+ Days', cell_format_with_color)
+            sheet.write(aging_row, column + 11, 'Total Due', cell_format_with_color)
+            
+            # Aging bucket values
+            aging_row += 1
+            sheet.write(aging_row, column + 1, f"{currency}{aging['current']:.2f}", txt_border)
+            sheet.write(aging_row, column + 3, f"{currency}{aging['days_30']:.2f}", txt_border)
+            sheet.write(aging_row, column + 5, f"{currency}{aging['days_60']:.2f}", txt_border)
+            sheet.write(aging_row, column + 7, f"{currency}{aging['days_90']:.2f}", txt_border)
+            sheet.write(aging_row, column + 9, f"{currency}{aging['days_120']:.2f}", txt_border)
+            sheet.write(aging_row, column + 11, f"{currency}{aging['total']:.2f}", txt_border)
         workbook.close()
         output.seek(0)
         response.stream.write(output.read())
@@ -340,6 +522,7 @@ class Partner(models.Model):
                 sheet.merge_range('D13:F13', data['zip'], txt)
             sheet.write('B15', 'Date', cell_format)
             sheet.write('D15', 'Invoice/Bill Number', cell_format)
+            sheet.write('F15', 'Reference', cell_format)
             sheet.write('H15', 'Due Date', cell_format)
             sheet.write('J15', 'Invoices/Debit', cell_format)
             sheet.write('M15', 'Amount Due', cell_format)
@@ -355,8 +538,10 @@ class Partner(models.Model):
 
                 sheet.merge_range(row, column + 1, row, column + 2,
                                   record['invoice_date'], date_style)
-                sheet.merge_range(row, column + 3, row, column + 5,
+                sheet.merge_range(row, column + 3, row, column + 4,
                                   record['name'], txt)
+                sheet.merge_range(row, column + 5, row, column + 6,
+                                  record.get('ref', '') or '', txt)
                 sheet.merge_range(row, column + 7, row, column + 8,
                                   record['invoice_date_due'], date_style)
                 sheet.merge_range(row, column + 9, row, column + 10,
@@ -422,7 +607,7 @@ class Partner(models.Model):
 
         for rec in partner:
             if rec.id:
-                main_query = """ SELECT name , invoice_date, invoice_date_due,
+                main_query = """ SELECT name, ref, invoice_date, invoice_date_due,
                             amount_total_signed AS sub_total,
                             amount_residual_signed AS amount_due ,
                             amount_residual AS balance
@@ -430,7 +615,7 @@ class Partner(models.Model):
                         IN ('out_invoice', 'in_invoice')
                        AND state ='posted' AND payment_state != 'paid'
                        AND company_id = '%s' AND partner_id = '%s'
-                    GROUP BY name, invoice_date, invoice_date_due,
+                    GROUP BY name, ref, invoice_date, invoice_date_due,
                     amount_total_signed, amount_residual_signed,
                     amount_residual
                     ORDER by name DESC""" % (self.env.company.id, rec.id)
@@ -552,7 +737,7 @@ class Partner(models.Model):
 
         for rec in partner:
             if rec.id:
-                main_query = """SELECT name , invoice_date, invoice_date_due,
+                main_query = """SELECT name, ref, invoice_date, invoice_date_due,
                         amount_total_signed AS sub_total,
                         amount_residual_signed AS amount_due ,
                         amount_residual AS balance
@@ -561,7 +746,7 @@ class Partner(models.Model):
                         AND state ='posted'
                         AND payment_state != 'paid'
                         AND company_id = '%s' AND partner_id = '%s'
-                   GROUP BY name, invoice_date, invoice_date_due,
+                   GROUP BY name, ref, invoice_date, invoice_date_due,
                     amount_total_signed, amount_residual_signed,
                     amount_residual
                     ORDER by name DESC""" % (self.env.company.id, rec.id)
