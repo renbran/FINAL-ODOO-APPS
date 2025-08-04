@@ -22,9 +22,13 @@
 import base64
 import io
 import json
-import xlsxwriter
+try:
+    import xlsxwriter
+    HAS_XLSXWRITER = True
+except ImportError:
+    HAS_XLSXWRITER = False
 from odoo import fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo.tools import date_utils
 
 
@@ -178,6 +182,10 @@ class Partner(models.Model):
 
     def action_print_xlsx(self):
         """ Action for printing xlsx report of customer """
+        if not HAS_XLSXWRITER:
+            raise UserError("The xlsxwriter Python library is not installed. "
+                          "Please install it using: pip install xlsxwriter")
+        
         if self.customer_report_ids:
             main_query = self.main_query()
             main_query += """ AND move_type IN ('out_invoice')"""
@@ -216,6 +224,10 @@ class Partner(models.Model):
 
     def get_xlsx_report(self, data, response):
         """ Get xlsx report data """
+        if not HAS_XLSXWRITER:
+            raise UserError("The xlsxwriter Python library is not installed. "
+                          "Please install it using: pip install xlsxwriter")
+        
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
