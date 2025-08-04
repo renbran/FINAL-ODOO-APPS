@@ -4,6 +4,8 @@
     <template id="res_partner_statement_report_template">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
+                <!-- Import datetime for date formatting -->
+                <t t-set="datetime" t-value="datetime"/>
                 <div page="page">
                     <h3>Payment Statement Report</h3>
                 </div><br/>
@@ -29,17 +31,55 @@
                     <tbody>
                         <t t-foreach="my_data" t-as="line">
                             <tr>
-                                <td align="center"><t t-esc="line['invoice_date']"/></td>
-                                <td align="center"><t t-esc="line['name']"/></td>
-                                <td align="center"><t t-esc="line['ref'] or ''"/></td>
-                                <td align="center"><t t-esc="line['invoice_date_due']"/></td>
+                                <!-- Date with DD-MMM-YYYY format -->
                                 <td align="center">
-                                    <t t-esc="currency"/>
-                                    <t t-esc="line['sub_total']"/>
+                                    <t t-call="statement_report.format_date">
+                                        <t t-set="date_value" t-value="line['invoice_date']"/>
+                                    </t>
                                 </td>
+                                
+                                <!-- Invoice Number with conditional color for overdue -->
                                 <td align="center">
-                                    <t t-esc="currency"/>
-                                    <t t-esc="line['balance']"/>
+                                    <t t-call="statement_report.format_overdue_text">
+                                        <t t-set="text_value" t-value="line['name']"/>
+                                        <t t-set="due_date" t-value="line['invoice_date_due']"/>
+                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
+                                    </t>
+                                </td>
+                                
+                                <!-- Reference with conditional color for overdue -->
+                                <td align="center">
+                                    <t t-call="statement_report.format_overdue_text">
+                                        <t t-set="text_value" t-value="line['ref'] or ''"/>
+                                        <t t-set="due_date" t-value="line['invoice_date_due']"/>
+                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
+                                    </t>
+                                </td>
+                                
+                                <!-- Due Date with DD-MMM-YYYY format and conditional color -->
+                                <td align="center">
+                                    <t t-call="statement_report.format_overdue_date">
+                                        <t t-set="date_value" t-value="line['invoice_date_due']"/>
+                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
+                                    </t>
+                                </td>
+                                
+                                <!-- Invoice Amount with professional number formatting -->
+                                <td align="center">
+                                    <t t-call="statement_report.format_overdue_currency">
+                                        <t t-set="amount_value" t-value="line['sub_total']"/>
+                                        <t t-set="currency_symbol" t-value="currency"/>
+                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
+                                    </t>
+                                </td>
+                                
+                                <!-- Balance with professional number formatting -->
+                                <td align="center">
+                                    <t t-call="statement_report.format_overdue_currency">
+                                        <t t-set="amount_value" t-value="line['balance']"/>
+                                        <t t-set="currency_symbol" t-value="currency"/>
+                                        <t t-set="is_overdue" t-value="line.get('is_overdue', False)"/>
+                                    </t>
                                 </td>
                             </tr>
                         </t>
@@ -55,15 +95,19 @@
                                         <tr>
                                             <td>Total Amount:</td>
                                             <td>
-                                                <t t-esc="currency"/>
-                                                <t t-esc="total"/>
+                                                <t t-call="statement_report.format_currency">
+                                                    <t t-set="amount_value" t-value="total"/>
+                                                    <t t-set="currency_symbol" t-value="currency"/>
+                                                </t>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Total Balance:</td>
                                             <td>
-                                                <t t-esc="currency"/>
-                                                <t t-esc="balance"/>
+                                                <t t-call="statement_report.format_currency">
+                                                    <t t-set="amount_value" t-value="balance"/>
+                                                    <t t-set="currency_symbol" t-value="currency"/>
+                                                </t>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -187,6 +231,115 @@
                     </div>
                 </t>
             </t>
+        </t>
+    </template>
+
+    <!-- Date Formatting Template: DD-MMM-YYYY -->
+    <template id="format_date">
+        <t t-if="date_value and str(date_value) != 'False'">
+            <t t-if="hasattr(date_value, 'strftime')">
+                <t t-esc="date_value.strftime('%d-%b-%Y')"/>
+            </t>
+            <t t-elif="'-' in str(date_value)">
+                <t t-set="date_parts" t-value="str(date_value)[:10].split('-')"/>
+                <t t-if="len(date_parts) == 3">
+                    <t t-set="year" t-value="date_parts[0]"/>
+                    <t t-set="month" t-value="date_parts[1]"/>
+                    <t t-set="day" t-value="date_parts[2]"/>
+                    <t t-set="month_names" t-value="['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']"/>
+                    <t t-set="month_idx" t-value="int(month) - 1"/>
+                    <t t-if="month_idx >= 0 and month_idx &lt; 12">
+                        <t t-esc="day"/>-<t t-esc="month_names[month_idx]"/>-<t t-esc="year"/>
+                    </t>
+                    <t t-else="">
+                        <t t-esc="date_value"/>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-esc="date_value"/>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-esc="date_value"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Professional Number/Currency Formatting Template -->
+    <template id="format_currency">
+        <t t-if="amount_value != False">
+            <t t-set="num_value" t-value="float(amount_value or 0)"/>
+            <t t-set="formatted_num" t-value="'{:,.2f}'.format(num_value)"/>
+            <!-- Remove trailing zeros after decimal point -->
+            <t t-if="'.' in formatted_num">
+                <t t-set="parts" t-value="formatted_num.split('.')"/>
+                <t t-set="decimal_part" t-value="parts[1].rstrip('0')"/>
+                <t t-if="decimal_part">
+                    <t t-set="clean_amount" t-value="parts[0] + '.' + decimal_part"/>
+                </t>
+                <t t-else="">
+                    <t t-set="clean_amount" t-value="parts[0]"/>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-set="clean_amount" t-value="formatted_num"/>
+            </t>
+            <t t-esc="currency_symbol or ''"/><t t-esc="clean_amount"/>
+        </t>
+        <t t-else="">
+            <t t-esc="currency_symbol or ''"/>0
+        </t>
+    </template>
+
+    <!-- Overdue Text Formatting Template -->
+    <template id="format_overdue_text">
+        <t t-if="is_overdue">
+            <span style="color: #dc3545; font-weight: 500;">
+                <t t-esc="text_value or ''"/>
+            </span>
+        </t>
+        <t t-else="">
+            <span style="color: #000000;">
+                <t t-esc="text_value or ''"/>
+            </span>
+        </t>
+    </template>
+
+    <!-- Overdue Date Formatting Template -->
+    <template id="format_overdue_date">
+        <t t-if="is_overdue">
+            <span style="color: #dc3545; font-weight: 500;">
+                <t t-call="statement_report.format_date">
+                    <t t-set="date_value" t-value="date_value"/>
+                </t>
+            </span>
+        </t>
+        <t t-else="">
+            <span style="color: #000000;">
+                <t t-call="statement_report.format_date">
+                    <t t-set="date_value" t-value="date_value"/>
+                </t>
+            </span>
+        </t>
+    </template>
+
+    <!-- Overdue Currency Formatting Template -->
+    <template id="format_overdue_currency">
+        <t t-if="is_overdue">
+            <span style="color: #dc3545; font-weight: 500;">
+                <t t-call="statement_report.format_currency">
+                    <t t-set="amount_value" t-value="amount_value"/>
+                    <t t-set="currency_symbol" t-value="currency_symbol"/>
+                </t>
+            </span>
+        </t>
+        <t t-else="">
+            <span style="color: #000000;">
+                <t t-call="statement_report.format_currency">
+                    <t t-set="amount_value" t-value="amount_value"/>
+                    <t t-set="currency_symbol" t-value="currency_symbol"/>
+                </t>
+            </span>
         </t>
     </template>
 </odoo>

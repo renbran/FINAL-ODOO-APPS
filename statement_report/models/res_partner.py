@@ -22,7 +22,7 @@
 import base64
 import io
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 try:
     import xlsxwriter
     HAS_XLSXWRITER = True
@@ -222,6 +222,51 @@ class Partner(models.Model):
         
         return buckets
 
+    def _process_report_lines(self, lines):
+        """Process report lines to add formatting flags and enhance data"""
+        processed_lines = []
+        today = date.today()
+        
+        for line in lines:
+            processed_line = line.copy()
+            
+            # Check if invoice is overdue
+            due_date = line.get('invoice_date_due')
+            is_overdue = False
+            
+            if due_date:
+                if isinstance(due_date, str):
+                    try:
+                        due_date_obj = datetime.strptime(due_date, '%Y-%m-%d').date()
+                        is_overdue = due_date_obj < today
+                    except ValueError:
+                        is_overdue = False
+                elif isinstance(due_date, date):
+                    is_overdue = due_date < today
+                elif hasattr(due_date, 'date'):
+                    is_overdue = due_date.date() < today
+            
+            processed_line['is_overdue'] = is_overdue
+            
+            # Format dates for proper display (handle various date formats)
+            for date_field in ['invoice_date', 'invoice_date_due']:
+                if line.get(date_field):
+                    date_value = line[date_field]
+                    if isinstance(date_value, str):
+                        try:
+                            # Try to parse string date
+                            parsed_date = datetime.strptime(date_value[:10], '%Y-%m-%d').date()
+                            processed_line[date_field] = parsed_date
+                        except (ValueError, TypeError):
+                            processed_line[date_field] = date_value
+                    elif isinstance(date_value, datetime):
+                        processed_line[date_field] = date_value.date()
+                    # If it's already a date object, keep it as is
+            
+            processed_lines.append(processed_line)
+        
+        return processed_lines
+
     def action_share_pdf(self):
         """ Action for sharing customer pdf report"""
         if self.customer_report_ids:
@@ -233,6 +278,9 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+
+            # Process lines for enhanced formatting
+            main = self._process_report_lines(main)
 
             # Calculate aging buckets
             aging_buckets = self.calculate_aging_buckets('out_invoice')
@@ -299,6 +347,9 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Process lines for enhanced formatting
+            main = self._process_report_lines(main)
             
             # Calculate aging buckets
             aging_buckets = self.calculate_aging_buckets('out_invoice')
@@ -941,6 +992,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Process lines for enhanced formatting
+            main = self._process_report_lines(main)
+            
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -971,6 +1026,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Process lines for enhanced formatting
+            main = self._process_report_lines(main)
+            
             data = {
                 'customer': self.display_name,
                 'street': self.street,
