@@ -73,47 +73,117 @@
                     </div>
                 </t>
                 
-                <!-- Aging Buckets Summary -->
+                <!-- Enhanced Aging Buckets Summary -->
                 <t t-if="aging_buckets">
                     <br/><br/>
-                    <div class="clearfix" name="aging_summary">
-                        <h4 style="text-align: center; background-color: #f8f9fa; padding: 10px; border: 1px solid #dee2e6;">
-                            AGING SUMMARY
+                    <div class="clearfix" name="aging_summary" style="page-break-inside: avoid;">
+                        <h4 style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                   color: white; padding: 12px; border-radius: 5px; margin-bottom: 15px; 
+                                   font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                            📊 AGING ANALYSIS SUMMARY
                         </h4>
-                        <table class="table table-bordered" style="margin-top: 15px;">
-                            <thead style="background-color: #e9ecef;">
-                                <tr>
-                                    <th class="text-center">Current (0-30)</th>
-                                    <th class="text-center">31-60 Days</th>
-                                    <th class="text-center">61-90 Days</th>
-                                    <th class="text-center">91-120 Days</th>
-                                    <th class="text-center">120+ Days</th>
-                                    <th class="text-center">Total Due</th>
+                        
+                        <!-- Aging Buckets Table -->
+                        <table class="table table-bordered" style="margin-top: 15px; border: 2px solid #dee2e6;">
+                            <thead>
+                                <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
+                                        Current<br/><small>(0-30 days)</small>
+                                    </th>
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
+                                        Past Due<br/><small>(31-60 days)</small>
+                                    </th>
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
+                                        Overdue<br/><small>(61-90 days)</small>
+                                    </th>
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
+                                        Critical<br/><small>(91-120 days)</small>
+                                    </th>
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; color: #495057;">
+                                        Very Overdue<br/><small>(120+ days)</small>
+                                    </th>
+                                    <th class="text-center" style="padding: 12px; font-weight: bold; border: 1px solid #adb5bd; 
+                                                                   background-color: #ffc107; color: #212529;">
+                                        Total Outstanding
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-center">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['current']"/>
+                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
+                                                                    background-color: #d4edda; font-weight: bold; font-size: 14px;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('current', 0))"/>
                                     </td>
-                                    <td class="text-center">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['days_30']"/>
+                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
+                                                                    background-color: #fff3cd; font-weight: bold; font-size: 14px;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_30', 0))"/>
                                     </td>
-                                    <td class="text-center">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['days_60']"/>
+                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
+                                                                    background-color: #fdeaa7; font-weight: bold; font-size: 14px;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_60', 0))"/>
                                     </td>
-                                    <td class="text-center">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['days_90']"/>
+                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
+                                                                    background-color: #f8d7da; font-weight: bold; font-size: 14px;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_90', 0))"/>
                                     </td>
-                                    <td class="text-center">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['days_120']"/>
+                                    <td class="text-center" style="padding: 15px; border: 1px solid #dee2e6; 
+                                                                    background-color: #f5c6cb; font-weight: bold; font-size: 14px;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('days_120', 0))"/>
                                     </td>
-                                    <td class="text-center" style="font-weight: bold;">
-                                        <t t-esc="currency"/><t t-esc="'%.2f' % aging_buckets['total']"/>
+                                    <td class="text-center" style="padding: 15px; border: 2px solid #ffc107; 
+                                                                    background-color: #fff3cd; font-weight: bold; font-size: 16px; color: #212529;">
+                                        <t t-esc="currency"/><t t-esc="'{:,.2f}'.format(aging_buckets.get('total', 0))"/>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- Aging Percentages Row -->
+                        <t t-if="aging_buckets.get('total', 0) > 0">
+                            <table class="table" style="margin-top: 10px;">
+                                <thead>
+                                    <tr style="background-color: #f1f3f4;">
+                                        <th colspan="6" class="text-center" style="padding: 8px; font-weight: bold; color: #495057;">
+                                            Percentage Distribution
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <t t-set="total_aging" t-value="aging_buckets.get('total', 0)"/>
+                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
+                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('current', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                        </td>
+                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
+                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_30', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                        </td>
+                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
+                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_60', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                        </td>
+                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
+                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_90', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                        </td>
+                                        <td class="text-center" style="padding: 8px; font-size: 12px;">
+                                            <t t-esc="'{:.1f}%'.format((aging_buckets.get('days_120', 0) / total_aging * 100) if total_aging > 0 else 0)"/>
+                                        </td>
+                                        <td class="text-center" style="padding: 8px; font-weight: bold; background-color: #e9ecef;">
+                                            100.0%
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        
+                        <!-- Risk Assessment Summary -->
+                        <t t-set="days_90_plus" t-value="aging_buckets.get('days_90', 0) + aging_buckets.get('days_120', 0)"/>
+                        <t t-if="days_90_plus > 0">
+                            <div style="margin-top: 15px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                                <strong style="color: #721c24;">⚠️ Risk Assessment:</strong>
+                                <span t-esc="currency"/><span t-esc="'{:,.2f}'.format(days_90_plus)"/> 
+                                (<span t-esc="'{:.1f}%'.format((days_90_plus / aging_buckets.get('total', 1) * 100))"/>)
+                                is overdue by more than 90 days and requires immediate attention.
+                            </div>
+                        </t>
                     </div>
                 </t>
             </t>

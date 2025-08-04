@@ -322,152 +322,228 @@ class Partner(models.Model):
             raise ValidationError('There is no statement to print')
 
     def action_print_xlsx(self):
-        """ Action for printing xlsx report of customer """
+        """ Action for printing xlsx report of customer with enhanced aging buckets """
         if not HAS_XLSXWRITER:
             raise UserError("The xlsxwriter Python library is not installed. "
                           "Please install it using: pip install xlsxwriter")
         
         if self.customer_report_ids:
-            main_query = self.main_query()
-            main_query += """ AND move_type IN ('out_invoice')"""
-            amount = self.amount_query()
-            amount += """ AND move_type IN ('out_invoice')"""
+            try:
+                main_query = self.main_query()
+                main_query += """ AND move_type IN ('out_invoice')"""
+                amount = self.amount_query()
+                amount += """ AND move_type IN ('out_invoice')"""
 
-            self.env.cr.execute(main_query)
-            main = self.env.cr.dictfetchall()
-            self.env.cr.execute(amount)
-            amount = self.env.cr.dictfetchall()
-            
-            # Calculate aging buckets
-            aging_buckets = self.calculate_aging_buckets('out_invoice')
-            
-            data = {
-                'customer': self.display_name,
-                'street': self.street,
-                'street2': self.street2,
-                'city': self.city,
-                'state': self.state_id.name,
-                'zip': self.zip,
-                'my_data': main,
-                'total': amount[0]['total'],
-                'balance': amount[0]['balance'],
-                'currency': self.currency_id.symbol,
-                'aging_buckets': aging_buckets,
-            }
-            return {
-                'type': 'ir.actions.report',
-                'data': {
-                    'model': 'res.partner',
-                    'options': json.dumps(data, default=date_utils.json_default),
-                    'output_format': 'xlsx',
-                    'report_name': 'Customer_Statement_Report'
-                },
-                'report_type': 'xlsx',
-            }
+                self.env.cr.execute(main_query)
+                main = self.env.cr.dictfetchall()
+                self.env.cr.execute(amount)
+                amount = self.env.cr.dictfetchall()
+                
+                # Calculate aging buckets with error handling
+                try:
+                    aging_buckets = self.calculate_aging_buckets('out_invoice')
+                except Exception as e:
+                    # Fallback aging buckets if calculation fails
+                    aging_buckets = {
+                        'current': 0.0,
+                        'days_30': 0.0,
+                        'days_60': 0.0,
+                        'days_90': 0.0,
+                        'days_120': 0.0,
+                        'total': 0.0
+                    }
+                
+                # Ensure we have valid data
+                if not amount:
+                    amount = [{'total': 0.0, 'balance': 0.0}]
+                
+                data = {
+                    'customer': self.display_name,
+                    'street': self.street or '',
+                    'street2': self.street2 or '',
+                    'city': self.city or '',
+                    'state': self.state_id.name if self.state_id else '',
+                    'zip': self.zip or '',
+                    'my_data': main,
+                    'total': amount[0]['total'] if amount else 0.0,
+                    'balance': amount[0]['balance'] if amount else 0.0,
+                    'currency': self.currency_id.symbol,
+                    'aging_buckets': aging_buckets,
+                    'partner_id': self.id,
+                    'report_date': date.today().strftime('%Y-%m-%d')
+                }
+                
+                # Use safe report name to prevent undefined errors
+                report_name = f'Customer_Statement_Report_{self.id}_{date.today().strftime("%Y%m%d")}'
+                
+                return {
+                    'type': 'ir.actions.report',
+                    'data': {
+                        'model': 'res.partner',
+                        'options': json.dumps(data, default=date_utils.json_default),
+                        'output_format': 'xlsx',
+                        'report_name': report_name
+                    },
+                    'report_type': 'xlsx',
+                }
+            except Exception as e:
+                raise UserError(f"Error generating Excel report: {str(e)}")
         else:
             raise ValidationError('There is no statement to print')
 
     def get_xlsx_report(self, data, response):
-        """ Get xlsx report data """
+        """ Get xlsx report data with enhanced aging buckets """
         if not HAS_XLSXWRITER:
             raise UserError("The xlsxwriter Python library is not installed. "
                           "Please install it using: pip install xlsxwriter")
         
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet()
-        cell_format_with_color = workbook.add_format({
-            'font_size': '14px', 'bold': True,
-            'bg_color': 'yellow', 'border': 1})
-        cell_format = workbook.add_format({'font_size': '14px', 'bold': True})
-        txt = workbook.add_format({'font_size': '13px'})
-        txt_border = workbook.add_format({'font_size': '13px', 'border': 1})
-        head = workbook.add_format({'align': 'center', 'bold': True,
-                                    'font_size': '22px'})
-        sheet.merge_range('B2:Q4', 'Payment Statement Report', head)
-
-        if data['customer']:
-            sheet.merge_range('B7:D7', 'Customer/Supplier : ', cell_format)
-            sheet.merge_range('E7:H7', data['customer'], txt)
-        sheet.merge_range('B9:C9', 'Address : ', cell_format)
-        if data['street']:
-            sheet.merge_range('D9:F9', data['street'], txt)
-        if data['street2']:
-            sheet.merge_range('D10:F10', data['street2'], txt)
-        if data['city']:
-            sheet.merge_range('D11:F11', data['city'], txt)
-        if data['state']:
-            sheet.merge_range('D12:F12', data['state'], )
-        if data['zip']:
-            sheet.merge_range('D13:F13', data['zip'], txt)
-
-        sheet.merge_range('B15:C15', 'Date', cell_format_with_color)
-        sheet.merge_range('D15:G15', 'Invoice/Bill Number',
-                          cell_format_with_color)
-        sheet.merge_range('H15:I15', 'Due Date', cell_format_with_color)
-        sheet.merge_range('J15:L15', 'Invoices/Debit', cell_format_with_color)
-        sheet.merge_range('M15:O15', 'Amount Due', cell_format_with_color)
-        sheet.merge_range('P15:R15', 'Balance Due', cell_format_with_color)
-
-        row = 15
-        column = 0
-        for record in data['my_data']:
-            sub_total = data['currency'] + str(record['sub_total'])
-            amount_due = data['currency'] + str(record['amount_due'])
-            balance = data['currency'] + str(record['balance'])
-            total = data['currency'] + str(data['total'])
-            remain_balance = data['currency'] + str(data['balance'])
-            sheet.merge_range(row, column + 1, row, column + 2,
-                              record['invoice_date'], txt_border)
-            sheet.merge_range(row, column + 3, row, column + 6,
-                              record['name'], txt_border)
-            sheet.merge_range(row, column + 7, row, column + 8,
-                              record['invoice_date_due'], txt_border)
-            sheet.merge_range(row, column + 9, row, column + 11,
-                              sub_total, txt_border)
-            sheet.merge_range(row, column + 12, row, column + 14,
-                              amount_due, txt_border)
-            sheet.merge_range(row, column + 15, row, column + 17,
-                              balance, txt_border)
-            row = row + 1
-        sheet.write(row + 2, column + 1, 'Total Amount: ', cell_format)
-        sheet.merge_range(row + 2, column + 3, row + 2, column + 4,
-                          total, txt)
-        sheet.write(row + 4, column + 1, 'Balance Due: ', cell_format)
-        sheet.merge_range(row + 4, column + 3, row + 4, column + 4,
-                          remain_balance, txt)
-        
-        # Add aging buckets section
-        if 'aging_buckets' in data:
-            aging = data['aging_buckets']
-            currency = data['currency']
+        try:
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+            sheet = workbook.add_worksheet('Statement Report')
             
-            # Aging header
-            sheet.write(row + 7, column + 1, 'AGING SUMMARY', 
-                       workbook.add_format({'font_size': '16px', 'bold': True, 
-                                           'bg_color': '#E6E6FA', 'border': 1}))
+            # Define enhanced formats
+            title_format = workbook.add_format({
+                'align': 'center', 'bold': True, 'font_size': '22px',
+                'bg_color': '#4472C4', 'font_color': 'white', 'border': 2
+            })
             
-            # Aging bucket headers
-            aging_row = row + 9
-            sheet.write(aging_row, column + 1, 'Current (0-30)', cell_format_with_color)
-            sheet.write(aging_row, column + 3, '31-60 Days', cell_format_with_color)
-            sheet.write(aging_row, column + 5, '61-90 Days', cell_format_with_color)
-            sheet.write(aging_row, column + 7, '91-120 Days', cell_format_with_color)
-            sheet.write(aging_row, column + 9, '120+ Days', cell_format_with_color)
-            sheet.write(aging_row, column + 11, 'Total Due', cell_format_with_color)
+            header_format = workbook.add_format({
+                'font_size': '14px', 'bold': True,
+                'bg_color': '#D9E1F2', 'border': 1, 'align': 'center'
+            })
             
-            # Aging bucket values
-            aging_row += 1
-            sheet.write(aging_row, column + 1, f"{currency}{aging['current']:.2f}", txt_border)
-            sheet.write(aging_row, column + 3, f"{currency}{aging['days_30']:.2f}", txt_border)
-            sheet.write(aging_row, column + 5, f"{currency}{aging['days_60']:.2f}", txt_border)
-            sheet.write(aging_row, column + 7, f"{currency}{aging['days_90']:.2f}", txt_border)
-            sheet.write(aging_row, column + 9, f"{currency}{aging['days_120']:.2f}", txt_border)
-            sheet.write(aging_row, column + 11, f"{currency}{aging['total']:.2f}", txt_border)
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
+            aging_header_format = workbook.add_format({
+                'font_size': '12px', 'bold': True,
+                'bg_color': '#FFC000', 'border': 1, 'align': 'center'
+            })
+            
+            cell_format = workbook.add_format({'font_size': '14px', 'bold': True})
+            txt = workbook.add_format({'font_size': '13px'})
+            txt_border = workbook.add_format({'font_size': '13px', 'border': 1})
+            currency_format = workbook.add_format({'font_size': '13px', 'border': 1, 'num_format': '[$-409]#,##0.00'})
+            
+            # Title
+            sheet.merge_range('B2:R4', 'CUSTOMER STATEMENT REPORT', title_format)
+            
+            # Customer information with better formatting
+            if data.get('customer'):
+                sheet.merge_range('B7:D7', 'Customer/Supplier:', cell_format)
+                sheet.merge_range('E7:H7', data['customer'], txt)
+            
+            sheet.merge_range('B9:C9', 'Address:', cell_format)
+            row_addr = 9
+            for addr_field, addr_value in [
+                ('street', data.get('street', '')),
+                ('street2', data.get('street2', '')),
+                ('city', data.get('city', '')),
+                ('state', data.get('state', '')),
+                ('zip', data.get('zip', ''))
+            ]:
+                if addr_value:
+                    sheet.merge_range(f'D{row_addr}:F{row_addr}', addr_value, txt)
+                    row_addr += 1
+
+            # Table headers with enhanced formatting
+            header_row = 15
+            sheet.merge_range(f'B{header_row}:C{header_row}', 'Date', header_format)
+            sheet.merge_range(f'D{header_row}:G{header_row}', 'Invoice/Bill Number', header_format)
+            sheet.merge_range(f'H{header_row}:I{header_row}', 'Due Date', header_format)
+            sheet.merge_range(f'J{header_row}:L{header_row}', 'Invoices/Debit', header_format)
+            sheet.merge_range(f'M{header_row}:O{header_row}', 'Amount Due', header_format)
+            sheet.merge_range(f'P{header_row}:R{header_row}', 'Balance Due', header_format)
+
+            # Data rows
+            row = header_row
+            for record in data.get('my_data', []):
+                row += 1
+                sheet.merge_range(row, 1, row, 2, record.get('invoice_date', ''), txt_border)
+                sheet.merge_range(row, 3, row, 6, record.get('name', ''), txt_border)
+                sheet.merge_range(row, 7, row, 8, record.get('invoice_date_due', ''), txt_border)
+                sheet.merge_range(row, 9, row, 11, record.get('sub_total', 0), currency_format)
+                sheet.merge_range(row, 12, row, 14, record.get('amount_due', 0), currency_format)
+                sheet.merge_range(row, 15, row, 17, record.get('balance', 0), currency_format)
+            
+            # Totals section
+            total_row = row + 3
+            sheet.write(total_row, 1, 'Total Amount:', cell_format)
+            sheet.merge_range(total_row, 3, total_row, 4, data.get('total', 0), currency_format)
+            
+            balance_row = total_row + 2
+            sheet.write(balance_row, 1, 'Balance Due:', cell_format)
+            sheet.merge_range(balance_row, 3, balance_row, 4, data.get('balance', 0), currency_format)
+            
+            # Enhanced Aging Buckets Section
+            if data.get('aging_buckets'):
+                aging = data['aging_buckets']
+                
+                # Aging section title
+                aging_title_row = balance_row + 4
+                sheet.merge_range(aging_title_row, 1, aging_title_row, 12, 
+                                'AGING ANALYSIS SUMMARY', 
+                                workbook.add_format({
+                                    'font_size': '16px', 'bold': True, 
+                                    'bg_color': '#E6E6FA', 'border': 2,
+                                    'align': 'center'
+                                }))
+                
+                # Aging bucket headers in a more professional layout
+                aging_header_row = aging_title_row + 2
+                aging_headers = [
+                    ('Current (0-30 days)', 'B'),
+                    ('31-60 Days', 'D'), 
+                    ('61-90 Days', 'F'),
+                    ('91-120 Days', 'H'),
+                    ('120+ Days', 'J'),
+                    ('Total Due', 'L')
+                ]
+                
+                for header, col in aging_headers:
+                    col_range = f'{col}{aging_header_row}:{chr(ord(col)+1)}{aging_header_row}'
+                    sheet.merge_range(col_range, header, aging_header_format)
+                
+                # Aging bucket values with currency formatting
+                aging_value_row = aging_header_row + 1
+                aging_values = [
+                    (aging.get('current', 0), 'B'),
+                    (aging.get('days_30', 0), 'D'),
+                    (aging.get('days_60', 0), 'F'),
+                    (aging.get('days_90', 0), 'H'),
+                    (aging.get('days_120', 0), 'J'),
+                    (aging.get('total', 0), 'L')
+                ]
+                
+                for value, col in aging_values:
+                    col_range = f'{col}{aging_value_row}:{chr(ord(col)+1)}{aging_value_row}'
+                    sheet.merge_range(col_range, value, currency_format)
+                
+                # Add aging percentages
+                aging_total = aging.get('total', 0)
+                if aging_total > 0:
+                    percent_row = aging_value_row + 1
+                    sheet.merge_range(f'B{percent_row}:M{percent_row}', 'Percentage Distribution:', cell_format)
+                    
+                    percent_value_row = percent_row + 1
+                    for value, col in aging_values[:-1]:  # Exclude total from percentage
+                        percentage = (value / aging_total * 100) if aging_total > 0 else 0
+                        col_range = f'{col}{percent_value_row}:{chr(ord(col)+1)}{percent_value_row}'
+                        sheet.merge_range(col_range, f'{percentage:.1f}%', 
+                                        workbook.add_format({'font_size': '11px', 'border': 1, 'align': 'center'}))
+            
+            # Set column widths for better readability
+            sheet.set_column('A:A', 2)
+            sheet.set_column('B:C', 12)
+            sheet.set_column('D:G', 15)
+            sheet.set_column('H:I', 12)
+            sheet.set_column('J:R', 14)
+            
+            workbook.close()
+            output.seek(0)
+            response.stream.write(output.read())
+            output.close()
+            
+        except Exception as e:
+            raise UserError(f"Error generating Excel file: {str(e)}")
 
     def action_share_xlsx(self):
         """ Action for sharing xlsx report via email"""
