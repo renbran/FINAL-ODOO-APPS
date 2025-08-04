@@ -13,14 +13,18 @@
                 <!-- Header Section -->
                 <div class="dashboard_header">
                     <div class="dashboard_title">
-                        <h2>Sales Dashboard</h2>
-                        <p>Real-time sales analytics and performance metrics</p>
+                        <h2>Enhanced Sales Dashboard</h2>
+                        <p>Real-time sales analytics with agent rankings and booking date analysis</p>
                     </div>
                     <div class="dashboard_filters">
                         <div class="filter_group">
                             <span class="o_form_label">Date Range:</span>
                             <input type="date" id="start_date" class="form-control"/>
                             <input type="date" id="end_date" class="form-control"/>
+                            <span class="o_form_label ml-3">Sale Type:</span>
+                            <select id="sale_type_filter" class="form-control" multiple="multiple">
+                                <!-- Populated by JavaScript -->
+                            </select>
                             <button class="btn btn-primary" id="refresh_dashboard">Refresh</button>
                             <button class="btn btn-info" id="test_backend">Test Backend</button>
                         </div>
@@ -83,7 +87,7 @@
                         <!-- Monthly Trend Chart -->
                         <div class="col-md-8">
                             <div class="chart_container">
-                                <h4>Monthly Sales Trend</h4>
+                                <h4>Monthly Sales Trend (by Booking Date)</h4>
                                 <canvas id="monthly_trend_chart" width="400" height="200"></canvas>
                             </div>
                         </div>
@@ -114,23 +118,92 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Agent and Broker Rankings -->
+                    <div class="row mt-4">
+                        <!-- Agent Rankings -->
+                        <div class="col-md-6">
+                            <div class="chart_container">
+                                <h4>Top Agents by Revenue</h4>
+                                <canvas id="agent_ranking_chart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Broker Rankings -->
+                        <div class="col-md-6">
+                            <div class="chart_container">
+                                <h4>Top Brokers by Revenue</h4>
+                                <canvas id="broker_ranking_chart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Data Tables Section -->
+                <!-- Agent and Broker Performance Tables -->
                 <div class="tables_section mt-4">
                     <div class="row">
+                        <!-- Agent Performance Table -->
+                        <div class="col-md-6">
+                            <div class="table_container">
+                                <h4>Agent Performance Details</h4>
+                                <div id="agent_performance_table">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent</th>
+                                                <th>Deal Count</th>
+                                                <th>Total Revenue</th>
+                                                <th>Avg Price Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="agent_table_body">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Broker Performance Table -->
+                        <div class="col-md-6">
+                            <div class="table_container">
+                                <h4>Broker Performance Details</h4>
+                                <div id="broker_performance_table">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Broker</th>
+                                                <th>Deal Count</th>
+                                                <th>Total Revenue</th>
+                                                <th>Avg Price Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="broker_table_body">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Table -->
+                    <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="table_container">
-                                <h4>Recent Sales Orders</h4>
+                                <h4>Recent Sales Orders (by Booking Date)</h4>
                                 <div id="recent_orders_table">
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Order #</th>
                                                 <th>Customer</th>
-                                                <th>Date</th>
+                                                <th>Booking Date</th>
                                                 <th>Amount</th>
                                                 <th>State</th>
+                                                <th>Agent</th>
+                                                <th>Broker</th>
+                                                <th>Sale Type</th>
                                             </tr>
                                         </thead>
                                         <tbody id="orders_table_body">

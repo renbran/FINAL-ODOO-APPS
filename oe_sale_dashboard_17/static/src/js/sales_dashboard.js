@@ -53,6 +53,8 @@ export class SalesDashboard extends Component {
                 start: this.getDefaultStartDate(),
                 end: this.getDefaultEndDate()
             },
+            saleTypeIds: [], // Selected sale type IDs for filtering
+            saleTypeOptions: [], // Available sale type options
             data: {
                 performance: {
                     total_quotations: 435,
@@ -79,12 +81,25 @@ export class SalesDashboard extends Component {
                 salesTeam: {
                     labels: ['Sales Team A', 'Sales Team B', 'Sales Team C'],
                     amounts: [49754161, 25000000, 15000000]
+                },
+                agentRanking: {
+                    agents: [],
+                    deal_counts: [],
+                    total_amounts: [],
+                    avg_price_units: []
+                },
+                brokerRanking: {
+                    brokers: [],
+                    deal_counts: [],
+                    total_amounts: [],
+                    avg_price_units: []
                 }
             }
         });
 
         onWillStart(async () => {
             console.log('[Sales Dashboard] Component starting...');
+            await this.loadSaleTypeOptions();
             await this.loadDashboardData();
         });
 
@@ -187,6 +202,23 @@ export class SalesDashboard extends Component {
                 this.state.dateRange.end = e.target.value;
             });
         }
+
+        // Setup sale type filter
+        const saleTypeFilter = document.getElementById('sale_type_filter');
+        if (saleTypeFilter) {
+            // Populate options
+            this.state.saleTypeOptions.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.id;
+                optionElement.textContent = option.name;
+                saleTypeFilter.appendChild(optionElement);
+            });
+
+            saleTypeFilter.addEventListener('change', (e) => {
+                this.state.saleTypeIds = Array.from(e.target.selectedOptions).map(option => parseInt(option.value));
+                console.log('[Sales Dashboard] Sale type filter changed:', this.state.saleTypeIds);
+            });
+        }
     }
 
     async loadDashboardData() {
@@ -209,14 +241,16 @@ export class SalesDashboard extends Component {
                 this.loadMonthlyData(),
                 this.loadStateData(),
                 this.loadCustomersData(),
-                this.loadTeamData()
+                this.loadTeamData(),
+                this.loadAgentRankingData(),
+                this.loadBrokerRankingData()
             ];
 
             const results = await Promise.allSettled(promises);
             
             // Log any failed promises
             results.forEach((result, index) => {
-                const methodNames = ['Performance', 'Monthly', 'State', 'Customers', 'Team'];
+                const methodNames = ['Performance', 'Monthly', 'State', 'Customers', 'Team', 'Agent Ranking', 'Broker Ranking'];
                 if (result.status === 'rejected') {
                     console.error(`[Sales Dashboard] ${methodNames[index]} data loading failed:`, result.reason);
                 }
@@ -336,13 +370,14 @@ export class SalesDashboard extends Component {
         try {
             console.log('[Sales Dashboard] Loading performance data with date range:', {
                 start: this.state.dateRange.start,
-                end: this.state.dateRange.end
+                end: this.state.dateRange.end,
+                saleTypeIds: this.state.saleTypeIds
             });
             
             const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_sales_performance_data", {
                 model: 'sale.dashboard',
                 method: 'get_sales_performance_data',
-                args: [this.state.dateRange.start, this.state.dateRange.end],
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null],
                 kwargs: {}
             });
             console.log('[Sales Dashboard] Performance data received:', result);
@@ -375,13 +410,14 @@ export class SalesDashboard extends Component {
         try {
             console.log('[Sales Dashboard] Loading monthly data with date range:', {
                 start: this.state.dateRange.start,
-                end: this.state.dateRange.end
+                end: this.state.dateRange.end,
+                saleTypeIds: this.state.saleTypeIds
             });
             
             const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_monthly_fluctuation_data", {
                 model: 'sale.dashboard',
                 method: 'get_monthly_fluctuation_data',
-                args: [this.state.dateRange.start, this.state.dateRange.end, null],
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null],
                 kwargs: {}
             });
             console.log('[Sales Dashboard] Monthly data received:', result);
@@ -423,7 +459,7 @@ export class SalesDashboard extends Component {
             const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_sales_by_state_data", {
                 model: 'sale.dashboard',
                 method: 'get_sales_by_state_data',
-                args: [this.state.dateRange.start, this.state.dateRange.end],
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null],
                 kwargs: {}
             });
             
@@ -491,7 +527,7 @@ export class SalesDashboard extends Component {
             const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_top_customers_data", {
                 model: 'sale.dashboard',
                 method: 'get_top_customers_data',
-                args: [this.state.dateRange.start, this.state.dateRange.end, 10],
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null, 10],
                 kwargs: {}
             });
             
@@ -568,7 +604,7 @@ export class SalesDashboard extends Component {
             const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_sales_team_performance", {
                 model: 'sale.dashboard',
                 method: 'get_sales_team_performance',
-                args: [this.state.dateRange.start, this.state.dateRange.end],
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null],
                 kwargs: {}
             });
             
@@ -634,6 +670,86 @@ export class SalesDashboard extends Component {
             this.state.data.salesTeam = {
                 labels: ['Sales Team'],
                 amounts: [0]
+            };
+        }
+    }
+
+    async loadSaleTypeOptions() {
+        try {
+            console.log('[Sales Dashboard] Loading sale type options...');
+            
+            const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_sale_type_options", {
+                model: 'sale.dashboard',
+                method: 'get_sale_type_options',
+                args: [],
+                kwargs: {}
+            });
+            
+            console.log('[Sales Dashboard] Sale type options received:', result);
+            this.state.saleTypeOptions = result || [];
+            
+        } catch (error) {
+            console.error('Error loading sale type options:', error);
+            this.state.saleTypeOptions = [];
+        }
+    }
+
+    async loadAgentRankingData() {
+        try {
+            console.log('[Sales Dashboard] Loading agent ranking data...');
+            
+            const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_agent_ranking_data", {
+                model: 'sale.dashboard',
+                method: 'get_agent_ranking_data',
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null, 10],
+                kwargs: {}
+            });
+            
+            console.log('[Sales Dashboard] Agent ranking data received:', result);
+            this.state.data.agentRanking = result || {
+                agents: [],
+                deal_counts: [],
+                total_amounts: [],
+                avg_price_units: []
+            };
+            
+        } catch (error) {
+            console.error('Error loading agent ranking data:', error);
+            this.state.data.agentRanking = {
+                agents: [],
+                deal_counts: [],
+                total_amounts: [],
+                avg_price_units: []
+            };
+        }
+    }
+
+    async loadBrokerRankingData() {
+        try {
+            console.log('[Sales Dashboard] Loading broker ranking data...');
+            
+            const result = await this.rpc("/web/dataset/call_kw/sale.dashboard/get_broker_ranking_data", {
+                model: 'sale.dashboard',
+                method: 'get_broker_ranking_data',
+                args: [this.state.dateRange.start, this.state.dateRange.end, this.state.saleTypeIds.length > 0 ? this.state.saleTypeIds : null, 10],
+                kwargs: {}
+            });
+            
+            console.log('[Sales Dashboard] Broker ranking data received:', result);
+            this.state.data.brokerRanking = result || {
+                brokers: [],
+                deal_counts: [],
+                total_amounts: [],
+                avg_price_units: []
+            };
+            
+        } catch (error) {
+            console.error('Error loading broker ranking data:', error);
+            this.state.data.brokerRanking = {
+                brokers: [],
+                deal_counts: [],
+                total_amounts: [],
+                avg_price_units: []
             };
         }
     }
@@ -863,6 +979,15 @@ export class SalesDashboard extends Component {
             
             console.log('[Sales Dashboard] Rendering sales team chart...');
             this.renderSimpleTeamChart();
+
+            console.log('[Sales Dashboard] Rendering agent ranking chart...');
+            this.renderAgentRankingChart();
+
+            console.log('[Sales Dashboard] Rendering broker ranking chart...');
+            this.renderBrokerRankingChart();
+
+            console.log('[Sales Dashboard] Updating performance tables...');
+            this.updatePerformanceTables();
             
             console.log('[Sales Dashboard] All charts rendered successfully');
         } catch (error) {
@@ -1047,6 +1172,130 @@ export class SalesDashboard extends Component {
                 </div>
             </div>
         `;
+    }
+
+    renderAgentRankingChart() {
+        const canvas = document.getElementById('agent_ranking_chart');
+        if (!canvas) {
+            console.warn('[Sales Dashboard] Agent ranking chart canvas not found');
+            return;
+        }
+        
+        const agentData = this.state.data.agentRanking || { agents: [], total_amounts: [] };
+        console.log('[Sales Dashboard] Agent data for chart:', agentData);
+        
+        if (!agentData.agents?.length) {
+            canvas.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    <h4>Top Agents by Revenue</h4>
+                    <p>No agent data available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const maxAmount = Math.max(...agentData.total_amounts, 1);
+        
+        canvas.innerHTML = `
+            <div style="padding: 20px;">
+                <h4 style="color: ${this.brandColors.primary}; margin-bottom: 20px;">Top Agents by Revenue</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${agentData.agents.map((agent, index) => {
+                        const amount = agentData.total_amounts[index] || 0;
+                        const dealCount = agentData.deal_counts[index] || 0;
+                        const percentage = ((amount / maxAmount) * 100);
+                        
+                        return `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 120px; font-weight: bold; font-size: 12px;">${agent}</div>
+                                <div style="flex: 1; background: #f0f0f0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                    <div style="background: ${this.brandColors.gold}; height: 100%; width: ${percentage}%; transition: width 0.3s;"></div>
+                                </div>
+                                <div style="width: 80px; text-align: right; font-size: 12px;">$${this.formatNumber(amount)}</div>
+                                <div style="width: 40px; text-align: right; font-size: 12px;">${dealCount} deals</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    renderBrokerRankingChart() {
+        const canvas = document.getElementById('broker_ranking_chart');
+        if (!canvas) {
+            console.warn('[Sales Dashboard] Broker ranking chart canvas not found');
+            return;
+        }
+        
+        const brokerData = this.state.data.brokerRanking || { brokers: [], total_amounts: [] };
+        console.log('[Sales Dashboard] Broker data for chart:', brokerData);
+        
+        if (!brokerData.brokers?.length) {
+            canvas.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    <h4>Top Brokers by Revenue</h4>
+                    <p>No broker data available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const maxAmount = Math.max(...brokerData.total_amounts, 1);
+        
+        canvas.innerHTML = `
+            <div style="padding: 20px;">
+                <h4 style="color: ${this.brandColors.primary}; margin-bottom: 20px;">Top Brokers by Revenue</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${brokerData.brokers.map((broker, index) => {
+                        const amount = brokerData.total_amounts[index] || 0;
+                        const dealCount = brokerData.deal_counts[index] || 0;
+                        const percentage = ((amount / maxAmount) * 100);
+                        
+                        return `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 120px; font-weight: bold; font-size: 12px;">${broker}</div>
+                                <div style="flex: 1; background: #f0f0f0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                    <div style="background: ${this.brandColors.accent}; height: 100%; width: ${percentage}%; transition: width 0.3s;"></div>
+                                </div>
+                                <div style="width: 80px; text-align: right; font-size: 12px;">$${this.formatNumber(amount)}</div>
+                                <div style="width: 40px; text-align: right; font-size: 12px;">${dealCount} deals</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    updatePerformanceTables() {
+        // Update agent performance table
+        const agentTableBody = document.getElementById('agent_table_body');
+        if (agentTableBody && this.state.data.agentRanking?.agents?.length) {
+            const agentData = this.state.data.agentRanking;
+            agentTableBody.innerHTML = agentData.agents.map((agent, index) => `
+                <tr>
+                    <td style="font-weight: bold;">${agent}</td>
+                    <td>${agentData.deal_counts[index] || 0}</td>
+                    <td>$${this.formatNumber(agentData.total_amounts[index] || 0)}</td>
+                    <td>$${this.formatNumber(agentData.avg_price_units[index] || 0)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Update broker performance table
+        const brokerTableBody = document.getElementById('broker_table_body');
+        if (brokerTableBody && this.state.data.brokerRanking?.brokers?.length) {
+            const brokerData = this.state.data.brokerRanking;
+            brokerTableBody.innerHTML = brokerData.brokers.map((broker, index) => `
+                <tr>
+                    <td style="font-weight: bold;">${broker}</td>
+                    <td>${brokerData.deal_counts[index] || 0}</td>
+                    <td>$${this.formatNumber(brokerData.total_amounts[index] || 0)}</td>
+                    <td>$${this.formatNumber(brokerData.avg_price_units[index] || 0)}</td>
+                </tr>
+            `).join('');
+        }
     }
 
     renderFallbackCharts() {
@@ -1579,6 +1828,21 @@ export class SalesDashboard extends Component {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(numAmount);
+    }
+
+    formatCurrency(value) {
+        if (!value && value !== 0) return '$0';
+        
+        // Convert to number if it's a string
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        
+        if (isNaN(numValue)) return '$0';
+        
+        // Format with currency symbol and commas
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(numValue);
     }
 
     formatNumber(value) {

@@ -533,3 +533,179 @@
         font-size: 11px;
     }
 }
+
+/* Agent and Broker Ranking Styles */
+.kpi_section .col-md-3 .kpi_card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi_section .col-md-3 .kpi_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(128, 0, 32, 0.25);
+}
+
+/* Sale Type Filter Styling */
+#sale_type_filter {
+    border: 2px solid var(--brand-gold);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--brand-white);
+    color: var(--brand-primary);
+    min-height: 40px;
+}
+
+#sale_type_filter option:checked {
+    background: var(--brand-gold);
+    color: var(--brand-primary);
+}
+
+/* Agent and Broker Chart Specific Styles */
+#agent_ranking_chart, #broker_ranking_chart {
+    background: var(--brand-white);
+    border-radius: 10px;
+    padding: 15px;
+    min-height: 250px;
+}
+
+/* Performance Table Enhancements */
+.table_container {
+    background: var(--brand-white);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--brand-shadow);
+    border: 2px solid var(--brand-light-gold);
+}
+
+.table_container h4 {
+    color: var(--brand-primary);
+    font-weight: bold;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--brand-gold);
+    padding-bottom: 10px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--brand-light-gold);
+}
+
+.table-striped tbody tr:hover {
+    background-color: var(--brand-gold);
+    color: var(--brand-primary);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.table th {
+    background: var(--brand-primary);
+    color: var(--brand-white);
+    font-weight: bold;
+    border: none;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.table td {
+    color: var(--brand-primary);
+    font-weight: 500;
+    border: 1px solid var(--brand-light-gold);
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Enhanced Filter Section */
+.dashboard_filters {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid var(--brand-gold);
+    box-shadow: var(--brand-shadow);
+}
+
+.dashboard_filters .form-group {
+    margin-bottom: 15px;
+}
+
+.dashboard_filters label {
+    color: var(--brand-primary);
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.dashboard_filters .form-control {
+    border: 2px solid var(--brand-gold);
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: var(--brand-white);
+    color: var(--brand-primary);
+}
+
+.dashboard_filters .form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 8px rgba(128, 0, 32, 0.3);
+}
+
+.dashboard_filters .btn {
+    margin: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard_filters .btn-primary {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: var(--brand-white);
+}
+
+.dashboard_filters .btn-primary:hover {
+    background: var(--brand-accent);
+    border-color: var(--brand-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(128, 0, 32, 0.3);
+}
+
+.dashboard_filters .btn-info {
+    background: var(--brand-gold);
+    border-color: var(--brand-gold);
+    color: var(--brand-primary);
+}
+
+.dashboard_filters .btn-info:hover {
+    background: var(--brand-dark-gold);
+    border-color: var(--brand-dark-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Responsive Enhancements for New Components */
+@media (max-width: 768px) {
+    .dashboard_filters {
+        margin-bottom: 20px;
+    }
+    
+    .dashboard_filters .form-group {
+        margin-bottom: 10px;
+    }
+    
+    .table_container {
+        overflow-x: auto;
+        padding: 15px;
+    }
+    
+    .table {
+        font-size: 12px;
+    }
+    
+    .table th, .table td {
+        padding: 8px 4px;
+    }
+    
+    #agent_ranking_chart, #broker_ranking_chart {
+        min-height: 200px;
+        padding: 10px;
+    }
+}
