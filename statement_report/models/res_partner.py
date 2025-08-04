@@ -208,17 +208,8 @@ class Partner(models.Model):
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
             }
-            return {
-                'type': 'ir.actions.report',
-                'data': {
-                    'model': 'res.partner',
-                    'options': json.dumps(data,
-                                          default=date_utils.json_default),
-                    'output_format': 'xlsx',
-                    'report_name': 'Payment Statement Report'
-                },
-                'report_type': 'xlsx',
-            }
+            # Use the proper report reference
+            return self.env.ref('statement_report.res_partner_action_xlsx').report_action(self, data=data)
         else:
             raise ValidationError('There is no statement to print')
 
