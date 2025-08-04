@@ -77,4 +77,3 @@
     'price': 0.00,
     'currency': 'USD',
 }
-}

@@ -149,50 +149,90 @@ export class CRMExecutiveDashboard extends Component {
     }
 
     initializeCharts() {
-        if (typeof Chart === 'undefined') {
-            console.warn("Chart.js not loaded, falling back to CDN");
-            this.loadChartJsFallback().then(() => {
-                this.renderAllCharts();
-            });
-        } else {
-            this.renderAllCharts();
-        }
+        // Wait for the DOM to be ready and Chart.js to be available
+        const initCharts = () => {
+            if (typeof Chart !== 'undefined') {
+                try {
+                    this.renderAllCharts();
+                } catch (error) {
+                    console.error("Error rendering charts:", error);
+                    this.showChartError();
+                }
+            } else {
+                console.warn("Chart.js not available, using fallback visualization");
+                this.showChartFallback();
+            }
+        };
+
+        // Use a small delay to ensure DOM is ready
+        setTimeout(initCharts, 100);
+    }
+
+    showChartError() {
+        // Show error message instead of breaking the component
+        const chartContainers = document.querySelectorAll('.chart-container canvas');
+        chartContainers.forEach(canvas => {
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div class="alert alert-warning text-center p-4">
+                    <i class="fa fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h5>Chart Loading Error</h5>
+                    <p>Unable to load charts. Please refresh the page.</p>
+                </div>
+            `;
+        });
+    }
+
+    showChartFallback() {
+        // Show fallback content when Chart.js is not available
+        const chartContainers = document.querySelectorAll('.chart-container canvas');
+        chartContainers.forEach(canvas => {
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div class="alert alert-info text-center p-4">
+                    <i class="fa fa-chart-bar fa-2x mb-2"></i>
+                    <h5>Charts Unavailable</h5>
+                    <p>Chart library is loading. Data is available in tables below.</p>
+                </div>
+            `;
+        });
     }
 
     async loadChartJsFallback() {
-        return new Promise((resolve, reject) => {
-            if (typeof Chart !== 'undefined') {
-                resolve();
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
+        // Simplified fallback - just return false to indicate failure
+        return Promise.resolve(false);
     }
 
     renderAllCharts() {
         requestAnimationFrame(() => {
-            this.renderPipelineChart();
-            this.renderTrendsChart();
-            this.renderTeamPerformanceChart();
-            this.renderSourcesChart();
+            try {
+                this.renderPipelineChart();
+                this.renderTrendsChart();
+                this.renderTeamPerformanceChart();
+                this.renderSourcesChart();
+            } catch (error) {
+                console.error("Error in renderAllCharts:", error);
+                this.showChartError();
+            }
         });
     }
 
     renderPipelineChart() {
+        if (typeof Chart === 'undefined') {
+            console.warn("Chart.js not available for pipeline chart");
+            return;
+        }
+
         const canvas = document.getElementById('pipelineChart');
         if (!canvas || !this.state.dashboardData.pipeline.labels) return;
 
-        if (this.charts.pipeline) {
-            this.charts.pipeline.destroy();
-        }
+        try {
+            if (this.charts.pipeline) {
+                this.charts.pipeline.destroy();
+            }
 
-        const ctx = canvas.getContext('2d');
-        this.charts.pipeline = new Chart(ctx, {
+            const ctx = canvas.getContext('2d');
+            this.charts.pipeline = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: this.state.dashboardData.pipeline.labels,
@@ -230,6 +270,9 @@ export class CRMExecutiveDashboard extends Component {
                 }
             }
         });
+        } catch (error) {
+            console.error("Error rendering pipeline chart:", error);
+        }
     }
 
     renderTrendsChart() {

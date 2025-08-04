@@ -107,20 +107,75 @@ export class CRMStrategicDashboard extends Component {
     }
 
     initializeCharts() {
-        this.createFinancialChart();
-        this.createRiskChart();
-        this.createPredictiveChart();
-        this.createTeamPerformanceChart();
+        // Wait for the DOM to be ready and Chart.js to be available
+        const initCharts = () => {
+            if (typeof Chart !== 'undefined') {
+                try {
+                    this.createFinancialChart();
+                    this.createRiskChart();
+                    this.createPredictiveChart();
+                    this.createTeamPerformanceChart();
+                } catch (error) {
+                    console.error("Error rendering strategic charts:", error);
+                    this.showChartError();
+                }
+            } else {
+                console.warn("Chart.js not available for strategic dashboard, using fallback");
+                this.showChartFallback();
+            }
+        };
+
+        // Use a small delay to ensure DOM is ready
+        setTimeout(initCharts, 150);
+    }
+
+    showChartError() {
+        // Show error message instead of breaking the component
+        const chartContainers = document.querySelectorAll('.strategic-chart-container canvas');
+        chartContainers.forEach(canvas => {
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div class="alert alert-warning text-center p-4">
+                    <i class="fa fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h5>Chart Loading Error</h5>
+                    <p>Unable to load strategic charts. Please refresh the page.</p>
+                </div>
+            `;
+        });
+    }
+
+    showChartFallback() {
+        // Show fallback content when Chart.js is not available
+        const chartContainers = document.querySelectorAll('.strategic-chart-container canvas');
+        chartContainers.forEach(canvas => {
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div class="alert alert-info text-center p-4">
+                    <i class="fa fa-chart-line fa-2x mb-2"></i>
+                    <h5>Strategic Charts Unavailable</h5>
+                    <p>Chart library is loading. Strategic data is available in metrics above.</p>
+                </div>
+            `;
+        });
     }
 
     createFinancialChart() {
-        const ctx = document.getElementById('financialChart');
-        if (!ctx) return;
+        if (typeof Chart === 'undefined') {
+            console.warn("Chart.js not available for financial chart");
+            return;
+        }
 
-        const financial = this.state.dashboardData.financial_performance;
-        const monthlyData = financial.monthly_revenue || {};
-        
-        this.charts.financial = new Chart(ctx, {
+        const ctx = document.getElementById('financialChart');
+        if (!ctx) {
+            console.warn("Financial chart canvas not found");
+            return;
+        }
+
+        try {
+            const financial = this.state.dashboardData.financial_performance;
+            const monthlyData = financial.monthly_revenue || {};
+            
+            this.charts.financial = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: Object.keys(monthlyData),
@@ -153,6 +208,9 @@ export class CRMStrategicDashboard extends Component {
                 }
             }
         });
+        } catch (error) {
+            console.error("Error creating financial chart:", error);
+        }
     }
 
     createRiskChart() {
