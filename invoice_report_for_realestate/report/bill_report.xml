@@ -57,7 +57,7 @@
                                         <td style="color: black;"><span t-field="line.name"/></td>
                                         <td class="text-center" style="color: black;">5%</td>
                                         <td class="text-end" style="color: black;">
-                                            <span t-esc="format_number(line.price_tax)"/> AED
+                                            <span t-esc="format_number(line.price_total - line.price_subtotal)"/> AED
                                         </td>
                                         <td class="text-end" style="color: black;">
                                             <span t-esc="format_number(line.price_total)"/> AED
