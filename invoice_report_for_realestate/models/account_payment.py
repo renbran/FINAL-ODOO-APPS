@@ -2,6 +2,9 @@
 
 from odoo import models, fields, api
 from num2words import num2words
+import qrcode
+import io
+import base64
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -20,6 +23,19 @@ class PaymentReportExtension(models.Model):
         help="Payment/Receipt reference number that will appear on the voucher"
     )
     
+    # QR Code fields for customer receipts
+    display_qr_code = fields.Boolean(
+        string='Display QR Code',
+        default=lambda self: self.payment_type == 'inbound',
+        help="Show QR code on payment voucher for customer receipts"
+    )
+    
+    qr_code_urls = fields.Text(
+        string='QR Code URLs',
+        compute='_compute_qr_code',
+        help="Generated QR code data URLs for payment voucher"
+    )
+    
     @api.model
     def create(self, vals):
         """Override create to ensure name field is always populated for NEW payments only"""
@@ -34,6 +50,48 @@ class PaymentReportExtension(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.payment.supplier.invoice') or \
                               self.env['ir.sequence'].next_by_code('account.payment.supplier') or '/'
         return super().create(vals)
+    
+    @api.depends('name', 'partner_id', 'amount', 'payment_date', 'display_qr_code', 'payment_type')
+    def _compute_qr_code(self):
+        """Generate QR code for customer receipts"""
+        for record in self:
+            if not record.display_qr_code or record.payment_type != 'inbound':
+                record.qr_code_urls = False
+                continue
+                
+            try:
+                # Create QR code content with payment information
+                qr_content = f"Payment Receipt\n"
+                qr_content += f"Reference: {record.name or 'N/A'}\n"
+                qr_content += f"Amount: {record.amount} {record.currency_id.name}\n"
+                qr_content += f"Date: {record.payment_date}\n"
+                qr_content += f"From: {record.partner_id.name or 'N/A'}\n"
+                
+                # Generate QR code
+                qr = qrcode.QRCode(
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(qr_content)
+                qr.make(fit=True)
+                
+                # Create image
+                img = qr.make_image(fill_color="black", back_color="white")
+                
+                # Convert to base64
+                buffer = io.BytesIO()
+                img.save(buffer, format='PNG')
+                img_data = base64.b64encode(buffer.getvalue()).decode()
+                
+                # Create data URL
+                data_url = f"data:image/png;base64,{img_data}"
+                record.qr_code_urls = data_url
+                
+            except Exception as e:
+                _logger.warning("Failed to generate QR code for payment %s: %s", record.id, str(e))
+                record.qr_code_urls = False
     
     def _get_amount_in_words(self):
         """Convert the amount to words"""

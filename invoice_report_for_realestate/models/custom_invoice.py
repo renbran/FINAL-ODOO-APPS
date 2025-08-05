@@ -32,16 +32,8 @@ class AccountMove(models.Model):
             _logger.warning("Custom bill report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(self)
 
-    def action_print_custom_receipt(self):
-        """
-        Print the PDF copy of the receipt using the custom report action.
-        With fallback to standard invoice report if custom report is not available.
-        """
-        try:
-            return self.env.ref('invoice_report_for_realestate.action_report_osus_invoice').report_action(self)
-        except ValueError as e:
-            _logger.warning("Custom receipt report not found: %s. Using standard report as fallback.", str(e))
-            return self.env.ref('account.account_invoices').report_action(self)
+    # Note: Customer receipts are handled by account.payment module (payment vouchers), 
+    # not account.move. See account_payment.py for customer receipt functionality.
 
     @api.model
     def action_bulk_print_invoices(self):

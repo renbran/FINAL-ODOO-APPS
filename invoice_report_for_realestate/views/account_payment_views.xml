@@ -48,6 +48,16 @@
                             </group>
                         </group>
                         
+                        <!-- QR Code Settings for Customer Receipts -->
+                        <group string="QR Code Settings" invisible="payment_type != 'inbound'">
+                            <group>
+                                <field name="display_qr_code" string="Show QR Code on Receipt"/>
+                            </group>
+                            <group>
+                                <field name="qr_code_urls" string="QR Code Preview" readonly="1" invisible="not qr_code_urls"/>
+                            </group>
+                        </group>
+                        
                         <group string="Print Options">
                             <button name="action_print_voucher" 
                                     string="Preview/Print Voucher" 

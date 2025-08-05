@@ -18,11 +18,7 @@
                         type="object" 
                         class="btn-secondary"
                         visibility="move_type == 'in_invoice' and state in ['posted', 'draft']"/>
-                <button name="action_print_custom_receipt" 
-                        string="Print OSUS Receipt" 
-                        type="object" 
-                        class="btn-secondary"
-                        visibility="move_type == 'out_refund' and state in ['posted', 'draft']"/>
+                <!-- Note: Customer receipts are handled by account.payment module, not account.move -->
             </xpath>
 
             <!-- Add Deal Tracking tab after other_info -->

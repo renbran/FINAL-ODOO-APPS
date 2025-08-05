@@ -96,6 +96,9 @@
         'report/bulk_report.xml',
         'report/simple_test_report.xml',
     ],
+    'demo': [
+        'data/demo_payment_data.xml',
+    ],
     'assets': {
         'web.assets_backend': [
             'invoice_report_for_realestate/static/src/js/bulk_print_controller.js',

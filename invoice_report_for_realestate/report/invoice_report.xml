@@ -12,14 +12,20 @@
                             <!-- QR Code and Vendor Details -->
                             <div class="row mb-2" style="margin-top: 10px; margin-bottom: 15px;">
                                 <div class="col-6">
-                                    <!-- QR Code Section - For Customer Invoices -->
+                                    <!-- QR Code Section - Optional for Customer Invoices -->
                                     <div style="display: flex; align-items: flex-start;">
-                                        <t t-if="o.display_qr_code and o.amount_residual > 0">
-                                            <img class="border border-dark rounded" t-att-src="o.qr_code_urls[0]" style="width:100px; height:100px;"/>
+                                        <t t-if="o.qr_in_report and o.qr_image">
+                                            <div style="text-align: center;">
+                                                <img class="border border-dark rounded" t-att-src="image_data_uri(o.qr_image)" style="width:120px; height:120px;"/>
+                                                <div style="font-size: 10px; color: #800020; margin-top: 5px; font-weight: bold;">
+                                                    Scan to view invoice<br/>or make payment
+                                                </div>
+                                            </div>
                                         </t>
                                         <t t-else="">
-                                            <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                                <span style="color: #800020; font-weight: bold; font-size: 11px;">INVOICE</span>
+                                            <div style="width:120px; height:120px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; flex-direction: column;">
+                                                <span style="color: #800020; font-weight: bold; font-size: 14px;">INVOICE</span>
+                                                <span style="color: #666; font-size: 10px; text-align: center;">QR Code<br/>Optional</span>
                                             </div>
                                         </t>
                                     </div>
