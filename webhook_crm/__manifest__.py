@@ -19,7 +19,7 @@
     'website': 'https://www.yourcompany.com',
     'depends': ['base', 'crm', 'website'],
     'data': [
-        'security/ir_model_access.xml',
+        'security/ir.model.access.csv',
         'views/webhook_mapping_views.xml',
         'data/webhook_mapping_data.xml',
     ],
