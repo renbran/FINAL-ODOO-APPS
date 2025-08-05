@@ -1,46 +1,47 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
-        <!-- Default Webhook Mapping -->
-        <record id="default_webhook_mapping" model="webhook.mapping">
-            <field name="name">Default Webhook Mapping</field>
-            <field name="source_name">default</field>
-            <field name="active">True</field>
-            <field name="default_values">{"type": "lead", "priority": "1"}</field>
-        </record>
+    <!-- Default Webhook Mapping -->
+    <record id="webhook_mapping_default" model="webhook.mapping">
+        <field name="name">Default Webhook Mapping</field>
+        <field name="source_name">default</field>
+        <field name="active">True</field>
+        <field name="default_values">{"type": "lead"}</field>
+    </record>
 
-        <!-- Default Field Mappings -->
-        <record id="default_mapping_name" model="webhook.field.mapping">
-            <field name="mapping_id" ref="default_webhook_mapping"/>
-            <field name="source_field">name</field>
-            <field name="target_field">name</field>
-            <field name="required">True</field>
-        </record>
+    <!-- Default Field Mappings -->
+    <record id="webhook_field_mapping_name" model="webhook.field.mapping">
+        <field name="mapping_id" ref="webhook_mapping_default"/>
+        <field name="source_field">name</field>
+        <field name="target_field">name</field>
+        <field name="transformation_type">strip</field>
+        <field name="required">True</field>
+    </record>
 
-        <record id="default_mapping_email" model="webhook.field.mapping">
-            <field name="mapping_id" ref="default_webhook_mapping"/>
-            <field name="source_field">email</field>
-            <field name="target_field">email_from</field>
-            <field name="transformation_type">lowercase</field>
-        </record>
+    <record id="webhook_field_mapping_email" model="webhook.field.mapping">
+        <field name="mapping_id" ref="webhook_mapping_default"/>
+        <field name="source_field">email</field>
+        <field name="target_field">email_from</field>
+        <field name="transformation_type">lowercase</field>
+    </record>
 
-        <record id="default_mapping_phone" model="webhook.field.mapping">
-            <field name="mapping_id" ref="default_webhook_mapping"/>
-            <field name="source_field">phone</field>
-            <field name="target_field">phone</field>
-            <field name="transformation_type">strip</field>
-        </record>
+    <record id="webhook_field_mapping_phone" model="webhook.field.mapping">
+        <field name="mapping_id" ref="webhook_mapping_default"/>
+        <field name="source_field">phone</field>
+        <field name="target_field">phone</field>
+        <field name="transformation_type">strip</field>
+    </record>
 
-        <record id="default_mapping_company" model="webhook.field.mapping">
-            <field name="mapping_id" ref="default_webhook_mapping"/>
-            <field name="source_field">company</field>
-            <field name="target_field">company_name</field>
-        </record>
+    <record id="webhook_field_mapping_company" model="webhook.field.mapping">
+        <field name="mapping_id" ref="webhook_mapping_default"/>
+        <field name="source_field">company</field>
+        <field name="target_field">company_name</field>
+        <field name="transformation_type">strip</field>
+    </record>
 
-        <record id="default_mapping_description" model="webhook.field.mapping">
-            <field name="mapping_id" ref="default_webhook_mapping"/>
-            <field name="source_field">message</field>
-            <field name="target_field">description</field>
-        </record>
-    </data>
+    <record id="webhook_field_mapping_message" model="webhook.field.mapping">
+        <field name="mapping_id" ref="webhook_mapping_default"/>
+        <field name="source_field">message</field>
+        <field name="target_field">description</field>
+        <field name="transformation_type">strip</field>
+    </record>
 </odoo>
