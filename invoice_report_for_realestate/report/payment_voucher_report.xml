@@ -344,6 +344,19 @@
                             </div>
                         </div>
 
+                        <!-- QR Code Section - Only for Customer Receipts -->
+                        <t t-if="o.payment_type == 'inbound'">
+                            <div class="row mt-4" t-if="o.display_qr_code and o.amount > 0">
+                                <div class="col-12 text-center">
+                                    <div class="field-label">Payment QR Code</div>
+                                    <div style="margin: 10px 0;">
+                                        <img class="border border-dark rounded" t-att-src="o.qr_code_urls[0]" style="width:120px; height:120px;"/>
+                                    </div>
+                                    <p style="font-size: 12px; color: #666; margin: 5px 0;">Scan with your banking app for payment details</p>
+                                </div>
+                            </div>
+                        </t>
+
                         <!-- Footer -->
                         <div class="footer-note">
                             Thank you for your business • Confirm payment at 0563905772

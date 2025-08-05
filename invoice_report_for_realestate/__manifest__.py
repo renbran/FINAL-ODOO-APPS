@@ -3,8 +3,19 @@
     'version': '17.0.3.0.0',
     'summary': 'Professional UAE Tax Invoice Reports with Bulk Printing & Intelligent Payment Vouchers',
     'description': '''
-        Professional Tax Invoice Reports with Advanced Features
-        =====================================================
+        Professional Tax Invoice Reports with Advanced Features - Now Default for Accounting
+        =================================================================================
+        
+        🎯 DEFAULT ACCOUNTING REPORTS OVERRIDE
+        =====================================
+        This module now automatically becomes the default for ALL invoice and bill printing in Odoo:
+        - Customer Invoices: Use enhanced invoice template with professional formatting
+        - Vendor Bills: Use simplified bill template optimized for vendor payments
+        - Smart Auto-Detection: Automatically chooses correct template based on document type
+        - Bulk Printing Compatible: All QR codes removed for reliable bulk printing
+        
+        ✨ ENHANCED INVOICE FEATURES
+        ==========================
         - UAE VAT compliant invoice layout
         - Real estate commission specific fields
         - UK date format support
@@ -13,8 +24,8 @@
         - Multi-company support
         - Inheritance-safe implementation
         
-        Bulk Printing Features
-        =====================
+        🖨️ BULK PRINTING FEATURES
+        =========================
         - Bulk print multiple customer invoices in single PDF
         - Bulk print multiple vendor bills in single PDF
         - Bulk print mixed documents (invoices, bills, credit notes)
@@ -23,6 +34,23 @@
         - Dedicated bulk print menu structure
         - Document count and total amount summaries
         - Error handling and validation
+        - NO QR CODES for reliable bulk printing
+        
+        💡 SMART BILL TEMPLATE
+        ======================
+        - Simplified structure optimized for vendor bills
+        - Default Odoo table structure and dates maintained
+        - Professional formatting similar to invoice template
+        - Automatic vendor/customer detection
+        - Consistent styling across all document types
+        
+        🔧 TECHNICAL IMPROVEMENTS
+        =========================
+        - Overrides default Odoo invoice reports automatically
+        - Smart template dispatcher based on move_type
+        - Enhanced document type detection
+        - Improved error handling and fallbacks
+        - Professional payment voucher enhancements
         
         NEW: Smart Payment Voucher Enhancements
         =====================================
@@ -60,6 +88,8 @@
         'report/report_action.xml',
         'report/bill_report_action.xml',
         'report/payment_voucher_report_action.xml',
+        'report/override_default_reports.xml',
+        'report/smart_dispatcher.xml',
         'report/invoice_report.xml',
         'report/bill_report.xml',
         'report/payment_voucher_report.xml',

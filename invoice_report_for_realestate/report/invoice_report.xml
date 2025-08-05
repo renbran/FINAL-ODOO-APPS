@@ -12,11 +12,16 @@
                             <!-- QR Code and Vendor Details -->
                             <div class="row mb-2" style="margin-top: 10px; margin-bottom: 15px;">
                                 <div class="col-6">
-                                    <!-- QR Code Section - Removed for bulk printing compatibility -->
+                                    <!-- QR Code Section - For Customer Invoices -->
                                     <div style="display: flex; align-items: flex-start;">
-                                        <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                            <span style="color: #800020; font-weight: bold; font-size: 11px;">INVOICE</span>
-                                        </div>
+                                        <t t-if="o.display_qr_code and o.amount_residual > 0">
+                                            <img class="border border-dark rounded" t-att-src="o.qr_code_urls[0]" style="width:100px; height:100px;"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div style="width:100px; height:100px; border: 2px solid #800020; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                <span style="color: #800020; font-weight: bold; font-size: 11px;">INVOICE</span>
+                                            </div>
+                                        </t>
                                     </div>
                                 </div>
                                 <div class="col-6">
