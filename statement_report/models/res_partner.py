@@ -137,6 +137,14 @@ class Partner(models.Model):
 
     def main_query(self):
         """Return select query"""
+        # Return safe query for unsaved records
+        if not self.id or not isinstance(self.id, int):
+            return """SELECT name, ref, invoice_date, invoice_date_due,
+                        amount_total_signed AS sub_total,
+                        amount_residual_signed AS amount_due ,
+                        amount_residual AS balance
+                FROM account_move WHERE 1=0"""  # Empty result set
+                
         query = """SELECT name, ref, invoice_date, invoice_date_due,
                     amount_total_signed AS sub_total,
                     amount_residual_signed AS amount_due ,
@@ -148,6 +156,10 @@ class Partner(models.Model):
 
     def amount_query(self):
         """Return query for calculating total amount"""
+        # Return safe query for unsaved records
+        if not self.id or not isinstance(self.id, int):
+            return """SELECT 0 AS total, 0 AS balance"""
+            
         amount_query = """ SELECT SUM(amount_total_signed) AS total, 
                     SUM(amount_residual) AS balance
                 FROM account_move WHERE payment_state != 'paid' 
@@ -159,6 +171,16 @@ class Partner(models.Model):
     def _compute_customer_aging(self):
         """Compute customer aging buckets"""
         for partner in self:
+            # Skip computation for unsaved records
+            if not partner.id or not isinstance(partner.id, int):
+                partner.customer_aging_current = 0
+                partner.customer_aging_30 = 0
+                partner.customer_aging_60 = 0
+                partner.customer_aging_90 = 0
+                partner.customer_aging_120 = 0
+                partner.customer_aging_total = 0
+                continue
+                
             aging_data = partner.calculate_aging_buckets('out_invoice')
             partner.customer_aging_current = aging_data.get('current', 0)
             partner.customer_aging_30 = aging_data.get('30_days', 0)
@@ -171,6 +193,16 @@ class Partner(models.Model):
     def _compute_supplier_aging(self):
         """Compute supplier aging buckets"""
         for partner in self:
+            # Skip computation for unsaved records
+            if not partner.id or not isinstance(partner.id, int):
+                partner.supplier_aging_current = 0
+                partner.supplier_aging_30 = 0
+                partner.supplier_aging_60 = 0
+                partner.supplier_aging_90 = 0
+                partner.supplier_aging_120 = 0
+                partner.supplier_aging_total = 0
+                continue
+                
             aging_data = partner.calculate_aging_buckets('in_invoice')
             partner.supplier_aging_current = aging_data.get('current', 0)
             partner.supplier_aging_30 = aging_data.get('30_days', 0)
@@ -181,6 +213,17 @@ class Partner(models.Model):
 
     def calculate_aging_buckets(self, move_type='out_invoice'):
         """Calculate aging buckets for receivables (0-30, 31-60, 61-90, 91-120, 120+)"""
+        # Return empty buckets for unsaved records
+        if not self.id or not isinstance(self.id, int):
+            return {
+                'current': 0.0,
+                'days_30': 0.0,
+                'days_60': 0.0,
+                'days_90': 0.0,
+                'days_120': 0.0,
+                'total': 0.0
+            }
+        
         today = date.today()
         
         aging_query = """

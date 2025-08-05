@@ -5,8 +5,8 @@
         <field name="name">OSUS Invoice</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_invoice_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_invoice_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_invoice_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_invoice_document</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
@@ -18,8 +18,8 @@
         <field name="name">OSUS Invoices (Bulk)</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_invoice_bulk_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_invoice_bulk_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_invoice_bulk_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_invoice_bulk_document</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
         <field name="print_report_name">'OSUS Invoices Bulk - %s documents' % (len(objects))</field>
     </record>
@@ -29,8 +29,8 @@
         <field name="name">OSUS Bills (Bulk)</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_bill_bulk_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_bill_bulk_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_bill_bulk_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_bill_bulk_document</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
         <field name="print_report_name">'OSUS Bills Bulk - %s documents' % (len(objects))</field>
     </record>
@@ -40,8 +40,8 @@
         <field name="name">OSUS Documents (Bulk)</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_mixed_bulk_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_mixed_bulk_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_mixed_bulk_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_mixed_bulk_document</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
         <field name="print_report_name">'OSUS Documents Bulk - %s items' % (len(objects))</field>
     </record>

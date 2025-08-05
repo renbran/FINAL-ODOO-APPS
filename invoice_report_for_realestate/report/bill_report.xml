@@ -106,30 +106,6 @@
                                 </div>
                             </div>
 
-                            <!-- Payment Instructions -->
-                            <div class="mb-4">
-                                <h4 style="color: #800020;">Payment Instructions</h4>
-                                <p style="color: black;">Please pay within 14 days to the account below:</p>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <tr>
-                                        <td style="width: 30%; color: black; font-weight: bold; padding: 4px;">Bank Name</td>
-                                        <td style="color: black; padding: 4px;">ABU DHABI COMMERCIAL BANK (ADCB)</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color: black; font-weight: bold; padding: 4px;">Account Name</td>
-                                        <td style="color: black; padding: 4px;">OSUS REAL ESTATE BROKERAGE LLC</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color: black; font-weight: bold; padding: 4px;">Account No.</td>
-                                        <td style="color: black; padding: 4px;">14041417820001 - AED</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color: black; font-weight: bold; padding: 4px;">IBAN</td>
-                                        <td style="color: black; padding: 4px;">AE35003001404141782000</td>
-                                    </tr>
-                                </table>
-                            </div>
-
                             <!-- Vendor Bill Note - No QR Code Required -->
                             <div class="mb-3" style="background-color: #f8f9fa; border-left: 4px solid #800020; padding: 10px; margin: 15px 0;">
                                 <p style="color: #800020; font-weight: bold; margin: 0; font-size: 13px;">
