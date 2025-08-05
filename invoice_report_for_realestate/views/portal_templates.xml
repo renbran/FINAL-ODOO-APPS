@@ -3,7 +3,7 @@
     <!-- Override the main invoice document template to use our OSUS template -->
     <template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document" priority="99">
         <xpath expr="." position="replace">
-            <t t-call="osus_invoice_report.report_osus_invoice_document"/>
+            <t t-call="invoice_report_for_realestate.report_osus_invoice_document"/>
         </xpath>
     </template>
 

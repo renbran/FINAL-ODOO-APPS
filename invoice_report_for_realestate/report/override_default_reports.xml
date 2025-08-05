@@ -2,8 +2,8 @@
 <odoo>
     <!-- Override default Odoo invoice report to use our custom invoice template -->
     <record id="account.account_invoices" model="ir.actions.report">
-        <field name="report_name">osus_invoice_report.report_osus_invoice_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_invoice_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_invoice_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_invoice_document</field>
         <field name="print_report_name">'Invoice - %s' % (object.name)</field>
     </record>
 
@@ -12,8 +12,8 @@
         <field name="name">Bills</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_bill_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_bill_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_bill_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_bill_document</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
@@ -25,8 +25,8 @@
         <field name="name">Smart Invoice/Bill Report</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.smart_report_dispatcher</field>
-        <field name="report_file">osus_invoice_report.smart_report_dispatcher</field>
+        <field name="report_name">invoice_report_for_realestate.smart_report_dispatcher</field>
+        <field name="report_file">invoice_report_for_realestate.smart_report_dispatcher</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>

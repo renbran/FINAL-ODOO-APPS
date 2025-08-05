@@ -187,7 +187,7 @@ class PaymentReportExtension(models.Model):
         """
         self.ensure_one()
         try:
-            return self.env.ref('osus_invoice_report.action_report_payment_voucher').report_action(self)
+            return self.env.ref('invoice_report_for_realestate.action_report_payment_voucher').report_action(self)
         except ValueError as e:
             # If custom report is not found, use a fallback or show error
             from odoo.exceptions import UserError

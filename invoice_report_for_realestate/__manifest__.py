@@ -98,10 +98,10 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'osus_invoice_report/static/src/js/bulk_print_controller.js',
+            'invoice_report_for_realestate/static/src/js/bulk_print_controller.js',
         ],
         'web.report_assets_pdf': [
-            'osus_invoice_report/static/src/css/report_style.css',
+            'invoice_report_for_realestate/static/src/css/report_style.css',
         ],
     },
     'installable': True,

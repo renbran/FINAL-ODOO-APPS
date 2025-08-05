@@ -72,7 +72,7 @@
                 <t t-set="format_number" t-value="lambda v: '{:,.2f}'.format(float(v)) if v else '0.00'"/>
                 
                 <!-- Call the existing single invoice template -->
-                <t t-call="osus_invoice_report.report_osus_single_invoice_content">
+                <t t-call="invoice_report_for_realestate.report_osus_single_invoice_content">
                     <t t-set="doc_index" t-value="doc_index"/>
                 </t>
                 
@@ -295,7 +295,7 @@
                 <t t-set="o" t-value="doc.with_context(lang=lang)"/>
                 
                 <!-- Call the existing bill template -->
-                <t t-call="osus_invoice_report.report_osus_bill_document"/>
+                <t t-call="invoice_report_for_realestate.report_osus_bill_document"/>
                 
                 <!-- Add page break if not last document -->
                 <t t-if="not doc_last">
@@ -374,13 +374,13 @@
                 
                 <!-- Choose appropriate template based on document type -->
                 <t t-if="doc.move_type == 'out_invoice'">
-                    <t t-call="osus_invoice_report.report_osus_single_invoice_content"/>
+                    <t t-call="invoice_report_for_realestate.report_osus_single_invoice_content"/>
                 </t>
                 <t t-elif="doc.move_type == 'in_invoice'">
-                    <t t-call="osus_invoice_report.report_osus_bill_document"/>
+                    <t t-call="invoice_report_for_realestate.report_osus_bill_document"/>
                 </t>
                 <t t-elif="doc.move_type in ['out_refund', 'in_refund']">
-                    <t t-call="osus_invoice_report.report_osus_single_invoice_content"/>
+                    <t t-call="invoice_report_for_realestate.report_osus_single_invoice_content"/>
                 </t>
                 
                 <!-- Add page break if not last document -->

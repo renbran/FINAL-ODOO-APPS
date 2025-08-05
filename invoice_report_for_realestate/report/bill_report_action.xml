@@ -4,8 +4,8 @@
         <field name="name">OSUS Bill</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">osus_invoice_report.report_osus_bill_document</field>
-        <field name="report_file">osus_invoice_report.report_osus_bill_document</field>
+        <field name="report_name">invoice_report_for_realestate.report_osus_bill_document</field>
+        <field name="report_file">invoice_report_for_realestate.report_osus_bill_document</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>

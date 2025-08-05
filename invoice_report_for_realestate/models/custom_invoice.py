@@ -16,7 +16,7 @@ class AccountMove(models.Model):
         With fallback to standard invoice report if custom report is not available.
         """
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_invoice').report_action(self)
         except ValueError as e:
             _logger.warning("Custom invoice report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(self)
@@ -27,7 +27,7 @@ class AccountMove(models.Model):
         With fallback to standard bill report if custom report is not available.
         """
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_bill').report_action(self)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_bill').report_action(self)
         except ValueError as e:
             _logger.warning("Custom bill report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(self)
@@ -38,7 +38,7 @@ class AccountMove(models.Model):
         With fallback to standard invoice report if custom report is not available.
         """
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_invoice').report_action(self)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_invoice').report_action(self)
         except ValueError as e:
             _logger.warning("Custom receipt report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(self)
@@ -61,7 +61,7 @@ class AccountMove(models.Model):
             raise UserError(_("Please select at least one customer invoice."))
         
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_invoice_bulk').report_action(customer_invoices)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_invoice_bulk').report_action(customer_invoices)
         except ValueError as e:
             _logger.warning("Custom bulk invoice report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(customer_invoices)
@@ -84,7 +84,7 @@ class AccountMove(models.Model):
             raise UserError(_("Please select at least one vendor bill."))
         
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_bill_bulk').report_action(vendor_bills)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_bill_bulk').report_action(vendor_bills)
         except ValueError as e:
             _logger.warning("Custom bulk bill report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(vendor_bills)
@@ -107,7 +107,7 @@ class AccountMove(models.Model):
             raise UserError(_("Please select at least one posted document."))
         
         try:
-            return self.env.ref('osus_invoice_report.action_report_osus_mixed_bulk').report_action(posted_documents)
+            return self.env.ref('invoice_report_for_realestate.action_report_osus_mixed_bulk').report_action(posted_documents)
         except ValueError as e:
             _logger.warning("Custom bulk mixed report not found: %s. Using standard report as fallback.", str(e))
             return self.env.ref('account.account_invoices').report_action(posted_documents)
