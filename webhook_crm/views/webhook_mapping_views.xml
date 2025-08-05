@@ -10,8 +10,13 @@
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="source_name"/>
+                            <field name="endpoint_url"/>
+                            <field name="method"/>
                             <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="description"/>
                         </group>
                     </group>
                     <notebook>
@@ -79,11 +84,7 @@
                             <field name="default_value"/>
                             <field name="required"/>
                             <field name="custom_function" invisible="transformation_type != 'custom'"/>
-                            <field name="validation_regex"/>
                         </group>
-                    </group>
-                    <group>
-                        <field name="description"/>
                     </group>
                 </sheet>
             </form>
@@ -97,7 +98,8 @@
         <field name="arch" type="xml">
             <tree string="Webhook Mappings">
                 <field name="name"/>
-                <field name="source_name"/>
+                <field name="endpoint_url"/>
+                <field name="method"/>
                 <field name="active"/>
             </tree>
         </field>
