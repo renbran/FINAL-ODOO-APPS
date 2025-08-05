@@ -156,10 +156,22 @@ class WebhookFieldMapping(models.Model):
     mapping_id = fields.Many2one(
         'webhook.mapping',
         string='Mapping ID',
-        required=True,
-        ondelete='cascade',
+        compute='_compute_mapping_id',
+        inverse='_inverse_mapping_id',
+        store=True,
         help="Parent webhook mapping configuration (alias for compatibility)"
     )
+    
+    @api.depends('webhook_mapping_id')
+    def _compute_mapping_id(self):
+        """Sync mapping_id with webhook_mapping_id"""
+        for record in self:
+            record.mapping_id = record.webhook_mapping_id
+    
+    def _inverse_mapping_id(self):
+        """Sync webhook_mapping_id with mapping_id"""
+        for record in self:
+            record.webhook_mapping_id = record.mapping_id
     
     @api.model
     def create(self, vals):
