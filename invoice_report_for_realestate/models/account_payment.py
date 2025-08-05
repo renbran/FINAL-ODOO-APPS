@@ -51,7 +51,7 @@ class PaymentReportExtension(models.Model):
                               self.env['ir.sequence'].next_by_code('account.payment.supplier') or '/'
         return super().create(vals)
     
-    @api.depends('name', 'partner_id', 'amount', 'payment_date', 'display_qr_code', 'payment_type')
+    @api.depends('name', 'partner_id', 'amount', 'date', 'display_qr_code', 'payment_type')
     def _compute_qr_code(self):
         """Generate QR code for customer receipts"""
         for record in self:
@@ -64,7 +64,7 @@ class PaymentReportExtension(models.Model):
                 qr_content = f"Payment Receipt\n"
                 qr_content += f"Reference: {record.name or 'N/A'}\n"
                 qr_content += f"Amount: {record.amount} {record.currency_id.name}\n"
-                qr_content += f"Date: {record.payment_date}\n"
+                qr_content += f"Date: {record.date}\n"
                 qr_content += f"From: {record.partner_id.name or 'N/A'}\n"
                 
                 # Generate QR code
