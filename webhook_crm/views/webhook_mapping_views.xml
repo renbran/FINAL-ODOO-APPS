@@ -44,11 +44,8 @@
                                                 <field name="default_value"/>
                                                 <field name="required"/>
                                                 <field name="custom_function" invisible="transformation_type != 'custom'"/>
-                                                <field name="validation_regex"/>
+                                                <field name="sequence"/>
                                             </group>
-                                        </group>
-                                        <group>
-                                            <field name="description"/>
                                         </group>
                                     </sheet>
                                 </form>
