@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Vacuum Fix Form View -->
+    <record id="view_account_vacuum_fix_form" model="ir.ui.view">
+        <field name="name">account.vacuum.fix.form</field>
+        <field name="model">account.vacuum.fix</field>
+        <field name="arch" type="xml">
+            <form string="Account Vacuum Fix">
+                <header>
+                    <button name="action_fix_vacuum_issues" 
+                            string="Fix Vacuum Issues" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="state != 'start'"/>
+                    <button name="action_manual_vacuum_test" 
+                            string="Test Vacuum" 
+                            type="object" 
+                            class="btn-secondary"
+                            invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Account Tax Report Vacuum Fix</h1>
+                    </div>
+                    
+                    <group invisible="state != 'start'">
+                        <div class="alert alert-info" role="alert">
+                            <strong>About this fix:</strong><br/>
+                            This tool fixes the autovacuum error that occurs with account.tax.report model:
+                            "You can't delete a report that has variants."
+                            <br/><br/>
+                            <strong>What it does:</strong>
+                            <ul>
+                                <li>Temporarily disables autovacuum to prevent conflicts</li>
+                                <li>Cleans up orphaned tax report variants</li>
+                                <li>Removes problematic transient records</li>
+                                <li>Re-enables autovacuum after fixes</li>
+                            </ul>
+                            <br/>
+                            <strong>Note:</strong> This process is safe and will only remove orphaned/inactive records.
+                        </div>
+                    </group>
+                    
+                    <group invisible="state != 'fixing'">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fa fa-spinner fa-spin"/> 
+                            <strong>Fix in progress...</strong><br/>
+                            Please wait while the vacuum issues are being fixed.
+                        </div>
+                    </group>
+                    
+                    <group invisible="state != 'done'">
+                        <div class="alert alert-success" role="alert">
+                            <i class="fa fa-check-circle"/> 
+                            <strong>Fix completed!</strong><br/>
+                            The vacuum issues have been resolved. You can now test the vacuum process or close this dialog.
+                        </div>
+                        
+                        <field name="fix_log" widget="text" readonly="1" 
+                               options="{'resizable': true}" 
+                               style="min-height: 200px; font-family: monospace;"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the fix wizard -->
+    <record id="action_account_vacuum_fix" model="ir.actions.act_window">
+        <field name="name">Fix Account Vacuum Issues</field>
+        <field name="res_model">account.vacuum.fix</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'dialog_size': 'medium'}</field>
+    </record>
+
+    <!-- Menu item -->
+    <menuitem id="menu_account_vacuum_fix"
+              name="Fix Vacuum Issues"
+              parent="account.menu_finance_configuration"
+              action="action_account_vacuum_fix"
+              sequence="100"/>
+</odoo>

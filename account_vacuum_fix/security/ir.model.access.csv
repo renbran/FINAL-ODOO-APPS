@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_vacuum_fix_user,account.vacuum.fix.user,model_account_vacuum_fix,base.group_user,1,1,1,1
+access_account_vacuum_fix_manager,account.vacuum.fix.manager,model_account_vacuum_fix,account.group_account_manager,1,1,1,1
