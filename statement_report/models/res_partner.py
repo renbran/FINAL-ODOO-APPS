@@ -307,7 +307,7 @@ class Partner(models.Model):
                 self, data=data)
             data_record = base64.b64encode(report[0])
             ir_values = {
-                'name': 'Statement Report',
+                'name': 'Invoice Report',
                 'type': 'binary',
                 'datas': data_record,
                 'mimetype': 'application/pdf',
@@ -316,10 +316,10 @@ class Partner(models.Model):
             attachment = self.env['ir.attachment'].sudo().create(ir_values)
             email_values = {
                 'email_to': self.email,
-                'subject': 'Payment Statement Report',
+                'subject': 'Account Statement Report',
                 'body_html': '<p>Dear <strong> Mr/Miss. ' + self.name +
                              '</strong> </p> <p> We have attached your '
-                             'payment statement. Please check </p> '
+                             'invoice statement. Please check </p> '
                              '<p>Best regards, </p> <p> ' + self.env.user.name,
                 'attachment_ids': [attachment.id],
             }
@@ -429,7 +429,7 @@ class Partner(models.Model):
                 }
                 
                 # Use safe report name to prevent undefined errors
-                report_name = f'Customer_Statement_Report_{self.id}_{date.today().strftime("%Y%m%d")}'
+                report_name = f'Invoice_Report_{self.id}_{date.today().strftime("%Y%m%d")}'
                 
                 return {
                     'type': 'ir.actions.report',
@@ -479,7 +479,7 @@ class Partner(models.Model):
             currency_format = workbook.add_format({'font_size': '13px', 'border': 1, 'num_format': '[$-409]#,##0.00'})
             
             # Title
-            sheet.merge_range('B2:R4', 'CUSTOMER STATEMENT REPORT', title_format)
+            sheet.merge_range('B2:R4', 'INVOICE REPORT', title_format)
             
             # Customer information with better formatting
             if data.get('customer'):
@@ -693,7 +693,7 @@ class Partner(models.Model):
             xlsx = base64.b64encode(output.read())
             output.close()
             ir_values = {
-                'name': "Statement Report.xlsx",
+                'name': "Invoice Report.xlsx",
                 'type': 'binary',
                 'datas': xlsx,
                 'store_fname': xlsx,
@@ -701,10 +701,10 @@ class Partner(models.Model):
             attachment = self.env['ir.attachment'].sudo().create(ir_values)
             email_values = {
                 'email_to': self.email,
-                'subject': 'Payment Statement Report',
+                'subject': 'Invoice Statement Report',
                 'body_html': '<p>Dear <strong> Mr/Miss. ' + self.name +
                              '</strong> </p> <p> We have attached your'
-                             ' payment statement. Please check </p> '
+                             ' invoice statement. Please check </p> '
                              '<p>Best regards, </p> <p> ' + self.env.user.name,
                 'attachment_ids': [attachment.id],
             }
@@ -1015,7 +1015,7 @@ class Partner(models.Model):
                 'report_timezone': datetime.now().strftime('%z'),
             }
             return self.env.ref(
-                'statement_report.res_partner_action').report_action(
+                'statement_report.res_partner_print_pdf_report_action').report_action(
                 self, data=data)
         else:
             raise ValidationError('There is no statement to print')
@@ -1051,7 +1051,7 @@ class Partner(models.Model):
                 'report_timezone': datetime.now().strftime('%z'),
             }
             report = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
-                'statement_report.res_partner_action', self, data=data)
+                'statement_report.res_partner_print_pdf_report_action', self, data=data)
             data_record = base64.b64encode(report[0])
             ir_values = {
                 'name': 'Statement Report',
@@ -1064,10 +1064,10 @@ class Partner(models.Model):
 
             email_values = {
                 'email_to': self.email,
-                'subject': 'Payment Statement Report',
+                'subject': 'Statement Report',
                 'body_html': '<p>Dear <strong> Mr/Miss. ' + self.name +
                              '</strong> </p> <p> We have attached'
-                             ' your payment statement. Please check </p> '
+                             ' your statement. Please check </p> '
                              '<p>Best regards, </p> <p> ' + self.env.user.name,
                 'attachment_ids': [attachment.id],
             }
@@ -1117,7 +1117,7 @@ class Partner(models.Model):
                     'options': json.dumps(data,
                                           default=date_utils.json_default),
                     'output_format': 'xlsx',
-                    'report_name': 'Payment Statement Report'
+                    'report_name': 'Statement Report'
                 },
                 'report_type': 'xlsx',
             }
@@ -1156,7 +1156,7 @@ class Partner(models.Model):
             txt = workbook.add_format({'font_size': '13px'})
             head = workbook.add_format(
                 {'align': 'center', 'bold': True, 'font_size': '22px'})
-            sheet.merge_range('B2:P4', 'Payment Statement Report', head)
+            sheet.merge_range('B2:P4', 'STATEMENT REPORT', head)
             date_style = workbook.add_format({
                 'text_wrap': True, 'align': 'center',
                 'num_format': 'yyyy-mm-dd'})
@@ -1216,7 +1216,7 @@ class Partner(models.Model):
             xlsx = base64.b64encode(output.read())
             output.close()
             ir_values = {
-                'name': "Statement Report",
+                'name': "Statement Report.xlsx",
                 'type': 'binary',
                 'datas': xlsx,
                 'store_fname': xlsx,
@@ -1225,10 +1225,10 @@ class Partner(models.Model):
 
             email_values = {
                 'email_to': self.email,
-                'subject': 'Payment Statement Report',
+                'subject': 'Statement Report',
                 'body_html': '<p>Dear <strong> Mr/Miss. ' + self.name +
                              '</strong> </p> <p> We have attached your '
-                             'payment statement. Please check </p> '
+                             'statement. Please check </p> '
                              '<p>Best regards, </p> <p> ' + self.env.user.name,
                 'attachment_ids': [attachment.id],
             }

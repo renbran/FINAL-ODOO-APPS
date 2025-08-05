@@ -20,11 +20,11 @@
                     </button>
                     <button name="action_share_pdf" type="object"
                             class="btn-secondary">
-                        Sent PDF By Email
+                        Send PDF By Email
                     </button>
                     <button name="action_share_xlsx" type="object"
                             class="btn-secondary">
-                        Sent Excel By Email
+                        Send Excel By Email
                     </button>
                     <br/>
                     <br/>
@@ -71,11 +71,11 @@
                     </button>
                     <button name="action_vendor_share_pdf" type="object"
                             class="btn-secondary">
-                        Sent PDF By Email
+                        Send PDF By Email
                     </button>
                     <button name="action_vendor_share_xlsx" type="object"
                             class="btn-secondary">
-                        Sent Excel By Email
+                        Send Excel By Email
                     </button>
                     <br/>
                     <br/>
