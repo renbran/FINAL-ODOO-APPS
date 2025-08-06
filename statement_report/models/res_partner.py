@@ -1315,7 +1315,6 @@ class Partner(models.Model):
             sheet.merge_range(row + 2, column + 4, row + 2, column + 5, total, txt)
             sheet.write(row + 4, column + 1, 'Balance Due : ', cell_format)
             sheet.merge_range(row + 4, column + 4, row + 4, column + 5, remain_balance, txt)
-                              remain_balance, txt)
 
             workbook.close()
             output.seek(0)
