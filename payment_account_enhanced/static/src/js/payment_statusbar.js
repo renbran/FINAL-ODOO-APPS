@@ -1,39 +1,31 @@
 /** @odoo-module **/
 
-import { Component, onMounted, onWillUnmount } from "@odoo/owl";
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+// Simple payment statusbar enhancement without OWL dependencies
+// This ensures compatibility with Odoo 17 without complex imports
 
-/**
- * Enhanced Payment Statusbar Component for Responsive Behavior
- */
-export class PaymentStatusbar extends Component {
-    static template = "payment_account_enhanced.PaymentStatusbar";
-    
-    setup() {
-        this.notification = useService("notification");
-        this.orm = useService("orm");
-        
-        onMounted(() => {
-            this.initializeResponsiveStatusbar();
-            this.addResizeListener();
-        });
-        
-        onWillUnmount(() => {
-            this.removeResizeListener();
+(function() {
+    'use strict';
+
+    /**
+     * Enhanced Payment Statusbar for Responsive Behavior
+     */
+    function initializeResponsiveStatusbar() {
+        const statusbars = document.querySelectorAll('.o_payment_statusbar');
+        statusbars.forEach(statusbar => {
+            if (!statusbar.dataset.enhanced) {
+                enhanceStatusbar(statusbar);
+                statusbar.dataset.enhanced = 'true';
+            }
         });
     }
-    
-    initializeResponsiveStatusbar() {
-        const statusbar = document.querySelector('.o_payment_statusbar');
-        if (statusbar) {
-            this.updateStatusbarLayout();
-            this.addStatusbarInteractivity();
-        }
+
+    function enhanceStatusbar(statusbar) {
+        updateStatusbarLayout(statusbar);
+        addStatusbarInteractivity(statusbar);
+        addResizeListener();
     }
-    
-    updateStatusbarLayout() {
-        const statusbar = document.querySelector('.o_payment_statusbar');
+
+    function updateStatusbarLayout(statusbar) {
         if (!statusbar) return;
         
         const isMobile = window.innerWidth <= 768;
@@ -54,23 +46,22 @@ export class PaymentStatusbar extends Component {
             }
         });
     }
-    
-    addStatusbarInteractivity() {
-        const statusbar = document.querySelector('.o_payment_statusbar');
+
+    function addStatusbarInteractivity(statusbar) {
         if (!statusbar) return;
         
         const statuses = statusbar.querySelectorAll('.o_statusbar_status');
         
         statuses.forEach(status => {
             // Add hover effects
-            status.addEventListener('mouseenter', (e) => {
+            status.addEventListener('mouseenter', function(e) {
                 if (!e.target.classList.contains('o_arrow_button_current')) {
                     e.target.style.transform = 'translateY(-2px)';
                     e.target.style.boxShadow = '0 4px 12px rgba(139, 21, 56, 0.3)';
                 }
             });
             
-            status.addEventListener('mouseleave', (e) => {
+            status.addEventListener('mouseleave', function(e) {
                 if (!e.target.classList.contains('o_arrow_button_current')) {
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = 'none';
@@ -78,108 +69,98 @@ export class PaymentStatusbar extends Component {
             });
             
             // Add click feedback
-            status.addEventListener('click', (e) => {
+            status.addEventListener('click', function(e) {
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple-effect');
                 e.target.appendChild(ripple);
                 
-                setTimeout(() => {
-                    ripple.remove();
+                setTimeout(function() {
+                    if (ripple.parentNode) {
+                        ripple.parentNode.removeChild(ripple);
+                    }
                 }, 600);
             });
         });
     }
-    
-    addResizeListener() {
-        this.resizeHandler = () => {
-            this.updateStatusbarLayout();
-        };
-        window.addEventListener('resize', this.resizeHandler);
-    }
-    
-    removeResizeListener() {
-        if (this.resizeHandler) {
-            window.removeEventListener('resize', this.resizeHandler);
+
+    function addResizeListener() {
+        if (window.paymentStatusbarResizeHandler) {
+            window.removeEventListener('resize', window.paymentStatusbarResizeHandler);
         }
+        
+        window.paymentStatusbarResizeHandler = function() {
+            const statusbars = document.querySelectorAll('.o_payment_statusbar');
+            statusbars.forEach(statusbar => {
+                updateStatusbarLayout(statusbar);
+            });
+        };
+        
+        window.addEventListener('resize', window.paymentStatusbarResizeHandler);
     }
-    
-    async onStatusChange(newState) {
-        try {
-            // Add smooth transition animation
-            const statusbar = document.querySelector('.o_payment_statusbar');
-            if (statusbar) {
-                statusbar.style.opacity = '0.7';
-                statusbar.style.transform = 'scale(0.98)';
-                
-                setTimeout(() => {
-                    statusbar.style.opacity = '1';
-                    statusbar.style.transform = 'scale(1)';
-                }, 200);
+
+    // Add CSS for ripple effect
+    function addRippleStyles() {
+        if (document.getElementById('payment-statusbar-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'payment-statusbar-styles';
+        style.textContent = `
+            .ripple-effect {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.6);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+                width: 30px;
+                height: 30px;
+                left: 50%;
+                top: 50%;
+                margin-left: -15px;
+                margin-top: -15px;
             }
             
-            // Show success notification
-            this.notification.add(
-                `Payment status updated to ${newState}`,
-                { type: "success" }
-            );
-        } catch (error) {
-            this.notification.add(
-                `Failed to update status: ${error.message}`,
-                { type: "danger" }
-            );
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .o_statusbar_status {
+                position: relative;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Initialize when DOM is ready
+    function initializeWhenReady() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                addRippleStyles();
+                initializeResponsiveStatusbar();
+            });
+        } else {
+            addRippleStyles();
+            initializeResponsiveStatusbar();
         }
     }
-}
 
-/**
- * Initialize the enhanced statusbar when the page loads
- */
-function initializeEnhancedStatusbar() {
-    const statusbars = document.querySelectorAll('.o_payment_statusbar');
-    statusbars.forEach(statusbar => {
-        if (!statusbar.dataset.enhanced) {
-            const enhancer = new PaymentStatusbar();
-            enhancer.initializeResponsiveStatusbar();
-            statusbar.dataset.enhanced = 'true';
-        }
-    });
-}
+    // Initialize immediately
+    initializeWhenReady();
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeEnhancedStatusbar);
-} else {
-    initializeEnhancedStatusbar();
-}
-
-// Also initialize on Odoo's view reload
-document.addEventListener('o_view_loaded', initializeEnhancedStatusbar);
-
-// Add CSS for ripple effect
-const style = document.createElement('style');
-style.textContent = `
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
+    // Also initialize on Odoo's view changes
+    if (typeof odoo !== 'undefined' && odoo.define) {
+        // For Odoo environments, also listen to view changes
+        document.addEventListener('DOMNodeInserted', function(e) {
+            if (e.target.classList && e.target.classList.contains('o_payment_statusbar')) {
+                setTimeout(function() {
+                    initializeResponsiveStatusbar();
+                }, 100);
+            }
+        });
     }
-    
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-    
-    .o_statusbar_status {
-        position: relative;
-        overflow: hidden;
-    }
-`;
-document.head.appendChild(style);
 
-// Export for registry if needed
-registry.category("components").add("payment_statusbar", PaymentStatusbar);
+})();

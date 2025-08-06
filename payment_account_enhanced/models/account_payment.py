@@ -192,8 +192,8 @@ class AccountPayment(models.Model):
                 subject="Payment Voucher Reset"
             )
         
-        # Call standard draft method
-        return super(AccountPayment, self).action_draft()
+        # Reset state to draft manually since parent method doesn't exist
+        self.write({'state': 'draft'})
     
     @api.model
     def get_osus_branding_data(self):

@@ -15,22 +15,5 @@
         <template id="assets_frontend" inherit_id="web.assets_frontend">
             <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher_report.scss"/>
         </template>
-
-        <!-- QWeb Templates for Enhanced Components -->
-        <template id="PaymentStatusbar" name="payment_account_enhanced.PaymentStatusbar">
-            <div class="o_payment_statusbar_enhanced">
-                <div class="statusbar-container">
-                    <t t-if="props.states">
-                        <t t-foreach="props.states" t-as="state">
-                            <button t-attf-class="o_statusbar_status #{state.current ? 'o_arrow_button_current' : ''}"
-                                    t-att-data-state="state.value"
-                                    t-on-click="() => this.onStatusChange(state.value)">
-                                <span t-esc="state.label"/>
-                            </button>
-                        </t>
-                    </t>
-                </div>
-            </div>
-        </template>
     </data>
 </odoo>
