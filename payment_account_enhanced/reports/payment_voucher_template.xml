@@ -691,24 +691,5 @@
             <field name="paperformat_id" ref="payment_account_enhanced.paperformat_osus_voucher"/>
         </record>
 
-        <!-- Enhanced Account Payment Model -->
-        <record id="view_account_payment_form_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.form.enhanced</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <button name="action_print_osus_voucher" 
-                            string="Print OSUS Voucher" 
-                            type="object" 
-                            class="btn-primary"
-                            attrs="{'invisible': [('state', '=', 'draft')]}"/>
-                </xpath>
-                <xpath expr="//field[@name='ref']" position="after">
-                    <field name="remarks" placeholder="Additional remarks or memo for this payment"/>
-                    <field name="authorized_by" readonly="1" attrs="{'invisible': [('state', '!=', 'posted')]}"/>
-                </xpath>
-            </field>
-        </record>
     </data>
 </odoo>
