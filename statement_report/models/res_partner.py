@@ -1040,9 +1040,11 @@ class Partner(models.Model):
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
             
-            # Process lines for enhanced formatting
+            # Process lines for enhanced formatting and add due status
             main = self._process_report_lines(main)
-            
+            for line in main:
+                line['due_status'] = 'Overdue' if line.get('is_overdue') else 'Upcoming'
+
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -1076,9 +1078,11 @@ class Partner(models.Model):
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
             
-            # Process lines for enhanced formatting
+            # Process lines for enhanced formatting and add due status
             main = self._process_report_lines(main)
-            
+            for line in main:
+                line['due_status'] = 'Overdue' if line.get('is_overdue') else 'Upcoming'
+
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -1141,6 +1145,10 @@ class Partner(models.Model):
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
 
+            # Add due_status to each line
+            main = self._process_report_lines(main)
+            for line in main:
+                line['due_status'] = 'Overdue' if line.get('is_overdue') else 'Upcoming'
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -1153,16 +1161,69 @@ class Partner(models.Model):
                 'balance': amount[0]['balance'],
                 'currency': self.currency_id.symbol,
             }
+
+            # Generate XLSX with Due Status column
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+            sheet = workbook.add_worksheet()
+            cell_format = workbook.add_format({'font_size': '14px', 'bold': True})
+            txt = workbook.add_format({'font_size': '13px'})
+            head = workbook.add_format({'align': 'center', 'bold': True, 'font_size': '22px'})
+            sheet.merge_range('B2:Q4', 'STATEMENT REPORT', head)
+            date_style = workbook.add_format({'text_wrap': True, 'align': 'center', 'num_format': 'yyyy-mm-dd'})
+            if data['customer']:
+                sheet.write('B7:C7', 'Supplier : ', cell_format)
+                sheet.merge_range('D7:G7', data['customer'], txt)
+            sheet.write('B9:C7', 'Address : ', cell_format)
+            if data['street']:
+                sheet.merge_range('D9:F9', data['street'], txt)
+            if data['street2']:
+                sheet.merge_range('D10:F10', data['street2'], txt)
+            if data['city']:
+                sheet.merge_range('D11:F11', data['city'], txt)
+            if data['state']:
+                sheet.merge_range('D12:F12', data['state'], txt)
+            if data['zip']:
+                sheet.merge_range('D13:F13', data['zip'], txt)
+            # Add Due Status header
+            sheet.write('B15', 'Date', cell_format)
+            sheet.write('D15', 'Invoice/Bill Number', cell_format)
+            sheet.write('H15', 'Due Date', cell_format)
+            sheet.write('J15', 'Invoices/Debit', cell_format)
+            sheet.write('M15', 'Amount Due', cell_format)
+            sheet.write('P15', 'Balance Due', cell_format)
+            sheet.write('Q15', 'Due Status', cell_format)
+
+            row = 16
+            column = 0
+            for record in data['my_data']:
+                sub_total = data['currency'] + str(record['sub_total'])
+                amount_due = data['currency'] + str(record['amount_due'])
+                balance = data['currency'] + str(record['balance'])
+                due_status = record.get('due_status', '')
+                sheet.merge_range(row, column + 1, row, column + 2, record['invoice_date'], date_style)
+                sheet.merge_range(row, column + 3, row, column + 5, record['name'], txt)
+                sheet.merge_range(row, column + 7, row, column + 8, record['invoice_date_due'], date_style)
+                sheet.merge_range(row, column + 9, row, column + 10, sub_total, txt)
+                sheet.merge_range(row, column + 12, row, column + 13, amount_due, txt)
+                sheet.merge_range(row, column + 15, row, column + 16, balance, txt)
+                sheet.write(row, column + 16, due_status, txt)
+                row = row + 1
+            workbook.close()
+            output.seek(0)
+            xlsx = base64.b64encode(output.read())
+            output.close()
+            ir_values = {
+                'name': "Statement Report.xlsx",
+                'type': 'binary',
+                'datas': xlsx,
+                'store_fname': xlsx,
+            }
+            attachment = self.env['ir.attachment'].sudo().create(ir_values)
             return {
-                'type': 'ir.actions.report',
-                'data': {
-                    'model': 'res.partner',
-                    'options': json.dumps(data,
-                                          default=date_utils.json_default),
-                    'output_format': 'xlsx',
-                    'report_name': 'Statement Report'
-                },
-                'report_type': 'xlsx',
+                'type': 'ir.actions.act_url',
+                'url': f"/web/content/{attachment.id}?download=true",
+                'target': 'self',
             }
         else:
             raise ValidationError('There is no statement to print')
@@ -1179,6 +1240,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            # Add due_status to each line
+            main = self._process_report_lines(main)
+            for line in main:
+                line['due_status'] = 'Overdue' if line.get('is_overdue') else 'Upcoming'
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -1222,7 +1287,13 @@ class Partner(models.Model):
             sheet.write('H15', 'Due Date', cell_format)
             sheet.write('J15', 'Invoices/Debit', cell_format)
             sheet.write('M15', 'Amount Due', cell_format)
+            sheet.write('B15', 'Date', cell_format)
+            sheet.write('D15', 'Invoice/Bill Number', cell_format)
+            sheet.write('H15', 'Due Date', cell_format)
+            sheet.write('J15', 'Invoices/Debit', cell_format)
+            sheet.write('M15', 'Amount Due', cell_format)
             sheet.write('P15', 'Balance Due', cell_format)
+            sheet.write('Q15', 'Due Status', cell_format)
 
             row = 16
             column = 0
@@ -1232,26 +1303,18 @@ class Partner(models.Model):
                 balance = data['currency'] + str(record['balance'])
                 total = data['currency'] + str(data['total'])
                 remain_balance = data['currency'] + str(data['balance'])
+                due_status = record.get('due_status', '')
 
-                sheet.merge_range(row, column + 1, row, column + 2,
-                                  record['invoice_date'], date_style)
-                sheet.merge_range(row, column + 3, row, column + 5,
-                                  record['name'], txt)
-                sheet.merge_range(row, column + 7, row, column + 8,
-                                  record['invoice_date_due'], date_style)
-                sheet.merge_range(row, column + 9, row, column + 10,
-                                  sub_total, txt)
-                sheet.merge_range(row, column + 12, row, column + 13,
-                                  amount_due, txt)
-                sheet.merge_range(row, column + 15, row, column + 16,
-                                  balance, txt)
+                sheet.merge_range(row, column + 1, row, column + 2, record['invoice_date'], date_style)
+                sheet.merge_range(row, column + 3, row, column + 5, record['name'], txt)
+                sheet.merge_range(row, column + 7, row, column + 8, record['invoice_date_due'], date_style)
+                sheet.write(row, column + 16, due_status, txt)
                 row = row + 1
 
             sheet.write(row + 2, column + 1, 'Total Amount : ', cell_format)
-            sheet.merge_range(row + 2, column + 4, row + 2, column + 5,
-                              total, txt)
+            sheet.merge_range(row + 2, column + 4, row + 2, column + 5, total, txt)
             sheet.write(row + 4, column + 1, 'Balance Due : ', cell_format)
-            sheet.merge_range(row + 4, column + 4, row + 4, column + 5,
+            sheet.merge_range(row + 4, column + 4, row + 4, column + 5, remain_balance, txt)
                               remain_balance, txt)
 
             workbook.close()
