@@ -1,314 +1,336 @@
-odoo.define('payment_account_enhanced.PaymentVoucherForm', function (require) {
-"use strict";
+/** @odoo-module **/
 
-var FormController = require('web.FormController');
-var FormView = require('web.FormView');
-var viewRegistry = require('web.view_registry');
-var core = require('web.core');
-var Dialog = require('web.Dialog');
+import { FormController } from "@web/views/form/form_controller";
+import { FormView } from "@web/views/form/form_view";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { Component, onWillStart, useState } from "@odoo/owl";
 
-var _t = core._t;
+const viewRegistry = registry.category("views");
+
+/** @odoo-module **/
+
+import { FormController } from "@web/views/form/form_controller";
+import { FormView } from "@web/views/form/form_view";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { patch } from "@web/core/utils/patch";
 
 /**
- * Enhanced Payment Voucher Form Controller
+ * Enhanced Payment Voucher Form Controller for Odoo 17
  * Handles the simplified 2-state approval workflow
  */
-var PaymentVoucherFormController = FormController.extend({
-    events: _.extend({}, FormController.prototype.events, {
-        'click .o_payment_submit_approval': '_onSubmitForApproval',
-        'click .o_payment_approve_post': '_onApproveAndPost',
-        'click .o_payment_reject': '_onRejectPayment',
-    }),
-
-    /**
-     * Override to add custom logic for payment voucher workflow
-     */
-    init: function () {
-        this._super.apply(this, arguments);
-        this._isPaymentVoucher = this.modelName === 'account.payment';
-    },
+export class PaymentVoucherFormController extends FormController {
+    setup() {
+        super.setup();
+        this.orm = useService("orm");
+        this.notification = useService("notification");
+        this.dialog = useService("dialog");
+        this._isPaymentVoucher = this.props.resModel === 'account.payment';
+    }
 
     /**
      * Update status bar and buttons when record changes
      */
-    _updateButtons: function () {
-        this._super.apply(this, arguments);
-        if (this._isPaymentVoucher && this.renderer.state.data) {
+    async _updateButtons() {
+        await super._updateButtons();
+        if (this._isPaymentVoucher && this.model.root.data) {
             this._updatePaymentWorkflowButtons();
             this._updateStatusBarColors();
         }
-    },
+    }
 
     /**
      * Update workflow buttons based on approval state
      */
-    _updatePaymentWorkflowButtons: function () {
-        var record = this.renderer.state.data;
-        var approvalState = record.approval_state;
+    _updatePaymentWorkflowButtons() {
+        const record = this.model.root.data;
+        const approvalState = record.approval_state;
         
         // Update button visibility based on state
-        this.$('.o_payment_submit_approval').toggle(approvalState === 'draft');
-        this.$('.o_payment_approve_post').toggle(['waiting_approval', 'approved'].includes(approvalState));
-        this.$('.o_payment_reject').toggle(approvalState === 'waiting_approval');
+        const $submitBtn = this.el.querySelector('.o_payment_submit_approval');
+        const $approveBtn = this.el.querySelector('.o_payment_approve_post');
+        const $rejectBtn = this.el.querySelector('.o_payment_reject');
+        
+        if ($submitBtn) $submitBtn.style.display = approvalState === 'draft' ? 'inline-block' : 'none';
+        if ($approveBtn) $approveBtn.style.display = ['waiting_approval', 'approved'].includes(approvalState) ? 'inline-block' : 'none';
+        if ($rejectBtn) $rejectBtn.style.display = approvalState === 'waiting_approval' ? 'inline-block' : 'none';
         
         // Update button text for context
-        if (approvalState === 'waiting_approval') {
-            this.$('.o_payment_approve_post').text(_t('Approve & Post'));
-        } else if (approvalState === 'approved') {
-            this.$('.o_payment_approve_post').text(_t('Post Payment'));
+        if ($approveBtn) {
+            if (approvalState === 'waiting_approval') {
+                $approveBtn.textContent = _t('Approve & Post');
+            } else if (approvalState === 'approved') {
+                $approveBtn.textContent = _t('Post Payment');
+            }
         }
-    },
+    }
 
     /**
      * Update status bar colors and animations
      */
-    _updateStatusBarColors: function () {
-        var record = this.renderer.state.data;
-        var approvalState = record.approval_state;
-        var $statusbar = this.$('.o_payment_statusbar');
+    _updateStatusBarColors() {
+        const record = this.model.root.data;
+        const approvalState = record.approval_state;
+        const $statusbar = this.el.querySelector('.o_payment_statusbar');
         
-        // Remove all state classes
-        $statusbar.removeClass('state-draft state-waiting state-approved state-posted state-cancelled');
-        
-        // Add current state class
-        $statusbar.addClass('state-' + approvalState.replace('_', '-'));
+        if ($statusbar) {
+            // Remove all state classes
+            $statusbar.className = $statusbar.className.replace(/state-\w+/g, '');
+            
+            // Add current state class
+            $statusbar.classList.add('state-' + approvalState.replace('_', '-'));
+        }
         
         // Add voucher number to display
         if (record.voucher_number) {
-            var $voucherDisplay = this.$('.o_voucher_number_display');
-            if ($voucherDisplay.length === 0) {
-                $statusbar.before('<div class="o_voucher_number_display">Voucher: <span class="o_voucher_number">' + record.voucher_number + '</span></div>');
-            } else {
-                $voucherDisplay.find('.o_voucher_number').text(record.voucher_number);
+            let $voucherDisplay = this.el.querySelector('.o_voucher_number_display');
+            if (!$voucherDisplay && $statusbar) {
+                const voucherDiv = document.createElement('div');
+                voucherDiv.className = 'o_voucher_number_display';
+                voucherDiv.innerHTML = `Voucher: <span class="o_voucher_number">${record.voucher_number}</span>`;
+                $statusbar.parentNode.insertBefore(voucherDiv, $statusbar);
+            } else if ($voucherDisplay) {
+                const $voucherNumber = $voucherDisplay.querySelector('.o_voucher_number');
+                if ($voucherNumber) {
+                    $voucherNumber.textContent = record.voucher_number;
+                }
             }
         }
-    },
+    }
 
     /**
      * Handle submit for approval action
      */
-    _onSubmitForApproval: function (event) {
-        event.preventDefault();
-        var self = this;
-        
+    async onSubmitForApproval() {
         // Validate required fields
         if (!this._validatePaymentData()) {
             return;
         }
         
         // Show confirmation dialog
-        Dialog.confirm(this, _t("Submit this payment for approval?"), {
-            confirm_callback: function () {
-                self._rpc({
-                    model: 'account.payment',
-                    method: 'action_submit_for_approval',
-                    args: [self.renderer.state.res_id],
-                }).then(function (result) {
+        this.dialog.add(ConfirmationDialog, {
+            body: _t("Submit this payment for approval?"),
+            confirm: async () => {
+                try {
+                    const result = await this.orm.call(
+                        'account.payment',
+                        'action_submit_for_approval',
+                        [this.model.root.resId]
+                    );
+                    
                     if (result && result.type === 'ir.actions.client') {
-                        self.displayNotification({
-                            message: result.params.message,
-                            type: result.params.type,
+                        this.notification.add(result.params.message, {
+                            type: result.params.type
                         });
                     }
-                    self.reload();
-                });
+                    
+                    await this.model.load();
+                } catch (error) {
+                    this.notification.add(_t("Failed to submit for approval"), {
+                        type: "danger"
+                    });
+                }
             }
         });
-    },
+    }
 
     /**
      * Handle approve and post action
      */
-    _onApproveAndPost: function (event) {
-        event.preventDefault();
-        var self = this;
-        
-        Dialog.confirm(this, _t("Approve and post this payment?"), {
-            confirm_callback: function () {
-                self._rpc({
-                    model: 'account.payment',
-                    method: 'action_approve_and_post',
-                    args: [self.renderer.state.res_id],
-                }).then(function (result) {
+    async onApproveAndPost() {
+        this.dialog.add(ConfirmationDialog, {
+            body: _t("Approve and post this payment?"),
+            confirm: async () => {
+                try {
+                    const result = await this.orm.call(
+                        'account.payment',
+                        'action_approve_and_post',
+                        [this.model.root.resId]
+                    );
+                    
                     if (result && result.type === 'ir.actions.client') {
-                        self.displayNotification({
-                            message: result.params.message,
-                            type: result.params.type,
+                        this.notification.add(result.params.message, {
+                            type: result.params.type
                         });
                     }
-                    self.reload();
-                });
+                    
+                    await this.model.load();
+                } catch (error) {
+                    this.notification.add(_t("Failed to approve and post"), {
+                        type: "danger"
+                    });
+                }
             }
         });
-    },
+    }
 
     /**
      * Handle reject payment action
      */
-    _onRejectPayment: function (event) {
-        event.preventDefault();
-        var self = this;
-        
-        Dialog.confirm(this, _t("Reject this payment and return to draft?"), {
-            confirm_callback: function () {
-                self._rpc({
-                    model: 'account.payment',
-                    method: 'action_reject_payment',
-                    args: [self.renderer.state.res_id],
-                }).then(function (result) {
+    async onRejectPayment() {
+        this.dialog.add(ConfirmationDialog, {
+            body: _t("Reject this payment and return to draft?"),
+            confirm: async () => {
+                try {
+                    const result = await this.orm.call(
+                        'account.payment',
+                        'action_reject_payment',
+                        [this.model.root.resId]
+                    );
+                    
                     if (result && result.type === 'ir.actions.client') {
-                        self.displayNotification({
-                            message: result.params.message,
-                            type: result.params.type,
+                        this.notification.add(result.params.message, {
+                            type: result.params.type
                         });
                     }
-                    self.reload();
-                });
+                    
+                    await this.model.load();
+                } catch (error) {
+                    this.notification.add(_t("Failed to reject payment"), {
+                        type: "danger"
+                    });
+                }
             }
         });
-    },
+    }
 
     /**
      * Validate payment data before submission
      */
-    _validatePaymentData: function () {
-        var record = this.renderer.state.data;
+    _validatePaymentData() {
+        const record = this.model.root.data;
         
         if (!record.partner_id) {
-            this.displayNotification({
-                message: _t('Please select a partner before submitting for approval.'),
-                type: 'warning',
+            this.notification.add(_t('Please select a partner before submitting for approval.'), {
+                type: 'warning'
             });
             return false;
         }
         
         if (!record.amount || record.amount <= 0) {
-            this.displayNotification({
-                message: _t('Please enter a valid amount greater than zero.'),
-                type: 'warning',
+            this.notification.add(_t('Please enter a valid amount greater than zero.'), {
+                type: 'warning'
             });
             return false;
         }
         
         if (!record.journal_id) {
-            this.displayNotification({
-                message: _t('Please select a payment journal.'),
-                type: 'warning',
+            this.notification.add(_t('Please select a payment journal.'), {
+                type: 'warning'
             });
             return false;
         }
         
         return true;
-    },
-
-    /**
-     * Override save to handle voucher number generation
-     */
-    saveRecord: function () {
-        var self = this;
-        return this._super.apply(this, arguments).then(function (result) {
-            // Reload to get updated voucher number
-            if (self._isPaymentVoucher && result) {
-                self.reload();
-            }
-            return result;
-        });
-    },
-});
+    }
+}
 
 /**
  * Enhanced Payment Voucher Form View
  */
-var PaymentVoucherFormView = FormView.extend({
-    config: _.extend({}, FormView.prototype.config, {
-        Controller: PaymentVoucherFormController,
-    }),
-});
+export class PaymentVoucherFormView extends FormView {
+    static components = {
+        ...FormView.components,
+    };
+}
+
+PaymentVoucherFormView.type = "payment_voucher_form";
+PaymentVoucherFormView.Controller = PaymentVoucherFormController;
 
 // Register the enhanced view for account.payment model
-viewRegistry.add('payment_voucher_form', PaymentVoucherFormView);
+registry.category("views").add("payment_voucher_form", PaymentVoucherFormView);
 
 /**
  * Auto-refresh functionality for approval status
  */
-var PaymentVoucherAutoRefresh = {
-    init: function () {
+class PaymentVoucherAutoRefresh {
+    constructor() {
         this.setupAutoRefresh();
-    },
+    }
 
-    setupAutoRefresh: function () {
+    setupAutoRefresh() {
         // Refresh approval status every 30 seconds for pending approvals
-        setInterval(function () {
-            var $pendingElements = $('.o_payment_statusbar[data-approval-state="waiting_approval"]');
-            if ($pendingElements.length > 0) {
-                // Trigger a soft refresh of the current view
+        setInterval(() => {
+            const pendingElements = document.querySelectorAll('.o_payment_statusbar[data-approval-state="waiting_approval"]');
+            if (pendingElements.length > 0) {
+                // Only refresh if we're viewing payment records
                 if (window.location.hash.includes('model=account.payment')) {
-                    // Only refresh if we're viewing payment records
-                    var controller = $('.o_content .o_form_view').data('controller');
-                    if (controller && controller.renderer && controller.renderer.state) {
-                        controller.reload();
+                    // Trigger a soft refresh of the current view
+                    const formView = document.querySelector('.o_content .o_form_view');
+                    if (formView && formView.__owl__) {
+                        const controller = formView.__owl__.component;
+                        if (controller && controller.model) {
+                            controller.model.load();
+                        }
                     }
                 }
             }
         }, 30000); // 30 seconds
     }
-};
-
-// Initialize auto-refresh when DOM is ready
-$(document).ready(function () {
-    PaymentVoucherAutoRefresh.init();
-});
+}
 
 /**
  * Enhanced notification system for payment workflow
  */
-var PaymentWorkflowNotifications = {
-    showWorkflowHelp: function () {
-        var $modal = $(
-            '<div class="modal fade" tabindex="-1">' +
-            '<div class="modal-dialog modal-lg">' +
-            '<div class="modal-content">' +
-            '<div class="modal-header">' +
-            '<h5 class="modal-title">Payment Voucher Workflow Guide</h5>' +
-            '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
-            '</div>' +
-            '<div class="modal-body">' +
-            '<div class="workflow-guide">' +
-            '<h6>Simplified 2-State Approval Workflow:</h6>' +
-            '<ol>' +
-            '<li><strong>Draft:</strong> Create and edit payment details. Add remarks, select partner, amount, and journal.</li>' +
-            '<li><strong>Waiting for Approval:</strong> Submit payment for approval. Only approved users can approve.</li>' +
-            '<li><strong>Approved & Posted:</strong> Payment is approved and automatically posted to accounting.</li>' +
-            '</ol>' +
-            '<div class="alert alert-info mt-3">' +
-            '<strong>Note:</strong> Voucher numbers are automatically generated when payments are created. ' +
-            'QR codes are generated for verification purposes once the payment is submitted for approval.' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
-            '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
-            '</div>'
-        );
+export const PaymentWorkflowNotifications = {
+    showWorkflowHelp() {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.tabIndex = -1;
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Payment Voucher Workflow Guide</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="workflow-guide">
+                            <h6>Simplified 2-State Approval Workflow:</h6>
+                            <ol>
+                                <li><strong>Draft:</strong> Create and edit payment details. Add remarks, select partner, amount, and journal.</li>
+                                <li><strong>Waiting for Approval:</strong> Submit payment for approval. Only approved users can approve.</li>
+                                <li><strong>Approved & Posted:</strong> Payment is approved and automatically posted to accounting.</li>
+                            </ol>
+                            <div class="alert alert-info mt-3">
+                                <strong>Note:</strong> Voucher numbers are automatically generated when payments are created. 
+                                QR codes are generated for verification purposes once the payment is submitted for approval.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
         
-        $modal.modal('show');
-        $modal.on('hidden.bs.modal', function () {
-            $modal.remove();
-        });
+        document.body.appendChild(modal);
+        
+        // Use Bootstrap 5 modal
+        if (window.bootstrap && window.bootstrap.Modal) {
+            const bsModal = new window.bootstrap.Modal(modal);
+            bsModal.show();
+            modal.addEventListener('hidden.bs.modal', () => {
+                modal.remove();
+            });
+        }
     }
 };
 
+// Initialize auto-refresh when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new PaymentVoucherAutoRefresh();
+    });
+} else {
+    new PaymentVoucherAutoRefresh();
+}
+
 // Export for global use
 window.PaymentWorkflowNotifications = PaymentWorkflowNotifications;
-
-return {
-    PaymentVoucherFormController: PaymentVoucherFormController,
-    PaymentVoucherFormView: PaymentVoucherFormView,
-    PaymentVoucherAutoRefresh: PaymentVoucherAutoRefresh,
-    PaymentWorkflowNotifications: PaymentWorkflowNotifications,
-};
-
-});

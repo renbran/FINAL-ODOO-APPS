@@ -23,20 +23,20 @@
                         <button name="action_submit_for_approval" 
                                 string="Submit for Approval" 
                                 type="object" 
-                                class="btn-primary"
+                                class="btn-primary o_payment_submit_approval"
                                 invisible="approval_state != 'draft'"/>
                         
                         <button name="action_approve_and_post" 
                                 string="Approve &amp; Post" 
                                 type="object" 
-                                class="btn-success"
+                                class="btn-success o_payment_approve_post"
                                 groups="account.group_account_invoice"
                                 invisible="approval_state not in ['waiting_approval', 'approved']"/>
                         
                         <button name="action_reject_payment" 
                                 string="Reject" 
                                 type="object" 
-                                class="btn-warning"
+                                class="btn-warning o_payment_reject"
                                 groups="account.group_account_invoice"
                                 confirm="Are you sure you want to reject this payment?"
                                 invisible="approval_state != 'waiting_approval'"/>
