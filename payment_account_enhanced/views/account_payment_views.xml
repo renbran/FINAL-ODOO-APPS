@@ -19,6 +19,9 @@
                                options="{'clickable_stages': [('draft', 'waiting_approval'), ('waiting_approval', 'approved'), ('approved', 'posted')]}"
                                class="o_payment_statusbar"/>
                         
+                        <!-- Include base state field for inherited view compatibility -->
+                        <field name="state" invisible="1"/>
+                        
                         <!-- Core Workflow Buttons (Simplified 2-State) -->
                         <button name="action_submit_for_approval" 
                                 string="Submit for Approval" 
@@ -100,6 +103,10 @@
                     </div>
                     
                     <notebook class="o_payment_voucher_notebook">
+                        <!-- Hidden fields for inherited view compatibility -->
+                        <field name="state" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        
                         <!-- Tab 1: Payment Information -->
                         <page string="💰 Payment Details" name="payment_details">
                             <group>
