@@ -23,49 +23,49 @@
                                 string="Validate &amp; Post" 
                                 type="object" 
                                 class="btn-success"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                                invisible="state != 'draft'"/>
                         
                         <button name="action_print_osus_voucher" 
                                 string="Print OSUS Voucher" 
                                 type="object" 
                                 class="btn-primary"
                                 icon="fa-print"
-                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                                invisible="state == 'draft'"/>
                         
                         <button name="action_cancel" 
                                 string="Cancel" 
                                 type="object" 
                                 class="btn-secondary"
                                 confirm="Are you sure you want to cancel this payment?"
-                                attrs="{'invisible': [('state', 'in', ['draft', 'cancel'])]}"/>
+                                invisible="state in ['draft', 'cancel']"/>
                         
                         <button name="action_draft" 
                                 string="Set to Draft" 
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_manager"
-                                attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
+                                invisible="state != 'cancel'"/>
                         
                         <!-- Workflow Buttons -->
                         <button name="action_review_payment" 
                                 string="Mark as Reviewed" 
                                 type="object" 
                                 class="btn-info"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                                invisible="state != 'draft'"/>
                         
                         <button name="action_approve_payment" 
                                 string="Approve Payment" 
                                 type="object" 
                                 class="btn-success"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                                invisible="state != 'draft'"/>
                     </header>
                 </xpath>
                 
                 <!-- QR Code Section -->
                 <xpath expr="//sheet" position="inside">
-                    <group string="QR Code &amp; Verification" name="qr_section" attrs="{'invisible': [('state', '=', 'draft')]}">
+                    <group string="QR Code &amp; Verification" name="qr_section" invisible="state == 'draft'">
                         <field name="qr_in_report"/>
-                        <field name="qr_code" widget="image" attrs="{'invisible': [('qr_code', '=', False)]}"/>
+                        <field name="qr_code" widget="image" invisible="qr_code == False"/>
                     </group>
                 </xpath>
                 
@@ -80,11 +80,11 @@
                 <xpath expr="//field[@name='currency_id']" position="after">
                     <field name="authorized_by" 
                            readonly="1" 
-                           attrs="{'invisible': [('state', '!=', 'posted')]}"
+                           invisible="state != 'posted'"
                            string="Authorized By"/>
                     <field name="actual_approver_id" 
                            readonly="1" 
-                           attrs="{'invisible': [('state', '!=', 'posted')]}"
+                           invisible="state != 'posted'"
                            string="Approved By"/>
                 </xpath>
                 
@@ -102,7 +102,8 @@
                 <!-- Destination Account Field -->
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="destination_account_id" 
-                           attrs="{'required': [('state', '=', 'draft')], 'readonly': [('state', '!=', 'draft')]}"
+                           required="state == 'draft'" 
+                           readonly="state != 'draft'"
                            domain="[('company_id', '=', company_id)]"/>
                 </xpath>
                 
