@@ -19,5 +19,23 @@ UPDATE res_company SET voucher_terms = 'This is a computer-generated document. N
 -- Command 6: Set default values for use_osus_branding
 UPDATE res_company SET use_osus_branding = TRUE WHERE use_osus_branding IS NULL;
 
--- Command 7: Verify the fix worked
+-- Command 7: Add reviewer_id column to account_payment
+ALTER TABLE account_payment ADD reviewer_id INTEGER;
+
+-- Command 8: Add reviewer_date column to account_payment
+ALTER TABLE account_payment ADD reviewer_date TIMESTAMP;
+
+-- Command 9: Add approver_id column to account_payment
+ALTER TABLE account_payment ADD approver_id INTEGER;
+
+-- Command 10: Add approver_date column to account_payment
+ALTER TABLE account_payment ADD approver_date TIMESTAMP;
+
+-- Command 11: Add qr_in_report column to account_payment
+ALTER TABLE account_payment ADD qr_in_report BOOLEAN DEFAULT TRUE;
+
+-- Command 12: Update existing payments to show QR codes by default
+UPDATE account_payment SET qr_in_report = TRUE WHERE qr_in_report IS NULL;
+
+-- Command 13: Verify the fix worked
 SELECT COUNT(*) as total_companies, COUNT(voucher_footer_message) as with_footer, COUNT(voucher_terms) as with_terms, COUNT(use_osus_branding) as with_branding FROM res_company;

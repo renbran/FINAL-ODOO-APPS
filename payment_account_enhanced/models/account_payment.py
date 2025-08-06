@@ -99,6 +99,14 @@ class AccountPayment(models.Model):
         store=True
     )
     
+    # Computed voucher number that shows even in draft state
+    voucher_number = fields.Char(
+        string='Voucher Number',
+        compute='_compute_voucher_number',
+        store=True,
+        help="Voucher number that displays even in draft state"
+    )
+    
     @api.depends('name', 'payment_type', 'partner_id', 'amount', 'currency_id')
     def _compute_display_name(self):
         """Compute enhanced display name for vouchers"""
@@ -108,6 +116,22 @@ class AccountPayment(models.Model):
                 record.display_name = f"{payment_type_label} Voucher {record.name} - {record.partner_id.name}"
             else:
                 record.display_name = record.name or 'New Payment'
+    
+    @api.depends('name', 'id', 'state', 'payment_type')
+    def _compute_voucher_number(self):
+        """Compute voucher number that shows even in draft state"""
+        for record in self:
+            if record.name and record.name != '/':
+                # Use existing name if available
+                record.voucher_number = record.name
+            elif record.id:
+                # Generate temporary number for draft payments
+                payment_type_prefix = 'PV' if record.payment_type == 'outbound' else 'RV'
+                record.voucher_number = f"DRAFT-{payment_type_prefix}-{record.id:06d}"
+            else:
+                # Fallback for new records
+                payment_type_prefix = 'PV' if record.payment_type == 'outbound' else 'RV'
+                record.voucher_number = f"NEW-{payment_type_prefix}"
     
     @api.depends('name', 'amount', 'partner_id', 'date')
     def _generate_payment_qr_code(self):
@@ -129,6 +153,73 @@ class AccountPayment(models.Model):
                     record.qr_code = False
             else:
                 record.qr_code = False
+    
+    def action_send_for_review(self):
+        """Send payment for review"""
+        if self.state != 'draft':
+            raise UserError(_("Only draft payments can be sent for review."))
+        
+        # Here you can add logic to notify reviewers
+        # For now, we'll just log it
+        _logger.info(f"Payment {self.name} sent for review")
+        return True
+    
+    def action_review_payment(self):
+        """Mark payment as reviewed"""
+        if not self.reviewer_id:
+            self.reviewer_id = self.env.user
+            self.reviewer_date = fields.Datetime.now()
+        
+        # Here you can add logic to notify approvers
+        _logger.info(f"Payment {self.name} reviewed by {self.env.user.name}")
+        return True
+    
+    def action_approve_payment(self):
+        """Mark payment as approved and set approver"""
+        if not self.approver_id:
+            self.approver_id = self.env.user
+            self.approver_date = fields.Datetime.now()
+        
+        _logger.info(f"Payment {self.name} approved by {self.env.user.name}")
+        return True
+    
+    def action_review_payment(self):
+        """Mark payment as reviewed"""
+        self.ensure_one()
+        if self.state != 'draft':
+            raise UserError(_("Only draft payments can be reviewed."))
+        
+        self.reviewer_id = self.env.user
+        self.reviewer_date = fields.Datetime.now()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Payment has been marked as reviewed.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_approve_payment(self):
+        """Mark payment as approved by final approver"""
+        self.ensure_one()
+        if self.state != 'draft':
+            raise UserError(_("Only draft payments can be approved."))
+        
+        self.approver_id = self.env.user
+        self.approver_date = fields.Datetime.now()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Payment has been approved and is ready for posting.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     @api.depends('state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):
