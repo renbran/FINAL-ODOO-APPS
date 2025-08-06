@@ -9,18 +9,18 @@
 #
 #############################################################################
 {
-    'name': "QR Code on Invoice",
+    'name': "QR Code on Invoice and Payment",
     'author': "Ingenuity Info",
     'category': 'Other',
-    'summary': """ This Module will allow to Generate QR Code for Invoice. """,
+    'summary': """ This Module will allow to Generate QR Code for Invoice and Payment. """,
     'website': "https://ingenuityinfo.in",
     'company': 'Ingenuity Info',
     'maintainer': 'Ingenuity Info',
     'version': '17.0.0.0',
     'price': 0.0,
     'currency': 'EUR',
-    'description': """ By using this module you can Generate QR Code for Invoice. Thae QR code will visible on Invoice form. 
-        You can also print the QR code on Invoice as well.
+    'description': """ By using this module you can Generate QR Code for Invoice and Payment. The QR code will be visible on Invoice and Payment forms. 
+        You can also print the QR code on Invoice and Payment reports as well.
     """,
     'depends': [
         'web',
@@ -28,7 +28,9 @@
     ],
     'data': [
         'report/account_invoice_report_template.xml',
+        'report/account_payment_report_template.xml',
         'views/qr_code_invoice_view.xml',
+        'views/qr_code_payment_view.xml',
     ],
     'qweb': [
         ],
