@@ -5,9 +5,13 @@ Adds voucher-specific fields and methods for the Enhanced REST API
 """
 
 from odoo import models, fields, api
-import qrcode
-import base64
-from io import BytesIO
+try:
+    import qrcode
+    from io import BytesIO
+    import base64
+    QRCODE_AVAILABLE = True
+except ImportError:
+    QRCODE_AVAILABLE = False
 
 
 class AccountPayment(models.Model):
@@ -46,7 +50,7 @@ class AccountPayment(models.Model):
     def _compute_qr_code(self):
         """Generate QR code image"""
         for payment in self:
-            if payment.qr_code_data:
+            if payment.qr_code_data and QRCODE_AVAILABLE:
                 try:
                     # Generate QR code
                     qr = qrcode.QRCode(

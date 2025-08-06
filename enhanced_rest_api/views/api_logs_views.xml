@@ -41,10 +41,10 @@
                                 <field name="is_success"/>
                             </group>
                         </group>
-                        <group name="data" string="Request Data" attrs="{'invisible': [('request_data', '=', False)]}">
+                        <group name="data" string="Request Data" invisible="not request_data">
                             <field name="request_data" widget="text"/>
                         </group>
-                        <group name="error" string="Error Details" attrs="{'invisible': [('error_message', '=', False)]}">
+                        <group name="error" string="Error Details" invisible="not error_message">
                             <field name="error_message" widget="text"/>
                         </group>
                     </sheet>

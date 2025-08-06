@@ -45,7 +45,7 @@
         'data/api_endpoints_data.xml',
     ],
     'external_dependencies': {
-        'python': ['jwt', 'requests'],
+        'python': ['jwt', 'requests', 'qrcode', 'Pillow'],
     },
     'images': ['static/description/icon.png'],
     'license': 'LGPL-3',
