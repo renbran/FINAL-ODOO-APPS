@@ -17,8 +17,8 @@
                 <field name="qr_code" invisible="state == 'draft' or not qr_in_report" widget="image" class="oe_avatar" options="{'size': [150, 150]}"/>
             </xpath>
             
-            <!-- Add validation section in the form -->
-            <xpath expr="//page[@name='other_info']" position="after">
+            <!-- Add validation section as a new page in notebook -->
+            <xpath expr="//notebook" position="inside">
                 <page string="Validation &amp; QR Code" name="validation_info" invisible="state == 'draft'">
                     <group>
                         <group string="Validation Token">
