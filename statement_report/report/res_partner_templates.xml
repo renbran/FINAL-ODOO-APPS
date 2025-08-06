@@ -126,6 +126,7 @@
                             <th>Invoice/Bill Number</th>
                             <th>Reference</th>
                             <th>Due Date</th>
+                            <th>Due Status</th>
                             <th>Invoices/Debit</th>
                             <th>Balance</th>
                         </tr>
@@ -137,6 +138,9 @@
                                 <td align="center"><t t-esc="line['name']"/></td>
                                 <td align="center"><t t-esc="line['ref'] or ''"/></td>
                                 <td align="center"><t t-esc="line['invoice_date_due']"/></td>
+                                <td align="center">
+                                    <t t-esc="line['due_status']"/>
+                                </td>
                                 <td align="center">
                                     <t t-esc="currency"/>
                                     <t t-esc="'{:,.2f}'.format(line['sub_total'])"/>
