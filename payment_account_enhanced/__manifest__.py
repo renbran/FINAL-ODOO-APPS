@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Payment Voucher Enhanced',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'category': 'Accounting/Payments',
     'summary': 'Enhanced Payment Vouchers with OSUS Brand Identity',
     'description': '''
