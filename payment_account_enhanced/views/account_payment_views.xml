@@ -88,8 +88,13 @@
                            string="Approved By"/>
                 </xpath>
                 
-                <!-- Workflow Tracking -->
-                <xpath expr="//field[@name='destination_account_id']" position="after">
+                <!-- Enhanced Fields Section -->
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="destination_account_id" 
+                           required="state == 'draft'" 
+                           readonly="state != 'draft'"
+                           domain="[('company_id', '=', company_id)]"/>
+                    
                     <separator string="Approval Workflow" colspan="2"/>
                     <group colspan="2" col="4">
                         <field name="reviewer_id" readonly="1"/>
@@ -97,14 +102,6 @@
                         <field name="approver_id" readonly="1"/>
                         <field name="approver_date" readonly="1"/>
                     </group>
-                </xpath>
-                
-                <!-- Destination Account Field -->
-                <xpath expr="//field[@name='journal_id']" position="after">
-                    <field name="destination_account_id" 
-                           required="state == 'draft'" 
-                           readonly="state != 'draft'"
-                           domain="[('company_id', '=', company_id)]"/>
                 </xpath>
                 
             </field>
