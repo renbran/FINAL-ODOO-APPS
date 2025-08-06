@@ -311,6 +311,11 @@ class Partner(models.Model):
             
             processed_lines.append(processed_line)
         
+        # Final safety check: ensure all lines have due_status
+        for line in processed_lines:
+            if 'due_status' not in line:
+                line['due_status'] = 'Unknown'
+        
         return processed_lines
 
     def action_share_pdf(self):

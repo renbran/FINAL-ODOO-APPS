@@ -139,7 +139,7 @@
                                 <td align="center"><t t-esc="line['ref'] or ''"/></td>
                                 <td align="center"><t t-esc="line['invoice_date_due']"/></td>
                                 <td align="center">
-                                    <t t-esc="line['due_status']"/>
+                                    <t t-esc="line.get('due_status', 'Unknown')"/>
                                 </td>
                                 <td align="center">
                                     <t t-esc="currency"/>
