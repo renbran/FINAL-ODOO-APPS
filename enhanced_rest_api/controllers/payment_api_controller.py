@@ -46,6 +46,111 @@ class PaymentAPIController(http.Controller):
             headers={'Content-Type': 'application/json'}
         )
 
+    @http.route('/api/v1/payments/voucher/<int:payment_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    def generate_payment_voucher(self, payment_id, **kwargs):
+        """Generate payment voucher report"""
+        try:
+            # Authenticate
+            user = self._authenticate_request()
+            if isinstance(user, dict):
+                return self._make_response(user, 401)
+
+            # Get payment record
+            payment = request.env['account.payment'].browse(payment_id)
+            if not payment.exists():
+                return self._make_response({'error': 'Payment not found', 'code': 404}, 404)
+
+            # Check access rights
+            try:
+                payment.check_access_rights('read')
+                payment.check_access_rule('read')
+            except AccessError:
+                return self._make_response({'error': 'Access denied', 'code': 403}, 403)
+
+            # Generate report
+            report = request.env.ref('enhanced_rest_api.action_report_payment_voucher')
+            pdf_content, _ = report._render_qweb_pdf([payment.id])
+            
+            # Create response
+            response = request.make_response(
+                pdf_content,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="Payment_Voucher_{payment.name or payment.id}.pdf"'),
+                    ('Content-Length', len(pdf_content)),
+                ]
+            )
+            
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error generating payment voucher: {str(e)}")
+            return self._make_response({'error': str(e), 'code': 500}, 500)
+
+    @http.route('/api/v1/payments/voucher/html/<int:payment_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    def get_payment_voucher_html(self, payment_id, **kwargs):
+        """Get payment voucher as HTML for preview"""
+        try:
+            # Authenticate
+            user = self._authenticate_request()
+            if isinstance(user, dict):
+                return self._make_response(user, 401)
+
+            # Get payment record
+            payment = request.env['account.payment'].browse(payment_id)
+            if not payment.exists():
+                return self._make_response({'error': 'Payment not found', 'code': 404}, 404)
+
+            # Check access rights
+            try:
+                payment.check_access_rights('read')
+                payment.check_access_rule('read')
+            except AccessError:
+                return self._make_response({'error': 'Access denied', 'code': 403}, 403)
+
+            # Render HTML template
+            template = request.env.ref('enhanced_rest_api.payment_voucher_document')
+            html_content = template._render({'docs': [payment]})
+            
+            return request.make_response(
+                html_content,
+                headers=[('Content-Type', 'text/html')]
+            )
+
+        except Exception as e:
+            _logger.error(f"Error generating payment voucher HTML: {str(e)}")
+            return self._make_response({'error': str(e), 'code': 500}, 500)
+
+    @http.route('/api/v1/payments/voucher/data/<int:payment_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    def get_payment_voucher_data(self, payment_id, **kwargs):
+        """Get payment voucher data as JSON"""
+        try:
+            # Authenticate
+            user = self._authenticate_request()
+            if isinstance(user, dict):
+                return self._make_response(user, 401)
+
+            # Get payment record
+            payment = request.env['account.payment'].browse(payment_id)
+            if not payment.exists():
+                return self._make_response({'error': 'Payment not found', 'code': 404}, 404)
+
+            # Check access rights
+            try:
+                payment.check_access_rights('read')
+                payment.check_access_rule('read')
+            except AccessError:
+                return self._make_response({'error': 'Access denied', 'code': 403}, 403)
+
+            # Get voucher data
+            voucher_data = payment.get_voucher_data()
+            
+            return self._make_response(voucher_data)
+
+        except Exception as e:
+            _logger.error(f"Error getting payment voucher data: {str(e)}")
+            return self._make_response({'error': str(e), 'code': 500}, 500)
+
     @http.route('/api/v1/payments', type='http', auth='none', methods=['GET'], csrf=False)
     def get_payments(self, **kwargs):
         """Get payment records with filtering options"""

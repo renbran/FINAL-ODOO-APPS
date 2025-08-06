@@ -41,6 +41,7 @@
         'security/security_groups.xml',
         'views/api_config_views.xml',
         'views/api_logs_views.xml',
+        'reports/payment_voucher_report.xml',
         'data/api_endpoints_data.xml',
     ],
     'external_dependencies': {

@@ -18,7 +18,16 @@ The Enhanced REST API module provides comprehensive REST API functionality for a
 - **CRM API**: Leads management, dashboard data, pipeline analytics
 - **Sales API**: Orders, products, customer data, sales analytics
 - **Payment API**: Payment processing, QR code verification, voucher management
+- **Payment Vouchers**: A4-optimized PDF/HTML voucher generation with OS PROPER branding
 - **Generic Model API**: CRUD operations for any Odoo model
+
+### 🧾 **Payment Voucher Features**
+- **Professional Templates**: A4-optimized voucher templates with OS PROPER branding
+- **Multiple Formats**: PDF download, HTML preview, and JSON data endpoints
+- **QR Code Integration**: Auto-generated QR codes for payment verification
+- **Workflow Tracking**: Multi-step approval process visualization
+- **Responsive Design**: Mobile-friendly and print-optimized layouts
+- **Dynamic Data**: Real-time integration with Odoo payment data
 
 ### 🔒 **Security Features**
 - **API Key Management**: Generate, revoke, and manage API keys
@@ -258,6 +267,43 @@ GET /api/v1/payments/123/verify
 GET /api/v1/payments/dashboard
 # Returns: Payment analytics and statistics
 ```
+
+### 🧾 **Payment Voucher Endpoints**
+
+#### Generate Payment Voucher PDF
+```bash
+GET /api/v1/payments/voucher/{payment_id}
+# Headers: X-API-Key: your_api_key
+# Returns: Professional A4 PDF voucher download
+# Example: curl -H "X-API-Key: your_key" -o voucher.pdf "/api/v1/payments/voucher/123"
+```
+
+#### Get Payment Voucher HTML Preview
+```bash
+GET /api/v1/payments/voucher/html/{payment_id}
+# Headers: X-API-Key: your_api_key
+# Returns: HTML preview of payment voucher
+# Features: Responsive design, print-optimized, OS PROPER branding
+```
+
+#### Get Payment Voucher Data
+```bash
+GET /api/v1/payments/voucher/data/{payment_id}
+# Headers: X-API-Key: your_api_key
+# Returns: Complete voucher data as JSON including:
+# - Payment details, company info, partner data
+# - QR code data for verification
+# - Workflow status and approval tracking
+# - Download URLs for PDF and HTML versions
+```
+
+**Voucher Features:**
+- **A4 Optimized**: Perfect for printing (210mm x 297mm)
+- **OS PROPER Branding**: Company colors, professional typography
+- **QR Code Integration**: Auto-generated verification codes
+- **Workflow Tracking**: Visual approval process status
+- **Responsive Design**: Mobile-friendly and print-ready
+- **Multi-format**: PDF, HTML, and JSON data endpoints
 
 ### 🔍 **Generic Model Endpoints**
 

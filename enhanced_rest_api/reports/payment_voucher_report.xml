@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Voucher Report Template -->
+    <template id="payment_voucher_document" name="Payment Voucher Document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <style>
+                        /* A4 Print Optimization */
+                        @page {
+                            size: A4 portrait;
+                            margin: 12mm;
+                            print-color-adjust: exact;
+                        }
+
+                        .voucher-container {
+                            width: 100%;
+                            min-height: 273mm;
+                            background: #ffffff;
+                            border-radius: 6px;
+                            overflow: hidden;
+                            position: relative;
+                            font-family: 'Arial', sans-serif;
+                            font-size: 12px;
+                            line-height: 1.4;
+                            color: #212529;
+                        }
+
+                        .voucher-container::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            height: 4px;
+                            background: linear-gradient(90deg, #800020 0%, #b8002e 50%, #800020 100%);
+                        }
+
+                        .header {
+                            background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                            color: white;
+                            text-align: center;
+                            padding: 20px 30px;
+                            position: relative;
+                            height: 85px;
+                        }
+
+                        .voucher-number {
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: #ffd700;
+                            margin: 6px 0;
+                            letter-spacing: 0.8px;
+                            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                        }
+
+                        .company-title {
+                            font-size: 20px;
+                            font-weight: 700;
+                            letter-spacing: 1.2px;
+                            margin-bottom: 3px;
+                            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                        }
+
+                        .subtitle {
+                            font-size: 13px;
+                            font-weight: 300;
+                            opacity: 0.95;
+                            letter-spacing: 0.4px;
+                        }
+
+                        .brand-section {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 16px 30px;
+                            background: #fafbfc;
+                            border-bottom: 1px solid #e9ecef;
+                            height: 70px;
+                        }
+
+                        .logo-container, .qr-container {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 6px;
+                        }
+
+                        .logo-box, .qr-box {
+                            width: 45px;
+                            height: 45px;
+                            background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: 700;
+                            font-size: 10px;
+                        }
+
+                        .logo-label, .qr-label {
+                            font-size: 10px;
+                            color: #6c757d;
+                            font-weight: 500;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                        }
+
+                        .content {
+                            padding: 20px 30px;
+                        }
+
+                        .voucher-title {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+
+                        .voucher-title h2 {
+                            font-size: 18px;
+                            color: #800020;
+                            font-weight: 600;
+                            letter-spacing: 0.8px;
+                            position: relative;
+                            display: inline-block;
+                            padding-bottom: 8px;
+                        }
+
+                        .voucher-title h2::after {
+                            content: '';
+                            position: absolute;
+                            bottom: 0;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            width: 60px;
+                            height: 2px;
+                            background: linear-gradient(90deg, #ffd700, #ffed4a);
+                            border-radius: 1px;
+                        }
+
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 20px;
+                            margin-bottom: 20px;
+                        }
+
+                        .info-section {
+                            background: #f8f9fa;
+                            border-radius: 8px;
+                            padding: 16px;
+                            border-left: 3px solid #800020;
+                        }
+
+                        .info-row {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 10px;
+                            padding: 4px 0;
+                            border-bottom: 1px solid #e9ecef;
+                            min-height: 22px;
+                        }
+
+                        .info-row:last-child {
+                            margin-bottom: 0;
+                            border-bottom: none;
+                        }
+
+                        .info-label {
+                            font-weight: 600;
+                            color: #495057;
+                            font-size: 11px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                            min-width: 85px;
+                            flex-shrink: 0;
+                            line-height: 1.2;
+                        }
+
+                        .info-value {
+                            font-weight: 500;
+                            color: #212529;
+                            text-align: right;
+                            flex: 1;
+                            font-size: 11px;
+                            line-height: 1.3;
+                            word-wrap: break-word;
+                            max-width: 120px;
+                        }
+
+                        .amount-highlight {
+                            color: #800020;
+                            font-size: 14px;
+                            font-weight: 700;
+                        }
+
+                        .pending-status {
+                            color: #dc3545;
+                            font-style: italic;
+                            font-weight: 500;
+                        }
+
+                        .approved-status {
+                            color: #28a745;
+                            font-weight: 600;
+                        }
+
+                        .authorization-section {
+                            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                            border: 1px solid #e9ecef;
+                            border-radius: 10px;
+                            padding: 20px;
+                            margin: 16px 0;
+                        }
+
+                        .section-title {
+                            color: #800020;
+                            font-size: 16px;
+                            font-weight: 700;
+                            margin-bottom: 20px;
+                            text-align: center;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            position: relative;
+                            padding-bottom: 10px;
+                        }
+
+                        .section-title::after {
+                            content: '';
+                            position: absolute;
+                            bottom: 0;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            width: 80px;
+                            height: 2px;
+                            background: linear-gradient(90deg, #ffd700, #ffed4a);
+                            border-radius: 1px;
+                        }
+
+                        .workflow-section {
+                            background: white;
+                            border-radius: 8px;
+                            padding: 16px;
+                            border-left: 3px solid #800020;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                            margin-bottom: 12px;
+                        }
+
+                        .workflow-title {
+                            color: #800020;
+                            font-size: 13px;
+                            font-weight: 600;
+                            margin-bottom: 12px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .workflow-title::before {
+                            content: '';
+                            width: 6px;
+                            height: 6px;
+                            background: #ffd700;
+                            border-radius: 50%;
+                            margin-right: 8px;
+                        }
+
+                        .workflow-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 16px;
+                        }
+
+                        .workflow-item {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 6px;
+                        }
+
+                        .workflow-label {
+                            font-weight: 600;
+                            color: #495057;
+                            font-size: 11px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                        }
+
+                        .workflow-value {
+                            font-weight: 500;
+                            color: #212529;
+                            font-size: 12px;
+                            padding: 6px 8px;
+                            background: #f8f9fa;
+                            border-radius: 4px;
+                            border: 1px solid #e9ecef;
+                            min-height: 28px;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .workflow-separator {
+                            height: 1px;
+                            background: linear-gradient(90deg, transparent 0%, #800020 20%, #ffd700 50%, #800020 80%, transparent 100%);
+                            margin: 12px 0;
+                            position: relative;
+                        }
+
+                        .workflow-separator::after {
+                            content: '';
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            width: 8px;
+                            height: 8px;
+                            background: #800020;
+                            border-radius: 50%;
+                            border: 2px solid #ffd700;
+                        }
+
+                        .receiver-info {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 12px;
+                        }
+
+                        .receiver-field {
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            min-height: 24px;
+                        }
+
+                        .field-label {
+                            font-weight: 600;
+                            color: #495057;
+                            font-size: 11px;
+                            min-width: 60px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                        }
+
+                        .field-line {
+                            flex: 1;
+                            height: 1px;
+                            background: #800020;
+                            position: relative;
+                        }
+
+                        .field-line::after {
+                            content: '';
+                            position: absolute;
+                            right: 0;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            width: 4px;
+                            height: 4px;
+                            background: #800020;
+                            border-radius: 50%;
+                        }
+
+                        .signature-section {
+                            background: white;
+                            border-radius: 8px;
+                            padding: 16px;
+                            border-left: 3px solid #800020;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .signature-box {
+                            text-align: center;
+                            padding: 16px;
+                            background: #f8f9fa;
+                            border: 1px dashed #800020;
+                            border-radius: 8px;
+                            margin-top: 10px;
+                        }
+
+                        .signature-line {
+                            width: 100%;
+                            height: 40px;
+                            border-bottom: 1px solid #800020;
+                            margin-bottom: 8px;
+                            position: relative;
+                        }
+
+                        .signature-text {
+                            font-size: 11px;
+                            color: #800020;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                        }
+
+                        .footer {
+                            background: #800020;
+                            color: white;
+                            text-align: center;
+                            padding: 16px 30px;
+                            margin-top: 16px;
+                        }
+
+                        .footer-text {
+                            font-size: 11px;
+                            font-weight: 400;
+                            opacity: 0.95;
+                            line-height: 1.4;
+                        }
+
+                        .contact-info {
+                            font-weight: 600;
+                            color: #ffd700;
+                        }
+                    </style>
+
+                    <div class="voucher-container">
+                        <!-- Header -->
+                        <div class="header">
+                            <h1 class="company-title">
+                                <t t-esc="o.company_id.name or 'OS PROPER'"/>
+                            </h1>
+                            <h2 class="voucher-number">
+                                <t t-if="o.voucher_type == 'receipt'">Receipt Voucher No. </t>
+                                <t t-else="">Payment Voucher No. </t>
+                                <t t-esc="o.name or o.reference"/>
+                            </h2>
+                            <p class="subtitle">Verify Payment System</p>
+                        </div>
+
+                        <!-- Brand Section -->
+                        <div class="brand-section">
+                            <div class="logo-container">
+                                <div class="logo-box">
+                                    <t t-if="o.company_id.logo">
+                                        <img t-att-src="image_data_uri(o.company_id.logo)" style="max-width: 40px; max-height: 40px;" alt="Logo"/>
+                                    </t>
+                                    <t t-else="">LOGO</t>
+                                </div>
+                                <span class="logo-label">Company Logo</span>
+                            </div>
+                            <div class="qr-container">
+                                <div class="qr-box">
+                                    <t t-if="o.qr_code">
+                                        <img t-att-src="image_data_uri(o.qr_code)" style="max-width: 40px; max-height: 40px;" alt="QR Code"/>
+                                    </t>
+                                    <t t-else="">QR</t>
+                                </div>
+                                <span class="qr-label">Scan to Verify</span>
+                            </div>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="content">
+                            <div class="voucher-title">
+                                <h2>
+                                    <t t-if="o.voucher_type == 'receipt'">RECEIPT VOUCHER</t>
+                                    <t t-else="">PAYMENT VOUCHER</t>
+                                </h2>
+                            </div>
+
+                            <!-- Information Grid -->
+                            <div class="info-grid">
+                                <!-- Payment Details -->
+                                <div class="info-section">
+                                    <div class="info-row">
+                                        <span class="info-label">Payment Method</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.payment_method_id.name or o.journal_id.name or 'Bank Transfer'"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Reference</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.reference or o.name"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Phone</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.partner_id.phone or o.partner_id.mobile or 'N/A'"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Total Amount</span>
+                                        <span class="info-value amount-highlight">
+                                            <t t-esc="o.currency_id.symbol or 'AED'"/>
+                                            <t t-esc="'{:,.2f}'.format(o.amount or 0)"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Date</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.date.strftime('%d %B %Y') if o.date else ''"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Company Details -->
+                                <div class="info-section">
+                                    <div class="info-row">
+                                        <span class="info-label">Issued By</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.company_id.name or 'CONTINENTAL INVESTMENT LTD LLC'"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Address</span>
+                                        <span class="info-value">
+                                            <t t-if="o.company_id.street">
+                                                <t t-esc="o.company_id.street"/>
+                                                <t t-if="o.company_id.street2"><br/><t t-esc="o.company_id.street2"/></t>
+                                                <t t-if="o.company_id.city"><br/><t t-esc="o.company_id.city"/></t>
+                                                <t t-if="o.company_id.country_id"><br/><t t-esc="o.company_id.country_id.name"/></t>
+                                            </t>
+                                            <t t-else="">Single Business Tower<br/>29th Floor, Dubai, UAE</t>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">VAT Number</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.company_id.vat or '100236589600003'"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Initiated By</span>
+                                        <span class="info-value">
+                                            <t t-esc="o.create_uid.name or 'ADMINISTRATOR'"/><br/>
+                                            <t t-esc="o.create_date.strftime('%d/%m/%Y %H:%M') if o.create_date else ''"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Status</span>
+                                        <span class="info-value">
+                                            <t t-if="o.state == 'draft'" class="pending-status">Draft</t>
+                                            <t t-elif="o.state == 'pending'" class="pending-status">Pending Review</t>
+                                            <t t-elif="o.state == 'approved'" class="approved-status">Approved</t>
+                                            <t t-elif="o.state == 'paid'" class="approved-status">Paid</t>
+                                            <t t-else="" class="pending-status">
+                                                <t t-esc="o.state.title()"/>
+                                            </t>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Authorization Section -->
+                            <div class="authorization-section">
+                                <h3 class="section-title">Payment Authorization</h3>
+                                
+                                <!-- Review & Validation -->
+                                <div class="workflow-section">
+                                    <h4 class="workflow-title">Review &amp; Validation</h4>
+                                    <div class="workflow-grid">
+                                        <div class="workflow-item">
+                                            <span class="workflow-label">Initiator</span>
+                                            <span class="workflow-value">
+                                                <t t-esc="o.create_uid.name or 'ADMINISTRATOR'"/>
+                                            </span>
+                                        </div>
+                                        <div class="workflow-item">
+                                            <span class="workflow-label">Validated</span>
+                                            <span class="workflow-value">
+                                                <t t-if="o.state in ['approved', 'paid']" class="approved-status">Validated</t>
+                                                <t t-else="" class="pending-status">Pending</t>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Separator -->
+                                <div class="workflow-separator"></div>
+
+                                <!-- Payment Authorize -->
+                                <div class="workflow-section">
+                                    <h4 class="workflow-title">Payment Authorize</h4>
+                                    <div class="workflow-grid">
+                                        <div class="workflow-item">
+                                            <span class="workflow-label">Reviewed</span>
+                                            <span class="workflow-value">
+                                                <t t-if="o.state in ['approved', 'paid']" class="approved-status">Reviewed</t>
+                                                <t t-else="" class="pending-status">Pending</t>
+                                            </span>
+                                        </div>
+                                        <div class="workflow-item">
+                                            <span class="workflow-label">Approved</span>
+                                            <span class="workflow-value">
+                                                <t t-if="o.state in ['approved', 'paid']" class="approved-status">Approved</t>
+                                                <t t-else="" class="pending-status">Pending</t>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Separator -->
+                                <div class="workflow-separator"></div>
+
+                                <!-- Receiver Information -->
+                                <div class="workflow-section">
+                                    <h4 class="workflow-title">Receiver Information</h4>
+                                    <div class="receiver-info">
+                                        <div class="receiver-field">
+                                            <span class="field-label">Name:</span>
+                                            <div class="field-line"></div>
+                                        </div>
+                                        <div class="receiver-field">
+                                            <span class="field-label">Mobile:</span>
+                                            <div class="field-line"></div>
+                                        </div>
+                                        <div class="receiver-field">
+                                            <span class="field-label">Date:</span>
+                                            <div class="field-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Separator -->
+                                <div class="workflow-separator"></div>
+
+                                <!-- Signature Section -->
+                                <div class="signature-section">
+                                    <h4 class="workflow-title">Signature</h4>
+                                    <div class="signature-area">
+                                        <div class="signature-box">
+                                            <div class="signature-line"></div>
+                                            <p class="signature-text">Authorized Signature</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="footer">
+                            <p class="footer-text">
+                                Thank you for your payment. For any inquiries, please contact: 
+                                <span class="contact-info">
+                                    <t t-esc="o.company_id.phone or o.partner_id.phone or '0563905772'"/>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Payment Voucher Report Definition -->
+    <record id="action_report_payment_voucher" model="ir.actions.report">
+        <field name="name">Payment Voucher</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">enhanced_rest_api.payment_voucher_document</field>
+        <field name="report_file">enhanced_rest_api.payment_voucher_document</field>
+        <field name="print_report_name">'Payment Voucher - %s' % (object.name or object.reference)</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
