@@ -117,39 +117,43 @@ class AccountPayment(models.Model):
             else:
                 record.display_name = record.name or 'New Payment'
     
-    @api.depends('name', 'id', 'state', 'payment_type')
+    @api.depends('name', 'state', 'payment_type')
     def _compute_voucher_number(self):
         """Compute voucher number that shows even in draft state"""
         for record in self:
             if record.name and record.name != '/':
                 # Use existing name if available
                 record.voucher_number = record.name
-            elif record.id:
+            else:
                 # Generate temporary number for draft payments
                 payment_type_prefix = 'PV' if record.payment_type == 'outbound' else 'RV'
-                record.voucher_number = f"DRAFT-{payment_type_prefix}-{record.id:06d}"
-            else:
-                # Fallback for new records
-                payment_type_prefix = 'PV' if record.payment_type == 'outbound' else 'RV'
-                record.voucher_number = f"NEW-{payment_type_prefix}"
+                if record._origin.id:
+                    # Use the record's database ID if available
+                    record.voucher_number = f"DRAFT-{payment_type_prefix}-{record._origin.id:06d}"
+                else:
+                    # Fallback for new records
+                    record.voucher_number = f"NEW-{payment_type_prefix}"
     
-    @api.depends('name', 'amount', 'partner_id', 'date')
+    @api.depends('name', 'amount', 'partner_id', 'date', 'state')
     def _generate_payment_qr_code(self):
         """Generate QR code for payment voucher"""
         for record in self:
-            if record.name and record.qr_in_report:
+            if record.qr_in_report:
                 try:
                     # Create verification URL or payment data
                     base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
-                    qr_data = f"{base_url}/payment/verify/{record.id}"
                     
-                    # Alternative: Include payment details in QR code
-                    if not base_url:
-                        qr_data = f"Payment: {record.name}\nAmount: {record.amount} {record.currency_id.name}\nTo: {record.partner_id.name}\nDate: {record.date}"
+                    if base_url and record._origin.id:
+                        qr_data = f"{base_url}/payment/verify/{record._origin.id}"
+                    else:
+                        # Alternative: Include payment details in QR code
+                        voucher_ref = record.voucher_number or record.name or 'Draft Payment'
+                        partner_name = record.partner_id.name if record.partner_id else 'Unknown'
+                        qr_data = f"Payment: {voucher_ref}\nAmount: {record.amount} {record.currency_id.name if record.currency_id else 'USD'}\nTo: {partner_name}\nDate: {record.date or 'Draft'}"
                     
                     record.qr_code = generate_qr_code_payment(qr_data)
                 except Exception as e:
-                    _logger.error(f"Error generating QR code for payment {record.name}: {e}")
+                    _logger.error(f"Error generating QR code for payment {record.name or 'Draft'}: {e}")
                     record.qr_code = False
             else:
                 record.qr_code = False
