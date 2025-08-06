@@ -6,32 +6,8 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
                     <div class="article o_report_layout_standard">
-                        <!-- Custom CSS for OSUS Branding --                                .osus-                                .osus-signature-grid {
-                                    grid-template-columns: 1fr 1fr;
-                                    gap: 15px;
-                                }
-                                
-                                .osus-signature-box {
-                                    min-height: 120px;
-                                    padding: 15px 10px;
-                                }
-                                
-                                .osus-signature-title {
-                                    font-size: 10px;
-                                    margin-bottom: 12px;
-                                }
-                                
-                                .osus-signature-name {
-                                    font-size: 10px;
-                                    min-height: 18px;
-                                }
-                                
-                                .osus-signature-date {
-                                    font-size: 8px;
-                                }ature-grid {
-                                    grid-template-columns: 1fr 1fr;
-                                    gap: 15px;
-                                }                       <style type="text/css">
+                        <!-- Custom CSS for OSUS Branding -->
+                        <style type="text/css">
                             @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap');
                             
                             /* OSUS Brand Colors */
