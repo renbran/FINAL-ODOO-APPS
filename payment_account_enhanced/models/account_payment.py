@@ -160,6 +160,41 @@ class AccountPayment(models.Model):
         # Call standard posting method
         return super(AccountPayment, self).action_post()
     
+    def action_cancel(self):
+        """Enhanced cancel action with proper validation"""
+        for record in self:
+            if record.state == 'posted':
+                # Check if user has permission to cancel posted payments
+                if not self.env.user.has_group('account.group_account_manager'):
+                    raise UserError(_("Only account managers can cancel posted payments."))
+                
+                # Log the cancellation
+                record.message_post(
+                    body=f"Payment voucher cancelled by {self.env.user.name}",
+                    subject="Payment Voucher Cancelled"
+                )
+        
+        # Call standard cancel method
+        return super(AccountPayment, self).action_cancel()
+    
+    def action_draft(self):
+        """Enhanced draft action for cancelled payments"""
+        for record in self:
+            if record.state != 'cancel':
+                raise UserError(_("Only cancelled payments can be set back to draft."))
+            
+            if not self.env.user.has_group('account.group_account_manager'):
+                raise UserError(_("Only account managers can reset payments to draft."))
+            
+            # Log the reset action
+            record.message_post(
+                body=f"Payment voucher reset to draft by {self.env.user.name}",
+                subject="Payment Voucher Reset"
+            )
+        
+        # Call standard draft method
+        return super(AccountPayment, self).action_draft()
+    
     @api.model
     def get_osus_branding_data(self):
         """Get OSUS branding data for reports"""
