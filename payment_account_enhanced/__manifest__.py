@@ -63,6 +63,9 @@
         'static/description/screenshot_1.png',
         'static/description/screenshot_2.png',
     ],
+    'external_dependencies': {
+        'python': ['qrcode', 'pillow'],
+    },
     'installable': True,
     'auto_install': False,
     'application': False,

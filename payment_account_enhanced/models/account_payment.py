@@ -1,13 +1,74 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import qrcode
+import base64
+from io import BytesIO
+import logging
+
+_logger = logging.getLogger(__name__)
+
+def generate_qr_code_payment(value):
+    """Generate QR code for payment data"""
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4
+        )
+        qr.add_data(value)
+        qr.make(fit=True)
+        img = qr.make_image()
+        stream = BytesIO()
+        img.save(stream, format="PNG")
+        qr_img = base64.b64encode(stream.getvalue())
+        return qr_img
+    except Exception as e:
+        _logger.error(f"Error generating QR code: {e}")
+        return False
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
+    
+    # QR Code fields
+    qr_code = fields.Binary(
+        string="Payment QR Code", 
+        compute='_generate_payment_qr_code',
+        help="QR code containing payment verification URL"
+    )
+    qr_in_report = fields.Boolean(
+        string='Display QR Code in Report?', 
+        default=True,
+        help="Whether to display QR code in payment voucher report"
+    )
     
     # Enhanced fields for OSUS voucher system
     remarks = fields.Text(
         string='Remarks/Memo',
         help="Additional remarks or memo for this payment voucher"
+    )
+    
+    # Enhanced signatory fields
+    reviewer_id = fields.Many2one(
+        'res.users',
+        string='Reviewed By',
+        help="User who reviewed the payment before approval"
+    )
+    
+    reviewer_date = fields.Datetime(
+        string='Review Date',
+        help="Date when the payment was reviewed"
+    )
+    
+    approver_id = fields.Many2one(
+        'res.users',
+        string='Final Approver',
+        help="User who gave final approval for the payment"
+    )
+    
+    approver_date = fields.Datetime(
+        string='Approval Date',
+        help="Date when the payment was finally approved"
     )
     
     authorized_by = fields.Char(
@@ -47,6 +108,27 @@ class AccountPayment(models.Model):
                 record.display_name = f"{payment_type_label} Voucher {record.name} - {record.partner_id.name}"
             else:
                 record.display_name = record.name or 'New Payment'
+    
+    @api.depends('name', 'amount', 'partner_id', 'date')
+    def _generate_payment_qr_code(self):
+        """Generate QR code for payment voucher"""
+        for record in self:
+            if record.name and record.qr_in_report:
+                try:
+                    # Create verification URL or payment data
+                    base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
+                    qr_data = f"{base_url}/payment/verify/{record.id}"
+                    
+                    # Alternative: Include payment details in QR code
+                    if not base_url:
+                        qr_data = f"Payment: {record.name}\nAmount: {record.amount} {record.currency_id.name}\nTo: {record.partner_id.name}\nDate: {record.date}"
+                    
+                    record.qr_code = generate_qr_code_payment(qr_data)
+                except Exception as e:
+                    _logger.error(f"Error generating QR code for payment {record.name}: {e}")
+                    record.qr_code = False
+            else:
+                record.qr_code = False
     
     @api.depends('state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):

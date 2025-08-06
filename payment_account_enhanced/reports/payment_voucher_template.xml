@@ -104,6 +104,32 @@
                                 opacity: 0.95;
                             }
                             
+                            /* QR Code Section */
+                            .osus-qr-section {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background: white;
+                                padding: 10px;
+                                border-radius: 8px;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                z-index: 10;
+                            }
+                            
+                            .osus-qr-code {
+                                width: 60px;
+                                height: 60px;
+                                object-fit: contain;
+                            }
+                            
+                            .osus-qr-label {
+                                font-size: 8px;
+                                text-align: center;
+                                color: var(--osus-dark);
+                                margin-top: 4px;
+                                font-weight: 500;
+                            }
+                            
                             /* Document Title with Gold Accent */
                             .osus-document-title {
                                 background: linear-gradient(135deg, var(--osus-gold-primary) 0%, var(--osus-gold-secondary) 100%);
@@ -241,8 +267,8 @@
                             
                             .osus-signature-grid {
                                 display: grid;
-                                grid-template-columns: repeat(3, 1fr);
-                                gap: 30px;
+                                grid-template-columns: repeat(4, 1fr);
+                                gap: 20px;
                             }
                             
                             .osus-signature-box {
