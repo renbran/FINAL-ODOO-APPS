@@ -291,6 +291,9 @@ class Partner(models.Model):
             
             processed_line['is_overdue'] = is_overdue
             
+            # Add due status for template compatibility
+            processed_line['due_status'] = 'Overdue' if is_overdue else 'Upcoming'
+            
             # Format dates for proper display (handle various date formats)
             for date_field in ['invoice_date', 'invoice_date_due']:
                 if line.get(date_field):
@@ -436,6 +439,9 @@ class Partner(models.Model):
                 main = self.env.cr.dictfetchall()
                 self.env.cr.execute(amount)
                 amount = self.env.cr.dictfetchall()
+                
+                # Process lines for enhanced formatting
+                main = self._process_report_lines(main)
                 
                 # Calculate aging buckets with error handling
                 try:
@@ -655,6 +661,10 @@ class Partner(models.Model):
             main = self.env.cr.dictfetchall()
             self.env.cr.execute(amount)
             amount = self.env.cr.dictfetchall()
+            
+            # Process lines for enhanced formatting
+            main = self._process_report_lines(main)
+            
             data = {
                 'customer': self.display_name,
                 'street': self.street,
@@ -796,6 +806,10 @@ class Partner(models.Model):
 
                 self.env.cr.execute(main_query)
                 main = self.env.cr.dictfetchall()
+                
+                # Process lines for enhanced formatting  
+                main = rec._process_report_lines(main) if hasattr(rec, '_process_report_lines') else main
+                
                 data = {
                     'customer': rec.display_name,
                     'street': rec.street,
@@ -927,6 +941,10 @@ class Partner(models.Model):
 
                 self.env.cr.execute(main_query)
                 main = self.env.cr.dictfetchall()
+                
+                # Process lines for enhanced formatting  
+                main = rec._process_report_lines(main) if hasattr(rec, '_process_report_lines') else main
+                
                 data = {
                     'customer': rec.display_name,
                     'street': rec.street,
