@@ -136,21 +136,34 @@ class AccountPayment(models.Model):
     
     @api.depends('name', 'amount', 'partner_id', 'date', 'state')
     def _generate_payment_qr_code(self):
-        """Generate QR code for payment voucher"""
+        """Generate QR code for payment voucher verification"""
         for record in self:
             if record.qr_in_report:
                 try:
-                    # Create verification URL or payment data
+                    # Get base URL from system parameters
                     base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
                     
                     if base_url and record._origin.id:
+                        # Create verification URL that points to our controller
                         qr_data = f"{base_url}/payment/verify/{record._origin.id}"
                     else:
-                        # Alternative: Include payment details in QR code
+                        # Fallback: Include structured payment details for manual verification
                         voucher_ref = record.voucher_number or record.name or 'Draft Payment'
-                        partner_name = record.partner_id.name if record.partner_id else 'Unknown'
-                        qr_data = f"Payment: {voucher_ref}\nAmount: {record.amount} {record.currency_id.name if record.currency_id else 'USD'}\nTo: {partner_name}\nDate: {record.date or 'Draft'}"
+                        partner_name = record.partner_id.name if record.partner_id else 'Unknown Partner'
+                        amount_str = f"{record.amount:.2f} {record.currency_id.name if record.currency_id else 'USD'}"
+                        date_str = record.date.strftime('%Y-%m-%d') if record.date else 'Draft'
+                        
+                        # Structured data that can be manually verified
+                        qr_data = f"""PAYMENT VERIFICATION
+Voucher: {voucher_ref}
+Amount: {amount_str}
+To: {partner_name}
+Date: {date_str}
+Status: {record.state.upper()}
+Company: {record.company_id.name}
+Verify at: {base_url}/payment/qr-guide"""
                     
+                    # Generate the QR code image
                     record.qr_code = generate_qr_code_payment(qr_data)
                 except Exception as e:
                     _logger.error(f"Error generating QR code for payment {record.name or 'Draft'}: {e}")

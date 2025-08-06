@@ -36,11 +36,13 @@
     'depends': [
         'account',
         'web',
+        'website',
     ],
     'data': [
         'security/ir.model.access.csv',
         'security/payment_security.xml',
         'views/account_payment_views.xml',
+        'views/payment_verification_templates.xml',
         'reports/payment_voucher_template.xml',
         'data/sequences.xml',
     ],

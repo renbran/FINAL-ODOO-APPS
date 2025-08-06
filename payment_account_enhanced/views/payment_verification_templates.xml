@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Verification Success Template -->
+    <template id="payment_verification_success" name="Payment Verification Success">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-md-10">
+                            <div class="card shadow-lg border-0">
+                                <!-- Header -->
+                                <div class="card-header bg-success text-white text-center py-4">
+                                    <i class="fa fa-check-circle fa-3x mb-3"></i>
+                                    <h2 class="mb-0">Payment Verification Successful</h2>
+                                    <p class="mb-0">Payment details verified and authenticated</p>
+                                </div>
+                                
+                                <!-- Payment Details -->
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-12 mb-4">
+                                            <h4 class="text-center text-muted">Payment Information</h4>
+                                            <hr/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Voucher Number:</strong>
+                                            <div class="text-primary font-weight-bold" t-esc="voucher_number"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Payment Reference:</strong>
+                                            <div t-esc="payment_reference"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Amount:</strong>
+                                            <div class="text-success font-weight-bold">
+                                                <t t-esc="amount"/> <t t-esc="currency"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Payment To:</strong>
+                                            <div t-esc="partner_name"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Payment Date:</strong>
+                                            <div t-esc="payment_date"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Status:</strong>
+                                            <div>
+                                                <span t-if="state == 'posted'" class="badge badge-success">
+                                                    <i class="fa fa-check"></i> Verified &amp; Posted
+                                                </span>
+                                                <span t-if="state == 'draft'" class="badge badge-warning">
+                                                    <i class="fa fa-clock-o"></i> Draft
+                                                </span>
+                                                <span t-if="state == 'cancelled'" class="badge badge-danger">
+                                                    <i class="fa fa-times"></i> Cancelled
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Payment Type:</strong>
+                                            <div t-esc="payment_type_display"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Journal:</strong>
+                                            <div t-esc="journal_name"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Company:</strong>
+                                            <div t-esc="company_name"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong>Verified At:</strong>
+                                            <div class="text-muted small" t-esc="verification_timestamp"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Verification Status -->
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <div t-if="is_verified" class="alert alert-success">
+                                                <i class="fa fa-shield"></i>
+                                                <strong>Verified Payment:</strong> This payment has been officially verified and posted in the system.
+                                            </div>
+                                            <div t-if="not is_verified" class="alert alert-warning">
+                                                <i class="fa fa-exclamation-triangle"></i>
+                                                <strong>Pending Verification:</strong> This payment is still in draft status and pending final approval.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="card-footer text-center bg-light">
+                                    <small class="text-muted">
+                                        <i class="fa fa-lock"></i>
+                                        This verification is secured and authenticated by the system
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Payment Verification Error Template -->
+    <template id="payment_verification_error" name="Payment Verification Error">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 col-md-8">
+                            <div class="card shadow-lg border-0">
+                                <div class="card-header bg-danger text-white text-center py-4">
+                                    <i class="fa fa-exclamation-triangle fa-3x mb-3"></i>
+                                    <h2 class="mb-0" t-esc="error_title"/>
+                                </div>
+                                
+                                <div class="card-body text-center p-4">
+                                    <p class="text-muted mb-4" t-esc="error_message"/>
+                                    <div class="alert alert-light">
+                                        <strong>Error Code:</strong> <code t-esc="error_code"/>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <h5>What you can do:</h5>
+                                        <ul class="list-unstyled text-left mt-3">
+                                            <li><i class="fa fa-check text-success"></i> Verify the QR code is not damaged</li>
+                                            <li><i class="fa fa-check text-success"></i> Try scanning the QR code again</li>
+                                            <li><i class="fa fa-check text-success"></i> Contact the payment issuer for assistance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer text-center bg-light">
+                                    <a href="/payment/qr-guide" class="btn btn-primary">
+                                        <i class="fa fa-question-circle"></i> QR Verification Guide
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- QR Verification Guide Template -->
+    <template id="qr_verification_guide" name="QR Code Verification Guide">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col-lg-10 mx-auto">
+                            <div class="card shadow-lg border-0">
+                                <div class="card-header bg-primary text-white text-center py-4">
+                                    <i class="fa fa-qrcode fa-3x mb-3"></i>
+                                    <h1 class="mb-0">Payment QR Code Verification Guide</h1>
+                                    <p class="mb-0">How to verify payments using QR codes</p>
+                                </div>
+                                
+                                <div class="card-body p-5">
+                                    <div class="row">
+                                        <div class="col-12 mb-5">
+                                            <h3 class="text-primary">
+                                                <i class="fa fa-info-circle"></i> What is Payment QR Code Verification?
+                                            </h3>
+                                            <p class="lead">
+                                                Payment QR codes provide a secure way to verify payment authenticity and details. 
+                                                Each payment voucher contains a unique QR code that links to verified payment information.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="card h-100 border-primary">
+                                                <div class="card-header bg-primary text-white">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-mobile"></i> Step 1: Scan QR Code
+                                                    </h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p>Use any QR code scanner app on your mobile device or camera app to scan the QR code on the payment voucher.</p>
+                                                    <ul>
+                                                        <li>Open your camera or QR scanner app</li>
+                                                        <li>Point it at the QR code</li>
+                                                        <li>Tap the notification or link that appears</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-4">
+                                            <div class="card h-100 border-success">
+                                                <div class="card-header bg-success text-white">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-check-circle"></i> Step 2: View Verification
+                                                    </h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p>You'll be directed to a secure verification page showing:</p>
+                                                    <ul>
+                                                        <li>Payment amount and currency</li>
+                                                        <li>Voucher number and reference</li>
+                                                        <li>Payment status and verification</li>
+                                                        <li>Company and recipient details</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <div class="alert alert-info">
+                                                <h5 class="alert-heading">
+                                                    <i class="fa fa-shield"></i> Security Features
+                                                </h5>
+                                                <hr/>
+                                                <ul class="mb-0">
+                                                    <li><strong>Unique Verification:</strong> Each QR code is unique to its payment</li>
+                                                    <li><strong>Real-time Status:</strong> Shows current payment status in the system</li>
+                                                    <li><strong>Tamper-proof:</strong> QR codes cannot be modified without detection</li>
+                                                    <li><strong>Audit Trail:</strong> All verification attempts are logged securely</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <div class="alert alert-warning">
+                                                <h5 class="alert-heading">
+                                                    <i class="fa fa-exclamation-triangle"></i> Troubleshooting
+                                                </h5>
+                                                <hr/>
+                                                <p><strong>If verification fails:</strong></p>
+                                                <ul class="mb-0">
+                                                    <li>Ensure the QR code is clear and not damaged</li>
+                                                    <li>Check your internet connection</li>
+                                                    <li>Try scanning from different angles or distances</li>
+                                                    <li>Contact <t t-esc="company_name"/> support if issues persist</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
