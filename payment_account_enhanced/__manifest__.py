@@ -40,22 +40,12 @@
     'data': [
         'security/ir.model.access.csv',
         'security/payment_security.xml',
-        'views/assets.xml',
         'views/account_payment_views.xml',
         'reports/payment_voucher_template.xml',
         'data/sequences.xml',
     ],
     'assets': {
-        'web.assets_backend': [
-            'payment_account_enhanced/static/src/css/osus_backend.css',
-            'payment_account_enhanced/static/src/js/payment_statusbar.js',
-        ],
-        'web.assets_frontend': [
-            'payment_account_enhanced/static/src/scss/payment_voucher_report.scss',
-        ],
-        'web.report_assets_pdf': [
-            'payment_account_enhanced/static/src/css/osus_report.css',
-        ],
+        # Remove assets temporarily to avoid inheritance issues
     },
     'images': [
         'static/description/icon.png',
