@@ -47,36 +47,118 @@ class SaleOrder(models.Model):
 
 
     def action_approve_order(self):
+        """Approve the order and move to final approved status"""
         self.ensure_one()
-        # Find the final status (approved)
-        final_status = self.env['order.status'].search([('is_final', '=', True)], limit=1)
-        if not final_status:
-            raise UserError(_("No final status defined in the system."))
+        # Check if current user can approve
+        if not self.final_review_user_id or self.final_review_user_id.id != self.env.user.id:
+            if not self.env.user.has_group('order_status_override.group_order_approval_manager'):
+                raise UserError(_("Only the assigned reviewer or approval managers can approve orders."))
         
-        # Change to final/approved status
-        self._change_status(final_status.id, _("Order approved"))
+        # Find the final approved status
+        approved_status = self.env['order.status'].search([('code', '=', 'approved')], limit=1)
+        if not approved_status:
+            raise UserError(_("Approved status not found in the system."))
+        
+        # Change to approved status
+        self._change_status(approved_status.id, _("Order approved by %s") % self.env.user.name)
         
         # Send approval notification
-        template = self.env.ref('custom_sales_order_status.email_template_order_approved', False)
-        if template:
-            template.send_mail(self.id, force_send=True)
+        self.message_post(
+            body=_("Order has been approved and is ready for confirmation."),
+            subject=_("Order Approved"),
+            message_type='notification'
+        )
         
         return True
     
     def action_reject_order(self):
+        """Reject the order and return to draft"""
         self.ensure_one()
-        # Find the initial status (draft)
-        initial_status = self.env['order.status'].search([('is_initial', '=', True)], limit=1)
-        if not initial_status:
-            raise UserError(_("No initial status defined in the system."))
+        # Check if current user can reject
+        if not self.final_review_user_id or self.final_review_user_id.id != self.env.user.id:
+            if not self.env.user.has_group('order_status_override.group_order_approval_manager'):
+                raise UserError(_("Only the assigned reviewer or approval managers can reject orders."))
         
-        # Change to initial/draft status
-        self._change_status(initial_status.id, _("Order rejected and returned to draft"))
+        # Find the draft status
+        draft_status = self.env['order.status'].search([('code', '=', 'draft')], limit=1)
+        if not draft_status:
+            raise UserError(_("Draft status not found in the system."))
+        
+        # Change to draft status
+        self._change_status(draft_status.id, _("Order rejected by %s and returned to draft") % self.env.user.name)
         
         # Send rejection notification
-        template = self.env.ref('custom_sales_order_status.email_template_order_rejected', False)
-        if template:
-            template.send_mail(self.id, force_send=True)
+        self.message_post(
+            body=_("Order has been rejected and returned to draft status for revision."),
+            subject=_("Order Rejected"),
+            message_type='notification'
+        )
+        
+        return True
+    
+    def action_submit_for_review(self):
+        """Submit order for final review"""
+        self.ensure_one()
+        if not self.final_review_user_id:
+            raise UserError(_("Please assign a user for final review before submitting."))
+        
+        # Find the final review status
+        review_status = self.env['order.status'].search([('code', '=', 'final_review')], limit=1)
+        if not review_status:
+            raise UserError(_("Final review status not found in the system."))
+        
+        # Change to final review status
+        self._change_status(review_status.id, _("Order submitted for final review by %s") % self.env.user.name)
+        
+        # Create activity for reviewer
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_("Review Order %s") % self.name,
+            note=_("This order is ready for final review and approval/rejection."),
+            user_id=self.final_review_user_id.id
+        )
+        
+        return True
+    
+    def action_return_to_previous(self):
+        """Return order to previous stage"""
+        self.ensure_one()
+        # Get previous status from history
+        last_history = self.env['order.status.history'].search([
+            ('order_id', '=', self.id)
+        ], order='create_date desc', limit=2)
+        
+        if len(last_history) < 2:
+            raise UserError(_("No previous status found to return to."))
+        
+        previous_status = last_history[1].status_id
+        
+        # Change to previous status
+        self._change_status(previous_status.id, _("Order returned to previous stage by %s") % self.env.user.name)
+        
+        return True
+    
+    def action_request_documentation(self):
+        """Start documentation process"""
+        self.ensure_one()
+        if not self.documentation_user_id:
+            raise UserError(_("Please assign a user for documentation before starting the process."))
+        
+        # Find the documentation status
+        doc_status = self.env['order.status'].search([('code', '=', 'documentation_progress')], limit=1)
+        if not doc_status:
+            raise UserError(_("Documentation progress status not found in the system."))
+        
+        # Change to documentation status
+        self._change_status(doc_status.id, _("Documentation process started by %s") % self.env.user.name)
+        
+        # Create activity for documentation user
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_("Prepare Documentation for Order %s") % self.name,
+            note=_("Please prepare all required documentation for this order."),
+            user_id=self.documentation_user_id.id
+        )
         
         return True
     

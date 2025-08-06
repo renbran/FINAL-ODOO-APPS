@@ -15,6 +15,14 @@
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
         
+        <record id="group_order_approval_manager" model="res.groups">
+            <field name="name">Order Approval Manager</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Users in this group can approve/reject orders regardless of assignment</field>
+            <field name="implied_ids" eval="[(4, ref('group_sale_workflow_manager'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+        
         <!-- Record Rules -->
         <record id="rule_order_status_all" model="ir.rule">
             <field name="name">Order Status Multi-Company</field>
