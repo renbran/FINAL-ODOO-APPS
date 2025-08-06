@@ -9,18 +9,31 @@
 #
 #############################################################################
 {
-    'name': "QR Code on Invoice and Payment",
+    'name': "QR Code on Invoice and Payment with Validation",
     'author': "Ingenuity Info",
     'category': 'Other',
-    'summary': """ This Module will allow to Generate QR Code for Invoice and Payment. """,
+    'summary': """ Generate QR Codes for Invoices and Payments with secure validation system for payment authenticity verification. """,
     'website': "https://ingenuityinfo.in",
     'company': 'Ingenuity Info',
     'maintainer': 'Ingenuity Info',
-    'version': '17.0.0.0',
+    'version': '17.0.1.0',
     'price': 0.0,
     'currency': 'EUR',
-    'description': """ By using this module you can Generate QR Code for Invoice and Payment. The QR code will be visible on Invoice and Payment forms. 
-        You can also print the QR code on Invoice and Payment reports as well.
+    'description': """ 
+        Enhanced QR Code Generator for Invoices and Payments with Payment Validation System:
+        
+        Features:
+        - Generate QR codes for invoices and payments
+        - Secure payment validation system with cryptographic tokens
+        - QR codes redirect to validation webpages for payment authenticity verification
+        - Token-based security with expiry dates and access tracking
+        - Professional validation pages with payment details
+        - Regenerate validation tokens as needed
+        - Track validation access and usage statistics
+        - Compatible with existing invoice and payment workflows
+        
+        The QR codes will be visible on Invoice and Payment forms and can be printed on reports.
+        Payment QR codes link to secure validation pages that verify payment authenticity.
     """,
     'depends': [
         'web',
@@ -31,6 +44,7 @@
         'report/account_payment_report_template.xml',
         'views/qr_code_invoice_view.xml',
         'views/qr_code_payment_view.xml',
+        'templates/payment_validation_templates.xml',
     ],
     'qweb': [
         ],
