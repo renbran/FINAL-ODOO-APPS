@@ -43,11 +43,15 @@
         'security/payment_security.xml',
         'views/account_payment_views.xml',
         'views/payment_verification_templates.xml',
+        'views/assets.xml',
         'reports/payment_voucher_template.xml',
         'data/sequences.xml',
     ],
     'assets': {
-        # Remove assets temporarily to avoid inheritance issues
+        'web.assets_backend': [
+            'payment_account_enhanced/static/src/scss/payment_voucher.scss',
+            'payment_account_enhanced/static/src/js/payment_voucher_form.js',
+        ],
     },
     'images': [
         'static/description/icon.png',

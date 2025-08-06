@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- OSUS Branded Payment Voucher QWeb Template -->
+        <!-- OSUS Compact Payment Voucher QWeb Template -->
         <template id="report_payment_voucher_osus">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <div class="article o_report_layout_standard">
-                        <!-- Custom CSS for OSUS Branding -->
+                    <div class="article o_report_layout_standard" style="page-break-inside: avoid;">
+                        <!-- Custom CSS for Compact A4 Design -->
                         <style type="text/css">
-                            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap');
-                            
-                            /* OSUS Brand Colors */
-                            :root {
-                                --osus-burgundy-primary: #8B1538;
-                                --osus-burgundy-secondary: #A41E3A;
-                                --osus-burgundy-light: #C73E5A;
-                                --osus-gold-primary: #D4AF37;
-                                --osus-gold-secondary: #B8960C;
-                                --osus-gold-light: #F5E67B;
-                                --osus-cream: #FAF8F3;
-                                --osus-dark: #2C2C2C;
-                                --osus-grey: #666666;
-                            }
+                            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap');
                             
                             /* Reset and Base Styles */
                             * {
@@ -31,23 +18,809 @@
                             }
                             
                             body, .article {
-                                font-family: 'Montserrat', Arial, sans-serif !important;
-                                background: linear-gradient(135deg, var(--osus-cream) 0%, #FFFFFF 100%);
-                                color: var(--osus-dark);
-                                line-height: 1.6;
-                                font-size: 12px;
+                                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                color: #212529;
+                                line-height: 1.4;
+                                font-size: 11px;
+                                margin: 0;
+                                padding: 0;
                             }
                             
-                            /* Main Container */
-                            .osus-voucher-container {
+                            /* Main Container - Compact A4 */
+                            .voucher-container {
+                                width: 210mm;
                                 max-width: 210mm;
-                                margin: 0 auto;
-                                background: white;
-                                box-shadow: 0 20px 60px rgba(139, 21, 56, 0.15);
-                                border-radius: 12px;
+                                min-height: 297mm;
+                                background: #ffffff;
+                                border-radius: 8px;
+                                box-shadow: 0 10px 30px rgba(128, 0, 32, 0.1);
                                 overflow: hidden;
                                 position: relative;
+                                margin: 0 auto;
+                                font-size: 11px;
                             }
+
+                            .voucher-container::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                height: 4px;
+                                background: linear-gradient(90deg, #800020 0%, #b8002e 50%, #800020 100%);
+                            }
+
+                            /* Header Section */
+                            .header {
+                                background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                                color: white;
+                                text-align: center;
+                                padding: 20px 30px;
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .header::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                background: repeating-linear-gradient(
+                                    45deg,
+                                    transparent,
+                                    transparent 10px,
+                                    rgba(255, 255, 255, 0.02) 10px,
+                                    rgba(255, 255, 255, 0.02) 20px
+                                );
+                            }
+
+                            .voucher-number {
+                                font-size: 16px;
+                                font-weight: 700;
+                                color: #ffd700;
+                                margin: 6px 0;
+                                letter-spacing: 1px;
+                                position: relative;
+                                z-index: 2;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                            }
+
+                            .company-title {
+                                font-size: 20px;
+                                font-weight: 700;
+                                letter-spacing: 1.5px;
+                                margin-bottom: 4px;
+                                position: relative;
+                                z-index: 2;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                            }
+
+                            .subtitle {
+                                font-size: 13px;
+                                font-weight: 300;
+                                opacity: 0.95;
+                                letter-spacing: 0.5px;
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            /* Logo and QR Section */
+                            .brand-section {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 20px 30px;
+                                background: #fafbfc;
+                                border-bottom: 1px solid #f1f3f4;
+                            }
+
+                            .logo-container, .qr-container {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 8px;
+                            }
+
+                            .logo-box, .qr-box {
+                                width: 60px;
+                                height: 60px;
+                                background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                                border-radius: 8px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-weight: 700;
+                                font-size: 10px;
+                                box-shadow: 0 4px 8px rgba(128, 0, 32, 0.2);
+                            }
+
+                            .logo-label, .qr-label {
+                                font-size: 10px;
+                                color: #6c757d;
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            /* Main Content */
+                            .content {
+                                padding: 25px 30px;
+                            }
+
+                            .voucher-title {
+                                text-align: center;
+                                margin-bottom: 20px;
+                            }
+
+                            .voucher-title h2 {
+                                font-size: 18px;
+                                color: #800020;
+                                font-weight: 600;
+                                letter-spacing: 1px;
+                                position: relative;
+                                display: inline-block;
+                                padding-bottom: 8px;
+                            }
+
+                            .voucher-title h2::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 60px;
+                                height: 2px;
+                                background: linear-gradient(90deg, #ffd700, #ffed4a);
+                                border-radius: 1px;
+                            }
+
+                            /* Information Grid */
+                            .info-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 20px;
+                                margin-bottom: 20px;
+                            }
+
+                            .info-section {
+                                background: #f8f9fa;
+                                border-radius: 8px;
+                                padding: 15px;
+                                border-left: 3px solid #800020;
+                            }
+
+                            .info-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                margin-bottom: 10px;
+                                padding: 4px 0;
+                                border-bottom: 1px solid #e9ecef;
+                            }
+
+                            .info-row:last-child {
+                                margin-bottom: 0;
+                                border-bottom: none;
+                            }
+
+                            .info-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                min-width: 80px;
+                                flex-shrink: 0;
+                            }
+
+                            .info-value {
+                                font-weight: 500;
+                                color: #212529;
+                                text-align: right;
+                                flex: 1;
+                                font-size: 11px;
+                            }
+
+                            .amount-highlight {
+                                color: #800020;
+                                font-size: 14px;
+                                font-weight: 700;
+                                text-shadow: 0 1px 2px rgba(128, 0, 32, 0.2);
+                            }
+
+                            .pending-status {
+                                color: #dc3545;
+                                font-style: italic;
+                                font-weight: 500;
+                            }
+
+                            .approved-status {
+                                color: #28a745;
+                                font-weight: 600;
+                            }
+
+                            /* Authorization Section */
+                            .authorization-section {
+                                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                                border: 1px solid #e9ecef;
+                                border-radius: 12px;
+                                padding: 20px;
+                                margin: 20px 0;
+                            }
+
+                            .section-title {
+                                color: #800020;
+                                font-size: 16px;
+                                font-weight: 700;
+                                margin-bottom: 20px;
+                                text-align: center;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                position: relative;
+                                padding-bottom: 10px;
+                            }
+
+                            .section-title::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 80px;
+                                height: 2px;
+                                background: linear-gradient(90deg, #ffd700, #ffed4a);
+                                border-radius: 1px;
+                            }
+
+                            .workflow-section {
+                                background: white;
+                                border-radius: 8px;
+                                padding: 15px;
+                                border-left: 3px solid #800020;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                                margin-bottom: 15px;
+                            }
+
+                            .workflow-title {
+                                color: #800020;
+                                font-size: 12px;
+                                font-weight: 600;
+                                margin-bottom: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                display: flex;
+                                align-items: center;
+                            }
+
+                            .workflow-title::before {
+                                content: '';
+                                width: 6px;
+                                height: 6px;
+                                background: #ffd700;
+                                border-radius: 50%;
+                                margin-right: 8px;
+                            }
+
+                            .workflow-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 15px;
+                            }
+
+                            .workflow-item {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            }
+
+                            .workflow-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .workflow-value {
+                                font-weight: 500;
+                                color: #212529;
+                                font-size: 11px;
+                                padding: 6px 8px;
+                                background: #f8f9fa;
+                                border-radius: 4px;
+                                border: 1px solid #e9ecef;
+                            }
+
+                            .workflow-separator {
+                                height: 1px;
+                                background: linear-gradient(90deg, transparent 0%, #800020 20%, #ffd700 50%, #800020 80%, transparent 100%);
+                                margin: 15px 0;
+                                position: relative;
+                            }
+
+                            .workflow-separator::after {
+                                content: '';
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                width: 8px;
+                                height: 8px;
+                                background: #800020;
+                                border-radius: 50%;
+                                border: 2px solid #ffd700;
+                            }
+
+                            /* Receiver Information */
+                            .receiver-info {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 12px;
+                            }
+
+                            .receiver-field {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                            }
+
+                            .field-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                min-width: 60px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .field-line {
+                                flex: 1;
+                                height: 1px;
+                                background: #800020;
+                                position: relative;
+                            }
+
+                            .field-line::after {
+                                content: '';
+                                position: absolute;
+                                right: 0;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                width: 4px;
+                                height: 4px;
+                                background: #800020;
+                                border-radius: 50%;
+                            }
+
+                            /* Signature Section */
+                            .signature-section {
+                                background: white;
+                                border-radius: 8px;
+                                padding: 15px;
+                                border-left: 3px solid #800020;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                            }
+
+                            .signature-box {
+                                text-align: center;
+                                padding: 15px;
+                                background: #f8f9fa;
+                                border: 1px dashed #800020;
+                                border-radius: 8px;
+                                margin-top: 10px;
+                            }
+
+                            .signature-line {
+                                width: 100%;
+                                height: 40px;
+                                border-bottom: 1px solid #800020;
+                                margin-bottom: 8px;
+                                position: relative;
+                            }
+
+                            .signature-text {
+                                font-size: 10px;
+                                color: #800020;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            /* Footer */
+                            .footer {
+                                background: #800020;
+                                color: white;
+                                text-align: center;
+                                padding: 15px 30px;
+                                margin-top: 20px;
+                            }
+
+                            .footer-text {
+                                font-size: 10px;
+                                font-weight: 400;
+                                opacity: 0.95;
+                            }
+
+                            .contact-info {
+                                font-weight: 600;
+                                color: #ffd700;
+                            }
+
+                            /* Print Optimizations */
+                            @media print {
+                                body {
+                                    background: white !important;
+                                    padding: 0 !important;
+                                    margin: 0 !important;
+                                }
+                                
+                                .voucher-container {
+                                    box-shadow: none !important;
+                                    border: 1px solid #ddd !important;
+                                    border-radius: 0 !important;
+                                    max-width: none !important;
+                                    width: 100% !important;
+                                    margin: 0 !important;
+                                    page-break-inside: avoid !important;
+                                }
+
+                                .header, .footer {
+                                    -webkit-print-color-adjust: exact !important;
+                                    color-adjust: exact !important;
+                                }
+                            }
+
+                            /* Compact adjustments for A4 fit */
+                            @page {
+                                size: A4;
+                                margin: 10mm;
+                            }
+                        </style>
+
+                        <!-- Voucher Content -->
+                        <div class="voucher-container">
+                            <!-- Header -->
+                            <div class="header">
+                                <h1 class="company-title">
+                                    <t t-esc="doc.company_id.name or 'OSUS Properties'"/>
+                                </h1>
+                                <h2 class="voucher-number">
+                                    <t t-if="doc.payment_type == 'outbound'">Payment Voucher No.</t>
+                                    <t t-else="">Receipt Voucher No.</t>
+                                    <t t-esc="doc.voucher_number or doc.name"/>
+                                </h2>
+                                <p class="subtitle">Enhanced Payment System</p>
+                            </div>
+
+                            <!-- Brand Section -->
+                            <div class="brand-section">
+                                <div class="logo-container">
+                                    <div class="logo-box">
+                                        <t t-if="doc.company_id.logo">
+                                            <img t-att-src="image_data_uri(doc.company_id.logo)" 
+                                                 style="max-width: 50px; max-height: 50px;" alt="Logo"/>
+                                        </t>
+                                        <t t-else="">LOGO</t>
+                                    </div>
+                                    <span class="logo-label">Company Logo</span>
+                                </div>
+                                <div class="qr-container">
+                                    <div class="qr-box">
+                                        <t t-if="doc.qr_code">
+                                            <img t-att-src="image_data_uri(doc.qr_code)" 
+                                                 style="max-width: 50px; max-height: 50px;" alt="QR Code"/>
+                                        </t>
+                                        <t t-else="">QR</t>
+                                    </div>
+                                    <span class="qr-label">Scan to Verify</span>
+                                </div>
+                            </div>
+
+                            <!-- Main Content -->
+                            <div class="content">
+                                <div class="voucher-title">
+                                    <h2>
+                                        <t t-if="doc.payment_type == 'outbound'">PAYMENT VOUCHER</t>
+                                        <t t-else="">RECEIPT VOUCHER</t>
+                                    </h2>
+                                </div>
+
+                                <!-- Information Grid -->
+                                <div class="info-grid">
+                                    <!-- Payment Details -->
+                                    <div class="info-section">
+                                        <div class="info-row">
+                                            <span class="info-label">Payment Method</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.journal_id.name"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Reference</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.ref or doc.voucher_number"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Partner</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.partner_id.name"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Total Amount</span>
+                                            <span class="info-value amount-highlight">
+                                                <t t-esc="doc.currency_id.symbol"/>
+                                                <t t-esc="'{:,.2f}'.format(doc.amount)"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Date</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.date.strftime('%d %B %Y') if doc.date else ''"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Details -->
+                                    <div class="info-section">
+                                        <div class="info-row">
+                                            <span class="info-label">Issued By</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.company_id.name"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Address</span>
+                                            <span class="info-value">
+                                                <t t-if="doc.company_id.street">
+                                                    <t t-esc="doc.company_id.street"/>
+                                                    <t t-if="doc.company_id.street2">
+                                                        <br/><t t-esc="doc.company_id.street2"/>
+                                                    </t>
+                                                    <t t-if="doc.company_id.city">
+                                                        <br/><t t-esc="doc.company_id.city"/>
+                                                    </t>
+                                                </t>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">VAT Number</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.company_id.vat or 'N/A'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Initiated By</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.create_uid.name.upper()"/>
+                                                <br/>
+                                                <t t-esc="doc.create_date.strftime('%d/%m/%Y %H:%M') if doc.create_date else ''"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Status</span>
+                                            <span class="info-value">
+                                                <t t-if="doc.approval_state == 'posted'">
+                                                    <span class="approved-status">APPROVED &amp; POSTED</span>
+                                                </t>
+                                                <t t-elif="doc.approval_state == 'waiting_approval'">
+                                                    <span class="pending-status">Pending Approval</span>
+                                                </t>
+                                                <t t-elif="doc.approval_state == 'approved'">
+                                                    <span class="approved-status">APPROVED</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="pending-status">Draft</span>
+                                                </t>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Authorization Section -->
+                                <div class="authorization-section">
+                                    <h3 class="section-title">Payment Authorization</h3>
+                                    
+                                    <!-- Review &amp; Validation -->
+                                    <div class="workflow-section">
+                                        <h4 class="workflow-title">Review &amp; Validation</h4>
+                                        <div class="workflow-grid">
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Initiator</span>
+                                                <span class="workflow-value">
+                                                    <t t-esc="doc.create_uid.name.upper()"/>
+                                                </span>
+                                            </div>
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Validated</span>
+                                                <span class="workflow-value">
+                                                    <t t-if="doc.approval_state in ['approved', 'posted']">
+                                                        <span class="approved-status">VALIDATED</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="pending-status">Pending</span>
+                                                    </t>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Separator -->
+                                    <div class="workflow-separator"></div>
+
+                                    <!-- Payment Authorize -->
+                                    <div class="workflow-section">
+                                        <h4 class="workflow-title">Payment Authorize</h4>
+                                        <div class="workflow-grid">
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Reviewed</span>
+                                                <span class="workflow-value">
+                                                    <t t-if="doc.reviewer_id">
+                                                        <span class="approved-status">
+                                                            <t t-esc="doc.reviewer_id.name"/>
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="pending-status">Pending</span>
+                                                    </t>
+                                                </span>
+                                            </div>
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Approved</span>
+                                                <span class="workflow-value">
+                                                    <t t-if="doc.approver_id">
+                                                        <span class="approved-status">
+                                                            <t t-esc="doc.approver_id.name"/>
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="pending-status">Pending</span>
+                                                    </t>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Separator -->
+                                    <div class="workflow-separator"></div>
+
+                                    <!-- Receiver Information -->
+                                    <div class="workflow-section">
+                                        <h4 class="workflow-title">Receiver Information</h4>
+                                        <div class="receiver-info">
+                                            <div class="receiver-field">
+                                                <span class="field-label">Name:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                            <div class="receiver-field">
+                                                <span class="field-label">Mobile:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                            <div class="receiver-field">
+                                                <span class="field-label">Date:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Separator -->
+                                    <div class="workflow-separator"></div>
+
+                                    <!-- Signature Section -->
+                                    <div class="signature-section">
+                                        <h4 class="workflow-title">Signature</h4>
+                                        <div class="signature-area">
+                                            <div class="signature-box">
+                                                <div class="signature-line"></div>
+                                                <p class="signature-text">Authorized Signature</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Remarks Section -->
+                                <t t-if="doc.remarks">
+                                    <div class="workflow-section" style="margin-top: 15px;">
+                                        <h4 class="workflow-title">Remarks</h4>
+                                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+                                            <t t-esc="doc.remarks"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="footer">
+                                <p class="footer-text">
+                                    <t t-if="doc.company_id.voucher_footer_message">
+                                        <t t-esc="doc.company_id.voucher_footer_message"/>
+                                    </t>
+                                    <t t-else="">
+                                        Thank you for your payment. For any inquiries, please contact: 
+                                    </t>
+                                    <t t-if="doc.company_id.phone">
+                                        <span class="contact-info"><t t-esc="doc.company_id.phone"/></span>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Report Action Definition -->
+        <record id="action_report_payment_voucher_osus" model="ir.actions.report">
+            <field name="name">OSUS Payment Voucher</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">payment_account_enhanced.report_payment_voucher_osus</field>
+            <field name="report_file">payment_account_enhanced.report_payment_voucher_osus</field>
+            <field name="print_report_name">'Payment Voucher - %s' % (object.voucher_number or object.name)</field>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+        </record>
+
+        <!-- Standard Payment Voucher Report (Fallback) -->
+        <template id="report_payment_voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <div class="article o_report_layout_standard">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <div class="row">
+                                <div class="col-12">
+                                    <h2>
+                                        <span t-if="doc.payment_type == 'outbound'">Payment Voucher</span>
+                                        <span t-else="">Receipt Voucher</span>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="row mt32 mb32">
+                                <div class="col-6">
+                                    <strong>Number:</strong> <span t-esc="doc.voucher_number or doc.name"/><br/>
+                                    <strong>Date:</strong> <span t-esc="doc.date"/><br/>
+                                    <strong>Partner:</strong> <span t-esc="doc.partner_id.name"/><br/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Amount:</strong> <span t-esc="doc.amount"/> <span t-esc="doc.currency_id.name"/><br/>
+                                    <strong>Journal:</strong> <span t-esc="doc.journal_id.name"/><br/>
+                                    <strong>Reference:</strong> <span t-esc="doc.ref"/><br/>
+                                </div>
+                            </div>
+                            <t t-if="doc.remarks">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <strong>Remarks:</strong><br/>
+                                        <span t-esc="doc.remarks"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="action_report_payment_voucher" model="ir.actions.report">
+            <field name="name">Payment Voucher (Standard)</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">payment_account_enhanced.report_payment_voucher</field>
+            <field name="report_file">payment_account_enhanced.report_payment_voucher</field>
+            <field name="print_report_name">'Payment Voucher - %s' % (object.voucher_number or object.name)</field>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>
                             
                             /* Header with Gradient and Logo */
                             .osus-voucher-header {

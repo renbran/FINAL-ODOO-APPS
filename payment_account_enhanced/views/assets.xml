@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Backend Assets for Enhanced Payment Workflow -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <!-- CSS for Payment Voucher Enhancements -->
+            <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher.scss"/>
+            
+            <!-- JavaScript for Enhanced Workflow -->
+            <script type="text/javascript" src="/payment_account_enhanced/static/src/js/payment_voucher_form.js"/>
+        </template>
+        
+        <!-- QWeb Templates for Payment Voucher Components -->
+        <template id="PaymentVoucherStatusBar" name="payment_account_enhanced.PaymentVoucherStatusBar">
+            <div class="o_payment_voucher_statusbar">
+                <t t-if="widget.record and widget.record.data">
+                    <div class="o_statusbar_wrapper">
+                        <div class="o_statusbar_status" t-att-data-approval-state="widget.record.data.approval_state">
+                            <t t-set="approval_state" t-value="widget.record.data.approval_state"/>
+                            <span t-if="approval_state == 'draft'" class="badge badge-info">Draft</span>
+                            <span t-elif="approval_state == 'waiting_approval'" class="badge badge-warning">Waiting for Approval</span>
+                            <span t-elif="approval_state == 'approved'" class="badge badge-success">Approved</span>
+                            <span t-elif="approval_state == 'posted'" class="badge badge-success">Posted</span>
+                            <span t-elif="approval_state == 'cancelled'" class="badge badge-danger">Cancelled</span>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </template>
+        
+        <!-- Notification Templates -->
+        <template id="PaymentApprovalNotification" name="payment_account_enhanced.PaymentApprovalNotification">
+            <div class="o_payment_approval_notification">
+                <div class="alert alert-info">
+                    <strong>Payment Voucher Workflow:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li><strong>Draft:</strong> Create and edit payment details</li>
+                        <li><strong>Waiting for Approval:</strong> Submit for approval and wait for approval</li>
+                        <li><strong>Approved &amp; Posted:</strong> Payment approved and posted to accounting</li>
+                    </ul>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

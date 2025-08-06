@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 import qrcode
 import base64
 from io import BytesIO
@@ -42,22 +42,40 @@ class AccountPayment(models.Model):
         help="Whether to display QR code in payment voucher report"
     )
     
+    # Simplified Approval Workflow State
+    approval_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('waiting_approval', 'Waiting for Approval'),
+        ('approved', 'Approved'),
+        ('posted', 'Posted'),
+        ('cancelled', 'Cancelled')
+    ], string='Approval State', default='draft', tracking=True,
+       help="Current approval state of the payment voucher")
+    
     # Enhanced fields for OSUS voucher system
     remarks = fields.Text(
         string='Remarks/Memo',
         help="Additional remarks or memo for this payment voucher"
     )
     
-    # Enhanced signatory fields
+    # Voucher number with automatic generation
+    voucher_number = fields.Char(
+        string='Voucher Number',
+        copy=False,
+        readonly=True,
+        help="Unique voucher number generated automatically"
+    )
+    
+    # Future expansion fields (currently inactive but ready for 4-checkpoint workflow)
     reviewer_id = fields.Many2one(
         'res.users',
         string='Reviewed By',
-        help="User who reviewed the payment before approval"
+        help="User who reviewed the payment before approval (Future Use)"
     )
     
     reviewer_date = fields.Datetime(
         string='Review Date',
-        help="Date when the payment was reviewed"
+        help="Date when the payment was reviewed (Future Use)"
     )
     
     approver_id = fields.Many2one(
@@ -99,42 +117,43 @@ class AccountPayment(models.Model):
         store=True
     )
     
-    # Computed voucher number that shows even in draft state
-    voucher_number = fields.Char(
-        string='Voucher Number',
-        compute='_compute_voucher_number',
-        store=True,
-        help="Voucher number that displays even in draft state"
-    )
-    
     @api.depends('name', 'payment_type', 'partner_id', 'amount', 'currency_id')
     def _compute_display_name(self):
         """Compute enhanced display name for vouchers"""
         for record in self:
-            if record.name and record.partner_id:
+            if record.voucher_number and record.partner_id:
+                payment_type_label = 'Payment' if record.payment_type == 'outbound' else 'Receipt'
+                record.display_name = f"{payment_type_label} Voucher {record.voucher_number} - {record.partner_id.name}"
+            elif record.name and record.partner_id:
                 payment_type_label = 'Payment' if record.payment_type == 'outbound' else 'Receipt'
                 record.display_name = f"{payment_type_label} Voucher {record.name} - {record.partner_id.name}"
             else:
-                record.display_name = record.name or 'New Payment'
+                record.display_name = record.voucher_number or record.name or 'New Payment'
+
+    def _generate_voucher_number(self):
+        """Generate unique voucher number using sequence"""
+        if not self.voucher_number:
+            sequence_code = 'payment.voucher'
+            if self.payment_type == 'inbound':
+                sequence_code = 'receipt.voucher'
+            
+            # Try to get sequence, create if not exists
+            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
+            if not sequence:
+                # Create sequence if not exists
+                sequence_name = 'Payment Voucher' if self.payment_type == 'outbound' else 'Receipt Voucher'
+                prefix = 'PV' if self.payment_type == 'outbound' else 'RV'
+                sequence = self.env['ir.sequence'].create({
+                    'name': sequence_name,
+                    'code': sequence_code,
+                    'prefix': prefix,
+                    'padding': 5,
+                    'company_id': self.company_id.id or False,
+                })
+            
+            self.voucher_number = sequence.next_by_id()
     
-    @api.depends('name', 'state', 'payment_type')
-    def _compute_voucher_number(self):
-        """Compute voucher number that shows even in draft state"""
-        for record in self:
-            if record.name and record.name != '/':
-                # Use existing name if available
-                record.voucher_number = record.name
-            else:
-                # Generate temporary number for draft payments
-                payment_type_prefix = 'PV' if record.payment_type == 'outbound' else 'RV'
-                if record._origin.id:
-                    # Use the record's database ID if available
-                    record.voucher_number = f"DRAFT-{payment_type_prefix}-{record._origin.id:06d}"
-                else:
-                    # Fallback for new records
-                    record.voucher_number = f"NEW-{payment_type_prefix}"
-    
-    @api.depends('name', 'amount', 'partner_id', 'date', 'state')
+    @api.depends('name', 'amount', 'partner_id', 'date', 'approval_state', 'voucher_number')
     def _generate_payment_qr_code(self):
         """Generate QR code for payment voucher verification"""
         for record in self:
@@ -159,53 +178,118 @@ Voucher: {voucher_ref}
 Amount: {amount_str}
 To: {partner_name}
 Date: {date_str}
-Status: {record.state.upper()}
+Status: {record.approval_state.upper()}
 Company: {record.company_id.name}
 Verify at: {base_url}/payment/qr-guide"""
                     
                     # Generate the QR code image
                     record.qr_code = generate_qr_code_payment(qr_data)
                 except Exception as e:
-                    _logger.error(f"Error generating QR code for payment {record.name or 'Draft'}: {e}")
+                    _logger.error(f"Error generating QR code for payment {record.voucher_number or 'Draft'}: {e}")
                     record.qr_code = False
             else:
                 record.qr_code = False
-    
+
+    # Simplified Workflow Methods
+    def action_submit_for_approval(self):
+        """Submit payment for approval"""
+        for record in self:
+            if record.approval_state != 'draft':
+                raise UserError(_("Only draft payments can be submitted for approval."))
+            
+            if not record.voucher_number:
+                record._generate_voucher_number()
+            
+            record.approval_state = 'waiting_approval'
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} submitted for approval by {self.env.user.name}",
+                subject="Payment Voucher Submitted for Approval"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Payment has been submitted for approval.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def action_approve_and_post(self):
+        """Approve and post payment in one action (simplified workflow)"""
+        for record in self:
+            if record.approval_state not in ['waiting_approval', 'approved']:
+                raise UserError(_("Only payments waiting for approval can be approved and posted."))
+            
+            # Check user permissions for approval
+            if not self.env.user.has_group('account.group_account_invoice'):
+                raise UserError(_("You don't have permission to approve payments."))
+            
+            # Set approval fields
+            record.approver_id = self.env.user
+            record.approver_date = fields.Datetime.now()
+            record.actual_approver_id = self.env.user
+            record.approval_state = 'approved'
+            
+            # Post the payment
+            record.action_post()
+            record.approval_state = 'posted'
+            
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} approved and posted by {self.env.user.name}",
+                subject="Payment Voucher Approved and Posted"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Payment has been approved and posted successfully.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def action_reject_payment(self):
+        """Reject payment and return to draft"""
+        for record in self:
+            if record.approval_state != 'waiting_approval':
+                raise UserError(_("Only payments waiting for approval can be rejected."))
+            
+            record.approval_state = 'draft'
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} rejected by {self.env.user.name}",
+                subject="Payment Voucher Rejected"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Payment has been rejected and returned to draft.'),
+                'type': 'info',
+                'sticky': False,
+            }
+        }
+
+    # Legacy methods for future 4-checkpoint workflow (currently disabled)
     def action_send_for_review(self):
-        """Send payment for review"""
-        if self.state != 'draft':
+        """Send payment for review (Future Use - 4 checkpoint workflow)"""
+        if self.approval_state != 'draft':
             raise UserError(_("Only draft payments can be sent for review."))
         
-        # Here you can add logic to notify reviewers
-        # For now, we'll just log it
-        _logger.info(f"Payment {self.name} sent for review")
+        # Future implementation for 4-checkpoint workflow
+        _logger.info(f"Payment {self.voucher_number} sent for review (4-checkpoint workflow disabled)")
         return True
     
     def action_review_payment(self):
-        """Mark payment as reviewed"""
-        if not self.reviewer_id:
-            self.reviewer_id = self.env.user
-            self.reviewer_date = fields.Datetime.now()
-        
-        # Here you can add logic to notify approvers
-        _logger.info(f"Payment {self.name} reviewed by {self.env.user.name}")
-        return True
-    
-    def action_approve_payment(self):
-        """Mark payment as approved and set approver"""
-        if not self.approver_id:
-            self.approver_id = self.env.user
-            self.approver_date = fields.Datetime.now()
-        
-        _logger.info(f"Payment {self.name} approved by {self.env.user.name}")
-        return True
-    
-    def action_review_payment(self):
-        """Mark payment as reviewed"""
+        """Mark payment as reviewed (Future Use - 4 checkpoint workflow)"""
         self.ensure_one()
-        if self.state != 'draft':
+        if self.approval_state != 'draft':
             raise UserError(_("Only draft payments can be reviewed."))
         
+        # Future implementation for 4-checkpoint workflow
         self.reviewer_id = self.env.user
         self.reviewer_date = fields.Datetime.now()
         
@@ -213,18 +297,19 @@ Verify at: {base_url}/payment/qr-guide"""
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'message': _('Payment has been marked as reviewed.'),
+                'message': _('Payment has been marked as reviewed (4-checkpoint workflow feature).'),
                 'type': 'success',
                 'sticky': False,
             }
         }
     
     def action_approve_payment(self):
-        """Mark payment as approved by final approver"""
+        """Mark payment as approved by final approver (Future Use - 4 checkpoint workflow)"""
         self.ensure_one()
-        if self.state != 'draft':
-            raise UserError(_("Only draft payments can be approved."))
+        if self.approval_state != 'draft':
+            raise UserError(_("Only draft payments can be approved in 4-checkpoint workflow."))
         
+        # Future implementation for 4-checkpoint workflow
         self.approver_id = self.env.user
         self.approver_date = fields.Datetime.now()
         
@@ -232,68 +317,134 @@ Verify at: {base_url}/payment/qr-guide"""
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'message': _('Payment has been approved and is ready for posting.'),
+                'message': _('Payment has been approved in 4-checkpoint workflow (feature disabled).'),
                 'type': 'success',
                 'sticky': False,
             }
         }
     
-    @api.depends('state', 'actual_approver_id', 'write_uid', 'write_date')
+    @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):
         """Compute authorization field showing who approved and posted the payment"""
         for record in self:
             if record.actual_approver_id:
                 # Show the actual approver who approved and posted the entry
                 record.authorized_by = record.actual_approver_id.name
-            elif record.state == 'posted' and record.write_uid:
+            elif record.approval_state == 'posted' and record.write_uid:
                 # If posted but no specific approver, show who posted it
                 record.authorized_by = record.write_uid.name
             else:
                 # For draft or other states, show who initiated
                 record.authorized_by = record.create_uid.name if record.create_uid else 'System'
-    
+
     @api.model
     def create(self, vals):
-        """Enhanced create method with validation"""
-        # Add any custom validation here if needed
-        if 'remarks' in vals and vals['remarks']:
-            # Log the creation with remarks for audit trail
-            self.env['mail.message'].create({
-                'body': f"Payment voucher created with remarks: {vals['remarks']}",
-                'model': 'account.payment',
-                'res_id': 0,  # Will be updated after creation
-                'message_type': 'comment',
-            })
+        """Enhanced create method with voucher number generation"""
+        # Generate voucher number if not provided
+        payment = super(AccountPayment, self).create(vals)
         
-        return super(AccountPayment, self).create(vals)
-    
+        if not payment.voucher_number:
+            payment._generate_voucher_number()
+        
+        # Log the creation with remarks for audit trail
+        if vals.get('remarks'):
+            payment.message_post(
+                body=f"Payment voucher {payment.voucher_number} created with remarks: {vals['remarks']}",
+                subject="Payment Voucher Created"
+            )
+        else:
+            payment.message_post(
+                body=f"Payment voucher {payment.voucher_number} created",
+                subject="Payment Voucher Created"
+            )
+        
+        return payment
+
     def write(self, vals):
-        """Override write to track the approver when payment is posted"""
+        """Override write to track approval state changes and posting"""
         # Track state changes for audit
         for record in self:
+            # Handle approval state changes
+            if vals.get('approval_state'):
+                old_state = record.approval_state
+                new_state = vals['approval_state']
+                if old_state != new_state:
+                    record.message_post(
+                        body=f"Payment voucher {record.voucher_number} state changed from {old_state} to {new_state} by {self.env.user.name}",
+                        subject="Payment Voucher State Changed"
+                    )
+            
+            # Track when payment is posted through standard Odoo workflow
             if vals.get('state') == 'posted' and record.state != 'posted':
-                # Payment is being posted, track who is posting it
-                if not record.actual_approver_id:
+                # If posted through standard workflow, update approval state
+                if record.approval_state not in ['approved', 'posted']:
+                    vals['approval_state'] = 'posted'
                     vals['actual_approver_id'] = self.env.user.id
+                    vals['approver_id'] = self.env.user.id
+                    vals['approver_date'] = fields.Datetime.now()
                 
-                # Log the approval action
+                # Log the posting action
                 record.message_post(
-                    body=f"Payment voucher approved and posted by {self.env.user.name}",
-                    subject="Payment Voucher Approved"
+                    body=f"Payment voucher {record.voucher_number} posted by {self.env.user.name}",
+                    subject="Payment Voucher Posted"
                 )
         
         return super(AccountPayment, self).write(vals)
     
     def action_print_osus_voucher(self):
         """Print OSUS branded payment voucher"""
-        if self.state == 'draft':
-            raise UserError(_("Cannot print voucher for draft payments. Please post the payment first."))
+        if self.approval_state == 'draft':
+            raise UserError(_("Cannot print voucher for draft payments. Please submit for approval first."))
         
         return self.env.ref('payment_account_enhanced.action_report_payment_voucher_osus').report_action(self)
     
     def action_print_standard_voucher(self):
         """Print standard payment voucher (fallback)"""
         return self.env.ref('payment_account_enhanced.action_report_payment_voucher').report_action(self)
+
+    def action_cancel(self):
+        """Enhanced cancel action with proper validation"""
+        for record in self:
+            if record.state == 'posted':
+                # Check if user has permission to cancel posted payments
+                if not self.env.user.has_group('account.group_account_manager'):
+                    raise UserError(_("Only account managers can cancel posted payments."))
+                
+                # Update approval state
+                record.approval_state = 'cancelled'
+                
+                # Log the cancellation
+                record.message_post(
+                    body=f"Payment voucher {record.voucher_number} cancelled by {self.env.user.name}",
+                    subject="Payment Voucher Cancelled"
+                )
+            else:
+                # For non-posted payments, just update approval state
+                record.approval_state = 'cancelled'
+        
+        # Call standard cancel method
+        return super(AccountPayment, self).action_cancel()
+    
+    def action_draft(self):
+        """Enhanced draft action for cancelled payments"""
+        for record in self:
+            if record.state != 'cancel':
+                raise UserError(_("Only cancelled payments can be set back to draft."))
+            
+            if not self.env.user.has_group('account.group_account_manager'):
+                raise UserError(_("Only account managers can reset payments to draft."))
+            
+            # Reset approval state to draft
+            record.approval_state = 'draft'
+            
+            # Log the reset action
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} reset to draft by {self.env.user.name}",
+                subject="Payment Voucher Reset"
+            )
+        
+        # Reset state to draft manually since parent method doesn't exist
+        self.write({'state': 'draft'})
     
     @api.onchange('journal_id')
     def _onchange_journal_id_destination_account(self):
@@ -309,7 +460,7 @@ Verify at: {base_url}/payment/qr-guide"""
             partner_banks = self.partner_id.bank_ids
             if partner_banks:
                 self.partner_bank_id = partner_banks[0].id
-    
+
     def _get_voucher_data(self):
         """Get formatted data for voucher printing"""
         self.ensure_one()
@@ -321,7 +472,7 @@ Verify at: {base_url}/payment/qr-guide"""
             amount_in_words = num2words(self.amount, lang='en').title()
         except ImportError:
             # Fallback if num2words is not available
-            amount_in_words = "Amount in words not available"
+            amount_in_words = f"{self.currency_id.name} {self.amount:,.2f}"
         
         return {
             'voucher_type': 'Payment Voucher' if self.payment_type == 'outbound' else 'Receipt Voucher',
@@ -329,10 +480,12 @@ Verify at: {base_url}/payment/qr-guide"""
             'currency_symbol': self.currency_id.symbol,
             'formatted_date': self.date.strftime('%d %B %Y') if self.date else '',
             'company_logo_url': self.company_id.logo_web if self.company_id.logo_web else '',
-            'is_posted': self.state == 'posted',
-            'approval_date': self.write_date.strftime('%d/%m/%Y %H:%M') if self.write_date and self.state == 'posted' else '',
+            'is_posted': self.approval_state == 'posted',
+            'approval_date': self.write_date.strftime('%d/%m/%Y %H:%M') if self.write_date and self.approval_state == 'posted' else '',
+            'voucher_number': self.voucher_number,
+            'approval_state': self.approval_state,
         }
-    
+
     def action_validate_and_post(self):
         """Enhanced validation and posting with OSUS specific checks"""
         for record in self:
@@ -346,44 +499,24 @@ Verify at: {base_url}/payment/qr-guide"""
             # Check if user has approval rights for large amounts
             if record.amount > 10000 and not self.env.user.has_group('account.group_account_manager'):
                 raise UserError(_("Payments above AED 10,000 require manager approval."))
+            
+            # Set approval fields if not set
+            if not record.approver_id:
+                record.approver_id = self.env.user
+                record.approver_date = fields.Datetime.now()
+                record.actual_approver_id = self.env.user
+            
+            # Update approval state
+            record.approval_state = 'approved'
         
         # Call standard posting method
-        return super(AccountPayment, self).action_post()
-    
-    def action_cancel(self):
-        """Enhanced cancel action with proper validation"""
-        for record in self:
-            if record.state == 'posted':
-                # Check if user has permission to cancel posted payments
-                if not self.env.user.has_group('account.group_account_manager'):
-                    raise UserError(_("Only account managers can cancel posted payments."))
-                
-                # Log the cancellation
-                record.message_post(
-                    body=f"Payment voucher cancelled by {self.env.user.name}",
-                    subject="Payment Voucher Cancelled"
-                )
+        result = super(AccountPayment, self).action_post()
         
-        # Call standard cancel method
-        return super(AccountPayment, self).action_cancel()
-    
-    def action_draft(self):
-        """Enhanced draft action for cancelled payments"""
+        # Update approval state to posted after successful posting
         for record in self:
-            if record.state != 'cancel':
-                raise UserError(_("Only cancelled payments can be set back to draft."))
-            
-            if not self.env.user.has_group('account.group_account_manager'):
-                raise UserError(_("Only account managers can reset payments to draft."))
-            
-            # Log the reset action
-            record.message_post(
-                body=f"Payment voucher reset to draft by {self.env.user.name}",
-                subject="Payment Voucher Reset"
-            )
+            record.approval_state = 'posted'
         
-        # Reset state to draft manually since parent method doesn't exist
-        self.write({'state': 'draft'})
+        return result
     
     @api.model
     def get_osus_branding_data(self):
