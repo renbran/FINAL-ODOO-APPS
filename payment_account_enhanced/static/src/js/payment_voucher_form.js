@@ -1,21 +1,24 @@
 /** @odoo-module **/
-import { FormController } from "@web/views/form/form_controller";
-import { FormView } from "@web/views/form/form_view";
+
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
-import { Component, onWillStart, useState } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
-const viewRegistry = registry.category("views");
-export class PaymentVoucherFormController extends FormController {
+
+/**
+ * Patch the standard FormController for payment voucher functionality
+ * This approach is more compatible and doesn't require extending undefined classes
+ */
+patch(registry.category("views").get("form").Controller.prototype, {
+    
     setup() {
         super.setup();
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.dialog = useService("dialog");
         this._isPaymentVoucher = this.props.resModel === 'account.payment';
-    }
+    },
 
     /**
      * Update status bar and buttons when record changes
@@ -26,7 +29,7 @@ export class PaymentVoucherFormController extends FormController {
             this._updatePaymentWorkflowButtons();
             this._updateStatusBarColors();
         }
-    }
+    },
 
     /**
      * Update workflow buttons based on approval state
@@ -52,7 +55,7 @@ export class PaymentVoucherFormController extends FormController {
                 $approveBtn.textContent = _t('Post Payment');
             }
         }
-    }
+    },
 
     /**
      * Update status bar colors and animations
@@ -85,7 +88,7 @@ export class PaymentVoucherFormController extends FormController {
                 }
             }
         }
-    }
+    },
 
     /**
      * Handle submit for approval action
@@ -121,7 +124,7 @@ export class PaymentVoucherFormController extends FormController {
                 }
             }
         });
-    }
+    },
 
     /**
      * Handle approve and post action
@@ -151,7 +154,7 @@ export class PaymentVoucherFormController extends FormController {
                 }
             }
         });
-    }
+    },
 
     /**
      * Handle reject payment action
@@ -181,7 +184,7 @@ export class PaymentVoucherFormController extends FormController {
                 }
             }
         });
-    }
+    },
 
     /**
      * Validate payment data before submission
@@ -212,22 +215,7 @@ export class PaymentVoucherFormController extends FormController {
         
         return true;
     }
-}
-
-/**
- * Enhanced Payment Voucher Form View
- */
-export class PaymentVoucherFormView extends FormView {
-    static components = {
-        ...FormView.components,
-    };
-}
-
-PaymentVoucherFormView.type = "payment_voucher_form";
-PaymentVoucherFormView.Controller = PaymentVoucherFormController;
-
-// Register the enhanced view for account.payment model
-registry.category("views").add("payment_voucher_form", PaymentVoucherFormView);
+});
 
 /**
  * Auto-refresh functionality for approval status
@@ -307,6 +295,89 @@ export const PaymentWorkflowNotifications = {
     }
 };
 
+/**
+ * Payment Voucher Button Actions - Global handlers
+ */
+window.PaymentVoucherActions = {
+    
+    async submitForApproval(recordId) {
+        const orm = useService("orm");
+        const notification = useService("notification");
+        
+        try {
+            const result = await orm.call(
+                'account.payment',
+                'action_submit_for_approval',
+                [recordId]
+            );
+            
+            if (result && result.type === 'ir.actions.client') {
+                notification.add(result.params.message, {
+                    type: result.params.type
+                });
+            }
+            
+            // Reload the page or trigger view refresh
+            window.location.reload();
+        } catch (error) {
+            console.error("Submit for approval failed:", error);
+            alert(_t("Failed to submit for approval"));
+        }
+    },
+    
+    async approveAndPost(recordId) {
+        if (confirm(_t("Approve and post this payment?"))) {
+            const orm = useService("orm");
+            const notification = useService("notification");
+            
+            try {
+                const result = await orm.call(
+                    'account.payment',
+                    'action_approve_and_post',
+                    [recordId]
+                );
+                
+                if (result && result.type === 'ir.actions.client') {
+                    notification.add(result.params.message, {
+                        type: result.params.type
+                    });
+                }
+                
+                window.location.reload();
+            } catch (error) {
+                console.error("Approve and post failed:", error);
+                alert(_t("Failed to approve and post"));
+            }
+        }
+    },
+    
+    async rejectPayment(recordId) {
+        if (confirm(_t("Reject this payment and return to draft?"))) {
+            const orm = useService("orm");
+            const notification = useService("notification");
+            
+            try {
+                const result = await orm.call(
+                    'account.payment',
+                    'action_reject_payment',
+                    [recordId]
+                );
+                
+                if (result && result.type === 'ir.actions.client') {
+                    notification.add(result.params.message, {
+                        type: result.params.type
+                    });
+                }
+                
+                window.location.reload();
+            } catch (error) {
+                console.error("Reject payment failed:", error);
+                alert(_t("Failed to reject payment"));
+            }
+        }
+    }
+};
+
 // Initialize auto-refresh when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -318,3 +389,153 @@ if (document.readyState === 'loading') {
 
 // Export for global use
 window.PaymentWorkflowNotifications = PaymentWorkflowNotifications;
+
+/**
+ * Simple event-driven approach for button handling
+ * This works when the patch approach might not be compatible
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle payment voucher buttons with event delegation
+    document.body.addEventListener('click', function(e) {
+        if (e.target.matches('.o_payment_submit_approval')) {
+            e.preventDefault();
+            const recordId = getRecordIdFromForm();
+            if (recordId) {
+                PaymentVoucherActions.submitForApproval(recordId);
+            }
+        } else if (e.target.matches('.o_payment_approve_post')) {
+            e.preventDefault();
+            const recordId = getRecordIdFromForm();
+            if (recordId) {
+                PaymentVoucherActions.approveAndPost(recordId);
+            }
+        } else if (e.target.matches('.o_payment_reject')) {
+            e.preventDefault();
+            const recordId = getRecordIdFromForm();
+            if (recordId) {
+                PaymentVoucherActions.rejectPayment(recordId);
+            }
+        }
+    });
+    
+    // Helper function to get record ID from current form
+    function getRecordIdFromForm() {
+        // Try multiple ways to get the current record ID
+        const urlMatch = window.location.href.match(/id=(\d+)/);
+        if (urlMatch) {
+            return parseInt(urlMatch[1]);
+        }
+        
+        // Try from data attributes
+        const formElement = document.querySelector('.o_form_view');
+        if (formElement && formElement.dataset.recordId) {
+            return parseInt(formElement.dataset.recordId);
+        }
+        
+        // Try from breadcrumb or other sources
+        const breadcrumbId = document.querySelector('.breadcrumb .active[data-id]');
+        if (breadcrumbId) {
+            return parseInt(breadcrumbId.dataset.id);
+        }
+        
+        console.warn('Could not determine record ID');
+        return null;
+    }
+});
+
+/**
+ * Enhanced status bar updates based on approval state changes
+ */
+const PaymentStatusBarUpdater = {
+    init() {
+        // Watch for changes in the approval state field
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                    PaymentStatusBarUpdater.updateStatusDisplay();
+                }
+            });
+        });
+        
+        // Start observing
+        const formView = document.querySelector('.o_form_view');
+        if (formView) {
+            observer.observe(formView, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['data-approval-state', 'class']
+            });
+        }
+    },
+    
+    updateStatusDisplay() {
+        const statusbar = document.querySelector('.o_payment_statusbar');
+        if (!statusbar) return;
+        
+        // Get approval state from various possible sources
+        let approvalState = null;
+        
+        // Check data attribute
+        if (statusbar.dataset.approvalState) {
+            approvalState = statusbar.dataset.approvalState;
+        }
+        
+        // Check for state indicators in the form
+        const stateField = document.querySelector('input[name="approval_state"], select[name="approval_state"]');
+        if (stateField && stateField.value) {
+            approvalState = stateField.value;
+        }
+        
+        if (approvalState) {
+            // Update status bar appearance
+            statusbar.className = statusbar.className.replace(/state-\w+/g, '');
+            statusbar.classList.add('state-' + approvalState.replace('_', '-'));
+            
+            // Update button visibility
+            PaymentStatusBarUpdater.updateButtonVisibility(approvalState);
+        }
+    },
+    
+    updateButtonVisibility(approvalState) {
+        const submitBtn = document.querySelector('.o_payment_submit_approval');
+        const approveBtn = document.querySelector('.o_payment_approve_post');
+        const rejectBtn = document.querySelector('.o_payment_reject');
+        
+        if (submitBtn) {
+            submitBtn.style.display = approvalState === 'draft' ? 'inline-block' : 'none';
+        }
+        
+        if (approveBtn) {
+            approveBtn.style.display = ['waiting_approval', 'approved'].includes(approvalState) ? 'inline-block' : 'none';
+            
+            // Update button text
+            if (approvalState === 'waiting_approval') {
+                approveBtn.textContent = _t('Approve & Post');
+            } else if (approvalState === 'approved') {
+                approveBtn.textContent = _t('Post Payment');
+            }
+        }
+        
+        if (rejectBtn) {
+            rejectBtn.style.display = approvalState === 'waiting_approval' ? 'inline-block' : 'none';
+        }
+    }
+};
+
+// Initialize status bar updater
+document.addEventListener('DOMContentLoaded', function() {
+    PaymentStatusBarUpdater.init();
+});
+
+// Also initialize when Odoo views change
+if (typeof odoo !== 'undefined') {
+    // Listen for Odoo's internal events
+    document.addEventListener('DOMNodeInserted', function(e) {
+        if (e.target.classList && e.target.classList.contains('o_form_view')) {
+            setTimeout(function() {
+                PaymentStatusBarUpdater.init();
+            }, 500);
+        }
+    });
+}
