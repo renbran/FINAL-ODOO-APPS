@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="assets_backend" inherit_id="web.assets_backend">
-        <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher.scss"/>
-        <script type="text/javascript" src="/payment_account_enhanced/static/src/js/payment_voucher_form.js"/>
-    </template>
+    <data>
+        <!-- Backend Assets for Enhanced Payment Module -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <!-- Enhanced CSS for OSUS Payment Styling -->
+            <link rel="stylesheet" type="text/css" href="/payment_account_enhanced/static/src/css/osus_backend.css"/>
+            <link rel="stylesheet" type="text/css" href="/payment_account_enhanced/static/src/css/osus_report.css"/>
+            
+            <!-- Enhanced JavaScript for Responsive Statusbar -->
+            <script type="text/javascript" src="/payment_account_enhanced/static/src/js/payment_statusbar.js"/>
+        </template>
+
+        <!-- Report Assets for Payment Vouchers -->
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher_report.scss"/>
+        </template>
+    </data>
 </odoo>
