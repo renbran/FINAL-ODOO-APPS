@@ -8,26 +8,20 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//page[@name='general_settings']" position="after">
+                <!-- Add at the end of notebook -->
+                <xpath expr="//notebook" position="inside">
                     <page string="OSUS Payment Voucher Settings" name="osus_payment_settings">
                         <group>
                             <group string="Branding Options">
                                 <field name="use_osus_branding"/>
-                                <field name="osus_logo_url" attrs="{'invisible': [('use_osus_branding', '=', False)]}"/>
-                                <field name="osus_primary_color" attrs="{'invisible': [('use_osus_branding', '=', False)]}"/>
-                                <field name="osus_secondary_color" attrs="{'invisible': [('use_osus_branding', '=', False)]}"/>
                             </group>
                             <group string="Voucher Settings">
                                 <field name="voucher_footer_message"/>
-                                <field name="enable_qr_verification"/>
-                                <field name="payment_approval_required"/>
+                                <field name="voucher_terms"/>
                             </group>
                         </group>
-                        <group string="Signature Settings" attrs="{'invisible': [('use_osus_branding', '=', False)]}">
-                            <field name="authorized_signatory_name"/>
-                            <field name="authorized_signatory_title"/>
-                            <field name="authorized_signatory_signature"/>
-                        </group>
+                    </page>
+                </xpath>
                     </page>
                 </xpath>
             </field>
