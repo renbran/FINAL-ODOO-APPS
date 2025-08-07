@@ -339,13 +339,26 @@ Verify at: {base_url}/payment/qr-guide"""
 
     @api.model
     def create(self, vals):
-        """Enhanced create method with voucher number generation"""
-        # Generate voucher number if not provided
+        """Enhanced create method with voucher number generation (pre-create for all stages)"""
+        # Generate voucher number before record creation so it's always present
+        payment_type = vals.get('payment_type', 'outbound')
+        sequence_code = 'payment.voucher'
+        if payment_type == 'inbound':
+            sequence_code = 'receipt.voucher'
+        if not vals.get('voucher_number'):
+            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
+            if not sequence:
+                sequence_name = 'Payment Voucher' if payment_type == 'outbound' else 'Receipt Voucher'
+                prefix = 'PV' if payment_type == 'outbound' else 'RV'
+                sequence = self.env['ir.sequence'].create({
+                    'name': sequence_name,
+                    'code': sequence_code,
+                    'prefix': prefix,
+                    'padding': 5,
+                    'company_id': vals.get('company_id', False),
+                })
+            vals['voucher_number'] = sequence.next_by_id()
         payment = super(AccountPayment, self).create(vals)
-        
-        if not payment.voucher_number:
-            payment._generate_voucher_number()
-        
         # Log the creation with remarks for audit trail
         if vals.get('remarks'):
             payment.message_post(
@@ -357,7 +370,6 @@ Verify at: {base_url}/payment/qr-guide"""
                 body=f"Payment voucher {payment.voucher_number} created",
                 subject="Payment Voucher Created"
             )
-        
         return payment
 
     def write(self, vals):
