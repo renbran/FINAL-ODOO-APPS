@@ -85,54 +85,38 @@
                     </div>
                 </xpath>
                 
-                <!-- Add notebook after main group -->
-                <xpath expr="//group[@name='group_partner_bank']" position="after">
+                <!-- Make standard fields readonly based on approval state -->
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='amount']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='journal_id']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                </xpath>
+                
+                <!-- Add custom fields to existing form -->
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="remarks" 
+                           readonly="approval_state not in ['draft', 'rejected']"
+                           placeholder="Enter additional remarks or purpose for this payment..."
+                           widget="text"/>
+                </xpath>
+                
+                <!-- Add notebook at the end of sheet -->
+                <xpath expr="//sheet" position="inside">
                     <notebook>
-                        <!-- Payment Information Tab -->
-                        <page string="Payment Information" name="payment_info">
-                            <group>
-                                <group string="Payment Details" name="payment_details">
-                                    <field name="partner_id" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           required="1"/>
-                                    <field name="amount" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           required="1"/>
-                                    <field name="currency_id" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           groups="base.group_multi_currency"/>
-                                    <field name="date" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           required="1"/>
-                                    <field name="ref" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           placeholder="Payment reference"/>
-                                </group>
-                                
-                                <group string="Account Information" name="account_info">
-                                    <field name="journal_id" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           domain="[('type', 'in', ['bank', 'cash']), ('company_id', '=', company_id)]"
-                                           required="1"/>
-                                    <field name="partner_bank_id" 
-                                           readonly="approval_state not in ['draft', 'rejected']"
-                                           domain="[('partner_id', '=', partner_id)]"
-                                           context="{'default_partner_id': partner_id}"/>
-                                    <field name="company_id" invisible="1"/>
-                                    <field name="state" invisible="1"/>
-                                </group>
-                            </group>
-                            
-                            <separator string="Additional Information"/>
-                            <group>
-                                <field name="remarks" 
-                                       readonly="approval_state not in ['draft', 'rejected']"
-                                       placeholder="Enter additional remarks or purpose for this payment..."
-                                       widget="text" 
-                                       colspan="2"/>
-                            </group>
-                        </page>
-                        
                         <!-- Approval Workflow Tab -->
                         <page string="Approval Workflow" name="approval_workflow">
                             <group string="Current Status">
