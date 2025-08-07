@@ -13,8 +13,8 @@
                     <header>
                         <!-- Approval State Status Bar -->
                         <field name="approval_state" widget="statusbar" 
-                               statusbar_visible="draft,submitted,approved,posted"
-                               statusbar_colors='{"draft":"blue","submitted":"orange","approved":"green","posted":"success","rejected":"danger","cancelled":"secondary"}'/>
+                               statusbar_visible="draft,waiting_approval,approved,posted"
+                               statusbar_colors='{"draft":"blue","waiting_approval":"orange","approved":"green","posted":"success","cancelled":"secondary"}'/>
                         
                         <!-- Workflow Action Buttons -->
                         <button name="action_submit_for_approval" 
@@ -28,14 +28,14 @@
                                 type="object" 
                                 class="btn-success"
                                 groups="account.group_account_invoice"
-                                invisible="approval_state != 'submitted'"/>
+                                invisible="approval_state != 'waiting_approval'"/>
                         
                         <button name="action_reject_payment" 
                                 string="Reject" 
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_invoice"
-                                invisible="approval_state != 'submitted'"/>
+                                invisible="approval_state != 'waiting_approval'"/>
                         
                         <!-- Standard Posting -->
                         <button name="action_post" 
@@ -66,7 +66,7 @@
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_manager"
-                                invisible="approval_state not in ['rejected', 'cancelled']"/>
+                                invisible="approval_state != 'cancelled'"/>
                     </header>
                 </xpath>
                 
@@ -87,29 +87,29 @@
                 
                 <!-- Make standard fields readonly based on approval state -->
                 <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='amount']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='currency_id']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='journal_id']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
                 </xpath>
                 
                 <!-- Add custom fields to existing form -->
                 <xpath expr="//field[@name='ref']" position="after">
                     <field name="remarks" 
-                           readonly="approval_state not in ['draft', 'rejected']"
+                           readonly="approval_state not in ['draft', 'cancelled']"
                            placeholder="Enter additional remarks or purpose for this payment..."
                            widget="text"/>
                 </xpath>
@@ -123,24 +123,13 @@
                                 <field name="approval_state" readonly="1" widget="badge"/>
                             </group>
                             
-                            <group string="Submission Details" invisible="approval_state == 'draft'">
+                            <group string="Approval Details" invisible="approval_state in ['draft']">
                                 <group>
-                                    <field name="submitted_by" readonly="1"/>
-                                    <field name="submitted_date" readonly="1"/>
+                                    <field name="approver_id" readonly="1"/>
+                                    <field name="approver_date" readonly="1"/>
                                 </group>
                                 <group invisible="approval_state not in ['approved', 'posted']">
-                                    <field name="approved_by" readonly="1"/>
-                                    <field name="approved_date" readonly="1"/>
-                                </group>
-                            </group>
-                            
-                            <group string="Rejection Details" invisible="approval_state != 'rejected'">
-                                <group>
-                                    <field name="rejected_by" readonly="1"/>
-                                    <field name="rejected_date" readonly="1"/>
-                                </group>
-                                <group>
-                                    <field name="rejection_reason" readonly="1" widget="text"/>
+                                    <field name="authorized_by" readonly="1"/>
                                 </group>
                             </group>
                         </page>
@@ -179,13 +168,13 @@
                     <field name="voucher_number" optional="show"/>
                     <field name="approval_state" widget="badge" optional="show"
                            decoration-info="approval_state == 'draft'"
-                           decoration-warning="approval_state == 'submitted'"
+                           decoration-warning="approval_state == 'waiting_approval'"
                            decoration-success="approval_state in ['approved', 'posted']"
-                           decoration-danger="approval_state in ['rejected', 'cancelled']"/>
+                           decoration-danger="approval_state == 'cancelled'"/>
                 </xpath>
                 <xpath expr="//field[@name='amount_company_currency_signed']" position="after">
-                    <field name="approved_by" optional="hide"/>
-                    <field name="submitted_date" optional="hide"/>
+                    <field name="approver_id" optional="hide"/>
+                    <field name="approver_date" optional="hide"/>
                 </xpath>
             </field>
         </record>
@@ -203,27 +192,23 @@
                     <separator/>
                     <filter string="Draft" name="filter_draft" 
                             domain="[('approval_state', '=', 'draft')]"/>
-                    <filter string="Submitted" name="filter_submitted" 
-                            domain="[('approval_state', '=', 'submitted')]"/>
+                    <filter string="Waiting Approval" name="filter_waiting" 
+                            domain="[('approval_state', '=', 'waiting_approval')]"/>
                     <filter string="Approved" name="filter_approved" 
                             domain="[('approval_state', '=', 'approved')]"/>
                     <filter string="Posted" name="filter_posted" 
                             domain="[('approval_state', '=', 'posted')]"/>
-                    <filter string="Rejected" name="filter_rejected" 
-                            domain="[('approval_state', '=', 'rejected')]"/>
+                    <filter string="Cancelled" name="filter_cancelled" 
+                            domain="[('approval_state', '=', 'cancelled')]"/>
                     <separator/>
-                    <filter string="My Submissions" name="filter_my_submissions"
-                            domain="[('submitted_by', '=', uid)]"/>
                     <filter string="My Approvals" name="filter_my_approvals"
-                            domain="[('approved_by', '=', uid)]"/>
+                            domain="[('approver_id', '=', uid)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter name="group_approval_state" string="Approval State" 
                                 context="{'group_by': 'approval_state'}"/>
-                        <filter name="group_submitted_by" string="Submitted By" 
-                                context="{'group_by': 'submitted_by'}"/>
-                        <filter name="group_approved_by" string="Approved By" 
-                                context="{'group_by': 'approved_by'}"/>
+                        <filter name="group_approver" string="Approver" 
+                                context="{'group_by': 'approver_id'}"/>
                     </group>
                 </xpath>
             </field>
@@ -274,10 +259,10 @@
             }</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    No payments pending approval
+                    No payment vouchers found
                 </p>
                 <p>
-                    Payments submitted for approval will appear here.
+                    Payment vouchers will appear here.
                 </p>
             </field>
         </record>
@@ -286,14 +271,14 @@
             <field name="name">My Submissions</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('submitted_by', '=', uid)]</field>
+            <field name="domain">[('create_uid', '=', uid)]</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    You haven't submitted any payments yet
+                    You haven't created any payments yet
                 </p>
                 <p>
-                    Payments you submit for approval will appear here.
+                    Payments you create will appear here.
                 </p>
             </field>
         </record>
@@ -302,7 +287,7 @@
             <field name="name">My Approvals</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('approved_by', '=', uid)]</field>
+            <field name="domain">[('approver_id', '=', uid)]</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
@@ -319,7 +304,7 @@
             <field name="name">Pending Approvals</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('approval_state', '=', 'submitted')]</field>
+            <field name="domain">[('approval_state', '=', 'waiting_approval')]</field>
             <field name="context">{}</field>
             <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
