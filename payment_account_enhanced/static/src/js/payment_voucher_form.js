@@ -8,11 +8,6 @@ import { _t } from "@web/core/l10n/translation";
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 const viewRegistry = registry.category("views");
-
-/**
- * Enhanced Payment Voucher Form Controller for Odoo 17
- * Handles the simplified 2-state approval workflow
- */
 export class PaymentVoucherFormController extends FormController {
     setup() {
         super.setup();
