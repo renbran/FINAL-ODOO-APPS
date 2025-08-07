@@ -50,7 +50,7 @@
     'assets': {
         'web.assets_backend': [
             'payment_account_enhanced/static/src/scss/payment_voucher.scss',
-            # 'payment_account_enhanced/static/src/js/payment_voucher_form.js',  # TEMPORARILY DISABLED for recovery
+            'payment_account_enhanced/static/src/js/payment_voucher_form.js',
         ],
     },
     'images': [
