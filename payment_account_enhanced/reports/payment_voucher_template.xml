@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- OSUS Compact Payment Voucher QWeb Template -->
-        <template id="report_payment_voucher_osus">
+        <!-- Identical HTML Design Payment/Receipt Voucher Template -->
+        <template id="report_payment_voucher_smart_modern">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
+                    <!-- Smart Variables for Dynamic Content -->
+                    <t t-set="is_receipt" t-value="doc.payment_type == 'inbound'"/>
+                    <t t-set="is_payment" t-value="doc.payment_type == 'outbound'"/>
+                    <t t-set="voucher_title" t-value="'RECEIPT VOUCHER' if is_receipt else 'PAYMENT VOUCHER'"/>
+                    <t t-set="partner_label" t-value="'Customer' if is_receipt else 'Vendor'"/>
+                    
                     <div class="article o_report_layout_standard" style="page-break-inside: avoid;">
-                        <!-- Custom CSS for Compact A4 Design -->
+                        <!-- Identical CSS Styling from HTML Template -->
                         <style type="text/css">
-                            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap');
+                            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap');
                             
-                            /* Reset and Base Styles */
                             * {
                                 margin: 0;
                                 padding: 0;
                                 box-sizing: border-box;
                             }
-                            
+
                             body, .article {
                                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
                                 background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                line-height: 1.5;
                                 color: #212529;
-                                line-height: 1.4;
-                                font-size: 11px;
                                 margin: 0;
                                 padding: 0;
                             }
-                            
-                            /* Main Container - Compact A4 */
+
                             .voucher-container {
                                 width: 210mm;
                                 max-width: 210mm;
                                 min-height: 297mm;
                                 background: #ffffff;
-                                border-radius: 8px;
-                                box-shadow: 0 10px 30px rgba(128, 0, 32, 0.1);
+                                border-radius: 12px;
+                                box-shadow: 0 20px 60px rgba(128, 0, 32, 0.15);
                                 overflow: hidden;
                                 position: relative;
                                 margin: 0 auto;
@@ -47,8 +50,8 @@
                                 top: 0;
                                 left: 0;
                                 right: 0;
-                                height: 4px;
-                                background: linear-gradient(90deg, #800020 0%, #b8002e 50%, #800020 100%);
+                                height: 8px;
+                                background: linear-gradient(90deg, #800020 0%, #b8002e 25%, #ffd700 50%, #b8002e 75%, #800020 100%);
                             }
 
                             /* Header Section */
@@ -56,7 +59,7 @@
                                 background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
                                 color: white;
                                 text-align: center;
-                                padding: 20px 30px;
+                                padding: 30px 40px;
                                 position: relative;
                                 overflow: hidden;
                             }
@@ -72,40 +75,1522 @@
                                     45deg,
                                     transparent,
                                     transparent 10px,
-                                    rgba(255, 255, 255, 0.02) 10px,
-                                    rgba(255, 255, 255, 0.02) 20px
+                                    rgba(255, 255, 255, 0.03) 10px,
+                                    rgba(255, 255, 255, 0.03) 20px
                                 );
+                                animation: subtle-move 30s linear infinite;
+                            }
+
+                            @keyframes subtle-move {
+                                0% { transform: translate(-50px, -50px); }
+                                100% { transform: translate(50px, 50px); }
+                            }
+
+                            .company-title {
+                                font-size: 28px;
+                                font-weight: 800;
+                                letter-spacing: 2px;
+                                margin-bottom: 6px;
+                                position: relative;
+                                z-index: 2;
+                                text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
                             }
 
                             .voucher-number {
                                 font-size: 16px;
-                                font-weight: 700;
+                                font-weight: 600;
                                 color: #ffd700;
-                                margin: 6px 0;
-                                letter-spacing: 1px;
-                                position: relative;
-                                z-index: 2;
-                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                            }
-
-                            .company-title {
-                                font-size: 20px;
-                                font-weight: 700;
-                                letter-spacing: 1.5px;
-                                margin-bottom: 4px;
+                                margin: 8px 0;
+                                letter-spacing: 0.5px;
                                 position: relative;
                                 z-index: 2;
                                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                             }
 
                             .subtitle {
-                                font-size: 13px;
-                                font-weight: 300;
+                                font-size: 12px;
+                                font-weight: 400;
                                 opacity: 0.95;
+                                letter-spacing: 1px;
+                                position: relative;
+                                z-index: 2;
+                                text-transform: uppercase;
+                            }
+
+                            /* Brand Section */
+                            .brand-section {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 25px 30px;
+                                background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
+                                border-bottom: 2px solid #e9ecef;
+                            }
+
+                            .logo-container, .qr-container {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 8px;
+                            }
+
+                            .logo-box, .qr-box {
+                                width: 75px;
+                                height: 75px;
+                                background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                                border-radius: 16px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-weight: 700;
+                                font-size: 12px;
+                                box-shadow: 0 10px 20px rgba(128, 0, 32, 0.2);
+                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .logo-box::before, .qr-box::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                                transform: rotate(45deg);
+                                transition: all 0.5s;
+                                opacity: 0;
+                            }
+
+                            .logo-box:hover::before, .qr-box:hover::before {
+                                animation: shine 0.5s ease-in-out;
+                            }
+
+                            @keyframes shine {
+                                0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+                                50% { opacity: 1; }
+                                100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+                            }
+
+                            .logo-box:hover, .qr-box:hover {
+                                transform: translateY(-4px) scale(1.05);
+                                box-shadow: 0 15px 30px rgba(128, 0, 32, 0.3);
+                            }
+
+                            .logo-label, .qr-label {
+                                font-size: 10px;
+                                color: #6c757d;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+
+                            /* Main Content */
+                            .content {
+                                padding: 30px;
+                            }
+
+                            .voucher-title {
+                                text-align: center;
+                                margin-bottom: 30px;
+                            }
+
+                            .voucher-title h2 {
+                                font-size: 24px;
+                                color: #800020;
+                                font-weight: 700;
+                                letter-spacing: 2px;
+                                position: relative;
+                                display: inline-block;
+                                padding-bottom: 12px;
+                            }
+
+                            .voucher-title h2::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 100px;
+                                height: 4px;
+                                background: linear-gradient(90deg, transparent, #ffd700, transparent);
+                                border-radius: 2px;
+                            }
+
+                            /* Information Grid */
+                            .info-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 25px;
+                                margin-bottom: 25px;
+                            }
+
+                            .info-section {
+                                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                                border-radius: 12px;
+                                padding: 20px;
+                                border-left: 5px solid #800020;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                                transition: all 0.3s ease;
+                            }
+
+                            .info-section:hover {
+                                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                                transform: translateY(-2px);
+                            }
+
+                            .info-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                margin-bottom: 14px;
+                                padding-bottom: 10px;
+                                border-bottom: 1px solid rgba(128, 0, 32, 0.1);
+                            }
+
+                            .info-row:last-child {
+                                margin-bottom: 0;
+                                padding-bottom: 0;
+                                border-bottom: none;
+                            }
+
+                            .info-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 11px;
+                                text-transform: uppercase;
                                 letter-spacing: 0.5px;
+                                min-width: 90px;
+                                flex-shrink: 0;
+                            }
+
+                            .info-value {
+                                font-weight: 500;
+                                color: #212529;
+                                text-align: right;
+                                flex: 1;
+                                font-size: 11px;
+                                line-height: 1.4;
+                            }
+
+                            /* Total Amount Section */
+                            .total-amount-section {
+                                background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                                border-radius: 16px;
+                                padding: 20px;
+                                margin: 20px 0;
+                                box-shadow: 0 12px 30px rgba(128, 0, 32, 0.3);
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .total-amount-section::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: repeating-linear-gradient(
+                                    45deg,
+                                    transparent,
+                                    transparent 10px,
+                                    rgba(255, 215, 0, 0.03) 10px,
+                                    rgba(255, 215, 0, 0.03) 20px
+                                );
+                                pointer-events: none;
+                            }
+
+                            .total-amount-container {
+                                text-align: center;
                                 position: relative;
                                 z-index: 2;
                             }
+
+                            .total-label {
+                                display: block;
+                                color: rgba(255, 255, 255, 0.95);
+                                font-size: 11px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 3px;
+                                margin-bottom: 8px;
+                            }
+
+                            .total-value {
+                                display: block;
+                                color: #ffd700;
+                                font-size: 32px;
+                                font-weight: 900;
+                                text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                                letter-spacing: 1px;
+                            }
+
+                            /* Authorization Section */
+                            .authorization-section {
+                                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                                border: 2px solid #e9ecef;
+                                border-radius: 12px;
+                                padding: 20px;
+                                margin: 20px 0;
+                            }
+
+                            .section-title {
+                                color: #800020;
+                                font-size: 16px;
+                                font-weight: 700;
+                                margin-bottom: 20px;
+                                text-align: center;
+                                text-transform: uppercase;
+                                letter-spacing: 1.5px;
+                                position: relative;
+                                padding-bottom: 10px;
+                            }
+
+                            .section-title::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 80px;
+                                height: 3px;
+                                background: linear-gradient(90deg, transparent, #ffd700, transparent);
+                                border-radius: 2px;
+                            }
+
+                            .workflow-section {
+                                background: white;
+                                border-radius: 10px;
+                                padding: 15px;
+                                margin-bottom: 15px;
+                                border-left: 4px solid #800020;
+                                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+                            }
+
+                            .workflow-title {
+                                color: #800020;
+                                font-size: 12px;
+                                font-weight: 700;
+                                margin-bottom: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.8px;
+                                display: flex;
+                                align-items: center;
+                            }
+
+                            .workflow-title::before {
+                                content: '';
+                                width: 8px;
+                                height: 8px;
+                                background: #ffd700;
+                                border-radius: 50%;
+                                margin-right: 10px;
+                                box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+                            }
+
+                            .workflow-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 15px;
+                            }
+
+                            .workflow-item {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 5px;
+                            }
+
+                            .workflow-label {
+                                font-weight: 600;
+                                color: #6c757d;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .workflow-value {
+                                font-weight: 500;
+                                color: #212529;
+                                font-size: 11px;
+                                padding: 6px 10px;
+                                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                                border-radius: 6px;
+                                border: 1px solid #e9ecef;
+                            }
+
+                            .pending-status {
+                                color: #dc3545;
+                                font-style: italic;
+                                font-weight: 600;
+                            }
+
+                            .workflow-separator {
+                                height: 2px;
+                                background: linear-gradient(90deg, transparent 0%, #800020 20%, #ffd700 50%, #800020 80%, transparent 100%);
+                                margin: 20px 0;
+                                position: relative;
+                            }
+
+                            .workflow-separator::after {
+                                content: '';
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                width: 10px;
+                                height: 10px;
+                                background: #800020;
+                                border-radius: 50%;
+                                border: 3px solid #ffd700;
+                                box-shadow: 0 0 0 5px white;
+                            }
+
+                            /* Receiver Information */
+                            .receiver-info {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 12px;
+                            }
+
+                            .receiver-field {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                            }
+
+                            .field-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                min-width: 60px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .field-line {
+                                flex: 1;
+                                height: 1px;
+                                background: linear-gradient(90deg, #800020, transparent);
+                                position: relative;
+                            }
+
+                            .field-line::after {
+                                content: '';
+                                position: absolute;
+                                right: 0;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                width: 6px;
+                                height: 6px;
+                                background: #800020;
+                                border-radius: 50%;
+                            }
+
+                            /* Signature Section */
+                            .signature-box {
+                                text-align: center;
+                                padding: 20px;
+                                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                                border: 2px dashed #800020;
+                                border-radius: 8px;
+                                margin-top: 12px;
+                            }
+
+                            .signature-line {
+                                width: 100%;
+                                height: 40px;
+                                border-bottom: 2px solid #800020;
+                                margin-bottom: 10px;
+                                position: relative;
+                            }
+
+                            .signature-text {
+                                font-size: 10px;
+                                color: #800020;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+
+                            /* Footer */
+                            .footer {
+                                background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                                color: white;
+                                text-align: center;
+                                padding: 25px 30px;
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .footer::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                height: 1px;
+                                background: linear-gradient(90deg, transparent, #ffd700, transparent);
+                            }
+
+                            .footer-text {
+                                font-size: 12px;
+                                font-weight: 400;
+                                line-height: 1.6;
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .contact-info {
+                                font-weight: 700;
+                                color: #ffd700;
+                                font-size: 14px;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                            }
+
+                            /* Responsive Design */
+                            @media (max-width: 768px) {
+                                .info-grid {
+                                    grid-template-columns: 1fr;
+                                    gap: 15px;
+                                }
+                                
+                                .workflow-grid {
+                                    grid-template-columns: 1fr;
+                                    gap: 10px;
+                                }
+                                
+                                .brand-section {
+                                    flex-direction: column;
+                                    gap: 15px;
+                                }
+                                
+                                .info-row {
+                                    flex-direction: column;
+                                    align-items: flex-start;
+                                    gap: 4px;
+                                }
+                                
+                                .info-value {
+                                    text-align: left;
+                                }
+                            }
+
+                            /* Print Optimizations */
+                            @media print {
+                                body {
+                                    background: white !important;
+                                    padding: 0 !important;
+                                    margin: 0 !important;
+                                }
+                                
+                                .voucher-container {
+                                    box-shadow: none !important;
+                                    border: none !important;
+                                    border-radius: 0 !important;
+                                    max-width: 100% !important;
+                                    width: 210mm !important;
+                                    margin: 0 !important;
+                                    page-break-inside: avoid !important;
+                                }
+
+                                .header, .authorization-section, .footer {
+                                    page-break-inside: avoid !important;
+                                    -webkit-print-color-adjust: exact !important;
+                                    color-adjust: exact !important;
+                                }
+
+                                .total-amount-section {
+                                    page-break-inside: avoid !important;
+                                    box-shadow: none !important;
+                                    -webkit-print-color-adjust: exact !important;
+                                    color-adjust: exact !important;
+                                }
+                            }
+
+                            /* A4 Page Setup */
+                            @page {
+                                size: A4;
+                                margin: 8mm;
+                            }
+                        </style>
+
+                            /* Animated Background Pattern */
+                            .modern-voucher-container::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: 
+                                    radial-gradient(circle at 20% 20%, var(--primary-color)10 0%, transparent 50%),
+                                    radial-gradient(circle at 80% 80%, var(--secondary-color)10 0%, transparent 50%),
+                                    radial-gradient(circle at 40% 40%, var(--osus-gold)05 0%, transparent 50%);
+                                opacity: 0.03;
+                                z-index: 0;
+                            }
+
+                            /* Modern Header with Dynamic Styling */
+                            .modern-header {
+                                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+                                color: white;
+                                padding: 2rem;
+                                position: relative;
+                                overflow: hidden;
+                                z-index: 2;
+                            }
+
+                            .modern-header::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                background: repeating-linear-gradient(
+                                    45deg,
+                                    transparent,
+                                    transparent 20px,
+                                    rgba(255, 255, 255, 0.03) 20px,
+                                    rgba(255, 255, 255, 0.03) 40px
+                                );
+                                animation: backgroundMove 20s linear infinite;
+                            }
+
+                            @keyframes backgroundMove {
+                                0% { transform: translate(-50%, -50%) rotate(0deg); }
+                                100% { transform: translate(-50%, -50%) rotate(360deg); }
+                            }
+
+                            .header-content {
+                                position: relative;
+                                z-index: 3;
+                                text-align: center;
+                            }
+
+                            .voucher-type-badge {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                background: rgba(255, 255, 255, 0.2);
+                                backdrop-filter: blur(10px);
+                                border: 1px solid rgba(255, 255, 255, 0.3);
+                                border-radius: 50px;
+                                padding: 0.5rem 1.5rem;
+                                font-size: 14px;
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
+                                margin-bottom: 1rem;
+                                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                            }
+
+                            .company-title {
+                                font-family: 'Poppins', sans-serif;
+                                font-size: 28px;
+                                font-weight: 700;
+                                letter-spacing: 2px;
+                                margin-bottom: 0.5rem;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                                background: linear-gradient(45deg, #ffffff, #f8f9fa);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                background-clip: text;
+                            }
+
+                            .voucher-number {
+                                font-size: 18px;
+                                font-weight: 600;
+                                color: var(--osus-gold);
+                                margin: 0.5rem 0;
+                                letter-spacing: 1px;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                                background: rgba(255, 255, 255, 0.1);
+                                padding: 0.5rem 1rem;
+                                border-radius: 8px;
+                                display: inline-block;
+                            }
+
+                            .header-subtitle {
+                                font-size: 14px;
+                                font-weight: 300;
+                                opacity: 0.95;
+                                letter-spacing: 0.5px;
+                            }
+
+                            /* Glassmorphism Cards */
+                            .glass-card {
+                                background: rgba(255, 255, 255, 0.7);
+                                backdrop-filter: blur(15px);
+                                border: 1px solid rgba(255, 255, 255, 0.2);
+                                border-radius: var(--border-radius);
+                                padding: 1.5rem;
+                                margin: 1rem;
+                                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .glass-card::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                height: 1px;
+                                background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+                                opacity: 0.5;
+                            }
+
+                            /* Brand Section with Logo and QR */
+                            .brand-showcase {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 1.5rem;
+                                background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.8) 100%);
+                                backdrop-filter: blur(15px);
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .logo-container, .qr-container {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 0.75rem;
+                            }
+
+                            .modern-logo-box, .modern-qr-box {
+                                width: 80px;
+                                height: 80px;
+                                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                                border-radius: 20px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-weight: 700;
+                                font-size: 12px;
+                                box-shadow: 
+                                    0 10px 30px rgba(0, 0, 0, 0.2),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .modern-logo-box::before, .modern-qr-box::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                                transform: rotate(45deg);
+                                transition: transform 0.6s ease;
+                            }
+
+                            .modern-logo-box:hover::before, .modern-qr-box:hover::before {
+                                transform: rotate(45deg) translate(100%, 100%);
+                            }
+
+                            .brand-label {
+                                font-size: 10px;
+                                color: #6c757d;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                text-align: center;
+                            }
+
+                            /* Content Area with Modern Grid */
+                            .modern-content {
+                                padding: 0;
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .section-title {
+                                font-family: 'Poppins', sans-serif;
+                                color: var(--primary-color);
+                                font-size: 20px;
+                                font-weight: 700;
+                                margin-bottom: 1.5rem;
+                                text-align: center;
+                                text-transform: uppercase;
+                                letter-spacing: 1.5px;
+                                position: relative;
+                                padding-bottom: 1rem;
+                            }
+
+                            .section-title::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 100px;
+                                height: 3px;
+                                background: linear-gradient(90deg, var(--primary-color), var(--osus-gold), var(--secondary-color));
+                                border-radius: 2px;
+                            }
+
+                            /* Modern Information Grid */
+                            .info-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 1.5rem;
+                                margin-bottom: 1.5rem;
+                            }
+
+                            .info-card {
+                                background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.7) 100%);
+                                backdrop-filter: blur(15px);
+                                border: 1px solid rgba(255, 255, 255, 0.3);
+                                border-radius: var(--border-radius);
+                                padding: 1.5rem;
+                                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .info-card::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 4px;
+                                height: 100%;
+                                background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+                                border-radius: 0 2px 2px 0;
+                            }
+
+                            .card-title {
+                                font-family: 'Poppins', sans-serif;
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: var(--primary-color);
+                                margin-bottom: 1rem;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                                padding-bottom: 0.5rem;
+                            }
+
+                            .info-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                margin-bottom: 0.75rem;
+                                padding: 0.5rem 0;
+                                border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+                            }
+
+                            .info-row:last-child {
+                                border-bottom: none;
+                                margin-bottom: 0;
+                            }
+
+                            .info-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                min-width: 80px;
+                                flex-shrink: 0;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.25rem;
+                            }
+
+                            .info-label::before {
+                                content: '•';
+                                color: var(--primary-color);
+                                font-weight: 900;
+                                font-size: 12px;
+                            }
+
+                            .info-value {
+                                font-weight: 500;
+                                color: #2c3e50;
+                                text-align: right;
+                                flex: 1;
+                                font-size: 11px;
+                                line-height: 1.4;
+                            }
+
+                            .amount-highlight {
+                                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                background-clip: text;
+                                font-size: 16px;
+                                font-weight: 800;
+                                text-shadow: none;
+                            }
+
+                            .status-badge {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.25rem;
+                                padding: 0.25rem 0.75rem;
+                                border-radius: 20px;
+                                font-size: 10px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .status-approved {
+                                background: linear-gradient(135deg, #28a745, #20c997);
+                                color: white;
+                                box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+                            }
+
+                            .status-pending {
+                                background: linear-gradient(135deg, #ffc107, #fd7e14);
+                                color: #495057;
+                                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+                            }
+
+                            .status-draft {
+                                background: linear-gradient(135deg, #6c757d, #495057);
+                                color: white;
+                                box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+                            }
+
+                            /* Smart Approval Workflow Section */
+                            .approval-workflow {
+                                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.9) 100%);
+                                backdrop-filter: blur(20px);
+                                border: 1px solid rgba(255, 255, 255, 0.3);
+                                border-radius: var(--border-radius);
+                                padding: 2rem;
+                                margin: 1.5rem;
+                                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .workflow-header {
+                                text-align: center;
+                                margin-bottom: 2rem;
+                            }
+
+                            .workflow-type-badge {
+                                display: inline-block;
+                                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                                color: white;
+                                padding: 0.5rem 1.5rem;
+                                border-radius: 25px;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                margin-bottom: 1rem;
+                                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                            }
+
+                            /* Conditional Workflow Grids */
+                            .workflow-grid {
+                                display: grid;
+                                gap: 1.5rem;
+                                margin-bottom: 1.5rem;
+                            }
+
+                            .workflow-grid.receipt-workflow {
+                                grid-template-columns: 1fr 1fr; /* 2 steps for receipts */
+                            }
+
+                            .workflow-grid.payment-workflow {
+                                grid-template-columns: repeat(4, 1fr); /* 4 steps for payments */
+                            }
+
+                            .workflow-step {
+                                background: rgba(255, 255, 255, 0.8);
+                                backdrop-filter: blur(10px);
+                                border: 2px solid rgba(255, 255, 255, 0.3);
+                                border-radius: 15px;
+                                padding: 1.5rem;
+                                text-align: center;
+                                position: relative;
+                                transition: all 0.3s ease;
+                                overflow: hidden;
+                            }
+
+                            .workflow-step::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                height: 4px;
+                                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+                                transform: scaleX(0);
+                                transition: transform 0.3s ease;
+                            }
+
+                            .workflow-step.active::before {
+                                transform: scaleX(1);
+                            }
+
+                            .workflow-step.completed {
+                                background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+                                border-color: #28a745;
+                            }
+
+                            .workflow-step.pending {
+                                background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
+                                border-color: #ffc107;
+                            }
+
+                            .step-icon {
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                                color: white;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin: 0 auto 1rem auto;
+                                font-size: 20px;
+                                font-weight: 700;
+                                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                            }
+
+                            .step-icon.completed {
+                                background: linear-gradient(135deg, #28a745, #20c997);
+                            }
+
+                            .step-icon.pending {
+                                background: linear-gradient(135deg, #ffc107, #fd7e14);
+                            }
+
+                            .step-title {
+                                font-weight: 700;
+                                color: var(--primary-color);
+                                font-size: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                margin-bottom: 0.5rem;
+                            }
+
+                            .step-user {
+                                font-size: 11px;
+                                color: #6c757d;
+                                font-weight: 500;
+                                background: rgba(255, 255, 255, 0.7);
+                                padding: 0.25rem 0.75rem;
+                                border-radius: 15px;
+                                display: inline-block;
+                                margin-top: 0.5rem;
+                            }
+
+                            .step-date {
+                                font-size: 9px;
+                                color: #868e96;
+                                margin-top: 0.25rem;
+                            }
+
+                            /* Workflow Connector Lines */
+                            .workflow-connector {
+                                height: 2px;
+                                background: linear-gradient(90deg, var(--primary-color)20, var(--secondary-color)20);
+                                position: relative;
+                                margin: 1rem 0;
+                            }
+
+                            .workflow-connector::after {
+                                content: '';
+                                position: absolute;
+                                top: 50%;
+                                right: -6px;
+                                transform: translateY(-50%);
+                                width: 0;
+                                height: 0;
+                                border-left: 8px solid var(--secondary-color);
+                                border-top: 4px solid transparent;
+                                border-bottom: 4px solid transparent;
+                            }
+
+                            /* Receiver Information */
+                            .receiver-section {
+                                background: rgba(255, 255, 255, 0.6);
+                                backdrop-filter: blur(10px);
+                                border-radius: var(--border-radius);
+                                padding: 1.5rem;
+                                margin-top: 1.5rem;
+                                border: 1px solid rgba(255, 255, 255, 0.3);
+                            }
+
+                            .receiver-title {
+                                font-family: 'Poppins', sans-serif;
+                                color: var(--primary-color);
+                                font-size: 16px;
+                                font-weight: 600;
+                                margin-bottom: 1rem;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .receiver-fields {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 1rem;
+                            }
+
+                            .receiver-field {
+                                position: relative;
+                            }
+
+                            .field-label {
+                                font-weight: 600;
+                                color: #495057;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                margin-bottom: 0.5rem;
+                                display: block;
+                            }
+
+                            .field-line {
+                                height: 2px;
+                                background: linear-gradient(90deg, var(--primary-color), transparent);
+                                border-radius: 1px;
+                                position: relative;
+                                margin-bottom: 0.5rem;
+                            }
+
+                            .field-line::after {
+                                content: '';
+                                position: absolute;
+                                right: 0;
+                                top: -2px;
+                                width: 6px;
+                                height: 6px;
+                                background: var(--primary-color);
+                                border-radius: 50%;
+                            }
+
+                            /* Signature Section */
+                            .signature-section {
+                                background: rgba(255, 255, 255, 0.7);
+                                backdrop-filter: blur(15px);
+                                border-radius: var(--border-radius);
+                                padding: 2rem;
+                                margin-top: 1.5rem;
+                                border: 2px dashed var(--primary-color);
+                                text-align: center;
+                                position: relative;
+                            }
+
+                            .signature-title {
+                                font-family: 'Poppins', sans-serif;
+                                color: var(--primary-color);
+                                font-size: 16px;
+                                font-weight: 600;
+                                margin-bottom: 1rem;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+
+                            .signature-area {
+                                height: 60px;
+                                border-bottom: 2px solid var(--primary-color);
+                                margin: 1.5rem auto;
+                                width: 300px;
+                                position: relative;
+                            }
+
+                            .signature-label {
+                                font-size: 12px;
+                                color: var(--primary-color);
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                margin-top: 0.5rem;
+                            }
+
+                            /* Modern Footer */
+                            .modern-footer {
+                                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                                color: white;
+                                text-align: center;
+                                padding: 1.5rem;
+                                margin-top: 2rem;
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .modern-footer::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: -100%;
+                                width: 100%;
+                                height: 1px;
+                                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+                                animation: shimmer 3s infinite;
+                            }
+
+                            @keyframes shimmer {
+                                0% { left: -100%; }
+                                100% { left: 100%; }
+                            }
+
+                            .footer-content {
+                                position: relative;
+                                z-index: 2;
+                            }
+
+                            .footer-text {
+                                font-size: 11px;
+                                font-weight: 400;
+                                opacity: 0.95;
+                                line-height: 1.4;
+                            }
+
+                            .contact-highlight {
+                                font-weight: 700;
+                                color: var(--osus-gold);
+                                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                            }
+
+                            /* Responsive Design */
+                            @media (max-width: 768px) {
+                                .info-grid {
+                                    grid-template-columns: 1fr;
+                                }
+                                
+                                .workflow-grid.payment-workflow {
+                                    grid-template-columns: 1fr 1fr;
+                                }
+                                
+                                .receiver-fields {
+                                    grid-template-columns: 1fr;
+                                }
+                            }
+
+                            /* Print Optimizations */
+                            @media print {
+                                body {
+                                    background: white !important;
+                                    padding: 0 !important;
+                                    margin: 0 !important;
+                                }
+                                
+                                .modern-voucher-container {
+                                    box-shadow: none !important;
+                                    border: 1px solid #ddd !important;
+                                    border-radius: 0 !important;
+                                    max-width: none !important;
+                                    width: 100% !important;
+                                    margin: 0 !important;
+                                    page-break-inside: avoid !important;
+                                    backdrop-filter: none !important;
+                                }
+
+                                .modern-header, .modern-footer, .glass-card, .info-card, .approval-workflow {
+                                    -webkit-print-color-adjust: exact !important;
+                                    color-adjust: exact !important;
+                                    backdrop-filter: none !important;
+                                }
+
+                                .modern-voucher-container::before {
+                                    display: none !important;
+                                }
+                            }
+
+                            /* A4 Page Setup */
+                            @page {
+                                size: A4;
+                                margin: 8mm;
+                            }
+                        </style>
+
+                        <!-- Modern Voucher Content with Dynamic Placeholders -->
+                        <div class="voucher-container">
+                            <!-- Header -->
+                            <div class="header">
+                                <h1 class="company-title">
+                                    <t t-esc="doc.company_id.name or 'YOUR COMPANY NAME'"/>
+                                </h1>
+                                <h2 class="voucher-number">
+                                    <t t-esc="voucher_title"/> No. <t t-esc="doc.voucher_number or doc.name or 'NV/2025/XXXXX'"/>
+                                </h2>
+                                <p class="subtitle">Verify Payment System</p>
+                            </div>
+
+                            <!-- Brand Section -->
+                            <div class="brand-section">
+                                <div class="logo-container">
+                                    <div class="logo-box">
+                                        <t t-if="doc.company_id.logo">
+                                            <img t-att-src="image_data_uri(doc.company_id.logo)" 
+                                                 style="max-width: 65px; max-height: 65px; border-radius: 8px;" alt="Company Logo"/>
+                                        </t>
+                                        <t t-else="">LOGO</t>
+                                    </div>
+                                    <span class="logo-label">Company Logo</span>
+                                </div>
+                                <div class="qr-container">
+                                    <div class="qr-box">
+                                        <t t-if="doc.qr_code">
+                                            <img t-att-src="image_data_uri(doc.qr_code)" 
+                                                 style="max-width: 65px; max-height: 65px; border-radius: 8px;" alt="QR Code"/>
+                                        </t>
+                                        <t t-else="">QR</t>
+                                    </div>
+                                    <span class="qr-label">Scan to Verify</span>
+                                </div>
+                            </div>
+
+                            <!-- Main Content -->
+                            <div class="content">
+                                <div class="voucher-title">
+                                    <h2><t t-esc="voucher_title"/></h2>
+                                </div>
+
+                                <!-- Information Grid -->
+                                <div class="info-grid">
+                                    <!-- Payment Details -->
+                                    <div class="info-section">
+                                        <div class="info-row">
+                                            <span class="info-label">Payment Method</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.journal_id.name or 'Bank Transfer'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Reference</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.ref or doc.voucher_number or doc.name or 'REF/2025/XXXXX'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label"><t t-esc="partner_label"/></span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.partner_id.name or 'Partner Name'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Phone</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.partner_id.phone or doc.partner_id.mobile or '0563905772'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Date</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.date.strftime('%d %B %Y') if doc.date else '06 August 2025'"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Details -->
+                                    <div class="info-section">
+                                        <div class="info-row">
+                                            <span class="info-label">Issued By</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.company_id.name or 'CONTINENTAL INVESTMENT LMD LLC'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Address</span>
+                                            <span class="info-value">
+                                                <t t-if="doc.company_id.street or doc.company_id.city">
+                                                    <t t-esc="doc.company_id.street or 'Single Business Tower'"/>
+                                                    <t t-if="doc.company_id.street2">
+                                                        <br/><t t-esc="doc.company_id.street2"/>
+                                                    </t>
+                                                    <t t-if="doc.company_id.city">
+                                                        <br/><t t-esc="doc.company_id.city"/>
+                                                        <t t-if="doc.company_id.country_id">
+                                                            , <t t-esc="doc.company_id.country_id.name"/>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <t t-else="">Single Business Tower<br/>29th Floor, Dubai, UAE</t>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">VAT Number</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.company_id.vat or '100236589600003'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Created</span>
+                                            <span class="info-value">
+                                                <t t-esc="doc.create_date.strftime('%d/%m/%Y %H:%M') if doc.create_date else '06/08/2025 15:06'"/>
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Printed</span>
+                                            <span class="info-value">
+                                                <t t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M')"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total Amount Section -->
+                                <div class="total-amount-section">
+                                    <div class="total-amount-container">
+                                        <span class="total-label">Total Amount</span>
+                                        <span class="total-value">
+                                            <t t-esc="doc.currency_id.symbol or 'AED'"/> <t t-esc="'{:,.2f}'.format(doc.amount or 1000.00)"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Authorization Section -->
+                                <div class="authorization-section">
+                                    <h3 class="section-title">Payment Authorization</h3>
+                                    
+                                    <!-- Smart Conditional Workflow for Receipts (2 Steps) -->
+                                    <t t-if="is_receipt">
+                                        <!-- Review & Validation for Receipts -->
+                                        <div class="workflow-section">
+                                            <h4 class="workflow-title">Review &amp; Validation</h4>
+                                            <div class="workflow-grid">
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Initiator</span>
+                                                    <span class="workflow-value">
+                                                        <t t-esc="doc.create_uid.name or 'ADMINISTRATOR'"/>
+                                                    </span>
+                                                </div>
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Validated</span>
+                                                    <span class="workflow-value" t-att-class="'pending-status' if not doc.approver_id else ''">
+                                                        <t t-if="doc.approver_id">
+                                                            <t t-esc="doc.approver_id.name"/>
+                                                        </t>
+                                                        <t t-else="">Pending</t>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <!-- Smart Conditional Workflow for Payments (4 Steps) -->
+                                    <t t-if="is_payment">
+                                        <!-- Review & Validation for Payments -->
+                                        <div class="workflow-section">
+                                            <h4 class="workflow-title">Review &amp; Validation</h4>
+                                            <div class="workflow-grid">
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Initiator</span>
+                                                    <span class="workflow-value">
+                                                        <t t-esc="doc.create_uid.name or 'ADMINISTRATOR'"/>
+                                                    </span>
+                                                </div>
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Validated</span>
+                                                    <span class="workflow-value pending-status">Future Implementation</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="workflow-separator"></div>
+
+                                        <!-- Payment Authorize for Payments -->
+                                        <div class="workflow-section">
+                                            <h4 class="workflow-title">Payment Authorize</h4>
+                                            <div class="workflow-grid">
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Reviewed</span>
+                                                    <span class="workflow-value pending-status">Future Implementation</span>
+                                                </div>
+                                                <div class="workflow-item">
+                                                    <span class="workflow-label">Approved</span>
+                                                    <span class="workflow-value" t-att-class="'pending-status' if not doc.approver_id else ''">
+                                                        <t t-if="doc.approver_id">
+                                                            <t t-esc="doc.approver_id.name"/>
+                                                        </t>
+                                                        <t t-else="">Pending</t>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <div class="workflow-separator"></div>
+
+                                    <!-- Receiver Information -->
+                                    <div class="workflow-section">
+                                        <h4 class="workflow-title">Receiver Information</h4>
+                                        <div class="receiver-info">
+                                            <div class="receiver-field">
+                                                <span class="field-label">Name:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                            <div class="receiver-field">
+                                                <span class="field-label">Mobile:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                            <div class="receiver-field">
+                                                <span class="field-label">Date:</span>
+                                                <div class="field-line"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="workflow-separator"></div>
+
+                                    <!-- Signature Section -->
+                                    <div class="workflow-section">
+                                        <h4 class="workflow-title">Signature</h4>
+                                        <div class="signature-box">
+                                            <div class="signature-line"></div>
+                                            <p class="signature-text">Authorized Signature</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="footer">
+                                <p class="footer-text">
+                                    <t t-if="doc.company_id.voucher_footer_message">
+                                        <t t-esc="doc.company_id.voucher_footer_message"/>
+                                    </t>
+                                    <t t-else="">
+                                        Thank you for your payment. For any inquiries, please contact: 
+                                    </t>
+                                    <span class="contact-info">
+                                        <t t-esc="doc.company_id.phone or '0563905772'"/>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- Smart Report Action Definition -->
+        <record id="action_report_payment_voucher_smart_modern" model="ir.actions.report">
+            <field name="name">Smart Payment/Receipt Voucher</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">payment_account_enhanced.report_payment_voucher_smart_modern</field>
+            <field name="report_file">payment_account_enhanced.report_payment_voucher_smart_modern</field>
+            <field name="print_report_name">
+                ('Receipt Voucher - %s' if object.payment_type == 'inbound' else 'Payment Voucher - %s') % (object.voucher_number or object.name)
+            </field>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+        </record>
+    </data>
+</odoo>
 
                             /* Logo and QR Section */
                             .brand-section {
