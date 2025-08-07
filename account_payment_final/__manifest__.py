@@ -44,7 +44,7 @@
         'security/ir.model.access.csv',
         
         # Data
-        'data/sequences.xml',
+        'data/payment_sequences.xml',
         'data/email_templates.xml',
         
         # Views
@@ -52,22 +52,12 @@
         'views/res_company_views.xml',
         
         # Reports
-        'reports/payment_voucher_actions.xml',
-        'reports/payment_voucher_report.xml',
-        'reports/payment_voucher_template.xml',
+        'reports/payment_voucher_reports.xml',
+        'reports/payment_voucher_templates.xml',
         
         # Website (for QR verification)
         'views/payment_verification_templates.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'payment_account_enhanced/static/src/css/payment_voucher.css',
-            'payment_account_enhanced/static/src/js/payment_voucher.js',
-        ],
-        'web.assets_frontend': [
-            'payment_account_enhanced/static/src/css/payment_verification.css',
-        ],
-    },
     'external_dependencies': {
         'python': ['qrcode', 'pillow'],
     },
