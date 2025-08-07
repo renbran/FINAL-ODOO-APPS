@@ -18,40 +18,40 @@
                             string="Change Status" 
                             type="object" 
                             class="btn-primary"
-                            attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                            invisible="state in ['sale', 'done', 'cancel']"/>
                     
                     <button name="action_submit_for_review" 
                             string="Submit for Review" 
                             type="object" 
                             class="btn-info"
-                            attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'commission_progress'), ('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                            invisible="custom_status_id.code != 'commission_progress' or state in ['sale', 'done', 'cancel']"/>
                     
                     <button name="action_approve_order" 
                             string="✓ Approve Order" 
                             type="object" 
                             class="btn-success"
-                            attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'final_review'), ('state', 'in', ['sale', 'done', 'cancel'])]}"
+                            invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
                             confirm="Are you sure you want to approve this order? This action cannot be undone."/>
                     
                     <button name="action_reject_order" 
                             string="✗ Reject Order" 
                             type="object" 
                             class="btn-danger"
-                            attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'final_review'), ('state', 'in', ['sale', 'done', 'cancel'])]}"
+                            invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
                             confirm="Are you sure you want to reject this order? It will be returned to draft status."/>
                     
                     <button name="action_return_to_previous" 
                             string="Return to Previous Stage" 
                             type="object" 
                             class="btn-warning"
-                            attrs="{'invisible': ['|', ('custom_status_id.code', 'in', ['draft', 'approved']), ('state', 'in', ['sale', 'done', 'cancel'])]}"
+                            invisible="custom_status_id.code in ['draft', 'approved'] or state in ['sale', 'done', 'cancel']"
                             confirm="Return this order to the previous stage?"/>
                     
                     <button name="action_request_documentation" 
                             string="Start Documentation" 
                             type="object" 
                             class="btn-secondary"
-                            attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'draft'), ('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                            invisible="custom_status_id.code != 'draft' or state in ['sale', 'done', 'cancel']"/>
                 </xpath>
                 
                 <!-- Add Status Assignment Tab -->
@@ -61,11 +61,11 @@
                             <div class="col-md-6">
                                 <group string="Stage Assignments">
                                     <field name="documentation_user_id" 
-                                           attrs="{'required': [('custom_status_id.code', 'in', ['documentation_progress'])]}"/>
+                                           required="custom_status_id.code in ['documentation_progress']"/>
                                     <field name="commission_user_id"
-                                           attrs="{'required': [('custom_status_id.code', 'in', ['commission_progress'])]}"/>
+                                           required="custom_status_id.code in ['commission_progress']"/>
                                     <field name="final_review_user_id"
-                                           attrs="{'required': [('custom_status_id.code', 'in', ['final_review'])]}"/>
+                                           required="custom_status_id.code in ['final_review']"/>
                                 </group>
                             </div>
                             <div class="col-md-6">
@@ -73,25 +73,25 @@
                                     <field name="custom_status_id" readonly="1"/>
                                     <field name="custom_status_id" string="Status Code" readonly="1" invisible="1"/>
                                 </group>
-                                <group string="Quick Actions" attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}">
+                                <group string="Quick Actions" invisible="state in ['sale', 'done', 'cancel']">
                                     <div class="d-flex flex-column gap-2">
                                         <button name="action_request_documentation" 
                                                 string="Start Documentation Process" 
                                                 type="object" 
                                                 class="btn btn-info btn-sm"
-                                                attrs="{'invisible': [('custom_status_id.code', '!=', 'draft')]}"/>
+                                                invisible="custom_status_id.code != 'draft'"/>
                                         
                                         <button name="action_submit_for_review" 
                                                 string="Submit for Final Review" 
                                                 type="object" 
                                                 class="btn btn-warning btn-sm"
-                                                attrs="{'invisible': [('custom_status_id.code', '!=', 'commission_progress')]}"/>
+                                                invisible="custom_status_id.code != 'commission_progress'"/>
                                         
                                         <button name="action_return_to_previous" 
                                                 string="Return to Previous Stage" 
                                                 type="object" 
                                                 class="btn btn-secondary btn-sm"
-                                                attrs="{'invisible': [('custom_status_id.code', 'in', ['draft', 'approved'])]}"/>
+                                                invisible="custom_status_id.code in ['draft', 'approved']"/>
                                     </div>
                                 </group>
                             </div>
@@ -142,16 +142,19 @@
                         
                         <!-- Dynamic Assignment Section -->
                         <group string="User Assignments" 
-                               attrs="{'invisible': [('requires_documentation_user', '=', False), ('requires_commission_user', '=', False), ('requires_review_user', '=', False)]}">
+                               invisible="requires_documentation_user == False and requires_commission_user == False and requires_review_user == False">>
                             <group>
                                 <field name="documentation_user_id" 
-                                       attrs="{'invisible': [('requires_documentation_user', '=', False)], 'required': [('requires_documentation_user', '=', True)]}"
+                                       invisible="requires_documentation_user == False" 
+                                       required="requires_documentation_user == True"
                                        string="Assign Documentation User"/>
                                 <field name="commission_user_id" 
-                                       attrs="{'invisible': [('requires_commission_user', '=', False)], 'required': [('requires_commission_user', '=', True)]}"
+                                       invisible="requires_commission_user == False" 
+                                       required="requires_commission_user == True"
                                        string="Assign Commission User"/>
                                 <field name="final_review_user_id" 
-                                       attrs="{'invisible': [('requires_review_user', '=', False)], 'required': [('requires_review_user', '=', True)]}"
+                                       invisible="requires_review_user == False" 
+                                       required="requires_review_user == True"
                                        string="Assign Review User"/>
                             </group>
                         </group>
@@ -161,16 +164,16 @@
                         </group>
                         
                         <!-- Quick Status Info -->
-                        <div class="alert alert-info" role="alert" attrs="{'invisible': [('new_status_id', '=', False)]}">
+                        <div class="alert alert-info" role="alert" invisible="new_status_id == False">>
                             <strong>Status Info:</strong>
                             <ul class="mb-0">
-                                <li attrs="{'invisible': [('requires_documentation_user', '=', False)]}">
+                                <li invisible="requires_documentation_user == False">>
                                     This status requires documentation preparation
                                 </li>
-                                <li attrs="{'invisible': [('requires_commission_user', '=', False)]}">
+                                <li invisible="requires_commission_user == False">>
                                     This status requires commission calculations
                                 </li>
-                                <li attrs="{'invisible': [('requires_review_user', '=', False)]}">
+                                <li invisible="requires_review_user == False">>
                                     This status requires final review and approval
                                 </li>
                             </ul>
