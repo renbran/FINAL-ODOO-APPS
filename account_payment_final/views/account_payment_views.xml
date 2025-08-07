@@ -45,7 +45,7 @@
                                 invisible="approval_state != 'approved' or state != 'draft'"/>
                         
                         <!-- Print Actions -->
-                        <button name="action_print_voucher" 
+                        <button name="action_print_osus_voucher" 
                                 string="Print Voucher" 
                                 type="object" 
                                 class="btn-primary"
@@ -61,7 +61,7 @@
                                 confirm="Are you sure you want to cancel this payment?"
                                 invisible="state != 'draft' or approval_state in ['cancelled']"/>
                         
-                        <button name="action_reset_to_draft" 
+                        <button name="action_draft" 
                                 string="Reset to Draft" 
                                 type="object" 
                                 class="btn-warning"
