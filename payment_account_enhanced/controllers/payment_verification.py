@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from odoo import http, fields
+from odoo import http
 from odoo.http import request
-import json
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -10,96 +7,65 @@ _logger = logging.getLogger(__name__)
 
 class PaymentVerificationController(http.Controller):
     
-    @http.route('/payment/verify/<int:payment_id>', type='http', auth='public', methods=['GET'], website=True)
-    def verify_payment(self, payment_id, **kwargs):
-        """Public endpoint to verify payment details via QR code scan"""
+    @http.route('/payment/verify/<int:payment_id>', type='http', auth='public', website=True)
+    def verify_payment(self, payment_id):
+        """Verify payment via QR code scan"""
         try:
-            # Search for the payment record
             payment = request.env['account.payment'].sudo().browse(payment_id)
             
             if not payment.exists():
-                return request.render('payment_account_enhanced.payment_verification_error', {
-                    'error_title': 'Payment Not Found',
-                    'error_message': f'No payment found with ID: {payment_id}',
-                    'error_code': 'PAYMENT_NOT_FOUND'
-                })
+                return self._render_error(
+                    'Payment Not Found',
+                    'The payment voucher you are trying to verify does not exist.',
+                    'PAYMENT_NOT_FOUND'
+                )
             
             # Prepare verification data
             verification_data = {
-                'payment': payment,
-                'voucher_number': payment.voucher_number,
-                'payment_reference': payment.name,
-                'amount': payment.amount,
-                'currency': payment.currency_id.name,
-                'partner_name': payment.partner_id.name if payment.partner_id else 'N/A',
-                'payment_date': payment.date,
-                'state': payment.state,
-                'state_display': dict(payment._fields['state'].selection).get(payment.state),
-                'payment_type': payment.payment_type,
-                'payment_type_display': dict(payment._fields['payment_type'].selection).get(payment.payment_type),
+                'voucher_number': payment.voucher_number or payment.name,
+                'payment_reference': payment.ref or 'N/A',
+                'amount': f"{payment.amount:,.2f}",
+                'currency': payment.currency_id.name or 'USD',
+                'partner_name': payment.partner_id.name or 'N/A',
+                'payment_date': payment.date.strftime('%d %B %Y') if payment.date else 'N/A',
+                'state': payment.approval_state,
+                'payment_type_display': 'Receipt' if payment.payment_type == 'inbound' else 'Payment',
+                'journal_name': payment.journal_id.name or 'N/A',
                 'company_name': payment.company_id.name,
-                'journal_name': payment.journal_id.name if payment.journal_id else 'N/A',
-                'is_verified': payment.state == 'posted',
-                'verification_timestamp': fields.Datetime.now(),
+                'is_verified': payment.approval_state == 'posted',
+                'verification_timestamp': request.env.context.get('tz_offset', 'UTC'),
             }
             
-            # Log the verification attempt
-            _logger.info(f"Payment verification accessed for payment ID: {payment_id} by IP: {request.httprequest.remote_addr}")
-            
-            return request.render('payment_account_enhanced.payment_verification_success', verification_data)
+            return request.render('osus_payment_voucher.payment_verification_success', verification_data)
             
         except Exception as e:
-            _logger.error(f"Error during payment verification for ID {payment_id}: {str(e)}")
-            return request.render('payment_account_enhanced.payment_verification_error', {
-                'error_title': 'Verification Error',
-                'error_message': 'An error occurred while verifying the payment. Please try again.',
-                'error_code': 'VERIFICATION_ERROR'
-            })
+            _logger.error(f"Error verifying payment {payment_id}: {e}")
+            return self._render_error(
+                'Verification Error',
+                'An error occurred while verifying the payment. Please try again or contact support.',
+                'VERIFICATION_ERROR'
+            )
     
-    @http.route('/payment/verify/api/<int:payment_id>', type='json', auth='public', methods=['POST'])
-    def verify_payment_api(self, payment_id, **kwargs):
-        """JSON API endpoint for mobile apps or systems integration"""
+    @http.route('/payment/qr-guide', type='http', auth='public', website=True)
+    def qr_verification_guide(self):
+        """Display QR code verification guide"""
         try:
-            payment = request.env['account.payment'].sudo().browse(payment_id)
-            
-            if not payment.exists():
-                return {
-                    'success': False,
-                    'error': 'PAYMENT_NOT_FOUND',
-                    'message': f'No payment found with ID: {payment_id}'
-                }
-            
-            return {
-                'success': True,
-                'payment_data': {
-                    'voucher_number': payment.voucher_number,
-                    'reference': payment.name,
-                    'amount': payment.amount,
-                    'currency': payment.currency_id.name,
-                    'partner': payment.partner_id.name if payment.partner_id else None,
-                    'date': payment.date.isoformat() if payment.date else None,
-                    'state': payment.state,
-                    'state_display': dict(payment._fields['state'].selection).get(payment.state),
-                    'payment_type': payment.payment_type,
-                    'company': payment.company_id.name,
-                    'journal': payment.journal_id.name if payment.journal_id else None,
-                    'is_verified': payment.state == 'posted',
-                    'verified_at': fields.Datetime.now().isoformat(),
-                }
-            }
-            
+            company = request.env.company
+            return request.render('osus_payment_voucher.qr_verification_guide', {
+                'company_name': company.name,
+            })
         except Exception as e:
-            _logger.error(f"API verification error for payment ID {payment_id}: {str(e)}")
-            return {
-                'success': False,
-                'error': 'VERIFICATION_ERROR',
-                'message': 'An error occurred during verification'
-            }
+            _logger.error(f"Error loading QR guide: {e}")
+            return self._render_error(
+                'Page Not Available',
+                'The QR verification guide is temporarily unavailable.',
+                'GUIDE_ERROR'
+            )
     
-    @http.route('/payment/qr-guide', type='http', auth='public', methods=['GET'], website=True)
-    def qr_verification_guide(self, **kwargs):
-        """Public page explaining how to use QR code verification"""
-        return request.render('payment_account_enhanced.qr_verification_guide', {
-            'page_title': 'Payment QR Code Verification Guide',
-            'company_name': request.env.company.name,
-        })
+    def _render_error(self, title, message, error_code):
+        """Render error page"""
+        return request.render('osus_payment_voucher.payment_verification_error', {
+            'error_title': title,
+            'error_message': message,
+            'error_code': error_code,
+        })  

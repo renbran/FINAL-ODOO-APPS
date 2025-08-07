@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Smart Payment/Receipt Voucher Template -->
-        <template id="report_payment_voucher_smart_modern">
+        <!-- OSUS Payment Voucher Template -->
+        <template id="report_payment_voucher_osus">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="doc">
-                    <!-- Smart Variables for Dynamic Content -->
                     <t t-set="is_receipt" t-value="doc.payment_type == 'inbound'"/>
-                    <t t-set="is_payment" t-value="doc.payment_type == 'outbound'"/>
                     <t t-set="voucher_title" t-value="'RECEIPT VOUCHER' if is_receipt else 'PAYMENT VOUCHER'"/>
                     <t t-set="partner_label" t-value="'Customer' if is_receipt else 'Vendor'"/>
                     
-                    <div class="article o_report_layout_standard" style="page-break-inside: avoid;">
-                        <!-- Identical CSS Styling from HTML Template -->
+                    <div class="article o_report_layout_standard">
                         <style type="text/css">
                             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap');
                             
@@ -29,6 +26,7 @@
                                 color: #212529;
                                 margin: 0;
                                 padding: 0;
+                                font-size: 11px;
                             }
 
                             .voucher-container {
@@ -41,7 +39,6 @@
                                 overflow: hidden;
                                 position: relative;
                                 margin: 0 auto;
-                                font-size: 11px;
                             }
 
                             .voucher-container::before {
@@ -54,7 +51,6 @@
                                 background: linear-gradient(90deg, #800020 0%, #b8002e 25%, #ffd700 50%, #b8002e 75%, #800020 100%);
                             }
 
-                            /* Header Section */
                             .header {
                                 background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
                                 color: white;
@@ -64,35 +60,11 @@
                                 overflow: hidden;
                             }
 
-                            .header::before {
-                                content: '';
-                                position: absolute;
-                                top: -50%;
-                                left: -50%;
-                                width: 200%;
-                                height: 200%;
-                                background: repeating-linear-gradient(
-                                    45deg,
-                                    transparent,
-                                    transparent 10px,
-                                    rgba(255, 255, 255, 0.03) 10px,
-                                    rgba(255, 255, 255, 0.03) 20px
-                                );
-                                animation: subtle-move 30s linear infinite;
-                            }
-
-                            @keyframes subtle-move {
-                                0% { transform: translate(-50px, -50px); }
-                                100% { transform: translate(50px, 50px); }
-                            }
-
                             .company-title {
                                 font-size: 28px;
                                 font-weight: 800;
                                 letter-spacing: 2px;
                                 margin-bottom: 6px;
-                                position: relative;
-                                z-index: 2;
                                 text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
                             }
 
@@ -102,8 +74,6 @@
                                 color: #ffd700;
                                 margin: 8px 0;
                                 letter-spacing: 0.5px;
-                                position: relative;
-                                z-index: 2;
                                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                             }
 
@@ -112,12 +82,9 @@
                                 font-weight: 400;
                                 opacity: 0.95;
                                 letter-spacing: 1px;
-                                position: relative;
-                                z-index: 2;
                                 text-transform: uppercase;
                             }
 
-                            /* Brand Section */
                             .brand-section {
                                 display: flex;
                                 justify-content: space-between;
@@ -146,9 +113,6 @@
                                 font-weight: 700;
                                 font-size: 12px;
                                 box-shadow: 0 10px 20px rgba(128, 0, 32, 0.2);
-                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                position: relative;
-                                overflow: hidden;
                             }
 
                             .logo-label, .qr-label {
@@ -159,7 +123,6 @@
                                 letter-spacing: 1px;
                             }
 
-                            /* Main Content */
                             .content {
                                 padding: 30px;
                             }
@@ -191,7 +154,6 @@
                                 border-radius: 2px;
                             }
 
-                            /* Information Grid */
                             .info-grid {
                                 display: grid;
                                 grid-template-columns: 1fr 1fr;
@@ -205,12 +167,6 @@
                                 padding: 20px;
                                 border-left: 5px solid #800020;
                                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-                                transition: all 0.3s ease;
-                            }
-
-                            .info-section:hover {
-                                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-                                transform: translateY(-2px);
                             }
 
                             .info-row {
@@ -247,7 +203,6 @@
                                 line-height: 1.4;
                             }
 
-                            /* Total Amount Section */
                             .total-amount-section {
                                 background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
                                 border-radius: 16px;
@@ -256,23 +211,6 @@
                                 box-shadow: 0 12px 30px rgba(128, 0, 32, 0.3);
                                 position: relative;
                                 overflow: hidden;
-                            }
-
-                            .total-amount-section::before {
-                                content: '';
-                                position: absolute;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
-                                background: repeating-linear-gradient(
-                                    45deg,
-                                    transparent,
-                                    transparent 10px,
-                                    rgba(255, 215, 0, 0.03) 10px,
-                                    rgba(255, 215, 0, 0.03) 20px
-                                );
-                                pointer-events: none;
                             }
 
                             .total-amount-container {
@@ -300,7 +238,6 @@
                                 letter-spacing: 1px;
                             }
 
-                            /* Authorization Section */
                             .authorization-section {
                                 background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
                                 border: 2px solid #e9ecef;
@@ -399,6 +336,11 @@
                                 font-weight: 600;
                             }
 
+                            .approved-status {
+                                color: #28a745;
+                                font-weight: 600;
+                            }
+
                             .workflow-separator {
                                 height: 2px;
                                 background: linear-gradient(90deg, transparent 0%, #800020 20%, #ffd700 50%, #800020 80%, transparent 100%);
@@ -420,63 +362,35 @@
                                 box-shadow: 0 0 0 5px white;
                             }
 
-                            /* Receiver Information */
-                            .receiver-info {
-                                display: flex;
-                                flex-direction: column;
-                                gap: 12px;
+                            .signature-section {
+                                background: white;
+                                border-radius: 10px;
+                                padding: 20px;
+                                margin-top: 15px;
+                                border-left: 4px solid #800020;
+                                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
                             }
 
-                            .receiver-field {
-                                display: flex;
-                                align-items: center;
-                                gap: 12px;
+                            .signature-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 30px;
+                                margin-top: 20px;
                             }
 
-                            .field-label {
-                                font-weight: 600;
-                                color: #495057;
-                                font-size: 10px;
-                                min-width: 60px;
-                                text-transform: uppercase;
-                                letter-spacing: 0.5px;
-                            }
-
-                            .field-line {
-                                flex: 1;
-                                height: 1px;
-                                background: linear-gradient(90deg, #800020, transparent);
-                                position: relative;
-                            }
-
-                            .field-line::after {
-                                content: '';
-                                position: absolute;
-                                right: 0;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                width: 6px;
-                                height: 6px;
-                                background: #800020;
-                                border-radius: 50%;
-                            }
-
-                            /* Signature Section */
                             .signature-box {
                                 text-align: center;
-                                padding: 20px;
+                                padding: 15px;
                                 background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
                                 border: 2px dashed #800020;
                                 border-radius: 8px;
-                                margin-top: 12px;
                             }
 
                             .signature-line {
                                 width: 100%;
-                                height: 40px;
+                                height: 50px;
                                 border-bottom: 2px solid #800020;
                                 margin-bottom: 10px;
-                                position: relative;
                             }
 
                             .signature-text {
@@ -487,7 +401,6 @@
                                 letter-spacing: 1px;
                             }
 
-                            /* Footer */
                             .footer {
                                 background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
                                 color: white;
@@ -522,35 +435,6 @@
                                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                             }
 
-                            /* Responsive Design */
-                            @media (max-width: 768px) {
-                                .info-grid {
-                                    grid-template-columns: 1fr;
-                                    gap: 15px;
-                                }
-                                
-                                .workflow-grid {
-                                    grid-template-columns: 1fr;
-                                    gap: 10px;
-                                }
-                                
-                                .brand-section {
-                                    flex-direction: column;
-                                    gap: 15px;
-                                }
-                                
-                                .info-row {
-                                    flex-direction: column;
-                                    align-items: flex-start;
-                                    gap: 4px;
-                                }
-                                
-                                .info-value {
-                                    text-align: left;
-                                }
-                            }
-
-                            /* Print Optimizations */
                             @media print {
                                 body {
                                     background: white !important;
@@ -582,24 +466,22 @@
                                 }
                             }
 
-                            /* A4 Page Setup */
                             @page {
                                 size: A4;
                                 margin: 8mm;
                             }
                         </style>
 
-                        <!-- Modern Voucher Content with Dynamic Placeholders -->
                         <div class="voucher-container">
                             <!-- Header -->
                             <div class="header">
                                 <h1 class="company-title">
-                                    <t t-esc="doc.company_id.name or 'YOUR COMPANY NAME'"/>
+                                    <t t-esc="doc.company_id.name or 'OSUS PROPERTIES'"/>
                                 </h1>
                                 <h2 class="voucher-number">
-                                    <t t-esc="voucher_title"/> No. <t t-esc="doc.voucher_number or doc.name or 'NV/2025/XXXXX'"/>
+                                    <t t-esc="voucher_title"/> No. <t t-esc="doc.voucher_number or doc.name or 'DRAFT'"/>
                                 </h2>
-                                <p class="subtitle">Verify Payment System</p>
+                                <p class="subtitle">Luxury Real Estate Excellence</p>
                             </div>
 
                             <!-- Brand Section -->
@@ -645,7 +527,7 @@
                                         <div class="info-row">
                                             <span class="info-label">Reference</span>
                                             <span class="info-value">
-                                                <t t-esc="doc.ref or doc.voucher_number or doc.name or 'REF/2025/XXXXX'"/>
+                                                <t t-esc="doc.ref or doc.voucher_number or doc.name or 'N/A'"/>
                                             </span>
                                         </div>
                                         <div class="info-row">
@@ -657,13 +539,13 @@
                                         <div class="info-row">
                                             <span class="info-label">Phone</span>
                                             <span class="info-value">
-                                                <t t-esc="doc.partner_id.phone or doc.partner_id.mobile or '0563905772'"/>
+                                                <t t-esc="doc.partner_id.phone or doc.partner_id.mobile or 'N/A'"/>
                                             </span>
                                         </div>
                                         <div class="info-row">
                                             <span class="info-label">Date</span>
                                             <span class="info-value">
-                                                <t t-esc="doc.date.strftime('%d %B %Y') if doc.date else '06 August 2025'"/>
+                                                <t t-esc="doc.date.strftime('%d %B %Y') if doc.date else 'N/A'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -673,14 +555,14 @@
                                         <div class="info-row">
                                             <span class="info-label">Issued By</span>
                                             <span class="info-value">
-                                                <t t-esc="doc.company_id.name or 'CONTINENTAL INVESTMENT LMD LLC'"/>
+                                                <t t-esc="doc.company_id.name or 'OSUS Properties'"/>
                                             </span>
                                         </div>
                                         <div class="info-row">
                                             <span class="info-label">Address</span>
                                             <span class="info-value">
                                                 <t t-if="doc.company_id.street or doc.company_id.city">
-                                                    <t t-esc="doc.company_id.street or 'Single Business Tower'"/>
+                                                    <t t-esc="doc.company_id.street or 'Dubai, UAE'"/>
                                                     <t t-if="doc.company_id.street2">
                                                         <br/><t t-esc="doc.company_id.street2"/>
                                                     </t>
@@ -691,19 +573,20 @@
                                                         </t>
                                                     </t>
                                                 </t>
-                                                <t t-else="">Single Business Tower<br/>29th Floor, Dubai, UAE</t>
+                                                <t t-else="">Dubai, UAE</t>
                                             </span>
                                         </div>
                                         <div class="info-row">
                                             <span class="info-label">VAT Number</span>
                                             <span class="info-value">
-                                                <t t-esc="doc.company_id.vat or '100236589600003'"/>
+                                                <t t-esc="doc.company_id.vat or 'N/A'"/>
                                             </span>
                                         </div>
                                         <div class="info-row">
-                                            <span class="info-label">Created</span>
-                                            <span class="info-value">
-                                                <t t-esc="doc.create_date.strftime('%d/%m/%Y %H:%M') if doc.create_date else '06/08/2025 15:06'"/>
+                                            <span class="info-label">Status</span>
+                                            <span class="info-value" 
+                                                  t-att-class="'approved-status' if doc.approval_state == 'posted' else 'pending-status'">
+                                                <t t-esc="dict(doc._fields['approval_state'].selection)[doc.approval_state]"/>
                                             </span>
                                         </div>
                                         <div class="info-row">
@@ -720,99 +603,55 @@
                                     <div class="total-amount-container">
                                         <span class="total-label">Total Amount</span>
                                         <span class="total-value">
-                                            <t t-esc="doc.currency_id.symbol or 'AED'"/> <t t-esc="'{:,.2f}'.format(doc.amount or 1000.00)"/>
+                                            <t t-esc="doc.currency_id.symbol or 'AED'"/> <t t-esc="'{:,.2f}'.format(doc.amount or 0.00)"/>
                                         </span>
                                     </div>
                                 </div>
 
-                                <!-- Payment Authorization Section -->
+                                <!-- Remarks Section -->
+                                <t t-if="doc.remarks">
+                                    <div class="info-section" style="margin: 20px 0;">
+                                        <div class="info-row">
+                                            <span class="info-label">Remarks</span>
+                                            <span class="info-value" style="text-align: left;">
+                                                <t t-esc="doc.remarks"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </t>
+
+                                <!-- Authorization Section -->
                                 <div class="authorization-section">
                                     <h3 class="section-title">Payment Authorization</h3>
                                     
-                                    <!-- Smart Conditional Workflow for Receipts (2 Steps) -->
-                                    <t t-if="is_receipt">
-                                        <!-- Review & Validation for Receipts -->
-                                        <div class="workflow-section">
-                                            <h4 class="workflow-title">Review &amp; Validation</h4>
-                                            <div class="workflow-grid">
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Initiator</span>
-                                                    <span class="workflow-value">
-                                                        <t t-esc="doc.create_uid.name or 'ADMINISTRATOR'"/>
-                                                    </span>
-                                                </div>
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Validated</span>
-                                                    <span class="workflow-value" t-att-class="'pending-status' if not doc.approver_id else ''">
-                                                        <t t-if="doc.approver_id">
-                                                            <t t-esc="doc.approver_id.name"/>
-                                                        </t>
-                                                        <t t-else="">Pending</t>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-
-                                    <!-- Smart Conditional Workflow for Payments (4 Steps) -->
-                                    <t t-if="is_payment">
-                                        <!-- Review & Validation for Payments -->
-                                        <div class="workflow-section">
-                                            <h4 class="workflow-title">Review &amp; Validation</h4>
-                                            <div class="workflow-grid">
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Initiator</span>
-                                                    <span class="workflow-value">
-                                                        <t t-esc="doc.create_uid.name or 'ADMINISTRATOR'"/>
-                                                    </span>
-                                                </div>
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Validated</span>
-                                                    <span class="workflow-value pending-status">Future Implementation</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="workflow-separator"></div>
-
-                                        <!-- Payment Authorize for Payments -->
-                                        <div class="workflow-section">
-                                            <h4 class="workflow-title">Payment Authorize</h4>
-                                            <div class="workflow-grid">
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Reviewed</span>
-                                                    <span class="workflow-value pending-status">Future Implementation</span>
-                                                </div>
-                                                <div class="workflow-item">
-                                                    <span class="workflow-label">Approved</span>
-                                                    <span class="workflow-value" t-att-class="'pending-status' if not doc.approver_id else ''">
-                                                        <t t-if="doc.approver_id">
-                                                            <t t-esc="doc.approver_id.name"/>
-                                                        </t>
-                                                        <t t-else="">Pending</t>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-
-                                    <div class="workflow-separator"></div>
-
-                                    <!-- Receiver Information -->
+                                    <!-- Workflow Details -->
                                     <div class="workflow-section">
-                                        <h4 class="workflow-title">Receiver Information</h4>
-                                        <div class="receiver-info">
-                                            <div class="receiver-field">
-                                                <span class="field-label">Name:</span>
-                                                <div class="field-line"></div>
+                                        <h4 class="workflow-title">Workflow Status</h4>
+                                        <div class="workflow-grid">
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Submitted By</span>
+                                                <span class="workflow-value">
+                                                    <t t-esc="doc.submitted_by.name or doc.create_uid.name or 'System'"/>
+                                                </span>
                                             </div>
-                                            <div class="receiver-field">
-                                                <span class="field-label">Mobile:</span>
-                                                <div class="field-line"></div>
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Submission Date</span>
+                                                <span class="workflow-value">
+                                                    <t t-esc="doc.submitted_date.strftime('%d/%m/%Y %H:%M') if doc.submitted_date else 'N/A'"/>
+                                                </span>
                                             </div>
-                                            <div class="receiver-field">
-                                                <span class="field-label">Date:</span>
-                                                <div class="field-line"></div>
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Approved By</span>
+                                                <span class="workflow-value" 
+                                                      t-att-class="'approved-status' if doc.approved_by else 'pending-status'">
+                                                    <t t-esc="doc.approved_by.name if doc.approved_by else 'Pending'"/>
+                                                </span>
+                                            </div>
+                                            <div class="workflow-item">
+                                                <span class="workflow-label">Approval Date</span>
+                                                <span class="workflow-value">
+                                                    <t t-esc="doc.approved_date.strftime('%d/%m/%Y %H:%M') if doc.approved_date else 'N/A'"/>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -820,11 +659,17 @@
                                     <div class="workflow-separator"></div>
 
                                     <!-- Signature Section -->
-                                    <div class="workflow-section">
-                                        <h4 class="workflow-title">Signature</h4>
-                                        <div class="signature-box">
-                                            <div class="signature-line"></div>
-                                            <p class="signature-text">Authorized Signature</p>
+                                    <div class="signature-section">
+                                        <h4 class="workflow-title">Authorization Signatures</h4>
+                                        <div class="signature-grid">
+                                            <div class="signature-box">
+                                                <div class="signature-line"></div>
+                                                <p class="signature-text">Prepared By</p>
+                                            </div>
+                                            <div class="signature-box">
+                                                <div class="signature-line"></div>
+                                                <p class="signature-text">Authorized By</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -837,10 +682,10 @@
                                         <t t-esc="doc.company_id.voucher_footer_message"/>
                                     </t>
                                     <t t-else="">
-                                        Thank you for your payment. For any inquiries, please contact: 
+                                        Thank you for your business with OSUS Properties. For inquiries, contact: 
                                     </t>
                                     <span class="contact-info">
-                                        <t t-esc="doc.company_id.phone or '0563905772'"/>
+                                        <t t-esc="doc.company_id.phone or '+971 4 123 4567'"/>
                                     </span>
                                 </p>
                             </div>
@@ -849,20 +694,5 @@
                 </t>
             </t>
         </template>
-
-        <!-- Smart Report Action Definition -->
-        <record id="action_report_payment_voucher_smart_modern" model="ir.actions.report">
-            <field name="name">Smart Payment/Receipt Voucher</field>
-            <field name="model">account.payment</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">payment_account_enhanced.report_payment_voucher_smart_modern</field>
-            <field name="report_file">payment_account_enhanced.report_payment_voucher_smart_modern</field>
-            <field name="print_report_name">
-                ('Receipt Voucher - %s' if object.payment_type == 'inbound' else 'Payment Voucher - %s') % (object.voucher_number or object.name)
-            </field>
-            <field name="binding_model_id" ref="account.model_account_payment"/>
-            <field name="binding_type">report</field>
-            <field name="paperformat_id" ref="base.paperformat_euro"/>
-        </record>
     </data>
 </odoo>
