@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Backend Assets for Enhanced Payment Workflow -->
-        <template id="assets_backend" inherit_id="web.assets_backend">
-            <!-- CSS for Payment Voucher Enhancements -->
-            <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher.scss"/>
-            
-            <!-- JavaScript ES6 Module for Enhanced Workflow -->
-            <script type="module" src="/payment_account_enhanced/static/src/js/payment_voucher_form.js"/>
-        </template>
+        <!-- Note: Assets are now managed via __manifest__.py assets section in Odoo 17 -->
+        <!-- This file remains for compatibility but assets are loaded via manifest -->
     </data>
 </odoo>
