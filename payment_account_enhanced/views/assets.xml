@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" inherit_id="web.assets_backend">
+        <link rel="stylesheet" type="text/scss" href="/payment_account_enhanced/static/src/scss/payment_voucher.scss"/>
+        <script type="text/javascript" src="/payment_account_enhanced/static/src/js/payment_voucher_form.js"/>
+    </template>
+</odoo>
