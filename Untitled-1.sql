@@ -1,0 +1,1 @@
+sudo -u odoo /var/odoo/testerp/src/odoo-bin -d testerp -u web --stop-after-init
