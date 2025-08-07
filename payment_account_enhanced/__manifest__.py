@@ -17,9 +17,17 @@
         ✓ Print-optimized layouts with company branding
         ✓ Comprehensive audit trail and logging
         
+        Design Standards:
+        ✓ Follows Odoo 17 development best practices
+        ✓ Modern UI/UX with responsive design
+        ✓ Professional color scheme (Burgundy & Gold)
+        ✓ Accessibility compliant interfaces
+        ✓ Production-ready code structure
+        
         This module transforms standard Odoo payment vouchers into 
         premium, branded documents that reflect OSUS Properties' 
-        luxury real estate excellence.
+        luxury real estate excellence while maintaining full 
+        compatibility with Odoo 17 standards.
     ''',
     'author': 'OSUS Properties Development Team',
     'website': 'https://www.osusproperties.com',
@@ -53,6 +61,10 @@
     'external_dependencies': {
         'python': ['qrcode', 'pillow'],
     },
+    'images': [
+        'static/description/icon.png',
+        'static/description/banner.png',
+    ],
     'installable': True,
     'auto_install': False,
     'application': False,

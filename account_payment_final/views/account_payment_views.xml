@@ -1,64 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        
-        <!-- Enhanced Payment Form View with Simplified Workflow -->
-        <record id="view_account_payment_form_osus_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.form.osus.enhanced</field>
+        <!-- Enhanced Payment Form View -->
+        <record id="view_account_payment_form_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.form.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 
-                <!-- Replace Status Bar with Simplified Workflow -->
+                <!-- Replace header with enhanced workflow -->
                 <xpath expr="//header" position="replace">
                     <header>
-                        <!-- Simplified Status Bar for 2-State Workflow -->
+                        <!-- Approval State Status Bar -->
                         <field name="approval_state" widget="statusbar" 
-                               statusbar_visible="draft,waiting_approval,approved,posted" 
-                               statusbar_colors='{"draft":"blue","waiting_approval":"orange","approved":"green","posted":"green","cancelled":"red"}'
-                               options="{'clickable_stages': [('draft', 'waiting_approval'), ('waiting_approval', 'approved'), ('approved', 'posted')]}"
-                               class="o_payment_statusbar"/>
+                               statusbar_visible="draft,submitted,approved,posted"
+                               statusbar_colors='{"draft":"blue","submitted":"orange","approved":"green","posted":"success","rejected":"danger","cancelled":"secondary"}'/>
                         
-                        <!-- Include base state field for inherited view compatibility -->
-                        <field name="state" invisible="1"/>
-                        
-                        <!-- Core Workflow Buttons (Simplified 2-State) -->
+                        <!-- Workflow Action Buttons -->
                         <button name="action_submit_for_approval" 
                                 string="Submit for Approval" 
                                 type="object" 
-                                class="btn-primary o_payment_submit_approval"
+                                class="btn-primary"
                                 invisible="approval_state != 'draft'"/>
                         
-                        <button name="action_approve_and_post" 
-                                string="Approve &amp; Post" 
+                        <button name="action_approve_payment" 
+                                string="Approve" 
                                 type="object" 
-                                class="btn-success o_payment_approve_post"
+                                class="btn-success"
                                 groups="account.group_account_invoice"
-                                invisible="approval_state not in ['waiting_approval', 'approved']"/>
+                                invisible="approval_state != 'submitted'"/>
                         
                         <button name="action_reject_payment" 
                                 string="Reject" 
                                 type="object" 
-                                class="btn-warning o_payment_reject"
+                                class="btn-warning"
                                 groups="account.group_account_invoice"
-                                confirm="Are you sure you want to reject this payment?"
-                                invisible="approval_state != 'waiting_approval'"/>
+                                invisible="approval_state != 'submitted'"/>
                         
-                        <!-- Standard Odoo Posting (Fallback) -->
-                        <button name="action_validate_and_post" 
-                                string="Direct Post" 
+                        <!-- Standard Posting -->
+                        <button name="action_post" 
+                                string="Post Payment" 
                                 type="object" 
                                 class="btn-success"
-                                groups="account.group_account_manager"
-                                invisible="approval_state not in ['draft', 'approved']"/>
+                                invisible="approval_state != 'approved' or state != 'draft'"/>
                         
                         <!-- Print Actions -->
-                        <button name="action_print_osus_voucher" 
-                                string="Print OSUS Voucher" 
+                        <button name="action_print_voucher" 
+                                string="Print Voucher" 
                                 type="object" 
                                 class="btn-primary"
                                 icon="fa-print"
-                                invisible="approval_state in ['draft', 'cancelled']"/>
+                                invisible="approval_state in ['draft']"/>
                         
                         <!-- Cancel/Reset Actions -->
                         <button name="action_cancel" 
@@ -67,357 +59,324 @@
                                 class="btn-secondary"
                                 groups="account.group_account_manager"
                                 confirm="Are you sure you want to cancel this payment?"
-                                invisible="approval_state in ['draft', 'cancelled']"/>
+                                invisible="state != 'draft' or approval_state in ['cancelled']"/>
                         
-                        <button name="action_draft" 
-                                string="Set to Draft" 
+                        <button name="action_reset_to_draft" 
+                                string="Reset to Draft" 
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_manager"
-                                invisible="approval_state != 'cancelled'"/>
-                        
-                        <!-- Future 4-Checkpoint Workflow Buttons (Hidden for now) -->
-                        <button name="action_review_payment" 
-                                string="Mark as Reviewed" 
-                                type="object" 
-                                class="btn-info"
-                                invisible="True"/>  <!-- Hidden for simplified workflow -->
-                        
-                        <button name="action_approve_payment" 
-                                string="Approve Payment" 
-                                type="object" 
-                                class="btn-success"
-                                invisible="True"/>  <!-- Hidden for simplified workflow -->
+                                invisible="approval_state not in ['rejected', 'cancelled']"/>
                     </header>
                 </xpath>
                 
-                <!-- Organize Content with Notebooks (Tabs) for Clean View -->
-                <xpath expr="//sheet" position="inside">
+                <!-- Add voucher fields after existing fields -->
+                <xpath expr="//field[@name='partner_id']" position="before">
                     <div class="oe_title">
                         <h1>
-                            <field name="voucher_number" readonly="1" class="o_voucher_number_title"/>
+                            <field name="voucher_number" readonly="1" 
+                                   placeholder="Will be auto-generated"/>
                         </h1>
-                        <h2>
-                            <field name="display_name" readonly="1" placeholder="Payment Voucher"/>
-                        </h2>
+                        <h3>
+                            <field name="payment_type" widget="radio" 
+                                   options="{'horizontal': true}"
+                                   readonly="approval_state != 'draft'"/>
+                        </h3>
                     </div>
-                    
-                    <notebook class="o_payment_voucher_notebook">
-                        <!-- Hidden fields for inherited view compatibility -->
-                        <field name="state" invisible="1"/>
-                        <field name="company_id" invisible="1"/>
-                        
-                        <!-- Tab 1: Payment Information -->
-                        <page string="💰 Payment Details" name="payment_details">
+                </xpath>
+                
+                <!-- Add notebook after main group -->
+                <xpath expr="//group[@name='group_partner_bank']" position="after">
+                    <notebook>
+                        <!-- Payment Information Tab -->
+                        <page string="Payment Information" name="payment_info">
                             <group>
-                                <group string="Payment Information">
-                                    <field name="payment_type" widget="radio" options="{'horizontal': true}"/>
-                                    <field name="partner_id" options="{'no_create': False, 'no_create_edit': False}"/>
-                                    <field name="amount" class="o_amount_field"/>
-                                    <field name="currency_id" options="{'no_create': True}"/>
-                                    <field name="date"/>
+                                <group string="Payment Details" name="payment_details">
+                                    <field name="partner_id" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           required="1"/>
+                                    <field name="amount" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           required="1"/>
+                                    <field name="currency_id" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           groups="base.group_multi_currency"/>
+                                    <field name="date" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           required="1"/>
+                                    <field name="ref" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           placeholder="Payment reference"/>
                                 </group>
                                 
-                                <group string="Account Information">
+                                <group string="Account Information" name="account_info">
                                     <field name="journal_id" 
-                                           domain="[('type', 'in', ['bank', 'cash']), ('company_id', '=', company_id)]"/>
-                                    <field name="destination_account_id" 
-                                           required="approval_state == 'draft'" 
-                                           readonly="approval_state not in ['draft']"
-                                           domain="[('company_id', '=', company_id)]"/>
-                                    <field name="ref" placeholder="Enter reference number or invoice number"/>
+                                           readonly="approval_state not in ['draft', 'rejected']"
+                                           domain="[('type', 'in', ['bank', 'cash']), ('company_id', '=', company_id)]"
+                                           required="1"/>
                                     <field name="partner_bank_id" 
+                                           readonly="approval_state not in ['draft', 'rejected']"
                                            domain="[('partner_id', '=', partner_id)]"
                                            context="{'default_partner_id': partner_id}"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
                                 </group>
                             </group>
                             
                             <separator string="Additional Information"/>
                             <group>
                                 <field name="remarks" 
-                                       placeholder="Enter additional remarks, memo, or purpose for this payment voucher..."
+                                       readonly="approval_state not in ['draft', 'rejected']"
+                                       placeholder="Enter additional remarks or purpose for this payment..."
                                        widget="text" 
-                                       colspan="2"
-                                       nolabel="1"/>
+                                       colspan="2"/>
                             </group>
                         </page>
                         
-                        <!-- Tab 2: Approval Workflow -->
-                        <page string="✅ Approval Workflow" name="approval_workflow">
-                            <div class="o_approval_workflow_container">
-                                <group string="Current Approval Status" class="o_approval_status_group">
-                                    <field name="approval_state" readonly="1" widget="badge"
-                                           decoration-info="approval_state == 'draft'"
-                                           decoration-warning="approval_state == 'waiting_approval'"
-                                           decoration-success="approval_state in ['approved', 'posted']"
-                                           decoration-danger="approval_state == 'cancelled'"/>
-                                    <field name="authorized_by" readonly="1" 
-                                           invisible="approval_state not in ['approved', 'posted']"
-                                           string="Authorized By"/>
-                                </group>
-                                
-                                <group string="Approval Details" col="4" class="o_approval_details">
-                                    <field name="approver_id" readonly="1" string="Approved By"/>
-                                    <field name="approver_date" readonly="1" string="Approval Date"/>
-                                    <field name="actual_approver_id" readonly="1" 
-                                           invisible="approval_state != 'posted'"
-                                           string="Posted By"/>
-                                </group>
-                                
-                                <!-- Future 4-Checkpoint Fields (Hidden but available for future use) -->
-                                <group string="Extended Approval Chain (Future Use)" 
-                                       invisible="True" 
-                                       class="o_future_approval_chain">
-                                    <field name="reviewer_id" readonly="1" string="Reviewer"/>
-                                    <field name="reviewer_date" readonly="1" string="Review Date"/>
-                                </group>
-                                
-                                <separator string="Approval Communication"/>
-                                <field name="message_ids" 
-                                       widget="mail_thread" 
-                                       options="{'display_log_button': True, 'thread_level': 1}"/>
-                            </div>
-                        </page>
-                        
-                        <!-- Tab 3: QR Code & Verification -->
-                        <page string="🔍 QR Code &amp; Verification" name="qr_verification" 
-                              invisible="approval_state in ['draft', 'cancelled']">
-                            <div class="o_qr_verification_container">
-                                <group string="QR Code Settings" class="o_qr_settings">
-                                    <field name="qr_in_report" 
-                                           string="Include QR Code in Printed Reports"/>
-                                </group>
-                                
-                                <div class="o_qr_code_section" invisible="qr_code == False">
-                                    <h3>Payment Verification QR Code</h3>
-                                    <div class="text-center o_qr_display">
-                                        <field name="qr_code" 
-                                               widget="image" 
-                                               options="{'size': [200, 200]}"
-                                               class="o_qr_code_image"/>
-                                        <p class="text-muted o_qr_description">
-                                            <i class="fa fa-info-circle"/> 
-                                            Scan this QR code with any QR reader to verify payment details
-                                        </p>
-                                        <div class="alert alert-info">
-                                            <strong>Verification Info:</strong><br/>
-                                            This QR code contains secure payment verification data including 
-                                            voucher number, amount, partner, and company information.
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="o_qr_help_section">
-                                    <h4>How to Use QR Code Verification:</h4>
-                                    <ol>
-                                        <li>Use any smartphone QR code scanner</li>
-                                        <li>Point camera at the QR code above</li>
-                                        <li>View payment verification details</li>
-                                        <li>Cross-check with payment voucher information</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </page>
-                        
-                        <!-- Tab 4: Company &amp; Configuration -->
-                        <page string="🏢 Company &amp; Settings" name="company_settings">
-                            <group string="Company Information">
-                                <field name="company_id" readonly="1" 
-                                       options="{'no_create': True, 'no_open': True}"/>
-                                <field name="display_name" readonly="1" string="Full Description"/>
+                        <!-- Approval Workflow Tab -->
+                        <page string="Approval Workflow" name="approval_workflow">
+                            <group string="Current Status">
+                                <field name="approval_state" readonly="1" widget="badge"/>
                             </group>
                             
-                            <group string="OSUS Branding Information" 
-                                   invisible="not context.get('show_branding_info', True)">
-                                <div class="alert alert-info">
-                                    <h4>OSUS Properties - Luxury Real Estate Excellence</h4>
-                                    <p>This payment voucher system is designed with OSUS Properties' 
-                                    premium brand standards in mind, featuring:</p>
-                                    <ul>
-                                        <li>Professional burgundy and gold color scheme</li>
-                                        <li>Streamlined approval workflow</li>
-                                        <li>Automatic voucher numbering</li>
-                                        <li>QR code verification system</li>
-                                        <li>Mobile-responsive design</li>
-                                    </ul>
-                                </div>
+                            <group string="Submission Details" invisible="approval_state == 'draft'">
+                                <group>
+                                    <field name="submitted_by" readonly="1"/>
+                                    <field name="submitted_date" readonly="1"/>
+                                </group>
+                                <group invisible="approval_state not in ['approved', 'posted']">
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                </group>
                             </group>
                             
-                            <group string="System Information" col="4">
-                                <field name="create_uid" readonly="1" string="Created By"/>
-                                <field name="create_date" readonly="1" string="Creation Date"/>
-                                <field name="write_uid" readonly="1" string="Last Modified By"/>
-                                <field name="write_date" readonly="1" string="Last Modified"/>
+                            <group string="Rejection Details" invisible="approval_state != 'rejected'">
+                                <group>
+                                    <field name="rejected_by" readonly="1"/>
+                                    <field name="rejected_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="rejection_reason" readonly="1" widget="text"/>
+                                </group>
                             </group>
+                        </page>
+                        
+                        <!-- QR Code Tab -->
+                        <page string="QR Code &amp; Verification" name="qr_code" 
+                              invisible="approval_state in ['draft']">
+                            <group>
+                                <group string="QR Code Settings">
+                                    <field name="qr_in_report"/>
+                                </group>
+                                <group string="QR Code Preview" invisible="not qr_code">
+                                    <field name="qr_code" widget="image" 
+                                           options="{'size': [150, 150]}"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-info" invisible="not qr_code">
+                                <p><strong>QR Code Information:</strong></p>
+                                <p>This QR code contains payment verification data and can be scanned 
+                                to verify payment details securely.</p>
+                            </div>
                         </page>
                     </notebook>
                 </xpath>
-                
             </field>
         </record>
         
         <!-- Enhanced Payment Tree View -->
-        <record id="view_account_payment_tree_osus_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.tree.osus.enhanced</field>
+        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.tree.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="after">
                     <field name="voucher_number" optional="show"/>
-                    <field name="approval_state" optional="show" widget="badge"
+                    <field name="approval_state" widget="badge" optional="show"
                            decoration-info="approval_state == 'draft'"
-                           decoration-warning="approval_state == 'waiting_approval'"
+                           decoration-warning="approval_state == 'submitted'"
                            decoration-success="approval_state in ['approved', 'posted']"
-                           decoration-danger="approval_state == 'cancelled'"/>
+                           decoration-danger="approval_state in ['rejected', 'cancelled']"/>
                 </xpath>
-                <xpath expr="//tree" position="inside">
-                    <field name="authorized_by" optional="hide"/>
-                    <field name="remarks" optional="hide"/>
+                <xpath expr="//field[@name='amount_company_currency_signed']" position="after">
+                    <field name="approved_by" optional="hide"/>
+                    <field name="submitted_date" optional="hide"/>
                 </xpath>
             </field>
         </record>
         
-        <!-- Search View Enhancement -->
-        <record id="view_account_payment_search_osus_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.search.osus.enhanced</field>
+        <!-- Enhanced Payment Search View -->
+        <record id="view_account_payment_search_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.search.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//search" position="inside">
                     <field name="voucher_number"/>
                     <field name="approval_state"/>
-                    <filter string="Draft" name="filter_draft" domain="[('approval_state', '=', 'draft')]"/>
-                    <filter string="Waiting Approval" name="filter_waiting" domain="[('approval_state', '=', 'waiting_approval')]"/>
-                    <filter string="Approved" name="filter_approved" domain="[('approval_state', '=', 'approved')]"/>
-                    <filter string="Posted" name="filter_posted" domain="[('approval_state', '=', 'posted')]"/>
+                    <field name="remarks"/>
+                    <separator/>
+                    <filter string="Draft" name="filter_draft" 
+                            domain="[('approval_state', '=', 'draft')]"/>
+                    <filter string="Submitted" name="filter_submitted" 
+                            domain="[('approval_state', '=', 'submitted')]"/>
+                    <filter string="Approved" name="filter_approved" 
+                            domain="[('approval_state', '=', 'approved')]"/>
+                    <filter string="Posted" name="filter_posted" 
+                            domain="[('approval_state', '=', 'posted')]"/>
+                    <filter string="Rejected" name="filter_rejected" 
+                            domain="[('approval_state', '=', 'rejected')]"/>
+                    <separator/>
+                    <filter string="My Submissions" name="filter_my_submissions"
+                            domain="[('submitted_by', '=', uid)]"/>
+                    <filter string="My Approvals" name="filter_my_approvals"
+                            domain="[('approved_by', '=', uid)]"/>
+                    <separator/>
                     <group expand="0" string="Group By">
-                        <filter name="group_approval_state" string="Approval State" context="{'group_by': 'approval_state'}"/>
-                        <filter name="group_approver" string="Approver" context="{'group_by': 'approver_id'}"/>
+                        <filter name="group_approval_state" string="Approval State" 
+                                context="{'group_by': 'approval_state'}"/>
+                        <filter name="group_submitted_by" string="Submitted By" 
+                                context="{'group_by': 'submitted_by'}"/>
+                        <filter name="group_approved_by" string="Approved By" 
+                                context="{'group_by': 'approved_by'}"/>
                     </group>
                 </xpath>
             </field>
         </record>
         
-        <!-- Company Settings Enhancement -->
-        <record id="view_company_form_osus_enhanced" model="ir.ui.view">
-            <field name="name">res.company.form.osus.enhanced</field>
-            <field name="model">res.company</field>
-            <field name="inherit_id" ref="base.view_company_form"/>
+        <!-- Payment Rejection Wizard View -->
+        <record id="view_payment_rejection_wizard_form" model="ir.ui.view">
+            <field name="name">payment.rejection.wizard.form</field>
+            <field name="model">payment.rejection.wizard</field>
             <field name="arch" type="xml">
-                <xpath expr="//sheet" position="inside">
-                    <group string="OSUS Voucher Settings" name="osus_voucher">
-                        <group string="Branding">
-                            <field name="use_osus_branding"/>
-                        </group>
-                        <group string="Voucher Customization">
-                            <field name="voucher_footer_message" 
-                                   widget="text" 
-                                   placeholder="Thank you for your business"/>
-                            <field name="voucher_terms" 
-                                   widget="text"
-                                   placeholder="Terms and conditions..."/>
-                        </group>
+                <form string="Payment Rejection">
+                    <group>
+                        <field name="payment_id" readonly="1"/>
+                        <field name="rejection_reason" widget="text" 
+                               placeholder="Please provide a reason for rejecting this payment..."/>
                     </group>
-                </xpath>
+                    <footer>
+                        <button string="Confirm Rejection" name="action_confirm_rejection" 
+                                type="object" class="btn-danger"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
             </field>
         </record>
         
-        <!-- Enhanced Payment Registration Wizard -->
-        <record id="view_account_payment_register_form_osus" model="ir.ui.view">
-            <field name="name">account.payment.register.form.osus</field>
+        <!-- Enhanced Payment Register Wizard -->
+        <record id="view_account_payment_register_form_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.register.form.enhanced</field>
             <field name="model">account.payment.register</field>
             <field name="inherit_id" ref="account.view_account_payment_register_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='communication']" position="after">
                     <field name="remarks" 
                            placeholder="Enter additional remarks for the payment voucher..."
-                           widget="text" colspan="2"/>
+                           widget="text"/>
                 </xpath>
             </field>
         </record>
         
-        <!-- Action Definitions -->
-        <record id="action_payment_voucher_osus" model="ir.actions.act_window">
-            <field name="name">OSUS Payment Vouchers</field>
+        <!-- Actions -->
+        <record id="action_payment_voucher_all" model="ir.actions.act_window">
+            <field name="name">Payment Vouchers</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('payment_type', 'in', ['outbound', 'inbound'])]</field>
             <field name="context">{
                 'default_payment_type': 'outbound',
-                'search_default_filter_waiting': 1,
             }</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create your first OSUS payment voucher
-                </p>
-                <p>
-                    OSUS branded payment vouchers provide professional,
-                    luxury-styled documentation for all your payments with 
-                    simplified approval workflow.
-                </p>
-                <ul>
-                    <li><strong>Draft:</strong> Create and edit payment details</li>
-                    <li><strong>Waiting for Approval:</strong> Submit for approval</li>
-                    <li><strong>Approved &amp; Posted:</strong> Payment completed</li>
-                </ul>
-            </field>
-        </record>
-        
-        <!-- Dashboard Action for Pending Approvals -->
-        <record id="action_payment_pending_approval" model="ir.actions.act_window">
-            <field name="name">Payments Pending Approval</field>
-            <field name="res_model">account.payment</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('approval_state', '=', 'waiting_approval')]</field>
-            <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No payments pending approval
                 </p>
                 <p>
-                    All payments have been processed. Payments will appear here
-                    when they are submitted for approval.
+                    Payments submitted for approval will appear here.
                 </p>
             </field>
         </record>
         
-        <!-- Dashboard Action for My Approvals -->
-        <record id="action_payment_my_approvals" model="ir.actions.act_window">
-            <field name="name">My Payment Approvals</field>
+        <record id="action_payment_my_submissions" model="ir.actions.act_window">
+            <field name="name">My Submissions</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('approver_id', '=', uid)]</field>
+            <field name="domain">[('submitted_by', '=', uid)]</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    No payments approved by you yet
+                    You haven't submitted any payments yet
                 </p>
                 <p>
-                    This view shows all payments that you have approved.
+                    Payments you submit for approval will appear here.
                 </p>
             </field>
         </record>
         
+        <record id="action_payment_my_approvals" model="ir.actions.act_window">
+            <field name="name">My Approvals</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approved_by', '=', uid)]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    You haven't approved any payments yet
+                </p>
+                <p>
+                    Payments you approve will appear here.
+                </p>
+            </field>
+        </record>
+        
+        <!-- Actions -->
+        <record id="action_payment_pending_approval" model="ir.actions.act_window">
+            <field name="name">Pending Approvals</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approval_state', '=', 'submitted')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No payments pending approval
+            </p>
+            <p>
+                Payments submitted for approval will appear here.
+            </p>
+            </field>
+        </record>
+
         <!-- Menu Items -->
-        <menuitem id="menu_osus_payment_vouchers"
-                  name="OSUS Vouchers"
-                  parent="account.menu_finance_payables"
-                  action="action_payment_voucher_osus"
-                  sequence="15"/>
+        <menuitem id="menu_payment_vouchers_root"
+              name="Payment Vouchers"
+              parent="account.menu_finance_payables"
+              sequence="10"/>
+        
+        <menuitem id="menu_payment_vouchers_all"
+              name="All Vouchers"
+              parent="menu_payment_vouchers_root"
+              action="action_payment_voucher_all"
+              sequence="10"/>
         
         <menuitem id="menu_payment_pending_approval"
-                  name="Pending Approvals"
-                  parent="account.menu_finance_payables"
-                  action="action_payment_pending_approval"
-                  groups="account.group_account_invoice"
-                  sequence="16"/>
+              name="Pending Approvals"
+              parent="menu_payment_vouchers_root"
+              action="action_payment_pending_approval"
+              groups="account.group_account_invoice"
+              sequence="20"/>
+        
+        <menuitem id="menu_payment_my_submissions"
+              name="My Submissions"
+              parent="menu_payment_vouchers_root"
+              action="action_payment_my_submissions"
+              sequence="30"/>
         
         <menuitem id="menu_payment_my_approvals"
-                  name="My Approvals"
-                  parent="account.menu_finance_payables"
-                  action="action_payment_my_approvals"
-                  groups="account.group_account_invoice"
-                  sequence="17"/>
-                  
-    </data>
-</odoo>
+              name="My Approvals"
+              parent="menu_payment_vouchers_root"
+              action="action_payment_my_approvals"
+              groups="account.group_account_invoice"
+              sequence="40"/>
+        </data>
+    </odoo>
