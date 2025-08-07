@@ -214,26 +214,6 @@
             </field>
         </record>
         
-        <!-- Payment Rejection Wizard View -->
-        <record id="view_payment_rejection_wizard_form" model="ir.ui.view">
-            <field name="name">payment.rejection.wizard.form</field>
-            <field name="model">payment.rejection.wizard</field>
-            <field name="arch" type="xml">
-                <form string="Payment Rejection">
-                    <group>
-                        <field name="payment_id" readonly="1"/>
-                        <field name="rejection_reason" widget="text" 
-                               placeholder="Please provide a reason for rejecting this payment..."/>
-                    </group>
-                    <footer>
-                        <button string="Confirm Rejection" name="action_confirm_rejection" 
-                                type="object" class="btn-danger"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
-        
         <!-- Enhanced Payment Register Wizard -->
         <record id="view_account_payment_register_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.register.form.enhanced</field>
