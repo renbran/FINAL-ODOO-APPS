@@ -1,5 +1,4 @@
 /** @odoo-module **/
-
 import { FormController } from "@web/views/form/form_controller";
 import { FormView } from "@web/views/form/form_view";
 import { registry } from "@web/core/registry";
@@ -7,18 +6,8 @@ import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { Component, onWillStart, useState } from "@odoo/owl";
-
-const viewRegistry = registry.category("views");
-
-/** @odoo-module **/
-
-import { FormController } from "@web/views/form/form_controller";
-import { FormView } from "@web/views/form/form_view";
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
+const viewRegistry = registry.category("views");
 
 /**
  * Enhanced Payment Voucher Form Controller for Odoo 17
