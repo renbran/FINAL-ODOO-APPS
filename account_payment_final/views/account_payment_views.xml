@@ -256,10 +256,8 @@
                            readonly="approval_state not in ['draft', 'cancelled']"
                            placeholder="Enter additional remarks or purpose for this payment..."
                            widget="text"/>
-                </xpath>
-                
-                <!-- Add notebook at the end of sheet -->
-                <xpath expr="//sheet" position="inside">
+                    
+                    <!-- Add notebook for approval workflow -->
                     <notebook>
                         <!-- Enhanced 4-Stage Approval Workflow Tab -->
                         <page string="Approval Workflow" name="approval_workflow">
@@ -494,7 +492,7 @@
             <field name="model">account.payment.register</field>
             <field name="inherit_id" ref="account.view_account_payment_register_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//sheet" position="inside">
+                <xpath expr="//field[@name='communication']" position="after">
                     <group string="Additional Information">
                         <field name="remarks" 
                                placeholder="Enter additional remarks for the payment voucher..."
