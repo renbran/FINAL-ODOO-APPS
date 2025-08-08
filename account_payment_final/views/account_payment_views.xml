@@ -77,7 +77,7 @@
                         
                         <!-- Real-time Status Indicator -->
                         <div class="oe_button_box">
-                            <button class="oe_stat_button" type="object" name="action_view_approval_details" icon="fa-info-circle">
+                            <button class="oe_stat_button" type="object" name="dummy_action" icon="fa-info-circle">
                                 <div class="o_field_widget o_stat_info">
                                     <span class="o_stat_value">
                                         <field name="approval_state" readonly="1" string="Status"/>
@@ -180,21 +180,7 @@
                     </group>
                 </xpath>
                 
-                <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
-                </xpath>
-                
-                <xpath expr="//field[@name='journal_id']" position="attributes">
-                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
-                </xpath>
-                
-                <!-- Add custom fields to existing form -->
-                <xpath expr="//field[@name='ref']" position="after">
-                    <field name="remarks" 
-                           readonly="approval_state not in ['draft', 'cancelled']"
-                           placeholder="Enter additional remarks or purpose for this payment..."
-                           widget="text"/>
-                </xpath>
+
                 
                 <!-- Add notebook at the end of sheet -->
                 <xpath expr="//sheet" position="inside">
