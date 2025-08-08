@@ -148,7 +148,7 @@
                 
                 <!-- Enhanced reference field -->
                 <!-- Enhanced Voucher Information Group -->
-                <xpath expr="//field[@name='communication']" position="after">
+                <xpath expr="//field[@name='ref']" position="after">
                     <group name="voucher_info" string="Voucher Information" col="2">
                         <field name="remarks" 
                                readonly="approval_state == 'posted'"
@@ -302,7 +302,7 @@
             <field name="model">account.payment.register</field>
             <field name="inherit_id" ref="account.view_account_payment_register_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='communication']" position="after">
+                <xpath expr="//field[@name='ref']" position="after">
                     <field name="remarks" 
                            placeholder="Enter additional remarks for the payment voucher..."
                            widget="text"/>
