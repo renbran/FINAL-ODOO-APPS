@@ -1,6 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Enhanced Payment Verification Success Template with 4-Stage Workflow -->
+        <template id="payment_verification_success_enhanced" name="Enhanced Payment Verification Success">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <div class="container mt-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 col-md-10">
+                                <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+                                    <!-- OSUS Branded Header -->
+                                    <div class="card-header text-white text-center py-4" 
+                                         style="background: linear-gradient(135deg, #800020 0%, #a0002b 100%);">
+                                        <i class="fa fa-check-circle fa-3x mb-3"></i>
+                                        <h2 class="mb-0">Payment Verification Successful</h2>
+                                        <p class="mb-0 opacity-75">OSUS Properties - Payment details verified and authenticated</p>
+                                    </div>
+                                    
+                                    <!-- Enhanced Payment Details with 4-Stage Workflow -->
+                                    <div class="card-body p-4">
+                                        <!-- Workflow Progress Indicator -->
+                                        <div class="row mb-4" t-if="approval_state">
+                                            <div class="col-12">
+                                                <h5 class="text-center mb-3" style="color: #800020;">Workflow Progress</h5>
+                                                <div class="progress-workflow text-center">
+                                                    <span class="badge badge-success" style="margin-right: 10px;">✓ Draft</span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;">
+                                                        <t t-if="approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Review
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;" t-if="payment_type_display == 'Vendor Payment'">
+                                                        <t t-if="approval_state in ['for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Approval
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;" t-if="payment_type_display == 'Vendor Payment'">
+                                                        <t t-if="approval_state in ['for_authorization', 'approved', 'posted']">✓</t> Authorization
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state == 'posted' else 'secondary'}}">
+                                                        <t t-if="approval_state == 'posted'">✓</t> Posted
+                                                    </span>
+                                                </div>
+                                                <hr style="border-color: #800020; width: 100px; margin: 15px auto;"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Payment Information Grid -->
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Voucher Number:</strong>
+                                                <div class="text-primary font-weight-bold" t-esc="voucher_number"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Payment Reference:</strong>
+                                                <div t-esc="payment_reference"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Amount:</strong>
+                                                <div class="text-success font-weight-bold" style="font-size: 1.3em;">
+                                                    <t t-esc="amount"/> <t t-esc="currency"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Payment To/From:</strong>
+                                                <div t-esc="partner_name"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Payment Date:</strong>
+                                                <div t-esc="payment_date"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <strong style="color: #800020;">Current Status:</strong>
+                                                <div>
+                                                    <span t-if="state == 'posted'" class="badge badge-success" style="font-size: 1em;">
+                                                        <i class="fa fa-check-circle"></i> Posted &amp; Completed
+                                                    </span>
+                                                    <span t-if="state == 'approved'" class="badge badge-primary" style="font-size: 1em;">        <!-- Enhanced Security Groups for 4-Stage Workflow -->
+        <record id="group_payment_voucher_user" model="res.groups">
+            <field name="name">Payment Voucher User</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="comment">Can create and submit payment vouchers for review</field>
+        </record>
+        
+        <record id="group_payment_voucher_reviewer" model="res.groups">
+            <field name="name">Payment Voucher Reviewer</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_user'))]"/>
+            <field name="comment">Can review payments and forward them for approval (Stage 1)</field>
+        </record>
+        
+        <record id="group_payment_voucher_approver" model="res.groups">
+            <field name="name">Payment Voucher Approver</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
+            <field name="comment">Can approve payments and forward vendor payments for authorization (Stage 2)</field>
+        </record>
+        
+        <record id="group_payment_voucher_authorizer" model="res.groups">
+            <field name="name">Payment Voucher Authorizer</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
+            <field name="comment">Can authorize vendor payments for final posting (Stage 3)</field>
+        </record>
+        
+        <record id="group_payment_voucher_poster" model="res.groups">                        <!-- Real-time status indicator with workflow stage info -->
+                        <div class="alert alert-info" invisible="approval_state == 'draft'">
+                            <strong>Status: </strong>
+                            <field name="approval_state" readonly="1" string=""/>
+                            
+                            <!-- Show current stage handler -->
+                            <span invisible="not reviewer_id and approval_state not in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']"> | Reviewed by: </span>
+                            <field name="reviewer_id" invisible="not reviewer_id" readonly="1"/>
+                            
+                            <span invisible="not approver_id and approval_state not in ['for_authorization', 'approved', 'posted']"> | Approved by: </span>
+                            <field name="approver_id" invisible="not approver_id" readonly="1"/>
+                            
+                            <span invisible="not authorizer_id and approval_state not in ['approved', 'poste<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
         <!-- Enhanced Payment Form View -->
         <record id="view_account_payment_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.form.enhanced</field>
@@ -239,14 +356,29 @@
                                decoration-muted="approval_state == 'cancelled'"/>
                     </group>
                     
-                    <!-- QR Code Section -->
-                    <group name="qr_info" string="QR Code" col="1" 
+                    <!-- QR Code Section with Enhanced Features -->
+                    <group name="qr_info" string="QR Code Verification" col="1" 
                            invisible="approval_state == 'draft' or not qr_code">
                         <field name="qr_in_report" widget="boolean_toggle"/>
                         <field name="qr_code" widget="image" 
                                readonly="1" 
                                class="oe_avatar"
-                               options="{'size': [150, 150]}"/>
+                               options="{'size': [200, 200]}"/>
+                        
+                        <!-- QR Code Information -->
+                        <div class="alert alert-info" invisible="not qr_code" style="margin-top: 10px;">
+                            <p><strong>🔒 Secure QR Verification</strong></p>
+                            <p>This QR code provides secure verification of payment details.</p>
+                            <p><strong>Voucher:</strong> <span t-field="voucher_number"/></p>
+                            <p><strong>Status:</strong> <span t-field="approval_state"/></p>
+                            <p><strong>Workflow:</strong> 
+                                <span invisible="payment_type != 'outbound'">4-Stage Vendor Payment Process</span>
+                                <span invisible="payment_type != 'inbound'">3-Stage Customer Receipt Process</span>
+                            </p>
+                            <small class="text-muted">
+                                <i class="fa fa-mobile"></i> Scan with any QR code reader to verify payment details
+                            </small>
+                        </div>
                     </group>
                 </xpath>
                 
@@ -275,10 +407,14 @@
                                         <h5>Vendor Payment Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
-                                            <span class="badge badge-secondary" style="margin-right: 10px;">2. Under Review</span>
-                                            <span class="badge badge-secondary" style="margin-right: 10px;">3. For Approval</span>
-                                            <span class="badge badge-secondary" style="margin-right: 10px;">4. For Authorization</span>
-                                            <span class="badge badge-secondary">5. Posted</span>
+                                            <span class="badge" style="margin-right: 10px;" 
+                                                  t-attf-class="badge-{{'success' if approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}">2. Under Review</span>
+                                            <span class="badge" style="margin-right: 10px;"
+                                                  t-attf-class="badge-{{'success' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}">3. For Approval</span>
+                                            <span class="badge" style="margin-right: 10px;"
+                                                  t-attf-class="badge-{{'success' if approval_state in ['for_authorization', 'approved', 'posted'] else 'secondary'}}">4. For Authorization</span>
+                                            <span class="badge"
+                                                  t-attf-class="badge-{{'success' if approval_state == 'posted' else 'secondary'}}">5. Posted</span>
                                         </div>
                                     </div>
                                     
@@ -286,9 +422,12 @@
                                         <h5>Customer Receipt Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
-                                            <span class="badge badge-secondary" style="margin-right: 10px;">2. Under Review</span>
-                                            <span class="badge badge-secondary" style="margin-right: 10px;">3. Approved</span>
-                                            <span class="badge badge-secondary">4. Posted</span>
+                                            <span class="badge" style="margin-right: 10px;" 
+                                                  t-attf-class="badge-{{'success' if approval_state in ['under_review', 'approved', 'posted'] else 'secondary'}}">2. Under Review</span>
+                                            <span class="badge" style="margin-right: 10px;"
+                                                  t-attf-class="badge-{{'success' if approval_state in ['approved', 'posted'] else 'secondary'}}">3. Approved</span>
+                                            <span class="badge"
+                                                  t-attf-class="badge-{{'success' if approval_state == 'posted' else 'secondary'}}">4. Posted</span>
                                         </div>
                                     </div>
                                 </div>
@@ -334,27 +473,70 @@
                             </group>
                         </page>
                         
-                        <!-- QR Code Tab -->
+                        <!-- Enhanced QR Code &amp; Verification Tab -->
                         <page string="QR Code &amp; Verification" name="qr_code" 
                               invisible="approval_state in ['draft']">
                             <group>
                                 <group string="QR Code Settings">
                                     <field name="qr_in_report"/>
+                                    <label for="qr_in_report" string="Generate QR code for payment verification"/>
                                 </group>
                                 <group string="QR Code Preview" invisible="not qr_code">
                                     <field name="qr_code" widget="image" 
-                                           options="{'size': [200, 200]}"/>
+                                           options="{'size': [250, 250]}"/>
                                 </group>
                             </group>
                             
+                            <!-- Enhanced QR Information Panel -->
+                            <div class="alert alert-success" invisible="not qr_code" style="margin: 20px 0;">
+                                <h5><i class="fa fa-qrcode"></i> QR Code Verification Information</h5>
+                                <hr/>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Voucher Number:</strong> <span t-field="voucher_number"/></p>
+                                        <p><strong>Current Status:</strong> <span t-field="approval_state"/></p>
+                                        <p><strong>Payment Type:</strong> 
+                                            <span invisible="payment_type != 'outbound'">Vendor Payment (4-Stage)</span>
+                                            <span invisible="payment_type != 'inbound'">Customer Receipt (3-Stage)</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Amount:</strong> <span t-field="amount"/> <span t-field="currency_id"/></p>
+                                        <p><strong>Partner:</strong> <span t-field="partner_id"/></p>
+                                        <p><strong>Company:</strong> <span t-field="company_id"/></p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Verification URL Display -->
+                                <div class="mt-3">
+                                    <p><strong>Verification URL:</strong></p>
+                                    <code style="background: #f8f9fa; padding: 5px; border-radius: 4px;">
+                                        <span t-esc="request.httprequest.host_url if request else ''"/>payment/verify/<span t-esc="id"/>
+                                    </code>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Code Features -->
                             <div class="alert alert-info" invisible="not qr_code">
-                                <p><strong>QR Code Information:</strong></p>
-                                <p>This QR code contains payment verification data and can be scanned 
-                                to verify payment details securely.</p>
-                                <group>
-                                    <field name="voucher_number" readonly="1" string="Voucher Number"/>
-                                    <field name="approval_state" readonly="1" string="Status" widget="badge"/>
-                                </group>
+                                <h6><i class="fa fa-shield"></i> Security Features:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Unique Identifier:</strong> Each QR code is unique to this specific payment</li>
+                                    <li><strong>Real-time Status:</strong> Shows current workflow status when scanned</li>
+                                    <li><strong>Tamper-proof:</strong> Cannot be modified without breaking verification</li>
+                                    <li><strong>Audit Trail:</strong> All verification attempts are logged for security</li>
+                                    <li><strong>Public Verification:</strong> Can be verified without system login</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Usage Instructions -->
+                            <div class="alert alert-warning" invisible="not qr_code">
+                                <h6><i class="fa fa-info-circle"></i> How to Use:</h6>
+                                <ol class="mb-0">
+                                    <li>Use any QR code scanner or smartphone camera</li>
+                                    <li>Scan the QR code above</li>
+                                    <li>Follow the link to view verification details</li>
+                                    <li>Verify payment information matches your records</li>
+                                </ol>
                             </div>
                         </page>
                         
@@ -483,22 +665,6 @@
                                 context="{'group_by': 'partner_id'}"/>
                         <filter name="group_date" string="Date" 
                                 context="{'group_by': 'date'}"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
-        
-        <!-- Enhanced Payment Register Wizard -->
-        <record id="view_account_payment_register_form_enhanced" model="ir.ui.view">
-            <field name="name">account.payment.register.form.enhanced</field>
-            <field name="model">account.payment.register</field>
-            <field name="inherit_id" ref="account.view_account_payment_register_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//sheet" position="inside">
-                    <group string="Additional Information">
-                        <field name="remarks" 
-                               placeholder="Enter additional remarks for the payment voucher..."
-                               widget="text"/>
                     </group>
                 </xpath>
             </field>
@@ -690,6 +856,27 @@
                     Track workflow progress across all 4 stages.
                 </p>
             </field>
+        </record>
+        
+        <!-- Security Groups for Enhanced Access Control -->
+        <record id="group_payment_voucher_user" model="res.groups">
+            <field name="name">Payment Voucher User</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="comment">Can create and submit payment vouchers for approval</field>
+        </record>
+        
+        <record id="group_payment_voucher_approver" model="res.groups">
+            <field name="name">Payment Voucher Approver</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_user'))]"/>
+            <field name="comment">Can approve and reject payment vouchers</field>
+        </record>
+        
+        <record id="group_payment_voucher_manager" model="res.groups">
+            <field name="name">Payment Voucher Manager</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
+            <field name="comment">Full access to payment voucher system including cancellation and reset</field>
         </record>
     </data>
 </odoo>
