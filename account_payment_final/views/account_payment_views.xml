@@ -21,6 +21,8 @@
                         <!-- Required fields for conditions (invisible but available) -->
                         <field name="partner_id" invisible="1"/>
                         <field name="amount" invisible="1"/>
+                        <field name="state" invisible="1"/>
+                        <field name="is_internal_transfer" invisible="1"/>
                         
                         <!-- Enhanced Workflow Action Buttons with 4-stage logic -->
                         <button name="action_submit_for_review" 
