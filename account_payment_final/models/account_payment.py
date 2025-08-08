@@ -52,7 +52,7 @@ class AccountPayment(models.Model):
         ('posted', 'Posted'),
         ('cancelled', 'Cancelled')
     ], string='Approval State', default='draft', tracking=True,
-       help="Current approval state of the payment voucher", compute='_compute_approval_state', store=True)
+       help="Current approval state of the payment voucher")
     
     # Enhanced fields for OSUS voucher system
     remarks = fields.Text(
@@ -129,19 +129,6 @@ class AccountPayment(models.Model):
         compute='_compute_display_name',
         store=True
     )
-    
-    @api.depends('state', 'is_reconciled')
-    def _compute_approval_state(self):
-        """Auto-compute approval state based on payment state for real-time responsiveness"""
-        for record in self:
-            if not hasattr(record, '_approval_state_manual'):
-                if record.state == 'posted':
-                    record.approval_state = 'posted'
-                elif record.state == 'cancel':
-                    record.approval_state = 'cancelled'
-                elif record.state == 'draft' and not record.approval_state:
-                    record.approval_state = 'draft'
-                # Keep existing approval_state if manually set
     
     @api.onchange('payment_type', 'partner_id', 'amount')
     def _onchange_payment_details(self):
@@ -289,8 +276,7 @@ Verify at: {base_url}/payment/qr-guide"""
             if not record.voucher_number:
                 record._generate_voucher_number()
             
-            # Set manual flag to prevent auto-computation override
-            record._approval_state_manual = True
+            # Update approval state
             record.approval_state = 'under_review'
             
             record.message_post(
@@ -320,7 +306,6 @@ Verify at: {base_url}/payment/qr-guide"""
             # Set review fields
             record.reviewer_id = self.env.user
             record.reviewer_date = fields.Datetime.now()
-            record._approval_state_manual = True
             
             # Determine next stage based on payment type
             if record.payment_type == 'outbound':  # Vendor payment
@@ -359,7 +344,6 @@ Verify at: {base_url}/payment/qr-guide"""
             # Set approval fields
             record.approver_id = self.env.user
             record.approver_date = fields.Datetime.now()
-            record._approval_state_manual = True
             
             # Determine next stage based on payment type
             if record.payment_type == 'outbound':  # Vendor payment
@@ -399,7 +383,6 @@ Verify at: {base_url}/payment/qr-guide"""
             # Set authorization fields
             record.authorizer_id = self.env.user
             record.authorizer_date = fields.Datetime.now()
-            record._approval_state_manual = True
             record.approval_state = 'approved'
             
             record.message_post(
@@ -435,7 +418,6 @@ Verify at: {base_url}/payment/qr-guide"""
             
             # Set posting fields
             record.actual_approver_id = self.env.user
-            record._approval_state_manual = True
             
             # Post the payment with error handling
             try:
@@ -486,7 +468,6 @@ Verify at: {base_url}/payment/qr-guide"""
                 record.authorizer_id = False
                 record.authorizer_date = False
             
-            record._approval_state_manual = True
             record.approval_state = 'draft'
             
             record.message_post(
@@ -587,10 +568,6 @@ Verify at: {base_url}/payment/qr-guide"""
 
     def write(self, vals):
         """Enhanced write method with real-time state management and audit tracking"""
-        # Track if approval_state is being manually changed
-        if 'approval_state' in vals:
-            for record in self:
-                record._approval_state_manual = True
         
         # Prevent modification of critical fields when not in draft
         restricted_fields = ['partner_id', 'amount', 'currency_id', 'payment_type']
