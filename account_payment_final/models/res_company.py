@@ -24,6 +24,7 @@ class ResCompany(models.Model):
     
     max_approval_amount = fields.Monetary(
         string='Maximum Approval Amount',
+        currency_field='currency_id',
         default=10000.0,
         help="Maximum amount that regular users can approve"
     )
@@ -70,6 +71,7 @@ class ResCompany(models.Model):
     
     authorization_threshold = fields.Monetary(
         string='Authorization Threshold',
+        currency_field='currency_id',
         default=5000.0,
         help="Amount below which authorization stage is skipped"
     )

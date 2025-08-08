@@ -88,6 +88,7 @@ class PaymentQRVerification(models.Model):
     payment_amount = fields.Monetary(
         related='payment_id.amount',
         string='Amount',
+        currency_field='payment_currency_id',
         store=True
     )
 
