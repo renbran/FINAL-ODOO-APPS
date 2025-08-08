@@ -275,14 +275,10 @@
                                         <h5>Vendor Payment Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
-                                            <span class="badge" style="margin-right: 10px;" 
-                                                  t-attf-class="badge-{{'success' if approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}">2. Under Review</span>
-                                            <span class="badge" style="margin-right: 10px;"
-                                                  t-attf-class="badge-{{'success' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}">3. For Approval</span>
-                                            <span class="badge" style="margin-right: 10px;"
-                                                  t-attf-class="badge-{{'success' if approval_state in ['for_authorization', 'approved', 'posted'] else 'secondary'}}">4. For Authorization</span>
-                                            <span class="badge"
-                                                  t-attf-class="badge-{{'success' if approval_state == 'posted' else 'secondary'}}">5. Posted</span>
+                                            <span class="badge badge-secondary" style="margin-right: 10px;">2. Under Review</span>
+                                            <span class="badge badge-secondary" style="margin-right: 10px;">3. For Approval</span>
+                                            <span class="badge badge-secondary" style="margin-right: 10px;">4. For Authorization</span>
+                                            <span class="badge badge-secondary">5. Posted</span>
                                         </div>
                                     </div>
                                     
@@ -290,12 +286,9 @@
                                         <h5>Customer Receipt Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
-                                            <span class="badge" style="margin-right: 10px;" 
-                                                  t-attf-class="badge-{{'success' if approval_state in ['under_review', 'approved', 'posted'] else 'secondary'}}">2. Under Review</span>
-                                            <span class="badge" style="margin-right: 10px;"
-                                                  t-attf-class="badge-{{'success' if approval_state in ['approved', 'posted'] else 'secondary'}}">3. Approved</span>
-                                            <span class="badge"
-                                                  t-attf-class="badge-{{'success' if approval_state == 'posted' else 'secondary'}}">4. Posted</span>
+                                            <span class="badge badge-secondary" style="margin-right: 10px;">2. Under Review</span>
+                                            <span class="badge badge-secondary" style="margin-right: 10px;">3. Approved</span>
+                                            <span class="badge badge-secondary">4. Posted</span>
                                         </div>
                                     </div>
                                 </div>
@@ -358,8 +351,10 @@
                                 <p><strong>QR Code Information:</strong></p>
                                 <p>This QR code contains payment verification data and can be scanned 
                                 to verify payment details securely.</p>
-                                <p><strong>Voucher Number:</strong> <span t-field="voucher_number"/></p>
-                                <p><strong>Status:</strong> <span t-field="approval_state"/></p>
+                                <group>
+                                    <field name="voucher_number" readonly="1" string="Voucher Number"/>
+                                    <field name="approval_state" readonly="1" string="Status" widget="badge"/>
+                                </group>
                             </div>
                         </page>
                         
