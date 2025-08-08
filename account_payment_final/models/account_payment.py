@@ -270,12 +270,12 @@ Verify at: {base_url}/payment/qr-guide"""
             }
         }
 
-    # Simplified Workflow Methods
-    def action_submit_for_approval(self):
-        """Submit payment for approval with enhanced validation and state management"""
+    # Enhanced 4-Stage Workflow Methods
+    def action_submit_for_review(self):
+        """Submit payment for initial review (Stage 1)"""
         for record in self:
             if record.approval_state != 'draft':
-                raise UserError(_("Only draft payments can be submitted for approval."))
+                raise UserError(_("Only draft payments can be submitted for review."))
             
             # Enhanced validation before submission
             if not record.partner_id:
@@ -291,46 +291,151 @@ Verify at: {base_url}/payment/qr-guide"""
             
             # Set manual flag to prevent auto-computation override
             record._approval_state_manual = True
-            record.approval_state = 'waiting_approval'
+            record.approval_state = 'under_review'
             
             record.message_post(
-                body=f"Payment voucher {record.voucher_number} submitted for approval by {self.env.user.name}",
-                subject="Payment Voucher Submitted for Approval"
+                body=f"Payment voucher {record.voucher_number} submitted for review by {self.env.user.name}",
+                subject="Payment Voucher Submitted for Review"
             )
         
-        # Force UI refresh and show success message
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
             'params': {
-                'message': _('Payment has been submitted for approval.'),
+                'message': _('Payment has been submitted for review.'),
                 'type': 'success',
             }
         }
 
-    def action_approve_and_post(self):
-        """Approve and post payment in one action with enhanced state management"""
+    def action_review_payment(self):
+        """Review payment and move to next stage (Stage 1 → Stage 2)"""
         for record in self:
-            if record.approval_state not in ['waiting_approval', 'approved']:
-                raise UserError(_("Only payments waiting for approval can be approved and posted."))
+            if record.approval_state != 'under_review':
+                raise UserError(_("Only payments under review can be reviewed."))
+            
+            # Check user permissions for review
+            if not self.env.user.has_group('account_payment_final.group_payment_voucher_reviewer'):
+                raise UserError(_("You don't have permission to review payments."))
+            
+            # Set review fields
+            record.reviewer_id = self.env.user
+            record.reviewer_date = fields.Datetime.now()
+            record._approval_state_manual = True
+            
+            # Determine next stage based on payment type
+            if record.payment_type == 'outbound':  # Vendor payment
+                record.approval_state = 'for_approval'
+                next_stage_msg = "sent for approval"
+            else:  # Customer receipt
+                record.approval_state = 'approved'
+                next_stage_msg = "approved"
+            
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} reviewed and {next_stage_msg} by {self.env.user.name}",
+                subject="Payment Voucher Reviewed"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'params': {
+                'message': _('Payment has been reviewed successfully.'),
+                'type': 'success',
+            }
+        }
+
+    def action_approve_payment(self):
+        """Approve payment (Stage 2 → Stage 3 for vendor, Stage 2 → Posted for customer)"""
+        for record in self:
+            if record.payment_type == 'outbound' and record.approval_state != 'for_approval':
+                raise UserError(_("Only vendor payments waiting for approval can be approved."))
+            elif record.payment_type == 'inbound' and record.approval_state != 'under_review':
+                raise UserError(_("Only customer receipts under review can be approved."))
             
             # Check user permissions for approval
-            if not self.env.user.has_group('account.group_account_invoice'):
+            if not self.env.user.has_group('account_payment_final.group_payment_voucher_approver'):
                 raise UserError(_("You don't have permission to approve payments."))
-            
-            # Additional validation before approval
-            if not record.partner_id:
-                raise ValidationError(_("Partner must be specified before approval."))
-            if not record.destination_account_id and record.payment_type == 'outbound':
-                # Auto-set destination account if not specified
-                record.destination_account_id = record.partner_id.property_account_payable_id
             
             # Set approval fields
             record.approver_id = self.env.user
             record.approver_date = fields.Datetime.now()
-            record.actual_approver_id = self.env.user
+            record._approval_state_manual = True
+            
+            # Determine next stage based on payment type
+            if record.payment_type == 'outbound':  # Vendor payment
+                record.approval_state = 'for_authorization'
+                next_stage_msg = "sent for authorization"
+            else:  # Customer receipt - can be posted directly after approval
+                record.approval_state = 'approved'
+                next_stage_msg = "approved and ready for posting"
+            
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} approved and {next_stage_msg} by {self.env.user.name}",
+                subject="Payment Voucher Approved"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'params': {
+                'message': _('Payment has been approved successfully.'),
+                'type': 'success',
+            }
+        }
+
+    def action_authorize_payment(self):
+        """Authorize vendor payment (Stage 3 → Ready for posting) - Vendor payments only"""
+        for record in self:
+            if record.payment_type != 'outbound':
+                raise UserError(_("Authorization stage only applies to vendor payments."))
+            
+            if record.approval_state != 'for_authorization':
+                raise UserError(_("Only vendor payments waiting for authorization can be authorized."))
+            
+            # Check user permissions for authorization
+            if not self.env.user.has_group('account_payment_final.group_payment_voucher_authorizer'):
+                raise UserError(_("You don't have permission to authorize payments."))
+            
+            # Set authorization fields
+            record.authorizer_id = self.env.user
+            record.authorizer_date = fields.Datetime.now()
             record._approval_state_manual = True
             record.approval_state = 'approved'
+            
+            record.message_post(
+                body=f"Payment voucher {record.voucher_number} authorized and ready for posting by {self.env.user.name}",
+                subject="Payment Voucher Authorized"
+            )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'params': {
+                'message': _('Payment has been authorized and is ready for posting.'),
+                'type': 'success',
+            }
+        }
+
+    def action_post_payment(self):
+        """Post payment after all approvals (Final stage)"""
+        for record in self:
+            if record.approval_state != 'approved':
+                raise UserError(_("Only approved payments can be posted."))
+            
+            # Check user permissions for posting
+            if not self.env.user.has_group('account_payment_final.group_payment_voucher_poster'):
+                raise UserError(_("You don't have permission to post payments."))
+            
+            # Additional validation before posting
+            if not record.partner_id:
+                raise ValidationError(_("Partner must be specified before posting."))
+            if not record.destination_account_id and record.payment_type == 'outbound':
+                # Auto-set destination account if not specified
+                record.destination_account_id = record.partner_id.property_account_payable_id
+            
+            # Set posting fields
+            record.actual_approver_id = self.env.user
+            record._approval_state_manual = True
             
             # Post the payment with error handling
             try:
@@ -338,42 +443,54 @@ Verify at: {base_url}/payment/qr-guide"""
                 record.approval_state = 'posted'
                 
                 record.message_post(
-                    body=f"Payment voucher {record.voucher_number} approved and posted by {self.env.user.name}",
-                    subject="Payment Voucher Approved and Posted"
+                    body=f"Payment voucher {record.voucher_number} posted by {self.env.user.name}",
+                    subject="Payment Voucher Posted"
                 )
             except Exception as e:
                 # Rollback approval state if posting fails
-                record.approval_state = 'waiting_approval'
+                record.approval_state = 'approved'
                 raise UserError(_("Failed to post payment: %s") % str(e))
         
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
             'params': {
-                'message': _('Payment has been approved and posted successfully.'),
+                'message': _('Payment has been posted successfully.'),
                 'type': 'success',
             }
         }
 
     def action_reject_payment(self):
-        """Reject payment and return to draft with enhanced feedback"""
+        """Reject payment and return to previous stage or draft"""
         for record in self:
-            if record.approval_state != 'waiting_approval':
-                raise UserError(_("Only payments waiting for approval can be rejected."))
+            if record.approval_state not in ['under_review', 'for_approval', 'for_authorization']:
+                raise UserError(_("Only payments in review/approval stages can be rejected."))
             
-            # Check user permissions for rejection
-            if not self.env.user.has_group('account.group_account_invoice'):
-                raise UserError(_("You don't have permission to reject payments."))
+            # Check user permissions for rejection based on current stage
+            current_stage = record.approval_state
+            if current_stage == 'under_review' and not self.env.user.has_group('account_payment_final.group_payment_voucher_reviewer'):
+                raise UserError(_("You don't have permission to reject payments at review stage."))
+            elif current_stage == 'for_approval' and not self.env.user.has_group('account_payment_final.group_payment_voucher_approver'):
+                raise UserError(_("You don't have permission to reject payments at approval stage."))
+            elif current_stage == 'for_authorization' and not self.env.user.has_group('account_payment_final.group_payment_voucher_authorizer'):
+                raise UserError(_("You don't have permission to reject payments at authorization stage."))
             
-            # Clear approval fields on rejection
-            record.approver_id = False
-            record.approver_date = False
-            record.actual_approver_id = False
+            # Clear relevant fields and return to draft
+            if current_stage == 'under_review':
+                record.reviewer_id = False
+                record.reviewer_date = False
+            elif current_stage == 'for_approval':
+                record.approver_id = False
+                record.approver_date = False
+            elif current_stage == 'for_authorization':
+                record.authorizer_id = False
+                record.authorizer_date = False
+            
             record._approval_state_manual = True
             record.approval_state = 'draft'
             
             record.message_post(
-                body=f"Payment voucher {record.voucher_number} rejected by {self.env.user.name}. Returned to draft for revision.",
+                body=f"Payment voucher {record.voucher_number} rejected at {current_stage} stage by {self.env.user.name}. Returned to draft for revision.",
                 subject="Payment Voucher Rejected"
             )
         
@@ -386,56 +503,6 @@ Verify at: {base_url}/payment/qr-guide"""
             }
         }
 
-    # Legacy methods for future 4-checkpoint workflow (currently disabled)
-    def action_send_for_review(self):
-        """Send payment for review (Future Use - 4 checkpoint workflow)"""
-        if self.approval_state != 'draft':
-            raise UserError(_("Only draft payments can be sent for review."))
-        
-        # Future implementation for 4-checkpoint workflow
-        _logger.info(f"Payment {self.voucher_number} sent for review (4-checkpoint workflow disabled)")
-        return True
-    
-    def action_review_payment(self):
-        """Mark payment as reviewed (Future Use - 4 checkpoint workflow)"""
-        self.ensure_one()
-        if self.approval_state != 'draft':
-            raise UserError(_("Only draft payments can be reviewed."))
-        
-        # Future implementation for 4-checkpoint workflow
-        self.reviewer_id = self.env.user
-        self.reviewer_date = fields.Datetime.now()
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'message': _('Payment has been marked as reviewed (4-checkpoint workflow feature).'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-    
-    def action_approve_payment(self):
-        """Mark payment as approved by final approver (Future Use - 4 checkpoint workflow)"""
-        self.ensure_one()
-        if self.approval_state != 'draft':
-            raise UserError(_("Only draft payments can be approved in 4-checkpoint workflow."))
-        
-        # Future implementation for 4-checkpoint workflow
-        self.approver_id = self.env.user
-        self.approver_date = fields.Datetime.now()
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'message': _('Payment has been approved in 4-checkpoint workflow (feature disabled).'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-    
     @api.constrains('amount', 'partner_id', 'approval_state')
     def _check_payment_requirements(self):
         """Enhanced validation constraints for payment requirements"""
@@ -700,7 +767,6 @@ Verify at: {base_url}/payment/qr-guide"""
         return {
             'primary_color': '#8B1538',
             'secondary_color': '#D4AF37',
-            'company_tagline': 'Luxury Real Estate Excellence',
             'website': 'www.osusproperties.com',
             'logo_url': 'https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png'
         }
