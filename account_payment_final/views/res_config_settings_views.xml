@@ -17,7 +17,7 @@
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label string="OSUS Branding"/>
+                                    <span class="o_form_label">OSUS Branding</span>
                                     <div class="text-muted">
                                         Enable OSUS brand guidelines for payment vouchers
                                     </div>
@@ -31,7 +31,7 @@
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label string="Auto-Post Payments"/>
+                                    <span class="o_form_label">Auto-Post Payments</span>
                                     <div class="text-muted">
                                         Automatically post payments when approved
                                     </div>
@@ -47,7 +47,7 @@
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label string="Approval Amount Limit"/>
+                                    <span class="o_form_label">Approval Amount Limit</span>
                                     <div class="text-muted">
                                         Maximum amount regular users can approve
                                     </div>
@@ -60,7 +60,7 @@
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label string="Email Notifications"/>
+                                    <span class="o_form_label">Email Notifications</span>
                                     <div class="text-muted">
                                         Send email notifications for approval requests
                                     </div>
