@@ -42,10 +42,12 @@ class AccountPayment(models.Model):
         help="Whether to display QR code in payment voucher report"
     )
     
-    # Simplified Approval Workflow State
+    # Enhanced 4-Stage Approval Workflow State
     approval_state = fields.Selection([
         ('draft', 'Draft'),
-        ('waiting_approval', 'Waiting for Approval'),
+        ('under_review', 'Under Review'),
+        ('for_approval', 'For Approval'),
+        ('for_authorization', 'For Authorization'),
         ('approved', 'Approved'),
         ('posted', 'Posted'),
         ('cancelled', 'Cancelled')
@@ -66,40 +68,51 @@ class AccountPayment(models.Model):
         help="Unique voucher number generated automatically"
     )
     
-    # Future expansion fields (currently inactive but ready for 4-checkpoint workflow)
+    # Enhanced workflow fields for 4-stage approval
     reviewer_id = fields.Many2one(
         'res.users',
         string='Reviewed By',
-        help="User who reviewed the payment before approval (Future Use)"
+        help="User who reviewed the payment (Stage 1)"
     )
     
     reviewer_date = fields.Datetime(
         string='Review Date',
-        help="Date when the payment was reviewed (Future Use)"
+        help="Date when the payment was reviewed"
     )
     
     approver_id = fields.Many2one(
         'res.users',
-        string='Final Approver',
-        help="User who gave final approval for the payment"
+        string='Approved By',
+        help="User who approved the payment (Stage 2)"
     )
     
     approver_date = fields.Datetime(
         string='Approval Date',
-        help="Date when the payment was finally approved"
+        help="Date when the payment was approved"
+    )
+    
+    authorizer_id = fields.Many2one(
+        'res.users',
+        string='Authorized By',
+        help="User who authorized the payment (Stage 3 - Vendor payments only)"
+    )
+    
+    authorizer_date = fields.Datetime(
+        string='Authorization Date',
+        help="Date when the payment was authorized"
     )
     
     authorized_by = fields.Char(
-        string='Authorized By',
+        string='Final Authorized By',
         compute='_compute_authorized_by',
         store=True,
-        help="Name of the person who approved and posted the payment"
+        help="Name of the person who gave final authorization and posted the payment"
     )
     
     actual_approver_id = fields.Many2one(
         'res.users',
-        string='Approved By User',
-        help="User who actually approved and posted the payment",
+        string='Posted By User',
+        help="User who actually posted the payment",
         readonly=True
     )
     
@@ -237,6 +250,25 @@ Verify at: {base_url}/payment/qr-guide"""
                     record.qr_code = False
             else:
                 record.qr_code = False
+
+    def action_view_approval_details(self):
+        """Show approval details and current status information"""
+        self.ensure_one()
+        
+        # Create a detailed view of the approval workflow
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Approval Details - {self.voucher_number or self.name}',
+            'res_model': 'account.payment',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('account_payment_final.view_account_payment_form_enhanced').id,
+            'target': 'new',
+            'context': {
+                'default_approval_state': self.approval_state,
+                'show_approval_details': True,
+            }
+        }
 
     # Simplified Workflow Methods
     def action_submit_for_approval(self):
@@ -437,28 +469,6 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return result
     
-    def write(self, vals):
-        """Enhanced write method with real-time state management"""
-        # Track if approval_state is being manually changed
-        if 'approval_state' in vals:
-            for record in self:
-                record._approval_state_manual = True
-        
-        # Prevent modification of critical fields when not in draft
-        restricted_fields = ['partner_id', 'amount', 'currency_id', 'payment_type']
-        if any(field in vals for field in restricted_fields):
-            for record in self:
-                if record.approval_state not in ['draft', 'cancelled']:
-                    raise UserError(_("Cannot modify payment details after submission for approval."))
-        
-        result = super().write(vals)
-        
-        # Trigger QR code regeneration if relevant fields changed
-        if any(field in vals for field in ['partner_id', 'amount', 'approval_state']):
-            self._generate_payment_qr_code()
-        
-        return result
-    
     @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):
         """Compute authorization field showing who approved and posted the payment"""
@@ -509,7 +519,19 @@ Verify at: {base_url}/payment/qr-guide"""
         return payment
 
     def write(self, vals):
-        """Override write to track approval state changes and posting"""
+        """Enhanced write method with real-time state management and audit tracking"""
+        # Track if approval_state is being manually changed
+        if 'approval_state' in vals:
+            for record in self:
+                record._approval_state_manual = True
+        
+        # Prevent modification of critical fields when not in draft
+        restricted_fields = ['partner_id', 'amount', 'currency_id', 'payment_type']
+        if any(field in vals for field in restricted_fields):
+            for record in self:
+                if record.approval_state not in ['draft', 'cancelled']:
+                    raise UserError(_("Cannot modify payment details after submission for approval."))
+        
         # Track state changes for audit
         for record in self:
             # Handle approval state changes
@@ -537,7 +559,13 @@ Verify at: {base_url}/payment/qr-guide"""
                     subject="Payment Voucher Posted"
                 )
         
-        return super(AccountPayment, self).write(vals)
+        result = super(AccountPayment, self).write(vals)
+        
+        # Trigger QR code regeneration if relevant fields changed
+        if any(field in vals for field in ['partner_id', 'amount', 'approval_state']):
+            self._generate_payment_qr_code()
+        
+        return result
     
     def action_print_osus_voucher(self):
         """Print OSUS branded payment voucher"""
@@ -695,22 +723,3 @@ class AccountPaymentRegister(models.TransientModel):
             payment_vals['remarks'] = self.remarks
             
         return payment_vals
-    
-    def action_view_approval_details(self):
-        """Show approval details and current status information"""
-        self.ensure_one()
-        
-        # Create a detailed view of the approval workflow
-        return {
-            'type': 'ir.actions.act_window',
-            'name': f'Approval Details - {self.voucher_number or self.name}',
-            'res_model': 'account.payment',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'view_id': self.env.ref('account_payment_final.view_account_payment_form_enhanced').id,
-            'target': 'new',
-            'context': {
-                'default_approval_state': self.approval_state,
-                'show_approval_details': True,
-            }
-        }
