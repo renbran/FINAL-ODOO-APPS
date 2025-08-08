@@ -18,6 +18,10 @@
                                options="{'clickable_stages': [('draft', 'Set to Draft'), ('cancelled', 'Cancel')]}"
                                readonly="0"/>
                         
+                        <!-- Required fields for conditions (invisible but available) -->
+                        <field name="partner_id" invisible="1"/>
+                        <field name="amount" invisible="1"/>
+                        
                         <!-- Enhanced Workflow Action Buttons with 4-stage logic -->
                         <button name="action_submit_for_review" 
                                 string="Submit for Review" 
