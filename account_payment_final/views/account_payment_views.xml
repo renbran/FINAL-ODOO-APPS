@@ -1,44 +1,4 @@
-<!-- Enhanced Security Groups for 4-Stage Workflow -->
-        <record id="group_payment_voucher_user" model="res.groups">
-            <field name="name">Payment Voucher User</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="comment">Can create and submit payment vouchers for review</field>
-        </record>
-        
-        <record id="group_payment_voucher_reviewer" model="res.groups">
-            <field name="name">Payment Voucher Reviewer</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_user'))]"/>
-            <field name="comment">Can review payments and forward them for approval (Stage 1)</field>
-        </record>
-        
-        <record id="group_payment_voucher_approver" model="res.groups">
-            <field name="name">Payment Voucher Approver</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
-            <field name="comment">Can approve payments and forward vendor payments for authorization (Stage 2)</field>
-        </record>
-        
-        <record id="group_payment_voucher_authorizer" model="res.groups">
-            <field name="name">Payment Voucher Authorizer</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
-            <field name="comment">Can authorize vendor payments for final posting (Stage 3)</field>
-        </record>
-        
-        <record id="group_payment_voucher_poster" model="res.groups">                        <!-- Real-time status indicator with workflow stage info -->
-                        <div class="alert alert-info" invisible="approval_state == 'draft'">
-                            <strong>Status: </strong>
-                            <field name="approval_state" readonly="1" string=""/>
-                            
-                            <!-- Show current stage handler -->
-                            <span invisible="not reviewer_id and approval_state not in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']"> | Reviewed by: </span>
-                            <field name="reviewer_id" invisible="not reviewer_id" readonly="1"/>
-                            
-                            <span invisible="not approver_id and approval_state not in ['for_authorization', 'approved', 'posted']"> | Approved by: </span>
-                            <field name="approver_id" invisible="not approver_id" readonly="1"/>
-                            
-                            <span invisible="not authorizer_id and approval_state not in ['approved', 'poste<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
         <!-- Enhanced Payment Form View -->
@@ -733,27 +693,6 @@
                     Track workflow progress across all 4 stages.
                 </p>
             </field>
-        </record>
-        
-        <!-- Security Groups for Enhanced Access Control -->
-        <record id="group_payment_voucher_user" model="res.groups">
-            <field name="name">Payment Voucher User</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="comment">Can create and submit payment vouchers for approval</field>
-        </record>
-        
-        <record id="group_payment_voucher_approver" model="res.groups">
-            <field name="name">Payment Voucher Approver</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_user'))]"/>
-            <field name="comment">Can approve and reject payment vouchers</field>
-        </record>
-        
-        <record id="group_payment_voucher_manager" model="res.groups">
-            <field name="name">Payment Voucher Manager</field>
-            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
-            <field name="comment">Full access to payment voucher system including cancellation and reset</field>
         </record>
     </data>
 </odoo>
