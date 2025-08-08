@@ -68,7 +68,7 @@
                                 type="object" 
                                 class="btn-success"
                                 groups="account_payment_final.group_payment_voucher_poster"
-                                invisible="approval_state != 'approved' or state != 'draft'"
+                                invisible="approval_state != 'approved'"
                                 confirm="Are you sure you want to post this payment?"/>
                         
                         <!-- Reject Button (appears at multiple stages) -->
@@ -94,7 +94,7 @@
                                 class="btn-secondary"
                                 groups="account.group_account_manager"
                                 confirm="Are you sure you want to cancel this payment? This action cannot be undone."
-                                invisible="state in ['posted', 'cancel'] or approval_state in ['cancelled', 'posted']"/>
+                                invisible="approval_state in ['cancelled', 'posted']"/>
                         
                         <button name="action_draft" 
                                 string="Reset to Draft" 

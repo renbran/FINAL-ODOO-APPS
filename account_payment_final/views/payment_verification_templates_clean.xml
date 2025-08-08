@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Enhanced Payment Verification Success Template with 4-Stage Workflow -->
+        <template id="payment_verification_success_enhanced" name="Enhanced Payment Verification Success">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <div class="container mt-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 col-md-10">
+                                <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+                                    <!-- OSUS Branded Header -->
+                                    <div class="card-header text-white text-center py-4" 
+                                         style="background: linear-gradient(135deg, #800020 0%, #a0002b 100%);">
+                                        <i class="fa fa-check-circle fa-3x mb-3"></i>
+                                        <h2 class="mb-0">Payment Verification Successful</h2>
+                                        <p class="mb-0 opacity-75">OSUS Properties - Payment details verified and authenticated</p>
+                                    </div>
+                                    
+                                    <!-- Enhanced Payment Details with 4-Stage Workflow -->
+                                    <div class="card-body p-4">
+                                        <!-- Workflow Progress Indicator -->
+                                        <div class="row mb-4" t-if="approval_state">
+                                            <div class="col-12">
+                                                <h5 class="text-center mb-3" style="color: #800020;">Workflow Progress</h5>
+                                                <div class="progress-workflow text-center">
+                                                    <span class="badge badge-success" style="margin-right: 10px;">✓ Draft</span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;">
+                                                        <t t-if="approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Review
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;">
+                                                        <t t-if="approval_state in ['for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Approval
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_authorization', 'approved', 'posted'] else 'secondary'}}" 
+                                                          style="margin-right: 10px;" t-if="payment_type == 'outbound'">
+                                                        <t t-if="approval_state in ['for_authorization', 'approved', 'posted']">✓</t> Authorization
+                                                    </span>
+                                                    <span t-attf-class="badge badge-{{'success' if approval_state == 'posted' else 'secondary'}}">
+                                                        <t t-if="approval_state == 'posted'">✓</t> Posted
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Payment Information Grid -->
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="info-box p-3 bg-light rounded">
+                                                    <strong style="color: #800020;">Reference:</strong><br/>
+                                                    <span t-field="payment.name" class="h5"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="info-box p-3 bg-light rounded">
+                                                    <strong style="color: #800020;">Amount:</strong><br/>
+                                                    <span t-field="payment.amount" t-options="{'widget': 'monetary', 'display_currency': payment.currency_id}" class="h5"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="info-box p-3 bg-light rounded">
+                                                    <strong style="color: #800020;">Partner:</strong><br/>
+                                                    <span t-field="payment.partner_id.name" class="h5"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="info-box p-3 bg-light rounded">
+                                                    <strong style="color: #800020;">Date:</strong><br/>
+                                                    <span t-field="payment.date" class="h5"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Enhanced Status and Workflow Information -->
+                                        <div class="row" t-if="approval_state">
+                                            <div class="col-12">
+                                                <div class="alert alert-info">
+                                                    <h5 class="alert-heading">Workflow Status</h5>
+                                                    <p class="mb-1"><strong>Current Stage:</strong> <span t-field="payment.approval_state"/></p>
+                                                    
+                                                    <!-- Show stage handlers -->
+                                                    <div t-if="reviewer_id and approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']">
+                                                        <strong>Reviewed by:</strong> <span t-field="payment.reviewer_id.name"/>
+                                                    </div>
+                                                    <div t-if="approver_id and approval_state in ['for_authorization', 'approved', 'posted']">
+                                                        <strong>Approved by:</strong> <span t-field="payment.approver_id.name"/>
+                                                    </div>
+                                                    <div t-if="authorizer_id and approval_state in ['approved', 'posted']">
+                                                        <strong>Authorized by:</strong> <span t-field="payment.authorizer_id.name"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- QR Code Section with enhanced styling -->
+                                        <div class="row mt-4" t-if="qr_code_data">
+                                            <div class="col-12 text-center">
+                                                <h5 style="color: #800020;">Quick Verification</h5>
+                                                <div class="qr-container p-3" style="background: #f8f9fa; border-radius: 10px; display: inline-block;">
+                                                    <img t-attf-src="data:image/png;base64,{{qr_code_data}}" alt="Payment QR Code" class="img-fluid" style="max-width: 200px;"/>
+                                                    <p class="small text-muted mt-2">Scan to verify payment details</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Action Buttons -->
+                                        <div class="row mt-4">
+                                            <div class="col-12 text-center">
+                                                <button class="btn btn-outline-primary me-2" onclick="window.print()">
+                                                    <i class="fa fa-print"></i> Print Verification
+                                                </button>
+                                                <a href="/web" class="btn btn-primary">
+                                                    <i class="fa fa-arrow-left"></i> Return to Dashboard
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Enhanced Footer -->
+                                    <div class="card-footer text-center py-3" style="background: #f8f9fa;">
+                                        <small class="text-muted">
+                                            Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/> | 
+                                            OSUS Properties Payment System v2.0
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Security Groups for Enhanced 4-Stage Workflow -->
+        <record id="group_payment_voucher_reviewer" model="res.groups">
+            <field name="name">Payment Voucher Reviewer</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="comment">Can review vendor payments for approval (Stage 1)</field>
+        </record>
+        
+        <record id="group_payment_voucher_approver" model="res.groups">
+            <field name="name">Payment Voucher Approver</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
+            <field name="comment">Can approve vendor payments for authorization (Stage 2)</field>
+        </record>
+        
+        <record id="group_payment_voucher_authorizer" model="res.groups">
+            <field name="name">Payment Voucher Authorizer</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
+            <field name="comment">Can authorize vendor payments for final posting (Stage 3)</field>
+        </record>
+        
+        <record id="group_payment_voucher_poster" model="res.groups">
+            <field name="name">Payment Voucher Poster</field>
+            <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_authorizer'))]"/>
+            <field name="comment">Can post vendor payments for final completion (Stage 4)</field>
+        </record>
+
+    </data>
+</odoo>
