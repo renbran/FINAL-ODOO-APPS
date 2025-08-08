@@ -59,5 +59,4 @@
     'auto_install': False,
     'application': False,
     'sequence': 10,
-    'post_init_hook': '_post_init_hook',
 }

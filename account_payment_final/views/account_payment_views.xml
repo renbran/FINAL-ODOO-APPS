@@ -23,7 +23,7 @@
                                 class="btn-primary"
                                 invisible="approval_state != 'draft'"/>
                         
-                        <button name="action_approve_payment" 
+                        <button name="action_approve_and_post" 
                                 string="Approve" 
                                 type="object" 
                                 class="btn-success"

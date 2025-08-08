@@ -208,11 +208,10 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return {
             'type': 'ir.actions.client',
-            'tag': 'display_notification',
+            'tag': 'reload',
             'params': {
                 'message': _('Payment has been submitted for approval.'),
                 'type': 'success',
-                'sticky': False,
             }
         }
 
@@ -243,11 +242,10 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return {
             'type': 'ir.actions.client',
-            'tag': 'display_notification',
+            'tag': 'reload',
             'params': {
                 'message': _('Payment has been approved and posted successfully.'),
                 'type': 'success',
-                'sticky': False,
             }
         }
 
@@ -265,11 +263,10 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return {
             'type': 'ir.actions.client',
-            'tag': 'display_notification',
+            'tag': 'reload',
             'params': {
                 'message': _('Payment has been rejected and returned to draft.'),
                 'type': 'info',
-                'sticky': False,
             }
         }
 
