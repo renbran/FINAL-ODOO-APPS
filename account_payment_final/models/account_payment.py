@@ -695,3 +695,22 @@ class AccountPaymentRegister(models.TransientModel):
             payment_vals['remarks'] = self.remarks
             
         return payment_vals
+    
+    def action_view_approval_details(self):
+        """Show approval details and current status information"""
+        self.ensure_one()
+        
+        # Create a detailed view of the approval workflow
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Approval Details - {self.voucher_number or self.name}',
+            'res_model': 'account.payment',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('account_payment_final.view_account_payment_form_enhanced').id,
+            'target': 'new',
+            'context': {
+                'default_approval_state': self.approval_state,
+                'show_approval_details': True,
+            }
+        }
