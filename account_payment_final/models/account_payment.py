@@ -50,7 +50,7 @@ class AccountPayment(models.Model):
         ('posted', 'Posted'),
         ('cancelled', 'Cancelled')
     ], string='Approval State', default='draft', tracking=True,
-       help="Current approval state of the payment voucher")
+       help="Current approval state of the payment voucher", compute='_compute_approval_state', store=True)
     
     # Enhanced fields for OSUS voucher system
     remarks = fields.Text(
@@ -116,6 +116,54 @@ class AccountPayment(models.Model):
         compute='_compute_display_name',
         store=True
     )
+    
+    @api.depends('state', 'is_reconciled')
+    def _compute_approval_state(self):
+        """Auto-compute approval state based on payment state for real-time responsiveness"""
+        for record in self:
+            if not hasattr(record, '_approval_state_manual'):
+                if record.state == 'posted':
+                    record.approval_state = 'posted'
+                elif record.state == 'cancel':
+                    record.approval_state = 'cancelled'
+                elif record.state == 'draft' and not record.approval_state:
+                    record.approval_state = 'draft'
+                # Keep existing approval_state if manually set
+    
+    @api.onchange('payment_type', 'partner_id', 'amount')
+    def _onchange_payment_details(self):
+        """Enhanced onchange for real-time field updates and validations"""
+        if self.approval_state not in ['draft', 'cancelled']:
+            return {
+                'warning': {
+                    'title': _('Warning'),
+                    'message': _('Payment details cannot be changed after submission for approval.')
+                }
+            }
+        
+        # Auto-generate voucher number if missing
+        if not self.voucher_number:
+            self._generate_voucher_number()
+        
+        # Update QR code when payment details change
+        if self.partner_id and self.amount:
+            self._generate_payment_qr_code()
+    
+    @api.onchange('approval_state')
+    def _onchange_approval_state(self):
+        """Real-time status bar updates and field state changes"""
+        if self.approval_state == 'posted' and self.state != 'posted':
+            # Auto-sync with Odoo's standard state
+            self.state = 'posted'
+        elif self.approval_state == 'cancelled' and self.state != 'cancel':
+            self.state = 'cancel'
+        
+        # Trigger UI refresh for status-dependent fields
+        return {
+            'domain': {
+                'partner_id': [] if self.approval_state in ['draft', 'cancelled'] else [('id', '=', self.partner_id.id or False)]
+            }
+        }
     
     @api.depends('name', 'payment_type', 'partner_id', 'amount', 'currency_id')
     def _compute_display_name(self):
@@ -192,20 +240,33 @@ Verify at: {base_url}/payment/qr-guide"""
 
     # Simplified Workflow Methods
     def action_submit_for_approval(self):
-        """Submit payment for approval"""
+        """Submit payment for approval with enhanced validation and state management"""
         for record in self:
             if record.approval_state != 'draft':
                 raise UserError(_("Only draft payments can be submitted for approval."))
             
+            # Enhanced validation before submission
+            if not record.partner_id:
+                raise ValidationError(_("Partner must be specified before submission."))
+            if not record.amount or record.amount <= 0:
+                raise ValidationError(_("Amount must be greater than zero."))
+            if not record.currency_id:
+                raise ValidationError(_("Currency must be specified."))
+            
+            # Generate voucher number if not already generated
             if not record.voucher_number:
                 record._generate_voucher_number()
             
+            # Set manual flag to prevent auto-computation override
+            record._approval_state_manual = True
             record.approval_state = 'waiting_approval'
+            
             record.message_post(
                 body=f"Payment voucher {record.voucher_number} submitted for approval by {self.env.user.name}",
                 subject="Payment Voucher Submitted for Approval"
             )
         
+        # Force UI refresh and show success message
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -216,7 +277,7 @@ Verify at: {base_url}/payment/qr-guide"""
         }
 
     def action_approve_and_post(self):
-        """Approve and post payment in one action (simplified workflow)"""
+        """Approve and post payment in one action with enhanced state management"""
         for record in self:
             if record.approval_state not in ['waiting_approval', 'approved']:
                 raise UserError(_("Only payments waiting for approval can be approved and posted."))
@@ -225,20 +286,33 @@ Verify at: {base_url}/payment/qr-guide"""
             if not self.env.user.has_group('account.group_account_invoice'):
                 raise UserError(_("You don't have permission to approve payments."))
             
+            # Additional validation before approval
+            if not record.partner_id:
+                raise ValidationError(_("Partner must be specified before approval."))
+            if not record.destination_account_id and record.payment_type == 'outbound':
+                # Auto-set destination account if not specified
+                record.destination_account_id = record.partner_id.property_account_payable_id
+            
             # Set approval fields
             record.approver_id = self.env.user
             record.approver_date = fields.Datetime.now()
             record.actual_approver_id = self.env.user
+            record._approval_state_manual = True
             record.approval_state = 'approved'
             
-            # Post the payment
-            record.action_post()
-            record.approval_state = 'posted'
-            
-            record.message_post(
-                body=f"Payment voucher {record.voucher_number} approved and posted by {self.env.user.name}",
-                subject="Payment Voucher Approved and Posted"
-            )
+            # Post the payment with error handling
+            try:
+                record.action_post()
+                record.approval_state = 'posted'
+                
+                record.message_post(
+                    body=f"Payment voucher {record.voucher_number} approved and posted by {self.env.user.name}",
+                    subject="Payment Voucher Approved and Posted"
+                )
+            except Exception as e:
+                # Rollback approval state if posting fails
+                record.approval_state = 'waiting_approval'
+                raise UserError(_("Failed to post payment: %s") % str(e))
         
         return {
             'type': 'ir.actions.client',
@@ -250,14 +324,24 @@ Verify at: {base_url}/payment/qr-guide"""
         }
 
     def action_reject_payment(self):
-        """Reject payment and return to draft"""
+        """Reject payment and return to draft with enhanced feedback"""
         for record in self:
             if record.approval_state != 'waiting_approval':
                 raise UserError(_("Only payments waiting for approval can be rejected."))
             
+            # Check user permissions for rejection
+            if not self.env.user.has_group('account.group_account_invoice'):
+                raise UserError(_("You don't have permission to reject payments."))
+            
+            # Clear approval fields on rejection
+            record.approver_id = False
+            record.approver_date = False
+            record.actual_approver_id = False
+            record._approval_state_manual = True
             record.approval_state = 'draft'
+            
             record.message_post(
-                body=f"Payment voucher {record.voucher_number} rejected by {self.env.user.name}",
+                body=f"Payment voucher {record.voucher_number} rejected by {self.env.user.name}. Returned to draft for revision.",
                 subject="Payment Voucher Rejected"
             )
         
@@ -266,7 +350,7 @@ Verify at: {base_url}/payment/qr-guide"""
             'tag': 'reload',
             'params': {
                 'message': _('Payment has been rejected and returned to draft.'),
-                'type': 'info',
+                'type': 'warning',
             }
         }
 
@@ -319,6 +403,61 @@ Verify at: {base_url}/payment/qr-guide"""
                 'sticky': False,
             }
         }
+    
+    @api.constrains('amount', 'partner_id', 'approval_state')
+    def _check_payment_requirements(self):
+        """Enhanced validation constraints for payment requirements"""
+        for record in self:
+            if record.approval_state != 'draft':
+                # Validate required fields for non-draft payments
+                if not record.partner_id:
+                    raise ValidationError(_("Partner is required for payment submission."))
+                if not record.amount or record.amount <= 0:
+                    raise ValidationError(_("Payment amount must be greater than zero."))
+                if not record.currency_id:
+                    raise ValidationError(_("Currency is required for payment processing."))
+    
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        """Enhanced view rendering with dynamic field attributes"""
+        result = super().fields_view_get(view_id, view_type, toolbar, submenu)
+        
+        # Add dynamic field classes and attributes for real-time updates
+        if view_type == 'form':
+            import xml.etree.ElementTree as ET
+            doc = ET.fromstring(result['arch'])
+            
+            # Add onchange attributes to key fields for real-time responsiveness
+            for field in doc.iter('field'):
+                field_name = field.get('name')
+                if field_name in ['partner_id', 'amount', 'currency_id', 'payment_type']:
+                    field.set('on_change', '1')
+                    
+            result['arch'] = ET.tostring(doc, encoding='unicode')
+        
+        return result
+    
+    def write(self, vals):
+        """Enhanced write method with real-time state management"""
+        # Track if approval_state is being manually changed
+        if 'approval_state' in vals:
+            for record in self:
+                record._approval_state_manual = True
+        
+        # Prevent modification of critical fields when not in draft
+        restricted_fields = ['partner_id', 'amount', 'currency_id', 'payment_type']
+        if any(field in vals for field in restricted_fields):
+            for record in self:
+                if record.approval_state not in ['draft', 'cancelled']:
+                    raise UserError(_("Cannot modify payment details after submission for approval."))
+        
+        result = super().write(vals)
+        
+        # Trigger QR code regeneration if relevant fields changed
+        if any(field in vals for field in ['partner_id', 'amount', 'approval_state']):
+            self._generate_payment_qr_code()
+        
+        return result
     
     @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'write_date')
     def _compute_authorized_by(self):

@@ -11,91 +11,173 @@
                 <!-- Replace header with enhanced workflow -->
                 <xpath expr="//header" position="replace">
                     <header>
-                        <!-- Approval State Status Bar -->
+                        <!-- Enhanced Approval State Status Bar with real-time updates -->
                         <field name="approval_state" widget="statusbar" 
                                statusbar_visible="draft,waiting_approval,approved,posted"
-                               statusbar_colors='{"draft":"blue","waiting_approval":"orange","approved":"green","posted":"success","cancelled":"secondary"}'/>
+                               statusbar_colors='{"draft":"blue","waiting_approval":"orange","approved":"green","posted":"success","cancelled":"secondary"}'
+                               options="{'clickable_stages': [('draft', 'Set to Draft'), ('cancelled', 'Cancel')]}"
+                               readonly="0"/>
                         
-                        <!-- Workflow Action Buttons -->
+                        <!-- Enhanced Workflow Action Buttons with dynamic visibility -->
                         <button name="action_submit_for_approval" 
                                 string="Submit for Approval" 
                                 type="object" 
                                 class="btn-primary"
-                                invisible="approval_state != 'draft'"/>
+                                invisible="approval_state != 'draft' or not partner_id or not amount"
+                                confirm="Are you sure you want to submit this payment for approval?"/>
                         
                         <button name="action_approve_and_post" 
-                                string="Approve" 
+                                string="Approve &amp; Post" 
                                 type="object" 
                                 class="btn-success"
                                 groups="account.group_account_invoice"
-                                invisible="approval_state != 'waiting_approval'"/>
+                                invisible="approval_state != 'waiting_approval'"
+                                confirm="Are you sure you want to approve and post this payment?"/>
                         
                         <button name="action_reject_payment" 
                                 string="Reject" 
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_invoice"
-                                invisible="approval_state != 'waiting_approval'"/>
+                                invisible="approval_state != 'waiting_approval'"
+                                confirm="Are you sure you want to reject this payment?"/>
                         
-                        <!-- Standard Posting -->
+                        <!-- Enhanced Post Button -->
                         <button name="action_post" 
                                 string="Post Payment" 
                                 type="object" 
                                 class="btn-success"
-                                invisible="approval_state != 'approved' or state != 'draft'"/>
+                                invisible="approval_state != 'approved' or state != 'draft'"
+                                confirm="Are you sure you want to post this payment?"/>
                         
-                        <!-- Print Actions -->
+                        <!-- Print Actions with enhanced visibility -->
                         <button name="action_print_osus_voucher" 
                                 string="Print Voucher" 
                                 type="object" 
                                 class="btn-primary"
                                 icon="fa-print"
-                                invisible="approval_state in ['draft']"/>
+                                invisible="approval_state in ['draft'] or not voucher_number"/>
                         
-                        <!-- Cancel/Reset Actions -->
+                        <!-- Enhanced Cancel/Reset Actions -->
                         <button name="action_cancel" 
                                 string="Cancel" 
                                 type="object" 
                                 class="btn-secondary"
                                 groups="account.group_account_manager"
-                                confirm="Are you sure you want to cancel this payment?"
-                                invisible="state != 'draft' or approval_state in ['cancelled']"/>
+                                confirm="Are you sure you want to cancel this payment? This action cannot be undone."
+                                invisible="state in ['posted', 'cancel'] or approval_state in ['cancelled', 'posted']"/>
                         
                         <button name="action_draft" 
                                 string="Reset to Draft" 
                                 type="object" 
                                 class="btn-warning"
                                 groups="account.group_account_manager"
-                                invisible="approval_state != 'cancelled'"/>
+                                invisible="approval_state not in ['cancelled']"
+                                confirm="Are you sure you want to reset this payment to draft?"/>
+                        
+                        <!-- Real-time Status Indicator -->
+                        <div class="oe_button_box">
+                            <button class="oe_stat_button" type="object" icon="fa-info-circle">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="approval_state" readonly="1" string="Status"/>
+                                    </span>
+                                    <span class="o_stat_text">Current State</span>
+                                </div>
+                            </button>
+                        </div>
                     </header>
                 </xpath>
                 
-                <!-- Add voucher fields after existing fields -->
+                <!-- Enhanced voucher fields with real-time updates -->
                 <xpath expr="//field[@name='partner_id']" position="before">
                     <div class="oe_title">
                         <h1>
                             <field name="voucher_number" readonly="1" 
-                                   placeholder="Will be auto-generated"/>
+                                   placeholder="Will be auto-generated"
+                                   class="o_field_highlight"/>
                         </h1>
                         <h3>
                             <field name="payment_type" widget="radio" 
                                    options="{'horizontal': true}"
-                                   readonly="approval_state != 'draft'"/>
+                                   readonly="approval_state not in ['draft', 'cancelled']"
+                                   class="o_field_payment_type"/>
                         </h3>
+                        <!-- Real-time status indicator -->
+                        <div class="alert alert-info" invisible="approval_state == 'draft'">
+                            <strong>Status: </strong>
+                            <field name="approval_state" readonly="1" string=""/>
+                            <span invisible="not approver_id"> | Approved by: </span>
+                            <field name="approver_id" invisible="not approver_id" readonly="1"/>
+                        </div>
                     </div>
                 </xpath>
                 
-                <!-- Make standard fields readonly based on approval state -->
+                <!-- Enhanced field attributes with dynamic readonly states -->
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
+                    <attribute name="required">1</attribute>
+                    <attribute name="placeholder">Select partner for payment</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='amount']" position="attributes">
                     <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
+                    <attribute name="required">1</attribute>
+                    <attribute name="class">o_field_monetary</attribute>
                 </xpath>
                 
-                <xpath expr="//field[@name='currency_id']" position="attributes">
+                <!-- Enhanced destination account field with responsiveness -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="destination_account_id" 
+                           readonly="approval_state not in ['draft', 'cancelled']"
+                           invisible="payment_type != 'outbound'"
+                           string="Destination Account"/>
+                </xpath>
+                
+                <!-- Enhanced journal field -->
+                <xpath expr="//field[@name='journal_id']" position="attributes">
                     <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
+                    <attribute name="required">1</attribute>
+                </xpath>
+                
+                <!-- Enhanced date field -->
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="readonly">approval_state not in ['draft', 'cancelled']</attribute>
+                    <attribute name="required">1</attribute>
+                </xpath>
+                
+                <!-- Enhanced reference field -->
+                <!-- Enhanced Voucher Information Group -->
+                <xpath expr="//field[@name='communication']" position="after">
+                    <group name="voucher_info" string="Voucher Information" col="2">
+                        <field name="remarks" 
+                               readonly="approval_state == 'posted'"
+                               placeholder="Additional remarks or notes"/>
+                        <field name="voucher_number" readonly="1"/>
+                        <field name="authorized_by" readonly="1" invisible="not authorized_by"/>
+                        <field name="approver_date" readonly="1" invisible="not approver_date"/>
+                    </group>
+                    
+                    <!-- Approval Workflow Information -->
+                    <group name="approval_info" string="Approval Information" col="2" 
+                           invisible="approval_state in ['draft']">
+                        <field name="actual_approver_id" readonly="1" invisible="not actual_approver_id"/>
+                        <field name="approval_state" readonly="1" widget="badge" 
+                               decoration-info="approval_state == 'draft'"
+                               decoration-warning="approval_state == 'waiting_approval'"
+                               decoration-success="approval_state in ['approved', 'posted']"
+                               decoration-muted="approval_state == 'cancelled'"/>
+                    </group>
+                    
+                    <!-- QR Code Section -->
+                    <group name="qr_info" string="QR Code" col="1" 
+                           invisible="approval_state == 'draft' or not qr_code">
+                        <field name="qr_in_report" widget="boolean_toggle"/>
+                        <field name="qr_code" widget="image" 
+                               readonly="1" 
+                               class="oe_avatar"
+                               options="{'size': [150, 150]}"/>
+                    </group>
                 </xpath>
                 
                 <xpath expr="//field[@name='date']" position="attributes">
