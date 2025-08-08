@@ -139,7 +139,7 @@
                                    class="o_field_payment_type"/>
                         </h3>
                         <!-- Real-time status indicator with workflow stage info -->
-                        <div class="alert alert-info" invisible="approval_state == 'draft'">
+                        <div class="alert alert-info" role="status" invisible="approval_state == 'draft'">
                             <strong>Status: </strong>
                             <field name="approval_state" readonly="1" string=""/>
                             
@@ -198,7 +198,7 @@
                 </xpath>
                 
                 <!-- Enhanced Voucher Information Group -->
-                <xpath expr="//field[@name='ref']" position="after">
+                <xpath expr="//field[@name='date']" position="after">
                     <group name="voucher_info" string="Voucher Information" col="2">
                         <field name="remarks" 
                                readonly="approval_state == 'posted'"
@@ -257,7 +257,7 @@
                 </xpath>
                 
                 <!-- Add custom fields to existing form -->
-                <xpath expr="//field[@name='ref']" position="after">
+                <xpath expr="//form" position="inside">
                     <field name="remarks" 
                            readonly="approval_state not in ['draft', 'cancelled']"
                            placeholder="Enter additional remarks or purpose for this payment..."
@@ -275,7 +275,7 @@
                             <!-- Workflow Progress Indicator -->
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="alert alert-success" invisible="payment_type != 'outbound'">
+                                    <div class="alert alert-success" role="status" invisible="payment_type != 'outbound'">
                                         <h5>Vendor Payment Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
@@ -286,7 +286,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="alert alert-info" invisible="payment_type != 'inbound'">
+                                    <div class="alert alert-info" role="status" invisible="payment_type != 'inbound'">
                                         <h5>Customer Receipt Workflow Progress:</h5>
                                         <div class="progress-workflow">
                                             <span class="badge badge-primary" style="margin-right: 10px;">1. Draft</span>
@@ -351,7 +351,7 @@
                                 </group>
                             </group>
                             
-                            <div class="alert alert-info" invisible="not qr_code">
+                            <div class="alert alert-info" role="status" invisible="not qr_code">
                                 <p><strong>QR Code Information:</strong></p>
                                 <p>This QR code contains payment verification data and can be scanned 
                                 to verify payment details securely.</p>
@@ -400,15 +400,13 @@
                            decoration-success="approval_state in ['approved', 'posted']"
                            decoration-danger="approval_state == 'cancelled'"/>
                 </xpath>
+                <!-- Add remarks field to tree view -->
                 <xpath expr="//field[@name='amount_company_currency_signed']" position="after">
                     <field name="reviewer_id" optional="hide"/>
                     <field name="approver_id" optional="hide"/>
                     <field name="authorizer_id" optional="hide"/>
                     <field name="actual_approver_id" optional="hide" string="Posted By"/>
                     <field name="authorized_by" optional="hide"/>
-                </xpath>
-                <!-- Add remarks field to tree view -->
-                <xpath expr="//field[@name='ref']" position="after">
                     <field name="remarks" optional="hide"/>
                 </xpath>
             </field>
@@ -498,7 +496,7 @@
             <field name="model">account.payment.register</field>
             <field name="inherit_id" ref="account.view_account_payment_register_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='communication']" position="after">
+                <xpath expr="//form" position="inside">
                     <group string="Additional Information">
                         <field name="remarks" 
                                placeholder="Enter additional remarks for the payment voucher..."
