@@ -559,26 +559,3 @@ class AccountPaymentRegister(models.TransientModel):
             payment_vals['remarks'] = self.remarks
             
         return payment_vals
-
-
-class ResCompany(models.Model):
-    """Enhanced company model for OSUS branding"""
-    _inherit = 'res.company'
-    
-    voucher_footer_message = fields.Text(
-        string='Voucher Footer Message',
-        default='Thank you for your business',
-        help="Custom message to display in payment voucher footer"
-    )
-    
-    voucher_terms = fields.Text(
-        string='Voucher Terms',
-        default='This is a computer-generated document. No physical signature or stamp required for system verification.',
-        help="Terms and conditions to display in payment voucher"
-    )
-    
-    use_osus_branding = fields.Boolean(
-        string='Use OSUS Branding',
-        default=True,
-        help="Apply OSUS brand guidelines to reports and vouchers"
-    )

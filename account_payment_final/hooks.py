@@ -28,13 +28,6 @@ def _post_init_hook(cr, registry):
         _logger.error(f"Error in post-install hook: {e}")
         # Don't raise the exception to prevent module installation failure
         pass
-            'voucher_terms': 'This is a computer-generated document. No physical signature required for system verification.',
-        })
-        
-        _logger.info("OSUS Payment Voucher module post-install setup completed successfully")
-        
-    except Exception as e:
-        _logger.error(f"Error in post-install hook: {e}")
 
 
 def _create_company_sequences(env, company):
