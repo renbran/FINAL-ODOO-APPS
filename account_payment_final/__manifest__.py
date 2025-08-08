@@ -44,8 +44,8 @@
         'views/res_company_views.xml',
         
         # Reports
-        'reports/payment_voucher_reports.xml',
-        'reports/payment_voucher_templates.xml',
+        'reports/payment_voucher_report.xml',
+        'reports/payment_voucher_template.xml',
         
         # Website (for QR verification)
         'views/payment_verification_templates.xml',

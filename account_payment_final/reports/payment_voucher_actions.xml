@@ -3,6 +3,17 @@
     <data>
         <!-- Payment Voucher Report Action -->
         <record id="action_report_payment_voucher" model="ir.actions.report">
+            ...existing code...
+        </record>
+
+        <record id="action_report_payment_voucher_osus" model="ir.actions.report">
+            <field name="name">OSUS Payment Voucher</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">account_payment_final.payment_voucher_template</field>
+            <field name="file">account_payment_final.payment_voucher_template</field>
+            <field name="print_report_name">(object.voucher_number or 'Voucher') + '_OSUS'</field>
+        </record>
             <field name="name">OSUS Payment Voucher</field>
             <field name="model">account.payment</field>
             <field name="report_type">qweb-pdf</field>
