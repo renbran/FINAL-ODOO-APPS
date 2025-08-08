@@ -408,11 +408,11 @@ Verify at: {base_url}/payment/qr-guide"""
         if self.approval_state == 'draft':
             raise UserError(_("Cannot print voucher for draft payments. Please submit for approval first."))
         
-        return self.env.ref('payment_account_enhanced.action_report_payment_voucher_osus').report_action(self)
+        return self.env.ref('account_payment_final.action_report_payment_voucher_osus').report_action(self)
     
     def action_print_standard_voucher(self):
         """Print standard payment voucher (fallback)"""
-        return self.env.ref('payment_account_enhanced.action_report_payment_voucher').report_action(self)
+        return self.env.ref('account_payment_final.action_report_payment_voucher').report_action(self)
 
     def action_cancel(self):
         """Enhanced cancel action with proper validation"""

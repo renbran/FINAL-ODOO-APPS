@@ -36,7 +36,7 @@ class PaymentVerificationController(http.Controller):
                 'verification_timestamp': request.env.context.get('tz_offset', 'UTC'),
             }
             
-            return request.render('osus_payment_voucher.payment_verification_success', verification_data)
+            return request.render('account_payment_final.payment_verification_success', verification_data)
             
         except Exception as e:
             _logger.error(f"Error verifying payment {payment_id}: {e}")
@@ -51,7 +51,7 @@ class PaymentVerificationController(http.Controller):
         """Display QR code verification guide"""
         try:
             company = request.env.company
-            return request.render('osus_payment_voucher.qr_verification_guide', {
+            return request.render('account_payment_final.qr_verification_guide', {
                 'company_name': company.name,
             })
         except Exception as e:
@@ -64,7 +64,7 @@ class PaymentVerificationController(http.Controller):
     
     def _render_error(self, title, message, error_code):
         """Render error page"""
-        return request.render('osus_payment_voucher.payment_verification_error', {
+        return request.render('account_payment_final.payment_verification_error', {
             'error_title': title,
             'error_message': message,
             'error_code': error_code,

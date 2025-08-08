@@ -42,10 +42,12 @@
         # Views
         'views/account_payment_views.xml',
         'views/res_company_views.xml',
+        'views/res_config_settings_views.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/payment_voucher_template.xml',
+        'reports/payment_voucher_actions.xml',
         
         # Website (for QR verification)
         'views/payment_verification_templates.xml',
