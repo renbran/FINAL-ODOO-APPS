@@ -1,10 +1,15 @@
-from odoo import models, fields
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
     
-    # OSUS Branding and Payment Settings
+    # ============================================================================
+    # OSUS BRANDING AND PAYMENT SETTINGS
+    # ============================================================================
+    
     use_osus_branding = fields.Boolean(
         string='Use OSUS Branding',
         default=True,
@@ -46,3 +51,94 @@ class ResCompany(models.Model):
         default='This is a computer-generated document. No physical signature required for system verification.',
         help="Terms and conditions text for payment vouchers"
     )
+    
+    # ============================================================================
+    # WORKFLOW SETTINGS
+    # ============================================================================
+    
+    enable_four_stage_approval = fields.Boolean(
+        string='Enable 4-Stage Approval',
+        default=True,
+        help="Enable the full 4-stage approval workflow for vendor payments"
+    )
+    
+    skip_authorization_for_small_amounts = fields.Boolean(
+        string='Skip Authorization for Small Amounts',
+        default=False,
+        help="Skip authorization stage for payments below a certain amount"
+    )
+    
+    authorization_threshold = fields.Monetary(
+        string='Authorization Threshold',
+        default=5000.0,
+        help="Amount below which authorization stage is skipped"
+    )
+    
+    # ============================================================================
+    # QR CODE SETTINGS
+    # ============================================================================
+    
+    enable_qr_codes = fields.Boolean(
+        string='Enable QR Codes',
+        default=True,
+        help="Generate QR codes for payment vouchers"
+    )
+    
+    qr_code_verification_url = fields.Char(
+        string='QR Verification URL',
+        help="Custom URL for QR code verification portal"
+    )
+    
+    # ============================================================================
+    # SECURITY SETTINGS
+    # ============================================================================
+    
+    restrict_payment_modification = fields.Boolean(
+        string='Restrict Payment Modification',
+        default=True,
+        help="Prevent modification of payments after submission"
+    )
+    
+    allow_manager_override = fields.Boolean(
+        string='Allow Manager Override',
+        default=True,
+        help="Allow account managers to override workflow restrictions"
+    )
+    
+    # ============================================================================
+    # METHODS
+    # ============================================================================
+    
+    @api.model
+    def get_payment_voucher_settings(self):
+        """Get payment voucher settings for the current company"""
+        company = self.env.company
+        return {
+            'use_osus_branding': company.use_osus_branding,
+            'auto_post_approved_payments': company.auto_post_approved_payments,
+            'max_approval_amount': company.max_approval_amount,
+            'send_approval_notifications': company.send_approval_notifications,
+            'require_remarks_for_large_payments': company.require_remarks_for_large_payments,
+            'voucher_footer_message': company.voucher_footer_message,
+            'voucher_terms': company.voucher_terms,
+            'enable_four_stage_approval': company.enable_four_stage_approval,
+            'skip_authorization_for_small_amounts': company.skip_authorization_for_small_amounts,
+            'authorization_threshold': company.authorization_threshold,
+            'enable_qr_codes': company.enable_qr_codes,
+            'qr_code_verification_url': company.qr_code_verification_url,
+            'restrict_payment_modification': company.restrict_payment_modification,
+            'allow_manager_override': company.allow_manager_override,
+        }
+    
+    def action_configure_payment_vouchers(self):
+        """Open payment voucher configuration wizard"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Payment Voucher Configuration',
+            'res_model': 'res.config.settings',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_company_id': self.id,
+            }
+        }

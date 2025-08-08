@@ -1,75 +1,451 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Backend Assets -->
-    <template id="assets_backend" inherit_id="web.assets_backend">
-        <!-- SCSS Variables -->
-        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/variables.scss"/>
-        
-        <!-- Component Styles -->
-        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/components/payment_widget.scss"/>
-        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/views/form_view.scss"/>
-        
-        <!-- JavaScript Components -->
-        <script type="text/javascript" src="/account_payment_final/static/src/js/components/payment_approval_widget.js"/>
-        <script type="text/javascript" src="/account_payment_final/static/src/js/fields/qr_code_field.js"/>
-        <script type="text/javascript" src="/account_payment_final/static/src/js/views/payment_list_view.js"/>
-    </template>
+    <data>
+        <!-- Enhanced Backend Assets -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <!-- Enhanced SCSS Styles -->
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/payment_voucher.scss"/>
+            
+            <!-- Enhanced JavaScript Components -->
+            <script type="text/javascript" src="/account_payment_final/static/src/js/payment_approval_widget.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/payment_workflow_helper.js"/>
+        </template>
 
-    <!-- Frontend Assets (for QR Verification Portal) -->
-    <template id="assets_frontend" inherit_id="web.assets_frontend">
-        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/frontend/verification_portal.scss"/>
-        <script type="text/javascript" src="/account_payment_final/static/src/js/frontend/qr_verification.js"/>
-    </template>
+        <!-- Frontend Assets for QR Verification -->
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/frontend/qr_verification.scss"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/frontend/qr_scanner.js"/>
+        </template>
 
-    <!-- QWeb Templates for Components -->
-    <template id="payment_approval_widget_template" name="account_payment_final.PaymentApprovalWidget">
-        <div class="o_payment_approval_widget" t-att-class="props.readonly ? 'o_readonly' : ''">
-            <div class="o_payment_approval_header">
-                <h4>Payment Approval Workflow</h4>
-                <span class="badge" t-att-class="getStateClass()" t-esc="getStateLabel()"/>
-            </div>
-            <div class="o_payment_approval_content">
-                <div class="o_approval_stages">
-                    <div class="o_stage" t-foreach="getApprovalStages()" t-as="stage" t-key="stage.id" 
-                         t-att-class="getStageClass(stage)">
-                        <div class="o_stage_icon">
-                            <i t-att-class="stage.icon"/>
-                        </div>
-                        <div class="o_stage_info">
-                            <div class="o_stage_name" t-esc="stage.name"/>
-                            <div class="o_stage_user" t-if="stage.user" t-esc="stage.user"/>
-                            <div class="o_stage_date" t-if="stage.date" t-esc="stage.date"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="o_approval_actions" t-if="!props.readonly">
-                    <button t-if="canApprove()" class="btn btn-primary" t-on-click="onApprove">
-                        <i class="fa fa-check"/> Approve
-                    </button>
-                    <button t-if="canReject()" class="btn btn-danger" t-on-click="onReject">
-                        <i class="fa fa-times"/> Reject
-                    </button>
-                </div>
-            </div>
-        </div>
-    </template>
+        <!-- Enhanced Payment Voucher Styles -->
+        <template id="payment_voucher_styles" name="Payment Voucher Enhanced Styles">
+            <style type="text/css">
+                /* Enhanced Form Styling */
+                .o_form_view .o_payment_voucher_form {
+                    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+                }
 
-    <template id="qr_code_field_template" name="account_payment_final.QRCodeField">
-        <div class="o_qr_code_field">
-            <div class="o_qr_code_container" t-if="state.qrCode">
-                <img t-att-src="state.qrCode" alt="Payment QR Code" class="o_qr_code_image"/>
-                <div class="o_qr_code_actions">
-                    <button class="btn btn-sm btn-secondary" t-on-click="onDownloadQR">
-                        <i class="fa fa-download"/> Download
-                    </button>
-                    <button class="btn btn-sm btn-info" t-on-click="onVerifyQR">
-                        <i class="fa fa-external-link"/> Verify
-                    </button>
-                </div>
-            </div>
-            <div class="o_qr_code_loading" t-else="">
-                <i class="fa fa-spinner fa-spin"/> Generating QR Code...
-            </div>
-        </div>
-    </template>
+                /* Status Bar Enhancement */
+                .o_form_statusbar {
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                    border-bottom: 2px solid #e2e8f0;
+                    padding: 15px 20px;
+                }
+
+                .o_statusbar_status .o_arrow_button {
+                    border-radius: 25px;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
+                    font-size: 11px;
+                    padding: 8px 16px;
+                    margin: 0 5px;
+                    transition: all 0.3s ease;
+                }
+
+                .o_statusbar_status .o_arrow_button.btn-primary {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                    border: none;
+                    box-shadow: 0 4px 15px rgba(128, 0, 32, 0.3);
+                }
+
+                .o_statusbar_status .o_arrow_button.btn-success {
+                    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+                    border: none;
+                    box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+                }
+
+                .o_statusbar_status .o_arrow_button.btn-warning {
+                    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+                    border: none;
+                    box-shadow: 0 4px 15px rgba(214, 158, 46, 0.3);
+                }
+
+                .o_statusbar_status .o_arrow_button.btn-danger {
+                    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                    border: none;
+                    box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+                }
+
+                /* Enhanced Card Styling */
+                .card {
+                    border: none;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    transition: all 0.3s ease;
+                    overflow: hidden;
+                }
+
+                .card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+                }
+
+                .card-header {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 20px;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                }
+
+                .card-header.bg-info {
+                    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
+                }
+
+                .card-header.bg-warning {
+                    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%) !important;
+                }
+
+                .card-header.bg-success {
+                    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%) !important;
+                }
+
+                .card-header.bg-primary {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%) !important;
+                }
+
+                .card-header.bg-dark {
+                    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important;
+                }
+
+                .card-body {
+                    padding: 20px;
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                }
+
+                /* Progress Workflow Styling */
+                .progress-workflow {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    padding: 15px;
+                    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+                    border-radius: 10px;
+                    border: 1px solid #e2e8f0;
+                }
+
+                .badge-step {
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    transition: all 0.3s ease;
+                }
+
+                .badge-primary {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                    color: white;
+                    box-shadow: 0 2px 10px rgba(128, 0, 32, 0.3);
+                }
+
+                .badge-success {
+                    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+                    color: white;
+                    box-shadow: 0 2px 10px rgba(56, 161, 105, 0.3);
+                }
+
+                .badge-secondary {
+                    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+                    color: white;
+                }
+
+                /* Enhanced Field Styling */
+                .o_field_widget.o_field_highlight {
+                    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+                    border: 2px solid #800020;
+                    border-radius: 8px;
+                    padding: 12px 16px;
+                    font-weight: 700;
+                    font-size: 18px;
+                    color: #800020;
+                    text-align: center;
+                    letter-spacing: 1px;
+                }
+
+                .o_field_monetary {
+                    font-weight: 700;
+                    font-size: 16px;
+                    color: #2f855a;
+                }
+
+                /* Badge Enhancements */
+                .badge {
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    border-radius: 15px;
+                    padding: 6px 12px;
+                }
+
+                .badge-info {
+                    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+                    color: white;
+                }
+
+                .badge-warning {
+                    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+                    color: white;
+                }
+
+                .badge-success {
+                    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+                    color: white;
+                }
+
+                .badge-danger {
+                    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                    color: white;
+                }
+
+                /* Alert Enhancements */
+                .alert {
+                    border: none;
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    margin: 15px 0;
+                    border-left: 4px solid;
+                }
+
+                .alert-info {
+                    background: linear-gradient(135deg, #ebf8ff 0%, #e6fffa 100%);
+                    border-left-color: #3182ce;
+                    color: #2c5282;
+                }
+
+                .alert-success {
+                    background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+                    border-left-color: #38a169;
+                    color: #2f855a;
+                }
+
+                .alert-warning {
+                    background: linear-gradient(135deg, #fffbeb 0%, #fef5e7 100%);
+                    border-left-color: #d69e2e;
+                    color: #b7791f;
+                }
+
+                /* Button Enhancements */
+                .btn {
+                    border-radius: 8px;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    padding: 10px 20px;
+                    transition: all 0.3s ease;
+                    border: none;
+                }
+
+                .btn-primary {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                    box-shadow: 0 4px 15px rgba(128, 0, 32, 0.3);
+                }
+
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(128, 0, 32, 0.4);
+                }
+
+                .btn-success {
+                    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+                    box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+                }
+
+                .btn-success:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(56, 161, 105, 0.4);
+                }
+
+                .btn-warning {
+                    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+                    box-shadow: 0 4px 15px rgba(214, 158, 46, 0.3);
+                }
+
+                .btn-warning:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(214, 158, 46, 0.4);
+                }
+
+                .btn-danger {
+                    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                    box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+                }
+
+                .btn-danger:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+                }
+
+                .btn-secondary {
+                    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+                    box-shadow: 0 4px 15px rgba(160, 174, 192, 0.3);
+                }
+
+                /* Kanban View Enhancements */
+                .o_kanban_view .o_kanban_record {
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    border: none;
+                    transition: all 0.3s ease;
+                    overflow: hidden;
+                }
+
+                .o_kanban_view .o_kanban_record:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+                }
+
+                .oe_kanban_card_success {
+                    border-left: 4px solid #38a169 !important;
+                    background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%) !important;
+                }
+
+                .oe_kanban_card_danger {
+                    border-left: 4px solid #e53e3e !important;
+                    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%) !important;
+                }
+
+                /* Tree View Enhancements */
+                .o_list_view .o_data_row.o_selected_row {
+                    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%) !important;
+                    border-left: 4px solid #800020;
+                }
+
+                /* Form View Title Enhancement */
+                .o_form_view .oe_title h1 {
+                    color: #800020;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    text-shadow: 0 2px 4px rgba(128, 0, 32, 0.1);
+                }
+
+                /* Notebook Tab Enhancement */
+                .nav-tabs .nav-link {
+                    border-radius: 8px 8px 0 0;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    transition: all 0.3s ease;
+                }
+
+                .nav-tabs .nav-link.active {
+                    background: linear-gradient(135deg, #800020 0%, #a0002b 100%);
+                    color: white;
+                    border: none;
+                }
+
+                /* Custom OSUS Branding */
+                .osus-brand {
+                    color: #800020;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                }
+
+                .osus-accent {
+                    color: #ffd700;
+                    font-weight: 600;
+                }
+
+                /* Loading and State Indicators */
+                .o_loading {
+                    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                    border-radius: 8px;
+                    padding: 20px;
+                    text-align: center;
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    .progress-workflow {
+                        flex-direction: column;
+                        align-items: stretch;
+                    }
+                    
+                    .progress-workflow .fa-arrow-right {
+                        transform: rotate(90deg);
+                        margin: 5px 0;
+                    }
+                    
+                    .info-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .signatures-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                /* Print Optimizations */
+                @media print {
+                    .card {
+                        box-shadow: none !important;
+                        border: 1px solid #e2e8f0 !important;
+                    }
+                    
+                    .btn {
+                        display: none !important;
+                    }
+                    
+                    .o_form_statusbar {
+                        -webkit-print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                }
+
+                /* Animation Classes */
+                .fade-in {
+                    animation: fadeIn 0.5s ease-in;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                .slide-in {
+                    animation: slideIn 0.3s ease-out;
+                }
+
+                @keyframes slideIn {
+                    from { transform: translateX(-20px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+
+                /* Focus and Accessibility */
+                .btn:focus,
+                .form-control:focus,
+                .o_field_widget:focus {
+                    outline: 2px solid #800020;
+                    outline-offset: 2px;
+                }
+
+                /* High Contrast Mode Support */
+                @media (prefers-contrast: high) {
+                    .card {
+                        border: 2px solid #000000;
+                    }
+                    
+                    .badge {
+                        border: 1px solid #000000;
+                    }
+                }
+
+                /* Dark Mode Support */
+                @media (prefers-color-scheme: dark) {
+                    .voucher-container {
+                        background: #1a202c;
+                        color: #f7fafc;
+                    }
+                    
+                    .card-body {
+                        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+                        color: #f7fafc;
+                    }
+                }
+            </style>
+        </template>
+
+    </data>
 </odoo>

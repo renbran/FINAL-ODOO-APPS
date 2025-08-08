@@ -1,7 +1,8 @@
-# OSUS Payment Voucher Enhanced Workflow Module
+# Account Payment Final - Enhanced Workflow Module
 
 ## Overview
-The `account_payment_final` module provides an enhanced payment voucher workflow system for Odoo 17, featuring simplified approval processes, QR code generation, and real-time UI responsiveness.
+
+The **Account Payment Final** module provides a comprehensive payment management system for Odoo 17 with a 4-stage approval workflow, QR code verification, and enhanced security features. This module is designed to meet enterprise-level requirements for payment processing with full audit trails and CloudPepper hosting compatibility.
 
 ## Key Features
 
