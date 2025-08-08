@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Backend Assets -->
+    <template id="assets_backend" inherit_id="web.assets_backend">
+        <!-- SCSS Variables -->
+        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/variables.scss"/>
+        
+        <!-- Component Styles -->
+        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/components/payment_widget.scss"/>
+        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/views/form_view.scss"/>
+        
+        <!-- JavaScript Components -->
+        <script type="text/javascript" src="/account_payment_final/static/src/js/components/payment_approval_widget.js"/>
+        <script type="text/javascript" src="/account_payment_final/static/src/js/fields/qr_code_field.js"/>
+        <script type="text/javascript" src="/account_payment_final/static/src/js/views/payment_list_view.js"/>
+    </template>
+
+    <!-- Frontend Assets (for QR Verification Portal) -->
+    <template id="assets_frontend" inherit_id="web.assets_frontend">
+        <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/frontend/verification_portal.scss"/>
+        <script type="text/javascript" src="/account_payment_final/static/src/js/frontend/qr_verification.js"/>
+    </template>
+
+    <!-- QWeb Templates for Components -->
+    <template id="payment_approval_widget_template" name="account_payment_final.PaymentApprovalWidget">
+        <div class="o_payment_approval_widget" t-att-class="props.readonly ? 'o_readonly' : ''">
+            <div class="o_payment_approval_header">
+                <h4>Payment Approval Workflow</h4>
+                <span class="badge" t-att-class="getStateClass()" t-esc="getStateLabel()"/>
+            </div>
+            <div class="o_payment_approval_content">
+                <div class="o_approval_stages">
+                    <div class="o_stage" t-foreach="getApprovalStages()" t-as="stage" t-key="stage.id" 
+                         t-att-class="getStageClass(stage)">
+                        <div class="o_stage_icon">
+                            <i t-att-class="stage.icon"/>
+                        </div>
+                        <div class="o_stage_info">
+                            <div class="o_stage_name" t-esc="stage.name"/>
+                            <div class="o_stage_user" t-if="stage.user" t-esc="stage.user"/>
+                            <div class="o_stage_date" t-if="stage.date" t-esc="stage.date"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="o_approval_actions" t-if="!props.readonly">
+                    <button t-if="canApprove()" class="btn btn-primary" t-on-click="onApprove">
+                        <i class="fa fa-check"/> Approve
+                    </button>
+                    <button t-if="canReject()" class="btn btn-danger" t-on-click="onReject">
+                        <i class="fa fa-times"/> Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="qr_code_field_template" name="account_payment_final.QRCodeField">
+        <div class="o_qr_code_field">
+            <div class="o_qr_code_container" t-if="state.qrCode">
+                <img t-att-src="state.qrCode" alt="Payment QR Code" class="o_qr_code_image"/>
+                <div class="o_qr_code_actions">
+                    <button class="btn btn-sm btn-secondary" t-on-click="onDownloadQR">
+                        <i class="fa fa-download"/> Download
+                    </button>
+                    <button class="btn btn-sm btn-info" t-on-click="onVerifyQR">
+                        <i class="fa fa-external-link"/> Verify
+                    </button>
+                </div>
+            </div>
+            <div class="o_qr_code_loading" t-else="">
+                <i class="fa fa-spinner fa-spin"/> Generating QR Code...
+            </div>
+        </div>
+    </template>
+</odoo>

@@ -1,0 +1,50 @@
+// Account Payment Final - SCSS Variables
+// Following Odoo 17 best practices and theme integration
+
+// Custom variables that don't conflict with Odoo
+$payment-primary-color: #3498db;
+$payment-success-color: #27ae60;
+$payment-warning-color: #f39c12;
+$payment-danger-color: #e74c3c;
+$payment-info-color: #2980b9;
+
+$payment-border-radius: 4px;
+$payment-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+$payment-transition: all 0.3s ease;
+
+// Breakpoints aligned with Odoo's responsive system
+$payment-mobile: 768px;
+$payment-tablet: 992px;
+$payment-desktop: 1200px;
+
+// Z-index values to avoid conflicts
+$payment-z-dropdown: 1050;
+$payment-z-modal: 1060;
+$payment-z-tooltip: 1070;
+
+// Spacing system
+$payment-spacing-xs: 4px;
+$payment-spacing-sm: 8px;
+$payment-spacing-md: 16px;
+$payment-spacing-lg: 24px;
+$payment-spacing-xl: 32px;
+
+// Typography
+$payment-font-size-sm: 0.875rem;
+$payment-font-size-base: 1rem;
+$payment-font-size-lg: 1.125rem;
+$payment-font-weight-normal: 400;
+$payment-font-weight-medium: 500;
+$payment-font-weight-bold: 600;
+
+// QR Code specific
+$qr-code-size: 150px;
+$qr-code-border: 2px solid var(--bs-border-color);
+
+// Approval workflow colors
+$approval-draft: #6c757d;
+$approval-review: #fd7e14;
+$approval-approve: #ffc107;
+$approval-authorize: #0d6efd;
+$approval-post: #198754;
+$approval-reject: #dc3545;

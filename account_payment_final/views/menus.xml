@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Voucher Management Menu -->
+    <menuitem 
+        id="menu_payment_voucher_management"
+        name="Payment Vouchers"
+        parent="account.menu_finance"
+        sequence="30"
+        groups="account.group_account_user"/>
+    
+    <!-- Payment Vouchers Submenu -->
+    <menuitem 
+        id="menu_payment_vouchers"
+        name="Payment Vouchers"
+        parent="menu_payment_voucher_management"
+        action="account.action_account_payments"
+        sequence="10"
+        groups="account.group_account_user"/>
+    
+    <!-- Payment Configuration Submenu -->
+    <menuitem 
+        id="menu_payment_voucher_config"
+        name="Configuration"
+        parent="menu_payment_voucher_management"
+        sequence="90"
+        groups="account.group_account_manager"/>
+    
+    <!-- Approval Settings -->
+    <menuitem 
+        id="menu_payment_approval_settings"
+        name="Approval Settings"
+        parent="menu_payment_voucher_config"
+        action="base.action_res_config"
+        sequence="10"
+        groups="account.group_account_manager"/>
+    
+    <!-- QR Verification Portal (External) -->
+    <menuitem 
+        id="menu_payment_qr_verification"
+        name="QR Verification Portal"
+        parent="menu_payment_voucher_management"
+        action="account_payment_final.action_payment_qr_verification"
+        sequence="80"
+        groups="base.group_user"/>
+</odoo>

@@ -1,60 +1,98 @@
 {
-    'name': 'OSUS Payment Voucher Enhanced',
+    'name': 'Account Payment Final - Enhanced Workflow',
     'version': '17.0.1.0.0',
     'category': 'Accounting/Payments',
-    'summary': 'Enhanced Payment Vouchers with OSUS Brand Identity and Approval Workflow',
-    'description': '''
-        Enhanced Payment Voucher System for OSUS Properties
-        ==================================================
+    'summary': 'Enhanced payment voucher system with 4-stage approval workflow and QR verification',
+    'description': """
+        Account Payment Final - Enhanced Workflow
+        ==========================================
+        
+        This module provides a comprehensive payment voucher system with:
         
         Features:
-        ✓ OSUS branded payment voucher reports with premium design
-        ✓ Professional approval workflow with state management
-        ✓ QR code verification system for payment authentication
-        ✓ Automatic voucher numbering with customizable sequences
-        ✓ Enhanced security validations and user permissions
-        ✓ Mobile-responsive design for modern browsers
-        ✓ Print-optimized layouts with company branding
-        ✓ Comprehensive audit trail and logging
+        ---------
+        • 4-stage approval workflow (Reviewer → Approver → Authorizer → Poster)
+        • QR code verification system for payment authentication
+        • Enhanced security with role-based access control
+        • Professional voucher reports with company branding
+        • Automated voucher numbering with configurable sequences
+        • Email notifications for approval workflow stages
+        • Mobile-responsive design for modern browsers
+        • Comprehensive audit trail and activity logging
+        • Print-optimized layouts with professional styling
+        • Web-based QR verification portal
         
-        This module transforms standard Odoo payment vouchers into 
-        premium, branded documents that reflect OSUS Properties' 
-        luxury real estate excellence.
-    ''',
-    'author': 'OSUS Properties Development Team',
-    'website': 'https://www.osusproperties.com',
+        Technical Features:
+        ------------------
+        • Odoo 17 compatible with modern ORM patterns
+        • OWL framework integration for frontend components
+        • REST API endpoints for QR verification
+        • PostgreSQL optimized database structure
+        • Docker-ready deployment configuration
+        • CloudPepper hosting compatible
+        
+        This module transforms standard Odoo payment vouchers into
+        a professional, secure, and user-friendly payment management system.
+    """,
+    'author': 'Odoo Development Team',
+    'website': 'https://www.odoo.com',
     'license': 'LGPL-3',
     'depends': [
         'base',
         'account',
         'web',
         'mail',
+        'portal',
     ],
     'data': [
-        # Security
+        # Security (Load First)
         'security/payment_security.xml',
         'security/ir.model.access.csv',
         
-        # Data
+        # Data and Sequences
         'data/payment_sequences.xml',
         'data/email_templates.xml',
         
-        # Views
+        # Main Views
         'views/account_payment_views.xml',
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
+        'views/menus.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/payment_voucher_template.xml',
         'reports/payment_voucher_actions.xml',
         
-        # Website (for QR verification)
+        # Website/Portal Views
         'views/payment_verification_templates.xml',
+        
+        # Assets (Load Last)
+        'views/assets.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'account_payment_final/static/src/scss/variables.scss',
+            'account_payment_final/static/src/scss/components/payment_widget.scss',
+            'account_payment_final/static/src/scss/views/form_view.scss',
+            'account_payment_final/static/src/js/components/payment_approval_widget.js',
+            'account_payment_final/static/src/js/fields/qr_code_field.js',
+            'account_payment_final/static/src/js/views/payment_list_view.js',
+        ],
+        'web.assets_frontend': [
+            'account_payment_final/static/src/scss/frontend/verification_portal.scss',
+            'account_payment_final/static/src/js/frontend/qr_verification.js',
+        ],
+        'web.qunit_suite_tests': [
+            'account_payment_final/static/tests/**/*.js',
+        ],
+    },
     'external_dependencies': {
         'python': ['qrcode', 'pillow'],
     },
+    'demo': [
+        'demo/demo_payments.xml',
+    ],
     'installable': True,
     'auto_install': False,
     'application': False,
