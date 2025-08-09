@@ -94,7 +94,7 @@ const CloudPepperOptimizer = {
         const preloadLinks = document.querySelectorAll('link[rel="preload"][as="font"]');
         preloadLinks.forEach(link => {
             const href = link.getAttribute('href');
-            if (href && href.includes('fontawesome') || href.includes('fa-')) {
+            if (href && (href.includes('fontawesome') || href.includes('fa-'))) {
                 // Check if font is actually used within 3 seconds
                 setTimeout(() => {
                     const isUsed = this.checkFontUsage(href);
@@ -186,6 +186,52 @@ const CloudPepperOptimizer = {
 
         // Handle redirect issues
         this.setupRedirectHandling();
+
+        // Preload critical assets only
+        const criticalAssets = [
+            { href: '/web/static/src/css/base.css', as: 'style' },
+            { href: '/web/static/src/js/boot.js', as: 'script' }
+        ];
+
+        const preloadCriticalAssets = () => {
+            criticalAssets.forEach(asset => {
+                const link = document.createElement('link');
+                link.rel = 'preload';
+                link.href = asset.href;
+                link.as = asset.as;
+                link.crossOrigin = 'anonymous';
+                
+                // Avoid duplicate preloads
+                const existingLink = document.querySelector(`link[href="${asset.href}"]`);
+                if (!existingLink) {
+                    document.head.appendChild(link);
+                }
+            });
+        };
+
+        // Defer non-critical scripts
+        const deferNonCriticalScripts = () => {
+            const scripts = document.querySelectorAll('script[src]');
+            scripts.forEach(script => {
+                if (!script.hasAttribute('defer') && !script.hasAttribute('async')) {
+                    const src = script.getAttribute('src');
+                    if (src && !src.includes('boot.js') && !src.includes('web.assets_common')) {
+                        script.setAttribute('defer', '');
+                    }
+                }
+            });
+        };
+
+        // Apply optimizations
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                preloadCriticalAssets();
+                setTimeout(deferNonCriticalScripts, 100);
+            });
+        } else {
+            preloadCriticalAssets();
+            deferNonCriticalScripts();
+        }
     },
 
     /**
@@ -220,103 +266,3 @@ const CloudPepperOptimizer = {
 registry.category("services").add("cloudpepper_optimizer", CloudPepperOptimizer);
 
 export default CloudPepperOptimizer;
-            `;
-            document.head.appendChild(style);
-        };
-
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', optimizeFontDisplay);
-        } else {
-            optimizeFontDisplay();
-        }
-    },
-
-    /**
-     * Suppress console warnings from third-party scripts
-     */
-    suppressThirdPartyWarnings() {
-        // Store original console methods
-        const originalWarn = console.warn;
-        const originalError = console.error;
-
-        // Filter out known third-party warnings
-        const thirdPartyPatterns = [
-            /Long Running Recorder/,
-            /Fullstory/,
-            /Page data capture skipped/,
-            /fontawesome-webfont.*preload/i
-        ];
-
-        console.warn = function(...args) {
-            const message = args.join(' ');
-            const isThirdParty = thirdPartyPatterns.some(pattern => pattern.test(message));
-            
-            if (!isThirdParty) {
-                originalWarn.apply(console, args);
-            }
-        };
-
-        console.error = function(...args) {
-            const message = args.join(' ');
-            const isThirdParty = thirdPartyPatterns.some(pattern => pattern.test(message));
-            
-            if (!isThirdParty) {
-                originalError.apply(console, args);
-            }
-        };
-    },
-
-    /**
-     * Optimize asset loading for CloudPepper
-     */
-    optimizeAssetLoading() {
-        // Preload critical resources with proper attributes
-        const preloadCriticalAssets = () => {
-            const criticalAssets = [
-                { href: '/web/static/src/css/bootstrap.css', as: 'style' },
-                { href: '/web/static/src/js/boot.js', as: 'script' }
-            ];
-
-            criticalAssets.forEach(asset => {
-                const link = document.createElement('link');
-                link.rel = 'preload';
-                link.href = asset.href;
-                link.as = asset.as;
-                link.crossOrigin = 'anonymous';
-                
-                // Avoid duplicate preloads
-                if (!document.querySelector(`link[href="${asset.href}"]`)) {
-                    document.head.appendChild(link);
-                }
-            });
-        };
-
-        // Defer non-critical scripts
-        const deferNonCriticalScripts = () => {
-            const scripts = document.querySelectorAll('script[src]');
-            scripts.forEach(script => {
-                if (!script.hasAttribute('defer') && !script.hasAttribute('async')) {
-                    const src = script.getAttribute('src');
-                    if (src && !src.includes('boot.js') && !src.includes('web.assets_common')) {
-                        script.setAttribute('defer', '');
-                    }
-                }
-            });
-        };
-
-        // Apply optimizations
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                preloadCriticalAssets();
-                setTimeout(deferNonCriticalScripts, 100);
-            });
-        } else {
-            preloadCriticalAssets();
-            deferNonCriticalScripts();
-        }
-    }
-};
-
-// Register the optimizer service
-registry.category("services").add("cloudpepper_optimizer", CloudPepperOptimizer);

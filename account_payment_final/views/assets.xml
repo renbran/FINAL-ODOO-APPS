@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- JavaScript Assets for CloudPepper Optimization -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <script type="text/javascript" src="/account_payment_final/static/src/js/error_handler.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/cloudpepper_optimizer_fixed.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/payment_workflow.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/payment_approval_widget.js"/>
+        </template>
+
         <!-- Enhanced QR Code Template for Payment Verification -->
         <template id="payment_qr_code_template" name="Payment QR Code Display">
             <div class="o_payment_qr_container text-center py-3">
