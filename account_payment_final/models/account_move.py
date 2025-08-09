@@ -86,7 +86,7 @@ class AccountMove(models.Model):
         return self._return_success_message(_('Invoice/Bill has been reviewed and forwarded for approval.'))
 
     def action_final_approve(self):
-        """Final approval of invoice/bill"""
+        """Final approval and auto-post invoice/bill"""
         for record in self:
             if record.approval_state != 'for_approval':
                 raise UserError(_("Only invoices/bills pending approval can be finally approved."))
@@ -99,6 +99,15 @@ class AccountMove(models.Model):
             record.approver_date = fields.Datetime.now()
             record.approval_state = 'approved'
             record._post_approval_message("approved and ready for posting")
+            
+            # Auto-post the invoice/bill after approval
+            try:
+                record.action_post_invoice_bill()
+                return self._return_success_message(_('Invoice/Bill has been approved and posted successfully.'))
+            except Exception as e:
+                # If auto-posting fails, keep it approved for manual posting
+                _logger.warning(f"Auto-posting failed for invoice/bill {record.name}: {str(e)}")
+                return self._return_success_message(_('Invoice/Bill has been approved. Please post manually due to technical issue.'))
         
         return self._return_success_message(_('Invoice/Bill has been approved and is ready for posting.'))
 

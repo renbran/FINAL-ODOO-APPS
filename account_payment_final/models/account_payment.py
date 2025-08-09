@@ -93,6 +93,12 @@ class AccountPayment(models.Model):
         help="Number of reconciled move lines"
     )
     
+    invoice_count = fields.Integer(
+        string='Invoice Count',
+        compute='_compute_invoice_count',
+        help="Number of invoices reconciled with this payment"
+    )
+    
     # Many2many field for journal items (for smart button)
     move_line_ids = fields.One2many(
         'account.move.line',
@@ -266,6 +272,17 @@ Verify at: {base_url}/payment/qr-guide"""
             if record.reconciled_bill_ids:
                 reconciled_count += len(record.reconciled_bill_ids)
             record.reconciliation_count = reconciled_count
+    
+    @api.depends('reconciled_invoice_ids', 'reconciled_bill_ids')
+    def _compute_invoice_count(self):
+        """Compute the total number of invoices/bills for smart button"""
+        for record in self:
+            invoice_count = 0
+            if record.reconciled_invoice_ids:
+                invoice_count += len(record.reconciled_invoice_ids)
+            if record.reconciled_bill_ids:
+                invoice_count += len(record.reconciled_bill_ids)
+            record.invoice_count = invoice_count
     
     def _get_next_voucher_number(self):
         """Generate next voucher number sequence"""
@@ -473,7 +490,7 @@ Verify at: {base_url}/payment/qr-guide"""
         return self._return_success_message(_('Payment has been reviewed successfully.'))
 
     def action_approve_payment(self):
-        """Approve payment (Stage 2 → Stage 3 for vendor, Stage 2 → Posted for customer)"""
+        """Approve payment (Stage 2 → Stage 3 for vendor, Stage 2 → Auto-post for customer)"""
         self.ensure_one()
         self._check_workflow_permissions('approve')
         
@@ -491,18 +508,27 @@ Verify at: {base_url}/payment/qr-guide"""
             self.approval_state = 'for_authorization'
             next_stage_msg = "sent for authorization"
             notification_type = 'authorization'
-        else:  # Customer receipt
+            
+            self._post_workflow_message(f"approved and {next_stage_msg}")
+            self._send_workflow_notification(notification_type)
+            
+            return self._return_success_message(_('Payment has been approved successfully.'))
+        else:  # Customer receipt - Auto-post after approval
             self.approval_state = 'approved'
-            next_stage_msg = "approved and ready for posting"
-            notification_type = 'posting'
-        
-        self._post_workflow_message(f"approved and {next_stage_msg}")
-        self._send_workflow_notification(notification_type)
-        
-        return self._return_success_message(_('Payment has been approved successfully.'))
+            self._post_workflow_message("approved and ready for posting")
+            
+            # Auto-post customer receipts after approval
+            try:
+                self.action_post_payment()
+                return self._return_success_message(_('Payment has been approved and posted successfully.'))
+            except Exception as e:
+                # If auto-posting fails, keep it approved for manual posting
+                _logger.warning(f"Auto-posting failed for payment {self.voucher_number}: {str(e)}")
+                self._send_workflow_notification('posting')
+                return self._return_success_message(_('Payment has been approved. Please post manually due to technical issue.'))
 
     def action_authorize_payment(self):
-        """Authorize vendor payment (Stage 3 → Ready for posting) - Vendor payments only"""
+        """Authorize vendor payment (Stage 3 → Auto-post) - Vendor payments only"""
         self.ensure_one()
         self._check_workflow_permissions('authorize')
         
@@ -518,9 +544,16 @@ Verify at: {base_url}/payment/qr-guide"""
         self.approval_state = 'approved'
         
         self._post_workflow_message("authorized and ready for posting")
-        self._send_workflow_notification('posting')
         
-        return self._return_success_message(_('Payment has been authorized and is ready for posting.'))
+        # Auto-post vendor payments after authorization
+        try:
+            self.action_post_payment()
+            return self._return_success_message(_('Payment has been authorized and posted successfully.'))
+        except Exception as e:
+            # If auto-posting fails, keep it approved for manual posting
+            _logger.warning(f"Auto-posting failed for payment {self.voucher_number}: {str(e)}")
+            self._send_workflow_notification('posting')
+            return self._return_success_message(_('Payment has been authorized. Please post manually due to technical issue.'))
 
     def action_post_payment(self):
         """Post payment after all approvals (Final stage - This overrides the default post button)"""
@@ -945,6 +978,36 @@ Verify at: {base_url}/payment/qr-guide"""
         return {
             'type': 'ir.actions.act_window',
             'name': f'Reconciled Documents - {self.voucher_number or self.name}',
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', invoices.ids)],
+            'context': {
+                'default_payment_id': self.id,
+                'search_default_posted': 1,
+            },
+            'target': 'current',
+        }
+
+    def action_view_invoice(self):
+        """Open invoices/bills related to this payment - alias for reconciliation"""
+        # This is essentially the same as reconciliation view but with different naming
+        self.ensure_one()
+        
+        invoices = self.env['account.move']
+        
+        if self.reconciled_invoice_ids:
+            invoices |= self.reconciled_invoice_ids
+        if self.reconciled_bill_ids:
+            invoices |= self.reconciled_bill_ids
+            
+        if not invoices:
+            raise UserError(_("No invoices/bills found for this payment."))
+        
+        view_name = "Invoices" if self.payment_type == 'inbound' else "Bills"
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'{view_name} - {self.voucher_number or self.name}',
             'res_model': 'account.move',
             'view_mode': 'tree,form',
             'domain': [('id', 'in', invoices.ids)],

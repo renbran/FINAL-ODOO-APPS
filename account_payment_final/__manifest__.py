@@ -76,6 +76,7 @@
             'account_payment_final/static/src/scss/variables.scss',
             'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
+            'account_payment_final/static/src/scss/osus_branding.scss',
             'account_payment_final/static/src/scss/components/payment_widget.scss',
             'account_payment_final/static/src/scss/views/form_view.scss',
             'account_payment_final/static/src/js/error_handler.js',

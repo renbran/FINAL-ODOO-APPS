@@ -16,44 +16,46 @@
                            invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                 </xpath>
 
-                <!-- Add approval workflow buttons to header -->
+                <!-- Add approval workflow buttons to header with OSUS branding -->
                 <xpath expr="//header" position="inside">
-                    <!-- Invoice/Bill Approval Workflow Buttons -->
+                    <!-- Invoice/Bill Approval Workflow Buttons - OSUS Branded -->
                     <button name="action_submit_for_review" 
                             string="Submit for Review" 
                             type="object" 
-                            class="btn-primary"
+                            class="btn osus_primary_btn"
                             invisible="approval_state != 'draft' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
                             confirm="Submit this invoice/bill for review?"/>
                     
                     <button name="action_review_approve" 
                             string="Review &amp; Forward" 
                             type="object" 
-                            class="btn-info"
+                            class="btn osus_success_btn"
                             groups="account_payment_final.group_payment_reviewer"
                             invisible="approval_state != 'under_review' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                     
                     <button name="action_final_approve" 
-                            string="Approve Invoice/Bill" 
+                            string="Approve &amp; Auto-Post" 
                             type="object" 
-                            class="btn-warning"
+                            class="btn osus_success_btn"
                             groups="account_payment_final.group_payment_approver"
                             invisible="approval_state != 'for_approval' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                     
+                    <!-- Manual Post Button (only if auto-post failed) -->
                     <button name="action_post_invoice_bill" 
                             string="Post to Ledger" 
                             type="object" 
-                            class="btn-success"
+                            class="btn osus_primary_btn"
                             groups="account_payment_final.group_payment_poster"
-                            invisible="approval_state != 'approved' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
+                            invisible="approval_state != 'approved' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
+                            confirm="Manually post this approved invoice/bill?"/>
                     
                     <button name="action_reject_invoice_bill" 
                             string="Reject" 
                             type="object" 
-                            class="btn-danger"
+                            class="btn osus_danger_btn"
                             groups="account_payment_final.group_payment_approver"
                             invisible="approval_state not in ['under_review', 'for_approval'] or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
-                            confirm="Are you sure you want to reject this invoice/bill?"/>
+                            confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
                 </xpath>
 
                 <!-- Add approval workflow fields to the form -->

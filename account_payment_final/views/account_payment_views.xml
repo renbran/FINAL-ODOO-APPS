@@ -23,85 +23,103 @@
                             <field name="payment_type" invisible="1"/>
                             <field name="is_internal_transfer" invisible="1"/>
                             
-                            <!-- Workflow Action Buttons -->
-                            <div class="workflow-buttons">
+                            <!-- Workflow Action Buttons - OSUS Branded with Clear Logic -->
+                            <div class="workflow-buttons osus-workflow">
+                                <!-- Draft Stage: Submit for Review -->
                                 <button name="action_submit_for_review" 
                                         string="Submit for Review" 
                                         type="object" 
-                                        class="btn-primary"
+                                        class="btn osus_primary_btn"
                                         invisible="approval_state != 'draft'"
                                         confirm="Submit this payment for review?"/>
                                 
+                                <!-- Review Stage: Approve or Reject -->
                                 <button name="action_review_payment" 
                                         string="Review &amp; Approve" 
                                         type="object" 
-                                        class="btn-info"
+                                        class="btn osus_success_btn"
                                         groups="account_payment_final.group_payment_voucher_reviewer"
                                         invisible="approval_state != 'under_review'"/>
                                 
+                                <!-- Approval Stage: Approve Payment -->
                                 <button name="action_approve_payment" 
                                         string="Approve Payment" 
                                         type="object" 
-                                        class="btn-warning"
+                                        class="btn osus_success_btn"
                                         groups="account_payment_final.group_payment_voucher_approver"
                                         invisible="approval_state != 'for_approval'"/>
                                 
+                                <!-- Authorization Stage: Final Authorization (Vendor only) -->
                                 <button name="action_authorize_payment" 
-                                        string="Authorize &amp; Post" 
+                                        string="Authorize &amp; Auto-Post" 
                                         type="object" 
-                                        class="btn-success"
+                                        class="btn osus_success_btn"
                                         groups="account_payment_final.group_payment_voucher_authorizer"
-                                        invisible="approval_state != 'for_authorization'"/>
+                                        invisible="approval_state != 'for_authorization' or payment_type != 'outbound'"/>
                                 
+                                <!-- Manual Post (Only if auto-post failed) -->
                                 <button name="action_post_payment" 
                                         string="Post Payment" 
                                         type="object" 
-                                        class="btn-success"
-                                        invisible="approval_state != 'approved'"/>
+                                        class="btn osus_primary_btn"
+                                        groups="account_payment_final.group_payment_poster"
+                                        invisible="approval_state != 'approved'"
+                                        confirm="Manually post this approved payment?"/>
                                 
+                                <!-- Reject Button -->
                                 <button name="action_reject_payment" 
                                         string="Reject" 
                                         type="object" 
-                                        class="btn-danger"
+                                        class="btn osus_danger_btn"
                                         groups="account_payment_final.group_payment_voucher_approver"
                                         invisible="approval_state in ['draft', 'posted', 'cancelled']"
-                                        confirm="Are you sure you want to reject this payment?"/>
+                                        confirm="Are you sure you want to reject this payment? It will return to draft state."/>
                             </div>
                         </header>
 
                         <!-- Main Content with Clean Layout -->
                         <sheet class="payment-sheet">
-                            <!-- Smart Buttons Bar -->
-                            <div class="oe_button_box" name="button_box">
-                                <button name="action_view_journal_items" 
-                                        type="object" 
-                                        class="oe_stat_button" 
-                                        icon="fa-bars"
-                                        invisible="state != 'posted'">
-                                    <field name="journal_item_count" widget="statinfo" string="Journal Items"/>
-                                </button>
-                                
-                                <button name="action_view_reconciliation" 
-                                        type="object" 
-                                        class="oe_stat_button" 
-                                        icon="fa-exchange"
-                                        invisible="state != 'posted'">
-                                    <field name="reconciliation_count" widget="statinfo" string="Reconciled"/>
-                                </button>
-                                
-                                <button name="action_view_qr_verification" 
-                                        type="object" 
-                                        class="oe_stat_button" 
-                                        icon="fa-qrcode"
-                                        invisible="not qr_code">
-                                    <div class="o_field_widget o_stat_info">
-                                        <span class="o_stat_value">QR</span>
-                                        <span class="o_stat_text">Verify</span>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <!-- Title Section with Voucher Number -->
+                        <!-- Smart Buttons Bar - Reorganized for Priority and OSUS Branding -->
+                        <div class="oe_button_box" name="button_box">
+                            <!-- Primary Smart Button: Journal Items (Most Important) -->
+                            <button name="action_view_journal_items" 
+                                    type="object" 
+                                    class="oe_stat_button osus_primary_button" 
+                                    icon="fa-list-alt"
+                                    invisible="state != 'posted'">
+                                <field name="journal_item_count" widget="statinfo" string="Journal Items"/>
+                            </button>
+                            
+                            <!-- Secondary: Reconciliation Status -->
+                            <button name="action_view_reconciliation" 
+                                    type="object" 
+                                    class="oe_stat_button osus_secondary_button" 
+                                    icon="fa-exchange"
+                                    invisible="state != 'posted'">
+                                <field name="reconciliation_count" widget="statinfo" string="Reconciled"/>
+                            </button>
+                            
+                            <!-- Tertiary: Invoice Link (if applicable) -->
+                            <button name="action_view_invoice" 
+                                    type="object" 
+                                    class="oe_stat_button osus_secondary_button" 
+                                    icon="fa-file-text-o"
+                                    invisible="not reconciled_invoice_ids">
+                                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                            </button>
+                            
+                            <!-- Last: QR Verification (Auxiliary Feature) -->
+                            <button name="action_view_qr_verification" 
+                                    type="object" 
+                                    class="oe_stat_button osus_accent_button" 
+                                    icon="fa-qrcode"
+                                    invisible="not qr_code">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">QR</span>
+                                    <span class="o_stat_text">Verify</span>
+                                </div>
+                            </button>
+                        </div>                            <!-- Title Section with Voucher Number -->
                             <div class="oe_title">
                                 <h1 class="payment-title">
                                     <field name="voucher_number" 
