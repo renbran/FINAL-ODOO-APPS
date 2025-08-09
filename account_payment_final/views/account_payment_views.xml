@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
         <!-- Enhanced Payment Form View - Clean & Organized -->
         <record id="view_account_payment_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.form.enhanced</field>
@@ -94,7 +91,7 @@
                                     <field name="ref" placeholder="Payment reference" readonly="state != 'draft'"/>
                                 </group>
                                 
-                                <group name="journal_details" string="Journal & Method" class="journal-details-group">
+                                <group name="journal_details" string="Journal &amp; Method" class="journal-details-group">
                                     <field name="journal_id" readonly="state != 'draft'"/>
                                     <field name="payment_method_line_id" readonly="state != 'draft'"/>
                                     <field name="is_internal_transfer" readonly="state != 'draft'"/>
@@ -305,8 +302,8 @@
                             <!-- Workflow type indicator -->
                             <div class="mt-2" invisible="approval_state == 'draft'">
                                 <small class="text-muted">
-                                    <span invisible="payment_type != 'outbound'">Vendor Payment Workflow: Draft → Review → Approval → Authorization → Posted</span>
-                                    <span invisible="payment_type != 'inbound'">Customer Receipt Workflow: Draft → Review → Approval → Posted</span>
+                                    <span invisible="payment_type != 'outbound'">Vendor Payment Workflow: Draft > Review > Approval > Authorization > Posted</span>
+                                    <span invisible="payment_type != 'inbound'">Customer Receipt Workflow: Draft > Review > Approval > Posted</span>
                                 </small>
                             </div>
                         </div>
