@@ -73,30 +73,36 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # Enhanced SCSS with CSS custom properties
             'account_payment_final/static/src/scss/variables.scss',
             'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
             'account_payment_final/static/src/scss/osus_branding.scss',
-            'account_payment_final/static/src/scss/components/payment_widget.scss',
+            'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
             'account_payment_final/static/src/scss/views/form_view.scss',
+            
+            # Enhanced JavaScript with modern OWL patterns
             'account_payment_final/static/src/js/error_handler.js',
             'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
             'account_payment_final/static/src/js/unknown_action_handler.js',
             'account_payment_final/static/src/js/payment_workflow.js',
-            'account_payment_final/static/src/js/components/payment_approval_widget.js',
+            'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',
             'account_payment_final/static/src/js/views/payment_list_view.js',
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_common': [
+            # Responsive design for reports
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
             'account_payment_final/static/src/scss/payment_voucher_report.scss',
         ],
         'web.assets_frontend': [
+            # Frontend verification portal
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',
             'account_payment_final/static/src/js/frontend/qr_verification.js',
         ],
         'web.qunit_suite_tests': [
+            # Comprehensive test suite
             'account_payment_final/static/tests/**/*.js',
         ],
     },

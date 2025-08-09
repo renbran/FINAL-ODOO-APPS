@@ -253,182 +253,153 @@
         }
     }
 }
-            &.badge-reject { background-color: $approval-reject; }
-        }
-    }
 
-    .o_payment_approval_content {
-        .o_approval_stages {
-            display: flex;
-            flex-direction: column;
-            gap: $payment-spacing-sm;
-            margin-bottom: $payment-spacing-md;
+// ============================================================================
+// RESPONSIVE DESIGN - Mobile First
+// ============================================================================
 
-            .o_stage {
-                display: flex;
-                align-items: center;
-                padding: $payment-spacing-sm;
-                border-radius: $payment-border-radius;
-                border: 1px solid transparent;
-                transition: $payment-transition;
-
-                &.o_stage_current {
-                    border-color: $payment-primary-color;
-                    background: rgba($payment-primary-color, 0.1);
-                }
-
-                &.o_stage_completed {
-                    border-color: $payment-success-color;
-                    background: rgba($payment-success-color, 0.1);
-                    
-                    .o_stage_icon i {
-                        color: $payment-success-color;
-                    }
-                }
-
-                &.o_stage_pending {
-                    opacity: 0.6;
-                }
-
-                .o_stage_icon {
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: var(--bs-light);
-                    margin-right: $payment-spacing-sm;
-                    
-                    i {
-                        font-size: 16px;
-                        color: var(--bs-body-color);
-                    }
-                }
-
-                .o_stage_info {
-                    flex: 1;
-                    
-                    .o_stage_name {
-                        font-weight: $payment-font-weight-medium;
-                        color: var(--bs-body-color);
-                    }
-                    
-                    .o_stage_user {
-                        font-size: $payment-font-size-sm;
-                        color: var(--bs-secondary-color);
-                    }
-                    
-                    .o_stage_date {
-                        font-size: $payment-font-size-sm;
-                        color: var(--bs-secondary-color);
-                    }
-                }
-            }
-        }
-
-        .o_approval_actions {
-            display: flex;
-            gap: $payment-spacing-sm;
-            justify-content: flex-end;
-            
-            .btn {
-                min-width: 100px;
-                font-weight: $payment-font-weight-medium;
-                
-                &.btn-primary {
-                    background-color: $payment-success-color;
-                    border-color: $payment-success-color;
-                    
-                    &:hover {
-                        background-color: darken($payment-success-color, 10%);
-                        border-color: darken($payment-success-color, 10%);
-                    }
-                }
-
-                &.btn-danger {
-                    background-color: $payment-danger-color;
-                    border-color: $payment-danger-color;
-                    
-                    &:hover {
-                        background-color: darken($payment-danger-color, 10%);
-                        border-color: darken($payment-danger-color, 10%);
-                    }
-                }
-            }
-        }
-    }
-
-    // Responsive design
-    @media (max-width: $payment-mobile) {
-        padding: $payment-spacing-sm;
+// Mobile devices (576px and down)
+@media (max-width: var(--bp-mobile)) {
+    .o_payment_approval_widget {
+        grid-template-columns: 1fr;
+        gap: var(--payment-spacing-sm);
+        padding: var(--payment-spacing-sm);
         
-        .o_payment_approval_header {
+        .o_approval_timeline {
             flex-direction: column;
-            align-items: flex-start;
-            gap: $payment-spacing-xs;
+            gap: var(--payment-spacing-xs);
+            
+            .o_stage {
+                justify-content: center;
+                min-width: auto;
+                width: 100%;
+            }
         }
-
+        
         .o_approval_actions {
             flex-direction: column;
             
             .btn {
                 width: 100%;
+                min-width: auto;
             }
         }
     }
 }
 
-// QR Code Field Styles
-.o_qr_code_field {
-    .o_qr_code_container {
-        text-align: center;
-        padding: $payment-spacing-md;
-        border: 1px solid var(--bs-border-color);
-        border-radius: $payment-border-radius;
-        background: var(--bs-body-bg);
+// Tablet devices (768px and down)
+@media (max-width: var(--bp-tablet)) {
+    .o_approval_timeline {
+        .o_stage {
+            padding: var(--payment-spacing-xs) var(--payment-spacing-sm);
+            font-size: var(--payment-font-size-xs);
+        }
+    }
+}
+
+// ============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// ============================================================================
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+    .o_payment_approval_widget {
+        border: 2px solid;
         
-        .o_qr_code_image {
-            width: $qr-code-size;
-            height: $qr-code-size;
-            border: $qr-code-border;
-            border-radius: $payment-border-radius;
-            margin-bottom: $payment-spacing-sm;
+        .o_approval_timeline .o_stage {
+            border: 1px solid;
         }
         
-        .o_qr_code_actions {
-            display: flex;
-            gap: $payment-spacing-xs;
-            justify-content: center;
-            
-            .btn {
-                font-size: $payment-font-size-sm;
-            }
+        .o_approval_actions .btn {
+            border: 2px solid;
+        }
+    }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+    .o_payment_approval_widget {
+        transition: none;
+        
+        &:hover {
+            transform: none;
         }
     }
     
-    .o_qr_code_loading {
-        text-align: center;
-        padding: $payment-spacing-lg;
-        color: var(--bs-secondary-color);
+    .o_approval_timeline .o_stage {
+        transition: none;
         
-        i {
-            margin-right: $payment-spacing-xs;
+        &.o_stage_current {
+            transform: none;
+        }
+    }
+    
+    .o_approval_actions .btn {
+        transition: none;
+        
+        &:hover {
+            transform: none;
         }
     }
 }
 
-// Dark mode support
+// Focus management for keyboard navigation
+.o_payment_approval_widget {
+    &:focus-within {
+        outline: 2px solid var(--payment-primary);
+        outline-offset: 2px;
+    }
+}
+
+.o_approval_actions .btn {
+    &:focus {
+        outline: 2px solid var(--payment-primary);
+        outline-offset: 2px;
+        z-index: 5;
+    }
+}
+
+// ============================================================================
+// ANIMATIONS
+// ============================================================================
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+// Apply animations to new stages
+.o_approval_timeline .o_stage {
+    animation: fadeIn 0.3s ease-out;
+}
+
+// ============================================================================
+// DARK THEME SUPPORT
+// ============================================================================
+
 @media (prefers-color-scheme: dark) {
     .o_payment_approval_widget {
-        border-color: var(--bs-border-color);
-        
         &:hover {
             box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
         }
     }
     
-    .o_qr_code_field .o_qr_code_container {
-        border-color: var(--bs-border-color);
+    .o_approval_timeline {
+        background: var(--bs-dark);
+        
+        .o_stage.o_stage_pending {
+            background: var(--bs-secondary);
+            color: var(--bs-light);
+        }
     }
 }
