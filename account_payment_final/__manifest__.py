@@ -62,6 +62,7 @@
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/payment_voucher_actions.xml',
+        'reports/payment_voucher_template.xml',
         
         # Website/Portal Views
         'views/payment_verification_templates.xml',

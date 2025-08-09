@@ -473,8 +473,9 @@ Verify at: {base_url}/payment/qr-guide"""
         self.ensure_one()
         self._check_workflow_permissions('post')
         
-        if self.approval_state != 'approved':
-            raise UserError(_("Only approved payments can be posted."))
+        # Allow posting for both 'approved' and 'authorized' states
+        if self.approval_state not in ['approved', 'authorized']:
+            raise UserError(_("Only approved or authorized payments can be posted."))
         
         # Additional validation before posting
         self._validate_payment_data()
@@ -655,6 +656,37 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return self.env.ref('account_payment_final.action_report_payment_voucher_osus_enhanced').report_action(self)
 
+    def action_generate_qr_code(self):
+        """Generate QR code for payment verification"""
+        self.ensure_one()
+        
+        if not self.qr_code:
+            # Force QR code generation
+            self._compute_payment_qr_code()
+        
+        if self.qr_code:
+            return self._return_success_message(_('QR Code generated successfully.'))
+        else:
+            raise UserError(_('Failed to generate QR Code. Please try again.'))
+
+    def action_view_qr_verification(self):
+        """Open QR verification page in browser"""
+        self.ensure_one()
+        
+        if not self.qr_code:
+            raise UserError(_('QR Code has not been generated yet. Please generate QR Code first.'))
+        
+        # Generate verification URL
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        verification_url = f"{base_url}/payment/verify/{self.id}"
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': verification_url,
+            'target': 'new',
+            'name': _('Payment Verification Page')
+        }
+
     def action_cancel(self):
         """Enhanced cancel action with proper validation"""
         for record in self:
@@ -668,6 +700,16 @@ Verify at: {base_url}/payment/qr-guide"""
                 record.approval_state = 'cancelled'
         
         return super(AccountPayment, self).action_cancel()
+
+    def action_post(self):
+        """Override core action_post to enforce approval workflow"""
+        for record in self:
+            # For records with approval workflow, enforce approval state check
+            if hasattr(record, 'approval_state') and record.approval_state:
+                if record.approval_state not in ['approved', 'posted']:
+                    raise UserError(_("Only approved or authorized payments can be posted. Current state: %s") % record.approval_state)
+        
+        return super(AccountPayment, self).action_post()
 
     def action_draft(self):
         """Enhanced draft action for cancelled payments"""

@@ -57,7 +57,6 @@ class ResConfigSettings(models.TransientModel):
     authorization_threshold = fields.Monetary(
         related='company_id.authorization_threshold',
         readonly=False,
-        currency_field='company_currency_id',
         string='Authorization Threshold',
         help="Amount below which authorization stage is skipped"
     )
@@ -66,7 +65,6 @@ class ResConfigSettings(models.TransientModel):
     max_approval_amount = fields.Monetary(
         related='company_id.max_approval_amount',
         readonly=False,
-        currency_field='company_currency_id',
         string='Maximum Approval Amount',
         help="Maximum amount that regular users can approve"
     )

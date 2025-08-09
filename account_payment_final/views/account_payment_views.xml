@@ -53,7 +53,7 @@
                                         groups="account_payment_final.group_payment_voucher_authorizer"
                                         invisible="approval_state != 'for_authorization'"/>
                                 
-                                <button name="action_post" 
+                                <button name="action_post_payment" 
                                         string="Post Payment" 
                                         type="object" 
                                         class="btn-success"
@@ -123,20 +123,55 @@
                                     <div class="workflow-progress mt-3">
                                         <h5>Workflow Progress</h5>
                                         <div class="progress-container">
-                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state != 'draft' else 'current' }}">
+                                            <!-- Draft Step -->
+                                            <div class="progress-step step-completed" t-if="approval_state != 'draft'">
                                                 <i class="fa fa-edit"/> Draft
                                             </div>
-                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'current' if approval_state == 'under_review' else 'pending' }}">
+                                            <div class="progress-step step-current" t-if="approval_state == 'draft'">
+                                                <i class="fa fa-edit"/> Draft
+                                            </div>
+                                            
+                                            <!-- Review Step -->
+                                            <div class="progress-step step-completed" t-if="approval_state in ['for_approval','for_authorization','approved','posted']">
                                                 <i class="fa fa-search"/> Review
                                             </div>
-                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['for_authorization', 'approved', 'posted'] else 'current' if approval_state == 'for_approval' else 'pending' }}">
+                                            <div class="progress-step step-current" t-if="approval_state == 'under_review'">
+                                                <i class="fa fa-search"/> Review
+                                            </div>
+                                            <div class="progress-step step-pending" t-if="approval_state == 'draft'">
+                                                <i class="fa fa-search"/> Review
+                                            </div>
+                                            
+                                            <!-- Approval Step -->
+                                            <div class="progress-step step-completed" t-if="approval_state in ['for_authorization','approved','posted']">
                                                 <i class="fa fa-check"/> Approval
                                             </div>
-                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['approved', 'posted'] else 'current' if approval_state == 'for_authorization' else 'pending' }}" 
-                                                 invisible="payment_type != 'outbound'">
+                                            <div class="progress-step step-current" t-if="approval_state == 'for_approval'">
+                                                <i class="fa fa-check"/> Approval
+                                            </div>
+                                            <div class="progress-step step-pending" t-if="approval_state in ['draft','under_review']">
+                                                <i class="fa fa-check"/> Approval
+                                            </div>
+                                            
+                                            <!-- Authorization Step (only for outbound payments) -->
+                                            <div class="progress-step step-completed" t-if="payment_type == 'outbound' and approval_state in ['approved','posted']" invisible="payment_type != 'outbound'">
                                                 <i class="fa fa-key"/> Authorization
                                             </div>
-                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state == 'posted' else 'current' if approval_state == 'approved' else 'pending' }}">
+                                            <div class="progress-step step-current" t-if="payment_type == 'outbound' and approval_state == 'for_authorization'" invisible="payment_type != 'outbound'">
+                                                <i class="fa fa-key"/> Authorization
+                                            </div>
+                                            <div class="progress-step step-pending" t-if="payment_type == 'outbound' and approval_state in ['draft','under_review','for_approval']" invisible="payment_type != 'outbound'">
+                                                <i class="fa fa-key"/> Authorization
+                                            </div>
+                                            
+                                            <!-- Posted Step -->
+                                            <div class="progress-step step-completed" t-if="approval_state == 'posted'">
+                                                <i class="fa fa-check-circle"/> Posted
+                                            </div>
+                                            <div class="progress-step step-current" t-if="approval_state == 'approved'">
+                                                <i class="fa fa-check-circle"/> Posted
+                                            </div>
+                                            <div class="progress-step step-pending" t-if="approval_state in ['draft','under_review','for_approval','for_authorization']">
                                                 <i class="fa fa-check-circle"/> Posted
                                             </div>
                                         </div>
@@ -503,6 +538,15 @@
                     Track workflow progress across all 4 stages.
                 </p>
             </field>
+        </record>
+
+        <!-- Payment Voucher Configuration Action -->
+        <record id="action_payment_voucher_config" model="ir.actions.act_window">
+            <field name="name">Payment Voucher Configuration</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'account_payment_final'}</field>
         </record>
     </data>
 </odoo>

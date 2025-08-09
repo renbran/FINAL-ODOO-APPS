@@ -14,7 +14,7 @@
             id="menu_payment_dashboard"
             name="Dashboard"
             parent="menu_payment_voucher_management"
-            action="action_payment_dashboard_enhanced"
+            action="action_payment_dashboard"
             sequence="5"
             groups="account.group_account_user"/>
         
@@ -23,7 +23,7 @@
             id="menu_payment_vouchers_all"
             name="All Vouchers"
             parent="menu_payment_voucher_management"
-            action="action_payment_voucher_all_enhanced"
+            action="action_payment_voucher_all"
             sequence="10"
             groups="account.group_account_user"/>
         
@@ -40,7 +40,7 @@
             id="menu_payment_pending_review"
             name="Pending Review"
             parent="menu_payment_workflow"
-            action="action_payment_pending_review_enhanced"
+            action="action_payment_pending_review"
             sequence="10"
             groups="account_payment_final.group_payment_voucher_reviewer"/>
         
@@ -49,7 +49,7 @@
             id="menu_payment_pending_approval"
             name="Pending Approval"
             parent="menu_payment_workflow"
-            action="action_payment_pending_approval_enhanced"
+            action="action_payment_pending_approval"
             sequence="20"
             groups="account_payment_final.group_payment_voucher_approver"/>
         
@@ -58,7 +58,7 @@
             id="menu_payment_pending_authorization"
             name="Pending Authorization"
             parent="menu_payment_workflow"
-            action="action_payment_pending_authorization_enhanced"
+            action="action_payment_pending_authorization"
             sequence="30"
             groups="account_payment_final.group_payment_voucher_authorizer"/>
         
@@ -67,7 +67,7 @@
             id="menu_payment_ready_to_post"
             name="Ready to Post"
             parent="menu_payment_workflow"
-            action="action_payment_ready_to_post_enhanced"
+            action="action_payment_ready_to_post"
             sequence="40"
             groups="account_payment_final.group_payment_voucher_poster"/>
         
@@ -84,7 +84,7 @@
             id="menu_payment_my_submissions"
             name="My Submissions"
             parent="menu_payment_personal"
-            action="action_payment_my_submissions_enhanced"
+            action="action_payment_my_submissions"
             sequence="10"
             groups="account.group_account_user"/>
         
@@ -93,7 +93,7 @@
             id="menu_payment_my_reviews"
             name="My Reviews"
             parent="menu_payment_personal"
-            action="action_payment_my_reviews_enhanced"
+            action="action_payment_my_reviews"
             sequence="20"
             groups="account_payment_final.group_payment_voucher_reviewer"/>
         
@@ -102,7 +102,7 @@
             id="menu_payment_my_approvals"
             name="My Approvals"
             parent="menu_payment_personal"
-            action="action_payment_my_approvals_enhanced"
+            action="action_payment_my_approvals"
             sequence="30"
             groups="account_payment_final.group_payment_voucher_approver"/>
         
@@ -111,7 +111,7 @@
             id="menu_payment_my_authorizations"
             name="My Authorizations"
             parent="menu_payment_personal"
-            action="action_payment_my_authorizations_enhanced"
+            action="action_payment_my_authorizations"
             sequence="40"
             groups="account_payment_final.group_payment_voucher_authorizer"/>
         
@@ -136,7 +136,7 @@
             id="menu_payment_approval_settings"
             name="Approval Settings"
             parent="menu_payment_voucher_config"
-            action="base.action_res_config_installer"
+            action="action_payment_voucher_config"
             sequence="10"
             groups="account.group_account_manager"/>
         
