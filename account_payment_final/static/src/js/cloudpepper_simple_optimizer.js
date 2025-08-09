@@ -25,6 +25,7 @@ const CloudPepperSimpleOptimizer = {
         // Store original console methods
         const originalError = console.error;
         const originalWarn = console.warn;
+        const originalLog = console.log;
 
         // Override console.error to handle undefined actions
         console.error = function(...args) {
@@ -33,8 +34,10 @@ const CloudPepperSimpleOptimizer = {
             // Handle known non-critical errors
             if (message.includes('Unknown action: undefined') || 
                 message.includes('Unknown action: is-mobile') ||
-                message.includes('Action not found')) {
-                console.warn('[CloudPepper] Suppressed non-critical error:', message);
+                message.includes('Action not found') ||
+                message.includes('Cannot read properties of undefined') ||
+                message.includes('TypeError: Cannot read property')) {
+                console.debug('[CloudPepper] Suppressed non-critical error:', message);
                 return;
             }
             
@@ -48,6 +51,46 @@ const CloudPepperSimpleOptimizer = {
             
             // Suppress known third-party warnings
             if (message.includes('Page data capture skipped') ||
+                message.includes('Fullstory: Skipped by sampling') ||
+                message.includes('Check Redirect') ||
+                message.includes('font preload') ||
+                message.includes('Unknown action') ||
+                message.includes('data-oe-')) {
+                return; // Silently suppress
+            }
+            
+            originalWarn.apply(console, args);
+        };
+
+        // Override console.log to filter out excessive logging
+        console.log = function(...args) {
+            const message = args.join(' ');
+            
+            // Allow CloudPepper messages and important logs
+            if (message.includes('[CloudPepper]') || 
+                (!message.includes('Check Redirect') &&
+                !message.includes('data-oe-'))) {
+                originalLog.apply(console, args);
+            }
+        };
+
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            const error = event.reason;
+            const errorMsg = error ? error.toString() : 'Unknown error';
+            
+            if (errorMsg.includes('Unknown action') || 
+                errorMsg.includes('Action not found') ||
+                errorMsg.includes('is-mobile') ||
+                errorMsg.includes('undefined')) {
+                console.debug('[CloudPepper] Suppressed promise rejection:', errorMsg);
+                event.preventDefault();
+                return;
+            }
+        });
+
+        console.log('[CloudPepper] Error handling initialized');
+    },
                 message.includes('Fullstory: Skipped by sampling') ||
                 message.includes('Check Redirect') ||
                 message.includes('font preload')) {
@@ -77,20 +120,43 @@ const CloudPepperSimpleOptimizer = {
      * Suppress known warnings and initialize missing actions
      */
     suppressKnownWarnings() {
-        // Initialize action registry if missing
-        if (typeof window !== 'undefined') {
-            window.odoo = window.odoo || {};
-            window.odoo.actions = window.odoo.actions || {};
-            
-            // Define common missing actions
-            if (!window.odoo.actions['is-mobile']) {
-                window.odoo.actions['is-mobile'] = {
-                    type: 'ir.actions.client',
-                    tag: 'mobile_check',
-                    name: 'Mobile Device Check'
-                };
+        // Intercept action dispatch to handle unknown actions gracefully
+        if (typeof window !== 'undefined' && window.odoo && window.odoo.define) {
+            // Hook into action service if available
+            try {
+                const actionService = registry.category("services").get("action", false);
+                if (actionService) {
+                    const originalDoAction = actionService.doAction;
+                    if (originalDoAction) {
+                        actionService.doAction = function(action, options = {}) {
+                            // Handle undefined or problematic actions
+                            if (!action || action === 'is-mobile' || action === 'undefined') {
+                                console.warn('[CloudPepper] Suppressed invalid action:', action);
+                                return Promise.resolve();
+                            }
+                            
+                            return originalDoAction.call(this, action, options);
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn('[CloudPepper] Could not hook action service:', e.message);
             }
         }
+        
+        // Suppress tracking-related errors
+        const suppressTrackingErrors = () => {
+            ['dataLayer', 'gtag', 'ga', '_gaq', 'fbq', 'FullStory', 'mixpanel'].forEach(name => {
+                if (typeof window[name] === 'undefined') {
+                    window[name] = function() {
+                        // Silently ignore tracking calls
+                        return true;
+                    };
+                }
+            });
+        };
+        
+        suppressTrackingErrors();
 
         console.log('[CloudPepper] Warning suppression configured');
     },

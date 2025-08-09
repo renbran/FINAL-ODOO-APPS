@@ -14,7 +14,8 @@
             <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/views/form_view.scss"/>
             
             <!-- JavaScript Components -->
-            <script type="text/javascript" src="/account_payment_final/static/src/js/cloudpepper_simple_optimizer.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/cloudpepper_console_optimizer.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/unknown_action_handler.js"/>
             <script type="text/javascript" src="/account_payment_final/static/src/js/components/payment_widget.js"/>
             <script type="text/javascript" src="/account_payment_final/static/src/js/fields/payment_field.js"/>
         </template>
