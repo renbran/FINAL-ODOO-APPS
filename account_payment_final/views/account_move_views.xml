@@ -116,12 +116,12 @@
                     <field name="approval_state"/>
                 </xpath>
                 
-                <xpath expr="//div[hasclass('\1')]" position="inside">
-                    <span class="badge badge"
+                <xpath expr="//div[@class='oe_kanban_bottom_right']" position="inside">
+                    <span class="badge badge-pill float-right"
                           t-attf-class="badge-#{record.approval_state.raw_value == 'approved' ? 'success' : 
                                                    record.approval_state.raw_value == 'under_review' ? 'info' :
                                                    record.approval_state.raw_value == 'for_approval' ? 'warning' : 'secondary'}"
-                          t-if="record.move_type.raw_value in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']">
+                          t-if="record.move_type.raw_value in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and record.approval_state.raw_value">
                         <t t-esc="record.approval_state.value"/>
                     </span>
                 </xpath>
