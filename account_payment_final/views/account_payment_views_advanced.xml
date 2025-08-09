@@ -80,14 +80,3 @@
 
     </data>
 </odoo>
-            <field name="arch" type="xml">
-                
-                <xpath expr="//field[@name='voucher_number']" position="after">
-                    <field name="approval_state" widget="badge"/>
-                </xpath>
-                
-            </field>
-        </record>
-
-    </data>
-</odoo>
