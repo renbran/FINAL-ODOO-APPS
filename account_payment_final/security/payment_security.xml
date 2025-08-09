@@ -161,7 +161,7 @@
         <record id="payment_voucher_user_own_rule" model="ir.rule">
             <field name="name">Payment Voucher: Users can see own drafts</field>
             <field name="model_id" ref="account.model_account_payment"/>
-            <field name="domain_force">['|', ('approval_state', '!=', 'draft'), ('create_uid', '=', user.id)]</field>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_payment_voucher_user'))]"/>
             <field name="perm_read">1</field>
             <field name="perm_write">1</field>
@@ -171,9 +171,9 @@
 
         <!-- Reviewers can see payments under review -->
         <record id="payment_voucher_reviewer_rule" model="ir.rule">
-            <field name="name">Payment Voucher: Reviewers see pending reviews</field>
+            <field name="name">Payment Voucher: Reviewers see all payments</field>
             <field name="model_id" ref="account.model_account_payment"/>
-            <field name="domain_force">['|', ('approval_state', '!=', 'under_review'), ('approval_state', '=', 'under_review')]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
             <field name="perm_read">1</field>
             <field name="perm_write">1</field>
@@ -183,9 +183,9 @@
 
         <!-- Approvers can see payments for approval -->
         <record id="payment_voucher_approver_rule" model="ir.rule">
-            <field name="name">Payment Voucher: Approvers see pending approvals</field>
+            <field name="name">Payment Voucher: Approvers see all payments</field>
             <field name="model_id" ref="account.model_account_payment"/>
-            <field name="domain_force">['|', ('approval_state', '!=', 'for_approval'), ('approval_state', '=', 'for_approval')]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_payment_voucher_approver'))]"/>
             <field name="perm_read">1</field>
             <field name="perm_write">1</field>
@@ -195,9 +195,9 @@
 
         <!-- Authorizers can see payments for authorization -->
         <record id="payment_voucher_authorizer_rule" model="ir.rule">
-            <field name="name">Payment Voucher: Authorizers see pending authorizations</field>
+            <field name="name">Payment Voucher: Authorizers see all payments</field>
             <field name="model_id" ref="account.model_account_payment"/>
-            <field name="domain_force">['|', ('approval_state', '!=', 'for_authorization'), ('approval_state', '=', 'for_authorization')]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_payment_voucher_authorizer'))]"/>
             <field name="perm_read">1</field>
             <field name="perm_write">1</field>
@@ -207,9 +207,9 @@
 
         <!-- Posters can see approved payments -->
         <record id="payment_voucher_poster_rule" model="ir.rule">
-            <field name="name">Payment Voucher: Posters see approved payments</field>
+            <field name="name">Payment Voucher: Posters see all payments</field>
             <field name="model_id" ref="account.model_account_payment"/>
-            <field name="domain_force">['|', ('approval_state', '!=', 'approved'), ('approval_state', '=', 'approved')]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_payment_voucher_poster'))]"/>
             <field name="perm_read">1</field>
             <field name="perm_write">1</field>
