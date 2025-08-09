@@ -25,6 +25,8 @@
                             <field name="state" invisible="1"/>
                             <field name="payment_type" invisible="1"/>
                             <field name="is_internal_transfer" invisible="1"/>
+                            <field name="reconciled_invoice_ids" invisible="1"/>
+                            <field name="reconciled_bill_ids" invisible="1"/>
                             
                             <!-- Workflow Action Buttons - OSUS Branded with Clear Logic -->
                             <div class="workflow-buttons osus-workflow">

@@ -108,6 +108,21 @@ class AccountPayment(models.Model):
         help="Journal entries created by this payment"
     )
     
+    # Reconciled invoices and bills for smart buttons and visibility
+    reconciled_invoice_ids = fields.Many2many(
+        'account.move',
+        string='Reconciled Invoices',
+        compute='_compute_reconciled_invoices',
+        help="Customer invoices reconciled with this payment"
+    )
+    
+    reconciled_bill_ids = fields.Many2many(
+        'account.move',
+        string='Reconciled Bills', 
+        compute='_compute_reconciled_bills',
+        help="Vendor bills reconciled with this payment"
+    )
+    
     # Ensure available payment method line IDs field is available
     available_payment_method_line_ids = fields.Many2many(
         'account.payment.method.line',
@@ -309,6 +324,38 @@ Verify at: {base_url}/payment/qr-guide"""
                 record.available_payment_method_line_ids = available_methods
             else:
                 record.available_payment_method_line_ids = self.env['account.payment.method.line']
+    
+    @api.depends('move_id', 'move_id.line_ids', 'move_id.line_ids.matched_debit_ids', 'move_id.line_ids.matched_credit_ids')
+    def _compute_reconciled_invoices(self):
+        """Compute reconciled customer invoices"""
+        for record in self:
+            reconciled_invoices = self.env['account.move']
+            if record.move_id:
+                # Get all reconciled moves from payment lines
+                for line in record.move_id.line_ids:
+                    # Check matched debits and credits
+                    for partial_rec in line.matched_debit_ids + line.matched_credit_ids:
+                        if partial_rec.debit_move_id.move_id.move_type == 'out_invoice':
+                            reconciled_invoices |= partial_rec.debit_move_id.move_id
+                        elif partial_rec.credit_move_id.move_id.move_type == 'out_invoice':
+                            reconciled_invoices |= partial_rec.credit_move_id.move_id
+            record.reconciled_invoice_ids = reconciled_invoices
+    
+    @api.depends('move_id', 'move_id.line_ids', 'move_id.line_ids.matched_debit_ids', 'move_id.line_ids.matched_credit_ids')
+    def _compute_reconciled_bills(self):
+        """Compute reconciled vendor bills"""
+        for record in self:
+            reconciled_bills = self.env['account.move']
+            if record.move_id:
+                # Get all reconciled moves from payment lines
+                for line in record.move_id.line_ids:
+                    # Check matched debits and credits
+                    for partial_rec in line.matched_debit_ids + line.matched_credit_ids:
+                        if partial_rec.debit_move_id.move_id.move_type == 'in_invoice':
+                            reconciled_bills |= partial_rec.debit_move_id.move_id
+                        elif partial_rec.credit_move_id.move_id.move_type == 'in_invoice':
+                            reconciled_bills |= partial_rec.credit_move_id.move_id
+            record.reconciled_bill_ids = reconciled_bills
     
     def _get_next_voucher_number(self):
         """Generate next voucher number sequence"""
