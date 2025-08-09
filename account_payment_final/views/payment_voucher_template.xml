@@ -57,7 +57,7 @@
                             <table class="table table-borderless voucher-info-table">
                                 <tr>
                                     <td class="label-col"><strong>Date:</strong></td>
-                                    <td class="value-col" t-field="payment.date"/>
+                                    <td class="value-col"><span t-field="payment.date"/></td>
                                     <td class="label-col"><strong>Amount:</strong></td>
                                     <td class="value-col">
                                         <strong t-field="payment.amount" 
@@ -71,17 +71,17 @@
                                             <span t-if="payment.payment_type == 'inbound'">Received From:</span>
                                         </strong>
                                     </td>
-                                    <td class="value-col" colspan="3" t-field="payment.partner_id.name"/>
+                                    <td class="value-col" colspan="3"><span t-field="payment.partner_id.name"/></td>
                                 </tr>
                                 <tr t-if="payment.ref">
                                     <td class="label-col"><strong>Reference:</strong></td>
-                                    <td class="value-col" colspan="3" t-field="payment.ref"/>
+                                    <td class="value-col" colspan="3"><span t-field="payment.ref"/></td>
                                 </tr>
                                 <tr>
                                     <td class="label-col"><strong>Payment Method:</strong></td>
-                                    <td class="value-col" t-field="payment.journal_id.name"/>
+                                    <td class="value-col"><span t-field="payment.journal_id.name"/></td>
                                     <td class="label-col"><strong>Currency:</strong></td>
-                                    <td class="value-col" t-field="payment.currency_id.name"/>
+                                    <td class="value-col"><span t-field="payment.currency_id.name"/></td>
                                 </tr>
                             </table>
 
