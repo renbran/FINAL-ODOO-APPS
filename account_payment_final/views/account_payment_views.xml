@@ -155,6 +155,9 @@
                                     <field name="destination_journal_id" 
                                            invisible="not is_internal_transfer" 
                                            readonly="state != 'draft'"/>
+                                    
+                                    <!-- Hidden field to ensure available_payment_method_line_ids is loaded -->
+                                    <field name="available_payment_method_line_ids" invisible="1"/>
                                 </group>
                             </group>
 

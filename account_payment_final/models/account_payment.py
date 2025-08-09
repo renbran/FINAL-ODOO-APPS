@@ -107,6 +107,14 @@ class AccountPayment(models.Model):
         readonly=True,
         help="Journal entries created by this payment"
     )
+    
+    # Ensure available payment method line IDs field is available
+    available_payment_method_line_ids = fields.Many2many(
+        'account.payment.method.line',
+        string='Available Payment Methods',
+        compute='_compute_available_payment_method_line_ids',
+        help="Available payment method lines for this journal"
+    )
 
     # Enhanced workflow fields for 4-stage approval
     reviewer_id = fields.Many2one(
@@ -253,11 +261,11 @@ Verify at: {base_url}/payment/qr-guide"""
             else:
                 record.qr_code = False
 
-    @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'authorizer_id', 'approver_id')
+    @api.depends('state', 'move_id', 'move_id.line_ids')
     def _compute_journal_item_count(self):
         """Compute the number of journal items for smart button"""
         for record in self:
-            if record.state == 'posted' and record.move_id:
+            if record.state == 'posted' and record.move_id and record.move_id.line_ids:
                 record.journal_item_count = len(record.move_id.line_ids)
             else:
                 record.journal_item_count = 0
@@ -283,6 +291,24 @@ Verify at: {base_url}/payment/qr-guide"""
             if record.reconciled_bill_ids:
                 invoice_count += len(record.reconciled_bill_ids)
             record.invoice_count = invoice_count
+    
+    @api.depends('journal_id', 'payment_type')
+    def _compute_available_payment_method_line_ids(self):
+        """Compute available payment method lines based on journal and payment type"""
+        for record in self:
+            if record.journal_id:
+                if record.payment_type == 'inbound':
+                    # For inbound payments, use inbound payment method lines
+                    available_methods = record.journal_id.inbound_payment_method_line_ids
+                elif record.payment_type == 'outbound':
+                    # For outbound payments, use outbound payment method lines
+                    available_methods = record.journal_id.outbound_payment_method_line_ids
+                else:
+                    available_methods = self.env['account.payment.method.line']
+                
+                record.available_payment_method_line_ids = available_methods
+            else:
+                record.available_payment_method_line_ids = self.env['account.payment.method.line']
     
     def _get_next_voucher_number(self):
         """Generate next voucher number sequence"""
@@ -944,8 +970,19 @@ Verify at: {base_url}/payment/qr-guide"""
     def action_view_journal_items(self):
         """Open journal items related to this payment"""
         self.ensure_one()
+        
+        # Check if payment has been posted and has journal entries
         if not self.move_id:
-            raise UserError(_("No journal entries found for this payment."))
+            if self.state == 'draft':
+                raise UserError(_("Journal entries are created when the payment is posted. This payment is still in draft state."))
+            else:
+                raise UserError(_("No journal entries found for this payment. The payment may not have been processed correctly."))
+        
+        # Get all move lines for this payment
+        move_lines = self.move_id.line_ids
+        
+        if not move_lines:
+            raise UserError(_("No journal items found for this payment."))
         
         return {
             'type': 'ir.actions.act_window',
@@ -956,6 +993,7 @@ Verify at: {base_url}/payment/qr-guide"""
             'context': {
                 'default_move_id': self.move_id.id,
                 'search_default_posted': 1,
+                'create': False,  # Prevent creating new journal items from this view
             },
             'target': 'current',
         }
