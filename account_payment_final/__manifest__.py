@@ -43,6 +43,7 @@
         'web',
         'mail',
         'portal',
+        'website',
     ],
     'data': [
         # Security (Load First)

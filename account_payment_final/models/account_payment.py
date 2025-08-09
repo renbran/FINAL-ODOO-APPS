@@ -676,16 +676,22 @@ Verify at: {base_url}/payment/qr-guide"""
         if not self.qr_code:
             raise UserError(_('QR Code has not been generated yet. Please generate QR Code first.'))
         
-        # Generate verification URL
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        verification_url = f"{base_url}/payment/verify/{self.id}"
-        
         return {
             'type': 'ir.actions.act_url',
-            'url': verification_url,
+            'url': self.get_verification_url(),
             'target': 'new',
             'name': _('Payment Verification Page')
         }
+
+    def get_verification_url(self):
+        """Get the public verification URL for this payment"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        return f"{base_url}/payment/verify/{self.id}"
+
+    def get_qr_code_url(self):
+        """Get the QR code image URL for this payment"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        return f"{base_url}/payment/qr_code/{self.id}"
 
     def action_cancel(self):
         """Enhanced cancel action with proper validation"""
