@@ -8,10 +8,13 @@
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 
+                <!-- First hide the original statusbar to prevent duplicates -->
+                <xpath expr="//header" position="replace"/>
+                
                 <!-- Replace entire form with clean organized layout -->
                 <form position="replace">
                     <form string="Payment">
-                        <!-- Clean Status Bar Header -->
+                        <!-- Clean Status Bar Header - Only One -->
                         <header class="payment-header">
                             <field name="approval_state" widget="statusbar" 
                                    statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted"

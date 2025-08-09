@@ -76,7 +76,7 @@ class AccountPayment(models.Model):
         copy=False,
         readonly=True,
         index=True,
-        default=lambda self: self._get_next_voucher_number(),
+        default='/',
         help="Unique voucher number generated automatically"
     )
     
@@ -899,49 +899,64 @@ Verify at: {base_url}/payment/qr-guide"""
         return {'can_bypass': False, 'reason': 'approval workflow required'}
 
     def action_post(self):
-        """Override core action_post to redirect to approval workflow or enforce approval"""
+        """Enhanced action_post with flexible workflow logic"""
         for record in self:
-            # If this is an approved payment being posted through workflow, allow normal posting
-            if hasattr(record, 'approval_state') and record.approval_state == 'approved':
-                # Check if user has permission to post
-                if not self.env.user.has_group('account.group_account_manager') and \
-                   not self.env.user.has_group('account_payment_final.group_payment_poster'):
-                    raise UserError(_("You do not have permission to post payments."))
-                
-                # Call the original post method and update state
-                result = super(AccountPayment, record).action_post()
-                record.approval_state = 'posted'
-                record.actual_approver_id = self.env.user
-                record._post_workflow_message("posted to ledger")
-                return result
+            # Check posting permissions first
+            if not self.env.user.has_group('account.group_account_manager') and \
+               not self.env.user.has_group('account_payment_final.group_payment_poster') and \
+               not self.env.user.has_group('account_payment_final.group_payment_voucher_approver'):
+                raise UserError(_("You do not have permission to post payments."))
             
-            # Check if payment can bypass approval workflow
-            elif hasattr(record, 'approval_state') and record.approval_state:
-                # Check conditions for bypassing approval workflow
-                can_bypass = record._can_bypass_approval_workflow()
+            # Handle different approval states
+            if hasattr(record, 'approval_state') and record.approval_state:
                 
-                if can_bypass:
-                    # Auto-approve and post the payment
-                    _logger.info(f"Payment {record.name} bypassing approval workflow: {can_bypass['reason']}")
-                    record.approval_state = 'approved'
-                    record.actual_approver_id = self.env.user
-                    record._post_workflow_message(f"auto-approved: {can_bypass['reason']}")
-                    
-                    # Call the original post method and update state
+                # If already posted, prevent double posting
+                if record.approval_state == 'posted':
+                    raise UserError(_("Payment is already posted."))
+                
+                # If cancelled, cannot post
+                if record.approval_state == 'cancelled':
+                    raise UserError(_("Cannot post cancelled payment."))
+                
+                # If approved, allow posting
+                if record.approval_state == 'approved':
                     result = super(AccountPayment, record).action_post()
                     record.approval_state = 'posted'
-                    record._post_workflow_message("posted to ledger")
+                    record.actual_approver_id = self.env.user
+                    record._post_workflow_message("manually posted to ledger")
                     return result
                 
-                # Enforce approval workflow
-                if record.approval_state == 'draft':
-                    raise UserError(_("Only approved or authorized payments can be posted. Current state: %s\n\nTo resolve this:\n1. Submit payment for review using 'Submit for Review' button\n2. Complete the approval workflow\n3. Then post the payment\n\nOr contact your manager if this payment should bypass approval.") % record.approval_state)
-                elif record.approval_state in ['under_review', 'for_approval', 'for_authorization']:
-                    raise UserError(_("Payment is still under approval workflow. Current state: %s. Please complete the approval process first.") % record.approval_state)
-                elif record.approval_state == 'posted':
-                    raise UserError(_("Payment is already posted."))
-                elif record.approval_state == 'cancelled':
-                    raise UserError(_("Cannot post cancelled payment."))
+                # For other states, allow posting if user has appropriate permissions
+                elif record.approval_state in ['draft', 'under_review', 'for_approval', 'for_authorization']:
+                    # Check if user can bypass workflow
+                    can_bypass = record._can_bypass_approval_workflow()
+                    
+                    if can_bypass or self.env.user.has_group('account.group_account_manager'):
+                        # Auto-approve and post
+                        reason = can_bypass.get('reason', 'account manager override') if can_bypass else 'account manager override'
+                        _logger.info(f"Payment {record.name} posting with override: {reason}")
+                        
+                        record.approval_state = 'approved'
+                        record.actual_approver_id = self.env.user
+                        record._post_workflow_message(f"approved and posting: {reason}")
+                        
+                        # Post the payment
+                        result = super(AccountPayment, record).action_post()
+                        record.approval_state = 'posted'
+                        record._post_workflow_message("posted to ledger")
+                        return result
+                    else:
+                        # Suggest workflow completion
+                        return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'title': _('Approval Required'),
+                                'message': _('This payment requires approval before posting. Please use the approval workflow buttons or contact your manager.'),
+                                'type': 'warning',
+                                'sticky': False,
+                            }
+                        }
                 else:
                     raise UserError(_("Payment state is invalid for posting: %s") % record.approval_state)
             
@@ -1078,10 +1093,50 @@ Verify at: {base_url}/payment/qr-guide"""
     # ============================================================================
 
     @api.model
+    def default_get(self, fields):
+        """Enhanced default_get to ensure voucher number is generated immediately"""
+        res = super(AccountPayment, self).default_get(fields)
+        
+        # Generate voucher number immediately for new records
+        if 'voucher_number' in fields and not res.get('voucher_number'):
+            payment_type = res.get('payment_type', 'outbound')
+            
+            if payment_type == 'inbound':
+                sequence_code = 'payment.voucher.receipt'
+                prefix = 'RV'
+            else:
+                sequence_code = 'payment.voucher.payment'
+                prefix = 'PV'
+            
+            # Get or create sequence
+            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
+            if not sequence:
+                sequence = self.env['ir.sequence'].create({
+                    'name': f"{'Receipt' if payment_type == 'inbound' else 'Payment'} Voucher",
+                    'code': sequence_code,
+                    'prefix': prefix,
+                    'padding': 5,
+                    'company_id': self.env.company.id,
+                })
+            
+            try:
+                res['voucher_number'] = sequence.next_by_id()
+                _logger.info(f"Generated voucher number on form load: {res['voucher_number']}")
+            except Exception as e:
+                # Fallback
+                import datetime
+                now = datetime.datetime.now()
+                res['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
+                _logger.warning(f"Fallback voucher number: {res['voucher_number']} due to: {e}")
+        
+        return res
+
+    @api.model
+    @api.model
     def create(self, vals):
         """Enhanced create method with voucher number generation"""
-        # Generate voucher number if not provided
-        if not vals.get('voucher_number'):
+        # Generate voucher number if not provided or is default '/'
+        if not vals.get('voucher_number') or vals.get('voucher_number') == '/':
             payment_type = vals.get('payment_type', 'outbound')
             
             # Try to get existing sequence or create one
@@ -1107,20 +1162,26 @@ Verify at: {base_url}/payment/qr-guide"""
             
             try:
                 vals['voucher_number'] = sequence.next_by_id()
-            except:
+                _logger.info(f"Generated voucher number: {vals['voucher_number']}")
+            except Exception as e:
                 # Fallback if sequence fails
                 import datetime
                 now = datetime.datetime.now()
                 vals['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
+                _logger.warning(f"Fallback voucher number generated: {vals['voucher_number']} due to error: {e}")
 
         payment = super(AccountPayment, self).create(vals)
+        
+        # Ensure voucher number is set if somehow missed
+        if not payment.voucher_number or payment.voucher_number == '/':
+            payment._generate_voucher_number()
         
         # Log the creation
         if vals.get('remarks'):
             payment._post_workflow_message(f"created with remarks: {vals['remarks']}")
-        else:
-            payment._post_workflow_message("created")
-            
+        
+        payment._post_workflow_message(f"voucher {payment.voucher_number} created")
+        
         return payment
 
     def write(self, vals):
