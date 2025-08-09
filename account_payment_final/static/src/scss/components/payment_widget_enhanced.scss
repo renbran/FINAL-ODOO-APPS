@@ -1,11 +1,11 @@
-// Payment Approval Widget Styles - Enhanced
-// Modular component following Odoo 17 design patterns with CSS custom properties
+ /* Payment Approval Widget Styles - Enhanced */
+/* Modular component following Odoo 17 design patterns with CSS custom properties */
 
 @import '../variables';
 
-// ============================================================================
-// PAYMENT APPROVAL WIDGET - Enhanced Component
-// ============================================================================
+/* ============================================================================ */
+ /* PAYMENT APPROVAL WIDGET - Enhanced Component */
+/* ============================================================================ */
 
 .o_payment_approval_widget {
     display: grid;
@@ -19,14 +19,14 @@
     margin: var(--payment-spacing-sm) 0;
     position: relative;
 
-    // Hover effects for interactive widgets
+    /* Hover effects for interactive widgets */
     &:not(.o_readonly):hover {
         box-shadow: var(--payment-box-shadow-hover);
         transform: translateY(-1px);
         border-color: var(--payment-primary);
     }
 
-    // Loading state
+    /* Loading state */
     &.o_loading {
         pointer-events: none;
         
@@ -46,7 +46,7 @@
         }
     }
 
-    // Readonly state
+    /* Readonly state */
     &.o_readonly {
         background: var(--bs-secondary-bg);
         pointer-events: none;
@@ -57,22 +57,22 @@
         }
     }
 
-    // Error state
+    /* Error state */
     &.o_error {
         border-color: var(--payment-danger);
         background: var(--bs-danger-bg-subtle);
     }
 
-    // Success state  
+    /* Success state  */
     &.o_success {
         border-color: var(--payment-success);
         background: var(--bs-success-bg-subtle);
     }
 }
 
-// ============================================================================
-// APPROVAL TIMELINE COMPONENT
-// ============================================================================
+/* ============================================================================ */
+ /* APPROVAL TIMELINE COMPONENT */
+/* ============================================================================ */
 
 .o_approval_timeline {
     display: flex;
@@ -100,7 +100,7 @@
             font-size: var(--payment-font-size-sm);
         }
 
-        // Stage states
+        /* Stage states */
         &.o_stage_current {
             background: var(--payment-info);
             color: white;
@@ -125,7 +125,7 @@
             color: white;
             
             i::before {
-                content: "\f00c"; // checkmark
+                content: "\f00c"; /* checkmark */
             }
         }
 
@@ -140,11 +140,11 @@
             color: white;
             
             i::before {
-                content: "\f00d"; // times
+                content: "\f00d"; /* times */
             }
         }
 
-        // Stage connectors (progress line)
+        /* Stage connectors (progress line) */
         &:not(:last-child)::before {
             content: '';
             position: absolute;
@@ -163,9 +163,9 @@
     }
 }
 
-// ============================================================================ 
-// APPROVAL ACTIONS COMPONENT
-// ============================================================================
+/* ============================================================================ */
+ /* APPROVAL ACTIONS COMPONENT */
+/* ============================================================================ */
 
 .o_approval_actions {
     display: flex;
@@ -181,7 +181,7 @@
         transition: var(--payment-transition-fast);
         position: relative;
         
-        // Loading state for buttons
+        /* Loading state for buttons */
         &.o_loading {
             pointer-events: none;
             
@@ -198,7 +198,7 @@
             }
         }
 
-        // Action-specific button styles
+        /* Action-specific button styles */
         &.o_btn_approve {
             background: var(--state-approved);
             border-color: var(--state-approved);
@@ -245,7 +245,7 @@
             }
         }
 
-        // Disabled state
+        /* Disabled state */
         &:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -254,11 +254,11 @@
     }
 }
 
-// ============================================================================
-// RESPONSIVE DESIGN - Mobile First
-// ============================================================================
+/* ============================================================================ */
+ /* RESPONSIVE DESIGN - Mobile First */
+/* ============================================================================ */
 
-// Mobile devices (576px and down)
+/* Mobile devices (576px and down) */
 @media (max-width: var(--bp-mobile)) {
     .o_payment_approval_widget {
         grid-template-columns: 1fr;
@@ -287,7 +287,7 @@
     }
 }
 
-// Tablet devices (768px and down)
+/* Tablet devices (768px and down) */
 @media (max-width: var(--bp-tablet)) {
     .o_approval_timeline {
         .o_stage {
@@ -297,11 +297,11 @@
     }
 }
 
-// ============================================================================
-// ACCESSIBILITY ENHANCEMENTS
-// ============================================================================
+/* ============================================================================ */
+ /* ACCESSIBILITY ENHANCEMENTS */
+/* ============================================================================ */
 
-// High contrast mode support
+/* High contrast mode support */
 @media (prefers-contrast: high) {
     .o_payment_approval_widget {
         border: 2px solid;
@@ -316,7 +316,7 @@
     }
 }
 
-// Reduced motion support
+/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .o_payment_approval_widget {
         transition: none;
@@ -343,7 +343,7 @@
     }
 }
 
-// Focus management for keyboard navigation
+/* Focus management for keyboard navigation */
 .o_payment_approval_widget {
     &:focus-within {
         outline: 2px solid var(--payment-primary);
@@ -359,9 +359,9 @@
     }
 }
 
-// ============================================================================
-// ANIMATIONS
-// ============================================================================
+/* ============================================================================ */
+ /* ANIMATIONS */
+/* ============================================================================ */
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -378,14 +378,14 @@
     to { transform: translateX(0); opacity: 1; }
 }
 
-// Apply animations to new stages
+/* Apply animations to new stages */
 .o_approval_timeline .o_stage {
     animation: fadeIn 0.3s ease-out;
 }
 
-// ============================================================================
-// DARK THEME SUPPORT
-// ============================================================================
+/* ============================================================================ */
+ /* DARK THEME SUPPORT */
+/* ============================================================================ */
 
 @media (prefers-color-scheme: dark) {
     .o_payment_approval_widget {

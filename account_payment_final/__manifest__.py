@@ -73,7 +73,10 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Enhanced SCSS with CSS custom properties
+            # Emergency CSS fix (load first to ensure basic styling)
+            'account_payment_final/static/src/scss/emergency_fix.scss',
+            
+            # Enhanced SCSS with CSS custom properties (fixed)
             'account_payment_final/static/src/scss/variables.scss',
             'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
