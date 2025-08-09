@@ -1,0 +1,22 @@
+{
+  "static/src/js/error_handler.js": {
+    "status": "PASS",
+    "method": "Node.js",
+    "size": 5433
+  },
+  "static/src/js/cloudpepper_simple_optimizer.js": {
+    "status": "PASS",
+    "method": "Node.js",
+    "size": 6637
+  },
+  "static/src/js/payment_workflow.js": {
+    "status": "PASS",
+    "method": "Node.js",
+    "size": 2481
+  },
+  "static/src/js/components/payment_approval_widget.js": {
+    "status": "PASS",
+    "method": "Node.js",
+    "size": 7967
+  }
+}
