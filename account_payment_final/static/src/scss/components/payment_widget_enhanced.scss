@@ -1,7 +1,8 @@
  /* Payment Approval Widget Styles - Enhanced */
 /* Modular component following Odoo 17 design patterns with CSS custom properties */
 
-@import '../variables';
+/* Note: Variables are loaded separately via manifest.py assets configuration */
+/* This ensures CloudPepper security compliance by avoiding local @import statements */
 
 /* ============================================================================ */
  /* PAYMENT APPROVAL WIDGET - Enhanced Component */

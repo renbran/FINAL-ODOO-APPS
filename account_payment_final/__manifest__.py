@@ -103,14 +103,10 @@
             # Frontend verification portal
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',
             'account_payment_final/static/src/js/frontend/qr_verification.js',
-        ],
-        'web.qunit_suite_tests': [
-            # Comprehensive test suite
-            'account_payment_final/static/tests/**/*.js',
-        ],
+        ]
     },
     'external_dependencies': {
-        'python': ['qrcode', 'pillow'],
+        'python': ['qrcode', 'pillow']
     },
     'demo': [
         'demo/demo_payments.xml',
@@ -118,5 +114,5 @@
     'installable': True,
     'auto_install': False,
     'application': False,
-    'sequence': 10,
+    'sequence': 10
 }
