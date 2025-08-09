@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Advanced Payment Form View - Post Installation -->
+        <record id="view_account_payment_form_advanced" model="ir.ui.view">
+            <field name="name">account.payment.form.advanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account_payment_final.view_account_payment_form_basic"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add approval state field to header -->
+                <xpath expr="//header" position="inside">
+                    <field name="approval_state" widget="statusbar" 
+                           statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted"/>
+                    
+                    <!-- Workflow buttons -->
+                    <button name="action_submit_for_review" 
+                            string="Submit for Review" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="approval_state != 'draft'"/>
+                            
+                    <button name="action_approve_payment" 
+                            string="Approve" 
+                            type="object" 
+                            class="btn-success"
+                            groups="account_payment_final.group_payment_voucher_approver"
+                            invisible="approval_state not in ('under_review', 'for_approval')"/>
+                </xpath>
+                
+                <!-- Add enhanced fields -->
+                <xpath expr="//field[@name='voucher_number']" position="after">
+                    <field name="remarks" placeholder="Enter payment remarks..."/>
+                </xpath>
+                
+                <!-- Add QR code field -->
+                <xpath expr="//field[@name='communication']" position="after">
+                    <field name="qr_code" widget="image" class="oe_avatar" 
+                           invisible="not qr_code"/>
+                    <field name="qr_in_report"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <!-- Advanced Tree View -->
+        <record id="view_account_payment_tree_advanced" model="ir.ui.view">
+            <field name="name">account.payment.tree.advanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account_payment_final.view_account_payment_tree_enhanced"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='voucher_number']" position="after">
+                    <field name="approval_state" widget="badge"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+    </data>
+</odoo>

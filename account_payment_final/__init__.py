@@ -3,9 +3,23 @@ from . import controllers
 
 
 def post_init_hook(env):
-    """Post-installation hook to ensure proper security rule activation"""
-    # Update security rules to use approval_state field after model installation
+    """Post-installation hook to ensure proper security rule and view activation"""
     try:
+        # Activate advanced views after successful installation
+        advanced_views = [
+            'account_payment_final.view_account_payment_form_advanced',
+            'account_payment_final.view_account_payment_tree_advanced',
+        ]
+        
+        for view_ref in advanced_views:
+            try:
+                view = env.ref(view_ref, raise_if_not_found=False)
+                if view:
+                    view.active = True
+                    view.invalidate_recordset()
+            except Exception:
+                pass  # Ignore if view doesn't exist yet
+        
         # Force update of security rules with proper field references
         payment_rules = [
             'account_payment_final.payment_voucher_user_own_rule',

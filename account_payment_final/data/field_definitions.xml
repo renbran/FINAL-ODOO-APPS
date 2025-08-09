@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Account Payment Field Creation -->
+        <record id="ir_model_fields_account_payment_approval_state" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="name">approval_state</field>
+            <field name="field_description">Approval State</field>
+            <field name="ttype">selection</field>
+            <field name="selection">[('draft', 'Draft'), ('under_review', 'Under Review'), ('for_approval', 'For Approval'), ('for_authorization', 'For Authorization'), ('approved', 'Approved'), ('posted', 'Posted'), ('cancelled', 'Cancelled')]</field>
+            <field name="required">True</field>
+            <field name="default">'draft'</field>
+            <field name="tracking">1</field>
+            <field name="copy">False</field>
+            <field name="help">Current approval state of the payment voucher</field>
+        </record>
+
+        <record id="ir_model_fields_account_payment_voucher_number" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="name">voucher_number</field>
+            <field name="field_description">Voucher Number</field>
+            <field name="ttype">char</field>
+            <field name="required">False</field>
+            <field name="copy">False</field>
+            <field name="readonly">True</field>
+            <field name="help">Unique voucher number generated automatically</field>
+        </record>
+
+        <record id="ir_model_fields_account_payment_remarks" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="name">remarks</field>
+            <field name="field_description">Remarks/Memo</field>
+            <field name="ttype">text</field>
+            <field name="help">Additional remarks or memo for this payment voucher</field>
+        </record>
+
+        <record id="ir_model_fields_account_payment_qr_code" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="name">qr_code</field>
+            <field name="field_description">Payment QR Code</field>
+            <field name="ttype">binary</field>
+            <field name="help">QR code containing payment verification URL</field>
+        </record>
+
+        <record id="ir_model_fields_account_payment_qr_in_report" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="name">qr_in_report</field>
+            <field name="field_description">Display QR Code in Report</field>
+            <field name="ttype">boolean</field>
+            <field name="default">True</field>
+            <field name="help">Whether to display QR code in payment voucher report</field>
+        </record>
+
+        <!-- Account Move Field Creation -->
+        <record id="ir_model_fields_account_move_approval_state" model="ir.model.fields">
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="name">approval_state</field>
+            <field name="field_description">Approval State</field>
+            <field name="ttype">selection</field>
+            <field name="selection">[('draft', 'Draft'), ('under_review', 'Under Review'), ('for_approval', 'For Approval'), ('approved', 'Approved'), ('posted', 'Posted'), ('cancelled', 'Cancelled')]</field>
+            <field name="required">True</field>
+            <field name="default">'draft'</field>
+            <field name="tracking">1</field>
+            <field name="copy">False</field>
+            <field name="help">Current approval state of the invoice/bill</field>
+        </record>
+
+    </data>
+</odoo>
