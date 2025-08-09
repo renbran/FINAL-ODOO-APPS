@@ -46,16 +46,19 @@
         'website',
     ],
     'data': [
-        # Security (Load First)
-        'security/payment_security.xml',
-        'security/ir.model.access.csv',
+        # Field Definitions (Must Load First)
+        'data/field_definitions.xml',
         
         # Data and Sequences
         'data/payment_sequences.xml',
-        'data/email_templates.xml',
+        'data/email_templates.xml', 
         'data/system_parameters.xml',
         
-        # Main Views
+        # Security (Load After Fields)
+        'security/payment_security.xml',
+        'security/ir.model.access.csv',
+        
+        # Main Views (Load After Models/Security)
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
         'views/res_company_views.xml',
