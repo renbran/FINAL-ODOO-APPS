@@ -78,6 +78,7 @@
             'account_payment_final/static/src/js/components/payment_approval_widget.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',
             'account_payment_final/static/src/js/views/payment_list_view.js',
+            'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_frontend': [
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',

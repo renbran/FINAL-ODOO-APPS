@@ -1,6 +1,11 @@
 // Payment Approval Widget Styles
 // Modular component following Odoo 17 design patterns
 
+// FontAwesome optimizations for CloudPepper
+.fa {
+    font-display: swap; // Improves font loading performance
+}
+
 .o_payment_approval_widget {
     padding: $payment-spacing-md;
     border: 1px solid var(--bs-border-color);

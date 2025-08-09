@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Note: CSS/JS Assets are managed through manifest.py 'assets' key for Odoo 17 -->
-        <!-- This file only contains QWeb templates and minimal inline styles for reports -->
-        
         <!-- Enhanced QR Code Template for Payment Verification -->
         <template id="payment_qr_code_template" name="Payment QR Code Display">
             <div class="o_payment_qr_container text-center py-3">
