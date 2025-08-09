@@ -106,28 +106,6 @@
             </field>
         </record>
 
-        <!-- Kanban view enhancement for approval workflow -->
-        <record id="view_account_invoice_kanban_approval" model="ir.ui.view">
-            <field name="name">account.move.kanban.approval</field>
-            <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_account_move_kanban"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='state']" position="after">
-                    <field name="approval_state"/>
-                </xpath>
-                
-                <xpath expr="//div[@class='oe_kanban_bottom_right']" position="inside">
-                    <span class="badge badge-pill float-right"
-                          t-attf-class="badge-#{record.approval_state.raw_value == 'approved' ? 'success' : 
-                                                   record.approval_state.raw_value == 'under_review' ? 'info' :
-                                                   record.approval_state.raw_value == 'for_approval' ? 'warning' : 'secondary'}"
-                          t-if="record.move_type.raw_value in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and record.approval_state.raw_value">
-                        <t t-esc="record.approval_state.value"/>
-                    </span>
-                </xpath>
-            </field>
-        </record>
-
         <!-- Search view enhancement -->
         <record id="view_account_invoice_filter_approval" model="ir.ui.view">
             <field name="name">account.move.search.approval</field>
