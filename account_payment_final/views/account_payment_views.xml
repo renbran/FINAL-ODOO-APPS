@@ -8,9 +8,11 @@
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 
-                <!-- Add basic enhanced fields -->
-                <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="voucher_number" readonly="1" invisible="not voucher_number"/>
+                <!-- Simple header enhancement for basic view -->
+                <xpath expr="//header" position="inside">
+                    <div class="payment-basic-info">
+                        <!-- Placeholder for post-install enhancements -->
+                    </div>
                 </xpath>
                 
             </field>
@@ -23,8 +25,9 @@
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
                 
-                <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="voucher_number" optional="show"/>
+                <!-- Basic tree enhancement -->
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="date" optional="show"/>
                 </xpath>
                 
             </field>

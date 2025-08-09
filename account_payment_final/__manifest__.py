@@ -48,8 +48,6 @@
     'data': [
         # Data and Sequences (Load First)
         'data/payment_sequences.xml',
-        'data/email_templates.xml', 
-        'data/system_parameters.xml',
         
         # Security (Load After Data)
         'security/payment_security.xml',
@@ -64,9 +62,6 @@
         
         # Advanced Views (Load After Basic Views)
         'views/account_payment_views_advanced.xml',
-        'views/res_company_views.xml',
-        'views/res_config_settings_views.xml',
-        'views/menus.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',

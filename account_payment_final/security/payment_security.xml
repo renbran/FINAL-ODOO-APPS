@@ -229,27 +229,5 @@
             <field name="perm_unlink">1</field>
         </record>
 
-        <!-- Simplified Group Aliases for Code References -->
-        <record id="group_payment_reviewer" model="res.groups">
-            <field name="name">Payment Reviewer (Alias)</field>
-            <field name="category_id" ref="base.module_category_accounting"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
-            <field name="comment">Alias group for payment reviewing permissions</field>
-        </record>
-        
-        <record id="group_payment_approver" model="res.groups">
-            <field name="name">Payment Approver (Alias)</field>
-            <field name="category_id" ref="base.module_category_accounting"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
-            <field name="comment">Alias group for payment approval permissions</field>
-        </record>
-        
-        <record id="group_payment_poster" model="res.groups">
-            <field name="name">Payment Poster (Alias)</field>
-            <field name="category_id" ref="base.module_category_accounting"/>
-            <field name="implied_ids" eval="[(4, ref('group_payment_voucher_poster'))]"/>
-            <field name="comment">Alias group for payment posting permissions</field>
-        </record>
-
     </data>
 </odoo>
