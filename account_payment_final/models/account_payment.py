@@ -76,7 +76,30 @@ class AccountPayment(models.Model):
         copy=False,
         readonly=True,
         index=True,
+        default=lambda self: self._get_next_voucher_number(),
         help="Unique voucher number generated automatically"
+    )
+    
+    # Smart Button Fields for UI Navigation
+    journal_item_count = fields.Integer(
+        string='Journal Items Count',
+        compute='_compute_journal_item_count',
+        help="Number of journal items related to this payment"
+    )
+    
+    reconciliation_count = fields.Integer(
+        string='Reconciliation Count',
+        compute='_compute_reconciliation_count',
+        help="Number of reconciled move lines"
+    )
+    
+    # Many2many field for journal items (for smart button)
+    move_line_ids = fields.One2many(
+        'account.move.line',
+        'payment_id',
+        string='Journal Items',
+        readonly=True,
+        help="Journal entries created by this payment"
     )
 
     # Enhanced workflow fields for 4-stage approval
@@ -223,6 +246,37 @@ Verify at: {base_url}/payment/qr-guide"""
                     record.qr_code = False
             else:
                 record.qr_code = False
+
+    @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'authorizer_id', 'approver_id')
+    def _compute_journal_item_count(self):
+        """Compute the number of journal items for smart button"""
+        for record in self:
+            if record.state == 'posted' and record.move_id:
+                record.journal_item_count = len(record.move_id.line_ids)
+            else:
+                record.journal_item_count = 0
+    
+    @api.depends('reconciled_invoice_ids', 'reconciled_bill_ids')
+    def _compute_reconciliation_count(self):
+        """Compute the number of reconciled documents for smart button"""
+        for record in self:
+            reconciled_count = 0
+            if record.reconciled_invoice_ids:
+                reconciled_count += len(record.reconciled_invoice_ids)
+            if record.reconciled_bill_ids:
+                reconciled_count += len(record.reconciled_bill_ids)
+            record.reconciliation_count = reconciled_count
+    
+    def _get_next_voucher_number(self):
+        """Generate next voucher number sequence"""
+        try:
+            if self.payment_type == 'inbound':
+                return self.env['ir.sequence'].next_by_code('payment.voucher.receipt') or '/'
+            else:
+                return self.env['ir.sequence'].next_by_code('payment.voucher.payment') or '/'
+        except:
+            # Fallback sequence generation
+            return self.env['ir.sequence'].next_by_code('payment.voucher') or f"PV{self.env['ir.sequence'].next_by_code('account.payment') or ''}"
 
     @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'authorizer_id', 'approver_id')
     def _compute_authorized_by(self):
@@ -851,29 +905,112 @@ Verify at: {base_url}/payment/qr-guide"""
         self.write({'state': 'draft'})
 
     # ============================================================================
+    # SMART BUTTON ACTION METHODS
+    # ============================================================================
+
+    def action_view_journal_items(self):
+        """Open journal items related to this payment"""
+        self.ensure_one()
+        if not self.move_id:
+            raise UserError(_("No journal entries found for this payment."))
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Journal Items - {self.voucher_number or self.name}',
+            'res_model': 'account.move.line',
+            'view_mode': 'tree,form',
+            'domain': [('move_id', '=', self.move_id.id)],
+            'context': {
+                'default_move_id': self.move_id.id,
+                'search_default_posted': 1,
+            },
+            'target': 'current',
+        }
+
+    def action_view_reconciliation(self):
+        """Open reconciled invoices/bills for this payment"""
+        self.ensure_one()
+        
+        domain = []
+        invoices = self.env['account.move']
+        
+        if self.reconciled_invoice_ids:
+            invoices |= self.reconciled_invoice_ids
+        if self.reconciled_bill_ids:
+            invoices |= self.reconciled_bill_ids
+            
+        if not invoices:
+            raise UserError(_("No reconciled documents found for this payment."))
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Reconciled Documents - {self.voucher_number or self.name}',
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', invoices.ids)],
+            'context': {
+                'default_payment_id': self.id,
+                'search_default_posted': 1,
+            },
+            'target': 'current',
+        }
+
+    def action_view_qr_verification(self):
+        """Open QR code verification portal"""
+        self.ensure_one()
+        
+        if not self.qr_code:
+            raise UserError(_("No QR code available for this payment."))
+        
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
+        verification_url = f"{base_url}/payment/verify/{self.id}"
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': verification_url,
+            'target': 'new',
+            'name': f'QR Verification - {self.voucher_number or self.name}',
+        }
+
+    # ============================================================================
     # OVERRIDE METHODS
     # ============================================================================
 
     @api.model
     def create(self, vals):
         """Enhanced create method with voucher number generation"""
-        # Generate voucher number before record creation
+        # Generate voucher number if not provided
         if not vals.get('voucher_number'):
             payment_type = vals.get('payment_type', 'outbound')
-            sequence_code = 'payment.voucher' if payment_type == 'outbound' else 'receipt.voucher'
             
+            # Try to get existing sequence or create one
+            if payment_type == 'inbound':
+                sequence_code = 'payment.voucher.receipt'
+                prefix = 'RV'
+                name = 'Receipt Voucher'
+            else:
+                sequence_code = 'payment.voucher.payment'
+                prefix = 'PV'
+                name = 'Payment Voucher'
+            
+            # Get or create sequence
             sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
             if not sequence:
-                sequence_name = 'Payment Voucher' if payment_type == 'outbound' else 'Receipt Voucher'
-                prefix = 'PV' if payment_type == 'outbound' else 'RV'
                 sequence = self.env['ir.sequence'].create({
-                    'name': sequence_name,
+                    'name': name,
                     'code': sequence_code,
                     'prefix': prefix,
                     'padding': 5,
-                    'company_id': vals.get('company_id', False),
+                    'company_id': vals.get('company_id', self.env.company.id),
                 })
-            vals['voucher_number'] = sequence.next_by_id()
+            
+            try:
+                vals['voucher_number'] = sequence.next_by_id()
+            except:
+                # Fallback if sequence fails
+                import datetime
+                now = datetime.datetime.now()
+                vals['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
 
         payment = super(AccountPayment, self).create(vals)
         

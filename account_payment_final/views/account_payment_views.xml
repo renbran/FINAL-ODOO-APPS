@@ -71,11 +71,50 @@
 
                         <!-- Main Content with Clean Layout -->
                         <sheet class="payment-sheet">
-                            <!-- Title Section -->
+                            <!-- Smart Buttons Bar -->
+                            <div class="oe_button_box" name="button_box">
+                                <button name="action_view_journal_items" 
+                                        type="object" 
+                                        class="oe_stat_button" 
+                                        icon="fa-bars"
+                                        invisible="state != 'posted'">
+                                    <field name="journal_item_count" widget="statinfo" string="Journal Items"/>
+                                </button>
+                                
+                                <button name="action_view_reconciliation" 
+                                        type="object" 
+                                        class="oe_stat_button" 
+                                        icon="fa-exchange"
+                                        invisible="state != 'posted'">
+                                    <field name="reconciliation_count" widget="statinfo" string="Reconciled"/>
+                                </button>
+                                
+                                <button name="action_view_qr_verification" 
+                                        type="object" 
+                                        class="oe_stat_button" 
+                                        icon="fa-qrcode"
+                                        invisible="not qr_code">
+                                    <div class="o_field_widget o_stat_info">
+                                        <span class="o_stat_value">QR</span>
+                                        <span class="o_stat_text">Verify</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Title Section with Voucher Number -->
                             <div class="oe_title">
-                                <h1>
-                                    <field name="name" placeholder="Payment Reference" readonly="state != 'draft'"/>
+                                <h1 class="payment-title">
+                                    <field name="voucher_number" 
+                                           placeholder="Will be auto-generated" 
+                                           readonly="1"
+                                           class="voucher-number-field"/>
                                 </h1>
+                                <h2>
+                                    <field name="name" 
+                                           placeholder="Payment Reference" 
+                                           readonly="state != 'draft'"
+                                           class="payment-reference-field"/>
+                                </h2>
                             </div>
 
                             <!-- Main Payment Information - 2 Column Layout -->

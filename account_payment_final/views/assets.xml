@@ -2,6 +2,35 @@
 <odoo>
     <data>
 
+        <!-- Backend Assets for Professional UI -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <!-- Core SCSS Files -->
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/variables.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/cloudpepper_optimizations.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/professional_payment_ui.scss"/>
+            
+            <!-- Component-specific styles -->
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/components/payment_widget.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/views/form_view.scss"/>
+            
+            <!-- JavaScript Components -->
+            <script type="text/javascript" src="/account_payment_final/static/src/js/cloudpepper_simple_optimizer.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/components/payment_widget.js"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/fields/payment_field.js"/>
+        </template>
+
+        <!-- Report Assets for Professional Printing -->
+        <template id="assets_common" inherit_id="web.assets_common">
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/responsive_report_styles.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/payment_voucher_report.scss"/>
+        </template>
+
+        <!-- Frontend Assets (for QR verification portal) -->
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/frontend/qr_verification.scss"/>
+            <script type="text/javascript" src="/account_payment_final/static/src/js/frontend/qr_verification.js"/>
+        </template>
+
         <!-- Enhanced QR Code Template for Payment Verification -->
         <template id="payment_qr_code_template" name="Payment QR Code Display">
             <div class="o_payment_qr_container text-center py-3">
