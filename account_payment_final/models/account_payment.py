@@ -469,13 +469,17 @@ Verify at: {base_url}/payment/qr-guide"""
         return self._return_success_message(_('Payment has been authorized and is ready for posting.'))
 
     def action_post_payment(self):
-        """Post payment after all approvals (Final stage)"""
+        """Post payment after all approvals (Final stage - This overrides the default post button)"""
         self.ensure_one()
-        self._check_workflow_permissions('post')
         
-        # Allow posting for both 'approved' and 'authorized' states
-        if self.approval_state not in ['approved', 'authorized']:
-            raise UserError(_("Only approved or authorized payments can be posted."))
+        # Check if user has permission to post
+        if not self.env.user.has_group('account.group_account_manager') and \
+           not self.env.user.has_group('account_payment_final.group_payment_poster'):
+            raise UserError(_("You do not have permission to post payments."))
+        
+        # Allow posting for approved payments only (remove 'authorized' to enforce single approval state)
+        if self.approval_state != 'approved':
+            raise UserError(_("Only approved payments can be posted. Current state: %s") % self.approval_state)
         
         # Additional validation before posting
         self._validate_payment_data()
@@ -484,23 +488,27 @@ Verify at: {base_url}/payment/qr-guide"""
         if not self.destination_account_id and self.payment_type == 'outbound':
             self.destination_account_id = self.partner_id.property_account_payable_id
         
-        # Set posting fields
+        # Set posting fields BEFORE posting
         self.actual_approver_id = self.env.user
         
         # Post the payment with error handling
         try:
-            self.action_post()
+            # Call the super method to actually post to ledger
+            result = super(AccountPayment, self).action_post()
+            
+            # Update approval state after successful posting
             self.approval_state = 'posted'
             
-            self._post_workflow_message("posted")
+            self._post_workflow_message("posted to ledger")
             self._send_workflow_notification('posted')
+            
+            return result
             
         except Exception as e:
             # Rollback approval state if posting fails
             self.approval_state = 'approved'
+            _logger.error(f"Failed to post payment {self.voucher_number}: {str(e)}")
             raise UserError(_("Failed to post payment: %s") % str(e))
-        
-        return self._return_success_message(_('Payment has been posted successfully.'))
 
     def action_reject_payment(self):
         """Reject payment and return to draft"""
@@ -707,15 +715,126 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return super(AccountPayment, self).action_cancel()
 
-    def action_post(self):
-        """Override core action_post to enforce approval workflow"""
-        for record in self:
-            # For records with approval workflow, enforce approval state check
-            if hasattr(record, 'approval_state') and record.approval_state:
-                if record.approval_state not in ['approved', 'posted']:
-                    raise UserError(_("Only approved or authorized payments can be posted. Current state: %s") % record.approval_state)
+    def _can_bypass_approval_workflow(self):
+        """
+        Determine if a payment can bypass the approval workflow based on various conditions.
+        Returns a dictionary with 'can_bypass' boolean and 'reason' string.
+        """
+        self.ensure_one()
         
-        return super(AccountPayment, self).action_post()
+        # Check if payment is created from invoice registration
+        is_from_invoice = bool(self.reconciled_invoice_ids or 
+                              (hasattr(self, 'invoice_ids') and self.invoice_ids) or
+                              self.ref and 'INV/' in str(self.ref))
+        
+        # Check payment amount thresholds
+        company_currency = self.company_id.currency_id
+        amount_in_company_currency = self.amount
+        if self.currency_id != company_currency:
+            amount_in_company_currency = self.currency_id._convert(
+                self.amount, company_currency, self.company_id, self.date or fields.Date.today()
+            )
+        
+        # Threshold for auto-approval (configurable via system parameters)
+        auto_approval_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_final.auto_approval_threshold', '1000.0'))
+        
+        small_payment_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_final.small_payment_threshold', '100.0'))
+        
+        # Check user permissions
+        user = self.env.user
+        is_account_manager = user.has_group('account.group_account_manager')
+        is_payment_manager = user.has_group('account_payment_final.group_payment_manager')
+        is_payment_approver = user.has_group('account_payment_final.group_payment_approver')
+        can_bypass_approval = user.has_group('account_payment_final.group_payment_bypass_approval')
+        
+        # Conditions for bypassing approval workflow
+        
+        # 1. User has explicit bypass permission
+        if can_bypass_approval:
+            return {'can_bypass': True, 'reason': 'user has bypass approval permission'}
+        
+        # 2. Account managers can bypass for small amounts
+        if is_account_manager and amount_in_company_currency <= auto_approval_threshold:
+            return {'can_bypass': True, 'reason': f'account manager posting payment under {auto_approval_threshold} threshold'}
+        
+        # 3. Payment managers and approvers can bypass for very small amounts from invoices
+        if (is_payment_manager or is_payment_approver) and is_from_invoice and amount_in_company_currency <= small_payment_threshold:
+            return {'can_bypass': True, 'reason': f'payment from invoice under {small_payment_threshold} threshold'}
+        
+        # 4. Internal transfers between company accounts (if applicable)
+        if self.payment_type == 'transfer' and is_payment_manager:
+            return {'can_bypass': True, 'reason': 'internal transfer by payment manager'}
+        
+        # 5. Petty cash payments (if payment method indicates)
+        if self.journal_id.name and 'petty' in self.journal_id.name.lower() and amount_in_company_currency <= small_payment_threshold:
+            return {'can_bypass': True, 'reason': 'petty cash payment under threshold'}
+        
+        # 6. Emergency payments (if marked in ref or memo)
+        emergency_keywords = ['emergency', 'urgent', 'critical', 'immediate']
+        if (self.ref and any(keyword in self.ref.lower() for keyword in emergency_keywords)) or \
+           (self.remarks and any(keyword in self.remarks.lower() for keyword in emergency_keywords)):
+            if is_payment_approver or is_account_manager:
+                return {'can_bypass': True, 'reason': 'emergency payment by authorized user'}
+        
+        # 7. Automatic payment reconciliation (from bank statements)
+        if hasattr(self, 'statement_line_id') and self.statement_line_id:
+            return {'can_bypass': True, 'reason': 'automatic bank reconciliation'}
+        
+        # Default: cannot bypass
+        return {'can_bypass': False, 'reason': 'approval workflow required'}
+
+    def action_post(self):
+        """Override core action_post to redirect to approval workflow or enforce approval"""
+        for record in self:
+            # If this is an approved payment being posted through workflow, allow normal posting
+            if hasattr(record, 'approval_state') and record.approval_state == 'approved':
+                # Check if user has permission to post
+                if not self.env.user.has_group('account.group_account_manager') and \
+                   not self.env.user.has_group('account_payment_final.group_payment_poster'):
+                    raise UserError(_("You do not have permission to post payments."))
+                
+                # Call the original post method and update state
+                result = super(AccountPayment, record).action_post()
+                record.approval_state = 'posted'
+                record.actual_approver_id = self.env.user
+                record._post_workflow_message("posted to ledger")
+                return result
+            
+            # Check if payment can bypass approval workflow
+            elif hasattr(record, 'approval_state') and record.approval_state:
+                # Check conditions for bypassing approval workflow
+                can_bypass = record._can_bypass_approval_workflow()
+                
+                if can_bypass:
+                    # Auto-approve and post the payment
+                    _logger.info(f"Payment {record.name} bypassing approval workflow: {can_bypass['reason']}")
+                    record.approval_state = 'approved'
+                    record.actual_approver_id = self.env.user
+                    record._post_workflow_message(f"auto-approved: {can_bypass['reason']}")
+                    
+                    # Call the original post method and update state
+                    result = super(AccountPayment, record).action_post()
+                    record.approval_state = 'posted'
+                    record._post_workflow_message("posted to ledger")
+                    return result
+                
+                # Enforce approval workflow
+                if record.approval_state == 'draft':
+                    raise UserError(_("Only approved or authorized payments can be posted. Current state: %s\n\nTo resolve this:\n1. Submit payment for review using 'Submit for Review' button\n2. Complete the approval workflow\n3. Then post the payment\n\nOr contact your manager if this payment should bypass approval.") % record.approval_state)
+                elif record.approval_state in ['under_review', 'for_approval', 'for_authorization']:
+                    raise UserError(_("Payment is still under approval workflow. Current state: %s. Please complete the approval process first.") % record.approval_state)
+                elif record.approval_state == 'posted':
+                    raise UserError(_("Payment is already posted."))
+                elif record.approval_state == 'cancelled':
+                    raise UserError(_("Cannot post cancelled payment."))
+                else:
+                    raise UserError(_("Payment state is invalid for posting: %s") % record.approval_state)
+            
+            # For payments without approval workflow, use default behavior
+            else:
+                return super(AccountPayment, record).action_post()
 
     def action_draft(self):
         """Enhanced draft action for cancelled payments"""

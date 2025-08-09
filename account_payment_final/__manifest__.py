@@ -53,9 +53,11 @@
         # Data and Sequences
         'data/payment_sequences.xml',
         'data/email_templates.xml',
+        'data/system_parameters.xml',
         
         # Main Views
         'views/account_payment_views.xml',
+        'views/account_move_views.xml',
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
         'views/menus.xml',
