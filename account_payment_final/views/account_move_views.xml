@@ -112,7 +112,8 @@
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_account_invoice_filter"/>
             <field name="arch" type="xml">
-                <xpath expr="//filter[@name='state_posted']" position="after">
+                <!-- Add approval filters at the end of the search view - safer approach -->
+                <xpath expr="//search" position="inside">
                     <separator/>
                     <filter string="Pending Review" name="approval_under_review" 
                             domain="[('approval_state', '=', 'under_review')]"/>
@@ -120,11 +121,12 @@
                             domain="[('approval_state', '=', 'for_approval')]"/>
                     <filter string="Approved" name="approval_approved" 
                             domain="[('approval_state', '=', 'approved')]"/>
-                </xpath>
-                
-                <xpath expr="//group" position="inside">
-                    <filter string="Approval State" name="group_approval_state" 
-                            domain="[]" context="{'group_by': 'approval_state'}"/>
+                    
+                    <!-- Group by approval state -->
+                    <group expand="0" string="Group By">
+                        <filter string="Approval State" name="group_approval_state" 
+                                domain="[]" context="{'group_by': 'approval_state'}"/>
+                    </group>
                 </xpath>
             </field>
         </record>
