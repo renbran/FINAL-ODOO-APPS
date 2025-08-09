@@ -1,0 +1,36 @@
+# CLOUDPEPPER EMERGENCY FIX - Copy and paste these commands
+
+# === STEP 1: Connect to your CloudPepper server ===
+# SSH into your CloudPepper instance
+# ssh your_username@stagingtry.cloudpepper.site
+
+# === STEP 2: Quick SQL fix (run all at once) ===
+# Connect to PostgreSQL and run this:
+psql -d stagingtry -c "
+BEGIN;
+-- Fix 1: Remove problematic tax reports
+DELETE FROM account_report WHERE model = 'kit.account.tax.report';
+-- Fix 2: Disable custom_background module  
+UPDATE ir_module_module SET state = 'uninstalled' WHERE name = 'custom_background';
+-- Fix 3: Disable autovacuum for problematic models
+INSERT INTO ir_config_parameter (key, value, create_date, create_uid, write_date, write_uid)
+VALUES ('base.autovacuum_disable', 'kit.account.tax.report,custom_background', NOW(), 1, NOW(), 1)
+ON CONFLICT (key) DO UPDATE SET value = 'kit.account.tax.report,custom_background';
+COMMIT;
+"
+
+# === STEP 3: Restart Odoo ===
+sudo systemctl restart odoo
+
+# === STEP 4: Check if errors are gone ===
+tail -f /var/log/odoo/odoo.log | grep -v "Long Running Recorder\|Fullstory"
+
+# === STEP 5: Install your payment module ===
+# Once errors stop, install the account_payment_final module via Odoo UI
+
+# === VERIFICATION COMMANDS ===
+# Check module states:
+psql -d stagingtry -c "SELECT name, state FROM ir_module_module WHERE name IN ('custom_background', 'account_payment_final');"
+
+# Check for remaining errors:
+tail -n 50 /var/log/odoo/odoo.log | grep -E "(ERROR|CRITICAL)" | grep -v "Long Running Recorder\|Fullstory"

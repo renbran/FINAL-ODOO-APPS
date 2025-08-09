@@ -1,134 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Enhanced Payment Verification Success Template with 4-Stage Workflow -->
-        <template id="payment_verification_success_enhanced" name="Enhanced Payment Verification Success">
+        <!-- Professional Payment Verification Page -->
+        <template id="payment_verification_success_enhanced" name="Professional Payment Verification">
             <t t-call="website.layout">
-                <div id="wrap" class="oe_structure oe_empty">
-                    <div class="container mt-5">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8 col-md-10">
-                                <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
-                                    <!-- OSUS Branded Header -->
-                                    <div class="card-header text-white text-center py-4" 
-                                         style="background: linear-gradient(135deg, #800020 0%, #a0002b 100%);">
-                                        <i class="fa fa-check-circle fa-3x mb-3"></i>
-                                        <h2 class="mb-0">Payment Verification Successful</h2>
-                                        <p class="mb-0 opacity-75">OSUS Properties - Payment details verified and authenticated</p>
-                                    </div>
+                <div id="wrap" class="verification-page">
+                    <div class="container-fluid">
+                        <div class="row min-vh-100">
+                            <!-- Main Content -->
+                            <div class="col-12">
+                                <div class="verification-container mx-auto" style="max-width: 900px;">
                                     
-                                    <!-- Enhanced Payment Details with 4-Stage Workflow -->
-                                    <div class="card-body p-4">
-                                        <!-- Workflow Progress Indicator -->
-                                        <div class="row mb-4" t-if="approval_state">
-                                            <div class="col-12">
-                                                <h5 class="text-center mb-3" style="color: #800020;">Workflow Progress</h5>
-                                                <div class="progress-workflow text-center">
-                                                    <span class="badge badge-success" style="margin-right: 10px;">✓ Draft</span>
-                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
-                                                          style="margin-right: 10px;">
-                                                        <t t-if="approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Review
-                                                    </span>
-                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'secondary'}}" 
-                                                          style="margin-right: 10px;">
-                                                        <t t-if="approval_state in ['for_approval', 'for_authorization', 'approved', 'posted']">✓</t> Approval
-                                                    </span>
-                                                    <span t-attf-class="badge badge-{{'success' if approval_state in ['for_authorization', 'approved', 'posted'] else 'secondary'}}" 
-                                                          style="margin-right: 10px;" t-if="payment_type == 'outbound'">
-                                                        <t t-if="approval_state in ['for_authorization', 'approved', 'posted']">✓</t> Authorization
-                                                    </span>
-                                                    <span t-attf-class="badge badge-{{'success' if approval_state == 'posted' else 'secondary'}}">
-                                                        <t t-if="approval_state == 'posted'">✓</t> Posted
-                                                    </span>
-                                                </div>
-                                            </div>
+                                    <!-- Header Section -->
+                                    <div class="verification-header text-center py-5">
+                                        <div class="company-logo mb-3">
+                                            <img t-if="payment.company_id.logo" 
+                                                 t-att-src="image_data_uri(payment.company_id.logo)" 
+                                                 alt="Company Logo" 
+                                                 style="max-height: 80px;"/>
                                         </div>
-                                        
-                                        <!-- Payment Information Grid -->
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="info-box p-3 bg-light rounded">
-                                                    <strong style="color: #800020;">Reference:</strong><br/>
-                                                    <span t-field="payment.name" class="h5"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="info-box p-3 bg-light rounded">
-                                                    <strong style="color: #800020;">Amount:</strong><br/>
-                                                    <span t-field="payment.amount" t-options="{'widget': 'monetary', 'display_currency': payment.currency_id}" class="h5"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="info-box p-3 bg-light rounded">
-                                                    <strong style="color: #800020;">Partner:</strong><br/>
-                                                    <span t-field="payment.partner_id.name" class="h5"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="info-box p-3 bg-light rounded">
-                                                    <strong style="color: #800020;">Date:</strong><br/>
-                                                    <span t-field="payment.date" class="h5"/>
-                                                </div>
-                                            </div>
+                                        <h1 class="display-4 fw-bold text-primary mb-2">Payment Verification</h1>
+                                        <p class="lead text-muted">Secure Payment Authentication System</p>
+                                        <div class="verification-status">
+                                            <span class="badge bg-success fs-6 px-4 py-2">
+                                                <i class="fa fa-shield-alt me-2"></i>
+                                                VERIFIED &amp; AUTHENTICATED
+                                            </span>
                                         </div>
-                                        
-                                        <!-- Enhanced Status and Workflow Information -->
-                                        <div class="row" t-if="approval_state">
-                                            <div class="col-12">
-                                                <div class="alert alert-info">
-                                                    <h5 class="alert-heading">Workflow Status</h5>
-                                                    <p class="mb-1"><strong>Current Stage:</strong> <span t-field="payment.approval_state"/></p>
+                                    </div>
+
+                                    <!-- Payment Details Card -->
+                                    <div class="payment-details-card">
+                                        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                                            
+                                            <!-- Card Header -->
+                                            <div class="card-header bg-gradient text-white py-4" 
+                                                 style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8">
+                                                        <h3 class="mb-1">
+                                                            <i class="fa fa-receipt me-2"></i>
+                                                            <span t-if="payment.payment_type == 'inbound'">Payment Receipt</span>
+                                                            <span t-if="payment.payment_type == 'outbound'">Payment Voucher</span>
+                                                        </h3>
+                                                        <p class="mb-0 opacity-75">Reference: <strong t-field="payment.name"/></p>
+                                                    </div>
+                                                    <div class="col-md-4 text-end">
+                                                        <div class="amount-display">
+                                                            <small class="d-block opacity-75">Amount</small>
+                                                            <h2 class="mb-0 fw-bold" t-field="payment.amount" 
+                                                                t-options="{'widget': 'monetary', 'display_currency': payment.currency_id}"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Card Body -->
+                                            <div class="card-body p-5">
+                                                
+                                                <!-- Payment Information Grid -->
+                                                <div class="row g-4 mb-4">
+                                                    <div class="col-md-6">
+                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
+                                                            <div class="info-header mb-3">
+                                                                <i class="fa fa-user text-primary fs-4 me-2"></i>
+                                                                <strong class="fs-5">
+                                                                    <span t-if="payment.payment_type == 'inbound'">Received From</span>
+                                                                    <span t-if="payment.payment_type == 'outbound'">Paid To</span>
+                                                                </strong>
+                                                            </div>
+                                                            <h5 class="text-dark mb-2" t-field="payment.partner_id.name"/>
+                                                            <div class="partner-details text-muted">
+                                                                <div t-field="payment.partner_id.street" t-if="payment.partner_id.street"/>
+                                                                <div>
+                                                                    <span t-field="payment.partner_id.city" t-if="payment.partner_id.city"/>
+                                                                    <span t-field="payment.partner_id.state_id.name" t-if="payment.partner_id.state_id"/>
+                                                                </div>
+                                                                <div t-field="payment.partner_id.country_id.name" t-if="payment.partner_id.country_id"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     
-                                                    <!-- Show stage handlers -->
-                                                    <div t-if="reviewer_id and approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted']">
-                                                        <strong>Reviewed by:</strong> <span t-field="payment.reviewer_id.name"/>
-                                                    </div>
-                                                    <div t-if="approver_id and approval_state in ['for_authorization', 'approved', 'posted']">
-                                                        <strong>Approved by:</strong> <span t-field="payment.approver_id.name"/>
-                                                    </div>
-                                                    <div t-if="authorizer_id and approval_state in ['approved', 'posted']">
-                                                        <strong>Authorized by:</strong> <span t-field="payment.authorizer_id.name"/>
+                                                    <div class="col-md-6">
+                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
+                                                            <div class="info-header mb-3">
+                                                                <i class="fa fa-credit-card text-primary fs-4 me-2"></i>
+                                                                <strong class="fs-5">Payment Details</strong>
+                                                            </div>
+                                                            <div class="payment-info">
+                                                                <div class="row mb-2">
+                                                                    <div class="col-5 text-muted">Method:</div>
+                                                                    <div class="col-7 fw-semibold" t-field="payment.journal_id.name"/>
+                                                                </div>
+                                                                <div class="row mb-2">
+                                                                    <div class="col-5 text-muted">Date:</div>
+                                                                    <div class="col-7 fw-semibold" t-field="payment.date"/>
+                                                                </div>
+                                                                <div class="row mb-2" t-if="payment.ref">
+                                                                    <div class="col-5 text-muted">Reference:</div>
+                                                                    <div class="col-7 fw-semibold" t-field="payment.ref"/>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-5 text-muted">Status:</div>
+                                                                    <div class="col-7">
+                                                                        <span class="badge bg-success">Verified</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- QR Code Section with enhanced styling -->
-                                        <div class="row mt-4" t-if="qr_code_data">
-                                            <div class="col-12 text-center">
-                                                <h5 style="color: #800020;">Quick Verification</h5>
-                                                <div class="qr-container p-3" style="background: #f8f9fa; border-radius: 10px; display: inline-block;">
-                                                    <img t-attf-src="data:image/png;base64,{{qr_code_data}}" alt="Payment QR Code" class="img-fluid" style="max-width: 200px;"/>
-                                                    <p class="small text-muted mt-2">Scan to verify payment details</p>
+
+                                                <!-- Workflow Progress -->
+                                                <div class="workflow-section mb-4" t-if="payment.approval_state">
+                                                    <h5 class="mb-3">
+                                                        <i class="fa fa-check-circle text-success me-2"></i>
+                                                        Approval Workflow Status
+                                                    </h5>
+                                                    <div class="workflow-progress">
+                                                        <div class="progress-steps d-flex justify-content-between align-items-center">
+                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state != 'draft' else 'current' }}">
+                                                                <div class="step-circle">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </div>
+                                                                <span class="step-label">Draft</span>
+                                                            </div>
+                                                            
+                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'current' if payment.approval_state == 'under_review' else 'pending' }}">
+                                                                <div class="step-circle">
+                                                                    <i class="fa fa-search"></i>
+                                                                </div>
+                                                                <span class="step-label">Review</span>
+                                                            </div>
+                                                            
+                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['for_authorization', 'approved', 'posted'] else 'current' if payment.approval_state == 'for_approval' else 'pending' }}">
+                                                                <div class="step-circle">
+                                                                    <i class="fa fa-check"></i>
+                                                                </div>
+                                                                <span class="step-label">Approval</span>
+                                                            </div>
+                                                            
+                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['approved', 'posted'] else 'current' if payment.approval_state == 'for_authorization' else 'pending' }}" 
+                                                                 t-if="payment.payment_type == 'outbound'">
+                                                                <div class="step-circle">
+                                                                    <i class="fa fa-key"></i>
+                                                                </div>
+                                                                <span class="step-label">Authorization</span>
+                                                            </div>
+                                                            
+                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state == 'posted' else 'current' if payment.approval_state == 'approved' else 'pending' }}">
+                                                                <div class="step-circle">
+                                                                    <i class="fa fa-check-circle"></i>
+                                                                </div>
+                                                                <span class="step-label">Posted</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- QR Code Section -->
+                                                <div class="qr-section text-center" t-if="payment.qr_code">
+                                                    <h5 class="mb-3">
+                                                        <i class="fa fa-qrcode text-primary me-2"></i>
+                                                        Verification QR Code
+                                                    </h5>
+                                                    <div class="qr-container p-4 bg-white border rounded-3 d-inline-block">
+                                                        <img t-attf-src="data:image/png;base64,{{payment.qr_code.decode('utf-8') if payment.qr_code else ''}}" 
+                                                             alt="Payment QR Code" 
+                                                             style="width: 200px; height: 200px;"/>
+                                                    </div>
+                                                    <p class="text-muted mt-2 mb-0">
+                                                        <small>This QR code contains encrypted payment verification data</small>
+                                                    </p>
+                                                </div>
+
+                                                <!-- Action Buttons -->
+                                                <div class="action-buttons text-center mt-5">
+                                                    <button class="btn btn-outline-primary me-3" onclick="window.print()">
+                                                        <i class="fa fa-print me-2"></i>Print Verification
+                                                    </button>
+                                                    <a href="/web" class="btn btn-primary">
+                                                        <i class="fa fa-arrow-left me-2"></i>Return to System
+                                                    </a>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <!-- Action Buttons -->
-                                        <div class="row mt-4">
-                                            <div class="col-12 text-center">
-                                                <button class="btn btn-outline-primary me-2" onclick="window.print()">
-                                                    <i class="fa fa-print"></i> Print Verification
-                                                </button>
-                                                <a href="/web" class="btn btn-primary">
-                                                    <i class="fa fa-arrow-left"></i> Return to Dashboard
-                                                </a>
+
+                                            <!-- Card Footer -->
+                                            <div class="card-footer bg-light text-center py-3">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-shield-alt me-1"></i>
+                                                    Secured &amp; Verified | Generated on <span t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
+                                                    <br/>
+                                                    <strong t-field="payment.company_id.name"/> Payment Verification System
+                                                </small>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- Enhanced Footer -->
-                                    <div class="card-footer text-center py-3" style="background: #f8f9fa;">
-                                        <small class="text-muted">
-                                            Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/> | 
-                                            OSUS Properties Payment System v2.0
-                                        </small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Custom CSS for Professional Look -->
+                <style>
+                    .verification-page {
+                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                        min-height: 100vh;
+                    }
+                    
+                    .verification-container {
+                        padding: 2rem 1rem;
+                    }
+                    
+                    .info-card {
+                        transition: all 0.3s ease;
+                        border: 1px solid #e9ecef;
+                    }
+                    
+                    .info-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                    }
+                    
+                    .workflow-progress .step {
+                        text-align: center;
+                        position: relative;
+                        flex: 1;
+                    }
+                    
+                    .step-circle {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 10px;
+                        font-size: 18px;
+                        color: white;
+                        background: #dee2e6;
+                    }
+                    
+                    .step.current .step-circle {
+                        background: #ffc107;
+                        animation: pulse 2s infinite;
+                    }
+                    
+                    .step.completed .step-circle {
+                        background: #28a745;
+                    }
+                    
+                    .step.pending .step-circle {
+                        background: #6c757d;
+                    }
+                    
+                    .step-label {
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                    
+                    @keyframes pulse {
+                        0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+                        70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+                        100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+                    }
+                    
+                    .qr-container {
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    }
+                    
+                    @media print {
+                        .action-buttons, .card-footer {
+                            display: none !important;
+                        }
+                    }
+                </style>
             </t>
         </template>
 

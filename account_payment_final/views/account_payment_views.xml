@@ -1,53 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Enhanced Payment Form View -->
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Enhanced Payment Form View - Clean & Organized -->
         <record id="view_account_payment_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.form.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 
-                <!-- Replace header with enhanced workflow -->
-                <xpath expr="//header" position="replace">
-                    <header>
-                        <!-- Enhanced Approval State Status Bar with 4-stage workflow -->
-                        <field name="approval_state" widget="statusbar" 
-                               statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted"
-                               statusbar_colors='{"draft":"blue","under_review":"orange","for_approval":"orange","for_authorization":"orange","approved":"green","posted":"success","cancelled":"secondary"}'
-                               options="{'clickable_stages': [('draft', 'Set to Draft'), ('cancelled', 'Cancel')]}"
-                               readonly="0"/>
-                        
-                        <!-- Required fields for conditions (invisible but available) -->
-                        <field name="partner_id" invisible="1"/>
-                        <field name="amount" invisible="1"/>
-                        <field name="state" invisible="1"/>
-                        <field name="is_internal_transfer" invisible="1"/>
-                        
-                        <!-- Enhanced Workflow Action Buttons with 4-stage logic -->
-                        <button name="action_submit_for_review" 
-                                string="Submit for Review" 
-                                type="object" 
-                                class="btn-primary"
-                                invisible="approval_state != 'draft' or not partner_id or not amount"
-                                confirm="Are you sure you want to submit this payment for review?"/>
-                        
-                        <!-- Review Stage Button -->
-                        <button name="action_review_payment" 
-                                string="Review &amp; Forward" 
-                                type="object" 
-                                class="btn-info"
-                                groups="account_payment_final.group_payment_voucher_reviewer"
-                                invisible="approval_state != 'under_review'"
-                                confirm="Are you sure you want to review and forward this payment?"/>
-                        
-                        <!-- Approval Stage Button (Vendor payments) -->
-                        <button name="action_approve_payment" 
-                                string="Approve &amp; Forward" 
-                                type="object" 
-                                class="btn-warning"
-                                groups="account_payment_final.group_payment_voucher_approver"
-                                invisible="approval_state != 'for_approval' or payment_type != 'outbound'"
+                <!-- Replace entire form with clean organized layout -->
+                <form position="replace">
+                    <form string="Payment">
+                        <!-- Clean Status Bar Header -->
+                        <header class="payment-header">
+                            <field name="approval_state" widget="statusbar" 
+                                   statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted"
+                                   statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","for_authorization":"warning","approved":"success","posted":"success"}'
+                                   readonly="0"/>
+                            
+                            <!-- Hidden Fields for Conditions -->
+                            <field name="state" invisible="1"/>
+                            <field name="payment_type" invisible="1"/>
+                            <field name="is_internal_transfer" invisible="1"/>
+                            
+                            <!-- Workflow Action Buttons -->
+                            <div class="workflow-buttons">
+                                <button name="action_submit_for_review" 
+                                        string="Submit for Review" 
+                                        type="object" 
+                                        class="btn-primary"
+                                        invisible="approval_state != 'draft'"
+                                        confirm="Submit this payment for review?"/>
+                                
+                                <button name="action_review_payment" 
+                                        string="Review &amp; Approve" 
+                                        type="object" 
+                                        class="btn-info"
+                                        groups="account_payment_final.group_payment_voucher_reviewer"
+                                        invisible="approval_state != 'under_review'"/>
+                                
+                                <button name="action_approve_payment" 
+                                        string="Approve Payment" 
+                                        type="object" 
+                                        class="btn-warning"
+                                        groups="account_payment_final.group_payment_voucher_approver"
+                                        invisible="approval_state != 'for_approval'"/>
+                                
+                                <button name="action_authorize_payment" 
+                                        string="Authorize &amp; Post" 
+                                        type="object" 
+                                        class="btn-success"
+                                        groups="account_payment_final.group_payment_voucher_authorizer"
+                                        invisible="approval_state != 'for_authorization'"/>
+                                
+                                <button name="action_post" 
+                                        string="Post Payment" 
+                                        type="object" 
+                                        class="btn-success"
+                                        invisible="approval_state != 'approved'"/>
+                                
+                                <button name="action_reject_payment" 
+                                        string="Reject" 
+                                        type="object" 
+                                        class="btn-danger"
+                                        groups="account_payment_final.group_payment_voucher_approver"
+                                        invisible="approval_state in ['draft', 'posted', 'cancelled']"
+                                        confirm="Are you sure you want to reject this payment?"/>
+                            </div>
+                        </header>
+
+                        <!-- Main Content with Clean Layout -->
+                        <sheet class="payment-sheet">
+                            <!-- Title Section -->
+                            <div class="oe_title">
+                                <h1>
+                                    <field name="name" placeholder="Payment Reference" readonly="state != 'draft'"/>
+                                </h1>
+                            </div>
+
+                            <!-- Main Payment Information - 2 Column Layout -->
+                            <group>
+                                <group name="payment_details" string="Payment Details" class="payment-details-group">
+                                    <field name="payment_type" widget="radio" options="{'horizontal': true}" readonly="state != 'draft'"/>
+                                    <field name="partner_type" invisible="1"/>
+                                    <field name="partner_id" string="Customer" invisible="payment_type != 'inbound'" readonly="state != 'draft'"/>
+                                    <field name="partner_id" string="Vendor" invisible="payment_type != 'outbound'" readonly="state != 'draft'"/>
+                                    <field name="amount" readonly="state != 'draft'"/>
+                                    <field name="currency_id" groups="base.group_multi_currency" readonly="state != 'draft'"/>
+                                    <field name="date" readonly="state != 'draft'"/>
+                                    <field name="ref" placeholder="Payment reference" readonly="state != 'draft'"/>
+                                </group>
+                                
+                                <group name="journal_details" string="Journal & Method" class="journal-details-group">
+                                    <field name="journal_id" readonly="state != 'draft'"/>
+                                    <field name="payment_method_line_id" readonly="state != 'draft'"/>
+                                    <field name="is_internal_transfer" readonly="state != 'draft'"/>
+                                    <field name="destination_journal_id" 
+                                           invisible="not is_internal_transfer" 
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+
+                            <!-- Approval Workflow Section -->
+                            <notebook>
+                                <page string="Approval Workflow" name="approval_workflow">
+                                    <group>
+                                        <group name="workflow_status" string="Current Status">
+                                            <field name="approval_state" readonly="1"/>
+                                            <field name="reviewer_id" readonly="1"/>
+                                            <field name="approver_id" readonly="1"/>
+                                            <field name="authorizer_id" readonly="1"/>
+                                        </group>
+                                        
+                                        <group name="workflow_dates" string="Workflow Dates">
+                                            <field name="review_date" readonly="1"/>
+                                            <field name="approval_date" readonly="1"/>
+                                            <field name="authorization_date" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    
+                                    <!-- Workflow Progress Visual -->
+                                    <div class="workflow-progress mt-3">
+                                        <h5>Workflow Progress</h5>
+                                        <div class="progress-container">
+                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state != 'draft' else 'current' }}">
+                                                <i class="fa fa-edit"/> Draft
+                                            </div>
+                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'current' if approval_state == 'under_review' else 'pending' }}">
+                                                <i class="fa fa-search"/> Review
+                                            </div>
+                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['for_authorization', 'approved', 'posted'] else 'current' if approval_state == 'for_approval' else 'pending' }}">
+                                                <i class="fa fa-check"/> Approval
+                                            </div>
+                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state in ['approved', 'posted'] else 'current' if approval_state == 'for_authorization' else 'pending' }}" 
+                                                 invisible="payment_type != 'outbound'">
+                                                <i class="fa fa-key"/> Authorization
+                                            </div>
+                                            <div class="progress-step" t-attf-class="step-{{ 'completed' if approval_state == 'posted' else 'current' if approval_state == 'approved' else 'pending' }}">
+                                                <i class="fa fa-check-circle"/> Posted
+                                            </div>
+                                        </div>
+                                    </div>
+                                </page>
+
+                                <page string="QR Code &amp; Verification" name="qr_verification">
+                                    <group>
+                                        <group string="QR Code Settings">
+                                            <field name="qr_in_report"/>
+                                            <field name="qr_code" widget="image" readonly="1" invisible="not qr_code"/>
+                                        </group>
+                                        
+                                        <group string="Verification">
+                                            <button name="action_generate_qr_code" 
+                                                    string="Generate QR Code" 
+                                                    type="object" 
+                                                    class="btn-info"
+                                                    invisible="qr_code"/>
+                                            
+                                            <button name="action_view_qr_verification" 
+                                                    string="View Verification Page" 
+                                                    type="object" 
+                                                    class="btn-success"
+                                                    invisible="not qr_code"/>
+                                        </group>
+                                    </group>
+                                    
+                                    <!-- QR Code Display -->
+                                    <div class="qr-display-section" invisible="not qr_code">
+                                        <h5>QR Code for Payment Verification</h5>
+                                        <div class="text-center">
+                                            <field name="qr_code" widget="image" style="max-width: 200px;"/>
+                                            <p class="text-muted mt-2">Scan this QR code to verify payment details</p>
+                                        </div>
+                                    </div>
+                                </page>
+
+                                <page string="Accounting Details" name="accounting_details">
+                                    <field name="line_ids" invisible="1"/>
+                                    <group string="Accounting Information">
+                                        <field name="move_id" readonly="1"/>
+                                        <field name="state" readonly="1"/>
+                                        <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                                    </group>
+                                </page>
+                            </notebook>
+                        </sheet>
+
+                        <!-- Chatter -->
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids"/>
+                            <field name="activity_ids"/>
+                            <field name="message_ids"/>
+                        </div>
+                    </form>
+                </form>
                                 confirm="Are you sure you want to approve this vendor payment?"/>
                         
                         <!-- Direct Approval for Customer Receipts -->

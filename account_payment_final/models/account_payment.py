@@ -286,6 +286,85 @@ Verify at: {base_url}/payment/qr-guide"""
                 self.destination_account_id = self.partner_id.property_account_payable_id
 
     # ============================================================================
+    # UTILITY METHODS
+    # ============================================================================
+
+    def _amount_in_words(self):
+        """Convert payment amount to words"""
+        self.ensure_one()
+        try:
+            # Try to use the built-in Odoo method if available
+            if hasattr(self.currency_id, 'amount_to_text'):
+                return self.currency_id.amount_to_text(self.amount)
+            
+            # Fallback to num2words library
+            try:
+                from num2words import num2words
+                amount_text = num2words(self.amount, lang='en', to='currency')
+                # Capitalize first letter of each word
+                return ' '.join(word.capitalize() for word in amount_text.split())
+            except ImportError:
+                # Ultimate fallback - manual conversion for common amounts
+                return self._manual_amount_to_words()
+                
+        except Exception as e:
+            _logger.warning(f"Error converting amount to words: {e}")
+            return f"{self.currency_id.name} {self.amount:,.2f} Only"
+
+    def _manual_amount_to_words(self):
+        """Manual amount to words conversion for basic amounts"""
+        amount = self.amount
+        currency = self.currency_id.name or 'Dollars'
+        
+        if amount == 0:
+            return f"Zero {currency} Only"
+        
+        # Simple conversion for whole numbers up to thousands
+        ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+        teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", 
+                "Sixteen", "Seventeen", "Eighteen", "Nineteen"]
+        tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
+        
+        def convert_hundreds(num):
+            result = ""
+            if num >= 100:
+                result += ones[num // 100] + " Hundred "
+                num %= 100
+            if num >= 20:
+                result += tens[num // 10] + " "
+                num %= 10
+            elif num >= 10:
+                result += teens[num - 10] + " "
+                num = 0
+            if num > 0:
+                result += ones[num] + " "
+            return result.strip()
+        
+        # Split into integer and decimal parts
+        integer_part = int(amount)
+        decimal_part = int((amount - integer_part) * 100)
+        
+        result = ""
+        if integer_part >= 1000000:
+            result += convert_hundreds(integer_part // 1000000) + " Million "
+            integer_part %= 1000000
+        if integer_part >= 1000:
+            result += convert_hundreds(integer_part // 1000) + " Thousand "
+            integer_part %= 1000
+        if integer_part > 0:
+            result += convert_hundreds(integer_part)
+        
+        if not result:
+            result = "Zero"
+        
+        result += f" {currency}"
+        
+        if decimal_part > 0:
+            result += f" and {decimal_part:02d}/100"
+        
+        return result.strip() + " Only"
+
+    # ============================================================================
     # WORKFLOW METHODS
     # ============================================================================
 

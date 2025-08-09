@@ -66,6 +66,7 @@
         
         # Website/Portal Views
         'views/payment_verification_templates.xml',
+        'views/payment_voucher_template.xml',
         
         # Assets (Load Last)
         'views/assets.xml',
@@ -73,8 +74,10 @@
     'assets': {
         'web.assets_backend': [
             'account_payment_final/static/src/scss/variables.scss',
+            'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/components/payment_widget.scss',
             'account_payment_final/static/src/scss/views/form_view.scss',
+            'account_payment_final/static/src/js/cloudpepper_optimizer.js',
             'account_payment_final/static/src/js/components/payment_approval_widget.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',
             'account_payment_final/static/src/js/views/payment_list_view.js',
