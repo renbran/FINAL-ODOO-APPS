@@ -1,24 +1,3 @@
-# -*- coding: utf-8 -*-
-#############################################################################
-#
-#    Cybrosys Technologies Pvt. Ltd.
-#
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Jumana Haseen (odoo@cybrosys.com)
-#
-#    You can modify it under the terms of the GNU LESSER
-#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
-#
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
-#    (LGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
-#############################################################################
 {
     'name': 'Enhanced Payment Voucher System - OSUS',
     'version': '17.0.2.0.0',
@@ -34,6 +13,8 @@
     • Digital signature capture for all workflow stages
     • QR code generation with secure verification portal
     • OSUS branded reports with professional styling
+    • Enhanced and compact report templates
+    • Report generation wizards (single and bulk)
     • Email notifications and activity tracking
     • Multi-company support with role-based permissions
     • Mobile-responsive design and verification interface
@@ -48,10 +29,12 @@
         'account', 
         'mail', 
         'web',
-        'base'
+        'portal',
+        'website',
+        'contacts'
     ],
     'external_dependencies': {
-        'python': ['qrcode', 'PIL']
+        'python': ['qrcode', 'num2words', 'PIL']
     },
     'data': [
         # Security
@@ -59,20 +42,38 @@
         'security/ir.model.access.csv',
         
         # Data
+        'data/email_templates.xml',
         'data/voucher_sequence.xml',
-        'data/server_actions.xml',
+        'data/qr_verification_data.xml',
         
         # Views
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
         'views/res_config_settings_views.xml',
+        'views/payment_report_wizard_views.xml',
         'views/menu_items.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/receipt_voucher_report.xml',
         'reports/qr_verification_report.xml',
+        'reports/enhanced_payment_report.xml',
         'reports/report_actions.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'account_payment_approval/static/src/js/digital_signature_widget.js',
+            'account_payment_approval/static/src/js/payment_approval_dashboard.js',
+            'account_payment_approval/static/src/js/qr_code_widget.js',
+            'account_payment_approval/static/src/scss/payment_approval.scss',
+            'account_payment_approval/static/src/xml/payment_approval_templates.xml',
+        ],
+        'web.assets_frontend': [
+            'account_payment_approval/static/src/scss/payment_approval.scss',
+        ],
+    },
+    'demo': [
+        'demo/demo_data.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],

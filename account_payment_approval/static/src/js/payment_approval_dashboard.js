@@ -97,7 +97,7 @@ export class PaymentApprovalDashboard extends Component {
 
     onPendingApprovalClick() {
         this.openPaymentList(
-            [['voucher_state', '=', 'reviewed']],
+            [['voucher_state', '=', 'under_review']],
             _t("Payments Pending Approval")
         );
     }
@@ -203,7 +203,7 @@ export class PaymentApprovalDashboard extends Component {
             case 'review':
                 return payment.voucher_state === 'submitted' && permissions.can_review;
             case 'approve':
-                return payment.voucher_state === 'reviewed' && permissions.can_approve;
+                return payment.voucher_state === 'under_review' && permissions.can_approve;
             case 'authorize':
                 return payment.voucher_state === 'approved' && permissions.can_authorize;
             case 'post':

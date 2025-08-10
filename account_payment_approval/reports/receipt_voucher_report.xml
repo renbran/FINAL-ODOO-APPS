@@ -137,7 +137,7 @@
                                 <t t-esc="doc.voucher_number or 'RV-DRAFT'"/>
                             </div>
                             <div class="workflow-badge">
-                                <t t-esc="doc.voucher_state.upper().replace('_', ' ')"/>
+                                <t t-esc="doc.voucher_state.upper().replace('_', ' ') if doc.voucher_state else 'DRAFT'"/>
                             </div>
                         </div>
 
@@ -145,7 +145,7 @@
                         <table class="voucher-details">
                             <tr>
                                 <th style="width: 25%;">Date</th>
-                                <td><t t-esc="doc.date.strftime('%B %d, %Y') if doc.date else ''"/></td>
+                                <td><span t-field="doc.date" t-options='{"widget": "date"}'/></td>
                                 <th style="width: 25%;">Company</th>
                                 <td><t t-esc="doc.company_id.name"/></td>
                             </tr>
@@ -188,7 +188,7 @@
                                 <td>
                                     <t t-esc="doc.related_document_type"/> - <t t-esc="doc.related_document_number"/>
                                     <t t-if="doc.related_document_date">
-                                        (<t t-esc="doc.related_document_date.strftime('%B %d, %Y')"/>)
+                                        (<span t-field="doc.related_document_date" t-options='{"widget": "date"}'/>)
                                     </t>
                                 </td>
                                 <th></th>
@@ -219,8 +219,7 @@
                                                 <td style="border: none; padding: 5px 0;"><strong>Amount in Figures:</strong></td>
                                                 <td style="border: none; padding: 5px 0; text-align: right;">
                                                     <span style="font-size: 24px; color: #2E7D32; font-weight: bold;">
-                                                        <t t-esc="doc.currency_id.symbol"/>
-                                                        <t t-esc="'{:,.2f}'.format(doc.amount)"/>
+                                                        <span t-field="doc.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -262,7 +261,7 @@
                                             <div class="signature-label">
                                                 <strong><t t-esc="doc.creator_name"/></strong><br/>
                                                 <t t-if="doc.creator_signature_date">
-                                                    Signed: <t t-esc="doc.creator_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                                    Signed: <span t-field="doc.creator_signature_date" t-options='{"widget": "datetime"}'/>
                                                 </t>
                                             </div>
                                         </div>
@@ -278,7 +277,7 @@
                                             <div class="signature-label">
                                                 <strong><t t-esc="doc.reviewer_name or '________________'"/></strong><br/>
                                                 <t t-if="doc.reviewer_signature_date">
-                                                    Signed: <t t-esc="doc.reviewer_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                                    Signed: <span t-field="doc.reviewer_signature_date" t-options='{"widget": "datetime"}'/>
                                                 </t>
                                                 <t t-if="not doc.reviewer_signature_date">
                                                     Date: ________________
@@ -301,7 +300,7 @@
                                             <div class="signature-label">
                                                 <strong><t t-esc="doc.authorizer_name or '________________'"/></strong><br/>
                                                 <t t-if="doc.authorizer_signature_date">
-                                                    Signed: <t t-esc="doc.authorizer_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                                    Signed: <span t-field="doc.authorizer_signature_date" t-options='{"widget": "datetime"}'/>
                                                 </t>
                                                 <t t-if="not doc.authorizer_signature_date">
                                                     Date: ________________
@@ -330,7 +329,7 @@
                             <p>
                                 <strong>OSUS Properties</strong> - Professional Real Estate Management<br/>
                                 This is a computer-generated receipt. Digital signatures are legally binding.<br/>
-                                Generated on <t t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
+                                Generated on <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y at %I:%M %p')"/>
                             </p>
                         </div>
                     </div>

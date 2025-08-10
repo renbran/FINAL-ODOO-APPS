@@ -273,23 +273,7 @@ class AccountPaymentUnified(models.Model):
                 'voucher_state': 'draft',
             })
     
-    def action_qr_verification_view(self):
-        """Open QR verification view in new window"""
-        self.ensure_one()
-        if not self.verification_token:
-            raise UserError(_("No verification token found for this payment."))
-        
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        verification_url = f"{base_url}/payment/verify/{self.verification_token}"
-        
-        return {
-            'type': 'ir.actions.act_url',
-            'name': _('QR Verification'),
-            'url': verification_url,
-            'target': 'new',
-        }
-    
-    # Helper Methods
+    # Add all other helper methods here
     def _create_signature(self, signature_type):
         """Create digital signature placeholder"""
         # This would contain actual signature logic
@@ -386,6 +370,22 @@ class AccountPaymentUnified(models.Model):
                 record.verification_url = f"{base_url}/payment/verify/{record.verification_token}"
             else:
                 record.verification_url = False
+    
+    def action_qr_verification_view(self):
+        """Open QR verification view in new window"""
+        self.ensure_one()
+        if not self.verification_token:
+            raise UserError(_("No verification token found for this payment."))
+        
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        verification_url = f"{base_url}/payment/verify/{self.verification_token}"
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'name': _('QR Verification'),
+            'url': verification_url,
+            'target': 'new',
+        }
     
     @api.model
     def create(self, vals):

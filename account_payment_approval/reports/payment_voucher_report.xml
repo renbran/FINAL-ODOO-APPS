@@ -1,362 +1,600 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Payment Voucher Report Template -->
-    <template id="report_payment_voucher_document">
+    <!-- Enhanced Payment Voucher Report Template - Complete Integration -->
+    <template id="report_payment_voucher_document_enhanced">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
+            <t t-foreach="docs" t-as="o">
                 <t t-call="web.external_layout">
                     <div class="page">
-                        <!-- OSUS Header Styling -->
                         <style>
-                            .osus-header {
-                                background: linear-gradient(135deg, #6B2B47 0%, #8B1538 100%);
-                                color: white;
-                                padding: 20px;
-                                margin: -20px -20px 20px -20px;
-                                text-align: center;
-                                border-radius: 0;
+                            @page {
+                                margin: 5mm;
+                                size: A4;
                             }
-                            .osus-title {
-                                font-size: 28px;
-                                font-weight: bold;
-                                margin: 0;
-                                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-                            }
-                            .osus-subtitle {
-                                color: #D4AF37;
-                                font-size: 16px;
-                                margin: 5px 0 0 0;
-                                font-weight: 500;
-                            }
-                            .voucher-header {
-                                background-color: #6B2B47;
-                                color: white;
-                                padding: 15px;
-                                margin: 20px 0;
-                                text-align: center;
-                                border-radius: 5px;
-                            }
-                            .voucher-number {
-                                font-size: 24px;
-                                font-weight: bold;
-                                color: #D4AF37;
-                            }
-                            .signature-section {
-                                border: 2px solid #6B2B47;
-                                padding: 15px;
-                                margin: 10px 0;
-                                border-radius: 5px;
-                                background-color: #f8f9fa;
-                            }
-                            .signature-title {
-                                color: #6B2B47;
-                                font-weight: bold;
-                                border-bottom: 1px solid #D4AF37;
-                                padding-bottom: 5px;
-                                margin-bottom: 10px;
-                            }
-                            .signature-line {
-                                border-bottom: 1px solid #333;
-                                min-height: 40px;
-                                margin: 10px 0;
-                                position: relative;
-                            }
-                            .signature-label {
+                            
+                            .voucher-container {
+                                font-family: Arial, sans-serif;
+                                background: white;
                                 font-size: 12px;
-                                color: #666;
-                                margin-top: 5px;
+                                line-height: 1.4;
+                                margin: 0;
+                                padding: 0;
                             }
-                            .amount-section {
-                                background-color: #f8f9fa;
-                                border: 2px solid #D4AF37;
-                                padding: 15px;
-                                border-radius: 5px;
-                                margin: 20px 0;
+                            
+                            .voucher-header {
+                                background: linear-gradient(135deg, #6B2B47, #8B1538);
+                                color: white;
+                                padding: 12px;
+                                margin: 0 0 15px 0;
+                                box-shadow: 0 3px 6px rgba(0,0,0,0.2);
                             }
-                            .qr-section {
+                            
+                            .voucher-title {
                                 text-align: center;
-                                border: 1px solid #dee2e6;
-                                padding: 15px;
-                                margin: 20px 0;
-                                border-radius: 5px;
+                                font-size: 26px;
+                                font-weight: bold;
+                                letter-spacing: 2px;
+                                margin: 0;
+                                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                                text-transform: uppercase;
                             }
-                            .workflow-badge {
+                            
+                            .voucher-subtitle {
+                                text-align: center;
+                                font-size: 14px;
+                                margin: 4px 0;
+                                color: #D4AF37;
+                            }
+                            
+                            .voucher-number-badge {
                                 background-color: #D4AF37;
                                 color: #6B2B47;
                                 padding: 5px 15px;
                                 border-radius: 20px;
                                 font-weight: bold;
                                 display: inline-block;
+                                font-size: 16px;
+                                margin: 5px 0;
                             }
-                            table.voucher-details {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin: 20px 0;
+                            
+                            .field-section {
+                                margin-bottom: 10px;
                             }
-                            table.voucher-details th {
-                                background-color: #6B2B47;
-                                color: white;
+                            
+                            .field-label {
+                                color: #6b0632;
+                                font-weight: bold;
+                                font-size: 12px;
+                                margin-bottom: 4px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+                            
+                            .field-value {
+                                border-bottom: 1px solid #333;
+                                padding: 4px;
+                                margin-bottom: 6px;
+                                min-height: 16px;
+                                color: #000;
+                                font-weight: 500;
+                                font-size: 12px;
+                            }
+                            
+                            .amount-section {
+                                background: linear-gradient(135deg, #D4AF37, #B8860B);
+                                color: #6B2B47;
+                                padding: 15px;
+                                text-align: center;
+                                margin: 15px 0;
+                                font-size: 18px;
+                                font-weight: bold;
+                                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+                                border-radius: 5px;
+                            }
+                            
+                            .payment-summary-section {
+                                margin: 12px 0;
                                 padding: 12px;
-                                text-align: left;
-                                border: 1px solid #8B1538;
+                                background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+                                border: 2px solid #D4AF37;
+                                border-radius: 6px;
                             }
-                            table.voucher-details td {
-                                padding: 12px;
-                                border: 1px solid #dee2e6;
+                            
+                            .summary-title {
+                                color: #6B2B47;
+                                font-weight: bold;
+                                font-size: 13px;
+                                margin-bottom: 6px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+                            
+                            .summary-item {
+                                margin-bottom: 4px;
+                                font-size: 12px;
+                                line-height: 1.4;
+                            }
+                            
+                            .signature-section {
+                                margin-top: 15px;
+                                padding-top: 12px;
+                                border-top: 2px solid #e9ecef;
+                            }
+                            
+                            .signature-box {
+                                text-align: center;
+                                padding: 6px;
+                                margin-bottom: 8px;
+                                border: 1px solid #6B2B47;
+                                background-color: #f8f9fa;
+                                border-radius: 5px;
+                            }
+                            
+                            .signature-line {
+                                border-bottom: 2px solid #333;
+                                margin-bottom: 5px;
+                                height: 35px;
+                                display: flex;
+                                align-items: flex-end;
+                                justify-content: center;
                                 background-color: white;
                             }
-                            table.voucher-details tr:nth-child(even) td {
-                                background-color: #f8f9fa;
+                            
+                            .signature-label {
+                                font-weight: bold;
+                                color: #6b0632;
+                                font-size: 11px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
                             }
+                            
+                            .signature-initials {
+                                font-size: 16px;
+                                font-weight: bold;
+                                color: #6B2B47;
+                                font-style: italic;
+                            }
+                            
+                            .digital-signature {
+                                max-height: 30px;
+                                max-width: 100px;
+                            }
+                            
                             .footer-note {
-                                font-size: 12px;
-                                color: #666;
+                                background: linear-gradient(135deg, #6B2B47, #8B1538);
+                                color: white;
                                 text-align: center;
-                                margin-top: 30px;
-                                padding-top: 20px;
-                                border-top: 1px solid #dee2e6;
+                                padding: 10px;
+                                font-size: 11px;
+                                margin: 15px 0 0 0;
+                            }
+                            
+                            .creator-info {
+                                font-size: 10px;
+                                color: #666;
+                                margin-top: 5px;
+                                text-align: right;
+                            }
+                            
+                            .received-by-box {
+                                border: 2px solid #6b0632;
+                                padding: 10px;
+                                background: #f8f9fa;
+                                margin-top: 8px;
+                                border-radius: 5px;
+                            }
+                            
+                            .compact-row {
+                                margin-bottom: 8px;
+                            }
+                            
+                            .qr-code-container {
+                                text-align: center;
+                                padding: 8px;
+                            }
+                            
+                            .qr-code-box {
+                                background: white;
+                                padding: 6px;
+                                border-radius: 4px;
+                                display: inline-block;
+                                border: 2px solid #333;
+                            }
+                            
+                            .workflow-status {
+                                background-color: #28a745;
+                                color: white;
+                                padding: 5px 10px;
+                                border-radius: 15px;
+                                font-size: 11px;
+                                font-weight: bold;
+                                display: inline-block;
+                                margin: 5px 0;
+                            }
+                            
+                            .workflow-status.draft { background-color: #6c757d; }
+                            .workflow-status.submitted { background-color: #17a2b8; }
+                            .workflow-status.under_review { background-color: #ffc107; color: #212529; }
+                            .workflow-status.approved { background-color: #007bff; }
+                            .workflow-status.authorized { background-color: #28a745; }
+                            .workflow-status.posted { background-color: #198754; }
+                            .workflow-status.rejected { background-color: #dc3545; }
+                            
+                            .verification-section {
+                                background-color: #e7f3ff;
+                                border: 1px solid #007bff;
+                                padding: 10px;
+                                margin: 10px 0;
+                                border-radius: 5px;
+                                text-align: center;
+                            }
+                            
+                            @media print {
+                                .page {
+                                    margin: 0;
+                                    padding: 2px;
+                                }
+                                .voucher-container {
+                                    margin: 0;
+                                    padding: 0;
+                                }
                             }
                         </style>
 
-                        <!-- OSUS Header -->
-                        <div class="osus-header">
-                            <h1 class="osus-title">OSUS PROPERTIES</h1>
-                            <p class="osus-subtitle">Real Estate Excellence Since 2010</p>
-                        </div>
-
-                        <!-- Voucher Header -->
-                        <div class="voucher-header">
-                            <h2 style="margin: 0; font-size: 20px;">PAYMENT VOUCHER</h2>
-                            <div class="voucher-number">
-                                <t t-esc="doc.voucher_number or 'PV-DRAFT'"/>
+                        <div class="voucher-container">
+                            <!-- Header Section -->
+                            <div class="voucher-header">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <div class="qr-code-container">
+                                            <div class="qr-code-box">
+                                                <t t-if="o.qr_code">
+                                                    <img t-att-src="image_data_uri(o.qr_code)" style="width: 65px; height: 65px;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <div style="width: 65px; height: 65px; background: white; border: 1px solid #333; position: relative;">
+                                                        <div style="position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; background: #000;"></div>
+                                                        <div style="position: absolute; top: 2px; right: 2px; width: 15px; height: 15px; background: #000;"></div>
+                                                        <div style="position: absolute; bottom: 2px; left: 2px; width: 15px; height: 15px; background: #000;"></div>
+                                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #000;"></div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                            <div style="font-size: 8px; margin-top: 2px; color: white;">Verify</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <h1 class="voucher-title">
+                                            <t t-if="o.payment_type == 'inbound'">Receipt Voucher</t>
+                                            <t t-else="">Payment Voucher</t>
+                                        </h1>
+                                        <div class="voucher-subtitle">
+                                            <strong>OSUS Properties - Real Estate Excellence</strong>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div class="voucher-number-badge">
+                                                <t t-esc="o.voucher_number or o.name"/>
+                                            </div>
+                                            <div t-att-class="'workflow-status ' + o.voucher_state">
+                                                <t t-esc="o.voucher_state.upper().replace('_', ' ')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div style="text-align: right; font-size: 8px; color: #D4AF37;">
+                                            <div><strong>Business Bay, Dubai</strong></div>
+                                            <div>+971-4-366-4500</div>
+                                            <div>info@osusproperties.com</div>
+                                            <div style="margin-top: 5px; font-size: 7px;">
+                                                Date: <span t-field="o.date"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="workflow-badge">
-                                <t t-esc="doc.voucher_state.upper().replace('_', ' ')"/>
+
+                            <!-- Main Content in 2 Columns -->
+                            <div class="row">
+                                <div class="col-6">
+                                    <!-- Left Column -->
+                                    <div class="field-section">
+                                        <div class="field-label">
+                                            <t t-if="o.payment_type == 'inbound'">Received From:</t>
+                                            <t t-else="">Pay To:</t>
+                                        </div>
+                                        <div class="field-value"><span t-field="o.partner_id.name"/></div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Phone:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.partner_id.mobile"/>
+                                            <t t-if="o.partner_id.phone and o.partner_id.phone != o.partner_id.mobile">
+                                                / <span t-field="o.partner_id.phone"/>
+                                            </t>
+                                            <t t-if="not o.partner_id.mobile and not o.partner_id.phone">N/A</t>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Email:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.partner_id.email"/>
+                                            <t t-if="not o.partner_id.email">N/A</t>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Payment Method:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.payment_method_id.name"/> - <span t-field="o.journal_id.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <!-- Right Column -->
+                                    <div class="field-section">
+                                        <div class="field-label">Related Document:</div>
+                                        <div class="field-value">
+                                            <t t-if="o.related_document_number">
+                                                <t t-esc="o.related_document_type"/> - <t t-esc="o.related_document_number"/>
+                                            </t>
+                                            <t t-else="">
+                                                N/A
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Transaction Type:</div>
+                                        <div class="field-value">
+                                            <t t-if="o.payment_type == 'inbound'">
+                                                <span style="color: #28a745; font-weight: bold;">Receipt (Money Received)</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span style="color: #dc3545; font-weight: bold;">Payment (Money Paid)</span>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Currency:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.currency_id.name"/> (<span t-field="o.currency_id.symbol"/>)
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Remarks:</div>
+                                        <div class="field-value" style="min-height: 30px;">
+                                            <span t-field="o.ref"/>
+                                            <t t-if="not o.ref">-</t>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Payment Details Table -->
-                        <table class="voucher-details">
-                            <tr>
-                                <th style="width: 25%;">Date</th>
-                                <td><t t-esc="doc.date.strftime('%B %d, %Y') if doc.date else ''"/></td>
-                                <th style="width: 25%;">Company</th>
-                                <td><t t-esc="doc.company_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <th>Pay To</th>
-                                <td><strong><t t-esc="doc.partner_id.name"/></strong></td>
-                                <th>Payment Method</th>
-                                <td><t t-esc="doc.payment_method_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <th>Partner Address</th>
-                                <td>
-                                    <t t-if="doc.partner_id.street">
-                                        <t t-esc="doc.partner_id.street"/><br/>
-                                    </t>
-                                    <t t-if="doc.partner_id.street2">
-                                        <t t-esc="doc.partner_id.street2"/><br/>
-                                    </t>
-                                    <t t-if="doc.partner_id.city">
-                                        <t t-esc="doc.partner_id.city"/>
-                                    </t>
-                                    <t t-if="doc.partner_id.state_id">
-                                        , <t t-esc="doc.partner_id.state_id.name"/>
-                                    </t>
-                                    <t t-if="doc.partner_id.zip">
-                                        <t t-esc="doc.partner_id.zip"/>
-                                    </t>
-                                </td>
-                                <th>Journal</th>
-                                <td><t t-esc="doc.journal_id.name"/></td>
-                            </tr>
-                            <tr t-if="doc.ref">
-                                <th>Reference</th>
-                                <td><t t-esc="doc.ref"/></td>
-                                <th>Currency</th>
-                                <td><t t-esc="doc.currency_id.name"/></td>
-                            </tr>
-                            <tr t-if="doc.related_document_number">
-                                <th>Related Document</th>
-                                <td>
-                                    <t t-esc="doc.related_document_type"/> - <t t-esc="doc.related_document_number"/>
-                                    <t t-if="doc.related_document_date">
-                                        (<t t-esc="doc.related_document_date.strftime('%B %d, %Y')"/>)
-                                    </t>
-                                </td>
-                                <th></th>
-                                <td></td>
-                            </tr>
-                        </table>
+                            <!-- Amount in Words -->
+                            <div class="field-section">
+                                <div class="field-label">Amount in Words:</div>
+                                <div class="field-value" style="font-style: italic; font-size: 13px; background-color: #f8f9fa;">
+                                    <span t-esc="o.amount_in_words"/>
+                                </div>
+                            </div>
 
-                        <!-- Amount Section -->
-                        <div class="amount-section">
-                            <table style="width: 100%; border: none;">
-                                <tr>
-                                    <td style="border: none; padding: 0;">
-                                        <h3 style="color: #6B2B47; margin: 0;">Amount Details</h3>
-                                        <table style="width: 100%; margin-top: 10px;">
-                                            <tr>
-                                                <td style="border: none; padding: 5px 0;"><strong>Amount in Figures:</strong></td>
-                                                <td style="border: none; padding: 5px 0; text-align: right;">
-                                                    <span style="font-size: 24px; color: #6B2B47; font-weight: bold;">
-                                                        <t t-esc="doc.currency_id.symbol"/>
-                                                        <t t-esc="'{:,.2f}'.format(doc.amount)"/>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border: none; padding: 5px 0;"><strong>Amount in Words:</strong></td>
-                                                <td style="border: none; padding: 5px 0; text-align: right; font-style: italic;">
-                                                    <t t-esc="doc.amount_in_words"/>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                            <!-- Total Amount -->
+                            <div class="amount-section">
+                                <strong>TOTAL AMOUNT: <span t-field="o.currency_id.symbol"/><span t-esc="'{:,.2f}'.format(o.amount)"/></strong>
+                            </div>
 
-                        <!-- Payment Purpose -->
-                        <div t-if="doc.ref or doc.communication" style="margin: 20px 0;">
-                            <h4 style="color: #6B2B47; border-bottom: 1px solid #D4AF37; padding-bottom: 5px;">Payment Purpose</h4>
-                            <p style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #D4AF37;">
-                                <t t-esc="doc.ref or doc.communication"/>
-                            </p>
-                        </div>
+                            <!-- Verification Section -->
+                            <div class="verification-section">
+                                <strong>🔒 Digital Verification</strong><br/>
+                                Token: <span t-esc="o.verification_token"/><br/>
+                                Verify at: <span t-esc="o.verification_url"/>
+                            </div>
 
-                        <!-- Digital Signatures Section -->
-                        <div style="margin-top: 30px;">
-                            <h3 style="color: #6B2B47; text-align: center; margin-bottom: 20px;">AUTHORIZATION SIGNATURES</h3>
-                            
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <!-- First Row: Creator and Reviewer -->
-                                <tr>
-                                    <td style="width: 50%; padding: 15px; vertical-align: top;">
-                                        <div class="signature-section">
-                                            <div class="signature-title">1. CREATED BY</div>
-                                            <div class="signature-line">
-                                                <t t-if="doc.creator_signature">
-                                                    <img t-att-src="image_data_uri(doc.creator_signature)" style="max-height: 30px;"/>
-                                                </t>
-                                            </div>
-                                            <div class="signature-label">
-                                                <strong><t t-esc="doc.creator_name"/></strong><br/>
-                                                <t t-if="doc.creator_signature_date">
-                                                    Signed: <t t-esc="doc.creator_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
-                                                </t>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style="width: 50%; padding: 15px; vertical-align: top;">
-                                        <div class="signature-section">
-                                            <div class="signature-title">2. REVIEWED BY</div>
-                                            <div class="signature-line">
-                                                <t t-if="doc.reviewer_signature">
-                                                    <img t-att-src="image_data_uri(doc.reviewer_signature)" style="max-height: 30px;"/>
-                                                </t>
-                                            </div>
-                                            <div class="signature-label">
-                                                <strong><t t-esc="doc.reviewer_name or '________________'"/></strong><br/>
-                                                <t t-if="doc.reviewer_signature_date">
-                                                    Signed: <t t-esc="doc.reviewer_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
-                                                </t>
-                                                <t t-if="not doc.reviewer_signature_date">
-                                                    Date: ________________
-                                                </t>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                            <!-- Enhanced Signature Section with Digital Signatures -->
+                            <div class="signature-section">
+                                <h4 style="text-align: center; color: #6B2B47; margin-bottom: 15px;">AUTHORIZATION SIGNATURES</h4>
                                 
-                                <!-- Second Row: Approver and Authorizer -->
-                                <tr>
-                                    <td style="padding: 15px; vertical-align: top;">
-                                        <div class="signature-section">
-                                            <div class="signature-title">3. APPROVED BY</div>
+                                <!-- Top Row: Creator, Reviewer, Approver -->
+                                <div class="row compact-row">
+                                    <!-- Creator -->
+                                    <div class="col-4">
+                                        <div class="signature-box">
                                             <div class="signature-line">
-                                                <t t-if="doc.approver_signature">
-                                                    <img t-att-src="image_data_uri(doc.approver_signature)" style="max-height: 30px;"/>
+                                                <t t-if="o.creator_signature">
+                                                    <img t-att-src="image_data_uri(o.creator_signature)" class="digital-signature"/>
+                                                </t>
+                                                <t t-elif="o.creator_name">
+                                                    <div class="signature-initials">
+                                                        <span t-esc="''.join([word[0].upper() for word in o.creator_name.split()[:2]])"/>
+                                                    </div>
                                                 </t>
                                             </div>
-                                            <div class="signature-label">
-                                                <strong><t t-esc="doc.approver_name or '________________'"/></strong><br/>
-                                                <t t-if="doc.approver_signature_date">
-                                                    Signed: <t t-esc="doc.approver_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
-                                                </t>
-                                                <t t-if="not doc.approver_signature_date">
-                                                    Date: ________________
+                                            <div class="signature-label">1. Created By</div>
+                                            <div style="font-size: 10px;">
+                                                <strong><span t-esc="o.creator_name"/></strong><br/>
+                                                <t t-if="o.creator_signature_date">
+                                                    <span t-esc="o.creator_signature_date.strftime('%d/%m/%Y %H:%M')"/>
                                                 </t>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td style="padding: 15px; vertical-align: top;">
-                                        <div class="signature-section">
-                                            <div class="signature-title">4. AUTHORIZED BY</div>
+                                    </div>
+                                    
+                                    <!-- Reviewer -->
+                                    <div class="col-4">
+                                        <div class="signature-box">
                                             <div class="signature-line">
-                                                <t t-if="doc.authorizer_signature">
-                                                    <img t-att-src="image_data_uri(doc.authorizer_signature)" style="max-height: 30px;"/>
+                                                <t t-if="o.reviewer_signature">
+                                                    <img t-att-src="image_data_uri(o.reviewer_signature)" class="digital-signature"/>
                                                 </t>
                                             </div>
-                                            <div class="signature-label">
-                                                <strong><t t-esc="doc.authorizer_name or '________________'"/></strong><br/>
-                                                <t t-if="doc.authorizer_signature_date">
-                                                    Signed: <t t-esc="doc.authorizer_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                            <div class="signature-label">2. Reviewed By</div>
+                                            <div style="font-size: 10px;">
+                                                <strong><span t-esc="o.reviewer_name or '________________'"/></strong><br/>
+                                                <t t-if="o.reviewer_signature_date">
+                                                    <span t-esc="o.reviewer_signature_date.strftime('%d/%m/%Y %H:%M')"/>
                                                 </t>
-                                                <t t-if="not doc.authorizer_signature_date">
-                                                    Date: ________________
-                                                </t>
+                                                <t t-else="">Date: ________</t>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                    
+                                    <!-- Approver (only for Payment Vouchers) -->
+                                    <div class="col-4">
+                                        <div class="signature-box" t-if="o.payment_type == 'outbound'">
+                                            <div class="signature-line">
+                                                <t t-if="o.approver_signature">
+                                                    <img t-att-src="image_data_uri(o.approver_signature)" class="digital-signature"/>
+                                                </t>
+                                            </div>
+                                            <div class="signature-label">3. Approved By</div>
+                                            <div style="font-size: 10px;">
+                                                <strong><span t-esc="o.approver_name or '________________'"/></strong><br/>
+                                                <t t-if="o.approver_signature_date">
+                                                    <span t-esc="o.approver_signature_date.strftime('%d/%m/%Y %H:%M')"/>
+                                                </t>
+                                                <t t-else="">Date: ________</t>
+                                            </div>
+                                        </div>
+                                        <!-- For Receipt Vouchers - different layout -->
+                                        <div class="signature-box" t-if="o.payment_type == 'inbound'">
+                                            <div class="signature-line">
+                                                <t t-if="o.authorizer_signature">
+                                                    <img t-att-src="image_data_uri(o.authorizer_signature)" class="digital-signature"/>
+                                                </t>
+                                            </div>
+                                            <div class="signature-label">3. Authorized By</div>
+                                            <div style="font-size: 10px;">
+                                                <strong><span t-esc="o.authorizer_name or '________________'"/></strong><br/>
+                                                <t t-if="o.authorizer_signature_date">
+                                                    <span t-esc="o.authorizer_signature_date.strftime('%d/%m/%Y %H:%M')"/>
+                                                </t>
+                                                <t t-else="">Date: ________</t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 
-                                <!-- Third Row: Receiver -->
-                                <tr>
-                                    <td colspan="2" style="padding: 15px;">
-                                        <div class="signature-section">
-                                            <div class="signature-title">5. RECEIVED BY (Payee Acknowledgment)</div>
+                                <!-- Authorizer Row (only for Payment Vouchers) -->
+                                <div class="row compact-row" t-if="o.payment_type == 'outbound'">
+                                    <div class="col-12">
+                                        <div class="signature-box">
                                             <div class="signature-line">
-                                                <t t-if="doc.receiver_signature">
-                                                    <img t-att-src="image_data_uri(doc.receiver_signature)" style="max-height: 30px;"/>
+                                                <t t-if="o.authorizer_signature">
+                                                    <img t-att-src="image_data_uri(o.authorizer_signature)" class="digital-signature"/>
                                                 </t>
                                             </div>
-                                            <div class="signature-label">
-                                                Signature: ________________ Name: ________________ Date: ________________<br/>
-                                                <t t-if="doc.receiver_signature_date">
-                                                    Received: <t t-esc="doc.receiver_signature_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                            <div class="signature-label">4. Authorized By</div>
+                                            <div style="font-size: 10px;">
+                                                <strong><span t-esc="o.authorizer_name or '________________'"/></strong><br/>
+                                                <t t-if="o.authorizer_signature_date">
+                                                    <span t-esc="o.authorizer_signature_date.strftime('%d/%m/%Y %H:%M')"/>
                                                 </t>
+                                                <t t-else="">Date: ________</t>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Received By -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="received-by-box">
+                                            <div class="signature-label" style="text-align: center; margin-bottom: 5px;">
+                                                <t t-if="o.payment_type == 'inbound'">Received From (Customer Acknowledgment)</t>
+                                                <t t-else="">Received By (Payee Acknowledgment)</t>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div style="margin-bottom: 5px;">
+                                                        <div style="font-weight: bold; margin-bottom: 2px; font-size: 9px;">Name and Signature:</div>
+                                                        <div style="border-bottom: 1px solid #333; height: 20px; display: flex; align-items: flex-end;">
+                                                            <t t-if="o.receiver_signature">
+                                                                <img t-att-src="image_data_uri(o.receiver_signature)" style="max-height: 18px;"/>
+                                                            </t>
+                                                        </div>
+                                                        <div style="font-size: 8px; color: #666;">Print: <span t-field="o.partner_id.name"/></div>
+                                                    </div>
+                                                    <div>
+                                                        <div style="font-weight: bold; margin-bottom: 2px; font-size: 9px;">Mobile:</div>
+                                                        <div style="border-bottom: 1px solid #333; height: 15px; font-size: 9px; padding-top: 2px;">
+                                                            <span t-field="o.partner_id.mobile"/>
+                                                            <t t-if="not o.partner_id.mobile">_______</t>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div style="margin-bottom: 5px;">
+                                                        <div style="font-weight: bold; margin-bottom: 2px; font-size: 9px;">Date:</div>
+                                                        <div style="border-bottom: 1px solid #333; height: 15px; font-size: 9px; padding-top: 2px;">
+                                                            <t t-if="o.receiver_signature_date">
+                                                                <span t-esc="o.receiver_signature_date.strftime('%d/%m/%Y')"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span t-field="o.date"/>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div style="font-weight: bold; margin-bottom: 2px; font-size: 9px;">ID Copy:</div>
+                                                        <div style="font-size: 9px;">[ ] Yes [ ] No</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- QR Code Section -->
-                        <div class="qr-section">
-                            <h4 style="color: #6B2B47; margin-bottom: 10px;">Payment Verification</h4>
-                            <t t-if="doc.qr_code">
-                                <img t-att-src="image_data_uri(doc.qr_code)" style="max-width: 150px; max-height: 150px;"/>
-                                <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">
-                                    Scan QR code to verify payment authenticity<br/>
-                                    Token: <t t-esc="doc.verification_token"/>
-                                </p>
-                            </t>
-                        </div>
+                            <!-- Creator and System Info -->
+                            <div class="creator-info">
+                                Created: <span t-esc="o.creator_name"/> | <span t-field="o.create_date"/>
+                                <t t-if="o.write_uid and o.write_uid != o.create_uid"> | Modified: <span t-field="o.write_uid.name"/></t>
+                                | System: OSUS Payment System v2.0
+                            </div>
 
-                        <!-- Footer -->
-                        <div class="footer-note">
-                            <p>
-                                <strong>OSUS Properties</strong> - Professional Real Estate Management<br/>
-                                This is a computer-generated document. Digital signatures are legally binding.<br/>
-                                Generated on <t t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
-                            </p>
+                            <!-- Footer -->
+                            <div class="footer-note">
+                                <strong>Thank you for your business!</strong> | 
+                                Computer-generated document with digital signatures | 
+                                OSUS Real Estate Brokerage LLC, Business Bay, Dubai, UAE | 
+                                www.osusproperties.com
+                            </div>
                         </div>
                     </div>
                 </t>
             </t>
         </t>
     </template>
+
+    <!-- Update the existing report action to use the enhanced template -->
+    <record id="action_report_payment_voucher_enhanced" model="ir.actions.report">
+        <field name="name">Enhanced Payment Voucher</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_payment_approval.report_payment_voucher_document_enhanced</field>
+        <field name="report_file">account_payment_approval.report_payment_voucher_document_enhanced</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_a4"/>
+    </record>
+
+    <!-- Add methods to account.payment model for report functionality -->
+    <record id="view_account_payment_methods_enhanced" model="ir.ui.view">
+        <field name="name">account.payment.methods.enhanced</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <script type="text/javascript">
+                    // Add any JavaScript functionality if needed
+                </script>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
