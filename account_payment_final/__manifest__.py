@@ -68,8 +68,8 @@
         'reports/payment_voucher_actions.xml',
         'reports/payment_voucher_template.xml',
         
-        # Website/Portal Views
-        'views/payment_verification_templates.xml',
+        # Website/Portal Views (QWeb Templates)
+        'reports/payment_verification_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
