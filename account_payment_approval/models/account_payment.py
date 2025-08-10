@@ -125,6 +125,9 @@ class AccountPaymentUnified(models.Model):
     signature_count = fields.Integer(string='Signature Count', compute='_compute_signature_count')
     verification_count = fields.Integer(string='Verification Count', compute='_compute_verification_count')
     
+    # Permission fields
+    is_approve_person = fields.Boolean(string='Can Approve', compute='_compute_is_approve_person')
+    
     @api.depends('payment_type')
     def _compute_voucher_type(self):
         """Determine voucher type based on payment type"""
@@ -332,6 +335,27 @@ class AccountPaymentUnified(models.Model):
                     record.verification_count = 0
             else:
                 record.verification_count = 0
+    
+    @api.depends('state')
+    def _compute_is_approve_person(self):
+        """Compute if current user can approve this payment"""
+        for record in self:
+            user = self.env.user
+            
+            # Check if user has approver group
+            is_approver = user.has_group('account_payment_approval.group_payment_voucher_approver')
+            is_authorizer = user.has_group('account_payment_approval.group_payment_voucher_authorizer')
+            is_manager = user.has_group('account_payment_approval.group_payment_voucher_manager')
+            
+            # Logic based on state and voucher type
+            if record.state == 'under_review' and record.voucher_type == 'payment':
+                record.is_approve_person = is_approver or is_manager
+            elif record.state == 'under_review' and record.voucher_type == 'receipt':
+                record.is_approve_person = is_authorizer or is_manager
+            elif record.state == 'approved':
+                record.is_approve_person = is_authorizer or is_manager
+            else:
+                record.is_approve_person = False
     
     @api.model
     def create(self, vals):
