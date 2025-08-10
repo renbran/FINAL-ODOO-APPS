@@ -89,7 +89,7 @@
                 </xpath>
 
                 <!-- Add Voucher Information Group -->
-                <xpath expr="//group[@name='group_main']" position="before">
+                <xpath expr="//field[@name='partner_id']" position="after">
                     <group name="voucher_info" string="Voucher Information" 
                            invisible="approval_state == 'draft' and not voucher_number">
                         <group>
@@ -287,7 +287,7 @@
             <field name="arch" type="xml">
                 
                 <!-- Add approval state filters -->
-                <xpath expr="//filter[@name='state_posted']" position="after">
+                <xpath expr="//search" position="inside">
                     <separator/>
                     <filter string="Draft Vouchers" name="approval_draft" 
                             domain="[('approval_state', '=', 'draft')]"/>

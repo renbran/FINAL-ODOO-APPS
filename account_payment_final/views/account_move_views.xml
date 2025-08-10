@@ -76,7 +76,7 @@
                 </xpath>
 
                 <!-- Add approval workflow information -->
-                <xpath expr="//group[@name='header_left_group']" position="after">
+                <xpath expr="//field[@name='partner_id']" position="after">
                     <group name="approval_info" string="Approval Information" 
                            invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] or not requires_approval">
                         <group>
@@ -169,7 +169,7 @@
             <field name="arch" type="xml">
                 
                 <!-- Add approval filters -->
-                <xpath expr="//filter[@name='late']" position="after">
+                <xpath expr="//search" position="inside">
                     <separator/>
                     <filter string="Pending Review" name="approval_under_review" 
                             domain="[('approval_state', '=', 'under_review')]"/>
@@ -187,9 +187,11 @@
                 </xpath>
                 
                 <!-- Add group by approval state -->
-                <xpath expr="//group[@expand='0']" position="inside">
-                    <filter string="Approval State" name="group_approval_state" 
-                            domain="[]" context="{'group_by':'approval_state'}"/>
+                <xpath expr="//search" position="inside">
+                    <group expand="0" string="Group By">
+                        <filter string="Approval State" name="group_approval_state" 
+                                domain="[]" context="{'group_by':'approval_state'}"/>
+                    </group>
                 </xpath>
                 
             </field>
