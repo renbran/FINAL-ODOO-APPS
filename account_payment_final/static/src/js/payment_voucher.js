@@ -271,14 +271,14 @@ export class WorkflowButtons extends Component {
                     name: 'Review & Forward',
                     method: 'action_review_approve',
                     class: 'btn-success',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_reviewer']
+                    groups: ['account_payment_final.group_payment_voucher_reviewer']
                 });
                 actions.push({
                     name: 'Reject',
                     method: 'action_reject_payment',
                     class: 'btn-danger',
                     confirm: 'Are you sure you want to reject this voucher?',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_reviewer']
+                    groups: ['account_payment_final.group_payment_voucher_reviewer']
                 });
                 break;
                 
@@ -288,7 +288,7 @@ export class WorkflowButtons extends Component {
                         name: 'Approve Payment',
                         method: 'action_approve_payment',
                         class: 'btn-success',
-                        groups: ['payment_voucher_enhanced.group_payment_voucher_approver']
+                        groups: ['account_payment_final.group_payment_voucher_approver']
                     });
                 }
                 actions.push({
@@ -296,7 +296,7 @@ export class WorkflowButtons extends Component {
                     method: 'action_reject_payment',
                     class: 'btn-danger',
                     confirm: 'Are you sure you want to reject this voucher?',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_approver']
+                    groups: ['account_payment_final.group_payment_voucher_approver']
                 });
                 break;
                 
@@ -305,14 +305,14 @@ export class WorkflowButtons extends Component {
                     name: 'Authorize Payment',
                     method: 'action_authorize_payment',
                     class: 'btn-warning',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_authorizer']
+                    groups: ['account_payment_final.group_payment_voucher_authorizer']
                 });
                 actions.push({
                     name: 'Reject',
                     method: 'action_reject_payment',
                     class: 'btn-danger',
                     confirm: 'Are you sure you want to reject this voucher?',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_authorizer']
+                    groups: ['account_payment_final.group_payment_voucher_authorizer']
                 });
                 break;
                 
@@ -321,7 +321,7 @@ export class WorkflowButtons extends Component {
                     name: 'Post to Ledger',
                     method: 'action_post_payment',
                     class: 'btn-primary',
-                    groups: ['payment_voucher_enhanced.group_payment_voucher_poster']
+                    groups: ['account_payment_final.group_payment_voucher_poster']
                 });
                 break;
         }

@@ -75,7 +75,6 @@ Security:
         'data/cron_jobs.xml',
         
         # Views
-        'views/payment_signatory_views.xml',
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
         'views/payment_verification_views.xml',

@@ -133,12 +133,8 @@
                         <div class="row mt16 o_settings_container">
                             <div class="col-12">
                                 <div class="o_setting_right_pane">
-                                    <button name="%(action_payment_signatory)d" 
-                                            string="Configure Signatories" 
-                                            type="action" 
-                                            class="btn-link"/>
                                     <div class="text-muted">
-                                        Set up digital signatories for payment vouchers
+                                        Payment voucher system is ready for use
                                     </div>
                                 </div>
                             </div>

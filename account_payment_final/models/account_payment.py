@@ -62,11 +62,6 @@ class AccountPayment(models.Model):
     posted_date = fields.Datetime(string='Posted Date', readonly=True)
     
     # Enhanced Signature Management
-    signatory_ids = fields.Many2many(
-        'payment.signatory',
-        string='Required Signatories',
-        domain="[('is_active', '=', True), ('company_id', '=', company_id)]"
-    )
     
     creator_signature = fields.Binary(string='Creator Signature')
     creator_signature_date = fields.Datetime(string='Creator Signature Date')
@@ -437,4 +432,81 @@ class AccountPayment(models.Model):
         if not self.currency_id:
             raise ValidationError(_("Currency must be specified."))
         if not self.journal_id:
-            raise
+            raise ValidationError(_("Payment journal must be specified."))
+
+    def _check_workflow_permission(self, action):
+        """Check if current user has permission for workflow action"""
+        user = self.env.user
+        group_mapping = {
+            'submit': 'account_payment_final.group_payment_voucher_user',
+            'review': 'account_payment_final.group_payment_voucher_reviewer',
+            'approve': 'account_payment_final.group_payment_voucher_approver',
+            'authorize': 'account_payment_final.group_payment_voucher_authorizer',
+            'post': 'account_payment_final.group_payment_voucher_poster',
+        }
+        
+        required_group = group_mapping.get(action)
+        if required_group and not user.has_group(required_group):
+            raise AccessError(_("You don't have permission to %s payment vouchers.") % action)
+
+    def _create_workflow_activities(self, activity_type):
+        """Create workflow activities for next approvers"""
+        activity_type_obj = self.env['mail.activity.type']
+        activity_type_record = activity_type_obj.search([
+            ('name', 'ilike', f'Payment {activity_type.title()}')
+        ], limit=1)
+        
+        if not activity_type_record:
+            # Create default activity type if not found
+            activity_type_record = activity_type_obj.create({
+                'name': f'Payment {activity_type.title()}',
+                'category': 'meeting',
+                'default_note': f'Please {activity_type} this payment voucher.',
+            })
+
+        # Find users with required permission
+        group_mapping = {
+            'review': 'account_payment_final.group_payment_voucher_reviewer',
+            'approve': 'account_payment_final.group_payment_voucher_approver',
+            'authorize': 'account_payment_final.group_payment_voucher_authorizer',
+            'post': 'account_payment_final.group_payment_voucher_poster',
+        }
+        
+        group_name = group_mapping.get(activity_type)
+        if group_name:
+            group = self.env.ref(group_name, raise_if_not_found=False)
+            if group and group.users:
+                for user in group.users:
+                    self.activity_schedule(
+                        act_type_id=activity_type_record.id,
+                        user_id=user.id,
+                        summary=f'{activity_type.title()} Payment Voucher {self.voucher_number or self.name}',
+                        note=f'Please {activity_type} payment voucher for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount:,.2f}'
+                    )
+
+    def _send_workflow_notification(self, stage):
+        """Send email notification for workflow stage"""
+        # This would typically send emails to relevant users
+        # For now, we'll just post a message
+        self._post_workflow_message(f"Workflow notification: Payment voucher {stage}")
+
+    def _post_workflow_message(self, message):
+        """Post workflow message to chatter"""
+        self.message_post(
+            body=f"<p>{message}</p>",
+            message_type='notification',
+            subtype_xmlid='mail.mt_note'
+        )
+
+    def _return_success_notification(self, message):
+        """Return success notification"""
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': message,
+                'type': 'success',
+                'sticky': False,
+            }
+        }

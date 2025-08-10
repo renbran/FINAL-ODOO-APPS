@@ -78,3 +78,4 @@ class ResCompany(models.Model):
         string='Use OSUS Branding',
         default=True,
         help="Apply OSUS brand styling to reports"
+    )

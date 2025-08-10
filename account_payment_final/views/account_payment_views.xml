@@ -37,35 +37,35 @@
                             string="Review &amp; Forward" 
                             type="object" 
                             class="btn-success"
-                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer"
+                            groups="account_payment_final.group_payment_voucher_reviewer"
                             invisible="approval_state != 'under_review'"/>
                     
                     <button name="action_approve_payment" 
                             string="Approve Payment" 
                             type="object" 
                             class="btn-success"
-                            groups="payment_voucher_enhanced.group_payment_voucher_approver"
+                            groups="account_payment_final.group_payment_voucher_approver"
                             invisible="approval_state != 'for_approval' or payment_type != 'outbound'"/>
                     
                     <button name="action_authorize_payment" 
                             string="Authorize Payment" 
                             type="object" 
                             class="btn-warning"
-                            groups="payment_voucher_enhanced.group_payment_voucher_authorizer"
+                            groups="account_payment_final.group_payment_voucher_authorizer"
                             invisible="approval_state != 'for_authorization'"/>
                     
                     <button name="action_post_payment" 
                             string="Post to Ledger" 
                             type="object" 
                             class="btn-primary"
-                            groups="payment_voucher_enhanced.group_payment_voucher_poster"
+                            groups="account_payment_final.group_payment_voucher_poster"
                             invisible="approval_state != 'approved'"/>
                     
                     <button name="action_reject_payment" 
                             string="Reject" 
                             type="object" 
                             class="btn-danger"
-                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer,payment_voucher_enhanced.group_payment_voucher_approver,payment_voucher_enhanced.group_payment_voucher_authorizer"
+                            groups="account_payment_final.group_payment_voucher_reviewer,account_payment_final.group_payment_voucher_approver,account_payment_final.group_payment_voucher_authorizer"
                             invisible="approval_state not in ['under_review', 'for_approval', 'for_authorization']"
                             confirm="Are you sure you want to reject this payment voucher?"/>
                     
@@ -211,19 +211,6 @@
                                        class="oe_avatar"/>
                                 <field name="receiver_signature_date"/>
                             </group>
-                        </group>
-                        
-                        <!-- Required Signatories -->
-                        <group string="Required Signatories">
-                            <field name="signatory_ids" nolabel="1">
-                                <tree>
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="name"/>
-                                    <field name="role"/>
-                                    <field name="user_id"/>
-                                    <field name="is_active"/>
-                                </tree>
-                            </field>
                         </group>
                     </page>
                 </xpath>

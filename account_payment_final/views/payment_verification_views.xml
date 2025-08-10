@@ -429,7 +429,7 @@
                             string="Regenerate QR Token" 
                             type="object" 
                             class="btn-outline-warning"
-                            groups="payment_voucher_enhanced.group_payment_voucher_manager"
+                            groups="account_payment_final.group_payment_voucher_manager"
                             invisible="approval_state == 'draft'"
                             confirm="This will invalidate the current QR code. Continue?"/>
                 </xpath>

@@ -26,13 +26,6 @@
                   parent="menu_payment_voucher_main"
                   sequence="100"/>
 
-        <!-- Signatory Management -->
-        <menuitem id="menu_payment_signatories"
-                  name="Signatories"
-                  parent="menu_payment_voucher_config"
-                  action="action_payment_signatory"
-                  sequence="10"/>
-
         <!-- Reports Menu -->
         <menuitem id="menu_payment_voucher_reports"
                   name="Reports"

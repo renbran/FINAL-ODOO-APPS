@@ -33,14 +33,14 @@
                             string="Review &amp; Forward" 
                             type="object" 
                             class="btn-success"
-                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer"
+                            groups="account_payment_final.group_payment_voucher_reviewer"
                             invisible="approval_state != 'under_review' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                     
                     <button name="action_final_approve" 
                             string="Approve &amp; Post" 
                             type="object" 
                             class="btn-success"
-                            groups="payment_voucher_enhanced.group_invoice_approver"
+                            groups="account_payment_final.group_invoice_approver"
                             invisible="approval_state != 'for_approval' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                     
                     <!-- Manual Post Button (only if auto-post failed or disabled) -->
@@ -48,7 +48,7 @@
                             string="Post to Ledger" 
                             type="object" 
                             class="btn-primary"
-                            groups="payment_voucher_enhanced.group_payment_voucher_poster"
+                            groups="account_payment_final.group_payment_voucher_poster"
                             invisible="approval_state != 'approved' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
                             confirm="Manually post this approved invoice/bill?"/>
                     
@@ -56,7 +56,7 @@
                             string="Reject" 
                             type="object" 
                             class="btn-danger"
-                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer,payment_voucher_enhanced.group_invoice_approver"
+                            groups="account_payment_final.group_payment_voucher_reviewer,account_payment_final.group_invoice_approver"
                             invisible="approval_state not in ['under_review', 'for_approval'] or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
                             confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
 
