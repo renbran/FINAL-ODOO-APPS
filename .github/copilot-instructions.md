@@ -2,80 +2,69 @@
 # 🧠 Copilot Instructions for odoo17_final
 
 ## Project Architecture & Big Picture
-- **Odoo 17, Direct Installation**: Production-ready Odoo modules collection. Main deployment is CloudPepper (https://stagingtry.cloudpepper.site/) but works with any Odoo 17 installation.
-- **Custom modules**: Each top-level folder (e.g. `account_payment_approval/`, `enhanced_rest_api/`, `oe_sale_dashboard_17/`) is a standard Odoo module with its own models, views, security, and tests.
-- **Testing/Validation**: Extensive Python validation scripts for syntax, structure, and deployment readiness checks.
-- **Production Environment**: CloudPepper deployment with login `salescompliance@osusproperties.com`.
-- **Module Installation**: Manual via Odoo Apps menu after "Update Apps List" or programmatic via Odoo CLI commands.
+- **Odoo 17, Direct Installation**: Production-ready Odoo modules collection. Main deployment is CloudPepper (https://stagingtry.cloudpepper.site/) with login `salescompliance@osusproperties.com`.
+- **Custom modules**: Each top-level folder is a standard Odoo module. Key examples: `account_payment_approval/` (enhanced payment workflows), `enhanced_rest_api/` (JWT API), `oe_sale_dashboard_17/` (Chart.js dashboards).
+- **Validation-First Development**: Extensive Python validation scripts (`validate_*.py`, `cloudpepper_*.py`) for syntax, structure, and deployment readiness.
+- **Emergency Response System**: Nuclear fix procedures (`nuclear_fix_*.sh`, `emergency_*.py`) for critical production issues.
+- **OSUS Branding**: All modules include OSUS Properties branding with specific color schemes (`#1f4788`, `#f8f9fa`).
 
 ## Developer Workflows
-- **Module Validation**: Run `python validate_module.py` or specific validators like `validate_account_payment_final.py`
-- **Syntax Checking**: Use module-specific validators (e.g. `validate_module_syntax.py`, `validate_xml_syntax.py`)  
-- **Production Testing**: Use comprehensive tests like `final_production_test.py` and `production_readiness_test.py`
-- **Module Updates**: Direct Odoo commands like `odoo --update=module_name --stop-after-init -d database_name`
-- **Installation Testing**: Use `.bat` scripts for Windows or `.sh` scripts for Linux/Mac (e.g. `test_account_payment_final.bat`)
-- **API Testing**: Dedicated scripts like `check_module_installation.py` and `verify_api_installation.py`
-- **Emergency Fixes**: Specialized fix scripts for critical issues (e.g. `emergency_fix.bat`, `nuclear_fix_testerp.sh`)
-- **Deployment Validation**: Always run `cloudpepper_deployment_validation.py` before CloudPepper deployment
+- **Module Validation**: Run `python validate_module.py module_name` or specific validators like `validate_account_payment_final.py`
+- **CloudPepper Deployment**: Always run `cloudpepper_deployment_validation.py` before deployment
+- **Syntax Checking**: Use `python -m py_compile` for Python, `xml.etree.ElementTree.parse()` for XML validation  
+- **Production Testing**: Use `final_production_test.py` and `production_readiness_test.py` for comprehensive checks
+- **Emergency Fixes**: For critical issues, use nuclear fix scripts: `nuclear_fix_testerp.sh`, `emergency_fix.bat`
+- **API Testing**: Use `check_module_installation.py` and `verify_api_installation.py` for endpoint validation
+- **Cache Management**: Use PowerShell commands to clean `__pycache__`, `.DS_Store`, and other temp files
 
-## Project Conventions & Patterns
-- **Module structure**: Each module has `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `demo/`, `static/`, `tests/`.
-- **Naming**: Use snake_case for modules/models. Prefix custom models with module name (e.g. `enhanced_rest_api.api_config`).
-- **Security**: Always define `ir.model.access.csv` and `security.xml` for each module. See `account_payment_approval/security/` for reference.
-- **Testing**: Use `TransactionCase` in `tests/` with `@tagged` decorators (see `tk_sale_split_invoice/tests/test_sale_split_invoice.py`).
-- **Validation Scripts**: Extensive use of Python validation scripts for module readiness (validate_*.py pattern).
-- **Model extension**: Use `_inherit` for extension, `_inherits` for delegation. Example: `account_payment_approval/models/account_payment.py`.
-- **State machines**: Use Selection fields and statusbar in form views (see `account_payment_approval`).
-- **API endpoints**: Use `@http.route` with proper auth/CSRF. See `enhanced_rest_api/` for comprehensive REST API patterns.
-- **Reports**: Use QWeb XML for PDF, controllers for Excel/CSV. See `report_font_enhancement/` for advanced styling.
-- **Config/settings**: Use `res.config.settings` and `ir.config_parameter` for settings.
-- **Error handling**: Use `ValidationError` for constraints, `UserError` for user-facing errors.
-- **Frontend**: Use Chart.js for dashboards (see `oe_sale_dashboard_17/`, `crm_executive_dashboard/`).
-- **CloudPepper deployment**: Production modules are optimized for CloudPepper hosting environment.
+## Critical Architecture Patterns
+- **Unified State Machines**: Use single `state` field with statusbar (see `account_payment_approval/models/account_payment.py` lines 25-42)
+- **Multi-Stage Workflows**: 4-stage payments (draft→submitted→under_review→approved→authorized→posted), 3-stage receipts
+- **Digital Signatures**: Binary fields with `attachment=True` for all workflow stages (`creator_signature`, `reviewer_signature`, etc.)
+- **QR Verification**: Generate with `qrcode` library, verify via public controllers (`/payment/verify/{token}`)
+- **Computed Field Patterns**: Always implement corresponding `_compute_*` methods (e.g., `is_approve_person` requires `_compute_is_approve_person`)
+- **Security Groups**: 6-tier hierarchy: Creator→Reviewer→Approver→Authorizer→Manager→Admin with granular `ir.model.access.csv`
+
+## Frontend Architecture (Odoo 17 Modern Stack)
+- **OWL Components**: Use `/** @odoo-module **/`, `Component.setup()`, `useState()`, `useService()` patterns
+- **SCSS Structure**: Component-based with CSS custom properties (`--bs-primary`, OSUS colors)
+- **Asset Loading**: Bundle in `assets_backend`/`assets_frontend` with proper dependency order
+- **Mobile-First**: All dashboards responsive with Chart.js integration (`crm_executive_dashboard/`, `oe_sale_dashboard_17/`)
 
 ## Integration & Cross-Component Patterns
-- **Excel export**: Use `report_xlsx` if available, but degrade gracefully if not (see `report_xlsx/` module).
-- **Multi-app integration**: Some modules add features to multiple Odoo apps (Accounting, CRM, Sales).
-- **Security**: Multi-level permissions and record rules with careful CloudPepper compatibility.
-- **REST API**: Comprehensive REST endpoints via `enhanced_rest_api/` module with JWT authentication.
-- **Mobile/responsive**: Dashboards and reports are designed for mobile (see `crm_executive_dashboard/`, `oe_sale_dashboard_17/`).
-- **Deployment validation**: Every module includes validation scripts for CloudPepper deployment readiness.
+- **REST API**: JWT authentication via `enhanced_rest_api/` with endpoints for CRM, Sales, Payments
+- **Report Generation**: QWeb XML for PDF (`payment_voucher_report.xml`), controllers for Excel/CSV with `report_xlsx` fallbacks
+- **Multi-App Integration**: Modules extend Account, CRM, Sales, Website with unified UX
+- **Email Integration**: Template-based with `mail.thread` inheritance and activity tracking
+
+## CloudPepper Deployment Specifics
+- **URL**: Production at `https://stagingtry.cloudpepper.site/` (not Docker)
+- **Dependencies**: Install `qrcode num2words pillow` before module installation
+- **File Validation**: All referenced files must exist (check `data/`, `static/`, `views/` paths in manifest)
+- **View-Model Sync**: All view button actions must have corresponding model methods
+- **Field References**: All view field references must exist in model (including computed fields)
+
+## Common Issues & Resolution Patterns
+- **Missing Action Methods**: Add to model if referenced in views (`action_print_multiple_reports`, `action_view_*`)
+- **Missing Computed Fields**: Implement field + `_compute_*` method (see `is_approve_person` pattern)
+- **XML Parse Errors**: Validate with `ET.parse()`, check field existence, verify xpath targets
+- **JS/CSS Conflicts**: Use module-prefixed classes (`.o_module_name_`), avoid global styles
+- **Permission Errors**: Check security groups in `ir.model.access.csv` and record rules in `security.xml`
+- **Cache Issues**: Clean `__pycache__` directories and restart after major changes
 
 ## Examples & References
-- **Module structure**: `account_payment_approval/`, `enhanced_rest_api/`, `crm_executive_dashboard/`
-- **API endpoint**: `enhanced_rest_api/controllers/`, comprehensive REST API with authentication
-- **Form view**: `account_payment_approval/views/account_payment_views.xml`
-- **Testing**: `tk_sale_split_invoice/tests/test_sale_split_invoice.py` with `@tagged` decorators
-- **Advanced styling**: `report_font_enhancement/` for print optimization and accessibility
-- **Dashboard implementation**: `oe_sale_dashboard_17/` for Chart.js integration patterns
+- **Complete Module**: `account_payment_approval/` - enterprise payment workflow with signatures, QR, reports
+- **API Implementation**: `enhanced_rest_api/controllers/` - JWT auth, CRUD endpoints, error handling
+- **Dashboard Pattern**: `oe_sale_dashboard_17/static/src/js/` - Chart.js integration with OWL
+- **Security Model**: `account_payment_approval/security/` - 6-tier groups with access rules
+- **Report Templates**: `account_payment_approval/reports/` - OSUS-branded QWeb with digital signatures
 
-## Common Issues & Troubleshooting
-- **DB errors**: If cron jobs fail, check `fix_cron_in_odoo.py`.
-- **Duplicate records**: See `fix_duplicate_partners.py` for deduplication logic.
-- **JS errors**: Run `fix_dashboard_js.py` for dashboard JS issues.
-- **Permission errors**: Check `ir.model.access.csv` and security groups.
-- **Module dependencies**: Ensure all dependencies are in `__manifest__.py` before install.
-- **Excel export**: If not available, check `xlsxwriter` and `report_xlsx` install.
-- **CloudPepper deployment**: Use `cloudpepper_deployment_validation.py` for pre-deployment checks.
-- **Emergency fixes**: Nuclear fix scripts available for critical production issues.
+## AI Agent Guidelines
+- **Always validate**: Use Python validation scripts before any deployment
+- **Follow patterns**: Match existing module structures, especially manifest dependencies and security
+- **CloudPepper first**: Test all changes against CloudPepper compatibility patterns
+- **Complete implementations**: If adding view elements, ensure all referenced methods/fields exist
+- **OSUS branding**: Maintain consistent styling and color schemes across modules
+- **Emergency ready**: Document any breaking changes for potential nuclear fix procedures
 
-## Tips for AI Agents
-- Always use Python validation scripts for all dev/test/debug workflows.
-- When adding modules, follow structure and manifest patterns of existing modules.
-- Prefer Odoo ORM, API, and security mechanisms over custom code.
-- Always include security definitions for new models.
-- Use Odoo's built-in test infra with `TransactionCase` and `@tagged` decorators.
-- For reports, prefer QWeb XML and follow theming patterns in `report_font_enhancement/`.
-- CloudPepper deployment requires specific compatibility patterns - check existing modules.
-
----
-
-For more details, see module-specific `README.md` files and the comprehensive frontend guide at `.github/instructions/`. Always run validation scripts before deployment and follow CloudPepper compatibility patterns established in existing modules.
-
-## Key Architectural Insights
-- **Validation-First**: Every module change requires comprehensive validation via Python scripts
-- **CloudPepper optimized**: Production environment is CloudPepper hosting (https://stagingtry.cloudpepper.site/) with specific compatibility requirements  
-- **Emergency protocols**: Nuclear fix procedures available for critical production issues
-- **API-centric**: Enhanced REST API provides comprehensive integration capabilities
-- **Mobile-responsive**: All dashboards and reports designed for mobile/tablet use
-- **Deployment automation**: Extensive use of validation and deployment scripts rather than manual processes
+For detailed frontend patterns, see `.github/instructions/Odoo 17 Copilot Agent Instructions - Enhanced with Frontend Best Practices.instructions.md`.

@@ -127,6 +127,7 @@ class AccountPaymentUnified(models.Model):
     
     # Permission fields
     is_approve_person = fields.Boolean(string='Can Approve', compute='_compute_is_approve_person')
+    authorized_approvers_display = fields.Text(string='Authorized Approvers', compute='_compute_authorized_approvers_display')
     
     @api.depends('payment_type')
     def _compute_voucher_type(self):
@@ -356,6 +357,43 @@ class AccountPaymentUnified(models.Model):
                 record.is_approve_person = is_authorizer or is_manager
             else:
                 record.is_approve_person = False
+    
+    @api.depends('state', 'voucher_type')
+    def _compute_authorized_approvers_display(self):
+        """Compute display text for authorized approvers"""
+        for record in self:
+            approvers = []
+            
+            # Get approver groups based on state and voucher type
+            if record.state == 'under_review' and record.voucher_type == 'payment':
+                # Payment vouchers need approval
+                approver_group = self.env.ref('account_payment_approval.group_payment_voucher_approver', raise_if_not_found=False)
+                if approver_group:
+                    approvers.extend([user.name for user in approver_group.users])
+                    
+            elif record.state == 'under_review' and record.voucher_type == 'receipt':
+                # Receipt vouchers skip to authorization
+                authorizer_group = self.env.ref('account_payment_approval.group_payment_voucher_authorizer', raise_if_not_found=False)
+                if authorizer_group:
+                    approvers.extend([user.name for user in authorizer_group.users])
+                    
+            elif record.state == 'approved':
+                # Need authorization
+                authorizer_group = self.env.ref('account_payment_approval.group_payment_voucher_authorizer', raise_if_not_found=False)
+                if authorizer_group:
+                    approvers.extend([user.name for user in authorizer_group.users])
+            
+            # Always include managers
+            manager_group = self.env.ref('account_payment_approval.group_payment_voucher_manager', raise_if_not_found=False)
+            if manager_group:
+                approvers.extend([user.name for user in manager_group.users])
+            
+            # Remove duplicates and format
+            unique_approvers = list(set(approvers))
+            if unique_approvers:
+                record.authorized_approvers_display = ', '.join(unique_approvers)
+            else:
+                record.authorized_approvers_display = 'No authorized approvers found'
     
     @api.model
     def create(self, vals):
