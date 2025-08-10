@@ -54,11 +54,11 @@
         'python': []
     },
     'data': [
-        # Security
+        # Security first
         'security/payment_voucher_security.xml',
         'security/ir.model.access.csv',
         
-        # Data
+        # Data files
         'data/voucher_sequence.xml',
         'data/server_actions.xml',
         
@@ -68,11 +68,11 @@
         'views/res_config_settings_views.xml',
         'views/menu_items.xml',
         
-        # Reports
+        # Reports last to avoid dependency issues
+        'reports/report_actions.xml',
         'reports/payment_voucher_report.xml',
         'reports/receipt_voucher_report.xml',
         'reports/qr_verification_report.xml',
-        'reports/report_actions.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],
