@@ -72,7 +72,8 @@
         'python': ['qrcode', 'pillow', 'num2words']
     },
     'demo': [
-        'demo/demo_payments.xml',
+        # Temporarily disabled demo data to avoid migration conflicts
+        # 'demo/demo_payments.xml',
     ],
     'installable': True,
     'auto_install': False,
