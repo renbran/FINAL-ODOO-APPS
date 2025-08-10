@@ -29,17 +29,6 @@
         <field name="domain">[('payment_type', '=', 'inbound')]</field>
     </record>
 
-    <!-- Verification Report (HTML for web viewing) -->
-    <record id="action_report_voucher_verification_web" model="ir.actions.report">
-        <field name="name">Voucher Verification (Web)</field>
-        <field name="model">account.payment</field>
-        <field name="report_type">qweb-html</field>
-        <field name="report_name">account_payment_approval.report_qr_verification_document</field>
-        <field name="report_file">account_payment_approval.report_qr_verification_document</field>
-        <field name="binding_model_id" ref="account.model_account_payment"/>
-        <field name="binding_type">report</field>
-    </record>
-
     <!-- Audit Trail Report -->
     <record id="action_report_voucher_audit_trail" model="ir.actions.report">
         <field name="name">Payment Voucher Audit Trail</field>
