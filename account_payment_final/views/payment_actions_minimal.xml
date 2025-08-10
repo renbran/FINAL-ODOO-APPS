@@ -163,5 +163,21 @@
             </field>
         </record>
 
+        <!-- Payment Voucher Configuration Action -->
+        <record id="action_payment_voucher_config" model="ir.actions.act_window">
+            <field name="name">Payment Voucher Configuration</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.company</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+            <field name="context">{'form_view_initial_mode': 'edit'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Configure Payment Voucher Settings
+                </p>
+                <p>Configure company settings for payment vouchers.</p>
+            </field>
+        </record>
+
     </data>
 </odoo>

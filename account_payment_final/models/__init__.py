@@ -21,5 +21,3 @@ from . import payment_workflow_stage
 # Integration models
 from . import res_partner
 from . import account_journal
-from . import account_journal
-from . import res_partner
