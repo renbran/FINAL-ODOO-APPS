@@ -1,0 +1,15 @@
+[tool.pylsp-mypy]
+enabled = false
+
+[tool.pyright]
+typeCheckingMode = "off"
+reportMissingImports = false
+reportUndefinedVariable = false
+reportAttributeAccessIssue = false
+
+[tool.pylint]
+disable = "all"
+
+[build-system]
+requires = []
+build-backend = ""
