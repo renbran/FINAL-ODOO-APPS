@@ -124,7 +124,7 @@
     
     <!-- Dashboard and Reports -->
     <menuitem id="menu_payment_approval_dashboard" 
-              name="Dashboard & Reports" 
+              name="Dashboard and Reports" 
               parent="menu_payment_approval_main"
               sequence="30"/>
     
@@ -145,24 +145,6 @@
               action="action_payment_approval_dashboard"
               sequence="10"/>
     
-    <!-- QR Verification -->
-    <menuitem id="menu_qr_verification" 
-              name="QR Verification" 
-              parent="menu_payment_approval_main"
-              sequence="40"/>
-    
-    <record id="action_qr_verification_portal" model="ir.actions.act_url">
-        <field name="name">QR Verification Portal</field>
-        <field name="url">/payment/verify/qr/scan</field>
-        <field name="target">new</field>
-    </record>
-    
-    <menuitem id="menu_qr_verification_portal"
-              name="QR Scanner"
-              parent="menu_qr_verification"
-              action="action_qr_verification_portal"
-              sequence="10"/>
-    
     <!-- Configuration Menu -->
     <menuitem id="menu_payment_approval_config" 
               name="Configuration" 
@@ -173,7 +155,7 @@
     <menuitem id="menu_payment_approval_settings"
               name="Payment Approval Settings"
               parent="menu_payment_approval_config"
-              action="account.action_account_config"
+              action="base.action_res_config_settings"
               sequence="10"/>
     
 </odoo>

@@ -60,6 +60,7 @@
         
         # Data
         'data/voucher_sequence.xml',
+        'data/server_actions.xml',
         
         # Views
         'views/account_payment_views.xml',
