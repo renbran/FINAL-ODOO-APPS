@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Approval Menu Items -->
+    
+    <!-- Main Menu -->
+    <menuitem id="menu_payment_approval_main" 
+              name="Payment Approval" 
+              parent="account.menu_finance"
+              sequence="50"/>
+    
+    <!-- Payment Vouchers Submenu -->
+    <menuitem id="menu_payment_vouchers" 
+              name="Payment Vouchers" 
+              parent="menu_payment_approval_main"
+              sequence="10"/>
+    
+    <!-- All Payment Vouchers -->
+    <menuitem id="menu_payment_vouchers_all"
+              name="All Payment Vouchers"
+              parent="menu_payment_vouchers"
+              action="account.action_account_payments"
+              sequence="10"/>
+    
+    <!-- Payment Vouchers by State -->
+    <record id="action_payment_vouchers_draft" model="ir.actions.act_window">
+        <field name="name">Draft Payment Vouchers</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'draft'), ('payment_type', '=', 'outbound')]</field>
+        <field name="context">{'default_payment_type': 'outbound'}</field>
+    </record>
+    
+    <menuitem id="menu_payment_vouchers_draft"
+              name="Draft Payment Vouchers"
+              parent="menu_payment_vouchers"
+              action="action_payment_vouchers_draft"
+              sequence="20"/>
+    
+    <record id="action_payment_vouchers_submitted" model="ir.actions.act_window">
+        <field name="name">Submitted for Review</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'submitted')]</field>
+    </record>
+    
+    <menuitem id="menu_payment_vouchers_submitted"
+              name="Pending Review"
+              parent="menu_payment_vouchers"
+              action="action_payment_vouchers_submitted"
+              sequence="30"/>
+    
+    <record id="action_payment_vouchers_reviewed" model="ir.actions.act_window">
+        <field name="name">Reviewed - Pending Approval</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'reviewed')]</field>
+    </record>
+    
+    <menuitem id="menu_payment_vouchers_reviewed"
+              name="Pending Approval"
+              parent="menu_payment_vouchers"
+              action="action_payment_vouchers_reviewed"
+              sequence="40"/>
+    
+    <record id="action_payment_vouchers_approved" model="ir.actions.act_window">
+        <field name="name">Approved - Pending Authorization</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'approved')]</field>
+    </record>
+    
+    <menuitem id="menu_payment_vouchers_approved"
+              name="Pending Authorization"
+              parent="menu_payment_vouchers"
+              action="action_payment_vouchers_approved"
+              sequence="50"/>
+    
+    <record id="action_payment_vouchers_authorized" model="ir.actions.act_window">
+        <field name="name">Authorized - Ready to Post</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'authorized')]</field>
+    </record>
+    
+    <menuitem id="menu_payment_vouchers_authorized"
+              name="Ready to Post"
+              parent="menu_payment_vouchers"
+              action="action_payment_vouchers_authorized"
+              sequence="60"/>
+    
+    <!-- Receipt Vouchers Submenu -->
+    <menuitem id="menu_receipt_vouchers" 
+              name="Receipt Vouchers" 
+              parent="menu_payment_approval_main"
+              sequence="20"/>
+    
+    <record id="action_receipt_vouchers_all" model="ir.actions.act_window">
+        <field name="name">All Receipt Vouchers</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payment_type', '=', 'inbound')]</field>
+        <field name="context">{'default_payment_type': 'inbound'}</field>
+    </record>
+    
+    <menuitem id="menu_receipt_vouchers_all"
+              name="All Receipt Vouchers"
+              parent="menu_receipt_vouchers"
+              action="action_receipt_vouchers_all"
+              sequence="10"/>
+    
+    <record id="action_receipt_vouchers_draft" model="ir.actions.act_window">
+        <field name="name">Draft Receipt Vouchers</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('voucher_state', '=', 'draft'), ('payment_type', '=', 'inbound')]</field>
+        <field name="context">{'default_payment_type': 'inbound'}</field>
+    </record>
+    
+    <menuitem id="menu_receipt_vouchers_draft"
+              name="Draft Receipt Vouchers"
+              parent="menu_receipt_vouchers"
+              action="action_receipt_vouchers_draft"
+              sequence="20"/>
+    
+    <!-- Dashboard and Reports -->
+    <menuitem id="menu_payment_approval_dashboard" 
+              name="Dashboard & Reports" 
+              parent="menu_payment_approval_main"
+              sequence="30"/>
+    
+    <record id="action_payment_approval_dashboard" model="ir.actions.act_window">
+        <field name="name">Payment Approval Dashboard</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{
+            'search_default_group_by_state': 1,
+            'search_default_group_by_payment_type': 1
+        }</field>
+    </record>
+    
+    <menuitem id="menu_payment_approval_dashboard_action"
+              name="Approval Dashboard"
+              parent="menu_payment_approval_dashboard"
+              action="action_payment_approval_dashboard"
+              sequence="10"/>
+    
+    <!-- QR Verification -->
+    <menuitem id="menu_qr_verification" 
+              name="QR Verification" 
+              parent="menu_payment_approval_main"
+              sequence="40"/>
+    
+    <record id="action_qr_verification_portal" model="ir.actions.act_url">
+        <field name="name">QR Verification Portal</field>
+        <field name="url">/payment/verify/qr/scan</field>
+        <field name="target">new</field>
+    </record>
+    
+    <menuitem id="menu_qr_verification_portal"
+              name="QR Scanner"
+              parent="menu_qr_verification"
+              action="action_qr_verification_portal"
+              sequence="10"/>
+    
+    <!-- Configuration Menu -->
+    <menuitem id="menu_payment_approval_config" 
+              name="Configuration" 
+              parent="menu_payment_approval_main"
+              groups="account_payment_approval.group_payment_voucher_manager"
+              sequence="50"/>
+    
+    <menuitem id="menu_payment_approval_settings"
+              name="Payment Approval Settings"
+              parent="menu_payment_approval_config"
+              action="account.action_account_config"
+              sequence="10"/>
+    
+</odoo>

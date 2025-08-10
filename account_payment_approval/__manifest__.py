@@ -66,38 +66,25 @@
         'data/qr_verification_data.xml',
         
         # Views
-        'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
-        'views/account_move_views.xml',
-        'views/payment_voucher_views.xml',
-        'views/signature_views.xml',
-        'views/qr_verification_views.xml',
-        'views/kanban_views.xml',
+        'views/menu_items.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/receipt_voucher_report.xml',
+        'reports/qr_verification_report.xml',
         'reports/report_actions.xml',
-        
-        # Portal/Website
-        'views/portal_templates.xml',
-        'views/verification_templates.xml',
-        
-        # Menus
-        'views/menu_items.xml',
-        
-        # Server Actions (legacy)
-        'data/server_actions.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            'account_payment_approval/static/src/js/signature_widget.js',
-            'account_payment_approval/static/src/js/workflow_tracker.js',
-            'account_payment_approval/static/src/css/payment_voucher.css',
+            'account_payment_approval/static/src/js/digital_signature_widget.js',
+            'account_payment_approval/static/src/js/payment_approval_dashboard.js',
+            'account_payment_approval/static/src/js/qr_code_widget.js',
+            'account_payment_approval/static/src/scss/payment_approval.scss',
+            'account_payment_approval/static/src/xml/payment_approval_templates.xml',
         ],
         'web.assets_frontend': [
-            'account_payment_approval/static/src/js/qr_verification.js',
-            'account_payment_approval/static/src/css/verification_portal.css',
+            'account_payment_approval/static/src/scss/payment_approval.scss',
         ],
     },
     'demo': [
