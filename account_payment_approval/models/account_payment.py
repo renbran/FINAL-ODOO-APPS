@@ -23,26 +23,22 @@ class AccountPaymentUnified(models.Model):
     """Unified Payment with single workflow status"""
     _inherit = "account.payment"
     
-    # Override the standard state field to include our enhanced states
+    # Extend the standard state field to include our enhanced states
     state = fields.Selection(
-        selection=[
-            ('draft', 'Draft'),
+        selection_add=[
             ('submitted', 'Submitted'),
             ('under_review', 'Under Review'),
             ('approved', 'Approved'),
             ('authorized', 'Authorized'),
-            ('posted', 'Posted'),
-            ('sent', 'Sent'),
-            ('reconciled', 'Reconciled'),
-            ('cancelled', 'Cancelled'),
             ('rejected', 'Rejected'),
         ],
-        string='Status',
-        required=True,
-        readonly=True,
-        copy=False,
-        tracking=True,
-        default='draft',
+        ondelete={
+            'submitted': 'set default',
+            'under_review': 'set default', 
+            'approved': 'set default',
+            'authorized': 'set default',
+            'rejected': 'set default'
+        },
         help="Status of the payment voucher in the approval workflow"
     )
     
