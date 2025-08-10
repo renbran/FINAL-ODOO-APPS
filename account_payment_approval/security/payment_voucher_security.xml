@@ -6,47 +6,47 @@
         
         <!-- Base Payment Voucher User Group -->
         <record id="group_payment_voucher_user" model="res.groups">
-            <field name="name">Payment Voucher User</field>
-            <field name="comment">Can create and submit payment vouchers for approval</field>
+            <field name="name">OSUS Payment Voucher User</field>
+            <field name="comment">Can create and submit OSUS payment vouchers for approval</field>
             <field name="category_id" ref="base.module_category_accounting"/>
         </record>
         
         <!-- Payment Voucher Reviewer Group -->
         <record id="group_payment_voucher_reviewer" model="res.groups">
-            <field name="name">Payment Voucher Reviewer</field>
-            <field name="comment">Can review submitted payment vouchers</field>
+            <field name="name">OSUS Payment Voucher Reviewer</field>
+            <field name="comment">Can review submitted OSUS payment vouchers</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="implied_ids" eval="[(4, ref('group_payment_voucher_user'))]"/>
         </record>
         
         <!-- Payment Voucher Approver Group -->
         <record id="group_payment_voucher_approver" model="res.groups">
-            <field name="name">Payment Voucher Approver</field>
-            <field name="comment">Can approve payment vouchers after review</field>
+            <field name="name">OSUS Payment Voucher Approver</field>
+            <field name="comment">Can approve OSUS payment vouchers after review</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="implied_ids" eval="[(4, ref('group_payment_voucher_reviewer'))]"/>
         </record>
         
         <!-- Payment Voucher Authorizer Group -->
         <record id="group_payment_voucher_authorizer" model="res.groups">
-            <field name="name">Payment Voucher Authorizer</field>
-            <field name="comment">Can authorize approved payment vouchers</field>
+            <field name="name">OSUS Payment Voucher Authorizer</field>
+            <field name="comment">Can authorize approved OSUS payment vouchers</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="implied_ids" eval="[(4, ref('group_payment_voucher_approver'))]"/>
         </record>
         
         <!-- Payment Voucher Poster Group -->
         <record id="group_payment_voucher_poster" model="res.groups">
-            <field name="name">Payment Voucher Poster</field>
-            <field name="comment">Can post authorized payment vouchers</field>
+            <field name="name">OSUS Payment Voucher Poster</field>
+            <field name="comment">Can post authorized OSUS payment vouchers</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="implied_ids" eval="[(4, ref('group_payment_voucher_authorizer'))]"/>
         </record>
         
         <!-- Payment Voucher Manager Group -->
         <record id="group_payment_voucher_manager" model="res.groups">
-            <field name="name">Payment Voucher Manager</field>
-            <field name="comment">Full access to payment voucher system including reset and configuration</field>
+            <field name="name">OSUS Payment Voucher Manager</field>
+            <field name="comment">Full access to OSUS payment voucher system including reset and configuration</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="implied_ids" eval="[(4, ref('group_payment_voucher_poster'))]"/>
         </record>
