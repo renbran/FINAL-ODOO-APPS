@@ -79,3 +79,23 @@ class ResCompany(models.Model):
         default=True,
         help="Apply OSUS brand styling to reports"
     )
+    
+    voucher_footer_message = fields.Text(
+        string='Voucher Footer Message',
+        default='Thank you for your business. This is a computer-generated payment voucher.',
+        help="Default footer message for payment vouchers"
+    )
+    
+    # Invoice Approval Settings
+    auto_post_approved_invoices = fields.Boolean(
+        string='Auto-Post Approved Invoices',
+        default=False,
+        help="Automatically post invoices when approved"
+    )
+    
+    invoice_approval_threshold = fields.Monetary(
+        string='Invoice Approval Threshold',
+        currency_field='currency_id',
+        default=5000.0,
+        help="Invoice amount threshold requiring approval"
+    )
