@@ -1,7 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- This file is deprecated. Templates have been moved to views/payment_voucher_template.xml -->
-        <!-- This file exists only for backward compatibility during upgrades -->
+        
+        <!-- Professional Payment Voucher Template -->
+        <template id="payment_voucher_professional" name="Professional Payment Voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            
+                            <!-- Document Header -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="o_payment_voucher_header text-center">
+                                        <h2 class="o_payment_voucher_title">
+                                            PAYMENT VOUCHER
+                                        </h2>
+                                        <div class="o_payment_voucher_subtitle">
+                                            Professional Payment Processing Document
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Company Information Section -->
+                            <div class="row mb-4">
+                                <div class="col-8">
+                                    <div class="o_company_info_section">
+                                        <h4 class="o_section_title">Company Information</h4>
+                                        <div class="o_company_details">
+                                            <div class="o_company_name" t-field="o.company_id.name"/>
+                                            <div class="o_company_address">
+                                                <div t-field="o.company_id.street"/>
+                                                <div t-field="o.company_id.street2"/>
+                                                <div>
+                                                    <span t-field="o.company_id.city"/>
+                                                    <span t-field="o.company_id.state_id"/>
+                                                    <span t-field="o.company_id.zip"/>
+                                                </div>
+                                                <div t-field="o.company_id.country_id"/>
+                                            </div>
+                                            <div class="o_company_contact">
+                                                <div t-field="o.company_id.phone"/>
+                                                <div t-field="o.company_id.email"/>
+                                                <div t-field="o.company_id.website"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <div class="o_voucher_meta_section">
+                                        <div class="o_voucher_number">
+                                            <strong>Voucher No:</strong>
+                                            <span t-field="o.voucher_number"/>
+                                        </div>
+                                        <div class="o_voucher_date">
+                                            <strong>Date:</strong>
+                                            <span t-field="o.date" t-options='{"widget": "date"}'/>
+                                        </div>
+                                        <div class="o_voucher_status">
+                                            <strong>Status:</strong>
+                                            <span class="badge" t-attf-class="badge-#{o.approval_state}">
+                                                <t t-esc="dict(o._fields['approval_state'].selection).get(o.approval_state, o.approval_state)"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Details Section -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="o_payment_details_section">
+                                        <h4 class="o_section_title">Payment Details</h4>
+                                        <table class="table table-bordered o_payment_details_table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="o_label_cell"><strong>Payment Type:</strong></td>
+                                                    <td class="o_value_cell">
+                                                        <span t-if="o.payment_type == 'outbound'">Vendor Payment</span>
+                                                        <span t-if="o.payment_type == 'inbound'">Customer Payment</span>
+                                                    </td>
+                                                    <td class="o_label_cell"><strong>Amount:</strong></td>
+                                                    <td class="o_value_cell">
+                                                        <strong class="o_amount_value">
+                                                            <span t-field="o.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                        </strong>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="o_label_cell"><strong>Currency:</strong></td>
+                                                    <td class="o_value_cell" t-field="o.currency_id.name"/>
+                                                    <td class="o_label_cell"><strong>Payment Method:</strong></td>
+                                                    <td class="o_value_cell" t-field="o.journal_id.name"/>
+                                                </tr>
+                                                <tr>
+                                                    <td class="o_label_cell"><strong>Partner:</strong></td>
+                                                    <td class="o_value_cell" t-field="o.partner_id.name"/>
+                                                    <td class="o_label_cell"><strong>Reference:</strong></td>
+                                                    <td class="o_value_cell" t-field="o.ref"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- QR Code Section -->
+                            <div class="row mb-4" t-if="o.qr_code">
+                                <div class="col-12 text-center">
+                                    <div class="o_qr_section">
+                                        <h4 class="o_section_title">Verification QR Code</h4>
+                                        <div class="o_qr_code_container">
+                                            <img t-att-src="'data:image/png;base64,%s' % o.qr_code" 
+                                                 alt="Payment Verification QR Code"
+                                                 class="o_qr_code_image"/>
+                                        </div>
+                                        <p class="o_qr_instruction">
+                                            Scan this QR code to verify payment authenticity
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Approval Workflow Section -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="o_approval_section">
+                                        <h4 class="o_section_title">Approval Workflow</h4>
+                                        <table class="table table-bordered o_approval_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Stage</th>
+                                                    <th>Role</th>
+                                                    <th>Person</th>
+                                                    <th>Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>1. Prepared</strong></td>
+                                                    <td>Creator</td>
+                                                    <td t-field="o.create_uid.name"/>
+                                                    <td t-field="o.create_date" t-options='{"widget": "datetime"}'/>
+                                                    <td><span class="badge badge-success">✓ Complete</span></td>
+                                                </tr>
+                                                <tr t-attf-class="#{o.approval_state in ['review', 'approved', 'authorized', 'posted'] and 'o_stage_active' or 'o_stage_pending'}">
+                                                    <td><strong>2. Review</strong></td>
+                                                    <td>Reviewer</td>
+                                                    <td t-field="o.reviewer_id.name"/>
+                                                    <td t-field="o.review_date" t-options='{"widget": "datetime"}'/>
+                                                    <td>
+                                                        <span t-if="o.approval_state in ['review', 'approved', 'authorized', 'posted']" class="badge badge-success">✓ Complete</span>
+                                                        <span t-else="" class="badge badge-secondary">Pending</span>
+                                                    </td>
+                                                </tr>
+                                                <tr t-attf-class="#{o.approval_state in ['approved', 'authorized', 'posted'] and 'o_stage_active' or 'o_stage_pending'}">
+                                                    <td><strong>3. Approval</strong></td>
+                                                    <td>Approver</td>
+                                                    <td t-field="o.approver_id.name"/>
+                                                    <td t-field="o.approval_date" t-options='{"widget": "datetime"}'/>
+                                                    <td>
+                                                        <span t-if="o.approval_state in ['approved', 'authorized', 'posted']" class="badge badge-success">✓ Complete</span>
+                                                        <span t-else="" class="badge badge-secondary">Pending</span>
+                                                    </td>
+                                                </tr>
+                                                <tr t-attf-class="#{o.approval_state in ['authorized', 'posted'] and 'o_stage_active' or 'o_stage_pending'}">
+                                                    <td><strong>4. Authorization</strong></td>
+                                                    <td>Authorizer</td>
+                                                    <td t-field="o.authorizer_id.name"/>
+                                                    <td t-field="o.authorization_date" t-options='{"widget": "datetime"}'/>
+                                                    <td>
+                                                        <span t-if="o.approval_state in ['authorized', 'posted']" class="badge badge-success">✓ Complete</span>
+                                                        <span t-else="" class="badge badge-secondary">Pending</span>
+                                                    </td>
+                                                </tr>
+                                                <tr t-attf-class="#{o.approval_state == 'posted' and 'o_stage_active' or 'o_stage_pending'}">
+                                                    <td><strong>5. Posted</strong></td>
+                                                    <td>System</td>
+                                                    <td t-field="o.poster_id.name"/>
+                                                    <td t-field="o.posting_date" t-options='{"widget": "datetime"}'/>
+                                                    <td>
+                                                        <span t-if="o.approval_state == 'posted'" class="badge badge-success">✓ Complete</span>
+                                                        <span t-else="" class="badge badge-secondary">Pending</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Section -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="o_footer_section text-center">
+                                        <hr/>
+                                        <p class="o_footer_text">
+                                            This is a computer-generated document. No signature is required.
+                                        </p>
+                                        <div class="o_print_info">
+                                            <small>
+                                                Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/> 
+                                                | Document ID: <span t-field="o.id"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
     </data>
 </odoo>

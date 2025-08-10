@@ -14,7 +14,7 @@
                            statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted"
                            statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","for_authorization":"warning","approved":"success","posted":"success"}'/>
                     
-                    <!-- Workflow action buttons -->
+                    <!-- Workflow buttons -->
                     <button name="action_submit_for_review" 
                             string="Submit for Review" 
                             type="object" 
@@ -36,18 +36,18 @@
                             attrs="{'invisible': [('approval_state', '!=', 'for_authorization')]}"/>
                 </xpath>
                 
-                <!-- Add voucher number after journal field -->
+                <!-- Add voucher number after journal -->
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="voucher_number" readonly="1" attrs="{'invisible': [('voucher_number', '=', '/')]}" 
                            placeholder="Generated automatically..."/>
                 </xpath>
                 
-                <!-- Add remarks field after amount field -->
+                <!-- Add remarks field after amount -->
                 <xpath expr="//field[@name='amount']" position="after">
                     <field name="remarks" placeholder="Enter payment remarks or memo..."/>
                 </xpath>
                 
-                <!-- Add QR code section -->
+                <!-- Add QR code section at the end of sheet -->
                 <xpath expr="//sheet" position="inside">
                     <group string="QR Code Verification" attrs="{'invisible': [('qr_code', '=', False)]}">
                         <field name="qr_code" widget="image" class="oe_avatar" 
@@ -66,7 +66,7 @@
             <field name="inherit_id" ref="account_payment_final.view_account_payment_tree_enhanced"/>
             <field name="arch" type="xml">
                 
-                <!-- Add enhanced fields to tree view -->
+                <!-- Add voucher number and approval state after partner -->
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="voucher_number" optional="show"/>
                     <field name="approval_state" optional="show" widget="badge" 

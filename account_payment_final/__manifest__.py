@@ -70,7 +70,6 @@
         
         # Website/Portal Views
         'views/payment_verification_templates.xml',
-        'views/payment_voucher_template.xml',
     ],
     'assets': {
         'web.assets_backend': [
