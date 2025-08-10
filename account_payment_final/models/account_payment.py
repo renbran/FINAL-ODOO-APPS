@@ -1,713 +1,449 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError, AccessError
-import qrcode
 import base64
-from io import BytesIO
+import qrcode
+import io
 import logging
-import datetime
+from datetime import datetime, timedelta
+from num2words import num2words
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError, AccessError, UserError
+from odoo.tools import html_escape
 
 _logger = logging.getLogger(__name__)
 
-
-def generate_qr_code_payment(value):
-    """Generate QR code for payment data with enhanced error handling"""
-    try:
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4
-        )
-        qr.add_data(value)
-        qr.make(fit=True)
-        
-        img = qr.make_image(fill_color="black", back_color="white")
-        stream = BytesIO()
-        img.save(stream, format="PNG")
-        qr_img = base64.b64encode(stream.getvalue())
-        return qr_img
-    except Exception as e:
-        _logger.error(f"Error generating QR code: {e}")
-        return False
-
-
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
+    _order = 'date desc, id desc'
 
     # ============================================================================
-    # FIELDS
+    # ENHANCED FIELDS
     # ============================================================================
-
-    # QR Code fields
-    qr_code = fields.Binary(
-        string="Payment QR Code",
-        compute='_compute_payment_qr_code',
-        store=True,
-        help="QR code containing payment verification URL"
-    )
     
-    qr_in_report = fields.Boolean(
-        string='Display QR Code in Report',
-        default=True,
-        help="Whether to display QR code in payment voucher report"
-    )
-
-    # Enhanced 4-Stage Approval Workflow State
-    approval_state = fields.Selection([
-        ('draft', 'Draft'),
-        ('under_review', 'Under Review'),
-        ('for_approval', 'For Approval'),
-        ('for_authorization', 'For Authorization'),
-        ('approved', 'Approved'),
-        ('posted', 'Posted'),
-        ('cancelled', 'Cancelled')
-    ], string='Approval State', default='draft', tracking=True, copy=False,
-       help="Current approval state of the payment voucher")
-
-    # Enhanced fields for OSUS voucher system
-    remarks = fields.Text(
-        string='Remarks/Memo',
-        help="Additional remarks or memo for this payment voucher"
-    )
-
-    # Voucher number with automatic generation
+    # Core Voucher Fields
     voucher_number = fields.Char(
         string='Voucher Number',
-        copy=False,
         readonly=True,
-        index=True,
-        default='/',
+        copy=False,
         help="Unique voucher number generated automatically"
     )
     
-    # Smart Button Fields for UI Navigation
-    journal_item_count = fields.Integer(
-        string='Journal Items Count',
-        compute='_compute_journal_item_count',
-        help="Number of journal items related to this payment"
+    approval_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('under_review', 'Under Review'),
+        ('for_approval', 'For Approval'),
+        ('for_authorization', 'For Authorization'),  # Only for payments
+        ('approved', 'Approved'),
+        ('posted', 'Posted'),
+        ('cancelled', 'Cancelled'),
+    ], string='Approval State', default='draft', tracking=True, 
+       help="Current state in the approval workflow")
+    
+    remarks = fields.Text(
+        string='Remarks/Memo',
+        help="Additional notes or remarks for this payment voucher"
     )
     
-    reconciliation_count = fields.Integer(
-        string='Reconciliation Count',
-        compute='_compute_reconciliation_count',
-        help="Number of reconciled move lines"
+    # Workflow Users and Timestamps
+    submitted_by = fields.Many2one('res.users', string='Submitted By', readonly=True)
+    submitted_date = fields.Datetime(string='Submitted Date', readonly=True)
+    
+    reviewed_by = fields.Many2one('res.users', string='Reviewed By', readonly=True)
+    reviewed_date = fields.Datetime(string='Reviewed Date', readonly=True)
+    
+    approved_by = fields.Many2one('res.users', string='Approved By', readonly=True)
+    approved_date = fields.Datetime(string='Approved Date', readonly=True)
+    
+    authorized_by = fields.Many2one('res.users', string='Authorized By', readonly=True)
+    authorized_date = fields.Datetime(string='Authorized Date', readonly=True)
+    
+    posted_by = fields.Many2one('res.users', string='Posted By', readonly=True)
+    posted_date = fields.Datetime(string='Posted Date', readonly=True)
+    
+    # Enhanced Signature Management
+    signatory_ids = fields.Many2many(
+        'payment.signatory',
+        string='Required Signatories',
+        domain="[('is_active', '=', True)]"
     )
     
-    invoice_count = fields.Integer(
-        string='Invoice Count',
-        compute='_compute_invoice_count',
-        help="Number of invoices reconciled with this payment"
-    )
+    creator_signature = fields.Binary(string='Creator Signature')
+    creator_signature_date = fields.Datetime(string='Creator Signature Date')
     
-    # Many2many field for journal items (for smart button)
-    move_line_ids = fields.One2many(
-        'account.move.line',
-        'payment_id',
-        string='Journal Items',
-        readonly=True,
-        help="Journal entries created by this payment"
-    )
+    reviewer_signature = fields.Binary(string='Reviewer Signature')
+    reviewer_signature_date = fields.Datetime(string='Reviewer Signature Date')
     
-    # Reconciled invoices and bills for smart buttons and visibility
-    reconciled_invoice_ids = fields.Many2many(
-        'account.move',
-        string='Reconciled Invoices',
-        compute='_compute_reconciled_invoices',
-        help="Customer invoices reconciled with this payment"
-    )
+    approver_signature = fields.Binary(string='Approver Signature')
+    approver_signature_date = fields.Datetime(string='Approver Signature Date')
     
-    reconciled_bill_ids = fields.Many2many(
-        'account.move',
-        string='Reconciled Bills', 
-        compute='_compute_reconciled_bills',
-        help="Vendor bills reconciled with this payment"
-    )
+    authorizer_signature = fields.Binary(string='Authorizer Signature')
+    authorizer_signature_date = fields.Datetime(string='Authorizer Signature Date')
     
-    # Ensure available payment method line IDs field is available
-    available_payment_method_line_ids = fields.Many2many(
-        'account.payment.method.line',
-        string='Available Payment Methods',
-        compute='_compute_available_payment_method_line_ids',
-        help="Available payment method lines for this journal"
-    )
-
-    # Enhanced workflow fields for 4-stage approval
-    reviewer_id = fields.Many2one(
-        'res.users',
-        string='Reviewed By',
-        copy=False,
-        help="User who reviewed the payment (Stage 1)"
-    )
-
-    reviewer_date = fields.Datetime(
-        string='Review Date',
-        copy=False,
-        help="Date when the payment was reviewed"
-    )
-
-    approver_id = fields.Many2one(
-        'res.users',
-        string='Approved By',
-        copy=False,
-        help="User who approved the payment (Stage 2)"
-    )
-
-    approver_date = fields.Datetime(
-        string='Approval Date',
-        copy=False,
-        help="Date when the payment was approved"
-    )
-
-    authorizer_id = fields.Many2one(
-        'res.users',
-        string='Authorized By',
-        copy=False,
-        help="User who authorized the payment (Stage 3 - Vendor payments only)"
-    )
-
-    authorizer_date = fields.Datetime(
-        string='Authorization Date',
-        copy=False,
-        help="Date when the payment was authorized"
-    )
-
-    authorized_by = fields.Char(
-        string='Final Authorized By',
-        compute='_compute_authorized_by',
-        store=True,
-        help="Name of the person who gave final authorization"
-    )
-
-    actual_approver_id = fields.Many2one(
-        'res.users',
-        string='Posted By User',
-        copy=False,
-        help="User who actually posted the payment",
-        readonly=True
-    )
-
-    destination_account_id = fields.Many2one(
-        'account.account',
-        string='Destination Account',
-        domain="[('account_type', 'in', ['asset_receivable', 'liability_payable', 'asset_cash', 'liability_credit_card'])]",
-        help="Account where the payment will be posted"
-    )
-
-    # Enhanced display name for vouchers
-    display_name = fields.Char(
-        string='Display Name',
-        compute='_compute_display_name',
+    receiver_signature = fields.Binary(string='Receiver Signature')
+    receiver_signature_date = fields.Datetime(string='Receiver Signature Date')
+    
+    # QR Code and Verification
+    qr_code = fields.Binary(string='QR Code', compute='_compute_qr_code', store=True)
+    qr_in_report = fields.Boolean(string='Include QR in Report', default=True)
+    verification_url = fields.Char(string='Verification URL', compute='_compute_verification_url')
+    qr_verification_token = fields.Char(string='QR Verification Token', readonly=True)
+    
+    # Amount in Words
+    amount_in_words = fields.Char(
+        string='Amount in Words',
+        compute='_compute_amount_in_words',
         store=True
     )
-
-    # Color field for kanban view
-    color = fields.Integer(
-        string='Color',
-        compute='_compute_color',
-        store=True
+    
+    # Enhanced Display and Workflow
+    display_name = fields.Char(compute='_compute_display_name', store=True)
+    color = fields.Integer(compute='_compute_color')
+    workflow_step = fields.Integer(default=0, help="Current workflow step number")
+    total_steps = fields.Integer(compute='_compute_total_steps')
+    
+    # Document Information
+    related_document_info = fields.Char(
+        string='Related Document Info',
+        compute='_compute_related_document_info',
+        help="Information about related invoices/bills"
     )
-
+    
     # ============================================================================
     # COMPUTE METHODS
     # ============================================================================
-
-    @api.depends('name', 'payment_type', 'partner_id', 'amount', 'currency_id', 'voucher_number')
-    def _compute_display_name(self):
-        """Compute enhanced display name for vouchers"""
+    
+    @api.depends('payment_type')
+    def _compute_total_steps(self):
+        """Compute total workflow steps based on payment type"""
         for record in self:
-            if record.voucher_number and record.partner_id:
-                payment_type_label = 'Receipt' if record.payment_type == 'inbound' else 'Payment'
-                record.display_name = f"{payment_type_label} Voucher {record.voucher_number} - {record.partner_id.name}"
-            elif record.name and record.partner_id:
-                payment_type_label = 'Receipt' if record.payment_type == 'inbound' else 'Payment'
-                record.display_name = f"{payment_type_label} Voucher {record.name} - {record.partner_id.name}"
+            # Receipts: 3 steps (submit → review → post)
+            # Payments: 5 steps (submit → review → approve → authorize → post)
+            record.total_steps = 3 if record.payment_type == 'inbound' else 5
+    
+    @api.depends('amount', 'currency_id')
+    def _compute_amount_in_words(self):
+        """Convert amount to words with enhanced formatting"""
+        for record in self:
+            if record.amount and record.currency_id:
+                try:
+                    # Use num2words for better conversion
+                    amount_words = num2words(record.amount, lang='en').title()
+                    currency_name = record.currency_id.name
+                    
+                    # Format: "One Thousand Five Hundred United States Dollars Only"
+                    record.amount_in_words = f"{amount_words} {currency_name} Only"
+                except Exception as e:
+                    _logger.warning(f"Error converting amount to words: {e}")
+                    record.amount_in_words = f"{record.currency_id.name} {record.amount:,.2f}"
+            else:
+                record.amount_in_words = ""
+    
+    @api.depends('voucher_number', 'name', 'partner_id', 'payment_type', 'amount')
+    def _compute_display_name(self):
+        """Enhanced display name for better UX"""
+        for record in self:
+            if record.partner_id:
+                payment_type = 'Receipt' if record.payment_type == 'inbound' else 'Payment'
+                voucher_ref = record.voucher_number or record.name or 'New'
+                amount_str = f"{record.currency_id.symbol}{record.amount:,.2f}" if record.amount else ""
+                record.display_name = f"{payment_type} {voucher_ref} - {record.partner_id.name} {amount_str}"
             else:
                 record.display_name = record.voucher_number or record.name or 'New Payment'
-
+    
     @api.depends('approval_state')
     def _compute_color(self):
         """Compute color for kanban view based on approval state"""
         color_map = {
             'draft': 1,          # Light blue
+            'submitted': 2,      # Blue
             'under_review': 3,   # Yellow
             'for_approval': 7,   # Orange
             'for_authorization': 9,  # Red
             'approved': 10,      # Green
             'posted': 10,        # Green
-            'cancelled': 2,      # Gray
+            'cancelled': 8,      # Gray
         }
         for record in self:
             record.color = color_map.get(record.approval_state, 0)
-
-    @api.depends('name', 'amount', 'partner_id', 'date', 'approval_state', 'voucher_number', 'qr_in_report')
-    def _compute_payment_qr_code(self):
-        """Generate QR code for payment voucher verification"""
+    
+    @api.depends('id', 'voucher_number')
+    def _compute_verification_url(self):
+        """Generate verification URL for QR code"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
         for record in self:
-            if record.qr_in_report and record.id:
+            if record.id and base_url:
+                # Generate verification token if not exists
+                if not record.qr_verification_token:
+                    record.qr_verification_token = record._generate_verification_token()
+                record.verification_url = f"{base_url}/payment/verify/{record.qr_verification_token}"
+            else:
+                record.verification_url = ""
+    
+    @api.depends('verification_url', 'qr_in_report')
+    def _compute_qr_code(self):
+        """Generate QR code for payment verification"""
+        for record in self:
+            if record.qr_in_report and record.verification_url:
                 try:
-                    # Get base URL from system parameters
-                    base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
+                    qr = qrcode.QRCode(
+                        version=1,
+                        error_correction=qrcode.constants.ERROR_CORRECT_L,
+                        box_size=10,
+                        border=4,
+                    )
+                    qr.add_data(record.verification_url)
+                    qr.make(fit=True)
                     
-                    if base_url and record._origin.id:
-                        # Create verification URL that points to our controller
-                        qr_data = f"{base_url}/payment/verify/{record._origin.id}"
-                    else:
-                        # Fallback: Include structured payment details for manual verification
-                        voucher_ref = record.voucher_number or record.name or 'Draft Payment'
-                        partner_name = record.partner_id.name if record.partner_id else 'Unknown Partner'
-                        amount_str = f"{record.amount:.2f} {record.currency_id.name if record.currency_id else 'USD'}"
-                        date_str = record.date.strftime('%Y-%m-%d') if record.date else 'Draft'
-                        
-                        # Structured data that can be manually verified
-                        qr_data = f"""PAYMENT VERIFICATION
-Voucher: {voucher_ref}
-Amount: {amount_str}
-To: {partner_name}
-Date: {date_str}
-Status: {record.approval_state.upper()}
-Company: {record.company_id.name}
-Verify at: {base_url}/payment/qr-guide"""
-                    
-                    # Generate the QR code image
-                    record.qr_code = generate_qr_code_payment(qr_data)
+                    img = qr.make_image(fill_color="black", back_color="white")
+                    temp = io.BytesIO()
+                    img.save(temp, format="PNG")
+                    qr_img = temp.getvalue()
+                    record.qr_code = base64.b64encode(qr_img)
                 except Exception as e:
-                    _logger.error(f"Error generating QR code for payment {record.voucher_number or 'Draft'}: {e}")
+                    _logger.warning(f"Error generating QR code: {e}")
                     record.qr_code = False
             else:
                 record.qr_code = False
-
-    @api.depends('state', 'move_id', 'move_id.line_ids')
-    def _compute_journal_item_count(self):
-        """Compute the number of journal items for smart button"""
-        for record in self:
-            if record.state == 'posted' and record.move_id and record.move_id.line_ids:
-                record.journal_item_count = len(record.move_id.line_ids)
-            else:
-                record.journal_item_count = 0
     
     @api.depends('reconciled_invoice_ids', 'reconciled_bill_ids')
-    def _compute_reconciliation_count(self):
-        """Compute the number of reconciled documents for smart button"""
+    def _compute_related_document_info(self):
+        """Compute information about related documents"""
         for record in self:
-            reconciled_count = 0
-            if record.reconciled_invoice_ids:
-                reconciled_count += len(record.reconciled_invoice_ids)
-            if record.reconciled_bill_ids:
-                reconciled_count += len(record.reconciled_bill_ids)
-            record.reconciliation_count = reconciled_count
-    
-    @api.depends('reconciled_invoice_ids', 'reconciled_bill_ids')
-    def _compute_invoice_count(self):
-        """Compute the total number of invoices/bills for smart button"""
-        for record in self:
-            invoice_count = 0
-            if record.reconciled_invoice_ids:
-                invoice_count += len(record.reconciled_invoice_ids)
-            if record.reconciled_bill_ids:
-                invoice_count += len(record.reconciled_bill_ids)
-            record.invoice_count = invoice_count
-    
-    @api.depends('journal_id', 'payment_type')
-    def _compute_available_payment_method_line_ids(self):
-        """Compute available payment method lines based on journal and payment type"""
-        for record in self:
-            if record.journal_id:
-                if record.payment_type == 'inbound':
-                    # For inbound payments, use inbound payment method lines
-                    available_methods = record.journal_id.inbound_payment_method_line_ids
-                elif record.payment_type == 'outbound':
-                    # For outbound payments, use outbound payment method lines
-                    available_methods = record.journal_id.outbound_payment_method_line_ids
+            documents = []
+            
+            # Get related invoices
+            for invoice in record.reconciled_invoice_ids:
+                documents.append({
+                    'name': invoice.name,
+                    'type': 'Customer Invoice' if invoice.move_type == 'out_invoice' else 'Customer Credit Note',
+                    'amount': invoice.amount_total,
+                    'date': invoice.invoice_date,
+                })
+            
+            # Get related bills
+            for bill in record.reconciled_bill_ids:
+                documents.append({
+                    'name': bill.name,
+                    'type': 'Vendor Bill' if bill.move_type == 'in_invoice' else 'Vendor Credit Note',
+                    'amount': bill.amount_total,
+                    'date': bill.invoice_date,
+                })
+            
+            if documents:
+                doc_count = len(documents)
+                if doc_count == 1:
+                    record.related_document_info = f"{documents[0]['name']} ({documents[0]['type']})"
                 else:
-                    available_methods = self.env['account.payment.method.line']
-                
-                record.available_payment_method_line_ids = available_methods
+                    record.related_document_info = f"{doc_count} documents"
             else:
-                record.available_payment_method_line_ids = self.env['account.payment.method.line']
+                record.related_document_info = "No related documents"
     
-    @api.depends('move_id', 'move_id.line_ids', 'move_id.line_ids.matched_debit_ids', 'move_id.line_ids.matched_credit_ids')
-    def _compute_reconciled_invoices(self):
-        """Compute reconciled customer invoices"""
-        for record in self:
-            reconciled_invoices = self.env['account.move']
-            if record.move_id:
-                # Get all reconciled moves from payment lines
-                for line in record.move_id.line_ids:
-                    # Check matched debits and credits
-                    for partial_rec in line.matched_debit_ids + line.matched_credit_ids:
-                        if partial_rec.debit_move_id.move_id.move_type == 'out_invoice':
-                            reconciled_invoices |= partial_rec.debit_move_id.move_id
-                        elif partial_rec.credit_move_id.move_id.move_type == 'out_invoice':
-                            reconciled_invoices |= partial_rec.credit_move_id.move_id
-            record.reconciled_invoice_ids = reconciled_invoices
+    # ============================================================================
+    # WORKFLOW METHODS - ENHANCED
+    # ============================================================================
     
-    @api.depends('move_id', 'move_id.line_ids', 'move_id.line_ids.matched_debit_ids', 'move_id.line_ids.matched_credit_ids')
-    def _compute_reconciled_bills(self):
-        """Compute reconciled vendor bills"""
-        for record in self:
-            reconciled_bills = self.env['account.move']
-            if record.move_id:
-                # Get all reconciled moves from payment lines
-                for line in record.move_id.line_ids:
-                    # Check matched debits and credits
-                    for partial_rec in line.matched_debit_ids + line.matched_credit_ids:
-                        if partial_rec.debit_move_id.move_id.move_type == 'in_invoice':
-                            reconciled_bills |= partial_rec.debit_move_id.move_id
-                        elif partial_rec.credit_move_id.move_id.move_type == 'in_invoice':
-                            reconciled_bills |= partial_rec.credit_move_id.move_id
-            record.reconciled_bill_ids = reconciled_bills
-    
-    def _get_next_voucher_number(self):
-        """Generate next voucher number sequence"""
-        try:
-            if self.payment_type == 'inbound':
-                return self.env['ir.sequence'].next_by_code('payment.voucher.receipt') or '/'
-            else:
-                return self.env['ir.sequence'].next_by_code('payment.voucher.payment') or '/'
-        except:
-            # Fallback sequence generation
-            return self.env['ir.sequence'].next_by_code('payment.voucher') or f"PV{self.env['ir.sequence'].next_by_code('account.payment') or ''}"
-
-    @api.depends('approval_state', 'actual_approver_id', 'write_uid', 'authorizer_id', 'approver_id')
-    def _compute_authorized_by(self):
-        """Compute authorization field showing who approved and posted the payment"""
-        for record in self:
-            if record.actual_approver_id:
-                record.authorized_by = record.actual_approver_id.name
-            elif record.authorizer_id:
-                record.authorized_by = record.authorizer_id.name
-            elif record.approver_id:
-                record.authorized_by = record.approver_id.name
-            elif record.approval_state == 'posted' and record.write_uid:
-                record.authorized_by = record.write_uid.name
-            else:
-                record.authorized_by = record.create_uid.name if record.create_uid else 'System'
-
-    # ============================================================================
-    # ONCHANGE METHODS
-    # ============================================================================
-
-    @api.onchange('payment_type', 'partner_id', 'amount')
-    def _onchange_payment_details(self):
-        """Enhanced onchange for real-time field updates and validations"""
-        if self.approval_state not in ['draft', 'cancelled']:
-            return {
-                'warning': {
-                    'title': _('Warning'),
-                    'message': _('Payment details cannot be changed after submission for approval.')
-                }
-            }
-
-        # Auto-generate voucher number if missing
-        if not self.voucher_number:
-            self._generate_voucher_number()
-
-    @api.onchange('approval_state')
-    def _onchange_approval_state(self):
-        """Real-time status bar updates and field state changes"""
-        if self.approval_state == 'posted' and self.state != 'posted':
-            self.state = 'posted'
-        elif self.approval_state == 'cancelled' and self.state != 'cancel':
-            self.state = 'cancel'
-
-    @api.onchange('journal_id')
-    def _onchange_journal_id_destination_account(self):
-        """Set default destination account based on journal"""
-        if self.journal_id and self.journal_id.default_account_id:
-            self.destination_account_id = self.journal_id.default_account_id.id
-
-    @api.onchange('partner_id')
-    def _onchange_partner_id_enhanced(self):
-        """Enhanced partner change logic"""
-        if self.partner_id:
-            # Auto-populate bank details if available
-            partner_banks = self.partner_id.bank_ids
-            if partner_banks:
-                self.partner_bank_id = partner_banks[0].id
-            
-            # Set destination account for vendor payments
-            if self.payment_type == 'outbound' and not self.destination_account_id:
-                self.destination_account_id = self.partner_id.property_account_payable_id
-
-    # ============================================================================
-    # UTILITY METHODS
-    # ============================================================================
-
-    def _amount_in_words(self):
-        """Convert payment amount to words"""
-        self.ensure_one()
-        try:
-            # Try to use the built-in Odoo method if available
-            if hasattr(self.currency_id, 'amount_to_text'):
-                return self.currency_id.amount_to_text(self.amount)
-            
-            # Fallback to num2words library
-            try:
-                from num2words import num2words
-                amount_text = num2words(self.amount, lang='en', to='currency')
-                # Capitalize first letter of each word
-                return ' '.join(word.capitalize() for word in amount_text.split())
-            except ImportError:
-                # Ultimate fallback - manual conversion for common amounts
-                return self._manual_amount_to_words()
-                
-        except Exception as e:
-            _logger.warning(f"Error converting amount to words: {e}")
-            return f"{self.currency_id.name} {self.amount:,.2f} Only"
-
-    def _manual_amount_to_words(self):
-        """Manual amount to words conversion for basic amounts"""
-        amount = self.amount
-        currency = self.currency_id.name or 'Dollars'
-        
-        if amount == 0:
-            return f"Zero {currency} Only"
-        
-        # Simple conversion for whole numbers up to thousands
-        ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-        teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", 
-                "Sixteen", "Seventeen", "Eighteen", "Nineteen"]
-        tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
-        
-        def convert_hundreds(num):
-            result = ""
-            if num >= 100:
-                result += ones[num // 100] + " Hundred "
-                num %= 100
-            if num >= 20:
-                result += tens[num // 10] + " "
-                num %= 10
-            elif num >= 10:
-                result += teens[num - 10] + " "
-                num = 0
-            if num > 0:
-                result += ones[num] + " "
-            return result.strip()
-        
-        # Split into integer and decimal parts
-        integer_part = int(amount)
-        decimal_part = int((amount - integer_part) * 100)
-        
-        result = ""
-        if integer_part >= 1000000:
-            result += convert_hundreds(integer_part // 1000000) + " Million "
-            integer_part %= 1000000
-        if integer_part >= 1000:
-            result += convert_hundreds(integer_part // 1000) + " Thousand "
-            integer_part %= 1000
-        if integer_part > 0:
-            result += convert_hundreds(integer_part)
-        
-        if not result:
-            result = "Zero"
-        
-        result += f" {currency}"
-        
-        if decimal_part > 0:
-            result += f" and {decimal_part:02d}/100"
-        
-        return result.strip() + " Only"
-
-    # ============================================================================
-    # WORKFLOW METHODS
-    # ============================================================================
-
     def action_submit_for_review(self):
-        """Submit payment for initial review (Stage 1)"""
+        """Submit payment for review with enhanced validation"""
         self.ensure_one()
-        self._check_workflow_permissions('submit')
-        
-        if self.approval_state != 'draft':
-            raise UserError(_("Only draft payments can be submitted for review."))
-        
-        # Enhanced validation before submission
         self._validate_payment_data()
+        self._check_workflow_permission('submit')
         
-        # Generate voucher number if not already generated
         if not self.voucher_number:
             self._generate_voucher_number()
         
-        # Update approval state
-        self.approval_state = 'under_review'
+        # Create activity for reviewer
+        reviewer_group = 'payment_voucher_enhanced.group_payment_voucher_reviewer'
+        reviewer_users = self.env.ref(reviewer_group).users
         
-        self._post_workflow_message('submitted for review')
-        self._send_workflow_notification('review')
+        self.write({
+            'approval_state': 'under_review',
+            'submitted_by': self.env.user.id,
+            'submitted_date': fields.Datetime.now(),
+            'workflow_step': 1,
+        })
         
-        return self._return_success_message(_('Payment has been submitted for review.'))
-
-    def action_review_payment(self):
-        """Review payment and move to next stage (Stage 1 → Stage 2)"""
+        # Create activities for reviewers
+        for user in reviewer_users:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=f'Review Payment Voucher {self.voucher_number}',
+                note=f'Payment voucher for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount:,.2f}',
+                user_id=user.id,
+            )
+        
+        self._send_workflow_notification('submitted')
+        self._post_workflow_message("submitted for review")
+        
+        return self._return_success_notification(_('Payment voucher submitted for review successfully.'))
+    
+    def action_review_approve(self):
+        """Review and approve - moves to next stage based on payment type"""
         self.ensure_one()
-        self._check_workflow_permissions('review')
+        self._check_workflow_permission('review')
         
-        if self.approval_state != 'under_review':
-            raise UserError(_("Only payments under review can be reviewed."))
+        # For receipts, go directly to approved
+        # For payments, go to for_approval
+        if self.payment_type == 'inbound':
+            next_state = 'approved'
+            next_step = 2
+            activity_group = 'payment_voucher_enhanced.group_payment_voucher_poster'
+            message = "reviewed and approved (receipt workflow)"
+        else:
+            next_state = 'for_approval'
+            next_step = 2
+            activity_group = 'payment_voucher_enhanced.group_payment_voucher_approver'
+            message = "reviewed and moved to approval stage"
         
-        # Set review fields
-        self.reviewer_id = self.env.user
-        self.reviewer_date = fields.Datetime.now()
+        self.write({
+            'approval_state': next_state,
+            'reviewed_by': self.env.user.id,
+            'reviewed_date': fields.Datetime.now(),
+            'workflow_step': next_step,
+        })
         
-        # Determine next stage based on payment type
-        if self.payment_type == 'outbound':  # Vendor payment
-            self.approval_state = 'for_approval'
-            next_stage_msg = "sent for approval"
-            notification_type = 'approval'
-        else:  # Customer receipt - skip to approved
-            self.approval_state = 'approved'
-            next_stage_msg = "approved and ready for posting"
-            notification_type = 'posting'
+        # Create activities for next stage
+        next_users = self.env.ref(activity_group).users
+        for user in next_users:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=f'{"Approve" if next_state == "for_approval" else "Post"} Payment Voucher {self.voucher_number}',
+                note=f'Payment voucher for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount:,.2f}',
+                user_id=user.id,
+            )
         
-        self._post_workflow_message(f"reviewed and {next_stage_msg}")
-        self._send_workflow_notification(notification_type)
+        self._send_workflow_notification('reviewed')
+        self._post_workflow_message(message)
         
-        return self._return_success_message(_('Payment has been reviewed successfully.'))
-
+        return self._return_success_notification(_('Payment voucher reviewed successfully.'))
+    
     def action_approve_payment(self):
-        """Approve payment (Stage 2 → Stage 3 for vendor, Stage 2 → Auto-post for customer)"""
+        """Approve payment (only for outbound payments)"""
         self.ensure_one()
-        self._check_workflow_permissions('approve')
-        
-        if self.payment_type == 'outbound' and self.approval_state != 'for_approval':
-            raise UserError(_("Only vendor payments waiting for approval can be approved."))
-        elif self.payment_type == 'inbound' and self.approval_state != 'under_review':
-            raise UserError(_("Only customer receipts under review can be approved."))
-        
-        # Set approval fields
-        self.approver_id = self.env.user
-        self.approver_date = fields.Datetime.now()
-        
-        # Determine next stage based on payment type
-        if self.payment_type == 'outbound':  # Vendor payment
-            self.approval_state = 'for_authorization'
-            next_stage_msg = "sent for authorization"
-            notification_type = 'authorization'
-            
-            self._post_workflow_message(f"approved and {next_stage_msg}")
-            self._send_workflow_notification(notification_type)
-            
-            return self._return_success_message(_('Payment has been approved successfully.'))
-        else:  # Customer receipt - Auto-post after approval
-            self.approval_state = 'approved'
-            self._post_workflow_message("approved and ready for posting")
-            
-            # Auto-post customer receipts after approval
-            try:
-                self.action_post_payment()
-                return self._return_success_message(_('Payment has been approved and posted successfully.'))
-            except Exception as e:
-                # If auto-posting fails, keep it approved for manual posting
-                _logger.warning(f"Auto-posting failed for payment {self.voucher_number}: {str(e)}")
-                self._send_workflow_notification('posting')
-                return self._return_success_message(_('Payment has been approved. Please post manually due to technical issue.'))
-
-    def action_authorize_payment(self):
-        """Authorize vendor payment (Stage 3 → Auto-post) - Vendor payments only"""
-        self.ensure_one()
-        self._check_workflow_permissions('authorize')
+        self._check_workflow_permission('approve')
         
         if self.payment_type != 'outbound':
-            raise UserError(_("Authorization stage only applies to vendor payments."))
+            raise UserError(_("This action is only available for outbound payments."))
         
-        if self.approval_state != 'for_authorization':
-            raise UserError(_("Only vendor payments waiting for authorization can be authorized."))
+        self.write({
+            'approval_state': 'for_authorization',
+            'approved_by': self.env.user.id,
+            'approved_date': fields.Datetime.now(),
+            'workflow_step': 3,
+        })
         
-        # Set authorization fields
-        self.authorizer_id = self.env.user
-        self.authorizer_date = fields.Datetime.now()
-        self.approval_state = 'approved'
+        # Create activities for authorizers
+        authorizer_users = self.env.ref('payment_voucher_enhanced.group_payment_voucher_authorizer').users
+        for user in authorizer_users:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=f'Authorize Payment Voucher {self.voucher_number}',
+                note=f'Payment voucher for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount:,.2f}',
+                user_id=user.id,
+            )
         
+        self._send_workflow_notification('approved')
+        self._post_workflow_message("approved and moved to authorization stage")
+        
+        return self._return_success_notification(_('Payment voucher approved successfully.'))
+    
+    def action_authorize_payment(self):
+        """Authorize payment (final approval before posting)"""
+        self.ensure_one()
+        self._check_workflow_permission('authorize')
+        
+        self.write({
+            'approval_state': 'approved',
+            'authorized_by': self.env.user.id,
+            'authorized_date': fields.Datetime.now(),
+            'workflow_step': 4,
+        })
+        
+        # Create activities for posters
+        poster_users = self.env.ref('payment_voucher_enhanced.group_payment_voucher_poster').users
+        for user in poster_users:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=f'Post Payment Voucher {self.voucher_number}',
+                note=f'Payment voucher for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount:,.2f}',
+                user_id=user.id,
+            )
+        
+        self._send_workflow_notification('authorized')
         self._post_workflow_message("authorized and ready for posting")
         
-        # Auto-post vendor payments after authorization
-        try:
-            self.action_post_payment()
-            return self._return_success_message(_('Payment has been authorized and posted successfully.'))
-        except Exception as e:
-            # If auto-posting fails, keep it approved for manual posting
-            _logger.warning(f"Auto-posting failed for payment {self.voucher_number}: {str(e)}")
-            self._send_workflow_notification('posting')
-            return self._return_success_message(_('Payment has been authorized. Please post manually due to technical issue.'))
-
+        return self._return_success_notification(_('Payment voucher authorized successfully.'))
+    
     def action_post_payment(self):
-        """Post payment after all approvals (Final stage - This overrides the default post button)"""
+        """Post the payment (final step)"""
         self.ensure_one()
+        self._check_workflow_permission('post')
         
-        # Check if user has permission to post
-        if not self.env.user.has_group('account.group_account_manager') and \
-           not self.env.user.has_group('account_payment_final.group_payment_poster'):
-            raise UserError(_("You do not have permission to post payments."))
-        
-        # Allow posting for approved payments only (remove 'authorized' to enforce single approval state)
-        if self.approval_state != 'approved':
-            raise UserError(_("Only approved payments can be posted. Current state: %s") % self.approval_state)
-        
-        # Additional validation before posting
+        # Validate one more time before posting
         self._validate_payment_data()
         
-        # Auto-set destination account if not specified
-        if not self.destination_account_id and self.payment_type == 'outbound':
-            self.destination_account_id = self.partner_id.property_account_payable_id
+        # Post the payment using Odoo's standard method
+        self.action_post()
         
-        # Set posting fields BEFORE posting
-        self.actual_approver_id = self.env.user
+        self.write({
+            'approval_state': 'posted',
+            'posted_by': self.env.user.id,
+            'posted_date': fields.Datetime.now(),
+            'workflow_step': self.total_steps,
+        })
         
-        # Post the payment with error handling
-        try:
-            # Call the super method to actually post to ledger
-            result = super(AccountPayment, self).action_post()
-            
-            # Update approval state after successful posting
-            self.approval_state = 'posted'
-            
-            self._post_workflow_message("posted to ledger")
-            self._send_workflow_notification('posted')
-            
-            return result
-            
-        except Exception as e:
-            # Rollback approval state if posting fails
-            self.approval_state = 'approved'
-            _logger.error(f"Failed to post payment {self.voucher_number}: {str(e)}")
-            raise UserError(_("Failed to post payment: %s") % str(e))
-
+        # Close all activities
+        self.activity_ids.action_done()
+        
+        self._send_workflow_notification('posted')
+        self._post_workflow_message("posted successfully")
+        
+        return self._return_success_notification(_('Payment voucher posted successfully.'))
+    
     def action_reject_payment(self):
         """Reject payment and return to draft"""
         self.ensure_one()
-        
-        if self.approval_state not in ['under_review', 'for_approval', 'for_authorization']:
-            raise UserError(_("Only payments in review/approval stages can be rejected."))
-        
-        # Check user permissions for rejection based on current stage
         self._check_rejection_permissions()
         
-        # Clear relevant fields and return to draft
+        # Reset to draft
+        self.write({
+            'approval_state': 'draft',
+            'workflow_step': 0,
+        })
+        
+        # Clear workflow fields based on current stage
         self._clear_workflow_fields()
-        self.approval_state = 'draft'
         
-        self._post_workflow_message("rejected and returned to draft for revision")
+        # Close all activities
+        self.activity_ids.action_done()
         
-        return self._return_success_message(_('Payment has been rejected and returned to draft.'))
-
+        self._send_workflow_notification('rejected')
+        self._post_workflow_message("rejected and returned to draft")
+        
+        return self._return_success_notification(_('Payment voucher rejected and returned to draft.'))
+    
     # ============================================================================
     # HELPER METHODS
     # ============================================================================
-
+    
     def _generate_voucher_number(self):
         """Generate unique voucher number using sequence"""
         if not self.voucher_number:
-            sequence_code = 'payment.voucher' if self.payment_type == 'outbound' else 'receipt.voucher'
+            sequence_code = 'payment.voucher.out' if self.payment_type == 'outbound' else 'receipt.voucher.in'
             
             # Try to get sequence, create if not exists
-            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
+            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code), ('company_id', '=', self.company_id.id)], limit=1)
             if not sequence:
                 sequence = self._create_voucher_sequence(sequence_code)
             
             self.voucher_number = sequence.next_by_id()
-
+    
     def _create_voucher_sequence(self, sequence_code):
         """Create voucher sequence if it doesn't exist"""
-        sequence_name = 'Payment Voucher' if self.payment_type == 'outbound' else 'Receipt Voucher'
-        prefix = 'PV' if self.payment_type == 'outbound' else 'RV'
+        if self.payment_type == 'outbound':
+            sequence_name = 'Payment Voucher'
+            prefix = 'PV'
+        else:
+            sequence_name = 'Receipt Voucher'
+            prefix = 'RV'
         
         return self.env['ir.sequence'].create({
             'name': sequence_name,
@@ -716,7 +452,12 @@ Verify at: {base_url}/payment/qr-guide"""
             'padding': 5,
             'company_id': self.company_id.id or False,
         })
-
+    
+    def _generate_verification_token(self):
+        """Generate secure verification token"""
+        import secrets
+        return secrets.token_urlsafe(32)
+    
     def _validate_payment_data(self):
         """Enhanced validation for payment data"""
         if not self.partner_id:
@@ -727,624 +468,465 @@ Verify at: {base_url}/payment/qr-guide"""
             raise ValidationError(_("Currency must be specified."))
         if not self.journal_id:
             raise ValidationError(_("Journal must be specified."))
-
-    def _check_workflow_permissions(self, action):
+        if not self.date:
+            raise ValidationError(_("Payment date must be specified."))
+        
+        # Check for large amounts requiring remarks
+        max_amount = self.company_id.max_approval_amount or 10000.0
+        if self.amount > max_amount and not self.remarks:
+            raise ValidationError(_("Remarks are required for payments above %s %s") % (max_amount, self.currency_id.name))
+    
+    def _check_workflow_permission(self, action):
         """Check if user has permission for workflow action"""
         permission_map = {
-            'submit': 'account.group_account_user',
-            'review': 'account_payment_final.group_payment_voucher_reviewer',
-            'approve': 'account_payment_final.group_payment_voucher_approver',
-            'authorize': 'account_payment_final.group_payment_voucher_authorizer',
-            'post': 'account_payment_final.group_payment_voucher_poster',
+            'submit': 'payment_voucher_enhanced.group_payment_voucher_user',
+            'review': 'payment_voucher_enhanced.group_payment_voucher_reviewer',
+            'approve': 'payment_voucher_enhanced.group_payment_voucher_approver',
+            'authorize': 'payment_voucher_enhanced.group_payment_voucher_authorizer',
+            'post': 'payment_voucher_enhanced.group_payment_voucher_poster',
         }
         
         required_group = permission_map.get(action)
         if required_group and not self.env.user.has_group(required_group):
             raise AccessError(_("You don't have permission to %s payments.") % action)
-
+    
     def _check_rejection_permissions(self):
-        """Check rejection permissions based on current stage"""
+        """Check if user can reject at current stage"""
         current_stage = self.approval_state
         
         if current_stage == 'under_review':
-            if not self.env.user.has_group('account_payment_final.group_payment_voucher_reviewer'):
+            if not self.env.user.has_group('payment_voucher_enhanced.group_payment_voucher_reviewer'):
                 raise AccessError(_("You don't have permission to reject payments at review stage."))
         elif current_stage == 'for_approval':
-            if not self.env.user.has_group('account_payment_final.group_payment_voucher_approver'):
+            if not self.env.user.has_group('payment_voucher_enhanced.group_payment_voucher_approver'):
                 raise AccessError(_("You don't have permission to reject payments at approval stage."))
         elif current_stage == 'for_authorization':
-            if not self.env.user.has_group('account_payment_final.group_payment_voucher_authorizer'):
+            if not self.env.user.has_group('payment_voucher_enhanced.group_payment_voucher_authorizer'):
                 raise AccessError(_("You don't have permission to reject payments at authorization stage."))
-
+        else:
+            raise AccessError(_("Cannot reject payment in current state."))
+    
     def _clear_workflow_fields(self):
         """Clear workflow fields when rejecting"""
-        current_stage = self.approval_state
-        
-        if current_stage == 'under_review':
-            self.reviewer_id = False
-            self.reviewer_date = False
-        elif current_stage == 'for_approval':
-            self.approver_id = False
-            self.approver_date = False
-        elif current_stage == 'for_authorization':
-            self.authorizer_id = False
-            self.authorizer_date = False
-
+        clear_fields = {
+            'submitted_by': False,
+            'submitted_date': False,
+            'reviewed_by': False,
+            'reviewed_date': False,
+            'approved_by': False,
+            'approved_date': False,
+            'authorized_by': False,
+            'authorized_date': False,
+        }
+        self.write(clear_fields)
+    
     def _post_workflow_message(self, action):
         """Post message to chatter for workflow actions"""
-        self.message_post(
-            body=f"Payment voucher {self.voucher_number} {action} by {self.env.user.name}",
-            subject=f"Payment Voucher {action.title()}"
+        body = _("Payment voucher %s %s by %s") % (
+            self.voucher_number or self.name,
+            action,
+            self.env.user.name
         )
-
+        self.message_post(
+            body=body,
+            subject=_("Payment Voucher %s") % action.title()
+        )
+    
     def _send_workflow_notification(self, notification_type):
         """Send email notifications for workflow actions"""
-        # Implement email notifications based on company settings
-        if self.company_id.send_approval_notifications:
-            # This would be implemented with email templates
-            pass
-
-    def _return_success_message(self, message):
-        """Return success message for workflow actions"""
+        template_map = {
+            'submitted': 'payment_voucher_enhanced.email_template_payment_submitted',
+            'reviewed': 'payment_voucher_enhanced.email_template_payment_reviewed',
+            'approved': 'payment_voucher_enhanced.email_template_payment_approved',
+            'authorized': 'payment_voucher_enhanced.email_template_payment_authorized',
+            'posted': 'payment_voucher_enhanced.email_template_payment_posted',
+            'rejected': 'payment_voucher_enhanced.email_template_payment_rejected',
+        }
+        
+        template_ref = template_map.get(notification_type)
+        if template_ref and self.company_id.send_approval_notifications:
+            try:
+                template = self.env.ref(template_ref, raise_if_not_found=False)
+                if template:
+                    template.send_mail(self.id, force_send=True)
+            except Exception as e:
+                _logger.warning(f"Failed to send notification email: {e}")
+    
+    def _return_success_notification(self, message):
+        """Return success notification to user"""
         return {
             'type': 'ir.actions.client',
-            'tag': 'reload',
+            'tag': 'display_notification',
             'params': {
+                'title': _('Success'),
                 'message': message,
                 'type': 'success',
+                'sticky': False,
             }
         }
-
+    
+    # ============================================================================
+    # REPORT HELPER METHODS
+    # ============================================================================
+    
+    def get_related_document_info(self):
+        """Get detailed information about related documents for report"""
+        self.ensure_one()
+        
+        documents = []
+        
+        # Get related invoices
+        for invoice in self.reconciled_invoice_ids:
+            documents.append(invoice)
+        
+        # Get related bills  
+        for bill in self.reconciled_bill_ids:
+            documents.append(bill)
+        
+        if documents:
+            doc_count = len(documents)
+            references = ", ".join([doc.name for doc in documents[:3]])  # Show first 3
+            if doc_count > 3:
+                references += f" and {doc_count - 3} more"
+                
+            if doc_count == 1:
+                label = "Related Invoice/Bill"
+            else:
+                label = f"Related Documents ({doc_count})"
+                
+            return {
+                'count': doc_count,
+                'label': label,
+                'references': references,
+                'documents': documents,
+            }
+        else:
+            return {
+                'count': 0,
+                'label': 'Related Document',
+                'references': 'No related documents',
+                'documents': [],
+            }
+    
+    def get_signatory_info(self):
+        """Get signatory information for report display"""
+        self.ensure_one()
+        
+        signatories = []
+        
+        # Creator (always present)
+        signatories.append({
+            'role': 'Created By',
+            'name': self.create_uid.name,
+            'date': self.create_date,
+            'signature': self.creator_signature,
+            'required': True,
+        })
+        
+        # Reviewer
+        if self.reviewed_by:
+            signatories.append({
+                'role': 'Reviewed By',
+                'name': self.reviewed_by.name,
+                'date': self.reviewed_date,
+                'signature': self.reviewer_signature,
+                'required': True,
+            })
+        
+        # For payments (4 signatures required)
+        if self.payment_type == 'outbound':
+            if self.approved_by:
+                signatories.append({
+                    'role': 'Approved By',
+                    'name': self.approved_by.name,
+                    'date': self.approved_date,
+                    'signature': self.approver_signature,
+                    'required': True,
+                })
+            
+            if self.authorized_by:
+                signatories.append({
+                    'role': 'Authorized By',
+                    'name': self.authorized_by.name,
+                    'date': self.authorized_date,
+                    'signature': self.authorizer_signature,
+                    'required': True,
+                })
+        
+        # Posted by (final)
+        if self.posted_by:
+            signatories.append({
+                'role': 'Posted By',
+                'name': self.posted_by.name,
+                'date': self.posted_date,
+                'signature': None,  # No signature required for posting
+                'required': True,
+            })
+        
+        # Receiver signature (for manual collection)
+        signatories.append({
+            'role': 'Received By',
+            'name': 'Recipient Signature',
+            'date': None,
+            'signature': self.receiver_signature,
+            'required': False,
+        })
+        
+        return signatories
+    
     # ============================================================================
     # ACTION METHODS
     # ============================================================================
-
-    def action_view_approval_details(self):
-        """Show approval details and current status information"""
+    
+    def action_view_workflow_history(self):
+        """Show detailed workflow history"""
         self.ensure_one()
         
         return {
             'type': 'ir.actions.act_window',
-            'name': f'Approval Details - {self.voucher_number or self.name}',
+            'name': f'Workflow History - {self.voucher_number}',
             'res_model': 'account.payment',
             'res_id': self.id,
             'view_mode': 'form',
-            'view_id': self.env.ref('account_payment_final.view_account_payment_form_enhanced').id,
+            'view_id': self.env.ref('payment_voucher_enhanced.view_payment_workflow_history').id,
             'target': 'new',
-            'context': {
-                'default_approval_state': self.approval_state,
-                'show_approval_details': True,
+        }
+    
+    def action_print_voucher_osus(self):
+        """Print OSUS branded payment voucher"""
+        self.ensure_one()
+        
+        if self.approval_state == 'draft':
+            raise UserError(_("Cannot print voucher for draft payments. Please submit for review first."))
+        
+        return self.env.ref('payment_voucher_enhanced.action_report_payment_voucher_osus').report_action(self)
+    
+    def action_verify_qr_code(self):
+        """Open QR code verification in new tab"""
+        self.ensure_one()
+        
+        if not self.verification_url:
+            raise UserError(_("QR verification URL not available."))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.verification_url,
+            'target': 'new',
+        }
+
+
+# ============================================================================
+# PAYMENT SIGNATORY MODEL
+# ============================================================================
+
+class PaymentSignatory(models.Model):
+    _name = 'payment.signatory'
+    _description = 'Payment Signatory'
+    _order = 'sequence, name'
+
+    name = fields.Char(string='Signatory Name', required=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    role = fields.Selection([
+        ('creator', 'Creator'),
+        ('reviewer', 'Reviewer'),
+        ('approver', 'Approver'),
+        ('authorizer', 'Authorizer'),
+        ('receiver', 'Receiver'),
+    ], string='Role', required=True)
+    
+    user_id = fields.Many2one('res.users', string='User', required=True)
+    company_id = fields.Many2one('res.company', string='Company', 
+                                default=lambda self: self.env.company)
+    is_active = fields.Boolean(string='Active', default=True)
+    
+    signature_image = fields.Binary(string='Signature Image')
+    signature_style = fields.Selection([
+        ('manual', 'Manual Signature'),
+        ('digital', 'Digital Signature'),
+        ('stamp', 'Stamp'),
+    ], string='Signature Style', default='manual')
+    
+    notes = fields.Text(string='Notes')
+
+
+# ============================================================================
+# ACCOUNT MOVE INTEGRATION
+# ============================================================================
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+    
+    # Add workflow for invoices/bills
+    approval_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('posted', 'Posted'),
+        ('cancelled', 'Cancelled'),
+    ], string='Approval State', default='draft', tracking=True)
+    
+    voucher_count = fields.Integer(
+        string='Payment Vouchers',
+        compute='_compute_voucher_count'
+    )
+    
+    @api.depends('line_ids.payment_id')
+    def _compute_voucher_count(self):
+        """Count related payment vouchers"""
+        for move in self:
+            vouchers = self.env['account.payment'].search([
+                '|',
+                ('reconciled_invoice_ids', 'in', move.ids),
+                ('reconciled_bill_ids', 'in', move.ids)
+            ])
+            move.voucher_count = len(vouchers)
+    
+    def action_view_vouchers(self):
+        """View related payment vouchers"""
+        self.ensure_one()
+        vouchers = self.env['account.payment'].search([
+            '|',
+            ('reconciled_invoice_ids', 'in', self.ids),
+            ('reconciled_bill_ids', 'in', self.ids)
+        ])
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Related Payment Vouchers',
+            'res_model': 'account.payment',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', vouchers.ids)],
+            'context': {'default_partner_id': self.partner_id.id}
+        }
+    
+    def action_submit_invoice_for_approval(self):
+        """Submit invoice/bill for approval workflow"""
+        self.ensure_one()
+        
+        if self.move_type not in ['in_invoice', 'out_invoice']:
+            raise UserError(_("Approval workflow is only available for invoices and bills."))
+        
+        self.approval_state = 'submitted'
+        
+        # Create activity for approvers
+        approver_group = 'payment_voucher_enhanced.group_invoice_approver'
+        if self.env.ref(approver_group, raise_if_not_found=False):
+            approver_users = self.env.ref(approver_group).users
+            for user in approver_users:
+                self.activity_schedule(
+                    'mail.mail_activity_data_todo',
+                    summary=f'Approve Invoice {self.name}',
+                    note=f'Invoice for {self.partner_id.name} - Amount: {self.currency_id.symbol}{self.amount_total:,.2f}',
+                    user_id=user.id,
+                )
+        
+        self.message_post(
+            body=f"Invoice {self.name} submitted for approval by {self.env.user.name}",
+            subject="Invoice Submitted for Approval"
+        )
+        
+        return self._return_success_notification(_('Invoice submitted for approval.'))
+    
+    def action_approve_invoice(self):
+        """Approve invoice/bill"""
+        self.ensure_one()
+        
+        if not self.env.user.has_group('payment_voucher_enhanced.group_invoice_approver'):
+            raise AccessError(_("You don't have permission to approve invoices."))
+        
+        self.approval_state = 'approved'
+        self.activity_ids.action_done()
+        
+        self.message_post(
+            body=f"Invoice {self.name} approved by {self.env.user.name}",
+            subject="Invoice Approved"
+        )
+        
+        return self._return_success_notification(_('Invoice approved successfully.'))
+    
+    def _return_success_notification(self, message):
+        """Return success notification"""
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': message,
+                'type': 'success',
+                'sticky': False,
             }
         }
 
-    def action_print_osus_voucher(self):
-        """Print OSUS branded payment voucher"""
-        if self.approval_state == 'draft':
-            raise UserError(_("Cannot print voucher for draft payments. Please submit for approval first."))
-        
-        return self.env.ref('account_payment_final.action_report_payment_voucher_osus_enhanced').report_action(self)
 
-    def action_generate_qr_code(self):
-        """Generate QR code for payment verification"""
-        self.ensure_one()
-        
-        if not self.qr_code:
-            # Force QR code generation
-            self._compute_payment_qr_code()
-        
-        if self.qr_code:
-            return self._return_success_message(_('QR Code generated successfully.'))
-        else:
-            raise UserError(_('Failed to generate QR Code. Please try again.'))
+# ============================================================================
+# RES CONFIG SETTINGS
+# ============================================================================
 
-    def action_view_qr_verification(self):
-        """Open QR verification page in browser"""
-        self.ensure_one()
-        
-        if not self.qr_code:
-            raise UserError(_('QR Code has not been generated yet. Please generate QR Code first.'))
-        
-        return {
-            'type': 'ir.actions.act_url',
-            'url': self.get_verification_url(),
-            'target': 'new',
-            'name': _('Payment Verification Page')
-        }
-
-    def get_verification_url(self):
-        """Get the public verification URL for this payment"""
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        return f"{base_url}/payment/verify/{self.id}"
-
-    def get_qr_code_url(self):
-        """Get the QR code image URL for this payment"""
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        return f"{base_url}/payment/qr_code/{self.id}"
-
-    def action_cancel(self):
-        """Enhanced cancel action with proper validation"""
-        for record in self:
-            if record.state == 'posted':
-                if not self.env.user.has_group('account.group_account_manager'):
-                    raise UserError(_("Only account managers can cancel posted payments."))
-                
-                record.approval_state = 'cancelled'
-                record._post_workflow_message("cancelled")
-            else:
-                record.approval_state = 'cancelled'
-        
-        return super(AccountPayment, self).action_cancel()
-
-    def _can_bypass_approval_workflow(self):
-        """
-        Determine if a payment can bypass the approval workflow based on various conditions.
-        Returns a dictionary with 'can_bypass' boolean and 'reason' string.
-        """
-        self.ensure_one()
-        
-        # Check if payment is created from invoice registration
-        is_from_invoice = bool(self.reconciled_invoice_ids or 
-                              (hasattr(self, 'invoice_ids') and self.invoice_ids) or
-                              self.ref and 'INV/' in str(self.ref))
-        
-        # Check payment amount thresholds
-        company_currency = self.company_id.currency_id
-        amount_in_company_currency = self.amount
-        if self.currency_id != company_currency:
-            amount_in_company_currency = self.currency_id._convert(
-                self.amount, company_currency, self.company_id, self.date or fields.Date.today()
-            )
-        
-        # Threshold for auto-approval (configurable via system parameters)
-        auto_approval_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_final.auto_approval_threshold', '1000.0'))
-        
-        small_payment_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
-            'account_payment_final.small_payment_threshold', '100.0'))
-        
-        # Check user permissions
-        user = self.env.user
-        is_account_manager = user.has_group('account.group_account_manager')
-        is_payment_manager = user.has_group('account_payment_final.group_payment_manager')
-        is_payment_approver = user.has_group('account_payment_final.group_payment_approver')
-        can_bypass_approval = user.has_group('account_payment_final.group_payment_bypass_approval')
-        
-        # Conditions for bypassing approval workflow
-        
-        # 1. User has explicit bypass permission
-        if can_bypass_approval:
-            return {'can_bypass': True, 'reason': 'user has bypass approval permission'}
-        
-        # 2. Account managers can bypass for small amounts
-        if is_account_manager and amount_in_company_currency <= auto_approval_threshold:
-            return {'can_bypass': True, 'reason': f'account manager posting payment under {auto_approval_threshold} threshold'}
-        
-        # 3. Payment managers and approvers can bypass for very small amounts from invoices
-        if (is_payment_manager or is_payment_approver) and is_from_invoice and amount_in_company_currency <= small_payment_threshold:
-            return {'can_bypass': True, 'reason': f'payment from invoice under {small_payment_threshold} threshold'}
-        
-        # 4. Internal transfers between company accounts (if applicable)
-        if self.payment_type == 'transfer' and is_payment_manager:
-            return {'can_bypass': True, 'reason': 'internal transfer by payment manager'}
-        
-        # 5. Petty cash payments (if payment method indicates)
-        if self.journal_id.name and 'petty' in self.journal_id.name.lower() and amount_in_company_currency <= small_payment_threshold:
-            return {'can_bypass': True, 'reason': 'petty cash payment under threshold'}
-        
-        # 6. Emergency payments (if marked in ref or memo)
-        emergency_keywords = ['emergency', 'urgent', 'critical', 'immediate']
-        if (self.ref and any(keyword in self.ref.lower() for keyword in emergency_keywords)) or \
-           (self.remarks and any(keyword in self.remarks.lower() for keyword in emergency_keywords)):
-            if is_payment_approver or is_account_manager:
-                return {'can_bypass': True, 'reason': 'emergency payment by authorized user'}
-        
-        # 7. Automatic payment reconciliation (from bank statements)
-        if hasattr(self, 'statement_line_id') and self.statement_line_id:
-            return {'can_bypass': True, 'reason': 'automatic bank reconciliation'}
-        
-        # Default: cannot bypass
-        return {'can_bypass': False, 'reason': 'approval workflow required'}
-
-    def action_post(self):
-        """Enhanced action_post with flexible workflow logic"""
-        for record in self:
-            # Check posting permissions first
-            if not self.env.user.has_group('account.group_account_manager') and \
-               not self.env.user.has_group('account_payment_final.group_payment_poster') and \
-               not self.env.user.has_group('account_payment_final.group_payment_voucher_approver'):
-                raise UserError(_("You do not have permission to post payments."))
-            
-            # Handle different approval states
-            if hasattr(record, 'approval_state') and record.approval_state:
-                
-                # If already posted, prevent double posting
-                if record.approval_state == 'posted':
-                    raise UserError(_("Payment is already posted."))
-                
-                # If cancelled, cannot post
-                if record.approval_state == 'cancelled':
-                    raise UserError(_("Cannot post cancelled payment."))
-                
-                # If approved, allow posting
-                if record.approval_state == 'approved':
-                    result = super(AccountPayment, record).action_post()
-                    record.approval_state = 'posted'
-                    record.actual_approver_id = self.env.user
-                    record._post_workflow_message("manually posted to ledger")
-                    return result
-                
-                # For other states, allow posting if user has appropriate permissions
-                elif record.approval_state in ['draft', 'under_review', 'for_approval', 'for_authorization']:
-                    # Check if user can bypass workflow
-                    can_bypass = record._can_bypass_approval_workflow()
-                    
-                    if can_bypass or self.env.user.has_group('account.group_account_manager'):
-                        # Auto-approve and post
-                        reason = can_bypass.get('reason', 'account manager override') if can_bypass else 'account manager override'
-                        _logger.info(f"Payment {record.name} posting with override: {reason}")
-                        
-                        record.approval_state = 'approved'
-                        record.actual_approver_id = self.env.user
-                        record._post_workflow_message(f"approved and posting: {reason}")
-                        
-                        # Post the payment
-                        result = super(AccountPayment, record).action_post()
-                        record.approval_state = 'posted'
-                        record._post_workflow_message("posted to ledger")
-                        return result
-                    else:
-                        # Suggest workflow completion
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'title': _('Approval Required'),
-                                'message': _('This payment requires approval before posting. Please use the approval workflow buttons or contact your manager.'),
-                                'type': 'warning',
-                                'sticky': False,
-                            }
-                        }
-                else:
-                    raise UserError(_("Payment state is invalid for posting: %s") % record.approval_state)
-            
-            # For payments without approval workflow, use default behavior
-            else:
-                return super(AccountPayment, record).action_post()
-
-    def action_draft(self):
-        """Enhanced draft action for cancelled payments"""
-        for record in self:
-            if record.state != 'cancel':
-                raise UserError(_("Only cancelled payments can be set back to draft."))
-            
-            if not self.env.user.has_group('account.group_account_manager'):
-                raise UserError(_("Only account managers can reset payments to draft."))
-            
-            record.approval_state = 'draft'
-            record._post_workflow_message("reset to draft")
-        
-        self.write({'state': 'draft'})
-
-    # ============================================================================
-    # SMART BUTTON ACTION METHODS
-    # ============================================================================
-
-    def action_view_journal_items(self):
-        """Open journal items related to this payment"""
-        self.ensure_one()
-        
-        # Check if payment has been posted and has journal entries
-        if not self.move_id:
-            if self.state == 'draft':
-                raise UserError(_("Journal entries are created when the payment is posted. This payment is still in draft state."))
-            else:
-                raise UserError(_("No journal entries found for this payment. The payment may not have been processed correctly."))
-        
-        # Get all move lines for this payment
-        move_lines = self.move_id.line_ids
-        
-        if not move_lines:
-            raise UserError(_("No journal items found for this payment."))
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': f'Journal Items - {self.voucher_number or self.name}',
-            'res_model': 'account.move.line',
-            'view_mode': 'tree,form',
-            'domain': [('move_id', '=', self.move_id.id)],
-            'context': {
-                'default_move_id': self.move_id.id,
-                'search_default_posted': 1,
-                'create': False,  # Prevent creating new journal items from this view
-            },
-            'target': 'current',
-        }
-
-    def action_view_reconciliation(self):
-        """Open reconciled invoices/bills for this payment"""
-        self.ensure_one()
-        
-        domain = []
-        invoices = self.env['account.move']
-        
-        if self.reconciled_invoice_ids:
-            invoices |= self.reconciled_invoice_ids
-        if self.reconciled_bill_ids:
-            invoices |= self.reconciled_bill_ids
-            
-        if not invoices:
-            raise UserError(_("No reconciled documents found for this payment."))
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': f'Reconciled Documents - {self.voucher_number or self.name}',
-            'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', invoices.ids)],
-            'context': {
-                'default_payment_id': self.id,
-                'search_default_posted': 1,
-            },
-            'target': 'current',
-        }
-
-    def action_view_invoice(self):
-        """Open invoices/bills related to this payment - alias for reconciliation"""
-        # This is essentially the same as reconciliation view but with different naming
-        self.ensure_one()
-        
-        invoices = self.env['account.move']
-        
-        if self.reconciled_invoice_ids:
-            invoices |= self.reconciled_invoice_ids
-        if self.reconciled_bill_ids:
-            invoices |= self.reconciled_bill_ids
-            
-        if not invoices:
-            raise UserError(_("No invoices/bills found for this payment."))
-        
-        view_name = "Invoices" if self.payment_type == 'inbound' else "Bills"
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': f'{view_name} - {self.voucher_number or self.name}',
-            'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', invoices.ids)],
-            'context': {
-                'default_payment_id': self.id,
-                'search_default_posted': 1,
-            },
-            'target': 'current',
-        }
-
-    def action_view_qr_verification(self):
-        """Open QR code verification portal"""
-        self.ensure_one()
-        
-        if not self.qr_code:
-            raise UserError(_("No QR code available for this payment."))
-        
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
-        verification_url = f"{base_url}/payment/verify/{self.id}"
-        
-        return {
-            'type': 'ir.actions.act_url',
-            'url': verification_url,
-            'target': 'new',
-            'name': f'QR Verification - {self.voucher_number or self.name}',
-        }
-
-    # ============================================================================
-    # OVERRIDE METHODS
-    # ============================================================================
-
-    @api.model
-    def default_get(self, fields):
-        """Enhanced default_get to ensure voucher number is generated immediately"""
-        res = super(AccountPayment, self).default_get(fields)
-        
-        # Generate voucher number immediately for new records
-        if 'voucher_number' in fields and not res.get('voucher_number'):
-            payment_type = res.get('payment_type', 'outbound')
-            
-            if payment_type == 'inbound':
-                sequence_code = 'payment.voucher.receipt'
-                prefix = 'RV'
-            else:
-                sequence_code = 'payment.voucher.payment'
-                prefix = 'PV'
-            
-            # Get or create sequence
-            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
-            if not sequence:
-                sequence = self.env['ir.sequence'].create({
-                    'name': f"{'Receipt' if payment_type == 'inbound' else 'Payment'} Voucher",
-                    'code': sequence_code,
-                    'prefix': prefix,
-                    'padding': 5,
-                    'company_id': self.env.company.id,
-                })
-            
-            try:
-                res['voucher_number'] = sequence.next_by_id()
-                _logger.info(f"Generated voucher number on form load: {res['voucher_number']}")
-            except Exception as e:
-                # Fallback
-                import datetime
-                now = datetime.datetime.now()
-                res['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
-                _logger.warning(f"Fallback voucher number: {res['voucher_number']} due to: {e}")
-        
-        return res
-
-    @api.model
-    @api.model
-    def create(self, vals):
-        """Enhanced create method with voucher number generation"""
-        # Generate voucher number if not provided or is default '/'
-        if not vals.get('voucher_number') or vals.get('voucher_number') == '/':
-            payment_type = vals.get('payment_type', 'outbound')
-            
-            # Try to get existing sequence or create one
-            if payment_type == 'inbound':
-                sequence_code = 'payment.voucher.receipt'
-                prefix = 'RV'
-                name = 'Receipt Voucher'
-            else:
-                sequence_code = 'payment.voucher.payment'
-                prefix = 'PV'
-                name = 'Payment Voucher'
-            
-            # Get or create sequence
-            sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
-            if not sequence:
-                sequence = self.env['ir.sequence'].create({
-                    'name': name,
-                    'code': sequence_code,
-                    'prefix': prefix,
-                    'padding': 5,
-                    'company_id': vals.get('company_id', self.env.company.id),
-                })
-            
-            try:
-                vals['voucher_number'] = sequence.next_by_id()
-                _logger.info(f"Generated voucher number: {vals['voucher_number']}")
-            except Exception as e:
-                # Fallback if sequence fails
-                import datetime
-                now = datetime.datetime.now()
-                vals['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
-                _logger.warning(f"Fallback voucher number generated: {vals['voucher_number']} due to error: {e}")
-
-        payment = super(AccountPayment, self).create(vals)
-        
-        # Ensure voucher number is set if somehow missed
-        if not payment.voucher_number or payment.voucher_number == '/':
-            payment._generate_voucher_number()
-        
-        # Log the creation
-        if vals.get('remarks'):
-            payment._post_workflow_message(f"created with remarks: {vals['remarks']}")
-        
-        payment._post_workflow_message(f"voucher {payment.voucher_number} created")
-        
-        return payment
-
-    def write(self, vals):
-        """Enhanced write method with real-time state management and audit tracking"""
-        # Prevent modification of critical fields when not in draft
-        restricted_fields = ['partner_id', 'amount', 'currency_id', 'payment_type']
-        if any(field in vals for field in restricted_fields):
-            for record in self:
-                if record.approval_state not in ['draft', 'cancelled']:
-                    raise UserError(_("Cannot modify payment details after submission for approval."))
-
-        # Track state changes for audit
-        for record in self:
-            if vals.get('approval_state') and vals['approval_state'] != record.approval_state:
-                old_state = record.approval_state
-                new_state = vals['approval_state']
-                record._post_workflow_message(f"state changed from {old_state} to {new_state}")
-
-            # Handle standard Odoo posting
-            if vals.get('state') == 'posted' and record.state != 'posted':
-                if record.approval_state not in ['approved', 'posted']:
-                    vals['approval_state'] = 'posted'
-                    vals['actual_approver_id'] = self.env.user.id
-                    if not record.approver_id:
-                        vals['approver_id'] = self.env.user.id
-                        vals['approver_date'] = fields.Datetime.now()
-
-        result = super(AccountPayment, self).write(vals)
-
-        # Trigger QR code regeneration if relevant fields changed
-        if any(field in vals for field in ['partner_id', 'amount', 'approval_state', 'qr_in_report']):
-            self._compute_payment_qr_code()
-
-        return result
-
-    @api.constrains('amount', 'partner_id', 'approval_state')
-    def _check_payment_requirements(self):
-        """Enhanced validation constraints for payment requirements"""
-        for record in self:
-            if record.approval_state != 'draft':
-                record._validate_payment_data()
-
-    def unlink(self):
-        """Enhanced unlink method with proper validation"""
-        for record in self:
-            if record.approval_state not in ['draft', 'cancelled']:
-                raise UserError(_("You can only delete draft or cancelled payments."))
-            if record.state == 'posted':
-                raise UserError(_("You cannot delete posted payments."))
-        
-        return super(AccountPayment, self).unlink()
-
-    # ============================================================================
-    # UTILITY METHODS
-    # ============================================================================
-
-    def _get_voucher_data(self):
-        """Get formatted data for voucher printing"""
-        self.ensure_one()
-        
-        # Format amount in words (if needed for check printing)
-        amount_in_words = ""
-        try:
-            from num2words import num2words
-            amount_in_words = num2words(self.amount, lang='en').title()
-        except ImportError:
-            amount_in_words = f"{self.currency_id.name} {self.amount:,.2f}"
-
-        return {
-            'voucher_type': 'Payment Voucher' if self.payment_type == 'outbound' else 'Receipt Voucher',
-            'amount_in_words': amount_in_words,
-            'currency_symbol': self.currency_id.symbol,
-            'formatted_date': self.date.strftime('%d %B %Y') if self.date else '',
-            'company_logo_url': self.company_id.logo_web if self.company_id.logo_web else '',
-            'is_posted': self.approval_state == 'posted',
-            'approval_date': self.write_date.strftime('%d/%m/%Y %H:%M') if self.write_date and self.approval_state == 'posted' else '',
-            'voucher_number': self.voucher_number,
-            'approval_state': self.approval_state,
-        }
-
-    @api.model
-    def get_osus_branding_data(self):
-        """Get OSUS branding data for reports"""
-        return {
-            'primary_color': '#800020',
-            'secondary_color': '#ffd700',
-            'website': 'www.osusproperties.com',
-            'logo_url': 'https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png'
-        }
-
-    @api.model
-    def get_approval_statistics(self):
-        """Get approval workflow statistics for dashboard"""
-        domain = [('payment_type', 'in', ['outbound', 'inbound'])]
-        
-        stats = {}
-        for state in ['draft', 'under_review', 'for_approval', 'for_authorization', 'approved', 'posted', 'cancelled']:
-            stats[state] = self.search_count(domain + [('approval_state', '=', state)])
-        
-        return stats
-
-
-class AccountPaymentRegister(models.TransientModel):
-    """Enhanced payment registration wizard"""
-    _inherit = 'account.payment.register'
-
-    remarks = fields.Text(
-        string='Remarks/Memo',
-        help="Additional remarks for the payment voucher"
+class ResConfigSettings(models.TransientModel):
+    _inherit = 'res.config.settings'
+    
+    # Payment Voucher Settings
+    auto_post_approved_payments = fields.Boolean(
+        related='company_id.auto_post_approved_payments',
+        readonly=False
+    )
+    
+    max_approval_amount = fields.Monetary(
+        related='company_id.max_approval_amount',
+        readonly=False
+    )
+    
+    send_approval_notifications = fields.Boolean(
+        related='company_id.send_approval_notifications',
+        readonly=False
+    )
+    
+    use_osus_branding = fields.Boolean(
+        related='company_id.use_osus_branding',
+        readonly=False
+    )
+    
+    voucher_footer_message = fields.Text(
+        related='company_id.voucher_footer_message',
+        readonly=False
     )
 
-    def _create_payment_vals_from_wizard(self, batch_result):
-        """Override to include remarks in payment creation"""
-        payment_vals = super()._create_payment_vals_from_wizard(batch_result)
-        
-        if self.remarks:
-            payment_vals['remarks'] = self.remarks
-            
-        return payment_vals
+
+# ============================================================================
+# RES COMPANY EXTENSION
+# ============================================================================
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+    
+    # OSUS Payment Settings
+    auto_post_approved_payments = fields.Boolean(
+        string='Auto-Post Approved Payments',
+        default=False,
+        help="Automatically post payments when approved"
+    )
+    
+    max_approval_amount = fields.Monetary(
+        string='Maximum Approval Amount',
+        currency_field='currency_id',
+        default=10000.0,
+        help="Maximum amount that can be approved without additional authorization"
+    )
+    
+    send_approval_notifications = fields.Boolean(
+        string='Send Email Notifications',
+        default=True,
+        help="Send email notifications for approval workflow"
+    )
+    
+    use_osus_branding = fields.Boolean(
+        string='Use OSUS Branding',
+        default=True,
+        help="Apply OSUS brand styling to reports"
+    )
+    
+    voucher_footer_message = fields.Text(
+        string='Voucher Footer Message',
+        default='Thank you for your business with OSUS Real Estate',
+        help="Custom footer message for payment vouchers"
+    )

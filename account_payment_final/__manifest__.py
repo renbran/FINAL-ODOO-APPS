@@ -1,96 +1,76 @@
 {
-    'name': 'Account Payment Final - Enhanced Workflow',
+    'name': 'Enhanced Payment Voucher System',
     'version': '17.0.1.0.0',
     'category': 'Accounting/Payments',
-    'summary': 'Enhanced payment voucher system with 4-stage approval workflow and QR verification',
+    'summary': 'Advanced Payment Voucher with Multi-level Approval and Digital Signatures',
     'description': """
-        Account Payment Final - Enhanced Workflow
-        ==========================================
-        
-        This module provides a comprehensive payment voucher system with:
-        
-        Features:
-        ---------
-        • 4-stage approval workflow (Reviewer → Approver → Authorizer → Poster)
-        • QR code verification system for payment authentication
-        • Enhanced security with role-based access control
-        • Professional voucher reports with company branding
-        • Automated voucher numbering with configurable sequences
-        • Email notifications for approval workflow stages
-        • Mobile-responsive design for modern browsers
-        • Comprehensive audit trail and activity logging
-        • Print-optimized layouts with professional styling
-        • Web-based QR verification portal
-        
-        Technical Features:
-        ------------------
-        • Odoo 17 compatible with modern ORM patterns
-        • OWL framework integration for frontend components
-        • REST API endpoints for QR verification
-        • PostgreSQL optimized database structure
-        • Docker-ready deployment configuration
-        • CloudPepper hosting compatible
-        
-        This module transforms standard Odoo payment vouchers into
-        a professional, secure, and user-friendly payment management system.
+        Enhanced Payment Voucher System for OSUS Real Estate with:
+        - 4-stage approval workflow for payments (Create → Review → Approve → Authorize → Post)
+        - 3-stage approval workflow for receipts (Create → Review → Post)
+        - Digital signature capture and management
+        - QR code verification system with secure URLs
+        - OSUS branded professional report templates
+        - Email notifications and Odoo activity tracking
+        - Role-based access control with granular permissions
+        - Integration with invoices and bills workflow
+        - Real-time workflow tracking and audit trails
+        - Amount in words conversion
+        - Multi-signatory support (4 for payments, 2 for receipts)
     """,
-    'author': 'Odoo Development Team',
-    'website': 'https://www.odoo.com',
-    'license': 'LGPL-3',
+    'author': 'OSUS Real Estate Development Team',
+    'website': 'https://www.osus.ae',
     'depends': [
         'base',
         'account',
-        'web',
         'mail',
+        'web',
         'portal',
+        'payment',
         'website',
     ],
     'data': [
-        # Data and Sequences (Load First)
-        'data/payment_sequences.xml',
-        
-        # Security (Load After Data)
-        'security/payment_security.xml',
+        # Security - Load first
+        'security/security_groups.xml',
         'security/ir.model.access.csv',
         
-        # Actions (Load Before Views)
-        'views/payment_actions_minimal.xml',
+        # Data and Configuration
+        'data/sequences.xml',
+        'data/email_templates.xml',
+        'data/workflow_stages.xml',
         
-        # Main Views (Load After Models/Security) - MINIMAL SAFE
+        # Views
+        'views/assets.xml',
+        'views/payment_signatory_views.xml',
         'views/account_payment_views.xml',
+        'views/account_move_views.xml',
         'views/menus.xml',
         
-        # Ultra Safe Views (NO OWL DIRECTIVES)
-        'views/account_payment_views_ultra_safe.xml',
-        
-        # NO ADVANCED VIEWS TEMPORARILY
-        # 'views/account_payment_views_advanced.xml',
-        
-        # Reports - MINIMAL
-        'reports/payment_voucher_report.xml',
-        'reports/payment_voucher_actions.xml',
-        
-        # NO QWeb TEMPLATES TEMPORARILY
-        # 'reports/payment_voucher_template.xml',
-        # 'reports/payment_verification_templates.xml',
+        # Reports
+        'reports/report_actions.xml',
+        'reports/payment_voucher_template.xml',
+        'reports/receipt_template.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            # ULTRA MINIMAL - Only emergency CSS
-            'account_payment_final/static/src/scss/emergency_fix.scss',
+            'payment_voucher_enhanced/static/src/scss/variables.scss',
+            'payment_voucher_enhanced/static/src/scss/payment_styles.scss',
+            'payment_voucher_enhanced/static/src/js/payment_workflow.js',
+            'payment_voucher_enhanced/static/src/js/qr_code_field.js',
+            'payment_voucher_enhanced/static/src/js/signature_capture.js',
         ],
-        # NO OTHER ASSETS TO PREVENT CONFLICTS
+        'web.assets_frontend': [
+            'payment_voucher_enhanced/static/src/scss/frontend_styles.scss',
+        ],
+        'web.report_assets_common': [
+            'payment_voucher_enhanced/static/src/scss/report_styles.scss',
+        ],
     },
     'external_dependencies': {
-        'python': ['qrcode', 'pillow']
+        'python': ['qrcode', 'pillow', 'num2words']
     },
-    'demo': [
-        'demo/demo_payments.xml',
-    ],
-    'post_init_hook': 'post_init_hook',
-    'uninstall_hook': 'uninstall_hook',
+    'demo': [],
     'installable': True,
     'auto_install': False,
-    'application': False,
-    'sequence': 10
+    'application': True,
+    'license': 'LGPL-3',
 }

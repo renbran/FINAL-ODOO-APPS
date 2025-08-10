@@ -1,212 +1,175 @@
-/* OSUS Payment Voucher Custom Styles */
-
 :root {
-    --osus-primary: #800020;
-    --osus-secondary: #FFD700;
+    --osus-primary: #6B2B47;
+    --osus-secondary: #8B1538;
+    --osus-gold: #D4AF37;
     --osus-light: #f8f9fa;
-    --osus-dark: #212529;
+    --osus-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Payment Voucher Form Enhancements */
-.o_payment_statusbar .o_statusbar_status.o_arrow_button_current {
-    background-color: var(--osus-primary) !important;
+// Enhanced Title Section
+.oe_title {
+    .o_voucher_number_title {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        color: var(--osus-primary);
+        font-size: 1.8em;
+        margin: 0 0 10px 0;
+        
+        input {
+            color: var(--osus-primary) !important;
+            font-weight: 600;
+            border: 2px solid var(--osus-primary);
+            border-radius: 6px;
+            padding: 8px 12px;
+            background: rgba(107, 43, 71, 0.05);
+            
+            &:focus {
+                box-shadow: 0 0 0 3px rgba(107, 43, 71, 0.2);
+                border-color: var(--osus-secondary);
+            }
+        }
+    }
 }
 
-.o_voucher_number_title {
-    color: var(--osus-primary);
-    font-weight: 600;
+// Enhanced Statusbar
+.o_payment_statusbar {
+    .o_statusbar_status {
+        transition: var(--osus-transition);
+        
+        &.o_arrow_button_current {
+            background: linear-gradient(135deg, var(--osus-primary), var(--osus-secondary)) !important;
+            border-color: var(--osus-primary) !important;
+            color: white !important;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        &.o_arrow_button_done {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+            border-color: #28a745 !important;
+            color: white !important;
+        }
+    }
 }
 
-.o_payment_voucher_notebook .nav-link.active {
-    border-bottom: 3px solid var(--osus-primary);
-    color: var(--osus-primary);
-}
-
-.o_amount_field input {
-    font-size: 1.2em;
-    font-weight: 600;
-    color: var(--osus-primary);
-}
-
-/* Approval Workflow Styling */
+// Workflow Container
 .o_approval_workflow_container {
     background: linear-gradient(135deg, var(--osus-light) 0%, #ffffff 100%);
-    border-radius: 8px;
-    padding: 20px;
-    margin: 15px 0;
-}
-
-.o_approval_status_group .o_field_widget.badge {
-    font-size: 1em;
-    padding: 8px 12px;
-}
-
-.o_approval_details {
-    border-left: 4px solid var(--osus-primary);
-    padding-left: 15px;
-}
-
-/* QR Code Section */
-.o_qr_verification_container {
-    text-align: center;
-    padding: 20px;
-}
-
-.o_qr_display {
-    background: white;
+    border: 2px solid var(--osus-primary);
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
+    margin: 15px 0;
+    box-shadow: 0 4px 12px rgba(107, 43, 71, 0.1);
+    
+    h5 {
+        color: var(--osus-primary);
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .progress {
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--osus-primary), var(--osus-gold));
+            font-weight: 600;
+            transition: width 0.6s ease;
+        }
+    }
 }
 
-.o_qr_code_image {
-    border: 3px solid var(--osus-primary);
-    border-radius: 8px;
-}
-
-.o_qr_description {
-    margin-top: 10px;
-    font-style: italic;
-}
-
-/* Button Styling */
+// Enhanced Buttons
 .o_payment_submit_approval {
-    background: linear-gradient(135deg, var(--osus-primary) 0%, #a0002b 100%);
-    border: none;
+    background: linear-gradient(135deg, var(--osus-primary), var(--osus-secondary)) !important;
+    border: none !important;
+    color: white !important;
     font-weight: 600;
-}
-
-.o_payment_approve_post {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    border: none;
-    font-weight: 600;
-}
-
-.o_payment_reject {
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-    border: none;
-    font-weight: 600;
-    color: #212529;
-}
-
-/* Tree View Enhancements */
-.o_list_view .o_data_row .o_field_badge {
-    font-size: 0.85em;
-    font-weight: 600;
-}
-
-.o_list_view .o_data_row[data-approval_state="draft"] {
-    background-color: rgba(0, 123, 255, 0.05);
-}
-
-.o_list_view .o_data_row[data-approval_state="submitted"] {
-    background-color: rgba(255, 193, 7, 0.05);
-}
-
-.o_list_view .o_data_row[data-approval_state="approved"],
-.o_list_view .o_data_row[data-approval_state="posted"] {
-    background-color: rgba(40, 167, 69, 0.05);
-}
-
-.o_list_view .o_data_row[data-approval_state="rejected"],
-.o_list_view .o_data_row[data-approval_state="cancelled"] {
-    background-color: rgba(220, 53, 69, 0.05);
-}
-
-/* Form View Enhancements */
-.o_form_view .oe_title h1 {
-    color: var(--osus-primary);
-}
-
-.o_form_view .oe_title h3 {
-    color: var(--osus-dark);
-    margin-top: 10px;
-}
-
-/* Notification Styling */
-.o_notification.o_notification_success {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-}
-
-.o_notification.o_notification_warning {
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-}
-
-.o_notification.o_notification_danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .o_approval_workflow_container {
-        padding: 15px;
-    }
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: var(--osus-transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     
-    .o_qr_verification_container {
-        padding: 15px;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 43, 71, 0.3);
+        background: linear-gradient(135deg, var(--osus-secondary), #A01B47) !important;
     }
+}
+
+// QR Code Section
+.o_qr_verification_container {
+    text-align: center;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid var(--osus-primary);
+    margin: 20px 0;
     
-    .o_payment_voucher_notebook .nav-link {
-        font-size: 0.9em;
-        padding: 8px 12px;
+    .o_qr_description {
+        color: var(--osus-primary);
+        font-weight: 500;
+        margin-top: 15px;
+        font-style: italic;
     }
 }
 
-/* Print Optimizations */
-@media print {
-    .o_payment_voucher_notebook,
-    .o_cp_top,
-    .o_cp_bottom {
-        display: none !important;
-    }
-    
-    .o_form_view {
-        background: white !important;
-    }
-}
-
-/* Animation Effects */
-.o_approval_status_group .o_field_widget.badge {
-    transition: all 0.3s ease;
-}
-
-.o_approval_status_group .o_field_widget.badge:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Custom Alert Styling */
-.alert-osus {
-    background: linear-gradient(135deg, var(--osus-light) 0%, #ffffff 100%);
-    border-left: 4px solid var(--osus-primary);
+// Signature Boxes
+.signature-box {
+    background: white;
+    border: 2px solid var(--osus-primary);
     border-radius: 8px;
-    color: var(--osus-dark);
+    padding: 15px;
+    margin: 10px 0;
+    transition: var(--osus-transition);
+    
+    &:hover {
+        box-shadow: 0 4px 12px rgba(107, 43, 71, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .signature-line {
+        border-bottom: 2px solid var(--osus-primary);
+        height: 40px;
+        margin-bottom: 10px;
+        position: relative;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 4px;
+            background: var(--osus-gold);
+        }
+    }
+    
+    .authorized-name {
+        color: var(--osus-primary);
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    .signature-initials {
+        color: var(--osus-secondary);
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 2px;
+    }
 }
 
-.alert-osus .alert-heading {
-    color: var(--osus-primary);
-}
-
-/* Status Badge Styling */
-.badge-draft {
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-}
-
-.badge-submitted {
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-    color: #212529;
-}
-
-.badge-approved {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-}
-
-.badge-posted {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-}
-
-.badge-rejected,
-.badge-cancelled {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-}
+// Enhanced Kanban Cards
+.o_kanban_card {
+    border-radius: 12px;
+    border: 2px solid transparent;
+    transition: var(--osus-transition);
+    
+    &:hover {
+        border-color: var(--osus-primary);
+        transform: translateY(-3px);
+        box-shadow: 0###

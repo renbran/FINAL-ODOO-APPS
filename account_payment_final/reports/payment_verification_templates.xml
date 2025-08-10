@@ -1,440 +1,627 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Professional Payment Verification Page -->
-        <template id="payment_verification_success_enhanced" name="Professional Payment Verification">
-            <t t-call="website.layout">
-                <div id="wrap" class="verification-page">
-                    <div class="container-fluid">
-                        <div class="row min-vh-100">
-                            <!-- Main Content -->
-                            <div class="col-12">
-                                <div class="verification-container mx-auto" style="max-width: 900px;">
-                                    
-                                    <!-- Header Section -->
-                                    <div class="verification-header text-center py-5">
-                                        <div class="company-logo mb-3">
-                                            <img t-if="payment.company_id.logo" 
-                                                 t-att-src="image_data_uri(payment.company_id.logo)" 
-                                                 alt="Company Logo" 
-                                                 style="max-height: 80px;"/>
+        <!-- Enhanced OSUS Payment Voucher Template -->
+        <template id="report_payment_voucher_osus" name="OSUS Payment Voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <!-- Custom CSS for OSUS Styling -->
+                            <style>
+                                .voucher-header {
+                                    background: linear-gradient(135deg, #6B2B47, #8B1538);
+                                    color: white;
+                                    padding: 15px;
+                                    margin: -15px -15px 20px -15px;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                                }
+                                .voucher-title {
+                                    text-align: center;
+                                    font-size: 28px;
+                                    font-weight: bold;
+                                    letter-spacing: 2px;
+                                    margin-bottom: 0;
+                                    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+                                }
+                                .voucher-subtitle {
+                                    text-align: center;
+                                    font-size: 16px;
+                                    margin: 5px 0 0 0;
+                                }
+                                .company-info {
+                                    font-size: 13px;
+                                    line-height: 1.3;
+                                    font-weight: 500;
+                                    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+                                }
+                                .field-label {
+                                    color: #6b0632ff;
+                                    font-weight: bold;
+                                    font-size: 14px;
+                                    margin-bottom: 5px;
+                                }
+                                .field-value {
+                                    border-bottom: 2px solid #333;
+                                    padding-bottom: 3px;
+                                    margin-bottom: 15px;
+                                    min-height: 20px;
+                                    color: #000;
+                                    font-weight: 500;
+                                    font-size: 13px;
+                                }
+                                .amount-section {
+                                    background: linear-gradient(135deg, #b19024ff, #8B6F00);
+                                    color: white;
+                                    padding: 15px;
+                                    text-align: center;
+                                    margin: 20px 0;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                                }
+                                .signature-section {
+                                    margin-top: 40px;
+                                }
+                                .signature-box {
+                                    text-align: center;
+                                    padding: 10px;
+                                    margin-bottom: 10px;
+                                }
+                                .signature-line {
+                                    border-bottom: 2px solid #000;
+                                    margin-bottom: 5px;
+                                    height: 30px;
+                                }
+                                .footer-note {
+                                    background: linear-gradient(135deg, #6B2B47, #8B1538);
+                                    color: white;
+                                    text-align: center;
+                                    padding: 12px;
+                                    font-size: 13px;
+                                    font-weight: 500;
+                                    margin: 20px -15px -15px -15px;
+                                    box-shadow: 0 -2px 4px rgba(0,0,0,0.3);
+                                    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+                                }
+                                .creator-info {
+                                    font-size: 12px;
+                                    color: #333;
+                                    margin-top: 5px;
+                                    font-style: italic;
+                                    font-weight: 500;
+                                }
+                                .authorized-name {
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                    color: #000;
+                                }
+                                .signature-initials {
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                    color: #6B2B47;
+                                    font-style: italic;
+                                    margin-top: 10px;
+                                    margin-bottom: 5px;
+                                    letter-spacing: 1px;
+                                    max-height: 60px;
+                                    overflow: hidden;
+                                }
+                                .user-signature {
+                                    font-family: cursive, 'Brush Script MT', fantasy;
+                                    font-size: 16px;
+                                    color: #6B2B47;
+                                    margin-top: 5px;
+                                    margin-bottom: 5px;
+                                    max-height: 50px;
+                                    overflow: hidden;
+                                }
+                                .qr-section {
+                                    text-align: center;
+                                    margin: 20px 0;
+                                    padding: 15px;
+                                    background: #f8f9fa;
+                                    border-radius: 8px;
+                                }
+                                .document-details-table {
+                                    width: 100%;
+                                    font-size: 12px;
+                                    border-collapse: collapse;
+                                    margin-top: 10px;
+                                }
+                                .document-details-table th,
+                                .document-details-table td {
+                                    padding: 8px;
+                                    border: 1px solid #ccc;
+                                    text-align: left;
+                                }
+                                .document-details-table th {
+                                    background-color: #6b0632ff;
+                                    color: white;
+                                    font-weight: bold;
+                                }
+                                .workflow-status {
+                                    margin: 20px 0;
+                                    padding: 15px;
+                                    background-color: #f8f9fa;
+                                    border-left: 4px solid #6b0632ff;
+                                    border-radius: 4px;
+                                }
+                            </style>
+
+                            <!-- Header Section -->
+                            <div class="voucher-header">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="company-info">
+                                            <strong>OSUS REAL ESTATE BROKERAGE LLC</strong><br/>
+                                            Single Tower<br/>
+                                            Business Bay<br/>
+                                            29th Floor<br/>
+                                            Dubai<br/>
+                                            United Arab Emirates
                                         </div>
-                                        <h1 class="display-4 fw-bold text-primary mb-2">Payment Verification</h1>
-                                        <p class="lead text-muted">Secure Payment Authentication System</p>
-                                        <div class="verification-status">
-                                            <span class="badge bg-success fs-6 px-4 py-2">
-                                                <i class="fa fa-shield-alt me-2"></i>
-                                                VERIFIED &amp; AUTHENTICATED
-                                            </span>
+                                    </div>
+                                    <div class="col-6">
+                                        <h2 class="voucher-title">
+                                            <t t-if="o.payment_type == 'inbound'">RECEIPT VOUCHER</t>
+                                            <t t-else="">PAYMENT VOUCHER</t>
+                                        </h2>
+                                        <div class="voucher-subtitle">
+                                            <strong>Reference: <span t-field="o.voucher_number"/></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Workflow Status -->
+                            <div class="workflow-status">
+                                <strong>Status: </strong>
+                                <span t-field="o.approval_state" class="badge badge-info"/>
+                                <t t-if="o.workflow_step > 0">
+                                    - Step <span t-esc="o.workflow_step"/> of <span t-esc="o.total_steps"/>
+                                </t>
+                            </div>
+
+                            <!-- Main Content -->
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-6">
+                                    <!-- Issue To Section -->
+                                    <div class="field-label">
+                                        <t t-if="o.payment_type == 'inbound'">Received from:</t>
+                                        <t t-else="">Pay to:</t>
+                                    </div>
+                                    <div class="field-value">
+                                        <span t-field="o.partner_id.name"/>
+                                    </div>
+
+                                    <!-- Phone Section -->
+                                    <div class="field-label">Phone</div>
+                                    <div class="field-value">
+                                        <span t-field="o.partner_id.mobile"/>
+                                        <t t-if="not o.partner_id.mobile">-</t>
+                                    </div>
+
+                                    <!-- Payment Method Section -->
+                                    <div class="field-label">Payment Method</div>
+                                    <div class="field-value">
+                                        <span t-field="o.journal_id.name"/>
+                                    </div>
+
+                                    <!-- Related Document Section -->
+                                    <t t-set="doc_info" t-value="o.get_related_document_info()"/>
+                                    <div class="field-label">
+                                        <span t-esc="doc_info['label']"/>
+                                    </div>
+                                    <div class="field-value">
+                                        <span t-esc="doc_info['references']"/>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-6">
+                                    <!-- Date Section -->
+                                    <div class="field-label">Date:</div>
+                                    <div class="field-value">
+                                        <span t-field="o.date" t-options='{"widget": "date"}'/>
+                                    </div>
+
+                                    <!-- Remarks Section -->
+                                    <div class="field-label">Remarks</div>
+                                    <div class="field-value" style="min-height: 60px;">
+                                        <span t-field="o.remarks"/>
+                                        <t t-if="not o.remarks">-</t>
+                                    </div>
+
+                                    <!-- QR Code Section -->
+                                    <t t-if="o.qr_code and o.qr_in_report">
+                                        <div class="qr-section">
+                                            <div class="field-label">Verification QR Code</div>
+                                            <img t-att-src="'data:image/png;base64,%s' % o.qr_code.decode('utf-8')" 
+                                                 alt="Payment Verification QR Code"
+                                                 style="width: 120px; height: 120px;"/>
+                                            <br/>
+                                            <small>Scan to verify payment</small>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Amount in Words Section -->
+                            <div class="field-label">Amount in words</div>
+                            <div class="field-value" style="min-height: 30px;">
+                                <span t-esc="o.amount_in_words"/>
+                            </div>
+
+                            <!-- Amount Section -->
+                            <div class="amount-section">
+                                <strong>
+                                    <t t-if="o.payment_type == 'inbound'">AMOUNT RECEIVED: </t>
+                                    <t t-else="">AMOUNT PAID: </t>
+                                    <span t-field="o.currency_id.symbol"/><span t-field="o.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </strong>
+                            </div>
+
+                            <!-- Detailed Document Information -->
+                            <t t-set="doc_info" t-value="o.get_related_document_info()"/>
+                            <t t-if="doc_info['count'] &gt; 1">
+                                <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #6b0632ff;">
+                                    <div class="field-label" style="margin-bottom: 10px;">
+                                        Document Details (<t t-esc="doc_info['count']"/> documents)
+                                    </div>
+                                    <table class="document-details-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Document #</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="doc_info['documents']" t-as="doc">
+                                                <tr>
+                                                    <td><span t-esc="doc.name"/></td>
+                                                    <td>
+                                                        <t t-if="doc.move_type == 'out_invoice'">Customer Invoice</t>
+                                                        <t t-elif="doc.move_type == 'in_invoice'">Vendor Bill</t>
+                                                        <t t-elif="doc.move_type == 'out_refund'">Customer Credit Note</t>
+                                                        <t t-elif="doc.move_type == 'in_refund'">Vendor Credit Note</t>
+                                                        <t t-else=""><t t-esc="doc.move_type"/></t>
+                                                    </td>
+                                                    <td><span t-field="doc.invoice_date" t-options='{"widget": "date"}'/></td>
+                                                    <td><span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+
+                            <!-- Signature Section -->
+                            <div class="signature-section">
+                                <t t-set="signatories" t-value="o.get_signatory_info()"/>
+                                
+                                <!-- Payment Voucher Signatures (4 required + receiver) -->
+                                <t t-if="o.payment_type == 'outbound'">
+                                    <div class="row">
+                                        <!-- Creator Signature -->
+                                        <div class="col-3">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.creator_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.creator_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.create_uid">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.create_uid.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Created By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.create_uid">
+                                                        <span t-field="o.create_uid.name"/><br/>
+                                                        <span t-field="o.create_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Reviewer Signature -->
+                                        <div class="col-3">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.reviewer_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.reviewer_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.reviewed_by">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.reviewed_by.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Reviewed By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.reviewed_by">
+                                                        <span t-field="o.reviewed_by.name"/><br/>
+                                                        <span t-field="o.reviewed_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Review</span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Approver Signature -->
+                                        <div class="col-3">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.approver_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.approver_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.approved_by">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.approved_by.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Approved By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.approved_by">
+                                                        <span t-field="o.approved_by.name"/><br/>
+                                                        <span t-field="o.approved_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Approval</span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Authorizer Signature -->
+                                        <div class="col-3">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.authorizer_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.authorizer_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.authorized_by">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.authorized_by.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Authorized By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.authorized_by">
+                                                        <span t-field="o.authorized_by.name"/><br/>
+                                                        <span t-field="o.authorized_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Authorization</span>
+                                                    </t>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Payment Details Card -->
-                                    <div class="payment-details-card">
-                                        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-                                            
-                                            <!-- Card Header -->
-                                            <div class="card-header bg-gradient text-white py-4" 
-                                                 style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-8">
-                                                        <h3 class="mb-1">
-                                                            <i class="fa fa-receipt me-2"></i>
-                                                            <span t-if="payment.payment_type == 'inbound'">Payment Receipt</span>
-                                                            <span t-if="payment.payment_type == 'outbound'">Payment Voucher</span>
-                                                        </h3>
-                                                        <p class="mb-0 opacity-75">Reference: <strong t-field="payment.name"/></p>
-                                                    </div>
-                                                    <div class="col-md-4 text-end">
-                                                        <div class="amount-display">
-                                                            <small class="d-block opacity-75">Amount</small>
-                                                            <h2 class="mb-0 fw-bold" t-field="payment.amount" 
-                                                                t-options="{'widget': 'monetary', 'display_currency': payment.currency_id}"/>
-                                                        </div>
-                                                    </div>
+                                    <!-- Receiver Signature (Second Row) -->
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-6">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.receiver_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.receiver_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Receiver Signature</div>
+                                                <div class="creator-info">
+                                                    Signature of the person receiving payment
                                                 </div>
                                             </div>
-
-                                            <!-- Card Body -->
-                                            <div class="card-body p-5">
-                                                
-                                                <!-- Payment Information Grid -->
-                                                <div class="row g-4 mb-4">
-                                                    <div class="col-md-6">
-                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
-                                                            <div class="info-header mb-3">
-                                                                <i class="fa fa-user text-primary fs-4 me-2"></i>
-                                                                <strong class="fs-5">
-                                                                    <span t-if="payment.payment_type == 'inbound'">Received From</span>
-                                                                    <span t-if="payment.payment_type == 'outbound'">Paid To</span>
-                                                                </strong>
-                                                            </div>
-                                                            <h5 class="text-dark mb-2" t-field="payment.partner_id.name"/>
-                                                            <div class="partner-details text-muted">
-                                                                <div t-field="payment.partner_id.street" t-if="payment.partner_id.street"/>
-                                                                <div>
-                                                                    <span t-field="payment.partner_id.city" t-if="payment.partner_id.city"/>
-                                                                    <span t-field="payment.partner_id.state_id.name" t-if="payment.partner_id.state_id"/>
-                                                                </div>
-                                                                <div t-field="payment.partner_id.country_id.name" t-if="payment.partner_id.country_id"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
-                                                            <div class="info-header mb-3">
-                                                                <i class="fa fa-credit-card text-primary fs-4 me-2"></i>
-                                                                <strong class="fs-5">Payment Details</strong>
-                                                            </div>
-                                                            <div class="payment-info">
-                                                                <div class="row mb-2">
-                                                                    <div class="col-5 text-muted">Method:</div>
-                                                                    <div class="col-7 fw-semibold" t-field="payment.journal_id.name"/>
-                                                                </div>
-                                                                <div class="row mb-2">
-                                                                    <div class="col-5 text-muted">Date:</div>
-                                                                    <div class="col-7 fw-semibold" t-field="payment.date"/>
-                                                                </div>
-                                                                <div class="row mb-2" t-if="payment.ref">
-                                                                    <div class="col-5 text-muted">Reference:</div>
-                                                                    <div class="col-7 fw-semibold" t-field="payment.ref"/>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-5 text-muted">Status:</div>
-                                                                    <div class="col-7">
-                                                                        <span class="badge bg-success">Verified</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Workflow Progress -->
-                                                <div class="workflow-section mb-4" t-if="payment.approval_state">
-                                                    <h5 class="mb-3">
-                                                        <i class="fa fa-check-circle text-success me-2"></i>
-                                                        Approval Workflow Status
-                                                    </h5>
-                                                    <div class="workflow-progress">
-                                                        <div class="progress-steps d-flex justify-content-between align-items-center">
-                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state != 'draft' else 'current' }}">
-                                                                <div class="step-circle">
-                                                                    <i class="fa fa-edit"></i>
-                                                                </div>
-                                                                <span class="step-label">Draft</span>
-                                                            </div>
-                                                            
-                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] else 'current' if payment.approval_state == 'under_review' else 'pending' }}">
-                                                                <div class="step-circle">
-                                                                    <i class="fa fa-search"></i>
-                                                                </div>
-                                                                <span class="step-label">Review</span>
-                                                            </div>
-                                                            
-                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['for_authorization', 'approved', 'posted'] else 'current' if payment.approval_state == 'for_approval' else 'pending' }}">
-                                                                <div class="step-circle">
-                                                                    <i class="fa fa-check"></i>
-                                                                </div>
-                                                                <span class="step-label">Approval</span>
-                                                            </div>
-                                                            
-                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state in ['approved', 'posted'] else 'current' if payment.approval_state == 'for_authorization' else 'pending' }}" 
-                                                                 t-if="payment.payment_type == 'outbound'">
-                                                                <div class="step-circle">
-                                                                    <i class="fa fa-key"></i>
-                                                                </div>
-                                                                <span class="step-label">Authorization</span>
-                                                            </div>
-                                                            
-                                                            <div t-attf-class="step {{ 'completed' if payment.approval_state == 'posted' else 'current' if payment.approval_state == 'approved' else 'pending' }}">
-                                                                <div class="step-circle">
-                                                                    <i class="fa fa-check-circle"></i>
-                                                                </div>
-                                                                <span class="step-label">Posted</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- QR Code Section -->
-                                                <div class="qr-section text-center" t-if="payment.qr_code">
-                                                    <h5 class="mb-3">
-                                                        <i class="fa fa-qrcode text-primary me-2"></i>
-                                                        Verification QR Code
-                                                    </h5>
-                                                    <div class="qr-container p-4 bg-white border rounded-3 d-inline-block">
-                                                        <img t-attf-src="data:image/png;base64,{{payment.qr_code.decode('utf-8') if payment.qr_code else ''}}" 
-                                                             alt="Payment QR Code" 
-                                                             style="width: 200px; height: 200px;"/>
-                                                    </div>
-                                                    <p class="text-muted mt-2 mb-0">
-                                                        <small>This QR code contains encrypted payment verification data</small>
-                                                    </p>
-                                                </div>
-
-                                                <!-- Action Buttons -->
-                                                <div class="action-buttons text-center mt-5">
-                                                    <button class="btn btn-outline-primary me-3" onclick="window.print()">
-                                                        <i class="fa fa-print me-2"></i>Print Verification
-                                                    </button>
-                                                    <a href="/web" class="btn btn-primary">
-                                                        <i class="fa fa-arrow-left me-2"></i>Return to System
-                                                    </a>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="signature-box">
+                                                <div class="signature-line"></div>
+                                                <div class="authorized-name">Posted By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.posted_by">
+                                                        <span t-field="o.posted_by.name"/><br/>
+                                                        <span t-field="o.posted_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Posting</span>
+                                                    </t>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </t>
 
-                                            <!-- Card Footer -->
-                                            <div class="card-footer bg-light text-center py-3">
+                                <!-- Receipt Voucher Signatures (3 required: creator, reviewer, poster) -->
+                                <t t-if="o.payment_type == 'inbound'">
+                                    <div class="row">
+                                        <!-- Creator Signature -->
+                                        <div class="col-4">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.creator_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.creator_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.create_uid">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.create_uid.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Created By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.create_uid">
+                                                        <span t-field="o.create_uid.name"/><br/>
+                                                        <span t-field="o.create_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Reviewer Signature -->
+                                        <div class="col-4">
+                                            <div class="signature-box">
+                                                <div class="signature-line">
+                                                    <t t-if="o.reviewer_signature">
+                                                        <img t-att-src="'data:image/png;base64,%s' % o.reviewer_signature.decode('utf-8')" 
+                                                             style="max-height: 25px; max-width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                                <div class="signature-initials">
+                                                    <t t-if="o.reviewed_by">
+                                                        <span t-esc="''.join([n[0].upper() for n in o.reviewed_by.name.split()[:2]])"/>
+                                                    </t>
+                                                </div>
+                                                <div class="authorized-name">Reviewed By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.reviewed_by">
+                                                        <span t-field="o.reviewed_by.name"/><br/>
+                                                        <span t-field="o.reviewed_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Review</span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Posted By -->
+                                        <div class="col-4">
+                                            <div class="signature-box">
+                                                <div class="signature-line"></div>
+                                                <div class="authorized-name">Posted By</div>
+                                                <div class="creator-info">
+                                                    <t t-if="o.posted_by">
+                                                        <span t-field="o.posted_by.name"/><br/>
+                                                        <span t-field="o.posted_date" t-options='{"widget": "datetime"}'/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="color: #dc3545;">Pending Posting</span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="footer-note">
+                                <p style="margin: 0;">
+                                    <t t-if="o.company_id.voucher_footer_message">
+                                        <span t-field="o.company_id.voucher_footer_message"/>
+                                    </t>
+                                    <t t-else="">
+                                        Thank you for your business with OSUS Real Estate
+                                    </t>
+                                </p>
+                                <p style="margin: 5px 0 0 0; font-size: 11px;">
+                                    This is a computer-generated document. For verification, scan the QR code or visit our website.
+                                </p>
+                            </div>
+
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <!-- QR Verification Templates -->
+        <template id="payment_verification_success" name="Payment Verification Success">
+            <t t-call="website.layout">
+                <div class="container py-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card shadow-lg border-0">
+                                <div class="card-header bg-success text-white text-center py-4">
+                                    <i class="fa fa-check-circle fa-3x mb-3"></i>
+                                    <h2 class="mb-0">Payment Verified Successfully</h2>
+                                    <p class="mb-0 opacity-75">Voucher #<span t-esc="voucher_number"/></p>
+                                </div>
+                                
+                                <div class="card-body p-5">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="text-success mb-3">
+                                                <i class="fa fa-info-circle me-2"></i>Payment Details
+                                            </h5>
+                                            <table class="table table-borderless">
+                                                <tr>
+                                                    <td class="text-muted">Voucher Number:</td>
+                                                    <td class="fw-bold" t-esc="voucher_number"/>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Partner:</td>
+                                                    <td class="fw-bold" t-esc="partner_name"/>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Amount:</td>
+                                                    <td class="fw-bold text-success">
+                                                        <span t-esc="amount"/> <span t-esc="currency"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Date:</td>
+                                                    <td class="fw-bold" t-esc="date"/>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Status:</td>
+                                                    <td>
+                                                        <span class="badge bg-success">
+                                                            <t t-if="is_posted">Posted</t>
+                                                            <t t-else=""><span t-esc="status.title()"/></t>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h5 class="text-primary mb-3">
+                                                <i class="fa fa-building me-2"></i>Company Information
+                                            </h5>
+                                            <div class="bg-light p-3 rounded">
+                                                <strong t-esc="company_name"/><br/>
                                                 <small class="text-muted">
-                                                    <i class="fa fa-shield-alt me-1"></i>
-                                                    Secured &amp; Verified | Generated on <span t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
-                                                    <br/>
-                                                    <strong t-field="payment.company_id.name"/> Payment Verification System
+                                                    OSUS Real Estate Brokerage LLC<br/>
+                                                    Single Tower, Business Bay<br/>
+                                                    29th Floor, Dubai, UAE
                                                 </small>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Custom CSS for Professional Look -->
-                <style>
-                    .verification-page {
-                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                        min-height: 100vh;
-                    }
-                    
-                    .verification-container {
-                        padding: 2rem 1rem;
-                    }
-                    
-                    .info-card {
-                        transition: all 0.3s ease;
-                        border: 1px solid #e9ecef;
-                    }
-                    
-                    .info-card:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-                    }
-                    
-                    .workflow-progress .step {
-                        text-align: center;
-                        position: relative;
-                        flex: 1;
-                    }
-                    
-                    .step-circle {
-                        width: 50px;
-                        height: 50px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin: 0 auto 10px;
-                        font-size: 18px;
-                        color: white;
-                        background: #dee2e6;
-                    }
-                    
-                    .step.current .step-circle {
-                        background: #ffc107;
-                        animation: pulse 2s infinite;
-                    }
-                    
-                    .step.completed .step-circle {
-                        background: #28a745;
-                    }
-                    
-                    .step.pending .step-circle {
-                        background: #6c757d;
-                    }
-                    
-                    .step-label {
-                        font-size: 12px;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                    }
-                    
-                    @keyframes pulse {
-                        0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-                        70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-                        100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-                    }
-                    
-                    .qr-container {
-                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                    }
-                    
-                    @media print {
-                        .action-buttons, .card-footer {
-                            display: none !important;
-                        }
-                    }
-                </style>
-            </t>
-        </template>
-
-        <!-- Payment Verification Main Page -->
-        <template id="payment_verification_page" name="Payment Verification Page">
-            <t t-call="website.layout">
-                <div id="wrap" class="verification-page">
-                    <div class="container-fluid">
-                        <div class="row min-vh-100">
-                            <div class="col-12">
-                                <div class="verification-container mx-auto" style="max-width: 900px;">
                                     
-                                    <!-- Header Section -->
-                                    <div class="verification-header text-center py-5">
-                                        <div class="company-logo mb-3">
-                                            <img t-if="company.logo" 
-                                                 t-att-src="image_data_uri(company.logo)" 
-                                                 alt="Company Logo" 
-                                                 style="max-height: 80px;"/>
-                                        </div>
-                                        <h1 class="display-4 fw-bold text-primary mb-2">Payment Verification</h1>
-                                        <p class="lead text-muted">Secure Payment Authentication System</p>
-                                        <div class="verification-status">
-                                            <span t-attf-class="badge fs-6 px-4 py-2 #{status_class}">
-                                                <i class="fa fa-shield-alt me-2"></i>
-                                                <t t-esc="status_message"/>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Payment Details Card -->
-                                    <div class="payment-details-card">
-                                        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-                                            
-                                            <!-- Card Header -->
-                                            <div class="card-header bg-gradient text-white py-4" 
-                                                 style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-8">
-                                                        <h3 class="mb-1">
-                                                            <i class="fa fa-receipt me-2"></i>
-                                                            <span t-if="payment.payment_type == 'inbound'">Payment Receipt</span>
-                                                            <span t-if="payment.payment_type == 'outbound'">Payment Voucher</span>
-                                                        </h3>
-                                                        <p class="mb-0 opacity-75">
-                                                            Voucher: <strong t-esc="payment.voucher_number or payment.name"/>
-                                                        </p>
-                                                    </div>
-                                                    <div class="col-md-4 text-end">
-                                                        <div class="amount-display">
-                                                            <small class="d-block opacity-75">Amount</small>
-                                                            <h2 class="mb-0 fw-bold">
-                                                                <t t-esc="payment.currency_id.symbol"/><t t-esc="'{:,.2f}'.format(payment.amount)"/>
-                                                            </h2>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Card Body -->
-                                            <div class="card-body p-5">
-                                                
-                                                <!-- Payment Information Grid -->
-                                                <div class="row g-4 mb-4">
-                                                    <div class="col-md-6">
-                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
-                                                            <div class="info-header mb-3">
-                                                                <i class="fa fa-user text-primary fs-4 me-2"></i>
-                                                                <strong class="fs-5">
-                                                                    <span t-if="payment.payment_type == 'inbound'">Received From</span>
-                                                                    <span t-if="payment.payment_type == 'outbound'">Paid To</span>
-                                                                </strong>
-                                                            </div>
-                                                            <h5 class="text-dark mb-2" t-esc="payment.partner_id.name"/>
-                                                            <div class="partner-details text-muted">
-                                                                <div t-if="payment.partner_id.street" t-esc="payment.partner_id.street"/>
-                                                                <div>
-                                                                    <span t-if="payment.partner_id.city" t-esc="payment.partner_id.city"/>
-                                                                    <span t-if="payment.partner_id.state_id.name" t-esc="payment.partner_id.state_id.name"/>
-                                                                </div>
-                                                                <div t-if="payment.partner_id.country_id.name" t-esc="payment.partner_id.country_id.name"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <div class="info-card h-100 p-4 bg-light rounded-3">
-                                                            <div class="info-header mb-3">
-                                                                <i class="fa fa-credit-card text-primary fs-4 me-2"></i>
-                                                                <strong class="fs-5">Payment Details</strong>
-                                                            </div>
-                                                            <div class="payment-info">
-                                                                <div class="row mb-2">
-                                                                    <div class="col-5 text-muted">Method:</div>
-                                                                    <div class="col-7 fw-semibold" t-esc="payment.journal_id.name"/>
-                                                                </div>
-                                                                <div class="row mb-2">
-                                                                    <div class="col-5 text-muted">Date:</div>
-                                                                    <div class="col-7 fw-semibold" t-esc="payment.date"/>
-                                                                </div>
-                                                                <div class="row mb-2" t-if="payment.ref">
-                                                                    <div class="col-5 text-muted">Reference:</div>
-                                                                    <div class="col-7 fw-semibold" t-esc="payment.ref"/>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-5 text-muted">Status:</div>
-                                                                    <div class="col-7">
-                                                                        <span t-attf-class="badge bg-#{verification_status}">
-                                                                            <t t-esc="payment.approval_state.replace('_', ' ').title()"/>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Verification Info -->
-                                                <div class="verification-info mb-4">
-                                                    <div class="alert alert-info">
-                                                        <i class="fa fa-info-circle me-2"></i>
-                                                        This payment has been verified at <strong t-esc="verification_time"/>
-                                                        (Verification #<t t-esc="qr_verification_count"/>)
-                                                    </div>
-                                                </div>
-
-                                                <!-- Actions -->
-                                                <div class="action-buttons text-center">
-                                                    <button class="btn btn-primary btn-lg me-2" onclick="window.print()">
-                                                        <i class="fa fa-print me-2"></i>Print Verification
-                                                    </button>
-                                                    <button class="btn btn-secondary btn-lg" onclick="window.close()">
-                                                        <i class="fa fa-times me-2"></i>Close
-                                                    </button>
-                                                </div>
-                                            </div>
+                                    <div class="text-center mt-4">
+                                        <div class="alert alert-success" role="alert">
+                                            <i class="fa fa-shield-alt me-2"></i>
+                                            <strong>Verification Complete:</strong> 
+                                            This payment voucher is authentic and has been verified against our records.
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </t>
-        </template>
-
-        <!-- Payment Not Found Page -->
-        <template id="payment_verification_not_found" name="Payment Not Found">
-            <t t-call="website.layout">
-                <div class="container text-center py-5">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6">
-                            <div class="card shadow">
-                                <div class="card-body p-5">
-                                    <i class="fa fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
-                                    <h2 class="mt-3 mb-3" t-esc="error_message"/>
-                                    <p class="text-muted" t-esc="error_details"/>
-                                    <a href="/" class="btn btn-primary">Return to Home</a>
+                                
+                                <div class="card-footer text-center text-muted py-3">
+                                    <small>
+                                        Verified on <span t-esc="verification_date"/> | 
+                                        Powered by OSUS Payment Verification System
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -443,18 +630,21 @@
             </t>
         </template>
 
-        <!-- Payment Verification Error Page -->
-        <template id="payment_verification_error" name="Verification Error">
+        <template id="payment_verification_error" name="Payment Verification Error">
             <t t-call="website.layout">
-                <div class="container text-center py-5">
+                <div class="container py-5">
                     <div class="row justify-content-center">
                         <div class="col-md-6">
-                            <div class="card shadow">
-                                <div class="card-body p-5">
-                                    <i class="fa fa-times-circle text-danger" style="font-size: 4rem;"></i>
-                                    <h2 class="mt-3 mb-3" t-esc="error_message"/>
-                                    <p class="text-muted" t-esc="error_details"/>
-                                    <a href="/" class="btn btn-primary">Return to Home</a>
+                            <div class="card shadow border-0">
+                                <div class="card-header bg-danger text-white text-center py-4">
+                                    <i class="fa fa-times-circle fa-3x mb-3"></i>
+                                    <h2 class="mb-0" t-esc="error_message"/>
+                                </div>
+                                <div class="card-body text-center p-5">
+                                    <p class="text-muted mb-4" t-esc="error_details"/>
+                                    <a href="/" class="btn btn-primary">
+                                        <i class="fa fa-home me-2"></i>Return to Home
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -463,8 +653,7 @@
             </t>
         </template>
 
-        <!-- QR Verification Guide -->
-        <template id="payment_qr_guide" name="QR Verification Guide">
+        <template id="qr_verification_guide" name="QR Verification Guide">
             <t t-call="website.layout">
                 <div class="container py-5">
                     <div class="row justify-content-center">
@@ -478,15 +667,15 @@
                                 </div>
                                 <div class="card-body p-4">
                                     <h5>How to verify payment vouchers:</h5>
-                                    <ol>
-                                        <li class="mb-2">Scan the QR code on the payment voucher using your phone camera or QR scanner app</li>
-                                        <li class="mb-2">You will be directed to a verification page showing payment details</li>
-                                        <li class="mb-2">Check that the amount, recipient, and date match the voucher</li>
-                                        <li class="mb-2">Look for the green "VERIFIED" status to confirm authenticity</li>
+                                    <ol class="list-group list-group-numbered">
+                                        <li class="list-group-item">Scan the QR code on the payment voucher using your phone camera or QR scanner app</li>
+                                        <li class="list-group-item">You will be directed to a verification page showing payment details</li>
+                                        <li class="list-group-item">Check that the amount, recipient, and date match the voucher</li>
+                                        <li class="list-group-item">Look for the green "VERIFIED" status to confirm authenticity</li>
                                     </ol>
                                     
                                     <div class="alert alert-info mt-4">
-                                        <strong>Note:</strong> All payment vouchers from <t t-esc="company_name"/> include QR codes for security verification.
+                                        <strong>Note:</strong> All payment vouchers from <span t-esc="company_name"/> include QR codes for security verification.
                                         If you cannot scan the QR code, please contact our support team for manual verification.
                                     </div>
                                 </div>
@@ -496,100 +685,5 @@
                 </div>
             </t>
         </template>
-
-        <!-- Bulk Verification Form -->
-        <template id="bulk_verification_form" name="Bulk Payment Verification">
-            <t t-call="website.layout">
-                <div class="container py-5">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <div class="card shadow">
-                                <div class="card-header bg-primary text-white">
-                                    <h3 class="mb-0">
-                                        <i class="fa fa-list-check me-2"></i>
-                                        Bulk Payment Verification
-                                    </h3>
-                                </div>
-                                <div class="card-body">
-                                    <form method="post">
-                                        <div class="mb-3">
-                                            <label for="voucher_numbers" class="form-label">
-                                                Voucher Numbers (one per line):
-                                            </label>
-                                            <textarea class="form-control" name="voucher_numbers" 
-                                                     rows="10" required="required"
-                                                     placeholder="PV00001&#10;PV00002&#10;RV00001"></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-lg">
-                                            <i class="fa fa-search me-2"></i>Verify Payments
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </t>
-        </template>
-
-        <!-- Bulk Verification Results -->
-        <template id="bulk_verification_results" name="Bulk Verification Results">
-            <t t-call="website.layout">
-                <div class="container py-5">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card shadow">
-                                <div class="card-header bg-success text-white">
-                                    <h3 class="mb-0">
-                                        <i class="fa fa-check-circle me-2"></i>
-                                        Verification Results - <t t-esc="found_count"/> of <t t-esc="total_checked"/> found
-                                    </h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>Voucher Number</th>
-                                                    <th>Status</th>
-                                                    <th>Partner</th>
-                                                    <th>Amount</th>
-                                                    <th>Date</th>
-                                                    <th>Approval Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr t-foreach="results" t-as="result">
-                                                    <td t-esc="result['voucher_number']"/>
-                                                    <td>
-                                                        <span t-if="result.get('found')" class="badge bg-success">Found</span>
-                                                        <span t-else="" class="badge bg-danger">Not Found</span>
-                                                    </td>
-                                                    <td t-esc="result.get('partner', 'N/A')"/>
-                                                    <td>
-                                                        <span t-if="result.get('found')">
-                                                            <t t-esc="result.get('currency', '')"/> <t t-esc="result.get('amount', '')"/>
-                                                        </span>
-                                                        <span t-else="">-</span>
-                                                    </td>
-                                                    <td t-esc="result.get('date', 'N/A')"/>
-                                                    <td t-esc="result.get('status', 'N/A')"/>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="mt-3">
-                                        <a href="/payment/bulk-verify" class="btn btn-primary">
-                                            <i class="fa fa-arrow-left me-2"></i>Verify More Payments
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </t>
-        </template>
-
     </data>
 </odoo>
