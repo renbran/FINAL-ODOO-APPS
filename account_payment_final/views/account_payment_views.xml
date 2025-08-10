@@ -109,8 +109,8 @@
                     </group>
                 </xpath>
 
-                <!-- Enhanced Partner and Amount Section -->
-                <xpath expr="//field[@name='amount']" position="after">
+                <!-- Enhanced Partner Section -->
+                <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="amount_in_words" readonly="1" 
                            invisible="not amount_in_words"
                            widget="text"/>
@@ -259,20 +259,15 @@
                            optional="show"/>
                 </xpath>
                 
-                <!-- Enhanced amount display -->
-                <xpath expr="//field[@name='amount']" position="attributes">
-                    <attribute name="sum">Total Amount</attribute>
-                </xpath>
-                
-                <!-- Add workflow step progress -->
-                <xpath expr="//field[@name='state']" position="after">
-                    <field name="workflow_step" optional="hide"/>
-                    <field name="total_steps" optional="hide"/>
-                </xpath>
-                
-                <!-- Add related document info -->
+                <!-- Enhanced amount display using partner_id as anchor -->
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="related_document_info" optional="hide"/>
+                </xpath>
+                
+                <!-- Add workflow step progress using date as anchor -->
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="workflow_step" optional="hide"/>
+                    <field name="total_steps" optional="hide"/>
                 </xpath>
                 
             </field>

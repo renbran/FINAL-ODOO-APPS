@@ -434,8 +434,8 @@
                             confirm="This will invalidate the current QR code. Continue?"/>
                 </xpath>
 
-                <!-- Add verification info to QR verification page -->
-                <xpath expr="//page[@name='qr_verification']" position="inside">
+                <!-- Add verification info using field positioning -->
+                <xpath expr="//field[@name='qr_code']" position="after">
                     <group string="Verification Statistics" invisible="verification_count == 0">
                         <group>
                             <field name="verification_count" readonly="1"/>
