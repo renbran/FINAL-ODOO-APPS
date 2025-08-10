@@ -20,28 +20,93 @@
 #
 #############################################################################
 {
-    'name': 'Payment Approvals',
-    'version': '17.0.1.0.0',
+    'name': 'Enhanced Payment Voucher System - OSUS',
+    'version': '17.0.2.0.0',
     'category': 'Accounting',
-    'summary': """ This modules Enables to use the approval feature in
-                    customer and vendor payments.""",
-    'description': """This modules enables approval feature in the payment.
-     as Approval stage .Approval feature can be applied based on the given 
-     amount. """,
-    'author': ' Cybrosys Techno Solutions',
-    'company': 'Cybrosys Techno Solutions',
-    'maintainer': 'Cybrosys Techno Solutions',
-    'website': "https://www.cybrosys.com",
-    'depends': ['account'],
+    'summary': """Advanced Payment and Receipt Voucher System with Digital Signatures, 
+                  QR Verification, Multi-stage Approval Workflows, and OSUS Branding""",
+    'description': """
+    Enhanced Payment Voucher System for OSUS Real Estate
+    
+    Key Features:
+    • 4-stage Payment Voucher workflow (Submit → Review → Approve → Authorize → Post)
+    • 3-stage Receipt Voucher workflow (Submit → Review → Post) 
+    • Digital signature capture for all workflow stages
+    • QR code generation with secure verification portal
+    • OSUS branded reports with professional styling
+    • Email notifications and activity tracking
+    • Multi-company support with role-based permissions
+    • Mobile-responsive design and verification interface
+    • Integration with invoices/bills workflow
+    • Comprehensive audit trails and security
+    """,
+    'author': 'OSUS Properties - Enhanced by AI Assistant',
+    'company': 'OSUS Properties',
+    'maintainer': 'OSUS Properties',
+    'website': "https://www.osusproperties.com",
+    'depends': [
+        'account', 
+        'mail', 
+        'web',
+        'portal',
+        'website',
+        'contacts'
+    ],
+    'external_dependencies': {
+        'python': ['qrcode', 'num2words', 'PIL']
+    },
     'data': [
+        # Security
+        'security/payment_voucher_security.xml',
+        'security/ir.model.access.csv',
+        
+        # Data
+        'data/email_templates.xml',
+        'data/voucher_sequence.xml',
+        'data/qr_verification_data.xml',
+        
+        # Views
         'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
+        'views/payment_voucher_views.xml',
+        'views/signature_views.xml',
+        'views/qr_verification_views.xml',
+        'views/kanban_views.xml',
+        
+        # Reports
+        'reports/payment_voucher_report.xml',
+        'reports/receipt_voucher_report.xml',
+        'reports/report_actions.xml',
+        
+        # Portal/Website
+        'views/portal_templates.xml',
+        'views/verification_templates.xml',
+        
+        # Menus
+        'views/menu_items.xml',
+        
+        # Server Actions (legacy)
         'data/server_actions.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'account_payment_approval/static/src/js/signature_widget.js',
+            'account_payment_approval/static/src/js/workflow_tracker.js',
+            'account_payment_approval/static/src/css/payment_voucher.css',
+        ],
+        'web.assets_frontend': [
+            'account_payment_approval/static/src/js/qr_verification.js',
+            'account_payment_approval/static/src/css/verification_portal.css',
+        ],
+    },
+    'demo': [
+        'demo/demo_data.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': False,
-    'application': False,
+    'application': True,
+    'sequence': 10,
 }

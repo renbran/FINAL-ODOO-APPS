@@ -1,0 +1,836 @@
+/* OSUS Properties Payment Approval Module - Main Stylesheet */
+
+/* ========================================
+   OSUS Brand Variables
+   ======================================== */
+:root {
+    --osus-primary: #6B2B47;
+    --osus-primary-dark: #8B1538;
+    --osus-gold: #D4AF37;
+    --osus-gold-light: #E5C965;
+    --osus-green: #2E7D32;
+    --osus-green-light: #81C784;
+    --osus-blue: #1976D2;
+    --osus-blue-light: #64B5F6;
+    --osus-gray: #757575;
+    --osus-gray-light: #E0E0E0;
+    --osus-success: #4CAF50;
+    --osus-warning: #FF9800;
+    --osus-danger: #F44336;
+    --osus-shadow: 0 2px 8px rgba(107, 43, 71, 0.1);
+    --osus-shadow-hover: 0 4px 16px rgba(107, 43, 71, 0.15);
+    --osus-border-radius: 8px;
+    --osus-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   Payment Approval Form Styles
+   ======================================== */
+
+.o_payment_approval_form {
+    .o_form_sheet {
+        padding: 24px;
+        background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+        border-radius: var(--osus-border-radius);
+        box-shadow: var(--osus-shadow);
+    }
+
+    .o_form_statusbar {
+        background: linear-gradient(135deg, var(--osus-primary) 0%, var(--osus-primary-dark) 100%);
+        color: white;
+        padding: 16px 24px;
+        margin: -24px -24px 24px -24px;
+        border-radius: var(--osus-border-radius) var(--osus-border-radius) 0 0;
+
+        .o_statusbar_status {
+            .o_arrow_button {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                transition: var(--osus-transition);
+
+                &.btn-primary, &.o_arrow_button_current {
+                    background: var(--osus-gold);
+                    color: var(--osus-primary);
+                    font-weight: 600;
+                    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+                }
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+}
+
+/* ========================================
+   Voucher Header Section
+   ======================================== */
+
+.o_voucher_header {
+    background: linear-gradient(135deg, var(--osus-primary) 0%, var(--osus-primary-dark) 100%);
+    color: white;
+    padding: 20px;
+    margin: 0 -24px 24px -24px;
+    border-radius: 0 0 var(--osus-border-radius) var(--osus-border-radius);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100%;
+        background: linear-gradient(45deg, transparent 0%, rgba(212, 175, 55, 0.1) 100%);
+    }
+
+    .o_voucher_number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--osus-gold);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        margin-bottom: 8px;
+    }
+
+    .o_voucher_type {
+        font-size: 16px;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    .o_voucher_amount {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        text-align: right;
+
+        .amount-figure {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--osus-gold);
+        }
+
+        .amount-currency {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    }
+}
+
+/* ========================================
+   Digital Signature Widgets
+   ======================================== */
+
+.o_digital_signature_widget {
+    border: 2px solid var(--osus-primary);
+    border-radius: var(--osus-border-radius);
+    background: white;
+    padding: 16px;
+    margin: 8px 0;
+    transition: var(--osus-transition);
+
+    &:hover {
+        box-shadow: var(--osus-shadow-hover);
+        border-color: var(--osus-gold);
+    }
+
+    .signature-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--osus-gray-light);
+
+        h5 {
+            color: var(--osus-primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .signature-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+
+            &.signed {
+                background: var(--osus-success);
+                color: white;
+            }
+
+            &.pending {
+                background: var(--osus-warning);
+                color: white;
+            }
+        }
+    }
+
+    .signature-canvas-container {
+        position: relative;
+        border: 1px dashed var(--osus-gray);
+        border-radius: 4px;
+        background: #fafafa;
+        margin: 12px 0;
+
+        canvas {
+            display: block;
+            border-radius: 4px;
+            cursor: crosshair;
+            background: white;
+            transition: var(--osus-transition);
+
+            &:hover {
+                border-color: var(--osus-primary);
+            }
+        }
+
+        .signature-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--osus-gray);
+            font-style: italic;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    }
+
+    .signature-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+
+        .btn {
+            border-radius: var(--osus-border-radius);
+            font-weight: 500;
+            transition: var(--osus-transition);
+
+            &.btn-primary {
+                background: var(--osus-primary);
+                border-color: var(--osus-primary);
+
+                &:hover {
+                    background: var(--osus-primary-dark);
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.btn-outline-secondary {
+                color: var(--osus-gray);
+                border-color: var(--osus-gray);
+
+                &:hover {
+                    background: var(--osus-gray);
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .signature-info {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--osus-gray);
+
+        .signature-date {
+            font-weight: 500;
+        }
+    }
+
+    &.readonly {
+        background: #f8f9fa;
+        border-color: var(--osus-gray-light);
+
+        .signature-canvas-container {
+            background: #f0f0f0;
+        }
+    }
+}
+
+/* ========================================
+   QR Code Widget
+   ======================================== */
+
+.o_qr_code_widget {
+    text-align: center;
+    padding: 20px;
+    border: 2px solid var(--osus-blue);
+    border-radius: var(--osus-border-radius);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    margin: 16px 0;
+    transition: var(--osus-transition);
+
+    &:hover {
+        box-shadow: var(--osus-shadow-hover);
+        border-color: var(--osus-blue-light);
+    }
+
+    .qr-header {
+        color: var(--osus-blue);
+        font-weight: 600;
+        margin-bottom: 16px;
+
+        i {
+            margin-right: 8px;
+        }
+    }
+
+    .qr-code-display {
+        margin: 16px 0;
+        padding: 16px;
+        background: white;
+        border-radius: var(--osus-border-radius);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+
+        img {
+            border-radius: 4px;
+        }
+    }
+
+    .qr-actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+
+        .btn {
+            border-radius: var(--osus-border-radius);
+            font-weight: 500;
+            transition: var(--osus-transition);
+
+            &.btn-primary {
+                background: var(--osus-blue);
+                border-color: var(--osus-blue);
+
+                &:hover {
+                    background: var(--osus-blue-light);
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+
+    .verification-token {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--osus-gray);
+        font-family: monospace;
+        background: #f0f0f0;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .verification-url {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--osus-blue);
+        word-break: break-all;
+    }
+}
+
+/* ========================================
+   Payment Approval Dashboard
+   ======================================== */
+
+.o_payment_approval_dashboard {
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--osus-primary) 0%, var(--osus-primary-dark) 100%);
+        color: white;
+        padding: 24px;
+        margin: -16px -16px 24px -16px;
+        border-radius: var(--osus-border-radius) var(--osus-border-radius) 0 0;
+
+        h2 {
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-subtitle {
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+    }
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .stat-card {
+            background: white;
+            border-radius: var(--osus-border-radius);
+            padding: 20px;
+            box-shadow: var(--osus-shadow);
+            transition: var(--osus-transition);
+            cursor: pointer;
+            border-left: 4px solid transparent;
+
+            &:hover {
+                box-shadow: var(--osus-shadow-hover);
+                transform: translateY(-2px);
+            }
+
+            &.pending-review {
+                border-left-color: var(--osus-blue);
+
+                .stat-number {
+                    color: var(--osus-blue);
+                }
+            }
+
+            &.pending-approval {
+                border-left-color: var(--osus-warning);
+
+                .stat-number {
+                    color: var(--osus-warning);
+                }
+            }
+
+            &.pending-authorization {
+                border-left-color: var(--osus-gold);
+
+                .stat-number {
+                    color: var(--osus-gold);
+                }
+            }
+
+            &.completed {
+                border-left-color: var(--osus-success);
+
+                .stat-number {
+                    color: var(--osus-success);
+                }
+            }
+
+            .stat-number {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 8px;
+            }
+
+            .stat-label {
+                color: var(--osus-gray);
+                font-weight: 500;
+                font-size: 14px;
+            }
+
+            .stat-icon {
+                float: right;
+                font-size: 24px;
+                opacity: 0.3;
+                margin-top: -4px;
+            }
+        }
+    }
+
+    .dashboard-recent {
+        background: white;
+        border-radius: var(--osus-border-radius);
+        box-shadow: var(--osus-shadow);
+        overflow: hidden;
+
+        .recent-header {
+            background: var(--osus-gray-light);
+            padding: 16px 20px;
+            border-bottom: 1px solid #ddd;
+
+            h4 {
+                margin: 0;
+                color: var(--osus-primary);
+                font-weight: 600;
+            }
+        }
+
+        .recent-list {
+            .recent-item {
+                padding: 16px 20px;
+                border-bottom: 1px solid #f0f0f0;
+                transition: var(--osus-transition);
+
+                &:hover {
+                    background: #f8f9fa;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .item-main {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 8px;
+
+                    .item-title {
+                        font-weight: 600;
+                        color: var(--osus-primary);
+                    }
+
+                    .item-amount {
+                        font-weight: 700;
+                        color: var(--osus-gold);
+                    }
+                }
+
+                .item-details {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 12px;
+                    color: var(--osus-gray);
+
+                    .item-partner {
+                        font-weight: 500;
+                    }
+
+                    .item-state {
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        font-size: 10px;
+
+                        &.draft { background: #e0e0e0; color: #666; }
+                        &.submitted { background: #e3f2fd; color: #1976d2; }
+                        &.reviewed { background: #f3e5f5; color: #7b1fa2; }
+                        &.approved { background: #fff3e0; color: #f57c00; }
+                        &.authorized { background: #e8f5e8; color: #388e3c; }
+                        &.posted { background: #e8f5e8; color: #2e7d32; }
+                        &.rejected { background: #ffebee; color: #d32f2f; }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ========================================
+   Workflow Badge Styles
+   ======================================== */
+
+.o_workflow_badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--osus-transition);
+
+    i {
+        margin-right: 4px;
+    }
+
+    &.state-draft {
+        background: #e0e0e0;
+        color: #666;
+    }
+
+    &.state-submitted {
+        background: var(--osus-blue-light);
+        color: var(--osus-blue);
+        animation: pulse 2s infinite;
+    }
+
+    &.state-reviewed {
+        background: #e1bee7;
+        color: #7b1fa2;
+    }
+
+    &.state-approved {
+        background: var(--osus-gold-light);
+        color: var(--osus-primary);
+    }
+
+    &.state-authorized {
+        background: var(--osus-green-light);
+        color: var(--osus-green);
+    }
+
+    &.state-posted {
+        background: var(--osus-success);
+        color: white;
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+    }
+
+    &.state-rejected {
+        background: var(--osus-danger);
+        color: white;
+        box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+    }
+}
+
+/* ========================================
+   Form Field Enhancements
+   ======================================== */
+
+.o_payment_approval_form {
+    .o_field_widget {
+        &.o_field_monetary {
+            .o_field_number {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--osus-primary);
+            }
+        }
+
+        &.o_field_many2one {
+            .o_input {
+                border-color: var(--osus-gray-light);
+                transition: var(--osus-transition);
+
+                &:focus {
+                    border-color: var(--osus-primary);
+                    box-shadow: 0 0 0 2px rgba(107, 43, 71, 0.1);
+                }
+            }
+        }
+    }
+
+    .o_group {
+        .o_field_widget {
+            margin-bottom: 8px;
+        }
+    }
+}
+
+/* ========================================
+   Button Enhancements
+   ======================================== */
+
+.o_payment_approval_form {
+    .o_form_buttons_view {
+        .btn {
+            border-radius: var(--osus-border-radius);
+            font-weight: 500;
+            transition: var(--osus-transition);
+            padding: 8px 16px;
+
+            &.btn-primary {
+                background: var(--osus-primary);
+                border-color: var(--osus-primary);
+
+                &:hover {
+                    background: var(--osus-primary-dark);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba(107, 43, 71, 0.2);
+                }
+            }
+
+            &.btn-secondary {
+                background: var(--osus-gray);
+                border-color: var(--osus-gray);
+
+                &:hover {
+                    background: var(--osus-gray);
+                    opacity: 0.9;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.btn-success {
+                background: var(--osus-success);
+                border-color: var(--osus-success);
+
+                &:hover {
+                    background: #45a049;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.btn-warning {
+                background: var(--osus-warning);
+                border-color: var(--osus-warning);
+
+                &:hover {
+                    background: #f57c00;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.btn-danger {
+                background: var(--osus-danger);
+                border-color: var(--osus-danger);
+
+                &:hover {
+                    background: #d32f2f;
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .o_payment_approval_form {
+        .o_form_sheet {
+            padding: 16px;
+        }
+
+        .o_voucher_header {
+            margin: 0 -16px 16px -16px;
+            padding: 16px;
+
+            .o_voucher_amount {
+                position: relative;
+                top: auto;
+                right: auto;
+                text-align: left;
+                margin-top: 12px;
+            }
+        }
+    }
+
+    .o_payment_approval_dashboard {
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-recent {
+            .recent-item {
+                .item-main {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .item-details {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 4px;
+                }
+            }
+        }
+    }
+
+    .o_digital_signature_widget {
+        .signature-canvas-container {
+            canvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        .signature-actions {
+            flex-direction: column;
+
+            .btn {
+                width: 100%;
+            }
+        }
+    }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    .o_payment_approval_form {
+        .o_form_buttons_view {
+            display: none !important;
+        }
+
+        .o_digital_signature_widget {
+            .signature-actions {
+                display: none !important;
+            }
+        }
+
+        .o_qr_code_widget {
+            .qr-actions {
+                display: none !important;
+            }
+        }
+    }
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.o_payment_approval_form {
+    .o_form_sheet {
+        animation: slideIn 0.3s ease-out;
+    }
+}
+
+/* ========================================
+   Dark Mode Support
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --osus-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --osus-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .o_payment_approval_form {
+        .o_form_sheet {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+            color: #ffffff;
+        }
+    }
+
+    .o_digital_signature_widget {
+        background: #3a3a3a;
+        border-color: #555;
+        color: #ffffff;
+
+        .signature-canvas-container {
+            background: #2d2d2d;
+            border-color: #555;
+
+            canvas {
+                background: #ffffff;
+            }
+        }
+    }
+
+    .o_qr_code_widget {
+        background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
+        border-color: var(--osus-blue);
+        color: #ffffff;
+    }
+}

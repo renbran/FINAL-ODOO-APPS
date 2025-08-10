@@ -1,43 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<!--        Inherit form view of account.payment model-->
-        <record id="view_account_payment_form" model="ir.ui.view">
-            <field name="name">account.payment.view.form.inherit.account.payment.approval</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//header//button[@name='action_post']" position="attributes">
-                    <attribute name="visibility">state in ['draft', 'approved']</attribute>
-                </xpath>
-                <xpath expr="//header//button[@name='action_cancel']" position="attributes">
-                    <attribute name="visibility">state in ['draft', 'waiting_approval', 'approved']</attribute>
-                </xpath>
-                <xpath expr="//header//button[@name='action_draft']" position="attributes">
-                    <attribute name="visibility">state in ['rejected', 'cancelled']</attribute>
-                </xpath>
-                <xpath expr="//header//button[@name='action_post']" position="before">
-                    <button name="action_submit_review" string="Submit for Review" type="object"
-                            class="oe_highlight" 
-                            visibility="state == 'draft'"/>
-                    <button name="approve_transfer" string="Approve" type="object"
-                            class="oe_highlight"
-                            visibility="is_approve_person and state == 'waiting_approval'"/>
-                    <button name="reject_transfer" string="Reject" type="object"
-                            class="oe_highlight" 
-                            visibility="is_approve_person and state == 'waiting_approval'"/>
-                </xpath>
-                <field name="partner_id" position="after">
-                    <field name="is_approve_person" invisible="1"/>
-                    <field name="is_locked" invisible="1"/>
-                    <field name="authorized_approvers_display" readonly="1" 
-                           invisible="state not in ['waiting_approval', 'approved', 'rejected']"
-                           help="These users can approve this payment"/>
-                </field>
-                <xpath expr="//field" position="attributes">
-                    <attribute name="readonly">is_locked</attribute>
-                </xpath>
+    <!-- Enhanced Payment Form View -->
+    <record id="view_account_payment_form_enhanced" model="ir.ui.view">
+        <field name="name">account.payment.form.enhanced</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <!-- Add voucher state field to header -->
+            <xpath expr="//header" position="inside">
+                <field name="voucher_state" widget="statusbar" statusbar_visible="draft,submitted,under_review,approved,authorized,posted"/>
+                
+                <!-- Workflow Action Buttons -->
+                <button name="action_submit_for_approval" string="Submit for Approval" 
+                        type="object" class="btn-primary" 
+                        invisible="voucher_state != 'draft'"/>
+                        
+                <button name="action_review" string="Review" 
+                        type="object" class="btn-info" 
+                        invisible="voucher_state != 'submitted'"
+                        groups="account_payment_approval.group_payment_voucher_reviewer"/>
+                        
+                <button name="action_approve" string="Approve" 
+                        type="object" class="btn-success" 
+                        invisible="voucher_state != 'under_review' or voucher_type != 'payment'"
+                        groups="account_payment_approval.group_payment_voucher_approver"/>
+                        
+                <button name="action_authorize" string="Authorize" 
+                        type="object" class="btn-warning" 
+                        invisible="voucher_state != 'approved'"
+                        groups="account_payment_approval.group_payment_voucher_authorizer"/>
+                        
+                <button name="action_post_payment" string="Post Payment" 
+                        type="object" class="btn-primary" 
+                        invisible="voucher_state not in ['authorized', 'under_review'] or (voucher_type == 'payment' and voucher_state != 'authorized') or (voucher_type == 'receipt' and voucher_state != 'under_review')"
+                        groups="account_payment_approval.group_payment_voucher_manager"/>
+                        
+                <button name="action_reject" string="Reject" 
+                        type="object" class="btn-danger" 
+                        invisible="voucher_state in ['draft', 'posted', 'rejected', 'cancelled']"
+                        groups="account_payment_approval.group_payment_voucher_reviewer"/>
+                        
+                <button name="action_reset_to_draft" string="Reset to Draft" 
+                        type="object" class="btn-secondary" 
+                        invisible="voucher_state in ['draft', 'posted']"
+                        groups="account_payment_approval.group_payment_voucher_manager"/>
+            </xpath>
+            
+            <!-- Add voucher information after partner_id -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="voucher_number" readonly="1"/>
+                <field name="voucher_type" readonly="1"/>
+                <field name="workflow_progress" widget="progressbar"/>
+            </xpath>
+            
+            <!-- Add amount in words -->
+            <xpath expr="//field[@name='amount']" position="after">
+                <field name="amount_in_words" readonly="1" string="Amount in Words"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Legacy form view (keeping for backward compatibility) -->
+    <record id="view_account_payment_form" model="ir.ui.view">
+        <field name="name">account.payment.view.form.inherit.account.payment.approval</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="priority">15</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header//button[@name='action_post']" position="attributes">
+                <attribute name="invisible">state in ['draft', 'approved']</attribute>
+            </xpath>
+            <xpath expr="//header//button[@name='action_cancel']" position="attributes">
+                <attribute name="invisible">state in ['draft', 'waiting_approval', 'approved']</attribute>
+            </xpath>
+            <xpath expr="//header//button[@name='action_draft']" position="attributes">
+                <attribute name="invisible">state in ['rejected', 'cancelled']</attribute>
+            </xpath>
+            <xpath expr="//header//button[@name='action_post']" position="before">
+                <button name="action_submit_review" string="Submit for Review" type="object"
+                        class="oe_highlight" 
+                        invisible="state == 'draft'"/>
+                <button name="approve_transfer" string="Approve" type="object"
+                        class="oe_highlight"
+                        invisible="is_approve_person and state == 'waiting_approval'"/>
+                <button name="reject_transfer" string="Reject" type="object"
+                        class="oe_highlight" 
+                        invisible="is_approve_person and state == 'waiting_approval'"/>
+            </xpath>
+            <field name="partner_id" position="after">
+                <field name="is_approve_person" invisible="1"/>
+                <field name="is_locked" invisible="1"/>
+                <field name="authorized_approvers_display" readonly="1" 
+                       invisible="state not in ['waiting_approval', 'approved', 'rejected']"
+                       help="These users can approve this payment"/>
             </field>
-        </record>
+            <xpath expr="//field" position="attributes">
+                <attribute name="readonly">is_locked</attribute>
+            </xpath>
+        </field>
+    </record>
 <!--        Inherit account.payment to add filters -->
         <record id="view_account_payment_search" model="ir.ui.view">
             <field name="name">account.payment.view.search.inherit.account.payment.approval</field>

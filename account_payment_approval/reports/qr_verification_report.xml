@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- QR Verification Report Template -->
+    <template id="report_qr_verification_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- OSUS Header Styling -->
+                        <style>
+                            .osus-header {
+                                background: linear-gradient(135deg, #6B2B47 0%, #8B1538 100%);
+                                color: white;
+                                padding: 20px;
+                                margin: -20px -20px 20px -20px;
+                                text-align: center;
+                                border-radius: 0;
+                            }
+                            .osus-title {
+                                font-size: 28px;
+                                font-weight: bold;
+                                margin: 0;
+                                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+                            }
+                            .osus-subtitle {
+                                color: #D4AF37;
+                                font-size: 16px;
+                                margin: 5px 0 0 0;
+                                font-weight: 500;
+                            }
+                            .verification-header {
+                                background-color: #1976D2;
+                                color: white;
+                                padding: 15px;
+                                margin: 20px 0;
+                                text-align: center;
+                                border-radius: 5px;
+                            }
+                            .verification-status {
+                                font-size: 24px;
+                                font-weight: bold;
+                                color: #64B5F6;
+                            }
+                            .verification-section {
+                                border: 2px solid #1976D2;
+                                padding: 15px;
+                                margin: 15px 0;
+                                border-radius: 5px;
+                                background-color: #E3F2FD;
+                            }
+                            .verification-title {
+                                color: #1976D2;
+                                font-weight: bold;
+                                border-bottom: 1px solid #64B5F6;
+                                padding-bottom: 5px;
+                                margin-bottom: 10px;
+                            }
+                            .status-badge {
+                                padding: 8px 16px;
+                                border-radius: 20px;
+                                font-weight: bold;
+                                display: inline-block;
+                                margin: 5px;
+                            }
+                            .status-valid {
+                                background-color: #4CAF50;
+                                color: white;
+                            }
+                            .status-invalid {
+                                background-color: #F44336;
+                                color: white;
+                            }
+                            .status-pending {
+                                background-color: #FF9800;
+                                color: white;
+                            }
+                            .qr-display {
+                                text-align: center;
+                                border: 2px solid #1976D2;
+                                padding: 20px;
+                                margin: 20px 0;
+                                border-radius: 10px;
+                                background-color: white;
+                            }
+                            table.verification-details {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 20px 0;
+                            }
+                            table.verification-details th {
+                                background-color: #1976D2;
+                                color: white;
+                                padding: 12px;
+                                text-align: left;
+                                border: 1px solid #0D47A1;
+                            }
+                            table.verification-details td {
+                                padding: 12px;
+                                border: 1px solid #dee2e6;
+                                background-color: white;
+                            }
+                            table.verification-details tr:nth-child(even) td {
+                                background-color: #f8f9fa;
+                            }
+                            .security-info {
+                                background-color: #FFF3E0;
+                                border-left: 4px solid #FF9800;
+                                padding: 15px;
+                                margin: 20px 0;
+                            }
+                            .footer-note {
+                                font-size: 12px;
+                                color: #666;
+                                text-align: center;
+                                margin-top: 30px;
+                                padding-top: 20px;
+                                border-top: 1px solid #dee2e6;
+                            }
+                            .digital-signature-display {
+                                border: 1px solid #ddd;
+                                padding: 10px;
+                                margin: 5px 0;
+                                border-radius: 3px;
+                                background-color: #fafafa;
+                                min-height: 50px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                        </style>
+
+                        <!-- OSUS Header -->
+                        <div class="osus-header">
+                            <h1 class="osus-title">OSUS PROPERTIES</h1>
+                            <p class="osus-subtitle">Real Estate Excellence Since 2010</p>
+                        </div>
+
+                        <!-- Verification Header -->
+                        <div class="verification-header">
+                            <h2 style="margin: 0; font-size: 20px;">PAYMENT VERIFICATION REPORT</h2>
+                            <div class="verification-status">
+                                Verification Certificate
+                            </div>
+                        </div>
+
+                        <!-- Verification Status -->
+                        <div class="verification-section">
+                            <div class="verification-title">Verification Status</div>
+                            <div style="text-align: center;">
+                                <t t-if="doc.voucher_state == 'posted'">
+                                    <span class="status-badge status-valid">✓ VERIFIED - PAYMENT COMPLETED</span>
+                                </t>
+                                <t t-elif="doc.voucher_state in ['submitted', 'reviewed', 'approved', 'authorized']">
+                                    <span class="status-badge status-pending">⏳ VERIFIED - PAYMENT IN PROCESS</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="status-badge status-invalid">⚠ PAYMENT STATUS UNCLEAR</span>
+                                </t>
+                            </div>
+                            <p style="text-align: center; margin-top: 10px; color: #666;">
+                                Last Verified: <t t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
+                            </p>
+                        </div>
+
+                        <!-- QR Code Display -->
+                        <div class="qr-display">
+                            <h3 style="color: #1976D2; margin-bottom: 15px;">Original QR Code</h3>
+                            <t t-if="doc.qr_code">
+                                <img t-att-src="image_data_uri(doc.qr_code)" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd;"/>
+                            </t>
+                            <t t-else="">
+                                <div style="width: 200px; height: 200px; border: 2px dashed #ccc; display: inline-flex; align-items: center; justify-content: center; color: #999;">
+                                    QR Code Not Available
+                                </div>
+                            </t>
+                            <p style="margin: 15px 0 0 0; font-size: 14px; color: #666;">
+                                Token: <strong><t t-esc="doc.verification_token or 'N/A'"/></strong>
+                            </p>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="verification-section">
+                            <div class="verification-title">Payment Details</div>
+                            <table class="verification-details">
+                                <tr>
+                                    <th style="width: 30%;">Voucher Number</th>
+                                    <td><strong><t t-esc="doc.voucher_number or 'DRAFT'"/></strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Voucher Type</th>
+                                    <td>
+                                        <t t-if="doc.payment_type == 'outbound'">Payment Voucher</t>
+                                        <t t-elif="doc.payment_type == 'inbound'">Receipt Voucher</t>
+                                        <t t-else="">Unknown Type</t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td><t t-esc="doc.date.strftime('%B %d, %Y') if doc.date else 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <t t-if="doc.payment_type == 'outbound'">Pay To</t>
+                                        <t t-else="">Received From</t>
+                                    </th>
+                                    <td><t t-esc="doc.partner_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Amount</th>
+                                    <td style="font-size: 18px; font-weight: bold; color: #1976D2;">
+                                        <t t-esc="doc.currency_id.symbol"/>
+                                        <t t-esc="'{:,.2f}'.format(doc.amount)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Amount in Words</th>
+                                    <td style="font-style: italic;"><t t-esc="doc.amount_in_words"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Payment Method</th>
+                                    <td><t t-esc="doc.payment_method_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Journal</th>
+                                    <td><t t-esc="doc.journal_id.name"/></td>
+                                </tr>
+                                <tr t-if="doc.ref">
+                                    <th>Reference/Purpose</th>
+                                    <td><t t-esc="doc.ref"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Digital Signatures Verification -->
+                        <div class="verification-section">
+                            <div class="verification-title">Digital Signature Verification</div>
+                            
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <th style="background-color: #1976D2; color: white; padding: 8px; border: 1px solid #0D47A1;">Role</th>
+                                    <th style="background-color: #1976D2; color: white; padding: 8px; border: 1px solid #0D47A1;">Name</th>
+                                    <th style="background-color: #1976D2; color: white; padding: 8px; border: 1px solid #0D47A1;">Signature Status</th>
+                                    <th style="background-color: #1976D2; color: white; padding: 8px; border: 1px solid #0D47A1;">Date</th>
+                                </tr>
+                                
+                                <!-- Creator -->
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Creator</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;"><t t-esc="doc.creator_name or 'N/A'"/></td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.creator_signature">
+                                            <span class="status-badge status-valid" style="font-size: 12px; padding: 3px 8px;">✓ Signed</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="status-badge status-invalid" style="font-size: 12px; padding: 3px 8px;">✗ Not Signed</span>
+                                        </t>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.creator_signature_date">
+                                            <t t-esc="doc.creator_signature_date.strftime('%B %d, %Y')"/>
+                                        </t>
+                                        <t t-else="">N/A</t>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Reviewer -->
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Reviewer</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;"><t t-esc="doc.reviewer_name or 'N/A'"/></td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.reviewer_signature">
+                                            <span class="status-badge status-valid" style="font-size: 12px; padding: 3px 8px;">✓ Signed</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="status-badge status-pending" style="font-size: 12px; padding: 3px 8px;">⏳ Pending</span>
+                                        </t>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.reviewer_signature_date">
+                                            <t t-esc="doc.reviewer_signature_date.strftime('%B %d, %Y')"/>
+                                        </t>
+                                        <t t-else="">N/A</t>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Approver (for Payment Vouchers) -->
+                                <tr t-if="doc.payment_type == 'outbound'">
+                                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Approver</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;"><t t-esc="doc.approver_name or 'N/A'"/></td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.approver_signature">
+                                            <span class="status-badge status-valid" style="font-size: 12px; padding: 3px 8px;">✓ Signed</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="status-badge status-pending" style="font-size: 12px; padding: 3px 8px;">⏳ Pending</span>
+                                        </t>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.approver_signature_date">
+                                            <t t-esc="doc.approver_signature_date.strftime('%B %d, %Y')"/>
+                                        </t>
+                                        <t t-else="">N/A</t>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Authorizer -->
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Authorizer</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;"><t t-esc="doc.authorizer_name or 'N/A'"/></td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.authorizer_signature">
+                                            <span class="status-badge status-valid" style="font-size: 12px; padding: 3px 8px;">✓ Signed</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="status-badge status-pending" style="font-size: 12px; padding: 3px 8px;">⏳ Pending</span>
+                                        </t>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <t t-if="doc.authorizer_signature_date">
+                                            <t t-esc="doc.authorizer_signature_date.strftime('%B %d, %Y')"/>
+                                        </t>
+                                        <t t-else="">N/A</t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Security Information -->
+                        <div class="security-info">
+                            <h4 style="color: #FF9800; margin: 0 0 10px 0;">🔒 Security Information</h4>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>This verification report is digitally generated and authenticated</li>
+                                <li>QR codes are unique and cannot be duplicated or forged</li>
+                                <li>Digital signatures are cryptographically secure and legally binding</li>
+                                <li>All timestamps are recorded in the system audit trail</li>
+                                <li>Any unauthorized modification will invalidate the verification</li>
+                            </ul>
+                        </div>
+
+                        <!-- Related Document Information -->
+                        <div t-if="doc.related_document_number" class="verification-section">
+                            <div class="verification-title">Related Document</div>
+                            <table class="verification-details">
+                                <tr>
+                                    <th style="width: 30%;">Document Type</th>
+                                    <td><t t-esc="doc.related_document_type"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Document Number</th>
+                                    <td><t t-esc="doc.related_document_number"/></td>
+                                </tr>
+                                <tr t-if="doc.related_document_date">
+                                    <th>Document Date</th>
+                                    <td><t t-esc="doc.related_document_date.strftime('%B %d, %Y')"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="footer-note">
+                            <p>
+                                <strong>OSUS Properties</strong> - Professional Real Estate Management<br/>
+                                This verification report is computer-generated and does not require a physical signature.<br/>
+                                Report Generated: <t t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/><br/>
+                                <strong>For verification inquiries, contact: verification@osusproperties.com</strong>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

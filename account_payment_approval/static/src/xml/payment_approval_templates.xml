@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Digital Signature Widget Template -->
+    <t t-name="account_payment_approval.DigitalSignatureWidget" owl="1">
+        <div class="o_digital_signature_widget" t-att-class="props.readonly ? 'readonly' : ''">
+            <div class="signature-header">
+                <h5>
+                    <i class="fa fa-edit"/>
+                    <t t-if="props.signature_type === 'creator'">Creator Signature</t>
+                    <t t-elif="props.signature_type === 'reviewer'">Reviewer Signature</t>
+                    <t t-elif="props.signature_type === 'approver'">Approver Signature</t>
+                    <t t-elif="props.signature_type === 'authorizer'">Authorizer Signature</t>
+                    <t t-elif="props.signature_type === 'receiver'">Receiver Signature</t>
+                    <t t-else="">Digital Signature</t>
+                </h5>
+                <span class="signature-status" t-att-class="state.hasSignature ? 'signed' : 'pending'">
+                    <t t-if="state.hasSignature">
+                        <i class="fa fa-check-circle"/> Signed
+                    </t>
+                    <t t-else="">
+                        <i class="fa fa-clock-o"/> Pending
+                    </t>
+                </span>
+            </div>
+
+            <div class="signature-canvas-container">
+                <canvas 
+                    t-ref="signatureCanvas"
+                    width="400" 
+                    height="150"
+                    t-att-style="props.readonly ? 'pointer-events: none;' : ''"
+                />
+                <div class="signature-placeholder" t-if="!state.hasSignature and !props.readonly">
+                    <i class="fa fa-pencil"/> <t t-esc="placeholderText"/>
+                </div>
+            </div>
+
+            <div class="signature-actions" t-if="!props.readonly">
+                <button 
+                    class="btn btn-primary btn-sm" 
+                    t-on-click="saveToDatabase"
+                    t-att-disabled="!canSave"
+                >
+                    <i class="fa fa-save"/> 
+                    <t t-if="state.isLoading">Saving...</t>
+                    <t t-else="">Save Signature</t>
+                </button>
+                
+                <button 
+                    class="btn btn-outline-secondary btn-sm" 
+                    t-on-click="clearSignature"
+                    t-att-disabled="!state.hasSignature"
+                >
+                    <i class="fa fa-eraser"/> Clear
+                </button>
+            </div>
+
+            <div class="signature-info" t-if="state.hasSignature">
+                <div class="signature-date">
+                    <i class="fa fa-clock-o"/> 
+                    Last modified: <span t-esc="new Date().toLocaleString()"/>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-2" t-if="props.readonly and !state.hasSignature">
+                <i class="fa fa-info-circle"/> No signature available
+            </div>
+        </div>
+    </t>
+
+    <!-- QR Code Widget Template -->
+    <t t-name="account_payment_approval.QRCodeWidget" owl="1">
+        <div class="o_qr_code_widget">
+            <div class="qr-header">
+                <h5>
+                    <i class="fa fa-qrcode"/> Payment Verification QR Code
+                </h5>
+            </div>
+
+            <div t-if="state.isLoading" class="text-center">
+                <i class="fa fa-spinner fa-spin fa-2x text-primary"/>
+                <div class="mt-2">Generating QR Code...</div>
+            </div>
+
+            <div t-elif="state.error" class="alert alert-danger">
+                <i class="fa fa-exclamation-triangle"/> 
+                <t t-esc="state.error"/>
+            </div>
+
+            <div t-elif="hasQRCode" class="qr-content">
+                <div class="qr-code-display">
+                    <img 
+                        t-att-src="state.qrCodeData" 
+                        t-att-width="qrCodeSize" 
+                        t-att-height="qrCodeSize"
+                        alt="Payment Verification QR Code"
+                    />
+                </div>
+
+                <div class="verification-token" t-if="state.verificationToken">
+                    Token: <t t-esc="state.verificationToken"/>
+                </div>
+
+                <div class="verification-url" t-if="verificationUrl">
+                    <small>
+                        <a t-att-href="verificationUrl" target="_blank">
+                            <t t-esc="verificationUrl"/>
+                        </a>
+                    </small>
+                </div>
+
+                <div class="qr-actions">
+                    <button 
+                        class="btn btn-primary btn-sm" 
+                        t-on-click="copyVerificationLink"
+                        title="Copy verification link to clipboard"
+                    >
+                        <i class="fa fa-copy"/> Copy Link
+                    </button>
+                    
+                    <button 
+                        class="btn btn-info btn-sm" 
+                        t-on-click="openVerificationPage"
+                        title="Open verification page in new tab"
+                    >
+                        <i class="fa fa-external-link"/> Verify
+                    </button>
+                    
+                    <button 
+                        class="btn btn-success btn-sm" 
+                        t-on-click="downloadQRCode"
+                        title="Download QR code as image"
+                    >
+                        <i class="fa fa-download"/> Download
+                    </button>
+                    
+                    <button 
+                        class="btn btn-warning btn-sm" 
+                        t-on-click="regenerateQRCode"
+                        t-att-disabled="!canGenerate"
+                        title="Generate new QR code"
+                    >
+                        <i class="fa fa-refresh"/> Regenerate
+                    </button>
+                </div>
+            </div>
+
+            <div t-else="" class="qr-empty">
+                <div class="text-center text-muted mb-3">
+                    <i class="fa fa-qrcode fa-3x"/>
+                    <div class="mt-2">No QR code generated yet</div>
+                </div>
+                
+                <div class="text-center" t-if="canGenerate">
+                    <button 
+                        class="btn btn-primary" 
+                        t-on-click="generateQRCode"
+                        t-att-disabled="state.isLoading"
+                    >
+                        <i class="fa fa-plus"/> Generate QR Code
+                    </button>
+                </div>
+                
+                <div class="alert alert-warning mt-2" t-if="!canGenerate">
+                    <i class="fa fa-info-circle"/> 
+                    Save the payment record first to generate QR code
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Payment Approval Dashboard Template -->
+    <t t-name="account_payment_approval.PaymentApprovalDashboard" owl="1">
+        <div class="o_payment_approval_dashboard">
+            <div class="dashboard-header">
+                <h2>
+                    <i class="fa fa-tachometer"/> Payment Approval Dashboard
+                </h2>
+                <div class="dashboard-subtitle">
+                    Manage and monitor payment approval workflows
+                </div>
+                <div class="dashboard-actions mt-2">
+                    <button class="btn btn-light btn-sm" t-on-click="refreshDashboard">
+                        <i class="fa fa-refresh"/> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="state.isLoading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x text-primary"/>
+                <div class="mt-2">Loading dashboard data...</div>
+            </div>
+
+            <div t-elif="state.error" class="alert alert-danger">
+                <i class="fa fa-exclamation-triangle"/> 
+                <t t-esc="state.error"/>
+                <button class="btn btn-outline-danger btn-sm ml-2" t-on-click="refreshDashboard">
+                    <i class="fa fa-refresh"/> Retry
+                </button>
+            </div>
+
+            <div t-elif="!hasPermissions" class="alert alert-warning">
+                <i class="fa fa-lock"/> 
+                You don't have sufficient permissions to view payment approvals.
+            </div>
+
+            <div t-else="" class="dashboard-content">
+                <!-- Statistics Cards -->
+                <div class="dashboard-stats">
+                    <div 
+                        class="stat-card pending-review" 
+                        t-if="state.userPermissions.can_review"
+                        t-on-click="onPendingReviewClick"
+                    >
+                        <div class="stat-number">
+                            <t t-esc="state.stats.pending_review || 0"/>
+                        </div>
+                        <div class="stat-label">Pending Review</div>
+                        <i class="stat-icon fa fa-eye"/>
+                    </div>
+
+                    <div 
+                        class="stat-card pending-approval" 
+                        t-if="state.userPermissions.can_approve"
+                        t-on-click="onPendingApprovalClick"
+                    >
+                        <div class="stat-number">
+                            <t t-esc="state.stats.pending_approval || 0"/>
+                        </div>
+                        <div class="stat-label">Pending Approval</div>
+                        <i class="stat-icon fa fa-check"/>
+                    </div>
+
+                    <div 
+                        class="stat-card pending-authorization" 
+                        t-if="state.userPermissions.can_authorize"
+                        t-on-click="onPendingAuthorizationClick"
+                    >
+                        <div class="stat-number">
+                            <t t-esc="state.stats.pending_authorization || 0"/>
+                        </div>
+                        <div class="stat-label">Pending Authorization</div>
+                        <i class="stat-icon fa fa-shield"/>
+                    </div>
+
+                    <div 
+                        class="stat-card completed" 
+                        t-if="state.userPermissions.can_post"
+                        t-on-click="onPendingPostingClick"
+                    >
+                        <div class="stat-number">
+                            <t t-esc="state.stats.pending_posting || 0"/>
+                        </div>
+                        <div class="stat-label">Ready to Post</div>
+                        <i class="stat-icon fa fa-paper-plane"/>
+                    </div>
+                </div>
+
+                <!-- Recent Payments -->
+                <div class="dashboard-recent" t-if="state.recentPayments.length">
+                    <div class="recent-header">
+                        <h4>
+                            <i class="fa fa-clock-o"/> Recent Payments
+                        </h4>
+                    </div>
+                    <div class="recent-list">
+                        <div 
+                            class="recent-item" 
+                            t-foreach="state.recentPayments" 
+                            t-as="payment"
+                            t-key="payment.id"
+                            t-on-click="() => this.openPaymentForm(payment.id)"
+                        >
+                            <div class="item-main">
+                                <div class="item-title">
+                                    <t t-esc="payment.voucher_number || 'DRAFT'"/>
+                                </div>
+                                <div class="item-amount">
+                                    <t t-esc="payment.currency_symbol"/>
+                                    <t t-esc="payment.amount"/>
+                                </div>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-partner">
+                                    <i class="fa fa-user"/> <t t-esc="payment.partner_name"/>
+                                </div>
+                                <div class="item-actions">
+                                    <span 
+                                        class="item-state" 
+                                        t-att-class="payment.voucher_state"
+                                    >
+                                        <t t-esc="getStateLabel(payment.voucher_state)"/>
+                                    </span>
+                                    
+                                    <!-- Quick Actions -->
+                                    <button 
+                                        class="btn btn-xs btn-primary ml-1" 
+                                        t-if="canPerformAction(payment, 'review')"
+                                        t-on-click.stop="() => this.onQuickAction(payment.id, 'review')"
+                                        title="Review"
+                                    >
+                                        <i class="fa fa-eye"/>
+                                    </button>
+                                    
+                                    <button 
+                                        class="btn btn-xs btn-warning ml-1" 
+                                        t-if="canPerformAction(payment, 'approve')"
+                                        t-on-click.stop="() => this.onQuickAction(payment.id, 'approve')"
+                                        title="Approve"
+                                    >
+                                        <i class="fa fa-check"/>
+                                    </button>
+                                    
+                                    <button 
+                                        class="btn btn-xs btn-success ml-1" 
+                                        t-if="canPerformAction(payment, 'authorize')"
+                                        t-on-click.stop="() => this.onQuickAction(payment.id, 'authorize')"
+                                        title="Authorize"
+                                    >
+                                        <i class="fa fa-shield"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Stats for Managers -->
+                <div class="dashboard-summary mt-4" t-if="state.userPermissions.is_manager">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="summary-card">
+                                <h6>Total in Process</h6>
+                                <div class="summary-number text-warning">
+                                    <t t-esc="totalPendingCount"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-card">
+                                <h6>Total Posted</h6>
+                                <div class="summary-number text-success">
+                                    <t t-esc="state.stats.total_posted || 0"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-card">
+                                <h6>Total Rejected</h6>
+                                <div class="summary-number text-danger">
+                                    <t t-esc="state.stats.total_rejected || 0"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-card">
+                                <h6>Total Draft</h6>
+                                <div class="summary-number text-muted">
+                                    <t t-esc="state.stats.total_draft || 0"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

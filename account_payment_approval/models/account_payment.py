@@ -1,37 +1,652 @@
 # -*- coding: utf-8 -*-
 #############################################################################
 #
-#    Cybrosys Technologies Pvt. Ltd.
+#    Enhanced Payment Voucher System - OSUS
+#    Copyright (C) 2024 OSUS Properties
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Jumana Haseen (odoo@cybrosys.com)
-#
-#    You can modify it under the terms of the GNU LESSER
-#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
-#
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
-#    (LGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
+#    GNU Lesser General Public License for more details.
 #
 #############################################################################
-from odoo import fields, models, _
-from odoo.exceptions import ValidationError, UserError
-from lxml import etree
-from odoo import api
+
+from odoo import fields, models, api, _
+from odoo.exceptions import ValidationError, UserError, AccessError
+from datetime import datetime, timedelta
 import logging
+import uuid
+import qrcode
+import io
+import base64
+from num2words import num2words
 
 _logger = logging.getLogger(__name__)
 
 
 class AccountPayment(models.Model):
-    """This class inherits model "account.payment" and adds required fields """
+    """Enhanced Payment with Digital Signatures, QR Codes, and Multi-stage Approval"""
     _inherit = "account.payment"
     _inherits = {'account.move': 'move_id'}
+    
+    # Enhanced Workflow States
+    voucher_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('authorized', 'Authorized'),
+        ('posted', 'Posted'),
+        ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled')
+    ], string='Voucher Status', default='draft', tracking=True, copy=False,
+       help="Enhanced workflow status for payment vouchers")
+    
+    # Voucher Information
+    voucher_number = fields.Char(
+        string='Voucher Number', 
+        readonly=True, 
+        copy=False,
+        help="Auto-generated voucher number"
+    )
+    
+    voucher_type = fields.Selection([
+        ('payment', 'Payment Voucher'),
+        ('receipt', 'Receipt Voucher')
+    ], string='Voucher Type', compute='_compute_voucher_type', store=True)
+    
+    # Digital Signature Fields
+    creator_signature = fields.Binary(string='Creator Signature', attachment=True)
+    creator_signature_date = fields.Datetime(string='Creator Signature Date')
+    creator_name = fields.Char(string='Creator Name', compute='_compute_creator_name', store=True)
+    
+    reviewer_signature = fields.Binary(string='Reviewer Signature', attachment=True)
+    reviewer_signature_date = fields.Datetime(string='Reviewer Signature Date')
+    reviewer_id = fields.Many2one('res.users', string='Reviewer')
+    reviewer_name = fields.Char(string='Reviewer Name', related='reviewer_id.name', store=True)
+    
+    approver_signature = fields.Binary(string='Approver Signature', attachment=True)
+    approver_signature_date = fields.Datetime(string='Approver Signature Date')
+    approver_id = fields.Many2one('res.users', string='Approver')
+    approver_name = fields.Char(string='Approver Name', related='approver_id.name', store=True)
+    
+    authorizer_signature = fields.Binary(string='Authorizer Signature', attachment=True)
+    authorizer_signature_date = fields.Datetime(string='Authorizer Signature Date')
+    authorizer_id = fields.Many2one('res.users', string='Authorizer')
+    authorizer_name = fields.Char(string='Authorizer Name', related='authorizer_id.name', store=True)
+    
+    receiver_signature = fields.Binary(string='Receiver Signature', attachment=True)
+    receiver_signature_date = fields.Datetime(string='Receiver Signature Date')
+    
+    # QR Code and Verification
+    qr_code = fields.Binary(string='QR Code', attachment=True, compute='_compute_qr_code', store=True)
+    verification_token = fields.Char(string='Verification Token', copy=False)
+    verification_url = fields.Char(string='Verification URL', compute='_compute_verification_url')
+    
+    # Amount in Words
+    amount_in_words = fields.Text(string='Amount in Words', compute='_compute_amount_in_words')
+    
+    # Related Document Information
+    related_document_type = fields.Char(string='Related Document Type')
+    related_document_number = fields.Char(string='Related Document Number')
+    related_document_date = fields.Date(string='Related Document Date')
+    
+    # Workflow Tracking
+    submitted_date = fields.Datetime(string='Submitted Date')
+    reviewed_date = fields.Datetime(string='Reviewed Date')
+    approved_date = fields.Datetime(string='Approved Date')
+    authorized_date = fields.Datetime(string='Authorized Date')
+    rejected_date = fields.Datetime(string='Rejected Date')
+    rejection_reason = fields.Text(string='Rejection Reason')
+    
+    # Progress Tracking
+    workflow_progress = fields.Float(string='Workflow Progress', compute='_compute_workflow_progress')
+    next_action_user_ids = fields.Many2many('res.users', string='Next Action Users', compute='_compute_next_action_users')
+    
+    # Legacy Fields (for backward compatibility)
+    is_approve_person = fields.Boolean(string='Is Approve Person', compute='_compute_is_approve_person')
+    
+    @api.depends('payment_type')
+    def _compute_voucher_type(self):
+        """Determine voucher type based on payment type"""
+        for record in self:
+            if record.payment_type == 'outbound':
+                record.voucher_type = 'payment'
+            else:
+                record.voucher_type = 'receipt'
+    
+    @api.depends('create_uid')
+    def _compute_creator_name(self):
+        """Compute creator name from create_uid"""
+        for record in self:
+            record.creator_name = record.create_uid.name if record.create_uid else ''
+    
+    @api.depends('amount', 'currency_id')
+    def _compute_amount_in_words(self):
+        """Convert amount to words"""
+        for record in self:
+            if record.amount and record.currency_id:
+                try:
+                    # Get currency name
+                    currency_name = record.currency_id.name or 'USD'
+                    
+                    # Convert amount to words
+                    amount_words = num2words(record.amount, to='currency', currency=currency_name)
+                    record.amount_in_words = amount_words.title()
+                except Exception as e:
+                    _logger.warning(f"Error converting amount to words: {e}")
+                    record.amount_in_words = f"{record.currency_id.symbol} {record.amount:,.2f}"
+            else:
+                record.amount_in_words = ''
+    
+    @api.depends('verification_token')
+    def _compute_verification_url(self):
+        """Generate QR verification URL"""
+        for record in self:
+            if record.verification_token:
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', 'http://localhost:8069')
+                record.verification_url = f"{base_url}/payment/verify/{record.verification_token}"
+            else:
+                record.verification_url = ''
+    
+    @api.depends('verification_url')
+    def _compute_qr_code(self):
+        """Generate QR code for payment verification"""
+        for record in self:
+            if record.verification_url:
+                try:
+                    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+                    qr.add_data(record.verification_url)
+                    qr.make(fit=True)
+                    
+                    img = qr.make_image(fill_color="black", back_color="white")
+                    buffer = io.BytesIO()
+                    img.save(buffer, format='PNG')
+                    qr_code_data = base64.b64encode(buffer.getvalue())
+                    record.qr_code = qr_code_data
+                except Exception as e:
+                    _logger.warning(f"Error generating QR code: {e}")
+                    record.qr_code = False
+            else:
+                record.qr_code = False
+    
+    @api.depends('voucher_state', 'voucher_type')
+    def _compute_workflow_progress(self):
+        """Calculate workflow progress percentage"""
+        for record in self:
+            if record.voucher_type == 'payment':
+                # Payment Voucher: 7 stages (Draft, Submitted, Review, Approved, Authorized, Posted)
+                progress_map = {
+                    'draft': 0,
+                    'submitted': 16.67,
+                    'under_review': 33.33,
+                    'approved': 50.0,
+                    'authorized': 66.67,
+                    'posted': 100.0,
+                    'rejected': 0,
+                    'cancelled': 0
+                }
+            else:
+                # Receipt Voucher: 4 stages (Draft, Submitted, Review, Posted)
+                progress_map = {
+                    'draft': 0,
+                    'submitted': 25.0,
+                    'under_review': 50.0,
+                    'posted': 100.0,
+                    'rejected': 0,
+                    'cancelled': 0
+                }
+            record.workflow_progress = progress_map.get(record.voucher_state, 0)
+    
+    @api.depends('voucher_state', 'voucher_type')
+    def _compute_next_action_users(self):
+        """Determine who should take the next action"""
+        for record in self:
+            users = self.env['res.users']
+            
+            if record.voucher_state == 'submitted':
+                # Need reviewer
+                users = self.env.ref('account_payment_approval.group_payment_voucher_reviewer').users
+            elif record.voucher_state == 'under_review' and record.voucher_type == 'payment':
+                # Need approver for payment vouchers
+                users = self.env.ref('account_payment_approval.group_payment_voucher_approver').users
+            elif record.voucher_state == 'approved' and record.voucher_type == 'payment':
+                # Need authorizer for payment vouchers
+                users = self.env.ref('account_payment_approval.group_payment_voucher_authorizer').users
+            elif record.voucher_state in ['under_review', 'authorized']:
+                # Ready for posting
+                users = self.env.ref('account_payment_approval.group_payment_voucher_manager').users
+            
+            record.next_action_user_ids = users
+    
+    def _compute_is_approve_person(self):
+        """Legacy method for backward compatibility"""
+        for record in self:
+            # Check if user has any approval permissions
+            user = self.env.user
+            approval_groups = [
+                'account_payment_approval.group_payment_voucher_reviewer',
+                'account_payment_approval.group_payment_voucher_approver',
+                'account_payment_approval.group_payment_voucher_authorizer',
+                'account_payment_approval.group_payment_voucher_manager'
+            ]
+            
+            record.is_approve_person = any(user.has_group(group) for group in approval_groups)
+    
+    @api.model
+    def create(self, vals):
+        """Override create to generate voucher number and verification token"""
+        payment = super().create(vals)
+        
+        # Generate voucher number
+        if not payment.voucher_number:
+            if payment.voucher_type == 'payment':
+                sequence = self.env.ref('account_payment_approval.sequence_payment_voucher')
+            else:
+                sequence = self.env.ref('account_payment_approval.sequence_receipt_voucher')
+            payment.voucher_number = sequence.next_by_id()
+        
+        # Generate verification token
+        if not payment.verification_token:
+            payment.verification_token = str(uuid.uuid4())
+        
+        # Create QR verification record
+        self.env['payment.voucher.qr.verification'].create({
+            'payment_id': payment.id,
+            'token': payment.verification_token,
+            'is_active': True
+        })
+        
+        return payment
+    
+    # Workflow Action Methods
+    def action_submit_for_approval(self):
+        """Submit payment for approval workflow"""
+        self.ensure_one()
+        
+        if self.voucher_state != 'draft':
+            raise UserError(_("Only draft vouchers can be submitted for approval."))
+        
+        # Validate required fields
+        self._validate_submission()
+        
+        # Update state and dates
+        self.write({
+            'voucher_state': 'submitted',
+            'submitted_date': fields.Datetime.now(),
+        })
+        
+        # Create creator signature if not exists
+        if not self.creator_signature_date:
+            self._create_signature('creator')
+        
+        # Send notification
+        self._send_notification('submitted')
+        
+        # Create activity for reviewers
+        self._create_activity_for_next_users()
+        
+        self.message_post(
+            body=_("Payment voucher submitted for approval by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    def action_review(self):
+        """Review the payment voucher"""
+        self.ensure_one()
+        self._check_workflow_permission('review')
+        
+        if self.voucher_state != 'submitted':
+            raise UserError(_("Only submitted vouchers can be reviewed."))
+        
+        self.write({
+            'voucher_state': 'under_review',
+            'reviewed_date': fields.Datetime.now(),
+            'reviewer_id': self.env.user.id,
+        })
+        
+        # Create reviewer signature
+        self._create_signature('reviewer')
+        
+        # Send notification
+        self._send_notification('reviewed')
+        
+        # Create next activity
+        self._create_activity_for_next_users()
+        
+        self.message_post(
+            body=_("Payment voucher reviewed by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    def action_approve(self):
+        """Approve the payment voucher (only for payment vouchers)"""
+        self.ensure_one()
+        self._check_workflow_permission('approve')
+        
+        if self.voucher_type != 'payment':
+            raise UserError(_("Only payment vouchers require approval step."))
+        
+        if self.voucher_state != 'under_review':
+            raise UserError(_("Only vouchers under review can be approved."))
+        
+        self.write({
+            'voucher_state': 'approved',
+            'approved_date': fields.Datetime.now(),
+            'approver_id': self.env.user.id,
+        })
+        
+        # Create approver signature
+        self._create_signature('approver')
+        
+        # Send notification
+        self._send_notification('approved')
+        
+        # Create next activity
+        self._create_activity_for_next_users()
+        
+        self.message_post(
+            body=_("Payment voucher approved by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    def action_authorize(self):
+        """Authorize the payment voucher (only for payment vouchers)"""
+        self.ensure_one()
+        self._check_workflow_permission('authorize')
+        
+        if self.voucher_type != 'payment':
+            raise UserError(_("Only payment vouchers require authorization step."))
+        
+        if self.voucher_state != 'approved':
+            raise UserError(_("Only approved vouchers can be authorized."))
+        
+        self.write({
+            'voucher_state': 'authorized',
+            'authorized_date': fields.Datetime.now(),
+            'authorizer_id': self.env.user.id,
+        })
+        
+        # Create authorizer signature
+        self._create_signature('authorizer')
+        
+        # Send notification
+        self._send_notification('authorized')
+        
+        # Create next activity
+        self._create_activity_for_next_users()
+        
+        self.message_post(
+            body=_("Payment voucher authorized by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    def action_post_payment(self):
+        """Post the payment (final step)"""
+        self.ensure_one()
+        self._check_workflow_permission('post')
+        
+        # Check state requirements
+        if self.voucher_type == 'payment' and self.voucher_state != 'authorized':
+            raise UserError(_("Payment vouchers must be authorized before posting."))
+        elif self.voucher_type == 'receipt' and self.voucher_state != 'under_review':
+            raise UserError(_("Receipt vouchers must be reviewed before posting."))
+        
+        # Post the payment using standard Odoo method
+        self.action_post()
+        
+        # Update voucher state
+        self.write({
+            'voucher_state': 'posted',
+        })
+        
+        # Send final notification
+        self._send_notification('posted')
+        
+        self.message_post(
+            body=_("Payment voucher posted by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    def action_reject(self):
+        """Reject the payment voucher"""
+        self.ensure_one()
+        self._check_workflow_permission('reject')
+        
+        # Get rejection reason
+        ctx = self.env.context
+        rejection_reason = ctx.get('rejection_reason', '')
+        
+        if not rejection_reason:
+            raise UserError(_("Please provide a reason for rejection."))
+        
+        self.write({
+            'voucher_state': 'rejected',
+            'rejected_date': fields.Datetime.now(),
+            'rejection_reason': rejection_reason,
+        })
+        
+        # Send notification
+        self._send_notification('rejected')
+        
+        self.message_post(
+            body=_("Payment voucher rejected by %s. Reason: %s") % (self.env.user.name, rejection_reason),
+            message_type='notification'
+        )
+    
+    def action_reset_to_draft(self):
+        """Reset voucher to draft state"""
+        self.ensure_one()
+        
+        if not self.env.user.has_group('account_payment_approval.group_payment_voucher_manager'):
+            raise AccessError(_("Only managers can reset vouchers to draft."))
+        
+        self.write({
+            'voucher_state': 'draft',
+            'submitted_date': False,
+            'reviewed_date': False,
+            'approved_date': False,
+            'authorized_date': False,
+            'rejected_date': False,
+            'rejection_reason': False,
+            'reviewer_id': False,
+            'approver_id': False,
+            'authorizer_id': False,
+        })
+        
+        self.message_post(
+            body=_("Payment voucher reset to draft by %s") % self.env.user.name,
+            message_type='notification'
+        )
+    
+    # Helper Methods
+    def _validate_submission(self):
+        """Validate required fields before submission"""
+        self.ensure_one()
+        
+        if not self.partner_id:
+            raise ValidationError(_("Partner is required for submission."))
+        
+        if not self.amount or self.amount <= 0:
+            raise ValidationError(_("Amount must be greater than zero."))
+        
+        if not self.currency_id:
+            raise ValidationError(_("Currency is required for submission."))
+        
+        if not self.payment_method_id:
+            raise ValidationError(_("Payment method is required for submission."))
+    
+    def _check_workflow_permission(self, action):
+        """Check if current user has permission for the workflow action"""
+        self.ensure_one()
+        user = self.env.user
+        
+        permission_map = {
+            'review': 'account_payment_approval.group_payment_voucher_reviewer',
+            'approve': 'account_payment_approval.group_payment_voucher_approver',
+            'authorize': 'account_payment_approval.group_payment_voucher_authorizer',
+            'post': 'account_payment_approval.group_payment_voucher_manager',
+            'reject': 'account_payment_approval.group_payment_voucher_reviewer',  # Reviewers can reject
+        }
+        
+        required_group = permission_map.get(action)
+        if required_group and not user.has_group(required_group):
+            raise AccessError(_("You don't have permission to %s this voucher.") % action)
+    
+    def _create_signature(self, signature_type):
+        """Create a digital signature for the current user"""
+        self.ensure_one()
+        
+        # Create signature record
+        signature_vals = {
+            'payment_id': self.id,
+            'user_id': self.env.user.id,
+            'signature_type': signature_type,
+            'signature_date': fields.Datetime.now(),
+            'ip_address': self.env.context.get('client_ip', ''),
+            'user_agent': self.env.context.get('user_agent', ''),
+        }
+        
+        self.env['payment.voucher.signature'].create(signature_vals)
+        
+        # Update payment fields
+        field_map = {
+            'creator': ('creator_signature_date',),
+            'reviewer': ('reviewer_signature_date',),
+            'approver': ('approver_signature_date',),
+            'authorizer': ('authorizer_signature_date',),
+            'receiver': ('receiver_signature_date',),
+        }
+        
+        if signature_type in field_map:
+            update_vals = {field_map[signature_type][0]: fields.Datetime.now()}
+            self.write(update_vals)
+    
+    def _send_notification(self, action):
+        """Send email notification for workflow action"""
+        self.ensure_one()
+        
+        template_map = {
+            'submitted': 'account_payment_approval.email_template_payment_submitted',
+            'reviewed': 'account_payment_approval.email_template_payment_reviewed',
+            'approved': 'account_payment_approval.email_template_payment_approved',
+            'authorized': 'account_payment_approval.email_template_payment_authorized',
+            'posted': 'account_payment_approval.email_template_payment_posted',
+            'rejected': 'account_payment_approval.email_template_payment_rejected',
+        }
+        
+        template_ref = template_map.get(action)
+        if template_ref:
+            try:
+                template = self.env.ref(template_ref)
+                template.send_mail(self.id, force_send=True)
+            except Exception as e:
+                _logger.warning(f"Failed to send email notification: {e}")
+    
+    def _create_activity_for_next_users(self):
+        """Create activities for users who need to take the next action"""
+        self.ensure_one()
+        
+        if not self.next_action_user_ids:
+            return
+        
+        activity_type = self.env.ref('mail.mail_activity_data_todo')
+        
+        action_messages = {
+            'submitted': 'Review payment voucher',
+            'under_review': 'Approve payment voucher' if self.voucher_type == 'payment' else 'Post receipt voucher',
+            'approved': 'Authorize payment voucher',
+            'authorized': 'Post payment voucher',
+        }
+        
+        summary = action_messages.get(self.voucher_state, 'Process payment voucher')
+        
+        for user in self.next_action_user_ids:
+            self.activity_schedule(
+                activity_type_id=activity_type.id,
+                summary=summary,
+                note=f"Voucher {self.voucher_number} requires your attention.",
+                user_id=user.id,
+                date_deadline=fields.Date.today() + timedelta(days=3)
+            )
+    
+    def get_voucher_verification_data(self):
+        """Get voucher data for QR verification portal"""
+        self.ensure_one()
+        
+        return {
+            'voucher_number': self.voucher_number,
+            'voucher_type': self.voucher_type,
+            'partner_name': self.partner_id.name,
+            'amount': self.amount,
+            'currency': self.currency_id.name,
+            'date': self.date.strftime('%B %d, %Y') if self.date else '',
+            'state': self.voucher_state,
+            'company': self.company_id.name,
+            'is_posted': self.state == 'posted',
+        }
+
+
+class PaymentVoucherSignature(models.Model):
+    """Digital Signature Model for Payment Vouchers"""
+    _name = 'payment.voucher.signature'
+    _description = 'Payment Voucher Digital Signature'
+    _order = 'signature_date desc'
+    
+    payment_id = fields.Many2one('account.payment', string='Payment', required=True, ondelete='cascade')
+    user_id = fields.Many2one('res.users', string='User', required=True)
+    signature_type = fields.Selection([
+        ('creator', 'Creator'),
+        ('reviewer', 'Reviewer'),
+        ('approver', 'Approver'),
+        ('authorizer', 'Authorizer'),
+        ('receiver', 'Receiver')
+    ], string='Signature Type', required=True)
+    signature_date = fields.Datetime(string='Signature Date', required=True)
+    signature_data = fields.Binary(string='Signature Image', attachment=True)
+    ip_address = fields.Char(string='IP Address')
+    user_agent = fields.Text(string='User Agent')
+    company_id = fields.Many2one('res.company', string='Company', related='payment_id.company_id', store=True)
+
+
+class PaymentVoucherQRVerification(models.Model):
+    """QR Code Verification Model"""
+    _name = 'payment.voucher.qr.verification'
+    _description = 'Payment Voucher QR Verification'
+    _rec_name = 'token'
+    
+    payment_id = fields.Many2one('account.payment', string='Payment', required=True, ondelete='cascade')
+    token = fields.Char(string='Verification Token', required=True, index=True)
+    is_active = fields.Boolean(string='Is Active', default=True)
+    verification_count = fields.Integer(string='Verification Count', default=0)
+    last_verified_date = fields.Datetime(string='Last Verified')
+    last_verified_ip = fields.Char(string='Last Verified IP')
+    
+    @api.model
+    def verify_token(self, token):
+        """Verify a QR token and return payment data"""
+        verification = self.search([('token', '=', token), ('is_active', '=', True)], limit=1)
+        
+        if not verification:
+            return {'error': 'Invalid or expired verification token'}
+        
+        # Update verification stats
+        verification.write({
+            'verification_count': verification.verification_count + 1,
+            'last_verified_date': fields.Datetime.now(),
+            'last_verified_ip': self.env.context.get('client_ip', ''),
+        })
+        
+        # Return payment data
+        return {
+            'success': True,
+            'payment_data': verification.payment_id.get_voucher_verification_data()
+        }
 
     def _compute_is_approve_person(self):
         """This function checks if the current user is authorized to approve payments.
