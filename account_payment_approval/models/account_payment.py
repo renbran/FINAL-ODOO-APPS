@@ -576,6 +576,106 @@ class AccountPaymentUnified(models.Model):
                 message_type='notification'
             )
     
+    def action_print_multiple_reports(self):
+        """Print multiple reports for the payment voucher"""
+        self.ensure_one()
+        
+        if self.state == 'draft':
+            raise UserError(_("Cannot print reports for draft vouchers."))
+        
+        # Get the appropriate report based on voucher type
+        if self.voucher_type == 'payment':
+            report_action = self.env.ref('account_payment_approval.action_report_payment_voucher')
+        else:
+            report_action = self.env.ref('account_payment_approval.action_report_receipt_voucher')
+        
+        # Return the report action
+        return report_action.report_action(self)
+    
+    def action_cancel(self):
+        """Cancel the payment voucher"""
+        for record in self:
+            if record.state in ['posted', 'reconciled']:
+                raise UserError(_("Cannot cancel posted or reconciled vouchers."))
+            
+            record.write({'state': 'cancelled'})
+            record.message_post(
+                body=_("Payment voucher cancelled by %s") % self.env.user.name,
+                message_type='notification'
+            )
+    
+    def action_draft(self):
+        """Set voucher back to draft"""
+        return self.action_reset_to_draft()
+    
+    def action_view_signatures(self):
+        """View digital signatures"""
+        self.ensure_one()
+        signatures = []
+        
+        if self.submitter_signature:
+            signatures.append({
+                'role': 'Submitter',
+                'user': self.create_uid.name,
+                'date': self.submitted_date,
+                'signature': self.submitter_signature
+            })
+        
+        if self.reviewer_signature:
+            signatures.append({
+                'role': 'Reviewer',
+                'user': self.reviewer_id.name,
+                'date': self.reviewed_date,
+                'signature': self.reviewer_signature
+            })
+            
+        if self.approver_signature:
+            signatures.append({
+                'role': 'Approver', 
+                'user': self.approver_id.name,
+                'date': self.approved_date,
+                'signature': self.approver_signature
+            })
+            
+        if self.authorizer_signature:
+            signatures.append({
+                'role': 'Authorizer',
+                'user': self.authorizer_id.name, 
+                'date': self.authorized_date,
+                'signature': self.authorizer_signature
+            })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Digital Signatures'),
+                'message': _('Signatures found: %s') % len(signatures),
+                'type': 'info',
+            }
+        }
+    
+    def action_view_verifications(self):
+        """View QR verifications"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/payment/verify/{self.verification_token}',
+            'target': 'new',
+        }
+    
+    def action_view_workflow_history(self):
+        """View workflow history"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Workflow History'),
+            'res_model': 'mail.message',
+            'view_mode': 'tree,form',
+            'domain': [('res_id', '=', self.id), ('model', '=', 'account.payment')],
+            'context': {'default_res_id': self.id, 'default_model': 'account.payment'},
+        }
+    
     # Permission and validation methods
     def _check_workflow_permission(self, action):
         """Check if current user has permission for the workflow action"""
