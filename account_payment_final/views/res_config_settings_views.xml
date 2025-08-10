@@ -13,7 +13,7 @@
                 <!-- Add Payment Voucher Section -->
                 <xpath expr="//div[hasclass('settings')]" position="inside">
                     <div class="app_settings_block" data-string="Payment Voucher" 
-                         string="Payment Voucher" data-key="payment_voucher_enhanced">
+                         string="Payment Voucher" data-key="account_payment_final">
                         
                         <h2>Payment Voucher Workflow</h2>
                         <div class="row mt16 o_settings_container">

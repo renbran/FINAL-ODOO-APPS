@@ -11,7 +11,7 @@ import { useService } from "@web/core/utils/hooks";
 
 // Workflow Progress Widget
 export class WorkflowProgressWidget extends Component {
-    static template = "payment_voucher_enhanced.WorkflowProgress";
+    static template = "account_payment_final.WorkflowProgress";
     
     setup() {
         this.notification = useService("notification");
@@ -50,7 +50,7 @@ export class WorkflowProgressWidget extends Component {
 
 // QR Code Verification Widget
 export class QRCodeWidget extends Component {
-    static template = "payment_voucher_enhanced.QRCodeWidget";
+    static template = "account_payment_final.QRCodeWidget";
     
     setup() {
         this.notification = useService("notification");
@@ -83,7 +83,7 @@ export class QRCodeWidget extends Component {
 
 // Signature Upload Widget
 export class SignatureWidget extends Component {
-    static template = "payment_voucher_enhanced.SignatureWidget";
+    static template = "account_payment_final.SignatureWidget";
     
     setup() {
         this.notification = useService("notification");
@@ -213,7 +213,7 @@ export class SignatureWidget extends Component {
 
 // Workflow Action Buttons Enhancement
 export class WorkflowButtons extends Component {
-    static template = "payment_voucher_enhanced.WorkflowButtons";
+    static template = "account_payment_final.WorkflowButtons";
     
     setup() {
         this.notification = useService("notification");
@@ -396,7 +396,7 @@ export function formatAmountInWords(amount, currency) {
 
 // Dashboard Statistics Component
 export class PaymentDashboard extends Component {
-    static template = "payment_voucher_enhanced.Dashboard";
+    static template = "account_payment_final.Dashboard";
     
     setup() {
         this.orm = useService("orm");

@@ -217,8 +217,8 @@ class AccountMove(models.Model):
     def _check_invoice_permission(self, action):
         """Check if user has permission for invoice workflow action"""
         permission_map = {
-            'review': 'payment_voucher_enhanced.group_payment_voucher_reviewer',
-            'approve': 'payment_voucher_enhanced.group_invoice_approver',
+            'review': 'account_payment_final.group_payment_voucher_reviewer',
+            'approve': 'account_payment_final.group_invoice_approver',
         }
         
         required_group = permission_map.get(action)
@@ -230,10 +230,10 @@ class AccountMove(models.Model):
         current_stage = self.approval_state
         
         if current_stage == 'under_review':
-            if not self.env.user.has_group('payment_voucher_enhanced.group_payment_voucher_reviewer'):
+            if not self.env.user.has_group('account_payment_final.group_payment_voucher_reviewer'):
                 raise AccessError(_("You don't have permission to reject at review stage."))
         elif current_stage == 'for_approval':
-            if not self.env.user.has_group('payment_voucher_enhanced.group_invoice_approver'):
+            if not self.env.user.has_group('account_payment_final.group_invoice_approver'):
                 raise AccessError(_("You don't have permission to reject at approval stage."))
         else:
             raise AccessError(_("Cannot reject invoice/bill in current state."))
@@ -241,8 +241,8 @@ class AccountMove(models.Model):
     def _create_invoice_activities(self, activity_type):
         """Create activities for invoice workflow stages"""
         activity_map = {
-            'review': 'payment_voucher_enhanced.group_payment_voucher_reviewer',
-            'approve': 'payment_voucher_enhanced.group_invoice_approver',
+            'review': 'account_payment_final.group_payment_voucher_reviewer',
+            'approve': 'account_payment_final.group_invoice_approver',
         }
         
         group_ref = activity_map.get(activity_type)
@@ -278,10 +278,10 @@ class AccountMove(models.Model):
     def _send_invoice_notification(self, notification_type):
         """Send email notifications for invoice workflow actions"""
         template_map = {
-            'submitted': 'payment_voucher_enhanced.email_template_invoice_submitted',
-            'reviewed': 'payment_voucher_enhanced.email_template_invoice_reviewed',
-            'approved': 'payment_voucher_enhanced.email_template_invoice_approved',
-            'rejected': 'payment_voucher_enhanced.email_template_invoice_rejected',
+            'submitted': 'account_payment_final.email_template_invoice_submitted',
+            'reviewed': 'account_payment_final.email_template_invoice_reviewed',
+            'approved': 'account_payment_final.email_template_invoice_approved',
+            'rejected': 'account_payment_final.email_template_invoice_rejected',
         }
         
         template_ref = template_map.get(notification_type)

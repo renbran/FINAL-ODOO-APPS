@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <!-- Workflow Progress Template -->
-    <t t-name="payment_voucher_enhanced.WorkflowProgress" owl="1">
+    <t t-name="account_payment_final.WorkflowProgress" owl="1">
         <div class="o_workflow_progress">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold">Workflow Progress:</span>
@@ -27,7 +27,7 @@
     </t>
 
     <!-- QR Code Widget Template -->
-    <t t-name="payment_voucher_enhanced.QRCodeWidget" owl="1">
+    <t t-name="account_payment_final.QRCodeWidget" owl="1">
         <div class="o_qr_code_widget">
             <div class="text-center mb-3">
                 <img t-if="props.record.data.qr_code" 
@@ -66,7 +66,7 @@
     </t>
 
     <!-- Signature Widget Template -->
-    <t t-name="payment_voucher_enhanced.SignatureWidget" owl="1">
+    <t t-name="account_payment_final.SignatureWidget" owl="1">
         <div class="o_signature_widget">
             <!-- Mode Selector -->
             <div class="mb-3">
@@ -133,7 +133,7 @@
     </t>
 
     <!-- Workflow Buttons Template -->
-    <t t-name="payment_voucher_enhanced.WorkflowButtons" owl="1">
+    <t t-name="account_payment_final.WorkflowButtons" owl="1">
         <div class="o_workflow_buttons">
             <div class="btn-group" role="group">
                 <t t-foreach="availableActions" t-as="action" t-key="action.method">
@@ -148,7 +148,7 @@
     </t>
 
     <!-- Dashboard Template -->
-    <t t-name="payment_voucher_enhanced.Dashboard" owl="1">
+    <t t-name="account_payment_final.Dashboard" owl="1">
         <div class="o_payment_dashboard">
             <div t-if="state.loading" class="text-center p-4">
                 <i class="fa fa-spinner fa-spin fa-2x"/>
@@ -204,7 +204,7 @@
     </t>
 
     <!-- Amount in Words Display -->
-    <t t-name="payment_voucher_enhanced.AmountInWords" owl="1">
+    <t t-name="account_payment_final.AmountInWords" owl="1">
         <div class="o_amount_in_words">
             <div class="alert alert-info">
                 <strong>Amount in Words:</strong>
@@ -215,7 +215,7 @@
     </t>
 
     <!-- Workflow History Timeline -->
-    <t t-name="payment_voucher_enhanced.WorkflowHistory" owl="1">
+    <t t-name="account_payment_final.WorkflowHistory" owl="1">
         <div class="o_workflow_history">
             <div class="timeline">
                 <t t-foreach="props.workflowSteps" t-as="step" t-key="step.id">
@@ -238,7 +238,7 @@
     </t>
 
     <!-- Notification Toast -->
-    <t t-name="payment_voucher_enhanced.NotificationToast" owl="1">
+    <t t-name="account_payment_final.NotificationToast" owl="1">
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <i t-att-class="props.icon" class="me-2"/>

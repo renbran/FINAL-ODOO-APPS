@@ -27,7 +27,7 @@ class PaymentVerificationController(http.Controller):
             ], limit=1)
             
             if not payment:
-                return request.render('payment_voucher_enhanced.verification_not_found', {
+                return request.render('account_payment_final.verification_not_found', {
                     'error_title': _('Voucher Not Found'),
                     'error_message': _('The verification code is invalid or expired.'),
                     'token': token
@@ -35,7 +35,7 @@ class PaymentVerificationController(http.Controller):
             
             # Check if payment is in verifiable state
             if payment.approval_state in ['draft', 'cancelled']:
-                return request.render('payment_voucher_enhanced.verification_error', {
+                return request.render('account_payment_final.verification_error', {
                     'error_title': _('Verification Not Available'),
                     'error_message': _('This voucher is not yet available for verification.'),
                     'payment': payment
@@ -63,7 +63,7 @@ class PaymentVerificationController(http.Controller):
                 'is_successful': True,
             })
             
-            return request.render('payment_voucher_enhanced.payment_verification', verification_data)
+            return request.render('account_payment_final.payment_verification', verification_data)
             
         except Exception as e:
             _logger.error(f"Payment verification error for token {token}: {str(e)}")
@@ -81,7 +81,7 @@ class PaymentVerificationController(http.Controller):
             except:
                 pass  # Don't fail verification if logging fails
             
-            return request.render('payment_voucher_enhanced.verification_error', {
+            return request.render('account_payment_final.verification_error', {
                 'error_title': _('Verification Error'),
                 'error_message': _('An error occurred while verifying the voucher. Please try again.'),
                 'token': token
@@ -204,11 +204,82 @@ class PaymentVerificationController(http.Controller):
             
             # Generate PDF report
             pdf_content, content_type = request.env.ref(
-                'payment_voucher_enhanced.action_report_payment_voucher_osus'
+                'account_payment_final.action_report_payment_voucher_osus'
             ).sudo()._render_qweb_pdf([payment.id])
             
             # Log download
             request.env['payment.verification.log'].sudo().create({
                 'payment_id': payment.id,
                 'token': token,
-                'ip_address': request.httprequest.environ.get('
+                'ip_address': request.httprequest.environ.get('REMOTE_ADDR', ''),
+                'action_type': 'download_pdf',
+                'is_successful': True,
+                'notes': f'PDF downloaded for payment {payment.name}'
+            })
+            
+            # Return PDF response
+            pdf_http_headers = [
+                ('Content-Type', 'application/pdf'),
+                ('Content-Length', len(pdf_content)),
+                ('Content-Disposition', f'attachment; filename="Payment_Voucher_{payment.voucher_number or payment.name}.pdf"')
+            ]
+            
+            return request.make_response(pdf_content, headers=pdf_http_headers)
+            
+        except Exception as e:
+            _logger.error(f"Error downloading payment voucher: {e}")
+            return request.render('account_payment_final.payment_verification_error', {
+                'error_message': 'Unable to download payment voucher. Please try again later.'
+            })
+
+    @http.route('/payment/verify/api/<string:token>', type='json', auth='public', methods=['GET'], csrf=False)
+    def verify_payment_api(self, token, **kwargs):
+        """API endpoint for payment verification (JSON response)"""
+        try:
+            payment = request.env['account.payment'].sudo().search([
+                ('qr_verification_token', '=', token)
+            ], limit=1)
+            
+            if not payment:
+                return {
+                    'success': False,
+                    'error': 'Invalid verification token',
+                    'payment': None
+                }
+            
+            # Log API verification
+            request.env['payment.verification.log'].sudo().create({
+                'payment_id': payment.id,
+                'token': token,
+                'ip_address': request.httprequest.environ.get('REMOTE_ADDR', ''),
+                'action_type': 'api_verification',
+                'is_successful': True,
+                'is_api_call': True,
+                'notes': f'API verification for payment {payment.name}'
+            })
+            
+            return {
+                'success': True,
+                'payment': {
+                    'id': payment.id,
+                    'name': payment.name,
+                    'voucher_number': payment.voucher_number,
+                    'partner_name': payment.partner_id.name,
+                    'amount': payment.amount,
+                    'currency': payment.currency_id.name,
+                    'date': payment.date.strftime('%Y-%m-%d') if payment.date else None,
+                    'state': payment.state,
+                    'approval_state': payment.approval_state,
+                    'payment_type': payment.payment_type,
+                    'reference': payment.ref or '',
+                    'company': payment.company_id.name
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error in API verification: {e}")
+            return {
+                'success': False,
+                'error': 'Server error during verification',
+                'payment': None
+            }
