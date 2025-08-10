@@ -165,12 +165,12 @@ class AccountPayment(models.Model):
         for record in self:
             record.color = color_map.get(record.approval_state, 0)
     
-    @api.depends('id', 'voucher_number')
+    @api.depends('voucher_number', 'qr_verification_token')
     def _compute_verification_url(self):
         """Generate verification URL for QR code"""
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url', '')
         for record in self:
-            if record.id and base_url:
+            if record.voucher_number and base_url:
                 # Generate verification token if not exists
                 if not record.qr_verification_token:
                     record.qr_verification_token = record._generate_verification_token()
