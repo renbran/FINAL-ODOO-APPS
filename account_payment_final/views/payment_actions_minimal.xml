@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Minimal Actions for Menu Items - Installation Safe -->
+        
+        <!-- Payment Dashboard Action (Basic List View) -->
+        <record id="action_payment_dashboard" model="ir.actions.act_window">
+            <field name="name">Payment Dashboard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Payment Dashboard
+                </p>
+                <p>This dashboard shows payment vouchers and workflow status.</p>
+            </field>
+        </record>
+
+        <!-- All Payment Vouchers Action -->
+        <record id="action_payment_voucher_all" model="ir.actions.act_window">
+            <field name="name">All Payment Vouchers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payment vouchers found
+                </p>
+                <p>Create your first payment voucher.</p>
+            </field>
+        </record>
+
+        <!-- Pending Review Action -->
+        <record id="action_payment_pending_review" model="ir.actions.act_window">
+            <field name="name">Pending Review</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payments pending review
+                </p>
+                <p>Payments requiring review will appear here.</p>
+            </field>
+        </record>
+
+        <!-- Pending Approval Action -->
+        <record id="action_payment_pending_approval" model="ir.actions.act_window">
+            <field name="name">Pending Approval</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payments pending approval
+                </p>
+                <p>Payments requiring approval will appear here.</p>
+            </field>
+        </record>
+
+        <!-- Pending Authorization Action -->
+        <record id="action_payment_pending_authorization" model="ir.actions.act_window">
+            <field name="name">Pending Authorization</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payments pending authorization
+                </p>
+                <p>Payments requiring authorization will appear here.</p>
+            </field>
+        </record>
+
+        <!-- Ready to Post Action -->
+        <record id="action_payment_ready_to_post" model="ir.actions.act_window">
+            <field name="name">Ready to Post</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payments ready to post
+                </p>
+                <p>Approved payments ready for posting will appear here.</p>
+            </field>
+        </record>
+
+        <!-- My Submissions Action -->
+        <record id="action_payment_my_submissions" model="ir.actions.act_window">
+            <field name="name">My Submissions</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid', '=', uid)]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No submissions found
+                </p>
+                <p>Your submitted payment vouchers will appear here.</p>
+            </field>
+        </record>
+
+        <!-- My Reviews Action -->
+        <record id="action_payment_my_reviews" model="ir.actions.act_window">
+            <field name="name">My Reviews</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No reviews assigned
+                </p>
+                <p>Payments assigned for your review will appear here.</p>
+            </field>
+        </record>
+
+        <!-- My Approvals Action -->
+        <record id="action_payment_my_approvals" model="ir.actions.act_window">
+            <field name="name">My Approvals</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No approvals pending
+                </p>
+                <p>Payments requiring your approval will appear here.</p>
+            </field>
+        </record>
+
+        <!-- My Authorizations Action -->
+        <record id="action_payment_my_authorizations" model="ir.actions.act_window">
+            <field name="name">My Authorizations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No authorizations pending
+                </p>
+                <p>Payments requiring your authorization will appear here.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

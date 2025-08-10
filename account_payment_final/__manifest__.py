@@ -53,6 +53,9 @@
         'security/payment_security.xml',
         'security/ir.model.access.csv',
         
+        # Actions (Load Before Views)
+        'views/payment_actions_minimal.xml',
+        
         # Main Views (Load After Models/Security) - MINIMAL SAFE
         'views/account_payment_views.xml',
         'views/menus.xml',
