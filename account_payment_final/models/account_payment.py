@@ -510,3 +510,29 @@ class AccountPayment(models.Model):
                 'sticky': False,
             }
         }
+
+    def action_print_voucher_osus(self):
+        """Print OSUS Payment Voucher"""
+        self.ensure_one()
+        return self.env.ref('account_payment_final.action_report_payment_voucher_osus').report_action(self)
+
+    def action_view_workflow_history(self):
+        """View workflow history and activities"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Workflow History'),
+            'res_model': 'mail.activity',
+            'view_mode': 'tree,form',
+            'domain': [('res_model', '=', 'account.payment'), ('res_id', '=', self.id)],
+            'context': {'default_res_model': 'account.payment', 'default_res_id': self.id},
+        }
+
+    def action_verify_qr_code(self):
+        """Open QR code verification view"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/payment/verify/{self.verification_token}',
+            'target': 'new',
+        }
