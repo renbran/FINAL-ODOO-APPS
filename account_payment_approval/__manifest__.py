@@ -48,12 +48,10 @@
         'account', 
         'mail', 
         'web',
-        'portal',
-        'website',
-        'contacts'
+        'base'
     ],
     'external_dependencies': {
-        'python': ['qrcode', 'num2words', 'PIL']
+        'python': ['qrcode', 'PIL']
     },
     'data': [
         # Security
@@ -61,12 +59,12 @@
         'security/ir.model.access.csv',
         
         # Data
-        'data/email_templates.xml',
         'data/voucher_sequence.xml',
-        'data/qr_verification_data.xml',
         
         # Views
         'views/account_payment_views.xml',
+        'views/account_move_views.xml',
+        'views/res_config_settings_views.xml',
         'views/menu_items.xml',
         
         # Reports
@@ -74,21 +72,6 @@
         'reports/receipt_voucher_report.xml',
         'reports/qr_verification_report.xml',
         'reports/report_actions.xml',
-    ],
-    'assets': {
-        'web.assets_backend': [
-            'account_payment_approval/static/src/js/digital_signature_widget.js',
-            'account_payment_approval/static/src/js/payment_approval_dashboard.js',
-            'account_payment_approval/static/src/js/qr_code_widget.js',
-            'account_payment_approval/static/src/scss/payment_approval.scss',
-            'account_payment_approval/static/src/xml/payment_approval_templates.xml',
-        ],
-        'web.assets_frontend': [
-            'account_payment_approval/static/src/scss/payment_approval.scss',
-        ],
-    },
-    'demo': [
-        'demo/demo_data.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],
