@@ -24,6 +24,7 @@ class AccountPaymentUnified(models.Model):
     _inherit = "account.payment"
     
     # Extend the standard state field to include our enhanced states
+    # Using selection_add to properly extend the base field
     state = fields.Selection(
         selection_add=[
             ('submitted', 'Submitted'),
