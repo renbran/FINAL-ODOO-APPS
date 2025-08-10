@@ -2,7 +2,7 @@
 # 🧠 Copilot Instructions for odoo17_final
 
 ## Project Architecture & Big Picture
-- **Odoo 17, Direct Installation**: Production-ready Odoo modules collection. Main deployment is CloudPepper (https://testerp.cloudpepper.site) but works with any Odoo 17 installation.
+- **Odoo 17, Direct Installation**: Production-ready Odoo modules collection. Main deployment is CloudPepper (https://stagingtry.cloudpepper.site/) but works with any Odoo 17 installation.
 - **Custom modules**: Each top-level folder (e.g. `account_payment_approval/`, `enhanced_rest_api/`, `oe_sale_dashboard_17/`) is a standard Odoo module with its own models, views, security, and tests.
 - **Testing/Validation**: Extensive Python validation scripts for syntax, structure, and deployment readiness checks.
 - **Production Environment**: CloudPepper deployment with login `salescompliance@osusproperties.com`.
@@ -16,6 +16,7 @@
 - **Installation Testing**: Use `.bat` scripts for Windows or `.sh` scripts for Linux/Mac (e.g. `test_account_payment_final.bat`)
 - **API Testing**: Dedicated scripts like `check_module_installation.py` and `verify_api_installation.py`
 - **Emergency Fixes**: Specialized fix scripts for critical issues (e.g. `emergency_fix.bat`, `nuclear_fix_testerp.sh`)
+- **Deployment Validation**: Always run `cloudpepper_deployment_validation.py` before CloudPepper deployment
 
 ## Project Conventions & Patterns
 - **Module structure**: Each module has `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `demo/`, `static/`, `tests/`.
@@ -69,4 +70,12 @@
 
 ---
 
-For more details, see the root `README.md` and module-level `README.md` files. If in doubt, mimic the structure and patterns of the most recently updated modules.
+For more details, see module-specific `README.md` files and the comprehensive frontend guide at `.github/instructions/`. Always run validation scripts before deployment and follow CloudPepper compatibility patterns established in existing modules.
+
+## Key Architectural Insights
+- **Validation-First**: Every module change requires comprehensive validation via Python scripts
+- **CloudPepper optimized**: Production environment is CloudPepper hosting (https://stagingtry.cloudpepper.site/) with specific compatibility requirements  
+- **Emergency protocols**: Nuclear fix procedures available for critical production issues
+- **API-centric**: Enhanced REST API provides comprehensive integration capabilities
+- **Mobile-responsive**: All dashboards and reports designed for mobile/tablet use
+- **Deployment automation**: Extensive use of validation and deployment scripts rather than manual processes
