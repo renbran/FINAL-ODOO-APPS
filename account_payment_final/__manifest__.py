@@ -25,52 +25,57 @@
         'mail',
         'web',
         'portal',
-        'payment',
-        'website',
     ],
     'data': [
         # Security - Load first
-        'security/security_groups.xml',
+        'security/payment_security.xml',
         'security/ir.model.access.csv',
         
         # Data and Configuration
-        'data/sequences.xml',
+        'data/payment_sequences.xml',
         'data/email_templates.xml',
-        'data/workflow_stages.xml',
+        'data/system_parameters.xml',
         
         # Views
-        'views/assets.xml',
-        'views/payment_signatory_views.xml',
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
+        'views/res_company_views.xml',
+        'views/res_config_settings_views.xml',
         'views/menus.xml',
         
         # Reports
-        'reports/report_actions.xml',
+        'reports/payment_voucher_actions.xml',
         'reports/payment_voucher_template.xml',
-        'reports/receipt_template.xml',
+        'reports/payment_verification_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            'payment_voucher_enhanced/static/src/scss/variables.scss',
-            'payment_voucher_enhanced/static/src/scss/payment_styles.scss',
-            'payment_voucher_enhanced/static/src/js/payment_workflow.js',
-            'payment_voucher_enhanced/static/src/js/qr_code_field.js',
-            'payment_voucher_enhanced/static/src/js/signature_capture.js',
+            'account_payment_final/static/src/scss/variables.scss',
+            'account_payment_final/static/src/scss/professional_payment_ui.scss',
+            'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
+            'account_payment_final/static/src/js/payment_workflow.js',
+            'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
+            'account_payment_final/static/src/js/fields/qr_code_field.js',
+            'account_payment_final/static/src/js/error_handler.js',
+            'account_payment_final/static/src/js/performance_optimizer.js',
         ],
         'web.assets_frontend': [
-            'payment_voucher_enhanced/static/src/scss/frontend_styles.scss',
+            'account_payment_final/static/src/scss/frontend/verification_portal.scss',
+            'account_payment_final/static/src/js/frontend/qr_verification.js',
         ],
         'web.report_assets_common': [
-            'payment_voucher_enhanced/static/src/scss/report_styles.scss',
+            'account_payment_final/static/src/scss/payment_voucher_report.scss',
+            'account_payment_final/static/src/scss/responsive_report_styles.scss',
         ],
     },
     'external_dependencies': {
         'python': ['qrcode', 'pillow', 'num2words']
     },
-    'demo': [],
+    'demo': [
+        'demo/demo_payments.xml',
+    ],
     'installable': True,
     'auto_install': False,
-    'application': True,
+    'application': False,
     'license': 'LGPL-3',
 }

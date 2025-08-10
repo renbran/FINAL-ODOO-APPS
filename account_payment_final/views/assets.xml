@@ -1,74 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
-        <!-- Backend Assets for Professional UI -->
-        <template id="assets_backend" inherit_id="web.assets_backend">
-            <!-- Core SCSS Files -->
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/variables.scss"/>
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/cloudpepper_optimizations.scss"/>
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/professional_payment_ui.scss"/>
-            
-            <!-- Component-specific styles -->
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/components/payment_widget.scss"/>
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/views/form_view.scss"/>
-            
-            <!-- JavaScript Components -->
-            <script type="text/javascript" src="/account_payment_final/static/src/js/cloudpepper_console_optimizer.js"/>
-            <script type="text/javascript" src="/account_payment_final/static/src/js/unknown_action_handler.js"/>
-            <script type="text/javascript" src="/account_payment_final/static/src/js/components/payment_widget.js"/>
-            <script type="text/javascript" src="/account_payment_final/static/src/js/fields/payment_field.js"/>
-        </template>
-
-        <!-- Report Assets for Professional Printing -->
-        <template id="assets_common" inherit_id="web.assets_common">
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/responsive_report_styles.scss"/>
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/payment_voucher_report.scss"/>
-        </template>
-
-        <!-- Frontend Assets (for QR verification portal) -->
-        <template id="assets_frontend" inherit_id="web.assets_frontend">
-            <link rel="stylesheet" type="text/scss" href="/account_payment_final/static/src/scss/frontend/qr_verification.scss"/>
-            <script type="text/javascript" src="/account_payment_final/static/src/js/frontend/qr_verification.js"/>
-        </template>
-
-        <!-- Enhanced QR Code Template for Payment Verification -->
-        <template id="payment_qr_code_template" name="Payment QR Code Display">
-            <div class="o_payment_qr_container text-center py-3">
-                <div class="o_qr_code_wrapper" style="display: inline-block; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <img t-att-src="qr_code_url" alt="Payment QR Code" class="img-fluid" style="max-width: 200px; height: auto;"/>
-                    <div class="mt-2">
-                        <small class="text-muted">Scan to verify payment</small>
-                    </div>
-                </div>
-            </div>
-        </template>
-        
-        <!-- Payment Status Badge Template -->
-        <template id="payment_status_badge_template" name="Payment Status Badge">
-            <span t-attf-class="badge badge-{{ status_class }} px-3 py-2" 
-                  style="font-size: 0.8em; border-radius: 15px; text-transform: uppercase; letter-spacing: 0.5px;">
-                <i t-attf-class="fa {{ status_icon }} me-1"></i>
-                <t t-esc="status_text"/>
-            </span>
-        </template>
-
-        <!-- Payment Workflow Progress Template -->
-        <template id="payment_workflow_progress_template" name="Payment Workflow Progress">
-            <div class="workflow-progress-container" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin: 10px 0;">
-                <h6 style="color: #800020; margin-bottom: 15px;">Workflow Progress</h6>
-                <div class="workflow-steps" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <t t-foreach="workflow_stages" t-as="stage">
-                        <span t-attf-class="workflow-step badge {{ 'badge-success' if stage['completed'] else 'badge-secondary' }}" 
-                              style="padding: 8px 15px; border-radius: 20px; font-size: 0.75em; font-weight: 600;">
-                            <i t-attf-class="fa {{ stage['icon'] }} me-1"></i>
-                            <t t-esc="stage['name']"/>
-                        </span>
-                        <i class="fa fa-arrow-right text-muted" t-if="not stage_last" style="font-size: 0.8em;"></i>
-                    </t>
-                </div>
-            </div>
-        </template>
-
+        <!-- 
+        Note: In Odoo 17, assets are now managed via __manifest__.py assets section.
+        This file is kept for future QWeb templates if needed.
+        All CSS/JS assets are loaded via the manifest file for better performance.
+        -->
     </data>
 </odoo>
