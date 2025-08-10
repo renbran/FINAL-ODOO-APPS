@@ -66,7 +66,7 @@
                             type="object" 
                             class="btn-outline-secondary"
                             invisible="voucher_count == 0">
-                        <span class="badge badge-pill badge-primary" t-field="voucher_count"/>
+                        <field name="voucher_count" nolabel="1" readonly="1"/>
                     </button>
                 </xpath>
 

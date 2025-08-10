@@ -22,7 +22,7 @@
                     <!-- Voucher Number Display -->
                     <div class="o_payment_voucher_info" invisible="not voucher_number">
                         <span class="fw-bold text-primary">Voucher: </span>
-                        <span class="text-info" t-field="voucher_number"/>
+                        <field name="voucher_number" nolabel="1" readonly="1"/>
                     </div>
                     
                     <!-- Workflow Action Buttons -->
@@ -100,10 +100,9 @@
                         <group>
                             <div class="o_workflow_progress" invisible="approval_state == 'draft'">
                                 <span class="fw-bold">Progress: </span>
-                                <span t-field="workflow_step"/>/<span t-field="total_steps"/>
+                                <field name="workflow_step" nolabel="1" readonly="1"/>/<field name="total_steps" nolabel="1" readonly="1"/>
                                 <div class="progress mt-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         t-attf-style="width: #{workflow_step/total_steps*100 if total_steps else 0}%"/>
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 50%"/>
                                 </div>
                             </div>
                         </group>
