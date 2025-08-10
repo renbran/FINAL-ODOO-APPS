@@ -9,8 +9,7 @@
             <field name="state">code</field>
             <field name="code">
 # Clean up old payment verification tokens older than 90 days
-from datetime import datetime, timedelta
-cutoff_date = datetime.now() - timedelta(days=90)
+cutoff_date = fields.Datetime.now() - relativedelta(days=90)
 
 old_payments = model.search([
     ('create_date', '&lt;', cutoff_date),
@@ -19,8 +18,7 @@ old_payments = model.search([
 ])
 
 # Clear verification tokens for old completed payments to save space
-for payment in old_payments:
-    payment.qr_verification_token = False
+old_payments.write({'qr_verification_token': False})
             </field>
             <field name="interval_number">1</field>
             <field name="interval_type">weeks</field>
@@ -41,7 +39,9 @@ payments = model.search([
     ('voucher_number', '!=', False)
 ])
 for payment in payments:
-    payment.qr_verification_token = payment._generate_verification_token()
+    if hasattr(payment, '_generate_verification_token'):
+        token = payment._generate_verification_token()
+        payment.write({'qr_verification_token': token})
             </field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
@@ -57,8 +57,7 @@ for payment in payments:
             <field name="state">code</field>
             <field name="code">
 # Find payments pending for more than 2 days
-from datetime import datetime, timedelta
-cutoff_date = datetime.now() - timedelta(days=2)
+cutoff_date = fields.Datetime.now() - relativedelta(days=2)
 
 # Pending reviews
 pending_reviews = model.search([
@@ -66,15 +65,17 @@ pending_reviews = model.search([
     ('submitted_date', '&lt;=', cutoff_date)
 ])
 
-# Pending approvals
+# Pending approvals  
 pending_approvals = model.search([
     ('approval_state', 'in', ['for_approval', 'for_authorization']),
     ('create_date', '&lt;=', cutoff_date)
 ])
 
 # Send reminder notifications
-for payment in (pending_reviews + pending_approvals):
-    payment._send_workflow_reminder()
+all_pending = pending_reviews + pending_approvals
+for payment in all_pending:
+    if hasattr(payment, '_send_workflow_reminder'):
+        payment._send_workflow_reminder()
             </field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
