@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Workflow Progress Template -->
+    <t t-name="payment_voucher_enhanced.WorkflowProgress" owl="1">
+        <div class="o_workflow_progress">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">Workflow Progress:</span>
+                <span class="text-muted">
+                    <t t-esc="state.currentStep"/> / <t t-esc="state.totalSteps"/>
+                </span>
+            </div>
+            <div class="progress mb-2" style="height: 8px;">
+                <div class="progress-bar" 
+                     role="progressbar" 
+                     t-att-class="progressClass"
+                     t-att-style="`width: ${progressPercentage}%`"
+                     t-att-aria-valuenow="progressPercentage" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+            <small class="text-muted">
+                Current Status: <strong t-esc="stepDescription"/>
+            </small>
+        </div>
+    </t>
+
+    <!-- QR Code Widget Template -->
+    <t t-name="payment_voucher_enhanced.QRCodeWidget" owl="1">
+        <div class="o_qr_code_widget">
+            <div class="text-center mb-3">
+                <img t-if="props.record.data.qr_code" 
+                     t-att-src="`data:image/png;base64,${props.record.data.qr_code}`"
+                     alt="QR Code" 
+                     class="img-fluid"
+                     style="max-width: 200px; max-height: 200px;"/>
+                <div t-else="" class="alert alert-info">
+                    <i class="fa fa-qrcode fa-3x mb-2"/>
+                    <br/>
+                    <small>QR Code will be generated after submission</small>
+                </div>
+            </div>
+            
+            <div t-if="props.record.data.verification_url" class="text-center">
+                <div class="btn-group" role="group">
+                    <button type="button" 
+                            class="btn btn-outline-primary btn-sm"
+                            t-on-click="copyVerificationUrl">
+                        <i class="fa fa-copy"/> Copy URL
+                    </button>
+                    <button type="button" 
+                            class="btn btn-outline-secondary btn-sm"
+                            t-on-click="openVerification">
+                        <i class="fa fa-external-link"/> Verify
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <strong>Verification URL:</strong><br/>
+                        <code class="text-break" t-esc="props.record.data.verification_url"/>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Signature Widget Template -->
+    <t t-name="payment_voucher_enhanced.SignatureWidget" owl="1">
+        <div class="o_signature_widget">
+            <!-- Mode Selector -->
+            <div class="mb-3">
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" 
+                            class="btn"
+                            t-att-class="state.signatureMode === 'upload' ? 'btn-primary' : 'btn-outline-primary'"
+                            t-on-click="() => this.switchMode('upload')">
+                        <i class="fa fa-upload"/> Upload
+                    </button>
+                    <button type="button" 
+                            class="btn"
+                            t-att-class="state.signatureMode === 'draw' ? 'btn-primary' : 'btn-outline-primary'"
+                            t-on-click="() => this.switchMode('draw')">
+                        <i class="fa fa-pencil"/> Draw
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Mode -->
+            <div t-if="state.signatureMode === 'upload'" class="upload-mode">
+                <div class="mb-3">
+                    <label class="form-label">Select signature image:</label>
+                    <input type="file" 
+                           class="form-control form-control-sm"
+                           accept="image/*"
+                           t-ref="fileInput"
+                           t-on-change="handleFileUpload"/>
+                </div>
+            </div>
+
+            <!-- Draw Mode -->
+            <div t-if="state.signatureMode === 'draw'" class="draw-mode">
+                <div class="border rounded p-2 mb-3 bg-white">
+                    <canvas t-ref="signatureCanvas" 
+                            class="border"
+                            style="cursor: crosshair; width: 100%; max-width: 400px; height: 150px;">
+                    </canvas>
+                </div>
+                <div class="text-center mb-3">
+                    <button type="button" 
+                            class="btn btn-outline-secondary btn-sm me-2"
+                            t-on-click="clearSignature">
+                        <i class="fa fa-eraser"/> Clear
+                    </button>
+                    <button type="button" 
+                            class="btn btn-primary btn-sm"
+                            t-on-click="saveSignature">
+                        <i class="fa fa-save"/> Save Signature
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Signature Display -->
+            <div t-if="props.record.data[props.name]" class="current-signature mt-3">
+                <label class="form-label">Current Signature:</label>
+                <div class="text-center p-3 border rounded bg-light">
+                    <img t-att-src="`data:image/png;base64,${props.record.data[props.name]}`"
+                         alt="Current Signature" 
+                         style="max-width: 200px; max-height: 100px;"/>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Workflow Buttons Template -->
+    <t t-name="payment_voucher_enhanced.WorkflowButtons" owl="1">
+        <div class="o_workflow_buttons">
+            <div class="btn-group" role="group">
+                <t t-foreach="availableActions" t-as="action" t-key="action.method">
+                    <button type="button" 
+                            t-att-class="`btn ${action.class} btn-sm`"
+                            t-on-click="() => this.executeWorkflowAction(action.method, action.confirm)"
+                            t-esc="action.name">
+                    </button>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Dashboard Template -->
+    <t t-name="payment_voucher_enhanced.Dashboard" owl="1">
+        <div class="o_payment_dashboard">
+            <div t-if="state.loading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x"/>
+                <p class="mt-2">Loading dashboard...</p>
+            </div>
+            
+            <div t-else="" class="row">
+                <!-- Pending Review Card -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <i class="fa fa-eye fa-2x text-warning mb-2"/>
+                            <h5 class="card-title" t-esc="state.stats.pending_review"/>
+                            <p class="card-text">Pending Review</p>
+                            <button class="btn btn-outline-warning btn-sm"
+                                    t-on-click="openPendingReviews">
+                                View All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Approval Card -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-danger">
+                        <div class="card-body text-center">
+                            <i class="fa fa-check-circle fa-2x text-danger mb-2"/>
+                            <h5 class="card-title" t-esc="state.stats.pending_approval"/>
+                            <p class="card-text">Pending Approval</p>
+                            <button class="btn btn-outline-danger btn-sm"
+                                    t-on-click="openPendingApprovals">
+                                View All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posted Today Card -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <i class="fa fa-check fa-2x text-success mb-2"/>
+                            <h5 class="card-title" t-esc="state.stats.posted_today"/>
+                            <p class="card-text">Posted Today</p>
+                            <small class="text-muted">
+                                Total: <t t-esc="state.stats.total_amount_pending"/>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Amount in Words Display -->
+    <t t-name="payment_voucher_enhanced.AmountInWords" owl="1">
+        <div class="o_amount_in_words">
+            <div class="alert alert-info">
+                <strong>Amount in Words:</strong>
+                <br/>
+                <em t-esc="props.amountInWords"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- Workflow History Timeline -->
+    <t t-name="payment_voucher_enhanced.WorkflowHistory" owl="1">
+        <div class="o_workflow_history">
+            <div class="timeline">
+                <t t-foreach="props.workflowSteps" t-as="step" t-key="step.id">
+                    <div class="timeline-item" 
+                         t-att-class="step.completed ? 'completed' : step.current ? 'current' : 'pending'">
+                        <div class="timeline-marker">
+                            <i t-att-class="step.icon"/>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 t-esc="step.title"/>
+                            <p t-esc="step.description"/>
+                            <small t-if="step.date" class="text-muted">
+                                <t t-esc="step.date"/> by <t t-esc="step.user"/>
+                            </small>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Notification Toast -->
+    <t t-name="payment_voucher_enhanced.NotificationToast" owl="1">
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i t-att-class="props.icon" class="me-2"/>
+                <strong class="me-auto" t-esc="props.title"/>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"/>
+            </div>
+            <div class="toast-body" t-esc="props.message"/>
+        </div>
+    </t>
+
+</templates>

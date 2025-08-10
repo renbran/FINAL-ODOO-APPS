@@ -1,79 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Safe Configuration Settings View -->
+
+        <!-- Inherit Accounting Configuration Settings -->
         <record id="res_config_settings_view_form_payment_voucher" model="ir.ui.view">
             <field name="name">res.config.settings.view.form.inherit.payment.voucher</field>
             <field name="model">res.config.settings</field>
-            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="priority" eval="5"/>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-                <!-- Add at the end of the form -->
-                <xpath expr="//form" position="inside">
-                    <div class="app_settings_block" data-string="OSUS Payment Vouchers" 
-                         string="OSUS Payment Vouchers" data-key="osus_payment_voucher">
-                        <h2>OSUS Payment Voucher Settings</h2>
+                
+                <!-- Add Payment Voucher Section -->
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Payment Voucher" 
+                         string="Payment Voucher" data-key="payment_voucher_enhanced">
                         
+                        <h2>Payment Voucher Workflow</h2>
                         <div class="row mt16 o_settings_container">
+                            
+                            <!-- Workflow Settings -->
                             <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_left_pane">
+                                    <field name="auto_post_approved_payments"/>
+                                </div>
                                 <div class="o_setting_right_pane">
-                                    <span class="o_form_label">OSUS Branding</span>
+                                    <label for="auto_post_approved_payments"/>
                                     <div class="text-muted">
-                                        Enable OSUS brand guidelines for payment vouchers
-                                    </div>
-                                    <div class="content-group mt16">
-                                        <field name="use_osus_branding"/>
-                                        <label for="use_osus_branding"/>
+                                        Automatically post payment vouchers when approved
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_left_pane">
+                                    <field name="send_approval_notifications"/>
+                                </div>
                                 <div class="o_setting_right_pane">
-                                    <span class="o_form_label">Auto-Post Payments</span>
+                                    <label for="send_approval_notifications"/>
                                     <div class="text-muted">
-                                        Automatically post payments when approved
+                                        Send email notifications at each workflow stage
                                     </div>
-                                    <div class="content-group mt16">
-                                        <field name="auto_post_approved_payments"/>
-                                        <label for="auto_post_approved_payments"/>
+                                </div>
+                            </div>
+
+                            <!-- Amount Thresholds -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="max_approval_amount" string="Payment Approval Threshold"/>
+                                    <div class="text-muted">
+                                        Maximum amount for payment approval without authorization
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="max_approval_amount" 
+                                                   class="o_light_label" 
+                                                   widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="invoice_approval_threshold" string="Invoice Approval Threshold"/>
+                                    <div class="text-muted">
+                                        Minimum amount requiring approval for invoices and bills
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="invoice_approval_threshold" 
+                                                   class="o_light_label" 
+                                                   widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Auto-Post -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="auto_post_approved_invoices"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="auto_post_approved_invoices"/>
+                                    <div class="text-muted">
+                                        Automatically post invoices/bills when approved
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h2>Report Customization</h2>
+                        <div class="row mt16 o_settings_container">
+
+                            <!-- Branding Settings -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="use_osus_branding"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="use_osus_branding"/>
+                                    <div class="text-muted">
+                                        Apply OSUS brand styling to payment voucher reports
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Message -->
+                            <div class="col-12 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="voucher_footer_message" string="Voucher Footer Message"/>
+                                    <div class="text-muted">
+                                        Custom footer message displayed on payment voucher reports
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="voucher_footer_message" 
+                                                   class="o_light_label"
+                                                   placeholder="Thank you for your business..."/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <h2>Quick Actions</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12">
+                                <div class="o_setting_right_pane">
+                                    <button name="%(action_payment_signatory)d" 
+                                            string="Configure Signatories" 
+                                            type="action" 
+                                            class="btn-link"/>
+                                    <div class="text-muted">
+                                        Set up digital signatories for payment vouchers
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="row mt16 o_settings_container">
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
-                                <div class="o_setting_right_pane">
-                                    <span class="o_form_label">Approval Amount Limit</span>
-                                    <div class="text-muted">
-                                        Maximum amount regular users can approve
-                                    </div>
-                                    <div class="content-group mt16">
-                                        <field name="max_approval_amount"/>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
-                                <div class="o_setting_right_pane">
-                                    <span class="o_form_label">Email Notifications</span>
-                                    <div class="text-muted">
-                                        Send email notifications for approval requests
-                                    </div>
-                                    <div class="content-group mt16">
-                                        <field name="send_approval_notifications"/>
-                                        <label for="send_approval_notifications"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </xpath>
+
             </field>
         </record>
+
     </data>
 </odoo>

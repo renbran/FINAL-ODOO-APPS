@@ -2,7 +2,7 @@ from . import account_payment
 from . import account_move
 from . import account_journal
 from . import payment_approval_history
-from . import payment_workflow_stage
+from . import payment_signatory
 from . import res_company
 from . import res_config_settings
 from . import res_partner

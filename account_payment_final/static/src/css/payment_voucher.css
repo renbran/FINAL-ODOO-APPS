@@ -1,175 +1,280 @@
-:root {
-    --osus-primary: #6B2B47;
-    --osus-secondary: #8B1538;
-    --osus-gold: #D4AF37;
-    --osus-light: #f8f9fa;
-    --osus-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* OSUS Payment Voucher Enhanced Styles */
+
+/* Workflow Progress Indicator */
+.o_workflow_progress {
+    margin: 10px 0;
 }
 
-// Enhanced Title Section
-.oe_title {
-    .o_voucher_number_title {
-        font-family: 'Roboto', sans-serif;
-        font-weight: 600;
-        color: var(--osus-primary);
-        font-size: 1.8em;
-        margin: 0 0 10px 0;
-        
-        input {
-            color: var(--osus-primary) !important;
-            font-weight: 600;
-            border: 2px solid var(--osus-primary);
-            border-radius: 6px;
-            padding: 8px 12px;
-            background: rgba(107, 43, 71, 0.05);
-            
-            &:focus {
-                box-shadow: 0 0 0 3px rgba(107, 43, 71, 0.2);
-                border-color: var(--osus-secondary);
-            }
-        }
-    }
+.o_workflow_progress .progress {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
-// Enhanced Statusbar
-.o_payment_statusbar {
-    .o_statusbar_status {
-        transition: var(--osus-transition);
-        
-        &.o_arrow_button_current {
-            background: linear-gradient(135deg, var(--osus-primary), var(--osus-secondary)) !important;
-            border-color: var(--osus-primary) !important;
-            color: white !important;
-            font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        
-        &.o_arrow_button_done {
-            background: linear-gradient(135deg, #28a745, #20c997) !important;
-            border-color: #28a745 !important;
-            color: white !important;
-        }
-    }
+.o_workflow_progress .progress-bar {
+    transition: width 0.3s ease;
 }
 
-// Workflow Container
-.o_approval_workflow_container {
-    background: linear-gradient(135deg, var(--osus-light) 0%, #ffffff 100%);
-    border: 2px solid var(--osus-primary);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 15px 0;
-    box-shadow: 0 4px 12px rgba(107, 43, 71, 0.1);
-    
-    h5 {
-        color: var(--osus-primary);
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
-    
-    .progress {
-        border-radius: 25px;
-        overflow: hidden;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        
-        .progress-bar {
-            background: linear-gradient(90deg, var(--osus-primary), var(--osus-gold));
-            font-weight: 600;
-            transition: width 0.6s ease;
-        }
-    }
+/* Voucher Information Panel */
+.o_payment_voucher_info {
+    background: linear-gradient(90deg, #007cba 0%, #0056b3 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: inline-block;
 }
 
-// Enhanced Buttons
-.o_payment_submit_approval {
-    background: linear-gradient(135deg, var(--osus-primary), var(--osus-secondary)) !important;
-    border: none !important;
-    color: white !important;
-    font-weight: 600;
-    padding: 10px 20px;
-    border-radius: 6px;
-    transition: var(--osus-transition);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(107, 43, 71, 0.3);
-        background: linear-gradient(135deg, var(--osus-secondary), #A01B47) !important;
-    }
+/* OSUS Branded Buttons */
+.btn.osus_primary_btn {
+    background-color: #007cba;
+    border-color: #007cba;
+    color: white;
 }
 
-// QR Code Section
-.o_qr_verification_container {
+.btn.osus_primary_btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn.osus_success_btn {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn.osus_success_btn:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn.osus_danger_btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn.osus_danger_btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Kanban Enhancements */
+.o_kanban_card.oe_kanban_color_1 {
+    border-left: 4px solid #007cba;
+}
+
+.o_kanban_card.oe_kanban_color_2 {
+    border-left: 4px solid #17a2b8;
+}
+
+.o_kanban_card.oe_kanban_color_3 {
+    border-left: 4px solid #ffc107;
+}
+
+.o_kanban_card.oe_kanban_color_7 {
+    border-left: 4px solid #fd7e14;
+}
+
+.o_kanban_card.oe_kanban_color_9 {
+    border-left: 4px solid #dc3545;
+}
+
+.o_kanban_card.oe_kanban_color_10 {
+    border-left: 4px solid #28a745;
+}
+
+.o_kanban_card.oe_kanban_color_8 {
+    border-left: 4px solid #6c757d;
+}
+
+/* Approval State Badges */
+.badge.badge-approval-draft {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge.badge-approval-submitted {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge.badge-approval-under-review {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge.badge-approval-for-approval {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.badge.badge-approval-for-authorization {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge.badge-approval-approved {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge.badge-approval-posted {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge.badge-approval-cancelled {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Status Bar Enhancements */
+.o_statusbar_status > .btn {
+    border-radius: 0;
+    border-right: none;
+    font-weight: 500;
+}
+
+.o_statusbar_status > .btn:first-child {
+    border-radius: 4px 0 0 4px;
+}
+
+.o_statusbar_status > .btn:last-child {
+    border-radius: 0 4px 4px 0;
+    border-right: 1px solid #dee2e6;
+}
+
+/* Signature Display */
+.o_signature_display {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
     text-align: center;
-    padding: 25px;
-    background: white;
-    border-radius: 12px;
-    border: 2px solid var(--osus-primary);
-    margin: 20px 0;
-    
-    .o_qr_description {
-        color: var(--osus-primary);
-        font-weight: 500;
-        margin-top: 15px;
-        font-style: italic;
-    }
+    background-color: #f8f9fa;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-// Signature Boxes
-.signature-box {
-    background: white;
-    border: 2px solid var(--osus-primary);
-    border-radius: 8px;
+.o_signature_display img {
+    max-width: 150px;
+    max-height: 60px;
+}
+
+/* QR Code Display */
+.o_qr_code_display {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.o_qr_code_display img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+/* Document Information Panel */
+.o_document_info {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
     padding: 15px;
     margin: 10px 0;
-    transition: var(--osus-transition);
-    
-    &:hover {
-        box-shadow: 0 4px 12px rgba(107, 43, 71, 0.15);
-        transform: translateY(-2px);
+}
+
+.o_document_info h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Activity Timeline */
+.o_activity_timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.o_activity_timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.o_activity_item {
+    position: relative;
+    margin-bottom: 20px;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.o_activity_item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 15px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #007cba;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.o_activity_item.completed::before {
+    background-color: #28a745;
+}
+
+.o_activity_item.current::before {
+    background-color: #ffc107;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .o_payment_voucher_info {
+        font-size: 0.9rem;
+        padding: 6px 12px;
     }
     
-    .signature-line {
-        border-bottom: 2px solid var(--osus-primary);
-        height: 40px;
-        margin-bottom: 10px;
-        position: relative;
-        
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 4px;
-            background: var(--osus-gold);
-        }
+    .o_workflow_progress {
+        margin: 5px 0;
     }
     
-    .authorized-name {
-        color: var(--osus-primary);
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 5px;
+    .o_signature_display {
+        min-height: 60px;
     }
     
-    .signature-initials {
-        color: var(--osus-secondary);
-        font-weight: 700;
-        font-size: 16px;
-        letter-spacing: 2px;
+    .o_qr_code_display img {
+        max-width: 150px;
+        max-height: 150px;
     }
 }
 
-// Enhanced Kanban Cards
-.o_kanban_card {
-    border-radius: 12px;
-    border: 2px solid transparent;
-    transition: var(--osus-transition);
+/* Print Styles */
+@media print {
+    .o_payment_voucher_info,
+    .btn,
+    .o_kanban_manage_button_section {
+        display: none !important;
+    }
     
-    &:hover {
-        border-color: var(--osus-primary);
-        transform: translateY(-3px);
-        box-shadow: 0###
+    .o_signature_display {
+        border: 1px solid #000;
+        background-color: white;
+    }
+    
+    .o_qr_code_display {
+        border: 1px solid #000;
+        background-color: white;
+    }
+}

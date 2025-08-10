@@ -1,45 +1,84 @@
+# -*- coding: utf-8 -*-
 {
-    'name': 'Enhanced Payment Voucher System',
+    'name': 'OSUS Enhanced Payment Voucher System',
     'version': '17.0.1.0.0',
     'category': 'Accounting/Payments',
     'summary': 'Advanced Payment Voucher with Multi-level Approval and Digital Signatures',
     'description': """
-        Enhanced Payment Voucher System for OSUS Real Estate with:
-        - 4-stage approval workflow for payments (Create → Review → Approve → Authorize → Post)
-        - 3-stage approval workflow for receipts (Create → Review → Post)
-        - Digital signature capture and management
-        - QR code verification system with secure URLs
-        - OSUS branded professional report templates
-        - Email notifications and Odoo activity tracking
-        - Role-based access control with granular permissions
-        - Integration with invoices and bills workflow
-        - Real-time workflow tracking and audit trails
-        - Amount in words conversion
-        - Multi-signatory support (4 for payments, 2 for receipts)
+OSUS Enhanced Payment Voucher System
+====================================
+
+Professional payment voucher system with comprehensive workflow management:
+
+Core Features:
+--------------
+* Multi-level approval workflow (3-step receipts, 5-step payments)
+* Digital signature capture and QR code verification
+* OSUS branded professional reports
+* Real-time workflow tracking and notifications
+* Role-based access control with 6 security groups
+
+Workflow Stages:
+---------------
+* Receipts: Submit → Review → Post
+* Payments: Submit → Review → Approve → Authorize → Post
+
+Advanced Features:
+-----------------
+* QR code verification system with public access
+* Email notifications at each workflow stage
+* Amount in words conversion
+* Multi-signatory support with digital signatures
+* Integration with invoices and bills
+* Audit trails and verification logging
+* Mobile-responsive design
+
+Technical:
+----------
+* Compatible with Odoo 17.0
+* SCSS-based styling system
+* JavaScript enhancements
+* API endpoints for verification
+* Automated maintenance tasks
+
+Security:
+---------
+* Payment Voucher User: Create and submit
+* Payment Voucher Reviewer: Review and forward
+* Payment Voucher Approver: Approve payments
+* Payment Voucher Authorizer: Final authorization
+* Payment Voucher Poster: Post to ledger
+* Payment Voucher Manager: Full access
     """,
     'author': 'OSUS Real Estate Development Team',
     'website': 'https://www.osus.ae',
     'depends': [
         'base',
         'account',
+        'account_payment',
         'mail',
         'web',
+        'website',
         'portal',
     ],
+    'external_dependencies': {
+        'python': ['qrcode', 'pillow', 'num2words']
+    },
     'data': [
-        # Security - Load first
+        # Security
         'security/payment_security.xml',
         'security/ir.model.access.csv',
         
-        # Data and Configuration
+        # Data
         'data/payment_sequences.xml',
         'data/email_templates.xml',
-        'data/system_parameters.xml',
+        'data/cron_jobs.xml',
         
         # Views
+        'views/payment_signatory_views.xml',
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
-        'views/res_company_views.xml',
+        'views/payment_verification_views.xml',
         'views/res_config_settings_views.xml',
         'views/menus.xml',
         
@@ -50,31 +89,19 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'account_payment_final/static/src/scss/variables.scss',
-            'account_payment_final/static/src/scss/professional_payment_ui.scss',
-            'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
-            'account_payment_final/static/src/js/payment_workflow.js',
-            'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
-            'account_payment_final/static/src/js/fields/qr_code_field.js',
-            'account_payment_final/static/src/js/error_handler.js',
-            'account_payment_final/static/src/js/performance_optimizer.js',
+            'account_payment_final/static/src/scss/payment_voucher.scss',
+            'account_payment_final/static/src/css/payment_voucher.css',
+            'account_payment_final/static/src/js/payment_voucher.js',
+            'account_payment_final/static/src/xml/payment_voucher_templates.xml',
         ],
         'web.assets_frontend': [
-            'account_payment_final/static/src/scss/frontend/verification_portal.scss',
-            'account_payment_final/static/src/js/frontend/qr_verification.js',
+            'account_payment_final/static/src/css/verification_portal.css',
+            'account_payment_final/static/src/js/qr_verification.js',
         ],
         'web.report_assets_common': [
-            'account_payment_final/static/src/scss/payment_voucher_report.scss',
-            'account_payment_final/static/src/scss/responsive_report_styles.scss',
+            'account_payment_final/static/src/css/report_payment_voucher.css',
         ],
     },
-    'external_dependencies': {
-        'python': ['qrcode', 'pillow', 'num2words']
-    },
-    'demo': [
-        # Temporarily disabled demo data to avoid migration conflicts
-        # 'demo/demo_payments.xml',
-    ],
     'installable': True,
     'auto_install': False,
     'application': False,

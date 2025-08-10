@@ -1,314 +1,511 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { FormController } from "@web/views/form/form_controller";
+import { Component, useState, onMounted, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 /**
- * Enhanced Payment Voucher Form Controller
+ * Payment Voucher Enhanced JavaScript Components
+ * OSUS Real Estate - Payment Voucher System
  */
-export class PaymentVoucherFormController extends FormController {
+
+// Workflow Progress Widget
+export class WorkflowProgressWidget extends Component {
+    static template = "payment_voucher_enhanced.WorkflowProgress";
+    
     setup() {
-        super.setup();
         this.notification = useService("notification");
-        this.action = useService("action");
+        this.state = useState({
+            currentStep: this.props.record.data.workflow_step || 0,
+            totalSteps: this.props.record.data.total_steps || 5,
+            approvalState: this.props.record.data.approval_state || 'draft'
+        });
     }
 
-    /**
-     * Handle approval workflow actions
-     */
-    async onApprovalAction(action, record) {
-        try {
-            const result = await this.model.orm.call(
-                "account.payment",
-                action,
-                [record.resId]
-            );
-            
-            if (result && result.type === 'ir.actions.client') {
-                this.notification.add(result.params.message, {
-                    type: result.params.type,
-                    sticky: result.params.sticky
+    get progressPercentage() {
+        if (this.state.totalSteps === 0) return 0;
+        return Math.round((this.state.currentStep / this.state.totalSteps) * 100);
+    }
+
+    get progressClass() {
+        const percentage = this.progressPercentage;
+        if (percentage === 100) return 'bg-success';
+        if (percentage >= 80) return 'bg-info';
+        if (percentage >= 60) return 'bg-warning';
+        return 'bg-primary';
+    }
+
+    get stepDescription() {
+        const steps = {
+            0: 'Draft',
+            1: 'Submitted',
+            2: 'Under Review',
+            3: 'For Approval',
+            4: 'For Authorization',
+            5: 'Posted'
+        };
+        return steps[this.state.currentStep] || 'Unknown';
+    }
+}
+
+// QR Code Verification Widget
+export class QRCodeWidget extends Component {
+    static template = "payment_voucher_enhanced.QRCodeWidget";
+    
+    setup() {
+        this.notification = useService("notification");
+        this.qrRef = useRef("qrCode");
+    }
+
+    async copyVerificationUrl() {
+        const url = this.props.record.data.verification_url;
+        if (url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                this.notification.add("Verification URL copied to clipboard!", {
+                    type: "success",
+                });
+            } catch (err) {
+                this.notification.add("Failed to copy URL", {
+                    type: "warning",
                 });
             }
-            
-            // Reload the form to show updated state
-            await this.model.load();
-        } catch (error) {
-            this.notification.add("Action failed: " + error.message, {
-                type: "danger"
-            });
         }
     }
 
-    /**
-     * Validate payment data before submission
-     */
-    async validatePaymentData(record) {
-        const data = record.data;
-        const errors = [];
-
-        if (!data.partner_id) {
-            errors.push("Partner is required");
+    openVerification() {
+        const url = this.props.record.data.verification_url;
+        if (url) {
+            window.open(url, '_blank');
         }
+    }
+}
 
-        if (!data.amount || data.amount <= 0) {
-            errors.push("Amount must be greater than zero");
-        }
-
-        if (!data.journal_id) {
-            errors.push("Payment journal is required");
-        }
-
-        if (!data.date) {
-            errors.push("Payment date is required");
-        }
-
-        if (errors.length > 0) {
-            this.notification.add("Validation Error: " + errors.join(", "), {
-                type: "danger"
-            });
-            return false;
-        }
-
-        return true;
+// Signature Upload Widget
+export class SignatureWidget extends Component {
+    static template = "payment_voucher_enhanced.SignatureWidget";
+    
+    setup() {
+        this.notification = useService("notification");
+        this.fileInput = useRef("fileInput");
+        this.canvas = useRef("signatureCanvas");
+        this.state = useState({
+            isDrawing: false,
+            signatureMode: 'upload' // 'upload' or 'draw'
+        });
     }
 
-    /**
-     * Enhanced save with validation
-     */
-    async onSave() {
-        if (this.model.root.data.approval_state === 'draft') {
-            const isValid = await this.validatePaymentData(this.model.root);
-            if (!isValid) {
-                return;
+    onMounted() {
+        if (this.canvas.el) {
+            this.setupCanvas();
+        }
+    }
+
+    setupCanvas() {
+        const canvas = this.canvas.el;
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 400;
+        canvas.height = 200;
+        
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        
+        // Mouse events
+        canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+        canvas.addEventListener('mousemove', this.draw.bind(this));
+        canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+        
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', this.handleTouch.bind(this));
+        canvas.addEventListener('touchmove', this.handleTouch.bind(this));
+        canvas.addEventListener('touchend', this.stopDrawing.bind(this));
+    }
+
+    startDrawing(e) {
+        this.state.isDrawing = true;
+        const rect = this.canvas.el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const ctx = this.canvas.el.getContext('2d');
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    draw(e) {
+        if (!this.state.isDrawing) return;
+        
+        const rect = this.canvas.el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const ctx = this.canvas.el.getContext('2d');
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+
+    stopDrawing() {
+        this.state.isDrawing = false;
+    }
+
+    handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                        e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        this.canvas.el.dispatchEvent(mouseEvent);
+    }
+
+    clearSignature() {
+        const canvas = this.canvas.el;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    saveSignature() {
+        const canvas = this.canvas.el;
+        const dataURL = canvas.toDataURL('image/png');
+        
+        // Convert to base64 for Odoo
+        const base64 = dataURL.split(',')[1];
+        
+        // Trigger change event to update the field
+        this.props.update(base64);
+        
+        this.notification.add("Signature saved successfully!", {
+            type: "success",
+        });
+    }
+
+    switchMode(mode) {
+        this.state.signatureMode = mode;
+        if (mode === 'draw' && this.canvas.el) {
+            this.clearSignature();
+        }
+    }
+
+    handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const base64 = event.target.result.split(',')[1];
+                    this.props.update(base64);
+                    this.notification.add("Signature uploaded successfully!", {
+                        type: "success",
+                    });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                this.notification.add("Please select an image file", {
+                    type: "warning",
+                });
             }
         }
-        
-        return super.onSave();
     }
 }
 
-/**
- * Payment Voucher List Controller
- */
-export class PaymentVoucherListController extends FormController {
+// Workflow Action Buttons Enhancement
+export class WorkflowButtons extends Component {
+    static template = "payment_voucher_enhanced.WorkflowButtons";
+    
     setup() {
-        super.setup();
         this.notification = useService("notification");
+        this.orm = useService("orm");
     }
 
-    /**
-     * Handle bulk approval actions
-     */
-    async onBulkApprove(selectedRecords) {
+    async executeWorkflowAction(action, confirmMessage = null) {
+        if (confirmMessage) {
+            const confirmed = confirm(confirmMessage);
+            if (!confirmed) return;
+        }
+
         try {
-            const recordIds = selectedRecords.map(r => r.resId);
-            
-            const result = await this.model.orm.call(
+            const result = await this.orm.call(
                 "account.payment",
-                "action_approve_payment",
-                [recordIds]
+                action,
+                [this.props.record.data.id]
             );
+
+            if (result && result.type === 'ir.actions.client') {
+                // Handle notification result
+                this.notification.add(result.params.message, {
+                    type: result.params.type,
+                });
+            }
+
+            // Reload the record to update the view
+            await this.props.record.load();
             
-            this.notification.add("Payments approved successfully", {
-                type: "success"
-            });
-            
-            await this.model.load();
         } catch (error) {
-            this.notification.add("Bulk approval failed: " + error.message, {
-                type: "danger"
+            this.notification.add("Action failed: " + error.message, {
+                type: "danger",
             });
         }
     }
-}
 
-/**
- * QR Code Widget for payment verification
- */
-import { Component } from "@odoo/owl";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-
-export class QRCodeWidget extends Component {
-    static template = "osus_payment_voucher.QRCodeWidget";
-    static props = {
-        ...standardWidgetProps,
-    };
-
-    get qrCodeUrl() {
-        if (this.props.record.data.qr_code) {
-            return `data:image/png;base64,${this.props.record.data.qr_code}`;
+    get availableActions() {
+        const state = this.props.record.data.approval_state;
+        const paymentType = this.props.record.data.payment_type;
+        
+        const actions = [];
+        
+        switch (state) {
+            case 'draft':
+                actions.push({
+                    name: 'Submit for Review',
+                    method: 'action_submit_for_review',
+                    class: 'btn-primary',
+                    confirm: 'Submit this payment voucher for review?'
+                });
+                break;
+                
+            case 'under_review':
+                actions.push({
+                    name: 'Review & Forward',
+                    method: 'action_review_approve',
+                    class: 'btn-success',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_reviewer']
+                });
+                actions.push({
+                    name: 'Reject',
+                    method: 'action_reject_payment',
+                    class: 'btn-danger',
+                    confirm: 'Are you sure you want to reject this voucher?',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_reviewer']
+                });
+                break;
+                
+            case 'for_approval':
+                if (paymentType === 'outbound') {
+                    actions.push({
+                        name: 'Approve Payment',
+                        method: 'action_approve_payment',
+                        class: 'btn-success',
+                        groups: ['payment_voucher_enhanced.group_payment_voucher_approver']
+                    });
+                }
+                actions.push({
+                    name: 'Reject',
+                    method: 'action_reject_payment',
+                    class: 'btn-danger',
+                    confirm: 'Are you sure you want to reject this voucher?',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_approver']
+                });
+                break;
+                
+            case 'for_authorization':
+                actions.push({
+                    name: 'Authorize Payment',
+                    method: 'action_authorize_payment',
+                    class: 'btn-warning',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_authorizer']
+                });
+                actions.push({
+                    name: 'Reject',
+                    method: 'action_reject_payment',
+                    class: 'btn-danger',
+                    confirm: 'Are you sure you want to reject this voucher?',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_authorizer']
+                });
+                break;
+                
+            case 'approved':
+                actions.push({
+                    name: 'Post to Ledger',
+                    method: 'action_post_payment',
+                    class: 'btn-primary',
+                    groups: ['payment_voucher_enhanced.group_payment_voucher_poster']
+                });
+                break;
         }
-        return null;
+        
+        return actions;
     }
+}
 
-    get isVisible() {
-        return this.props.record.data.qr_in_report && this.qrCodeUrl;
-    }
+// Amount in Words Formatter
+export function formatAmountInWords(amount, currency) {
+    // This would integrate with the Python num2words conversion
+    // For now, providing a basic JavaScript implementation
+    
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const thousands = ['', 'Thousand', 'Million', 'Billion'];
 
-    onQRClick() {
-        if (this.qrCodeUrl) {
-            const baseUrl = window.location.origin;
-            const verifyUrl = `${baseUrl}/payment/verify/${this.props.record.resId}`;
-            window.open(verifyUrl, '_blank');
+    function convertHundreds(num) {
+        let result = '';
+        
+        if (num >= 100) {
+            result += ones[Math.floor(num / 100)] + ' Hundred ';
+            num %= 100;
         }
+        
+        if (num >= 20) {
+            result += tens[Math.floor(num / 10)] + ' ';
+            num %= 10;
+        } else if (num >= 10) {
+            result += teens[num - 10] + ' ';
+            return result;
+        }
+        
+        if (num > 0) {
+            result += ones[num] + ' ';
+        }
+        
+        return result;
     }
+
+    function convertToWords(num) {
+        if (num === 0) return 'Zero';
+        
+        let result = '';
+        let thousandCounter = 0;
+        
+        while (num > 0) {
+            if (num % 1000 !== 0) {
+                result = convertHundreds(num % 1000) + thousands[thousandCounter] + ' ' + result;
+            }
+            num = Math.floor(num / 1000);
+            thousandCounter++;
+        }
+        
+        return result.trim();
+    }
+
+    const integerPart = Math.floor(amount);
+    const decimalPart = Math.round((amount - integerPart) * 100);
+    
+    let result = convertToWords(integerPart);
+    
+    if (decimalPart > 0) {
+        result += ' and ' + convertToWords(decimalPart) + ' Cents';
+    }
+    
+    result += ' ' + (currency || 'Dollars') + ' Only';
+    
+    return result;
 }
 
-/**
- * Payment Status Badge Widget
- */
-export class PaymentStatusBadge extends Component {
-    static template = "osus_payment_voucher.PaymentStatusBadge";
-    static props = {
-        ...standardWidgetProps,
-    };
-
-    get statusClass() {
-        const state = this.props.record.data.approval_state;
-        const statusClasses = {
-            draft: 'badge-secondary',
-            submitted: 'badge-warning',
-            approved: 'badge-success',
-            posted: 'badge-primary',
-            rejected: 'badge-danger',
-            cancelled: 'badge-dark'
-        };
-        return statusClasses[state] || 'badge-secondary';
-    }
-
-    get statusIcon() {
-        const state = this.props.record.data.approval_state;
-        const statusIcons = {
-            draft: 'fa-edit',
-            submitted: 'fa-clock-o',
-            approved: 'fa-check',
-            posted: 'fa-check-circle',
-            rejected: 'fa-times',
-            cancelled: 'fa-ban'
-        };
-        return statusIcons[state] || 'fa-question';
-    }
-
-    get statusText() {
-        const state = this.props.record.data.approval_state;
-        const statusTexts = {
-            draft: 'Draft',
-            submitted: 'Submitted',
-            approved: 'Approved',
-            posted: 'Posted',
-            rejected: 'Rejected',
-            cancelled: 'Cancelled'
-        };
-        return statusTexts[state] || 'Unknown';
-    }
-}
-
-/**
- * Register components
- */
-registry.category("view_widgets").add("qr_code_widget", QRCodeWidget);
-registry.category("view_widgets").add("payment_status_badge", PaymentStatusBadge);
-
-/**
- * Payment Voucher Dashboard
- */
-export class PaymentVoucherDashboard extends Component {
-    static template = "osus_payment_voucher.Dashboard";
-
+// Dashboard Statistics Component
+export class PaymentDashboard extends Component {
+    static template = "payment_voucher_enhanced.Dashboard";
+    
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
         this.state = useState({
             stats: {
-                submitted: 0,
+                pending_review: 0,
+                pending_approval: 0,
+                pending_authorization: 0,
                 approved: 0,
-                rejected: 0
+                posted_today: 0,
+                total_amount_pending: 0
             },
             loading: true
         });
         
-        this.loadStats();
+        onMounted(() => {
+            this.loadDashboardData();
+        });
     }
 
-    async loadStats() {
+    async loadDashboardData() {
         try {
             const stats = await this.orm.call(
                 "account.payment",
-                "get_approval_statistics",
+                "get_dashboard_statistics",
                 []
             );
             
             this.state.stats = stats;
             this.state.loading = false;
+            
         } catch (error) {
-            console.error("Failed to load payment statistics:", error);
+            console.error("Failed to load dashboard data:", error);
             this.state.loading = false;
         }
     }
 
-    async openPayments(state) {
-        const action = await this.orm.call(
-            "ir.actions.act_window",
-            "for_xml_id",
-            ["osus_payment_voucher", "action_payment_voucher_all"]
-        );
-        
-        action.domain = [['approval_state', '=', state]];
-        action.context = {
-            ...action.context,
-            search_default_filter_state: 1
-        };
-        
-        this.action.doAction(action);
+    async openPendingReviews() {
+        // Implementation to open pending reviews
+    }
+
+    async openPendingApprovals() {
+        // Implementation to open pending approvals
     }
 }
 
-/**
- * Utility functions
- */
-export const PaymentVoucherUtils = {
-    /**
-     * Format currency amount
-     */
+// Register components
+registry.category("fields").add("workflow_progress", WorkflowProgressWidget);
+registry.category("fields").add("qr_code_widget", QRCodeWidget);
+registry.category("fields").add("signature_widget", SignatureWidget);
+registry.category("fields").add("workflow_buttons", WorkflowButtons);
+
+// Utility functions for global use
+window.PaymentVoucherUtils = {
+    formatAmountInWords,
+    
+    // Format currency with proper symbols
     formatCurrency(amount, currency) {
-        return new Intl.NumberFormat('en-US', {
+        const formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency || 'USD',
-            minimumFractionDigits: 2
-        }).format(amount);
+        });
+        return formatter.format(amount);
     },
-
-    /**
-     * Get status color
-     */
-    getStatusColor(state) {
-        const colors = {
-            draft: '#6c757d',
-            submitted: '#ffc107',
-            approved: '#28a745',
-            posted: '#007bff',
-            rejected: '#dc3545',
-            cancelled: '#343a40'
-        };
-        return colors[state] || '#6c757d';
-    },
-
-    /**
-     * Validate QR code data
-     */
-    validateQRCode(qrData) {
-        try {
-            // Basic validation for QR code content
-            return qrData && qrData.length > 0;
-        } catch (error) {
-            return false;
+    
+    // Validate payment data
+    validatePaymentData(data) {
+        const errors = [];
+        
+        if (!data.partner_id) {
+            errors.push('Partner is required');
         }
+        
+        if (!data.amount || data.amount <= 0) {
+            errors.push('Amount must be greater than zero');
+        }
+        
+        if (!data.journal_id) {
+            errors.push('Journal is required');
+        }
+        
+        if (!data.date) {
+            errors.push('Payment date is required');
+        }
+        
+        return errors;
+    },
+    
+    // Get workflow step description
+    getWorkflowStepDescription(step, paymentType) {
+        const steps = {
+            inbound: {
+                0: 'Draft',
+                1: 'Submitted for Review',
+                2: 'Under Review',
+                3: 'Posted'
+            },
+            outbound: {
+                0: 'Draft',
+                1: 'Submitted for Review',
+                2: 'Under Review',
+                3: 'For Approval',
+                4: 'For Authorization',
+                5: 'Posted'
+            }
+        };
+        
+        return steps[paymentType]?.[step] || 'Unknown';
     }
 };
 
-/**
- * Export for global use
- */
-window.PaymentVoucherUtils = PaymentVoucherUtils;
+console.log('OSUS Payment Voucher Enhanced - JavaScript loaded successfully');

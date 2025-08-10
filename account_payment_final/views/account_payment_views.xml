@@ -1,35 +1,406 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Basic Payment Form View - Installation Safe -->
-        <record id="view_account_payment_form_basic" model="ir.ui.view">
-            <field name="name">account.payment.form.basic</field>
+
+        <!-- Enhanced Payment Form View with Full Workflow -->
+        <record id="view_account_payment_form_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.form.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 
-                <!-- Simple header enhancement for basic view -->
-                <xpath expr="//header" position="inside">
-                    <div class="payment-basic-info">
-                        <!-- Placeholder for post-install enhancements -->
-                    </div>
+                <!-- Add Approval Statusbar -->
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="approval_state" widget="statusbar" 
+                           statusbar_visible="draft,submitted,under_review,for_approval,for_authorization,approved,posted"
+                           statusbar_colors='{"draft":"secondary","submitted":"info","under_review":"warning","for_approval":"warning","for_authorization":"danger","approved":"success","posted":"success"}'/>
                 </xpath>
-                
+
+                <!-- Enhanced Header with Workflow Buttons -->
+                <xpath expr="//header" position="inside">
+                    
+                    <!-- Voucher Number Display -->
+                    <div class="o_payment_voucher_info" invisible="not voucher_number">
+                        <span class="fw-bold text-primary">Voucher: </span>
+                        <span class="text-info" t-field="voucher_number"/>
+                    </div>
+                    
+                    <!-- Workflow Action Buttons -->
+                    <button name="action_submit_for_review" 
+                            string="Submit for Review" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="approval_state != 'draft'"
+                            confirm="Submit this payment voucher for review?"/>
+                    
+                    <button name="action_review_approve" 
+                            string="Review &amp; Forward" 
+                            type="object" 
+                            class="btn-success"
+                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer"
+                            invisible="approval_state != 'under_review'"/>
+                    
+                    <button name="action_approve_payment" 
+                            string="Approve Payment" 
+                            type="object" 
+                            class="btn-success"
+                            groups="payment_voucher_enhanced.group_payment_voucher_approver"
+                            invisible="approval_state != 'for_approval' or payment_type != 'outbound'"/>
+                    
+                    <button name="action_authorize_payment" 
+                            string="Authorize Payment" 
+                            type="object" 
+                            class="btn-warning"
+                            groups="payment_voucher_enhanced.group_payment_voucher_authorizer"
+                            invisible="approval_state != 'for_authorization'"/>
+                    
+                    <button name="action_post_payment" 
+                            string="Post to Ledger" 
+                            type="object" 
+                            class="btn-primary"
+                            groups="payment_voucher_enhanced.group_payment_voucher_poster"
+                            invisible="approval_state != 'approved'"/>
+                    
+                    <button name="action_reject_payment" 
+                            string="Reject" 
+                            type="object" 
+                            class="btn-danger"
+                            groups="payment_voucher_enhanced.group_payment_voucher_reviewer,payment_voucher_enhanced.group_payment_voucher_approver,payment_voucher_enhanced.group_payment_voucher_authorizer"
+                            invisible="approval_state not in ['under_review', 'for_approval', 'for_authorization']"
+                            confirm="Are you sure you want to reject this payment voucher?"/>
+                    
+                    <!-- Utility Buttons -->
+                    <button name="action_print_voucher_osus" 
+                            string="Print Voucher" 
+                            type="object" 
+                            class="btn-secondary"
+                            invisible="approval_state == 'draft'"/>
+                    
+                    <button name="action_view_workflow_history" 
+                            string="Workflow History" 
+                            type="object" 
+                            class="btn-outline-secondary"
+                            invisible="approval_state == 'draft'"/>
+                </xpath>
+
+                <!-- Override default Post button to enforce workflow -->
+                <xpath expr="//button[@name='action_post']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <!-- Add Voucher Information Group -->
+                <xpath expr="//group[@name='group_main']" position="before">
+                    <group name="voucher_info" string="Voucher Information" 
+                           invisible="approval_state == 'draft' and not voucher_number">
+                        <group>
+                            <field name="voucher_number" readonly="1"/>
+                            <field name="workflow_step" invisible="1"/>
+                            <field name="total_steps" invisible="1"/>
+                        </group>
+                        <group>
+                            <div class="o_workflow_progress" invisible="approval_state == 'draft'">
+                                <span class="fw-bold">Progress: </span>
+                                <span t-field="workflow_step"/>/<span t-field="total_steps"/>
+                                <div class="progress mt-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         t-attf-style="width: #{workflow_step/total_steps*100 if total_steps else 0}%"/>
+                                </div>
+                            </div>
+                        </group>
+                    </group>
+                </xpath>
+
+                <!-- Enhanced Partner and Amount Section -->
+                <xpath expr="//field[@name='amount']" position="after">
+                    <field name="amount_in_words" readonly="1" 
+                           invisible="not amount_in_words"
+                           widget="text"/>
+                </xpath>
+
+                <!-- Add Remarks Field -->
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="remarks" placeholder="Additional remarks or memo for this payment voucher..."/>
+                </xpath>
+
+                <!-- Add Related Documents Information -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Related Documents" name="related_docs">
+                        <group>
+                            <field name="related_document_info" readonly="1"/>
+                        </group>
+                        <!-- Show related invoices/bills if any -->
+                        <field name="reconciled_invoice_ids" readonly="1" 
+                               invisible="not reconciled_invoice_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="invoice_date"/>
+                                <field name="amount_total"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                        <field name="reconciled_bill_ids" readonly="1" 
+                               invisible="not reconciled_bill_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="invoice_date"/>
+                                <field name="amount_total"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+
+                <!-- Workflow Tracking Page -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Workflow Tracking" name="workflow_tracking" 
+                          invisible="approval_state == 'draft'">
+                        <group string="Workflow History">
+                            <group>
+                                <field name="submitted_by" readonly="1"/>
+                                <field name="submitted_date" readonly="1"/>
+                                <field name="reviewed_by" readonly="1"/>
+                                <field name="reviewed_date" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="approved_by" readonly="1" 
+                                       invisible="payment_type == 'inbound'"/>
+                                <field name="approved_date" readonly="1" 
+                                       invisible="payment_type == 'inbound'"/>
+                                <field name="authorized_by" readonly="1" 
+                                       invisible="payment_type == 'inbound'"/>
+                                <field name="authorized_date" readonly="1" 
+                                       invisible="payment_type == 'inbound'"/>
+                                <field name="posted_by" readonly="1"/>
+                                <field name="posted_date" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+                <!-- Digital Signatures Page -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Digital Signatures" name="signatures" 
+                          invisible="approval_state == 'draft'">
+                        <group>
+                            <group string="Workflow Signatures">
+                                <field name="creator_signature" widget="image" 
+                                       class="oe_avatar" readonly="1"/>
+                                <field name="creator_signature_date" readonly="1"/>
+                                
+                                <field name="reviewer_signature" widget="image" 
+                                       class="oe_avatar" readonly="1" 
+                                       invisible="not reviewed_by"/>
+                                <field name="reviewer_signature_date" readonly="1" 
+                                       invisible="not reviewed_by"/>
+                                
+                                <field name="approver_signature" widget="image" 
+                                       class="oe_avatar" readonly="1" 
+                                       invisible="payment_type == 'inbound' or not approved_by"/>
+                                <field name="approver_signature_date" readonly="1" 
+                                       invisible="payment_type == 'inbound' or not approved_by"/>
+                                
+                                <field name="authorizer_signature" widget="image" 
+                                       class="oe_avatar" readonly="1" 
+                                       invisible="payment_type == 'inbound' or not authorized_by"/>
+                                <field name="authorizer_signature_date" readonly="1" 
+                                       invisible="payment_type == 'inbound' or not authorized_by"/>
+                            </group>
+                            
+                            <group string="Collection Signature">
+                                <field name="receiver_signature" widget="image" 
+                                       class="oe_avatar"/>
+                                <field name="receiver_signature_date"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Required Signatories -->
+                        <group string="Required Signatories">
+                            <field name="signatory_ids" nolabel="1">
+                                <tree>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="role"/>
+                                    <field name="user_id"/>
+                                    <field name="is_active"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+
+                <!-- QR Code and Verification -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="QR Verification" name="qr_verification" 
+                          invisible="approval_state == 'draft'">
+                        <group>
+                            <group string="QR Code Settings">
+                                <field name="qr_in_report"/>
+                                <field name="verification_url" readonly="1" widget="url" 
+                                       invisible="not verification_url"/>
+                                <button name="action_verify_qr_code" 
+                                        string="Test QR Verification" 
+                                        type="object" 
+                                        class="btn-outline-primary"
+                                        invisible="not verification_url"/>
+                            </group>
+                            <group string="QR Code Preview">
+                                <field name="qr_code" widget="image" 
+                                       class="oe_avatar" readonly="1" 
+                                       invisible="not qr_code"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
             </field>
         </record>
 
-        <!-- Payment Tree View Enhancement -->
+        <!-- Enhanced Tree View -->
         <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
             <field name="name">account.payment.tree.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
                 
-                <!-- Basic tree enhancement -->
-                <xpath expr="//field[@name='state']" position="before">
-                    <field name="date" optional="show"/>
+                <!-- Add voucher number and approval state -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="voucher_number" optional="show"/>
+                    <field name="approval_state" 
+                           decoration-info="approval_state in ['submitted', 'under_review']"
+                           decoration-warning="approval_state in ['for_approval', 'for_authorization']"
+                           decoration-success="approval_state in ['approved', 'posted']"
+                           decoration-danger="approval_state == 'cancelled'"
+                           optional="show"/>
                 </xpath>
                 
+                <!-- Enhanced amount display -->
+                <xpath expr="//field[@name='amount']" position="attributes">
+                    <attribute name="sum">Total Amount</attribute>
+                </xpath>
+                
+                <!-- Add workflow step progress -->
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="workflow_step" optional="hide"/>
+                    <field name="total_steps" optional="hide"/>
+                </xpath>
+                
+                <!-- Add related document info -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="related_document_info" optional="hide"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <!-- Enhanced Search View -->
+        <record id="view_account_payment_search_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.search.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add approval state filters -->
+                <xpath expr="//filter[@name='state_posted']" position="after">
+                    <separator/>
+                    <filter string="Draft Vouchers" name="approval_draft" 
+                            domain="[('approval_state', '=', 'draft')]"/>
+                    <filter string="Pending Review" name="approval_pending_review" 
+                            domain="[('approval_state', '=', 'under_review')]"/>
+                    <filter string="Pending Approval" name="approval_pending_approval" 
+                            domain="[('approval_state', 'in', ['for_approval', 'for_authorization'])]"/>
+                    <filter string="Approved" name="approval_approved" 
+                            domain="[('approval_state', '=', 'approved')]"/>
+                    <filter string="Posted" name="approval_posted" 
+                            domain="[('approval_state', '=', 'posted')]"/>
+                </xpath>
+                
+                <!-- Add voucher number search -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="voucher_number"/>
+                    <field name="remarks"/>
+                </xpath>
+                
+                <!-- Add group by approval state -->
+                <xpath expr="//group" position="inside">
+                    <filter string="Approval State" name="group_approval_state" 
+                            domain="[]" context="{'group_by': 'approval_state'}"/>
+                    <filter string="Workflow Step" name="group_workflow_step" 
+                            domain="[]" context="{'group_by': 'workflow_step'}"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <!-- Kanban View for Payment Vouchers -->
+        <record id="view_account_payment_kanban_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.kanban.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="approval_state" class="o_kanban_small_column">
+                    <field name="color"/>
+                    <field name="voucher_number"/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+                    <field name="currency_id"/>
+                    <field name="payment_type"/>
+                    <field name="approval_state"/>
+                    <field name="workflow_step"/>
+                    <field name="total_steps"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="voucher_number"/>
+                                        </strong>
+                                        <br/>
+                                        <span class="o_kanban_record_subtitle">
+                                            <field name="partner_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <a class="o_kanban_manage_toggle_button" href="#"><i class="fa fa-ellipsis-v"/></a>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <span class="badge badge-pill" 
+                                                  t-attf-class="badge-#{record.payment_type.value == 'inbound' and 'success' or 'info'}">
+                                                <t t-if="record.payment_type.value == 'inbound'">Receipt</t>
+                                                <t t-else="">Payment</t>
+                                            </span>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <strong>
+                                                <field name="currency_id" invisible="1"/>
+                                                <t t-esc="record.currency_id.value"/>
+                                                <field name="amount"/>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     t-attf-style="width: #{record.workflow_step.value / record.total_steps.value * 100}%"/>
+                                            </div>
+                                            <small class="text-muted">
+                                                Step <t t-esc="record.workflow_step.value"/> of <t t-esc="record.total_steps.value"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="date"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
             </field>
         </record>
 
