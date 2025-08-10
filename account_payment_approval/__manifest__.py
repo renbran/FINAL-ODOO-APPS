@@ -51,7 +51,7 @@
         'base'
     ],
     'external_dependencies': {
-        'python': ['qrcode', 'PIL']
+        'python': []
     },
     'data': [
         # Security

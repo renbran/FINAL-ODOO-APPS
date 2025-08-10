@@ -152,10 +152,5 @@
               groups="account_payment_approval.group_payment_voucher_manager"
               sequence="50"/>
     
-    <menuitem id="menu_payment_approval_settings"
-              name="Payment Approval Settings"
-              parent="menu_payment_approval_config"
-              action="base.action_res_config_settings"
-              sequence="10"/>
-    
+
 </odoo>

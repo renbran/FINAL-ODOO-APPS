@@ -97,12 +97,12 @@
     </record>
 
     <!-- Inherit account.payment to add filters -->
-    <record id="view_account_payment_search" model="ir.ui.view">
+    <record id="view_account_payment_search_inherit" model="ir.ui.view">
         <field name="name">account.payment.view.search.inherit.account.payment.approval</field>
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//search/filter[@name='state_draft']" position="after">
+            <xpath expr="//search" position="inside">
                 <filter string="Waiting For Approval" name="state_waiting_approval"
                         domain="[('state', '=', 'waiting_approval')]"/>
                 <filter string="Approved" name="state_approved"
