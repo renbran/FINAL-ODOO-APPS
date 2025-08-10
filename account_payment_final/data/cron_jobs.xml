@@ -2,12 +2,26 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- Cleanup Old Verification Logs -->
+        <!-- Cleanup Old Payment Verification Tokens -->
         <record id="cron_cleanup_verification_logs" model="ir.cron">
-            <field name="name">Payment Voucher: Cleanup Old Verification Logs</field>
-            <field name="model_id" ref="model_payment_verification_log"/>
+            <field name="name">Payment Voucher: Cleanup Old Verification Data</field>
+            <field name="model_id" ref="account.model_account_payment"/>
             <field name="state">code</field>
-            <field name="code">model.cleanup_old_logs(days=90)</field>
+            <field name="code">
+# Clean up old payment verification tokens older than 90 days
+from datetime import datetime, timedelta
+cutoff_date = datetime.now() - timedelta(days=90)
+
+old_payments = model.search([
+    ('create_date', '&lt;', cutoff_date),
+    ('qr_verification_token', '!=', False),
+    ('approval_state', 'in', ['posted', 'cancelled'])
+])
+
+# Clear verification tokens for old completed payments to save space
+for payment in old_payments:
+    payment.qr_verification_token = False
+            </field>
             <field name="interval_number">1</field>
             <field name="interval_type">weeks</field>
             <field name="numbercall">-1</field>
