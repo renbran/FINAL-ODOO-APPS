@@ -738,6 +738,22 @@ class AccountPaymentUnified(models.Model):
             'context': {'default_res_id': self.id, 'default_model': 'account.payment'},
         }
     
+    def action_qr_verification_view(self):
+        """Open QR verification view in new window"""
+        self.ensure_one()
+        if not self.verification_token:
+            raise UserError(_("No verification token found for this payment."))
+        
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        verification_url = f"{base_url}/payment/verify/{self.verification_token}"
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'name': _('QR Verification'),
+            'url': verification_url,
+            'target': 'new',
+        }
+    
     # Permission and validation methods
     def _check_workflow_permission(self, action):
         """Check if current user has permission for the workflow action"""
