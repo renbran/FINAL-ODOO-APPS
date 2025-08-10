@@ -53,57 +53,30 @@
         'security/payment_security.xml',
         'security/ir.model.access.csv',
         
-        # Main Views (Load After Models/Security)
+        # Main Views (Load After Models/Security) - MINIMAL SAFE
         'views/account_payment_views.xml',
-        'views/account_move_views.xml',
-        'views/res_company_views.xml',
-        'views/res_config_settings_views.xml',
         'views/menus.xml',
         
-        # Advanced Views (Load After Basic Views)
-        'views/account_payment_views_advanced.xml',
+        # Ultra Safe Views (NO OWL DIRECTIVES)
+        'views/account_payment_views_ultra_safe.xml',
         
-        # Reports
+        # NO ADVANCED VIEWS TEMPORARILY
+        # 'views/account_payment_views_advanced.xml',
+        
+        # Reports - MINIMAL
         'reports/payment_voucher_report.xml',
         'reports/payment_voucher_actions.xml',
-        'reports/payment_voucher_template.xml',
         
-        # Website/Portal Views (QWeb Templates)
-        'reports/payment_verification_templates.xml',
+        # NO QWeb TEMPLATES TEMPORARILY
+        # 'reports/payment_voucher_template.xml',
+        # 'reports/payment_verification_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            # Emergency CSS fix (load first to ensure basic styling)
+            # ULTRA MINIMAL - Only emergency CSS
             'account_payment_final/static/src/scss/emergency_fix.scss',
-            
-            # Enhanced SCSS with CSS custom properties (fixed)
-            'account_payment_final/static/src/scss/variables.scss',
-            'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
-            'account_payment_final/static/src/scss/professional_payment_ui.scss',
-            'account_payment_final/static/src/scss/osus_branding.scss',
-            'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
-            'account_payment_final/static/src/scss/views/form_view.scss',
-            
-            # Enhanced JavaScript with modern OWL patterns
-            'account_payment_final/static/src/js/error_handler.js',
-            'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
-            'account_payment_final/static/src/js/unknown_action_handler.js',
-            'account_payment_final/static/src/js/payment_workflow.js',
-            'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
-            'account_payment_final/static/src/js/fields/qr_code_field.js',
-            'account_payment_final/static/src/js/views/payment_list_view.js',
-            'account_payment_final/static/src/xml/payment_templates.xml',
         ],
-        'web.assets_common': [
-            # Responsive design for reports
-            'account_payment_final/static/src/scss/responsive_report_styles.scss',
-            'account_payment_final/static/src/scss/payment_voucher_report.scss',
-        ],
-        'web.assets_frontend': [
-            # Frontend verification portal
-            'account_payment_final/static/src/scss/frontend/verification_portal.scss',
-            'account_payment_final/static/src/js/frontend/qr_verification.js',
-        ]
+        # NO OTHER ASSETS TO PREVENT CONFLICTS
     },
     'external_dependencies': {
         'python': ['qrcode', 'pillow']
