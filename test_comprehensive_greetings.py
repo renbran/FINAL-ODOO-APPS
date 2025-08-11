@@ -7,6 +7,8 @@ with odoo.registry(db_name).cursor() as cr:
     env = api.Environment(cr, SUPERUSER_ID, {})
     emp = env['hr.employee'].search([('work_email', '!=', False)], limit=1)
     if emp:
+        print(f'Testing with employee: {emp.name} ({emp.work_email})')
+        print(f'Employee has joining_date: {emp.joining_date if hasattr(emp, \"joining_date\") else \"Field not available\"}')
         for template_name in ['mail_template_birthday_personal', 'mail_template_birthday_announcement', 'mail_template_anniversary_personal', 'mail_template_anniversary_announcement']:
             try:
                 template = env.ref(f'comprehensive_greetings.{template_name}')
@@ -19,7 +21,7 @@ with odoo.registry(db_name).cursor() as cr:
             except Exception as e:
                 print(f'❌ {template_name}: {e}')
         env.cr.commit()
-        print('🎉 All tests completed!')
+        print('🎉 All OSUS Greetings tests completed!')
     else:
-        print('❌ No employees found')
+        print('❌ No employees found with work email')
 "
