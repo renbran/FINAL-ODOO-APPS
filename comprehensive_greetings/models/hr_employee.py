@@ -15,39 +15,23 @@ class HrEmployee(models.Model):
         string='Date of Birth',
         help="Employee's birthday for birthday greetings"
     )
-
-    joining_date = fields.Date(
-        string='Joining Date',
-        help="Employee joining date for work anniversary calculations",
-        compute='_compute_joining_date',
-        store=True
-    )
     
     years_of_service = fields.Integer(
         string='Years of Service',
         compute='_compute_years_of_service',
-        help="Total years of service based on joining date"
+        help="Total years of service based on joining date from hr_uae module"
     )
-
-    @api.depends('contract_id')
-    def _compute_joining_date(self):
-        """Compute joining date from the earliest contract start date"""
-        for rec in self:
-            if rec.contract_id:
-                rec.joining_date = min(rec.contract_id.mapped('date_start'))
-            else:
-                rec.joining_date = False
 
     @api.depends('joining_date')
     def _compute_years_of_service(self):
-        """Calculate years of service based on joining date"""
+        """Calculate years of service based on joining date from hr_uae module"""
         today = date.today()
         for rec in self:
             if rec.joining_date:
                 years = relativedelta(today, rec.joining_date).years
                 rec.years_of_service = years
             else:
-                rec.years_of_service = 0
+                rec.years_of_service = 1  # Default to 1 year if no joining date
 
     def birthday_reminder(self):
         """

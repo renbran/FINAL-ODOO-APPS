@@ -8,7 +8,7 @@
             <field name="model_id" ref="hr.model_hr_employee"/>
             <field name="partner_to">{{object.id}}</field>
             <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
-            <field name="subject">🏆 Happy {{ object.years_of_service }} Year Work Anniversary {{ object.name }}! - OSUS Properties</field>
+            <field name="subject">🏆 Happy Work Anniversary {{ object.name }}! - OSUS Properties</field>
             <field name="email_to">{{ (object.work_email) }}</field>
             <field name="body_html"><![CDATA[
 <div style="font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%); padding: 20px; color: #454748;">

@@ -29,7 +29,7 @@
     "author": "OSUS Properties",
     "website": "https://osusproperties.com",
     "support": "info@osusproperties.com",
-    "depends": ['contacts', 'hr', 'hr_contract', 'mail'],
+    "depends": ['contacts', 'hr', 'hr_contract', 'mail', 'hr_uae'],
     "data": [
         "security/greetings_security.xml",
         "security/ir.model.access.csv",
