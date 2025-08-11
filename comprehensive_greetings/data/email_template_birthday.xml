@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Personal Birthday Wish Template -->
+        <record id="mail_template_birthday_personal" model="mail.template">
+            <field name="name">OSUS Birthday Personal Greetings</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
+            <field name="subject">🎉 Happy Birthday {{ object.name }}! - OSUS Properties</field>
+            <field name="email_to">{{ (object.work_email) }}</field>
+            <field name="body_html" type="html">
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Birthday Wishes - OSUS Properties</title>
+                                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+                                    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(135deg, #8B1538 0%, #4A0E1F 100%);
+            padding: 20px 0;
+            color: #454748;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #8B1538 0%, #B91C47 50%, #8B1538 100%);
+            padding: 60px 40px;
+            color: #ffffff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                        <circle cx="30" cy="30" r="15" fill="rgba(255,255,255,0.1)"/>
+                                        <circle cx="70" cy="20" r="10" fill="rgba(255,215,55,0.3)"/>
+                                        <circle cx="20" cy="70" r="8" fill="rgba(255,255,255,0.05)"/>
+                                    </svg>');
+            opacity: 0.6;
+        }
+        
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                    <circle cx="60" cy="60" r="20" fill="rgba(212,175,55,0.2)"/>
+                                    <circle cx="30" cy="80" r="12" fill="rgba(255,255,255,0.05)"/>
+                                    <circle cx="80" cy="30" r="8" fill="rgba(255,255,255,0.1)"/>
+                                </svg>');
+            opacity: 0.4;
+        }
+        
+        .balloons {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 60px;
+            opacity: 0.7;
+            z-index: 1;
+        }
+        
+        .balloons-right {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 45px;
+            opacity: 0.6;
+            z-index: 1;
+        }
+        
+        .main-title {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .birthday-script {
+            font-size: 64px;
+            font-weight: 400;
+            font-family: 'Brush Script MT', cursive;
+            color: #ffffff;
+            margin: 20px 0;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            line-height: 1.2;
+        }
+        
+        .employee-name-hero {
+            font-size: 32px;
+            font-weight: 600;
+            color: #D4AF37;
+            margin: 15px 0;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            font-weight: 300;
+            opacity: 0.95;
+            z-index: 2;
+            position: relative;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+        
+        .osus-logo {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        
+        .osus-logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #D4AF37;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .osus-subtitle {
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2px;
+        }
+        
+        .main-content {
+            padding: 50px 40px;
+            background: #ffffff;
+        }
+        
+        .message-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #454748;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .message-body p {
+            margin-bottom: 20px;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #D4AF37;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .highlight-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #8B1538;
+            font-style: italic;
+        }
+        
+        .signature {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #E0E0E0;
+        }
+        
+        .signature-title {
+            font-size: 14px;
+            color: #999999;
+            margin-bottom: 10px;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8B1538;
+            letter-spacing: 1px;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%);
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #E0E0E0;
+        }
+        
+        .company-info {
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.6;
+        }
+        
+        .company-info strong {
+            color: #8B1538;
+            font-weight: 600;
+        }
+        
+        .contact-info {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #999999;
+        }
+        
+        .contact-info a {
+            color: #8B1538;
+            text-decoration: none;
+        }
+        
+        .powered-by {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+            font-size: 10px;
+            color: #AAAAAA;
+        }
+        
+        .powered-by a {
+            color: #D4AF37;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0 10px;
+            }
+            
+            .hero-section {
+                padding: 40px 25px;
+                min-height: 350px;
+            }
+            
+            .main-title {
+                font-size: 36px;
+            }
+            
+            .birthday-script {
+                font-size: 48px;
+            }
+            
+            .employee-name-hero {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+                max-width: 300px;
+            }
+            
+            .main-content {
+                padding: 30px 25px;
+            }
+            
+            .message-body {
+                font-size: 15px;
+            }
+            
+            .balloons {
+                font-size: 40px;
+                top: 15px;
+                left: 20px;
+            }
+            
+            .balloons-right {
+                font-size: 30px;
+                bottom: 20px;
+                right: 25px;
+            }
+        }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="email-container">
+                                <!-- Hero Section -->
+                                <div class="hero-section">
+                                    <div class="balloons">🎈🎈</div>
+                                    <div class="balloons-right">🎉✨</div>
+
+                                    <div class="main-title">HAPPY</div>
+                                    <div class="birthday-script">Birthday</div>
+                                    <div class="employee-name-hero" t-out="object.name or 'Team Member'">{{ object.name }}</div>
+                                    <div class="subtitle">Wishing you a year filled with joy, blessings, and prosperity.</div>
+
+                                    <div class="osus-logo">
+                                        <div class="osus-logo-text">OSUS</div>
+                                        <div class="osus-subtitle">PROPERTIES</div>
+                                    </div>
+                                </div>
+
+                                <!-- Main Content -->
+                                <div class="main-content">
+                                    <div class="message-body">
+                                        <p>On this special day, we want to celebrate not just another year of your life, but another year of your valuable contributions to <strong t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</strong>.
+                                        </p>
+
+                                        <div class="highlight-box">
+                                            <div class="highlight-text">
+                        "You are one of our most valued team members, and your dedication continues to inspire us every day."
+                                            </div>
+                                        </div>
+
+                                        <p>As you embark on another year of success and achievements, we wish you nothing but happiness, prosperity, and continued excellence in all your endeavors.</p>
+
+                                        <p>
+                                            <strong>May this year bring you joy, success, and all the wonderful moments you deserve!</strong>
+                                        </p>
+                                    </div>
+
+                                    <div class="signature">
+                                        <div class="signature-title">Warmest Regards,</div>
+                                        <div class="company-name" t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="footer">
+                                    <div class="company-info">
+                                        <strong t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</strong>
+                                        <br/>
+                Sheikh Zayed Road, Single Business Tower<br/>
+                Office 2902, 29th Floor, Dubai, UAE
+                                    </div>
+
+                                    <div class="contact-info">
+                                        <span t-out="object.company_id.phone or '+971 4 XXX XXXX'">+971 4 XXX XXXX</span>
+                                        <t t-if="object.company_id.email">
+                    |                                            <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" t-out="object.company_id.email or 'info@osusproperties.com'">info@osusproperties.com</a>
+                                        </t>
+                                        <t t-if="object.company_id.website">
+                    |                                            <a t-attf-href="'%s' % {{ object.company_id.website }}" t-out="object.company_id.website or 'www.osusproperties.com'">www.osusproperties.com</a>
+                                        </t>
+                                    </div>
+
+                                    <div class="powered-by">
+                Powered by <a href="https://osusproperties.com" target="_blank">OSUS PROPERTIES</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                </field>
+                <field name="auto_delete" eval="True"/>
+                <field name="lang">{{object.lang}}</field>
+            </record>
+
+            <!-- Birthday Announcement Template -->
+            <record id="mail_template_birthday_announcement" model="mail.template">
+                <field name="name">OSUS Birthday Team Announcement</field>
+                <field name="model_id" ref="hr.model_hr_employee"/>
+                <field name="partner_to">{{object.id}}</field>
+                <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
+                <field name="subject">🎉 Today is {{ object.name }}'s Birthday - Let's Celebrate! - OSUS Properties</field>
+                <field name="email_to">{{ (object.work_email) }}</field>
+                <field name="body_html" type="html">
+                    <table class="pc-project-body" style="box-sizing:border-box;border-collapse:collapse;caption-side:bottom;width: 100%; background-color: #f5f5f5;" bgcolor="#f5f5f5" border="0" cellspacing="0" cellpadding="0" role="presentation" width="100%">
+                        <tbody>
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table class="pc-project-container" align="center" style="width: 600px; max-width: 600px;" border="0" cellpadding="0" cellspacing="0" role="presentation" width="600">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 20px 0;" align="left" valign="top">
+
+                                                    <!-- Header -->
+                                                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="header" style="padding:25px 40px; text-align:center; border-bottom: 3px solid #8b1538; background-color:#ffffff;">
+                                                                        <div class="logo">
+                                                                            <a href="https://osusproperties.com" target="_blank" style="text-decoration: none;">
+                                                                                <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" alt="OSUS Properties" style="height: 45px; width: auto;" width="auto" height="45"/>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- Hero Section -->
+                                                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="hero" style="padding:80px 40px; color:#ffffff; text-align:center; overflow:hidden; position:relative; background: linear-gradient(135deg, #8b1538 0%, #b91c47 100%);">
+                                                                        <div class="balloon-left" style="z-index:1; opacity:0.3; font-size:28px; left:40px; top:30px; position:absolute;">🎈</div>
+                                                                        <div class="balloon-right" style="z-index:1; opacity:0.3; font-size:24px; right:40px; bottom:40px; position:absolute;">🎉</div>
+
+                                                                        <div class="hero-content" style="z-index:2; position:relative;">
+                                                                            <h1 style="margin:0 0 20px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.3); letter-spacing:2px; font-size:64px; color:#ffffff; line-height:1.2; font-weight:300; font-family:'Playfair Display', serif;">🎉 CELEBRATION TIME! 🎉</h1>
+                                                                            <div class="birthday-text" style="margin:0 0 30px 0; line-height:0.9; text-shadow: 0px 3px 6px rgba(0,0,0,0.3); color:#d4af37; font-style:italic; font-weight:600; font-size:72px; font-family:'Playfair Display', serif;">Birthday</div>
+
+                                                                            <div class="name-highlight" style="border-radius:15px; border: 2px solid #d4af37; padding:25px; margin:30px auto; max-width:400px; backdrop-filter:blur(10px); background: rgba(212,175,55,0.2);">
+                                                                                <div class="recipient-name" style="margin:0 0 8px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.3); letter-spacing:1px; text-transform:uppercase; color:#d4af37; font-weight:700; font-size:32px; font-family:Montserrat, sans-serif;">
+                                                                                    <t t-out="object.name or 'Team Member'">{{ object.name }}</t>
+                                                                                </div>
+                                                                                <div class="name-subtitle" style="font-weight:400; color:#ffffff; font-size:14px;">✨ Let's Celebrate Together ✨</div>
+                                                                            </div>
+
+                                                                            <div class="hero-subtitle" style="margin:0px auto 40px auto; line-height:1.5; max-width:450px; opacity:0.9; font-weight:300; font-size:18px;">
+                                                            Join us in wishing our amazing colleague a very happy birthday!
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- Content Section -->
+                                                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="content" style="padding:60px 40px; background-color:#ffffff;">
+                                                                        <div class="message" style="margin:0 0 40px 0; color:#444444; line-height:1.8; font-size:16px; text-align:center;">
+                                                                            <p style="margin:0 0 20px 0;">Today is a special day as we celebrate <strong t-out="object.name or 'our colleague'" style="font-weight:bolder;">{{ object.name }}</strong>'s birthday at <strong t-out="object.company_id.name or 'OSUS Properties'" style="font-weight:bolder;">OSUS Properties</strong>!
+                                                                            </p>
+
+                                                                            <div class="celebration-elements" style="margin:40px 0; text-align:center;">
+                                                                                <span class="cake-emoji" style="margin:0 0 20px 0; font-size:48px; display:block;">🎂</span>
+                                                                                <div class="celebration-text" style="margin:0 0 20px 0; font-weight:500; color:#8b1538; font-size:18px;">Let's make this day extra special!</div>
+                                                                                <div class="balloon-row" style="margin:20px 0; letter-spacing:8px; font-size:32px;">🎈🎈🎈🎈🎈</div>
+                                                                            </div>
+
+                                                                            <p style="margin:0 0 20px 0;">We're so grateful to have such a wonderful person as part of our OSUS Properties family. Your positive energy and dedication make our workplace brighter every day.</p>
+                                                                        </div>
+
+                                                                        <div class="quote-section" style="border-radius:0px; border-left: 4px solid #8b1538; padding:30px; margin:40px 0; position:relative; background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);">
+                                                                            <div class="quote-text" style="margin:0 0 0 30px; font-weight:500; text-align:center; color:#8b1538; font-style:italic; font-size:20px; font-family:'Playfair Display', serif;">
+                                                            Join us in sending warm birthday wishes and making this celebration memorable!
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- CTA Section -->
+                                                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="cta-section" style="padding:50px 40px; text-align:center; background: linear-gradient(135deg, #8b1538 0%, #b91c47 100%);">
+                                                                        <div class="sparkles" style="margin:20px 0; font-size:24px; color:#d4af37;">✨ ⭐ ✨</div>
+                                                                        <a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" class="cta-button" style="text-decoration:none; border-radius:50px; padding:18px 40px; box-shadow: 0px 6px 20px rgba(211,175,55,0.4); transition: all 0.3s ease; letter-spacing:1px; text-transform:uppercase; font-size:16px; font-weight:600; background-color:#d4af37; display:inline-block; color:#8b1538;">
+                                                        🎉 Send Birthday Greetings 🎉
+                                                                        </a>
+                                                                        <div class="sparkles" style="margin:20px 0; font-size:24px; color:#d4af37;">🎊 🌟 🎊</div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- Footer -->
+                                                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="footer" style="padding:40px; text-align:center; color:#ffffff; background-color:#2c2c2c;">
+                                                                        <div class="company-info" style="margin:0 0 20px 0;">
+                                                                            <div class="company-name" t-out="object.company_id.name or 'OSUS Properties'" style="margin:0 0 10px 0; color:#d4af37; font-weight:600; font-size:18px;">OSUS Properties</div>
+                                                                            <div class="address" style="opacity:0.8; line-height:1.6; font-size:14px;">
+                                                            Sheikh Zayed Road, Single Business Tower<br/>
+                                                            Office 2902, 29th Floor, Dubai, UAE
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="contact-links" style="margin:20px 0 0 0; font-size:12px;">
+                                                                            <span t-out="object.company_id.phone or '+971 4 XXX XXXX'">+971 4 XXX XXXX</span>
+                                                                            <t t-if="object.company_id.email">
+                                                            |                                                                                <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" t-out="object.company_id.email or 'info@osusproperties.com'" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">info@osusproperties.com</a>
+                                                                            </t>
+                                                                            <t t-if="object.company_id.website">
+                                                            |                                                                                <a t-attf-href="'%s' % {{ object.company_id.website }}" t-out="object.company_id.website or 'www.osusproperties.com'" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">www.osusproperties.com</a>
+                                                                            </t>
+                                                                        </div>
+
+                                                                        <div class="signature" style="border-top: 1px solid #444444; padding:20px 0 0 0; margin:30px 0 0 0; opacity:0.6; font-size:11px;">
+                                                                            <strong style="font-weight:bolder;">Warmest Regards,</strong>
+                                                                            <br/>
+                                                        The OSUS Properties Team
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </field>
+                <field name="auto_delete" eval="True"/>
+                <field name="lang">{{object.lang}}</field>
+            </record>
+
+        </data>
+    </odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Employee Form View Inheritance -->
+        <record id="view_employee_form_greetings" model="ir.ui.view">
+            <field name="name">hr.employee.form.greetings</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='birthday']" position="after">
+                    <field name="joining_date" readonly="1"/>
+                    <field name="years_of_service" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Employee Tree View Inheritance -->
+        <record id="view_employee_tree_greetings" model="ir.ui.view">
+            <field name="name">hr.employee.tree.greetings</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='birthday']" position="after">
+                    <field name="joining_date" optional="hide"/>
+                    <field name="years_of_service" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Employee Search View Inheritance -->
+        <record id="view_employee_filter_greetings" model="ir.ui.view">
+            <field name="name">hr.employee.search.greetings</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='birthday']" position="after">
+                    <filter name="work_anniversary_today" string="Work Anniversary Today" domain="[('joining_date','!=',False), ('joining_date','like',context_today().strftime('%%m-%%d'))]"/>
+                    <filter name="upcoming_anniversaries" string="Upcoming Anniversaries (This Month)" domain="[('joining_date','!=',False), ('joining_date','like',context_today().strftime('%%m'))]"/>
+                </xpath>
+                <xpath expr="//group[@name='group_by']" position="inside">
+                    <filter name="group_by_years_service" string="Years of Service" context="{'group_by': 'years_of_service'}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
