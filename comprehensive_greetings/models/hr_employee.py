@@ -15,23 +15,6 @@ class HrEmployee(models.Model):
         string='Date of Birth',
         help="Employee's birthday for birthday greetings"
     )
-    
-    years_of_service = fields.Integer(
-        string='Years of Service',
-        compute='_compute_years_of_service',
-        help="Total years of service based on joining date from hr_uae module"
-    )
-
-    @api.depends('joining_date')
-    def _compute_years_of_service(self):
-        """Calculate years of service based on joining date from hr_uae module"""
-        today = date.today()
-        for rec in self:
-            if rec.joining_date:
-                years = relativedelta(today, rec.joining_date).years
-                rec.years_of_service = years
-            else:
-                rec.years_of_service = 1  # Default to 1 year if no joining date
 
     def birthday_reminder(self):
         """
@@ -117,10 +100,11 @@ class HrEmployee(models.Model):
             for employee in anniversary_employees:
                 if (employee.joining_date and 
                     employee.joining_date.day == day and 
-                    employee.joining_date.month == month and
-                    employee.years_of_service > 0):  # Not for first day employees
+                    employee.joining_date.month == month):  # Check if today is anniversary
                     
-                    _logger.info(f"Processing {employee.years_of_service} year anniversary for {employee.name}")
+                    # Calculate years of service for logging
+                    years_of_service = relativedelta(today, employee.joining_date).years
+                    _logger.info(f"Processing {years_of_service} year anniversary for {employee.name}")
                     
                     # Send personal anniversary wish to the employee
                     if employee.work_email:

@@ -14,9 +14,6 @@
                             <group string="Personal Information">
                                 <field name="birthday"/>
                             </group>
-                            <group string="Work Information">
-                                <field name="years_of_service" readonly="1"/>
-                            </group>
                         </group>
                     </page>
                 </xpath>
@@ -31,7 +28,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="after">
                     <field name="birthday" optional="hide"/>
-                    <field name="years_of_service" optional="hide"/>
                 </xpath>
             </field>
         </record>
