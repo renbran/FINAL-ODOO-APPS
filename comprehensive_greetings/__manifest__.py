@@ -31,6 +31,8 @@
     "support": "info@osusproperties.com",
     "depends": ['contacts', 'hr', 'hr_contract', 'mail'],
     "data": [
+        "security/greetings_security.xml",
+        "security/ir.model.access.csv",
         "data/ir_cron.xml",
         "data/mail_template_birthday.xml",
         "data/mail_template_anniversary.xml",

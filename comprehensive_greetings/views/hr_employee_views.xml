@@ -8,7 +8,8 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='birthday']" position="after">
+                <xpath expr="//field[@name='private_email']" position="after">
+                    <field name="birthday"/>
                     <field name="joining_date" readonly="1"/>
                     <field name="years_of_service" readonly="1"/>
                 </xpath>
@@ -21,7 +22,8 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='birthday']" position="after">
+                <xpath expr="//field[@name='work_email']" position="after">
+                    <field name="birthday" optional="hide"/>
                     <field name="joining_date" optional="hide"/>
                     <field name="years_of_service" optional="hide"/>
                 </xpath>
@@ -34,7 +36,8 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_filter"/>
             <field name="arch" type="xml">
-                <xpath expr="//filter[@name='birthday']" position="after">
+                <xpath expr="//filter[@name='inactive']" position="before">
+                    <filter name="birthday_today" string="Birthday Today" domain="[('birthday','!=',False), ('birthday','like',context_today().strftime('%%m-%%d'))]"/>
                     <filter name="work_anniversary_today" string="Work Anniversary Today" domain="[('joining_date','!=',False), ('joining_date','like',context_today().strftime('%%m-%%d'))]"/>
                     <filter name="upcoming_anniversaries" string="Upcoming Anniversaries (This Month)" domain="[('joining_date','!=',False), ('joining_date','like',context_today().strftime('%%m'))]"/>
                 </xpath>

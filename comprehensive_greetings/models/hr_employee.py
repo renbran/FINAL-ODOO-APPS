@@ -11,6 +11,11 @@ _logger = logging.getLogger(__name__)
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
+    birthday = fields.Date(
+        string='Date of Birth',
+        help="Employee's birthday for birthday greetings"
+    )
+
     joining_date = fields.Date(
         string='Joining Date',
         help="Employee joining date for work anniversary calculations",
