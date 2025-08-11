@@ -10,440 +10,84 @@
             <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
             <field name="subject">🏆 Happy {{ object.years_of_service }} Year Work Anniversary {{ object.name }}! - OSUS Properties</field>
             <field name="email_to">{{ (object.work_email) }}</field>
-            <field name="body_html" type="html">
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Work Anniversary Celebration - OSUS Properties</title>
-                                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-                                    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%); padding: 20px; color: #454748;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
         
-        body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%);
-            padding: 20px 0;
-            color: #454748;
-        }
-        
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%);
-            padding: 70px 40px;
-            color: #ffffff;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -30px;
-            left: -30px;
-            width: 140px;
-            height: 140px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                                        <circle cx="30" cy="30" r="15" fill="rgba(255,255,255,0.08)"/>
-                                        <circle cx="70" cy="20" r="12" fill="rgba(212,175,55,0.3)"/>
-                                        <circle cx="20" cy="70" r="10" fill="rgba(255,255,255,0.05)"/>
-                                    </svg>');
-            opacity: 0.7;
-        }
-        
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            bottom: -40px;
-            right: -40px;
-            width: 180px;
-            height: 180px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                                    <circle cx="60" cy="60" r="25" fill="rgba(212,175,55,0.2)"/>
-                                    <circle cx="30" cy="80" r="15" fill="rgba(255,255,255,0.05)"/>
-                                    <circle cx="80" cy="30" r="10" fill="rgba(255,255,255,0.08)"/>
-                                </svg>');
-            opacity: 0.5;
-        }
-        
-        .achievement-icons {
-            position: absolute;
-            top: 25px;
-            left: 35px;
-            font-size: 45px;
-            opacity: 0.7;
-            z-index: 1;
-        }
-        
-        .celebration-icons {
-            position: absolute;
-            bottom: 35px;
-            right: 45px;
-            font-size: 40px;
-            opacity: 0.6;
-            z-index: 1;
-        }
-        
-        .main-title {
-            font-size: 42px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            z-index: 2;
-            position: relative;
-            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .anniversary-script {
-            font-size: 58px;
-            font-weight: 600;
-            font-family: 'Playfair Display', serif;
-            color: #D4AF37;
-            margin: 25px 0;
-            z-index: 2;
-            position: relative;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            line-height: 1.1;
-        }
-        
-        .years-badge {
-            background: rgba(212,175,55,0.9);
-            color: #1E3A8A;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 24px;
-            font-weight: 700;
-            margin: 20px 0;
-            z-index: 2;
-            position: relative;
-            box-shadow: 0 6px 20px rgba(212,175,55,0.3);
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        .employee-name-hero {
-            font-size: 34px;
-            font-weight: 600;
-            color: #ffffff;
-            margin: 20px 0;
-            z-index: 2;
-            position: relative;
-            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
-        }
-        
-        .subtitle {
-            font-size: 19px;
-            font-weight: 300;
-            opacity: 0.95;
-            z-index: 2;
-            position: relative;
-            max-width: 450px;
-            line-height: 1.5;
-        }
-        
-        .osus-logo {
-            position: absolute;
-            bottom: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-        }
-        
-        .osus-logo-text {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #D4AF37;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-        
-        .osus-subtitle {
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.85);
-            margin-top: 3px;
-        }
-        
-        .main-content {
-            padding: 55px 40px;
-            background: #ffffff;
-        }
-        
-        .message-body {
-            font-size: 16px;
-            line-height: 1.8;
-            color: #454748;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .message-body p {
-            margin-bottom: 22px;
-        }
-        
-        .milestone-box {
-            background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);
-            padding: 30px;
-            border-radius: 12px;
-            border-left: 5px solid #1E3A8A;
-            margin: 35px 0;
-            text-align: center;
-        }
-        
-        .milestone-text {
-            font-size: 19px;
-            font-weight: 500;
-            color: #1E3A8A;
-            font-style: italic;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .achievement-highlights {
-            background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 4px solid #D4AF37;
-            margin: 30px 0;
-        }
-        
-        .achievement-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #8B1538;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .achievement-list {
-            color: #555555;
-            font-size: 15px;
-            line-height: 1.6;
-            text-align: center;
-        }
-        
-        .signature {
-            text-align: center;
-            margin-top: 45px;
-            padding-top: 35px;
-            border-top: 1px solid #E0E0E0;
-        }
-        
-        .signature-title {
-            font-size: 15px;
-            color: #999999;
-            margin-bottom: 12px;
-        }
-        
-        .company-name {
-            font-size: 19px;
-            font-weight: 600;
-            color: #8B1538;
-            letter-spacing: 1px;
-        }
-        
-        .footer {
-            background: linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%);
-            padding: 35px;
-            text-align: center;
-            border-top: 1px solid #E0E0E0;
-        }
-        
-        .company-info {
-            font-size: 12px;
-            color: #666666;
-            line-height: 1.6;
-        }
-        
-        .company-info strong {
-            color: #8B1538;
-            font-weight: 600;
-        }
-        
-        .contact-info {
-            margin-top: 18px;
-            font-size: 11px;
-            color: #999999;
-        }
-        
-        .contact-info a {
-            color: #8B1538;
-            text-decoration: none;
-        }
-        
-        .powered-by {
-            margin-top: 22px;
-            padding-top: 22px;
-            border-top: 1px solid #E0E0E0;
-            font-size: 10px;
-            color: #AAAAAA;
-        }
-        
-        .powered-by a {
-            color: #D4AF37;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        @media (max-width: 600px) {
-            .email-container {
-                margin: 0 10px;
-            }
-            
-            .hero-section {
-                padding: 50px 25px;
-                min-height: 400px;
-            }
-            
-            .main-title {
-                font-size: 32px;
-            }
-            
-            .anniversary-script {
-                font-size: 44px;
-            }
-            
-            .years-badge {
-                font-size: 20px;
-                padding: 12px 25px;
-            }
-            
-            .employee-name-hero {
-                font-size: 26px;
-            }
-            
-            .subtitle {
-                font-size: 16px;
-                max-width: 320px;
-            }
-            
-            .main-content {
-                padding: 35px 25px;
-            }
-            
-            .message-body {
-                font-size: 15px;
-            }
-            
-            .achievement-icons {
-                font-size: 35px;
-                top: 20px;
-                left: 25px;
-            }
-            
-            .celebration-icons {
-                font-size: 30px;
-                bottom: 25px;
-                right: 30px;
-            }
-        }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="email-container">
-                                <!-- Hero Section -->
-                                <div class="hero-section">
-                                    <div class="achievement-icons">🏆🎖️</div>
-                                    <div class="celebration-icons">🎊⭐</div>
+        <!-- Hero Section -->
+<div style="background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%); padding: 70px 40px; color: #ffffff; text-align: center; position: relative; min-height: 350px;">
+<div style="position: absolute; top: 25px; left: 35px; font-size: 35px; opacity: 0.7;">🏆🎖️</div>
+<div style="position: absolute; bottom: 35px; right: 45px; font-size: 30px; opacity: 0.6;">🎊⭐</div>
 
-                                    <div class="main-title">CONGRATULATIONS</div>
-                                    <div class="anniversary-script">Work Anniversary</div>
-                                    <div class="years-badge">
-                                        <t t-out="object.years_of_service or '1'">{{ object.years_of_service }}</t>
-                                        <t t-if="object.years_of_service == 1">Year</t>
-                                        <t t-else="">Years</t>
-                                    </div>
-                                    <div class="employee-name-hero" t-out="object.name or 'Team Member'">{{ object.name }}</div>
-                                    <div class="subtitle">Celebrating your dedication, growth, and outstanding contributions to our success.</div>
+<h1 style="font-size: 42px; font-weight: 300; letter-spacing: 2px; margin-bottom: 15px; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">CONGRATULATIONS</h1>
+<h2 style="font-size: 58px; font-weight: 600; color: #D4AF37; margin: 25px 0; text-shadow: 0 4px 8px rgba(0,0,0,0.5); line-height: 1.1;">Work Anniversary</h2>
 
-                                    <div class="osus-logo">
-                                        <div class="osus-logo-text">OSUS</div>
-                                        <div class="osus-subtitle">PROPERTIES</div>
-                                    </div>
-                                </div>
+<div style="background: rgba(212,175,55,0.9); color: #1E3A8A; padding: 15px 30px; border-radius: 50px; font-size: 24px; font-weight: 700; margin: 20px auto; max-width: 300px; box-shadow: 0 6px 20px rgba(212,175,55,0.3);">
+                {{ object.years_of_service or '1' }} Year{{ object.years_of_service == 1 and '' or 's' }}
+            </div>
 
-                                <!-- Main Content -->
-                                <div class="main-content">
-                                    <div class="message-body">
-                                        <p>Today marks a significant milestone in your journey with <strong t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</strong>. 
-                                            <t t-out="object.years_of_service or '1'">{{ object.years_of_service }}</t>
-                                            <t t-if="object.years_of_service == 1">year ago</t>
-                                            <t t-else="">years ago</t>, you joined our team and have been an integral part of our success story ever since.</p>
+<h3 style="font-size: 34px; font-weight: 600; color: #ffffff; margin: 20px 0; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">{{ object.name }}</h3>
+<p style="font-size: 19px; font-weight: 300; opacity: 0.95; max-width: 450px; margin: 0 auto; line-height: 1.5;">Celebrating your dedication, growth, and outstanding contributions to our success.</p>
 
-                                        <div class="milestone-box">
-                                            <div class="milestone-text">
+<div style="position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);">
+<div style="font-size: 26px; font-weight: 700; letter-spacing: 3px; color: #D4AF37; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">OSUS</div>
+<div style="font-size: 11px; font-weight: 400; letter-spacing: 2px; color: rgba(255,255,255,0.85); margin-top: 3px;">PROPERTIES</div>
+</div>
+</div>
+
+<!-- Main Content -->
+<div style="padding: 55px 40px; background: #ffffff;">
+<div style="font-size: 16px; line-height: 1.8; color: #454748; text-align: center; margin-bottom: 40px;">
+<p style="margin-bottom: 22px;">Today marks a significant milestone in your journey with <strong>{{ object.company_id.name or 'OSUS Properties' }}</strong>. 
+                {{ object.years_of_service or '1' }} year{{ object.years_of_service == 1 and '' or 's' }} ago, you joined our team and have been an integral part of our success story ever since.</p>
+
+<div style="background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%); padding: 30px; border-radius: 12px; border-left: 5px solid #1E3A8A; margin: 35px 0; text-align: center;">
+<div style="font-size: 19px; font-weight: 500; color: #1E3A8A; font-style: italic;">
                         "Your commitment, professionalism, and positive attitude have made a lasting impact on our organization and the lives of everyone around you."
-                                            </div>
-                                        </div>
+                    </div>
+</div>
 
-                                        <div class="achievement-highlights">
-                                            <div class="achievement-title">🌟 Your Journey with OSUS Properties 🌟</div>
-                                            <div class="achievement-list">
+<div style="background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%); padding: 25px; border-radius: 10px; border-left: 4px solid #D4AF37; margin: 30px 0;">
+<div style="font-size: 18px; font-weight: 600; color: #8B1538; margin-bottom: 15px; text-align: center;">🌟 Your Journey with OSUS Properties 🌟</div>
+<div style="color: #555555; font-size: 15px; line-height: 1.6; text-align: center;">
                         Your dedication has contributed to our growth in the real estate industry<br/>
                         Your expertise has helped countless clients find their perfect properties<br/>
                         Your teamwork has strengthened our OSUS Properties family
-                                        </div>
-                                    </div>
+                    </div>
+</div>
 
-                                    <p>As you continue to grow with us, we look forward to many more years of collaboration, innovation, and shared achievements. Thank you for being such a valuable member of our team.</p>
+<p style="margin-bottom: 22px;">As you continue to grow with us, we look forward to many more years of collaboration, innovation, and shared achievements. Thank you for being such a valuable member of our team.</p>
 
-                                    <p>
-                                        <strong>Here's to your continued success and many more anniversaries to celebrate!</strong>
-                                    </p>
-                                </div>
+<p><strong>Here's to your continued success and many more anniversaries to celebrate!</strong></p>
+</div>
 
-                                <div class="signature">
-                                    <div class="signature-title">With appreciation and best wishes,</div>
-                                    <div class="company-name" t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</div>
-                                </div>
-                            </div>
+<div style="text-align: center; margin-top: 45px; padding-top: 35px; border-top: 1px solid #E0E0E0;">
+<div style="font-size: 15px; color: #999999; margin-bottom: 12px;">With appreciation and best wishes,</div>
+<div style="font-size: 19px; font-weight: 600; color: #8B1538; letter-spacing: 1px;">{{ object.company_id.name or 'OSUS Properties' }}</div>
+</div>
+</div>
 
-                            <!-- Footer -->
-                            <div class="footer">
-                                <div class="company-info">
-                                    <strong t-out="object.company_id.name or 'OSUS Properties'">OSUS Properties</strong>
-                                    <br/>
+<!-- Footer -->
+<div style="background: linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%); padding: 35px; text-align: center; border-top: 1px solid #E0E0E0;">
+<div style="font-size: 12px; color: #666666; line-height: 1.6;">
+<strong style="color: #8B1538; font-weight: 600;">{{ object.company_id.name or 'OSUS Properties' }}</strong><br/>
                 Sheikh Zayed Road, Single Business Tower<br/>
                 Office 2902, 29th Floor, Dubai, UAE
-                                </div>
+            </div>
 
-                                <div class="contact-info">
-                                    <span t-out="object.company_id.phone or '+971 4 XXX XXXX'">+971 4 XXX XXXX</span>
-                                    <t t-if="object.company_id.email">
-                    |                                        <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" t-out="object.company_id.email or 'info@osusproperties.com'">info@osusproperties.com</a>
-                                    </t>
-                                    <t t-if="object.company_id.website">
-                    |                                        <a t-attf-href="'%s' % {{ object.company_id.website }}" t-out="object.company_id.website or 'www.osusproperties.com'">www.osusproperties.com</a>
-                                    </t>
-                                </div>
+<div style="margin-top: 18px; font-size: 11px; color: #999999;">
+<span>{{ object.company_id.phone or '+971 4 XXX XXXX' }}</span>
+                | <a href="mailto:{{ object.company_id.email or 'info@osusproperties.com' }}" style="color: #8B1538; text-decoration: none;">{{ object.company_id.email or 'info@osusproperties.com' }}</a>
+                | <a href="https://{{ object.company_id.website or 'www.osusproperties.com' }}" style="color: #8B1538; text-decoration: none;">{{ object.company_id.website or 'www.osusproperties.com' }}</a>
+</div>
 
-                                <div class="powered-by">
-                Powered by <a href="https://osusproperties.com" target="_blank">OSUS PROPERTIES</a>
-                                </div>
-                            </div>
-                        </div>
-                    </body>
-                </html>
-            </field>
+<div style="margin-top: 22px; padding-top: 22px; border-top: 1px solid #E0E0E0; font-size: 10px; color: #AAAAAA;">
+                Powered by <a href="https://osusproperties.com" target="_blank" style="color: #D4AF37; text-decoration: none; font-weight: 500;">OSUS PROPERTIES</a>
+</div>
+</div>
+</div>
+</div>
+]]>            </field>
             <field name="auto_delete" eval="True"/>
             <field name="lang">{{object.lang}}</field>
         </record>
@@ -456,142 +100,100 @@
             <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
             <field name="subject">🏆 Celebrating {{ object.name }}'s {{ object.years_of_service }} Year Work Anniversary! - OSUS Properties</field>
             <field name="email_to">{{ (object.work_email) }}</field>
-            <field name="body_html" type="html">
-                <table class="pc-project-body" style="box-sizing:border-box;border-collapse:collapse;caption-side:bottom;width: 100%; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 100%);" bgcolor="#1E3A8A" border="0" cellspacing="0" cellpadding="0" role="presentation" width="100%">
-                    <tbody>
-                        <tr>
-                            <td align="center" valign="top" style="padding: 20px;">
-                                <table align="center" style="width: 600px; max-width: 600px; background: #ffffff; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden;" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                                    <tbody>
-                                        <!-- Header -->
-                                        <tr>
-                                            <td style="background: #ffffff; padding: 30px 40px; border-bottom: 3px solid #1E3A8A; text-align: center;">
-                                                <a href="https://osusproperties.com" target="_blank" style="text-decoration: none;">
-                                                    <img src="https://osusproperties.com/wp-content/uploads/2025/02/OSUS-logotype-2.png" alt="OSUS Properties" style="height: 50px; width: auto;" width="auto" height="50"/>
-                                                </a>
-                                            </td>
-                                        </tr>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 100%); padding: 20px;">
+    <div style="width: 600px; max-width: 600px; margin: 0 auto; background: #ffffff; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden;">
+        
+        <!-- Header -->
+<div style="background: #ffffff; padding: 30px 40px; border-bottom: 3px solid #1E3A8A; text-align: center;">
+<div style="font-size: 28px; font-weight: 700; color: #1E3A8A; letter-spacing: 2px;">OSUS PROPERTIES</div>
+</div>
 
-                                        <!-- Hero Section -->
-                                        <tr>
-                                            <td style="background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%); position: relative; overflow: hidden; text-align: center; color: #ffffff; padding: 80px 40px;">
-                                                <div style="position: absolute; top: 30px; left: 40px; font-size: 35px; opacity: 0.4; z-index: 1;">🏆</div>
-                                                <div style="position: absolute; bottom: 40px; right: 40px; font-size: 30px; opacity: 0.4; z-index: 1;">🎊</div>
+<!-- Hero Section -->
+<div style="background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%); position: relative; overflow: hidden; text-align: center; color: #ffffff; padding: 80px 40px;">
+<div style="position: absolute; top: 30px; left: 40px; font-size: 35px; opacity: 0.4;">🏆</div>
+<div style="position: absolute; bottom: 40px; right: 40px; font-size: 30px; opacity: 0.4;">🎊</div>
 
-                                                <div style="z-index: 2; position: relative;">
-                                                    <h1 style="margin: 0 0 25px 0; text-shadow: 0px 3px 6px rgba(0,0,0,0.4); letter-spacing: 2px; font-size: 58px; color: #ffffff; line-height: 1.2; font-weight: 400; font-family: 'Playfair Display', serif;">🏆 MILESTONE CELEBRATION! 🏆</h1>
-                                                    <div style="margin: 0 0 35px 0; line-height: 0.9; text-shadow: 0px 4px 8px rgba(0,0,0,0.4); color: #D4AF37; font-style: italic; font-weight: 600; font-size: 68px; font-family: 'Playfair Display', serif;">Work Anniversary</div>
+<h1 style="margin: 0 0 25px 0; text-shadow: 0px 3px 6px rgba(0,0,0,0.4); letter-spacing: 2px; font-size: 58px; color: #ffffff; line-height: 1.2; font-weight: 400;">🏆 MILESTONE CELEBRATION! 🏆</h1>
+<div style="margin: 0 0 35px 0; line-height: 0.9; text-shadow: 0px 4px 8px rgba(0,0,0,0.4); color: #D4AF37; font-style: italic; font-weight: 600; font-size: 68px;">Work Anniversary</div>
 
-                                                    <div style="border-radius: 20px; border: 3px solid #D4AF37; padding: 30px; margin: 35px auto; max-width: 450px; backdrop-filter: blur(15px); background: rgba(212,175,55,0.15);">
-                                                        <div style="margin: 0 0 10px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.4); letter-spacing: 1px; text-transform: uppercase; color: #D4AF37; font-weight: 700; font-size: 36px; font-family: Montserrat, sans-serif;">
-                                                            <t t-out="object.name or 'Team Member'">{{ object.name }}</t>
-                                                        </div>
-                                                        <div style="margin: 10px 0; background: #D4AF37; color: #1E3A8A; padding: 12px 25px; border-radius: 30px; font-weight: 700; font-size: 20px; display: inline-block;">
-                                                            <t t-out="object.years_of_service or '1'">{{ object.years_of_service }}</t>
-                                                            <t t-if="object.years_of_service == 1">Year</t>
-                                                            <t t-else="">Years</t>
-                                            of Excellence
-                                                        </div>
-                                                        <div style="font-weight: 400; color: #ffffff; font-size: 15px; margin-top: 10px;">🌟 Celebrating Dedication & Growth 🌟</div>
-                                                    </div>
+<div style="border-radius: 20px; border: 3px solid #D4AF37; padding: 30px; margin: 35px auto; max-width: 450px; background: rgba(212,175,55,0.15);">
+<div style="margin: 0 0 10px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.4); letter-spacing: 1px; text-transform: uppercase; color: #D4AF37; font-weight: 700; font-size: 36px;">{{ object.name }}</div>
+<div style="margin: 10px 0; background: #D4AF37; color: #1E3A8A; padding: 12px 25px; border-radius: 30px; font-weight: 700; font-size: 20px; display: inline-block;">
+                    {{ object.years_of_service or '1' }} Year{{ object.years_of_service == 1 and '' or 's' }} of Excellence
+                </div>
+<div style="font-weight: 400; color: #ffffff; font-size: 15px; margin-top: 10px;">🌟 Celebrating Dedication &amp; Growth 🌟</div>
+</div>
 
-                                                    <div style="margin: 0px auto 45px auto; line-height: 1.5; max-width: 480px; opacity: 0.95; font-weight: 300; font-size: 19px;">
-                                        Join us in celebrating this incredible milestone in our colleague's journey!
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
+<div style="margin: 0px auto 45px auto; line-height: 1.5; max-width: 480px; opacity: 0.95; font-weight: 300; font-size: 19px;">
+                Join us in celebrating this incredible milestone in our colleague's journey!
+            </div>
+</div>
 
-                                        <!-- Content Section -->
-                                        <tr>
-                                            <td style="padding: 65px 40px; background-color: #ffffff;">
-                                                <div style="margin: 0 0 45px 0; color: #444444; line-height: 1.8; font-size: 16px; text-align: center;">
-                                                    <p style="margin: 0 0 22px 0;">Today we celebrate a remarkable milestone as <strong t-out="object.name or 'our colleague'" style="font-weight: bolder;">{{ object.name }}</strong> marks 
-                                                        <strong>
-                                                            <t t-out="object.years_of_service or '1'">{{ object.years_of_service }}</t>
-                                                            <t t-if="object.years_of_service == 1">year</t>
-                                                            <t t-else="">years</t>
-                                                        </strong> of dedicated service with <strong t-out="object.company_id.name or 'OSUS Properties'" style="font-weight: bolder;">OSUS Properties</strong>!
-                                                    </p>
+<!-- Content Section -->
+<div style="padding: 65px 40px; background-color: #ffffff;">
+<div style="margin: 0 0 45px 0; color: #444444; line-height: 1.8; font-size: 16px; text-align: center;">
+<p style="margin: 0 0 22px 0;">Today we celebrate a remarkable milestone as <strong>{{ object.name }}</strong> marks 
+                <strong>{{ object.years_of_service or '1' }} year{{ object.years_of_service == 1 and '' or 's' }}</strong> of dedicated service with <strong>{{ object.company_id.name or 'OSUS Properties' }}</strong>!</p>
 
-                                                    <div style="margin: 45px 0; text-align: center;">
-                                                        <span style="margin: 0 0 25px 0; font-size: 55px; display: block;">🎯</span>
-                                                        <div style="margin: 0 0 25px 0; font-weight: 500; color: #1E3A8A; font-size: 20px;">Achievement Unlocked!</div>
-                                                        <div style="margin: 25px 0; letter-spacing: 6px; font-size: 35px;">🏆⭐🎖️⭐🏆</div>
-                                                    </div>
+<div style="margin: 45px 0; text-align: center;">
+<span style="margin: 0 0 25px 0; font-size: 55px; display: block;">🎯</span>
+<div style="margin: 0 0 25px 0; font-weight: 500; color: #1E3A8A; font-size: 20px;">Achievement Unlocked!</div>
+<div style="margin: 25px 0; letter-spacing: 6px; font-size: 35px;">🏆⭐🎖️⭐🏆</div>
+</div>
 
-                                                    <p style="margin: 0 0 22px 0;">Throughout 
-                                                        <t t-if="object.years_of_service == 1">this year</t>
-                                                        <t t-else="">these <t t-out="object.years_of_service">{{ object.years_of_service }}</t> years</t>, 
-                                    they have consistently demonstrated excellence, professionalism, and unwavering commitment to our team's success.</p>
-                                                </div>
+<p style="margin: 0 0 22px 0;">Throughout {{ object.years_of_service == 1 and 'this year' or 'these years' }}, they have consistently demonstrated excellence, professionalism, and unwavering commitment to our team's success.</p>
+</div>
 
-                                                <div style="border-radius: 0px; border-left: 5px solid #1E3A8A; padding: 35px; margin: 45px 0; position: relative; background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);">
-                                                    <div style="margin: 0 0 0 35px; font-weight: 500; text-align: center; color: #1E3A8A; font-style: italic; font-size: 22px; font-family: 'Playfair Display', serif;">
-                                        Let's take a moment to appreciate their contributions and wish them continued success in their career journey with us!
-                                                    </div>
-                                                </div>
+<div style="border-radius: 0px; border-left: 5px solid #1E3A8A; padding: 35px; margin: 45px 0; position: relative; background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);">
+<div style="margin: 0 0 0 35px; font-weight: 500; text-align: center; color: #1E3A8A; font-style: italic; font-size: 22px;">
+                    Let's take a moment to appreciate their contributions and wish them continued success in their career journey with us!
+                </div>
+</div>
 
-                                                <div style="margin: 45px 0; background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%); padding: 30px; border-radius: 12px; border-left: 4px solid #D4AF37;">
-                                                    <div style="font-size: 19px; font-weight: 600; color: #8B1538; margin-bottom: 18px; text-align: center;">🌟 Celebrating Excellence 🌟</div>
-                                                    <div style="color: #555555; font-size: 16px; line-height: 1.7; text-align: center;">
-                                                        <t t-if="object.years_of_service == 1">One year of outstanding performance and growth</t>
-                                                        <t t-else="">
-                                                            <t t-out="object.years_of_service">{{ object.years_of_service }}</t> years of consistent excellence and dedication</t>
-                                                        <br/>
-                                        A valued member of our OSUS Properties family<br/>
-                                        Contributing to our success in the real estate industry
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
+<div style="margin: 45px 0; background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%); padding: 30px; border-radius: 12px; border-left: 4px solid #D4AF37;">
+<div style="font-size: 19px; font-weight: 600; color: #8B1538; margin-bottom: 18px; text-align: center;">🌟 Celebrating Excellence 🌟</div>
+<div style="color: #555555; font-size: 16px; line-height: 1.7; text-align: center;">
+                    {{ object.years_of_service == 1 and 'One year of outstanding performance and growth' or 'Years of consistent excellence and dedication' }}<br/>
+                    A valued member of our OSUS Properties family<br/>
+                    Contributing to our success in the real estate industry
+                </div>
+</div>
+</div>
 
-                                        <!-- CTA Section -->
-                                        <tr>
-                                            <td style="padding: 55px 40px; text-align: center; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%);">
-                                                <div style="margin: 25px 0; font-size: 28px; color: #D4AF37;">✨ 🎊 ✨</div>
-                                                <a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" style="text-decoration: none; border-radius: 50px; padding: 20px 45px; box-shadow: 0px 8px 25px rgba(212,175,55,0.4); transition: all 0.3s ease; letter-spacing: 1px; text-transform: uppercase; font-size: 17px; font-weight: 600; background-color: #D4AF37; display: inline-block; color: #1E3A8A;">
-                                    🏆 Send Congratulations 🏆
-                                                </a>
-                                                <div style="margin: 25px 0; font-size: 28px; color: #D4AF37;">🌟 🎖️ 🌟</div>
-                                            </td>
-                                        </tr>
+<!-- CTA Section -->
+<div style="padding: 55px 40px; text-align: center; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 50%, #D4AF37 100%);">
+<div style="margin: 25px 0; font-size: 28px; color: #D4AF37;">✨ 🎊 ✨</div>
+<a href="https://t.me/+bWdZc6_TZME5ODM0" target="_blank" style="text-decoration: none; border-radius: 50px; padding: 20px 45px; box-shadow: 0px 8px 25px rgba(212,175,55,0.4); letter-spacing: 1px; text-transform: uppercase; font-size: 17px; font-weight: 600; background-color: #D4AF37; display: inline-block; color: #1E3A8A;">
+                🏆 Send Congratulations 🏆
+            </a>
+<div style="margin: 25px 0; font-size: 28px; color: #D4AF37;">🌟 🎖️ 🌟</div>
+</div>
 
-                                        <!-- Footer -->
-                                        <tr>
-                                            <td style="padding: 45px; text-align: center; color: #ffffff; background-color: #2c2c2c;">
-                                                <div style="margin: 0 0 25px 0;">
-                                                    <div t-out="object.company_id.name or 'OSUS Properties'" style="margin: 0 0 12px 0; color: #D4AF37; font-weight: 600; font-size: 20px;">OSUS Properties</div>
-                                                    <div style="opacity: 0.8; line-height: 1.6; font-size: 14px;">
-                                        Sheikh Zayed Road, Single Business Tower<br/>
-                                        Office 2902, 29th Floor, Dubai, UAE
-                                                    </div>
-                                                </div>
+<!-- Footer -->
+<div style="padding: 45px; text-align: center; color: #ffffff; background-color: #2c2c2c;">
+<div style="margin: 0 0 25px 0;">
+<div style="margin: 0 0 12px 0; color: #D4AF37; font-weight: 600; font-size: 20px;">{{ object.company_id.name or 'OSUS Properties' }}</div>
+<div style="opacity: 0.8; line-height: 1.6; font-size: 14px;">
+                    Sheikh Zayed Road, Single Business Tower<br/>
+                    Office 2902, 29th Floor, Dubai, UAE
+                </div>
+</div>
 
-                                                <div style="margin: 25px 0 0 0; font-size: 12px;">
-                                                    <span t-out="object.company_id.phone or '+971 4 XXX XXXX'">+971 4 XXX XXXX</span>
-                                                    <t t-if="object.company_id.email">
-                                        |                                                        <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}" t-out="object.company_id.email or 'info@osusproperties.com'" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">info@osusproperties.com</a>
-                                                    </t>
-                                                    <t t-if="object.company_id.website">
-                                        |                                                        <a t-attf-href="'%s' % {{ object.company_id.website }}" t-out="object.company_id.website or 'www.osusproperties.com'" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">www.osusproperties.com</a>
-                                                    </t>
-                                                </div>
+<div style="margin: 25px 0 0 0; font-size: 12px;">
+<span>{{ object.company_id.phone or '+971 4 XXX XXXX' }}</span>
+                | <a href="mailto:{{ object.company_id.email or 'info@osusproperties.com' }}" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">{{ object.company_id.email or 'info@osusproperties.com' }}</a>
+                | <a href="https://{{ object.company_id.website or 'www.osusproperties.com' }}" style="text-decoration: none; margin: 0px 10px; color: #ffffff;">{{ object.company_id.website or 'www.osusproperties.com' }}</a>
+</div>
 
-                                                <div style="border-top: 1px solid #444444; padding: 25px 0 0 0; margin: 35px 0 0 0; opacity: 0.6; font-size: 11px;">
-                                                    <strong style="font-weight: bolder;">With appreciation,</strong>
-                                                    <br/>
-                                    The OSUS Properties Team
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </field>
+<div style="border-top: 1px solid #444444; padding: 25px 0 0 0; margin: 35px 0 0 0; opacity: 0.6; font-size: 11px;">
+<strong>With appreciation,</strong><br/>
+                The OSUS Properties Team
+            </div>
+</div>
+</div>
+</div>
+]]>            </field>
             <field name="auto_delete" eval="True"/>
             <field name="lang">{{object.lang}}</field>
         </record>
