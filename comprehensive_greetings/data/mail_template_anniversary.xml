@@ -23,7 +23,7 @@
 <h2 style="font-size: 58px; font-weight: 600; color: #D4AF37; margin: 25px 0; text-shadow: 0 4px 8px rgba(0,0,0,0.5); line-height: 1.1;">Work Anniversary</h2>
 
 <div style="background: rgba(212,175,55,0.9); color: #1E3A8A; padding: 15px 30px; border-radius: 50px; font-size: 24px; font-weight: 700; margin: 20px auto; max-width: 300px; box-shadow: 0 6px 20px rgba(212,175,55,0.3);">
-                {{ object.years_of_service or '1' }} Year{{ object.years_of_service == 1 and '' or 's' }}
+                Work Anniversary
             </div>
 
 <h3 style="font-size: 34px; font-weight: 600; color: #ffffff; margin: 20px 0; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">{{ object.name }}</h3>
@@ -39,7 +39,7 @@
 <div style="padding: 55px 40px; background: #ffffff;">
 <div style="font-size: 16px; line-height: 1.8; color: #454748; text-align: center; margin-bottom: 40px;">
 <p style="margin-bottom: 22px;">Today marks a significant milestone in your journey with <strong>{{ object.company_id.name or 'OSUS Properties' }}</strong>. 
-                {{ object.years_of_service or '1' }} year{{ object.years_of_service == 1 and '' or 's' }} ago, you joined our team and have been an integral part of our success story ever since.</p>
+                Since you joined our team, you have been an integral part of our success story.</p>
 
 <div style="background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%); padding: 30px; border-radius: 12px; border-left: 5px solid #1E3A8A; margin: 35px 0; text-align: center;">
 <div style="font-size: 19px; font-weight: 500; color: #1E3A8A; font-style: italic;">
@@ -98,7 +98,7 @@
             <field name="model_id" ref="hr.model_hr_employee"/>
             <field name="partner_to">{{object.id}}</field>
             <field name="email_from">{{ (object.company_id.email) or 'info@osusproperties.com' }}</field>
-            <field name="subject">🏆 Celebrating {{ object.name }}'s {{ object.years_of_service }} Year Work Anniversary! - OSUS Properties</field>
+            <field name="subject">🏆 Celebrating {{ object.name }}'s Work Anniversary! - OSUS Properties</field>
             <field name="email_to">{{ (object.work_email) }}</field>
             <field name="body_html"><![CDATA[
 <div style="font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1E3A8A 0%, #8B1538 100%); padding: 20px;">
@@ -120,7 +120,7 @@
 <div style="border-radius: 20px; border: 3px solid #D4AF37; padding: 30px; margin: 35px auto; max-width: 450px; background: rgba(212,175,55,0.15);">
 <div style="margin: 0 0 10px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.4); letter-spacing: 1px; text-transform: uppercase; color: #D4AF37; font-weight: 700; font-size: 36px;">{{ object.name }}</div>
 <div style="margin: 10px 0; background: #D4AF37; color: #1E3A8A; padding: 12px 25px; border-radius: 30px; font-weight: 700; font-size: 20px; display: inline-block;">
-                    {{ object.years_of_service or '1' }} Year{{ object.years_of_service == 1 and '' or 's' }} of Excellence
+                    Work Anniversary
                 </div>
 <div style="font-weight: 400; color: #ffffff; font-size: 15px; margin-top: 10px;">🌟 Celebrating Dedication &amp; Growth 🌟</div>
 </div>
@@ -134,7 +134,7 @@
 <div style="padding: 65px 40px; background-color: #ffffff;">
 <div style="margin: 0 0 45px 0; color: #444444; line-height: 1.8; font-size: 16px; text-align: center;">
 <p style="margin: 0 0 22px 0;">Today we celebrate a remarkable milestone as <strong>{{ object.name }}</strong> marks 
-                <strong>{{ object.years_of_service or '1' }} year{{ object.years_of_service == 1 and '' or 's' }}</strong> of dedicated service with <strong>{{ object.company_id.name or 'OSUS Properties' }}</strong>!</p>
+                their work anniversary of dedicated service with <strong>{{ object.company_id.name or 'OSUS Properties' }}</strong>!</p>
 
 <div style="margin: 45px 0; text-align: center;">
 <span style="margin: 0 0 25px 0; font-size: 55px; display: block;">🎯</span>
@@ -142,7 +142,7 @@
 <div style="margin: 25px 0; letter-spacing: 6px; font-size: 35px;">🏆⭐🎖️⭐🏆</div>
 </div>
 
-<p style="margin: 0 0 22px 0;">Throughout {{ object.years_of_service == 1 and 'this year' or 'these years' }}, they have consistently demonstrated excellence, professionalism, and unwavering commitment to our team's success.</p>
+<p style="margin: 0 0 22px 0;">Throughout their time with us, they have consistently demonstrated excellence, professionalism, and unwavering commitment to our team's success.</p>
 </div>
 
 <div style="border-radius: 0px; border-left: 5px solid #1E3A8A; padding: 35px; margin: 45px 0; position: relative; background: linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);">
@@ -154,7 +154,7 @@
 <div style="margin: 45px 0; background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%); padding: 30px; border-radius: 12px; border-left: 4px solid #D4AF37;">
 <div style="font-size: 19px; font-weight: 600; color: #8B1538; margin-bottom: 18px; text-align: center;">🌟 Celebrating Excellence 🌟</div>
 <div style="color: #555555; font-size: 16px; line-height: 1.7; text-align: center;">
-                    {{ object.years_of_service == 1 and 'One year of outstanding performance and growth' or 'Years of consistent excellence and dedication' }}<br/>
+                    Outstanding performance and consistent growth<br/>
                     A valued member of our OSUS Properties family<br/>
                     Contributing to our success in the real estate industry
                 </div>
