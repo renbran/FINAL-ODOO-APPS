@@ -9,8 +9,8 @@
         <field name="arch" type="xml">
             <form string="Bulk Payment Approval">
                 <header>
-                    <button name="action_process_bulk" string="Process Bulk Action" type="object" class="btn-primary" attrs="{'invisible': [('eligible_count', '=', 0)]}"/>
-                    <button name="action_preview_changes" string="Preview Changes" type="object" class="btn-secondary" attrs="{'invisible': [('eligible_count', '=', 0)]}"/>
+                    <button name="action_process_bulk" string="Process Bulk Action" type="object" class="btn-primary" invisible="eligible_count == 0"/>
+                    <button name="action_preview_changes" string="Preview Changes" type="object" class="btn-secondary" invisible="eligible_count == 0"/>
                     <button name="action_filter_payments" string="Apply Filters" type="object" class="btn-info"/>
                     <button string="Cancel" class="btn-default" special="cancel"/>
                 </header>
@@ -35,16 +35,14 @@
                         </group>
                     </group>
 
-                    <group name="action_details" attrs="{'invisible': [('action_type', 'not in', ['approve', 'authorize', 'post', 'reject'])]}">
+                    <group name="action_details" invisible="action_type not in ('approve', 'authorize', 'post', 'reject')">
                         <group>
                             <field name="notes" placeholder="Optional notes for all payments..."/>
-                            <field name="rejection_reason" attrs="{'invisible': [('action_type', '!=', 'reject')], 
-                                          'required': [('action_type', '=', 'reject')]}"/>
+                            <field name="rejection_reason" invisible="action_type != 'reject'" required="action_type == 'reject'"/>
                         </group>
                         <group>
                             <field name="require_signature"/>
-                            <field name="signature_data" widget="signature" attrs="{'invisible': [('require_signature', '=', False)],
-                                          'required': [('require_signature', '=', True)]}"/>
+                            <field name="signature_data" widget="signature" invisible="require_signature == False" required="require_signature == True"/>
                         </group>
                     </group>
 
@@ -63,7 +61,7 @@
                             </field>
                         </page>
 
-                        <page string="Eligible Payments" name="eligible_payments" attrs="{'invisible': [('eligible_count', '=', 0)]}">
+                        <page string="Eligible Payments" name="eligible_payments" invisible="eligible_count == 0">
                             <field name="eligible_payment_ids" nolabel="1">
                                 <tree decoration-bf="1">
                                     <field name="name"/>
@@ -77,7 +75,7 @@
                             </field>
                         </page>
 
-                        <page string="Ineligible Payments" name="ineligible_payments" attrs="{'invisible': [('ineligible_payment_ids', '=', [])]}">
+                        <page string="Ineligible Payments" name="ineligible_payments" invisible="ineligible_payment_ids == []">
                             <field name="ineligible_payment_ids" nolabel="1">
                                 <tree decoration-muted="1">
                                     <field name="name"/>
@@ -177,7 +175,7 @@
                         <field name="signature_required"/>
                     </group>
 
-                    <group name="signature" attrs="{'invisible': [('signature_required', '=', False)]}">
+                    <group name="signature" invisible="signature_required == False">
                         <field name="signature_data" widget="signature" nolabel="1" colspan="2"/>
                     </group>
                 </sheet>
@@ -266,8 +264,7 @@
                         <page string="Email Settings" name="email">
                             <group>
                                 <field name="email_report"/>
-                                <field name="email_recipients" attrs="{'invisible': [('email_report', '=', False)],
-                                              'required': [('email_report', '=', True)]}" placeholder="email1@example.com, email2@example.com"/>
+                                <field name="email_recipients" invisible="email_report == False" required="email_report == True" placeholder="email1@example.com, email2@example.com"/>
                             </group>
                         </page>
                     </notebook>
