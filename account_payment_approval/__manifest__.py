@@ -79,7 +79,6 @@ Technical Features:
         
         # Views
         'views/account_payment_views.xml',
-        'views/account_move_enhanced_views.xml',
         'views/menu_views.xml',
         'views/wizard_views.xml',
     ],
