@@ -100,42 +100,8 @@ Technical Features:
     ],
     'assets': {
         'web.assets_backend': [
-            # SCSS Variables and Utilities (load first)
-            'account_payment_approval/static/src/scss/_variables.scss',
-            
-            # Component SCSS files
-            'account_payment_approval/static/src/scss/components/_dashboard.scss',
-            'account_payment_approval/static/src/scss/components/_badges.scss',
-            'account_payment_approval/static/src/scss/components/_signature.scss',
-            'account_payment_approval/static/src/scss/components/_qr_code.scss',
-            'account_payment_approval/static/src/scss/components/_account_move_widgets.scss',
-            
-            # Main SCSS (loads all imports and global styles)
-            'account_payment_approval/static/src/scss/main.scss',
-            
-            # Compiled CSS (backup/fallback)
-            'account_payment_approval/static/src/css/payment_approval.css',
-            
-            # JavaScript Components (load in dependency order)
-            'account_payment_approval/static/src/js/components/payment_approval_dashboard.js',
-            'account_payment_approval/static/src/js/fields/voucher_state_field.js',
-            'account_payment_approval/static/src/js/widgets/digital_signature_widget.js',
-            'account_payment_approval/static/src/js/widgets/qr_code_widget.js',
-            'account_payment_approval/static/src/js/widgets/bulk_approval_widget.js',
-            'account_payment_approval/static/src/js/widgets/account_move_widgets.js',
-            'account_payment_approval/static/src/js/views/payment_form_view.js',
-            
-            # XML Templates (load after JavaScript components)
-            'account_payment_approval/static/src/xml/payment_approval_templates.xml',
-            'account_payment_approval/static/src/xml/dashboard_templates.xml',
-            'account_payment_approval/static/src/xml/digital_signature_templates.xml',
-            'account_payment_approval/static/src/xml/qr_verification_templates.xml',
-            'account_payment_approval/static/src/xml/account_move_templates.xml',
-        ],
-        'web.assets_frontend': [
-            # Frontend styles for QR verification portal
-            'account_payment_approval/static/src/css/payment_approval.css',
-            'account_payment_approval/static/src/js/qr_verification.js',
+            # Simplified SCSS - Single file with no complex imports
+            'account_payment_approval/static/src/scss/payment_approval.scss',
         ],
     },
     'demo': [
