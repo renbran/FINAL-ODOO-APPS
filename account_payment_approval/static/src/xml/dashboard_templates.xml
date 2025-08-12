@@ -49,7 +49,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3">
                         <div class="kpi-card approved">
                             <div class="kpi-icon">
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3">
                         <div class="kpi-card amount">
                             <div class="kpi-icon">
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3">
                         <div class="kpi-card efficiency">
                             <div class="kpi-icon">
@@ -132,8 +132,7 @@
                             </div>
                             <div class="widget-content">
                                 <div class="activity-timeline">
-                                    <div t-foreach="state.recentActivities" t-as="activity" t-key="activity.id" 
-                                         class="activity-item">
+                                    <div t-foreach="state.recentActivities" t-as="activity" t-key="activity.id" class="activity-item">
                                         <div class="activity-icon" t-att-class="getActivityIconClass(activity.type)">
                                             <i t-att-class="getActivityIcon(activity.type)"></i>
                                         </div>
@@ -199,8 +198,7 @@
                             <div class="widget-content">
                                 <canvas t-ref="statusChart" height="250"></canvas>
                                 <div class="status-legend">
-                                    <div t-foreach="state.statusDistribution" t-as="status" t-key="status.state" 
-                                         class="legend-item">
+                                    <div t-foreach="state.statusDistribution" t-as="status" t-key="status.state" class="legend-item">
                                         <span class="legend-color" t-att-style="'background-color: ' + status.color"></span>
                                         <span class="legend-label" t-esc="status.label"></span>
                                         <span class="legend-value" t-esc="status.count"></span>
@@ -219,20 +217,17 @@
                             </div>
                             <div class="widget-content">
                                 <div class="urgent-payments-list">
-                                    <div t-foreach="state.urgentPayments" t-as="payment" t-key="payment.id" 
-                                         class="urgent-payment-item">
+                                    <div t-foreach="state.urgentPayments" t-as="payment" t-key="payment.id" class="urgent-payment-item">
                                         <div class="payment-info">
                                             <div class="payment-ref" t-esc="payment.name"></div>
                                             <div class="payment-partner" t-esc="payment.partner"></div>
                                             <div class="payment-amount" t-esc="formatCurrency(payment.amount)"></div>
                                         </div>
                                         <div class="payment-actions">
-                                            <button class="btn btn-sm btn-primary" t-on-click="approvePayment" 
-                                                    t-att-data-payment-id="payment.id">
+                                            <button class="btn btn-sm btn-primary" t-on-click="approvePayment" t-att-data-payment-id="payment.id">
                                                 <i class="fa fa-check"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-secondary" t-on-click="viewPayment" 
-                                                    t-att-data-payment-id="payment.id">
+                                            <button class="btn btn-sm btn-secondary" t-on-click="viewPayment" t-att-data-payment-id="payment.id">
                                                 <i class="fa fa-eye"></i>
                                             </button>
                                         </div>
@@ -256,30 +251,27 @@
                                         <div class="metric-value" t-esc="state.metrics.avgProcessingTime"></div>
                                         <div class="metric-progress">
                                             <div class="progress">
-                                                <div class="progress-bar bg-success" 
-                                                     t-att-style="'width: ' + state.metrics.processingTimeProgress + '%'"></div>
+                                                <div class="progress-bar bg-success" t-att-style="'width: ' + state.metrics.processingTimeProgress + '%'"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="metric-item">
                                         <div class="metric-label">SLA Compliance</div>
                                         <div class="metric-value" t-esc="state.metrics.slaCompliance + '%'"></div>
                                         <div class="metric-progress">
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" 
-                                                     t-att-style="'width: ' + state.metrics.slaCompliance + '%'"></div>
+                                                <div class="progress-bar bg-info" t-att-style="'width: ' + state.metrics.slaCompliance + '%'"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="metric-item">
                                         <div class="metric-label">First-Time Approval Rate</div>
                                         <div class="metric-value" t-esc="state.metrics.firstTimeApproval + '%'"></div>
                                         <div class="metric-progress">
                                             <div class="progress">
-                                                <div class="progress-bar bg-warning" 
-                                                     t-att-style="'width: ' + state.metrics.firstTimeApproval + '%'"></div>
+                                                <div class="progress-bar bg-warning" t-att-style="'width: ' + state.metrics.firstTimeApproval + '%'"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -368,12 +360,10 @@
 
                 <div class="tab-content" id="recent-tab">
                     <div class="payment-list">
-                        <div t-foreach="state.recentPayments" t-as="payment" t-key="payment.id" 
-                             class="payment-item">
+                        <div t-foreach="state.recentPayments" t-as="payment" t-key="payment.id" class="payment-item">
                             <div class="payment-header">
                                 <span class="payment-ref" t-esc="payment.name"></span>
-                                <span class="payment-status" t-att-class="'status-' + payment.state" 
-                                      t-esc="payment.state"></span>
+                                <span class="payment-status" t-att-class="'status-' + payment.state" t-esc="payment.state"></span>
                             </div>
                             <div class="payment-details">
                                 <div class="payment-partner" t-esc="payment.partner"></div>
@@ -396,8 +386,7 @@
                 </h4>
                 <div class="widget-actions" t-if="props.actions">
                     <t t-foreach="props.actions" t-as="action" t-key="action.id">
-                        <button t-att-class="action.className || 'btn btn-sm btn-outline-secondary'" 
-                                t-on-click="action.handler">
+                        <button t-att-class="action.className || 'btn btn-sm btn-outline-secondary'" t-on-click="action.handler">
                             <i t-att-class="action.icon + ' me-1'" t-if="action.icon"></i>
                             <span t-esc="action.label"></span>
                         </button>

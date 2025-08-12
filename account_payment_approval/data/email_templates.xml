@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Payment Approval Email Templates -->
-    
+
     <!-- Template: Payment Submitted for Review -->
     <record id="email_template_payment_submitted" model="mail.template">
         <field name="name">Payment Submitted for Review</field>
@@ -66,8 +66,7 @@
         % endif
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #1f4788; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #1f4788; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Review Payment
             </a>
         </div>
@@ -83,7 +82,7 @@
         <p style="margin: 5px 0 0 0; opacity: 0.8;">This is an automated message from the Payment Approval System.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Under Review -->
@@ -133,8 +132,7 @@
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #e65100; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #e65100; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Approve Payment
             </a>
         </div>
@@ -148,7 +146,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Approved -->
@@ -194,8 +192,7 @@
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Authorize Payment
             </a>
         </div>
@@ -205,7 +202,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Authorized -->
@@ -251,8 +248,7 @@
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Post Payment
             </a>
         </div>
@@ -262,7 +258,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Posted (Completed) -->
@@ -312,8 +308,7 @@
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #6f42c1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #6f42c1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 View Payment Details
             </a>
         </div>
@@ -327,7 +322,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Rejected -->
@@ -391,8 +386,7 @@
         % endif
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Review and Resubmit
             </a>
         </div>
@@ -409,7 +403,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
     <!-- Template: Payment Escalated -->
@@ -465,8 +459,7 @@
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-               style="background: #fd7e14; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" style="background: #fd7e14; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                 Review Escalation
             </a>
         </div>
@@ -480,7 +473,7 @@
         <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
     </div>
 </div>
-        ]]></field>
+        ]]>        </field>
     </record>
 
 </odoo>

@@ -28,7 +28,7 @@
                             <p t-esc="props.amount"/>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <strong>Partner:</strong>
@@ -103,23 +103,27 @@
                         Verification Failed
                     </h6>
                     <p t-esc="state.verificationResult.message"/>
-                    
+
                     <div t-if="state.verificationResult.success and state.verificationResult.paymentData">
                         <hr/>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Payment:</strong> <span t-esc="state.verificationResult.paymentData.name"/>
+                                <strong>Payment:</strong>
+                                <span t-esc="state.verificationResult.paymentData.name"/>
                             </div>
                             <div class="col-md-6">
-                                <strong>Amount:</strong> <span t-esc="state.verificationResult.paymentData.amount"/>
+                                <strong>Amount:</strong>
+                                <span t-esc="state.verificationResult.paymentData.amount"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Partner:</strong> <span t-esc="state.verificationResult.paymentData.partner"/>
+                                <strong>Partner:</strong>
+                                <span t-esc="state.verificationResult.paymentData.partner"/>
                             </div>
                             <div class="col-md-6">
-                                <strong>Verified At:</strong> <span t-esc="state.verificationResult.timestamp"/>
+                                <strong>Verified At:</strong>
+                                <span t-esc="state.verificationResult.timestamp"/>
                             </div>
                         </div>
                     </div>
@@ -128,15 +132,11 @@
 
             <div class="qr-controls mt-3">
                 <div class="btn-group" role="group">
-                    <button class="btn btn-outline-primary" 
-                            t-att-class="{'active': state.showQR}" 
-                            t-on-click="showQRCode">
+                    <button class="btn btn-outline-primary" t-att-class="{'active': state.showQR}" t-on-click="showQRCode">
                         <i class="fa fa-qrcode me-1"></i>
                         Show QR
                     </button>
-                    <button class="btn btn-outline-primary" 
-                            t-att-class="{'active': state.showScanner}" 
-                            t-on-click="toggleScanner">
+                    <button class="btn btn-outline-primary" t-att-class="{'active': state.showScanner}" t-on-click="toggleScanner">
                         <i class="fa fa-camera me-1"></i>
                         Scanner
                     </button>
@@ -178,32 +178,42 @@
                     <div class="success-icon text-center mb-4">
                         <i class="fa fa-check-circle fa-4x text-success"></i>
                     </div>
-                    
+
                     <div class="payment-details card">
                         <div class="card-header bg-success text-white">
                             <h5 class="mb-0">Payment Verified Successfully</h5>
                         </div>
                         <div class="card-body">
                             <div class="row mb-2">
-                                <div class="col-6"><strong>Reference:</strong></div>
+                                <div class="col-6">
+                                    <strong>Reference:</strong>
+                                </div>
                                 <div class="col-6" t-esc="state.paymentData.name"></div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-6"><strong>Amount:</strong></div>
+                                <div class="col-6">
+                                    <strong>Amount:</strong>
+                                </div>
                                 <div class="col-6" t-esc="state.paymentData.amount"></div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-6"><strong>Partner:</strong></div>
+                                <div class="col-6">
+                                    <strong>Partner:</strong>
+                                </div>
                                 <div class="col-6" t-esc="state.paymentData.partner"></div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-6"><strong>Status:</strong></div>
+                                <div class="col-6">
+                                    <strong>Status:</strong>
+                                </div>
                                 <div class="col-6">
                                     <span class="badge bg-success" t-esc="state.paymentData.status"></span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6"><strong>Verified:</strong></div>
+                                <div class="col-6">
+                                    <strong>Verified:</strong>
+                                </div>
                                 <div class="col-6" t-esc="state.verificationTime"></div>
                             </div>
                         </div>
@@ -225,24 +235,24 @@
                     <div class="error-icon text-center mb-4">
                         <i class="fa fa-exclamation-triangle fa-4x text-danger"></i>
                     </div>
-                    
+
                     <div class="error-details card">
                         <div class="card-header bg-danger text-white">
                             <h5 class="mb-0">Verification Failed</h5>
                         </div>
                         <div class="card-body">
                             <p t-esc="state.errorMessage"></p>
-                            
+
                             <div t-if="state.errorCode === 'EXPIRED'" class="alert alert-warning">
                                 <strong>Token Expired:</strong> This verification link has expired. 
                                 Please request a new verification from the payment creator.
                             </div>
-                            
+
                             <div t-if="state.errorCode === 'INVALID'" class="alert alert-danger">
                                 <strong>Invalid Token:</strong> This verification link is not valid. 
                                 Please check the QR code or URL and try again.
                             </div>
-                            
+
                             <div t-if="state.errorCode === 'USED'" class="alert alert-info">
                                 <strong>Already Verified:</strong> This payment has already been verified. 
                                 Check the payment system for current status.
@@ -283,12 +293,7 @@
             </div>
 
             <div class="progress mb-3">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                     role="progressbar" 
-                     t-att-style="'width: ' + state.progress + '%'"
-                     t-att-aria-valuenow="state.progress"
-                     aria-valuemin="0" 
-                     aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" t-att-style="'width: ' + state.progress + '%'" t-att-aria-valuenow="state.progress" aria-valuemin="0" aria-valuemax="100">
                     <span t-esc="state.progress + '%'"></span>
                 </div>
             </div>

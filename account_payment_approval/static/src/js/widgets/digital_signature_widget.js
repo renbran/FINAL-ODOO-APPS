@@ -34,68 +34,68 @@ export class DigitalSignatureWidget extends Component {
         if (!this.canvasRef.el || this.props.readonly) return;
 
         const canvas = this.canvasRef.el;
-        const ctx = canvas.getContext('2d');
-        
+        const ctx = canvas.getContext("2d");
+
         // Set canvas size for high DPI displays
         const rect = canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
-        
+
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
-        
+
         ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-        
+        canvas.style.width = rect.width + "px";
+        canvas.style.height = rect.height + "px";
+
         // Set drawing styles
-        ctx.strokeStyle = '#2c3e50';
+        ctx.strokeStyle = "#2c3e50";
         ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.fillStyle = '#ffffff';
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         // Add event listeners
         this.addEventListeners(canvas);
     }
 
     addEventListeners(canvas) {
         // Mouse events
-        canvas.addEventListener('mousedown', this.startDrawing.bind(this));
-        canvas.addEventListener('mousemove', this.draw.bind(this));
-        canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
-        canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
+        canvas.addEventListener("mousedown", this.startDrawing.bind(this));
+        canvas.addEventListener("mousemove", this.draw.bind(this));
+        canvas.addEventListener("mouseup", this.stopDrawing.bind(this));
+        canvas.addEventListener("mouseout", this.stopDrawing.bind(this));
 
         // Touch events for mobile
-        canvas.addEventListener('touchstart', this.handleTouch.bind(this));
-        canvas.addEventListener('touchmove', this.handleTouch.bind(this));
-        canvas.addEventListener('touchend', this.stopDrawing.bind(this));
+        canvas.addEventListener("touchstart", this.handleTouch.bind(this));
+        canvas.addEventListener("touchmove", this.handleTouch.bind(this));
+        canvas.addEventListener("touchend", this.stopDrawing.bind(this));
     }
 
     startDrawing(event) {
         if (this.props.readonly) return;
-        
+
         this.state.isDrawing = true;
         const rect = this.canvasRef.el.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
-        const ctx = this.canvasRef.el.getContext('2d');
+
+        const ctx = this.canvasRef.el.getContext("2d");
         ctx.beginPath();
         ctx.moveTo(x, y);
     }
 
     draw(event) {
         if (!this.state.isDrawing || this.props.readonly) return;
-        
+
         const rect = this.canvasRef.el.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
-        const ctx = this.canvasRef.el.getContext('2d');
+
+        const ctx = this.canvasRef.el.getContext("2d");
         ctx.lineTo(x, y);
         ctx.stroke();
-        
+
         this.state.hasSignature = true;
     }
 
@@ -106,22 +106,24 @@ export class DigitalSignatureWidget extends Component {
     handleTouch(event) {
         event.preventDefault();
         const touch = event.touches[0];
-        const mouseEvent = new MouseEvent(event.type === 'touchstart' ? 'mousedown' : 
-                                         event.type === 'touchmove' ? 'mousemove' : 'mouseup', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
+        const mouseEvent = new MouseEvent(
+            event.type === "touchstart" ? "mousedown" : event.type === "touchmove" ? "mousemove" : "mouseup",
+            {
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+            }
+        );
         this.canvasRef.el.dispatchEvent(mouseEvent);
     }
 
     clearSignature() {
         if (this.props.readonly) return;
-        
+
         const canvas = this.canvasRef.el;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         this.state.hasSignature = false;
         this.state.signatureData = null;
     }
@@ -133,49 +135,41 @@ export class DigitalSignatureWidget extends Component {
         }
 
         this.state.isLoading = true;
-        
+
         try {
             // Convert canvas to base64 data URL
             const canvas = this.canvasRef.el;
-            const signatureData = canvas.toDataURL('image/png');
-            
+            const signatureData = canvas.toDataURL("image/png");
+
             // Get current user info for signature
             const userInfo = {
                 user_name: this.env.services.user.name,
                 user_id: this.env.services.user.userId,
                 signature_date: new Date().toISOString(),
-                signature_type: this.props.signature_type || 'generic',
+                signature_type: this.props.signature_type || "generic",
             };
 
             // Save signature to record
             const signatureField = this._getSignatureField();
             const dateField = this._getSignatureDateField();
-            
+
             if (signatureField && dateField) {
-                await this.orm.write(
-                    this.props.record.resModel,
-                    [this.props.record.resId],
-                    {
-                        [signatureField]: signatureData.split(',')[1], // Remove data:image/png;base64, prefix
-                        [dateField]: userInfo.signature_date,
-                    }
-                );
+                await this.orm.write(this.props.record.resModel, [this.props.record.resId], {
+                    [signatureField]: signatureData.split(",")[1], // Remove data:image/png;base64, prefix
+                    [dateField]: userInfo.signature_date,
+                });
 
                 this.notification.add(_t("Signature saved successfully"), { type: "success" });
                 this.state.showModal = false;
-                
+
                 // Trigger record reload if needed
                 if (this.props.record.model && this.props.record.model.load) {
                     await this.props.record.model.load();
                 }
             }
-
         } catch (error) {
             console.error("Error saving signature:", error);
-            this.notification.add(
-                _t("Failed to save signature: %s", error.message),
-                { type: "danger" }
-            );
+            this.notification.add(_t("Failed to save signature: %s", error.message), { type: "danger" });
         } finally {
             this.state.isLoading = false;
         }
@@ -184,7 +178,7 @@ export class DigitalSignatureWidget extends Component {
     openSignatureModal() {
         if (this.props.readonly) return;
         this.state.showModal = true;
-        
+
         // Initialize canvas after modal is shown
         setTimeout(() => {
             this.initializeCanvas();
@@ -198,27 +192,27 @@ export class DigitalSignatureWidget extends Component {
 
     _getSignatureField() {
         const typeMapping = {
-            'creator': 'creator_signature',
-            'reviewer': 'reviewer_signature',
-            'approver': 'approver_signature',
-            'authorizer': 'authorizer_signature',
+            creator: "creator_signature",
+            reviewer: "reviewer_signature",
+            approver: "approver_signature",
+            authorizer: "authorizer_signature",
         };
         return typeMapping[this.props.signature_type] || this.props.name;
     }
 
     _getSignatureDateField() {
         const typeMapping = {
-            'creator': 'creator_signature_date',
-            'reviewer': 'reviewer_signature_date',
-            'approver': 'approver_signature_date',
-            'authorizer': 'authorizer_signature_date',
+            creator: "creator_signature_date",
+            reviewer: "reviewer_signature_date",
+            approver: "approver_signature_date",
+            authorizer: "authorizer_signature_date",
         };
         return typeMapping[this.props.signature_type] || `${this.props.name}_date`;
     }
 
     _hasExistingSignature() {
         const dateField = this._getSignatureDateField();
-        return !!(this.props.record.data[dateField]);
+        return !!this.props.record.data[dateField];
     }
 
     _getSignatureDisplayText() {

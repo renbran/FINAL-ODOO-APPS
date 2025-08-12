@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Payment Approval Security Groups -->
-    
+
     <!-- Base Category -->
     <record id="category_payment_approval" model="ir.module.category">
         <field name="name">Payment Approval</field>
@@ -74,7 +74,7 @@
     </record>
 
     <!-- Rule-based Permissions -->
-    
+
     <!-- Rule 1: Creators can only see their own drafts and all submitted+ -->
     <record id="rule_payment_creator_own" model="ir.rule">
         <field name="name">Payment Creator: Own Drafts + All Others</field>

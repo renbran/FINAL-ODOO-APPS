@@ -99,18 +99,30 @@ Technical Features:
     ],
     'assets': {
         'web.assets_backend': [
-            'account_payment_approval/static/src/scss/payment_approval.scss',
-            'account_payment_approval/static/src/js/payment_approval_dashboard.js',
-            'account_payment_approval/static/src/js/digital_signature_widget.js',
-            'account_payment_approval/static/src/js/qr_code_widget.js',
-            'account_payment_approval/static/src/js/bulk_approval_widget.js',
+            # Main CSS (compiled from modular SCSS)
+            'account_payment_approval/static/src/css/payment_approval.css',
+            
+            # SCSS Variables and Components (for development/customization)
+            'account_payment_approval/static/src/scss/_variables.scss',
+            'account_payment_approval/static/src/scss/main.scss',
+            
+            # JavaScript Components (organized structure)
+            'account_payment_approval/static/src/js/components/payment_approval_dashboard.js',
+            'account_payment_approval/static/src/js/widgets/digital_signature_widget.js',
+            'account_payment_approval/static/src/js/widgets/qr_code_widget.js',
+            'account_payment_approval/static/src/js/widgets/bulk_approval_widget.js',
+            'account_payment_approval/static/src/js/views/payment_form_view.js',
+            'account_payment_approval/static/src/js/fields/approval_state_field.js',
+            
+            # XML Templates
             'account_payment_approval/static/src/xml/payment_approval_templates.xml',
             'account_payment_approval/static/src/xml/dashboard_templates.xml',
             'account_payment_approval/static/src/xml/digital_signature_templates.xml',
             'account_payment_approval/static/src/xml/qr_verification_templates.xml',
         ],
         'web.assets_frontend': [
-            'account_payment_approval/static/src/scss/payment_approval_frontend.scss',
+            # Frontend styles for QR verification portal
+            'account_payment_approval/static/src/css/payment_approval.css',
             'account_payment_approval/static/src/js/qr_verification.js',
         ],
         'web.qunit_suite_tests': [

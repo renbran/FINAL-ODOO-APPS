@@ -1,0 +1,384 @@
+// Digital Signature Widget Styles
+// Canvas-based signature capture and display
+
+@import '../variables';
+
+.o_digital_signature_widget {
+  background: $signature-canvas-bg;
+  border-radius: $border-radius-lg;
+  padding: $spacer-lg;
+  box-shadow: $box-shadow-sm;
+
+  .signature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacer-lg;
+
+    .signature-title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-semibold;
+      color: $osus-dark;
+      margin: 0;
+    }
+
+    .signature-actions {
+      display: flex;
+      gap: $spacer-sm;
+    }
+  }
+
+  .signature-canvas-container {
+    position: relative;
+    background: $signature-canvas-bg;
+    border: $signature-canvas-border;
+    border-radius: $border-radius;
+    margin-bottom: $spacer-lg;
+    overflow: hidden;
+    transition: $transition-base;
+
+    &.active {
+      border: $signature-canvas-active-border;
+      box-shadow: 0 0 0 3px rgba($osus-primary, 0.1);
+    }
+
+    &.has-signature {
+      border-color: $state-approved;
+    }
+
+    .signature-canvas {
+      display: block;
+      width: 100%;
+      height: 200px;
+      cursor: crosshair;
+      touch-action: none;
+
+      @include media-breakpoint-down(md) {
+        height: 150px;
+      }
+    }
+
+    .signature-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #6c757d;
+      font-size: $font-size-base;
+      text-align: center;
+      pointer-events: none;
+      z-index: 1;
+
+      .placeholder-icon {
+        font-size: 2rem;
+        margin-bottom: $spacer-sm;
+        opacity: 0.5;
+      }
+
+      .placeholder-text {
+        font-weight: $font-weight-medium;
+      }
+
+      .placeholder-hint {
+        font-size: $font-size-small;
+        margin-top: $spacer-xs;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .signature-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacer-md;
+
+    .signature-tools {
+      display: flex;
+      align-items: center;
+      gap: $spacer-md;
+
+      .color-picker {
+        display: flex;
+        align-items: center;
+        gap: $spacer-sm;
+
+        label {
+          font-size: $font-size-small;
+          font-weight: $font-weight-medium;
+          color: $osus-dark;
+        }
+
+        .color-options {
+          display: flex;
+          gap: $spacer-xs;
+
+          .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: $transition-fast;
+
+            &.active {
+              border-color: $osus-primary;
+              box-shadow: 0 0 0 2px rgba($osus-primary, 0.3);
+            }
+
+            &.black { background: #000000; }
+            &.blue { background: #007bff; }
+            &.red { background: #dc3545; }
+            &.green { background: #28a745; }
+          }
+        }
+      }
+
+      .stroke-width {
+        display: flex;
+        align-items: center;
+        gap: $spacer-sm;
+
+        label {
+          font-size: $font-size-small;
+          font-weight: $font-weight-medium;
+          color: $osus-dark;
+        }
+
+        input[type="range"] {
+          width: 80px;
+          accent-color: $osus-primary;
+        }
+
+        .width-display {
+          font-size: $font-size-small;
+          color: #6c757d;
+          min-width: 20px;
+        }
+      }
+    }
+
+    .signature-actions {
+      display: flex;
+      gap: $spacer-sm;
+
+      .btn {
+        padding: $spacer-sm $spacer-md;
+        font-size: $font-size-small;
+        font-weight: $font-weight-medium;
+        border-radius: $border-radius;
+        transition: $transition-base;
+
+        &.btn-clear {
+          @include button-variant(#ffffff, $border-color, $osus-dark);
+          
+          &:hover {
+            @include button-variant($state-rejected, $state-rejected, #ffffff);
+          }
+        }
+
+        &.btn-save {
+          @include button-variant($state-approved, $state-approved, #ffffff);
+        }
+
+        &.btn-export {
+          @include button-variant($osus-primary, $osus-primary, #ffffff);
+        }
+      }
+    }
+  }
+
+  .signature-info {
+    margin-top: $spacer-lg;
+    padding: $spacer-md;
+    background: rgba($osus-primary, 0.05);
+    border: 1px solid rgba($osus-primary, 0.1);
+    border-radius: $border-radius;
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: $spacer-md;
+
+      .info-item {
+        .info-label {
+          font-size: $font-size-small;
+          color: #6c757d;
+          margin-bottom: $spacer-xs;
+          font-weight: $font-weight-medium;
+        }
+
+        .info-value {
+          font-size: $font-size-base;
+          color: $osus-dark;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+  }
+
+  // Signature display mode (read-only)
+  &.signature-display {
+    .signature-canvas-container {
+      border: 1px solid $border-color-light;
+      background: #fafafa;
+
+      .signature-canvas {
+        cursor: default;
+        pointer-events: none;
+      }
+    }
+
+    .signature-controls {
+      display: none;
+    }
+
+    .signature-verification {
+      margin-top: $spacer-lg;
+      padding: $spacer-md;
+      background: rgba($state-approved, 0.05);
+      border: 1px solid rgba($state-approved, 0.3);
+      border-radius: $border-radius;
+
+      .verification-status {
+        display: flex;
+        align-items: center;
+        gap: $spacer-sm;
+        margin-bottom: $spacer-sm;
+
+        .status-icon {
+          color: $state-approved;
+          font-size: $font-size-large;
+        }
+
+        .status-text {
+          color: $state-approved;
+          font-weight: $font-weight-semibold;
+        }
+      }
+
+      .verification-details {
+        font-size: $font-size-small;
+        color: #6c757d;
+      }
+    }
+  }
+
+  // Touch device optimizations
+  @media (pointer: coarse) {
+    .signature-canvas {
+      height: 180px;
+    }
+
+    .signature-tools {
+      .color-option {
+        width: 32px;
+        height: 32px;
+      }
+
+      .stroke-width input[type="range"] {
+        width: 100px;
+      }
+    }
+  }
+
+  // Loading state
+  &.loading {
+    .signature-canvas-container {
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        border: 3px solid $border-color-light;
+        border-top-color: $osus-primary;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 11;
+      }
+    }
+  }
+
+  // Error state
+  &.error {
+    .signature-canvas-container {
+      border-color: $state-rejected;
+      background: rgba($state-rejected, 0.05);
+    }
+
+    .error-message {
+      margin-top: $spacer-md;
+      padding: $spacer-sm $spacer-md;
+      background: rgba($state-rejected, 0.1);
+      border: 1px solid rgba($state-rejected, 0.3);
+      border-radius: $border-radius;
+      color: $state-rejected;
+      font-size: $font-size-small;
+    }
+  }
+
+  // Responsive adjustments
+  @include media-breakpoint-down(md) {
+    padding: $spacer-md;
+
+    .signature-controls {
+      flex-direction: column;
+      align-items: stretch;
+
+      .signature-tools {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .signature-actions {
+        justify-content: center;
+      }
+    }
+
+    .signature-info .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Signature modal overlay
+.o_signature_modal {
+  .modal-dialog {
+    max-width: 800px;
+
+    .modal-body {
+      padding: 0;
+    }
+  }
+
+  .o_digital_signature_widget {
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
+
+// Animation keyframes
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
