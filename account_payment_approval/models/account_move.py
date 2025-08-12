@@ -321,6 +321,7 @@ class AccountMoveLine(models.Model):
         related='payment_id.state',
         string='Payment State',
         readonly=True,
+        store=True,
         help="State of the associated payment"
     )
     
@@ -328,6 +329,7 @@ class AccountMoveLine(models.Model):
         related='payment_id.voucher_state',
         string='Payment Approval State',
         readonly=True,
+        store=True,
         help="Approval state of the associated payment"
     )
     
