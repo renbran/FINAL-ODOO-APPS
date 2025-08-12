@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Payment Approval Record Rules -->
-    
+
     <!-- Account Payment Rules -->
     <record id="payment_creator_rule" model="ir.rule">
         <field name="name">Payment Creator: Own Records</field>

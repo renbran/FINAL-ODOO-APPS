@@ -71,13 +71,11 @@ Technical Features:
         # Security
         'security/payment_approval_groups.xml',
         'security/ir.model.access.csv',
-        'security/record_rules.xml',
         
-        # Data and Sequences
+        # Data
         'data/payment_sequences.xml',
         'data/email_templates.xml',
         'data/system_parameters.xml',
-        'data/cron_jobs.xml',
         
         # Views
         'views/account_payment_views.xml',

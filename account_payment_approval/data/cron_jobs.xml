@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Payment Approval Cron Jobs -->
-    
+
     <!-- Payment Status Sync Cron Job -->
     <record id="cron_payment_status_sync" model="ir.cron">
         <field name="name">Payment Approval: Status Sync</field>
