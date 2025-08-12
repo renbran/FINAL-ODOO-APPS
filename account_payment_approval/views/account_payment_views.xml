@@ -108,10 +108,13 @@
             </xpath>
 
             <!-- Add groupby options -->
-            <xpath expr="//group[@expand='0']" position="inside">
-                <filter string="Voucher Type" name="group_voucher_type" domain="[]" context="{'group_by': 'voucher_type'}"/>
-                <filter string="Reviewer" name="group_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
-                <filter string="Approver" name="group_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
+            <xpath expr="//filter[@name='requires_approval']" position="after">
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Voucher Type" name="group_voucher_type" domain="[]" context="{'group_by': 'voucher_type'}"/>
+                    <filter string="Reviewer" name="group_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
+                    <filter string="Approver" name="group_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
+                </group>
             </xpath>
 
             <!-- Add search fields -->
