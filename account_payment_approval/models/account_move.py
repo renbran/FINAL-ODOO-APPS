@@ -162,8 +162,9 @@ class AccountMove(models.Model):
                 html_content.append('<tbody>')
                 
                 for line in move.line_ids.filtered(lambda l: l.account_id.reconcile):
-                    status = "Reconciled" if line.full_reconcile_id else "Outstanding"
-                    status_class = "text-success" if line.full_reconcile_id else "text-warning"
+                    full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
+                    status = "Reconciled" if full_reconcile else "Outstanding"
+                    status_class = "text-success" if full_reconcile else "text-warning"
                     matched_invoice = line.matched_invoice_id.name if hasattr(line, 'matched_invoice_id') and line.matched_invoice_id else "None"
                     
                     html_content.append(
@@ -265,8 +266,9 @@ class AccountMove(models.Model):
         
         matched_moves = self.env['account.move']
         for line in self.line_ids:
-            if line.full_reconcile_id:
-                reconciled_lines = line.full_reconcile_id.reconciled_line_ids
+            full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
+            if full_reconcile:
+                reconciled_lines = full_reconcile.reconciled_line_ids
                 matched_moves |= reconciled_lines.mapped('move_id') - self
         
         if not matched_moves:
@@ -353,9 +355,10 @@ class AccountMoveLine(models.Model):
             matched_invoice = self.env['account.move']
             
             # Check if full_reconcile_id field exists
-            if hasattr(line, 'full_reconcile_id') and line.full_reconcile_id:
+            full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
+            if full_reconcile:
                 # Get all reconciled lines
-                reconciled_lines = line.full_reconcile_id.reconciled_line_ids
+                reconciled_lines = full_reconcile.reconciled_line_ids
                 # Find invoice moves (excluding current move)
                 invoice_moves = reconciled_lines.mapped('move_id').filtered(
                     lambda m: m != line.move_id and m.move_type in ['out_invoice', 'in_invoice', 'out_refund', 'in_refund']
