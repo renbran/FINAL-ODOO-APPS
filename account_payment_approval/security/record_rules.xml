@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Approval Record Rules -->
+    
+    <!-- Account Payment Rules -->
+    <record id="payment_creator_rule" model="ir.rule">
+        <field name="name">Payment Creator: Own Records</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[(4, ref('group_payment_creator'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+    </record>
+
+    <record id="payment_reviewer_rule" model="ir.rule">
+        <field name="name">Payment Reviewer: Submitted Records</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[(4, ref('group_payment_reviewer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">['|', ('create_uid', '=', user.id), ('voucher_state', 'in', ['submitted', 'under_review'])]</field>
+    </record>
+
+    <record id="payment_approver_rule" model="ir.rule">
+        <field name="name">Payment Approver: Under Review Records</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[(4, ref('group_payment_approver'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">['|', ('create_uid', '=', user.id), ('voucher_state', 'in', ['submitted', 'under_review', 'approved'])]</field>
+    </record>
+
+    <record id="payment_authorizer_rule" model="ir.rule">
+        <field name="name">Payment Authorizer: Approved Records</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[(4, ref('group_payment_authorizer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">['|', ('create_uid', '=', user.id), ('voucher_state', 'in', ['submitted', 'under_review', 'approved', 'authorized'])]</field>
+    </record>
+
+    <record id="payment_manager_rule" model="ir.rule">
+        <field name="name">Payment Manager: All Records</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Account Move Rules -->
+    <record id="move_creator_rule" model="ir.rule">
+        <field name="name">Move Creator: Own Records</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('group_payment_creator'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+    </record>
+
+    <record id="move_reviewer_rule" model="ir.rule">
+        <field name="name">Move Reviewer: Accessible Records</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('group_payment_reviewer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="move_manager_rule" model="ir.rule">
+        <field name="name">Move Manager: All Records</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+</odoo>
