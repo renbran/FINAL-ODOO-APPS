@@ -1,159 +1,486 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Email Template: Payment Submitted -->
-    <record id="email_template_payment_submitted" model="mail.template">
-        <field name="name">Payment Voucher Submitted</field>
-        <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Submitted for Review</field>
-        <field name="email_from">${object.company_id.email}</field>
-        <field name="email_to">${','.join([user.email for user in object.next_action_user_ids if user.email])}</field>
-        <field name="body_html"><![CDATA[
-            <div style="margin: 0px; padding: 0px; font-family: Arial, Helvetica, sans-serif;">
-                <table border="0" width="100%" cellpadding="0" cellspacing="0" style="padding: 20px; background-color: #F7F7F7;">
-                    <tr><td align="center">
-                        <table border="0" width="600" cellpadding="0" cellspacing="0" style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px;">
-                            <!-- Header -->
-                            <tr><td style="background: linear-gradient(135deg, #6B2B47 0%, #8B1538 100%); padding: 20px; text-align: center;">
-                                <h1 style="color: white; margin: 0; font-size: 24px;">OSUS Properties</h1>
-                                <p style="color: #D4AF37; margin: 5px 0 0 0; font-size: 14px;">Payment Voucher System</p>
-                            </td></tr>
-                            
-                            <!-- Content -->
-                            <tr><td style="padding: 30px;">
-                                <h2 style="color: #6B2B47; margin-top: 0;">Payment Voucher Submitted</h2>
-                                
-                                <p>A new payment voucher has been submitted for your review:</p>
-                                
-                                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                                    <tr style="background-color: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Voucher Number:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.voucher_number}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Partner:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.partner_id.name}</td>
-                                    </tr>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Amount:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.currency_id.symbol} ${'{:,.2f}'.format(object.amount)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Submitted By:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.create_uid.name}</td>
-                                    </tr>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.submitted_date.strftime('%B %d, %Y at %I:%M %p') if object.submitted_date else ''}</td>
-                                    </tr>
-                                </table>
-                                
-                                <p style="margin-top: 30px;">
-                                    <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-                                       style="background-color: #6B2B47; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                        Review Voucher
-                                    </a>
-                                </p>
-                            </td></tr>
-                            
-                            <!-- Footer -->
-                            <tr><td style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #dee2e6;">
-                                <p style="margin: 0; color: #6c757d; font-size: 12px;">
-                                    This is an automated message from OSUS Properties Payment Voucher System.
-                                </p>
-                            </td></tr>
-                        </table>
-                    </td></tr>
-                </table>
-            </div>
-        ]]></field>
-    </record>
-
-    <!-- Email Template: Payment Reviewed -->
-    <record id="email_template_payment_reviewed" model="mail.template">
-        <field name="name">Payment Voucher Reviewed</field>
-        <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Reviewed</field>
-        <field name="email_from">${object.company_id.email}</field>
-        <field name="email_to">${','.join([user.email for user in object.next_action_user_ids if user.email])}</field>
-        <field name="body_html"><![CDATA[
-            <div style="margin: 0px; padding: 0px; font-family: Arial, Helvetica, sans-serif;">
-                <table border="0" width="100%" cellpadding="0" cellspacing="0" style="padding: 20px; background-color: #F7F7F7;">
-                    <tr><td align="center">
-                        <table border="0" width="600" cellpadding="0" cellspacing="0" style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px;">
-                            <tr><td style="background: linear-gradient(135deg, #6B2B47 0%, #8B1538 100%); padding: 20px; text-align: center;">
-                                <h1 style="color: white; margin: 0; font-size: 24px;">OSUS Properties</h1>
-                                <p style="color: #D4AF37; margin: 5px 0 0 0; font-size: 14px;">Payment Voucher System</p>
-                            </td></tr>
-                            
-                            <tr><td style="padding: 30px;">
-                                <h2 style="color: #6B2B47; margin-top: 0;">Payment Voucher Reviewed</h2>
-                                <p>Payment voucher ${object.voucher_number} has been reviewed and is ready for the next step.</p>
-                                
-                                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                                    <tr style="background-color: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Reviewed By:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.reviewer_id.name}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Review Date:</td>
-                                        <td style="padding: 10px; border: 1px solid #dee2e6;">${object.reviewed_date.strftime('%B %d, %Y at %I:%M %p') if object.reviewed_date else ''}</td>
-                                    </tr>
-                                </table>
-                                
-                                <p style="margin-top: 30px;">
-                                    <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
-                                       style="background-color: #6B2B47; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                        View Voucher
-                                    </a>
-                                </p>
-                            </td></tr>
-                            
-                            <tr><td style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #dee2e6;">
-                                <p style="margin: 0; color: #6c757d; font-size: 12px;">OSUS Properties Payment Voucher System</p>
-                            </td></tr>
-                        </table>
-                    </td></tr>
-                </table>
-            </div>
-        ]]></field>
-    </record>
-
-    <!-- Similar templates for approved, authorized, posted, and rejected states... -->
-    <!-- For brevity, I'll create simplified versions -->
+    <!-- Payment Approval Email Templates -->
     
+    <!-- Template: Payment Submitted for Review -->
+    <record id="email_template_payment_submitted" model="mail.template">
+        <field name="name">Payment Submitted for Review</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="subject">Payment Submitted: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="email_to">${','.join([user.email for user in object._get_review_users()])}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">submitted</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #1f4788 0%, #2563eb 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Payment Submitted for Review</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Review Team,</p>
+        
+        <p>A new payment has been submitted for review and requires your attention.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1f4788;">
+            <h3 style="margin-top: 0; color: #1f4788;">Payment Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Partner:</td>
+                    <td style="padding: 8px 0;">${object.partner_id.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Reference:</td>
+                    <td style="padding: 8px 0;">${object.ref or object.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Payment Date:</td>
+                    <td style="padding: 8px 0;">${object.date}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Urgency:</td>
+                    <td style="padding: 8px 0; color: ${'#dc3545' if object.urgency == 'urgent' else '#ffc107' if object.urgency == 'high' else '#6c757d'};">
+                        ${dict(object._fields['urgency'].selection)[object.urgency].upper() if hasattr(object, 'urgency') else 'MEDIUM'}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Created By:</td>
+                    <td style="padding: 8px 0;">${object.create_uid.name}</td>
+                </tr>
+            </table>
+        </div>
+        
+        % if object.approval_notes:
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4 style="margin-top: 0; color: #1976d2;">Notes:</h4>
+            <p style="margin-bottom: 0;">${object.approval_notes}</p>
+        </div>
+        % endif
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #1f4788; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Review Payment
+            </a>
+        </div>
+        
+        <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+            This payment requires review within 24 hours. 
+            Please log into the system to complete the review process.
+        </p>
+    </div>
+    
+    <div style="background: #1f4788; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+        <p style="margin: 5px 0 0 0; opacity: 0.8;">This is an automated message from the Payment Approval System.</p>
+    </div>
+</div>
+        ]]></field>
+    </record>
+
+    <!-- Template: Payment Under Review -->
+    <record id="email_template_payment_under_review" model="mail.template">
+        <field name="name">Payment Under Review</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="subject">Payment Under Review: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="email_to">${','.join([user.email for user in object._get_approval_users()])}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">under_review</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%); padding: 20px; color: #212529; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Payment Under Review</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.8;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Approval Team,</p>
+        
+        <p>The payment has completed initial review and is now ready for approval.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+            <h3 style="margin-top: 0; color: #e65100;">Payment Summary</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Partner:</td>
+                    <td style="padding: 8px 0;">${object.partner_id.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Reviewed By:</td>
+                    <td style="padding: 8px 0;">${object.reviewed_by_id.name if hasattr(object, 'reviewed_by_id') and object.reviewed_by_id else 'System'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Review Date:</td>
+                    <td style="padding: 8px 0;">${object.review_date if hasattr(object, 'review_date') and object.review_date else 'Just completed'}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #e65100; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Approve Payment
+            </a>
+        </div>
+        
+        <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+            This payment requires approval within 48 hours.
+        </p>
+    </div>
+    
+    <div style="background: #e65100; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
+    </record>
+
+    <!-- Template: Payment Approved -->
     <record id="email_template_payment_approved" model="mail.template">
-        <field name="name">Payment Voucher Approved</field>
+        <field name="name">Payment Approved</field>
         <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Approved</field>
-        <field name="email_from">${object.company_id.email}</field>
-        <field name="email_to">${','.join([user.email for user in object.next_action_user_ids if user.email])}</field>
-        <field name="body_html"><![CDATA[<p>Payment voucher ${object.voucher_number} has been approved by ${object.approver_id.name}.</p>]]></field>
+        <field name="subject">✓ Payment Approved: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="email_to">${','.join([user.email for user in object._get_authorization_users()])}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">approved</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">✓ Payment Approved</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Authorization Team,</p>
+        
+        <p>The payment has been approved and is ready for final authorization.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
+            <h3 style="margin-top: 0; color: #28a745;">Approved Payment</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Approved By:</td>
+                    <td style="padding: 8px 0;">${object.approved_by_id.name if hasattr(object, 'approved_by_id') and object.approved_by_id else user.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Approval Date:</td>
+                    <td style="padding: 8px 0;">${object.approval_date if hasattr(object, 'approval_date') and object.approval_date else object.write_date}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Authorize Payment
+            </a>
+        </div>
+    </div>
+    
+    <div style="background: #28a745; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
     </record>
 
+    <!-- Template: Payment Authorized -->
     <record id="email_template_payment_authorized" model="mail.template">
-        <field name="name">Payment Voucher Authorized</field>
+        <field name="name">Payment Authorized</field>
         <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Authorized</field>
-        <field name="email_from">${object.company_id.email}</field>
-        <field name="email_to">${','.join([user.email for user in object.next_action_user_ids if user.email])}</field>
-        <field name="body_html"><![CDATA[<p>Payment voucher ${object.voucher_number} has been authorized by ${object.authorizer_id.name}.</p>]]></field>
+        <field name="subject">✓ Payment Authorized: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="email_to">${','.join([user.email for user in object._get_posting_users()])}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">authorized</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">✓ Payment Authorized</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Finance Team,</p>
+        
+        <p>The payment has been fully authorized and is ready for posting.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #17a2b8;">
+            <h3 style="margin-top: 0; color: #17a2b8;">Authorized Payment</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Authorized By:</td>
+                    <td style="padding: 8px 0;">${object.authorized_by_id.name if hasattr(object, 'authorized_by_id') and object.authorized_by_id else user.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Authorization Date:</td>
+                    <td style="padding: 8px 0;">${object.authorization_date if hasattr(object, 'authorization_date') and object.authorization_date else object.write_date}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Post Payment
+            </a>
+        </div>
+    </div>
+    
+    <div style="background: #17a2b8; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
     </record>
 
+    <!-- Template: Payment Posted (Completed) -->
     <record id="email_template_payment_posted" model="mail.template">
-        <field name="name">Payment Voucher Posted</field>
+        <field name="name">Payment Completed</field>
         <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Posted</field>
-        <field name="email_from">${object.company_id.email}</field>
-        <field name="email_to">${object.create_uid.email}</field>
-        <field name="body_html"><![CDATA[<p>Payment voucher ${object.voucher_number} has been posted successfully.</p>]]></field>
+        <field name="subject">✅ Payment Completed: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="email_to">${object.create_uid.email},${object.approved_by_id.email if hasattr(object, 'approved_by_id') and object.approved_by_id else ''}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">posted</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">False</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">✅ Payment Completed</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Team,</p>
+        
+        <p>The payment has been successfully completed and posted to the accounting system.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6f42c1;">
+            <h3 style="margin-top: 0; color: #6f42c1;">Completed Payment</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Posted By:</td>
+                    <td style="padding: 8px 0;">${object.posted_by_id.name if hasattr(object, 'posted_by_id') and object.posted_by_id else object.write_uid.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Posting Date:</td>
+                    <td style="padding: 8px 0;">${object.posting_date if hasattr(object, 'posting_date') and object.posting_date else object.write_date}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Move Reference:</td>
+                    <td style="padding: 8px 0;">${object.move_id.name if object.move_id else 'Pending'}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #6f42c1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                View Payment Details
+            </a>
+        </div>
+        
+        <p style="color: #28a745; font-weight: bold; text-align: center; margin: 20px 0;">
+            ✅ Payment workflow completed successfully
+        </p>
+    </div>
+    
+    <div style="background: #6f42c1; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
     </record>
 
+    <!-- Template: Payment Rejected -->
     <record id="email_template_payment_rejected" model="mail.template">
-        <field name="name">Payment Voucher Rejected</field>
+        <field name="name">Payment Rejected</field>
         <field name="model_id" ref="account.model_account_payment"/>
-        <field name="subject">Payment Voucher ${object.voucher_number} Rejected</field>
-        <field name="email_from">${object.company_id.email}</field>
+        <field name="subject">❌ Payment Rejected: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
         <field name="email_to">${object.create_uid.email}</field>
-        <field name="body_html"><![CDATA[<p>Payment voucher ${object.voucher_number} has been rejected. Reason: ${object.rejection_reason}</p>]]></field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">rejected</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">False</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">❌ Payment Rejected</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear ${object.create_uid.name},</p>
+        
+        <p>Unfortunately, your payment has been rejected during the approval process.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc3545;">
+            <h3 style="margin-top: 0; color: #dc3545;">Rejected Payment</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Partner:</td>
+                    <td style="padding: 8px 0;">${object.partner_id.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Rejected By:</td>
+                    <td style="padding: 8px 0;">${object.rejected_by_id.name if hasattr(object, 'rejected_by_id') and object.rejected_by_id else 'System'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Rejection Date:</td>
+                    <td style="padding: 8px 0;">${object.rejection_date if hasattr(object, 'rejection_date') and object.rejection_date else object.write_date}</td>
+                </tr>
+            </table>
+        </div>
+        
+        % if object.rejection_reason:
+        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #f5c6cb;">
+            <h4 style="margin-top: 0; color: #721c24;">Rejection Reason:</h4>
+            <p style="margin-bottom: 0; color: #721c24;">${object.rejection_reason}</p>
+        </div>
+        % endif
+        
+        % if hasattr(object, 'required_actions') and object.required_actions:
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7;">
+            <h4 style="margin-top: 0; color: #856404;">Required Actions:</h4>
+            <p style="margin-bottom: 0; color: #856404;">${object.required_actions}</p>
+        </div>
+        % endif
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Review and Resubmit
+            </a>
+        </div>
+        
+        <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+            Please review the rejection reason and make necessary corrections before resubmitting.
+            % if hasattr(object, 'allow_resubmission') and object.allow_resubmission:
+            You are allowed to resubmit this payment after addressing the issues.
+            % endif
+        </p>
+    </div>
+    
+    <div style="background: #dc3545; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
     </record>
+
+    <!-- Template: Payment Escalated -->
+    <record id="email_template_payment_escalated" model="mail.template">
+        <field name="name">Payment Escalated</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="subject">⚠️ Payment Escalated: ${object.name or object.ref} - ${object.currency_id.format(object.amount)}</field>
+        <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+        <field name="is_payment_approval_template">True</field>
+        <field name="approval_stage">escalated</field>
+        <field name="include_payment_details">True</field>
+        <field name="include_qr_code">True</field>
+        <field name="urgency_sensitive">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%); padding: 20px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">⚠️ Payment Escalated</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">OSUS Properties</p>
+    </div>
+    
+    <div style="padding: 30px; background: #f8f9fa;">
+        <p>Dear Manager,</p>
+        
+        <p>A payment has been escalated and requires your immediate attention.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #fd7e14;">
+            <h3 style="margin-top: 0; color: #fd7e14;">Escalated Payment</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold; width: 30%;">Amount:</td>
+                    <td style="padding: 8px 0;">${object.currency_id.format(object.amount)}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Partner:</td>
+                    <td style="padding: 8px 0;">${object.partner_id.name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Current State:</td>
+                    <td style="padding: 8px 0;">${dict(object._fields['approval_state'].selection)[object.approval_state] if hasattr(object, 'approval_state') else 'Unknown'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: bold;">Days Pending:</td>
+                    <td style="padding: 8px 0;">${(ctx.get('current_date', object.write_date) - object.create_date).days} days</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7;">
+            <h4 style="margin-top: 0; color: #856404;">Escalation Reason:</h4>
+            <p style="margin-bottom: 0; color: #856404;">
+                This payment has been pending approval beyond the normal time limits and requires management intervention.
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=account.payment&amp;view_type=form" 
+               style="background: #fd7e14; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Review Escalation
+            </a>
+        </div>
+        
+        <p style="color: #dc3545; font-weight: bold; text-align: center; margin: 20px 0;">
+            ⚠️ Urgent management attention required
+        </p>
+    </div>
+    
+    <div style="background: #fd7e14; color: white; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0;">© 2025 OSUS Properties. All rights reserved.</p>
+    </div>
+</div>
+        ]]></field>
+    </record>
+
 </odoo>

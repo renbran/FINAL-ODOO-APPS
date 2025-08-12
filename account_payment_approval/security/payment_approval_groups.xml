@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Approval Security Groups -->
+    
+    <!-- Base Category -->
+    <record id="category_payment_approval" model="ir.module.category">
+        <field name="name">Payment Approval</field>
+        <field name="description">Manage payment approval workflow permissions</field>
+        <field name="sequence">25</field>
+    </record>
+
+    <!-- Creator Group - Can create and submit payments -->
+    <record id="group_payment_creator" model="res.groups">
+        <field name="name">Payment Creator</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Can create and submit payments for approval</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Reviewer Group - Can review submitted payments -->
+    <record id="group_payment_reviewer" model="res.groups">
+        <field name="name">Payment Reviewer</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Can review submitted payments and move them to approval stage</field>
+        <field name="implied_ids" eval="[(4, ref('group_payment_creator'))]"/>
+    </record>
+
+    <!-- Approver Group - Can approve reviewed payments -->
+    <record id="group_payment_approver" model="res.groups">
+        <field name="name">Payment Approver</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Can approve payments in review stage</field>
+        <field name="implied_ids" eval="[(4, ref('group_payment_reviewer'))]"/>
+    </record>
+
+    <!-- Authorizer Group - Can authorize high-value approved payments -->
+    <record id="group_payment_authorizer" model="res.groups">
+        <field name="name">Payment Authorizer</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Can authorize high-value approved payments (final stage)</field>
+        <field name="implied_ids" eval="[(4, ref('group_payment_approver'))]"/>
+    </record>
+
+    <!-- Manager Group - Full access to payment approval workflow -->
+    <record id="group_payment_manager" model="res.groups">
+        <field name="name">Payment Manager</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Full access to payment approval workflow and configuration</field>
+        <field name="implied_ids" eval="[(4, ref('group_payment_authorizer')), (4, ref('account.group_account_manager'))]"/>
+    </record>
+
+    <!-- Admin Group - System configuration and security settings -->
+    <record id="group_payment_admin" model="res.groups">
+        <field name="name">Payment Administrator</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">System configuration and security settings for payment approval</field>
+        <field name="implied_ids" eval="[(4, ref('group_payment_manager')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <!-- Portal Group - Limited access for external verification -->
+    <record id="group_payment_portal" model="res.groups">
+        <field name="name">Payment Portal User</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Portal users who can verify payments via QR codes</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <!-- Public Group - Public access for QR verification -->
+    <record id="group_payment_public" model="res.groups">
+        <field name="name">Payment Public Access</field>
+        <field name="category_id" ref="category_payment_approval"/>
+        <field name="comment">Public access for QR code verification (read-only)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_public'))]"/>
+    </record>
+
+    <!-- Rule-based Permissions -->
+    
+    <!-- Rule 1: Creators can only see their own drafts and all submitted+ -->
+    <record id="rule_payment_creator_own" model="ir.rule">
+        <field name="name">Payment Creator: Own Drafts + All Others</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[
+            '|', 
+            ('approval_state', '!=', 'draft'),
+            ('create_uid', '=', user.id)
+        ]</field>
+        <field name="groups" eval="[(4, ref('group_payment_creator'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Rule 2: Reviewers can see submitted and their own -->
+    <record id="rule_payment_reviewer" model="ir.rule">
+        <field name="name">Payment Reviewer: All Submitted+</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('approval_state', 'in', ['submitted', 'under_review', 'approved', 'authorized', 'posted', 'rejected'])]</field>
+        <field name="groups" eval="[(4, ref('group_payment_reviewer'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Rule 3: Approvers can see under_review and beyond -->
+    <record id="rule_payment_approver" model="ir.rule">
+        <field name="name">Payment Approver: Under Review+</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('approval_state', 'in', ['under_review', 'approved', 'authorized', 'posted', 'rejected'])]</field>
+        <field name="groups" eval="[(4, ref('group_payment_approver'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Rule 4: Authorizers can see approved and beyond -->
+    <record id="rule_payment_authorizer" model="ir.rule">
+        <field name="name">Payment Authorizer: Approved+</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('approval_state', 'in', ['approved', 'authorized', 'posted', 'rejected'])]</field>
+        <field name="groups" eval="[(4, ref('group_payment_authorizer'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Rule 5: Managers can see everything -->
+    <record id="rule_payment_manager" model="ir.rule">
+        <field name="name">Payment Manager: All Access</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Configuration Access Rules -->
+    <record id="rule_config_manager_only" model="ir.rule">
+        <field name="name">Payment Config: Manager+ Only</field>
+        <field name="model_id" ref="model_payment_approval_config"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_manager')), (4, ref('group_payment_admin'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Portal and Public Rules for QR Verification -->
+    <record id="rule_payment_portal_verify" model="ir.rule">
+        <field name="name">Payment Portal: QR Verification Only</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('approval_state', 'in', ['authorized', 'posted'])]</field>
+        <field name="groups" eval="[(4, ref('group_payment_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_payment_public_verify" model="ir.rule">
+        <field name="name">Payment Public: QR Verification Read Only</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('approval_state', 'in', ['authorized', 'posted'])]</field>
+        <field name="groups" eval="[(4, ref('group_payment_public'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Company-based Rules -->
+    <record id="rule_payment_company" model="ir.rule">
+        <field name="name">Payment: Multi-Company</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_multi_company'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

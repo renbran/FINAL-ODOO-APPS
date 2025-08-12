@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, useState, onWillStart } from "@odoo/owl";
+import { Component, useState, onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -10,107 +10,95 @@ export class QRCodeWidget extends Component {
     static props = {
         record: Object,
         name: String,
-        readonly: { type: Boolean, optional: true },
         size: { type: Number, optional: true },
     };
 
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
-        
         this.state = useState({
-            isLoading: false,
             qrCodeData: null,
-            verificationToken: null,
+            verificationUrl: null,
+            isLoading: false,
             error: null,
+            showModal: false,
+            verificationStats: null,
         });
 
-        onWillStart(this.loadQRCode);
+        onMounted(this.loadQRData);
     }
 
-    async loadQRCode() {
-        const qrData = this.props.record.data[this.props.name];
-        const token = this.props.record.data.verification_token;
-        
-        if (qrData) {
-            this.state.qrCodeData = qrData;
-            this.state.verificationToken = token;
-        }
-    }
-
-    async generateQRCode() {
-        if (this.props.readonly) return;
-        
+    async loadQRData() {
         this.state.isLoading = true;
         this.state.error = null;
 
         try {
-            const result = await this.orm.call(
-                "account.payment",
-                "generate_qr_code",
-                [this.props.record.resId]
-            );
+            const record = this.props.record.data;
+            
+            // Get QR code data from record
+            if (record.qr_code) {
+                this.state.qrCodeData = `data:image/png;base64,${record.qr_code}`;
+            }
+            
+            if (record.verification_url) {
+                this.state.verificationUrl = record.verification_url;
+            }
 
-            if (result.success) {
-                this.state.qrCodeData = result.qr_code_data;
-                this.state.verificationToken = result.verification_token;
-                
-                // Update the record
-                this.props.record.update({
-                    [this.props.name]: result.qr_code_data,
-                    verification_token: result.verification_token
-                });
-
-                this.notification.add(_t("QR code generated successfully"), { type: "success" });
-            } else {
-                throw new Error(result.error || _t("Failed to generate QR code"));
+            // Load verification statistics if available
+            if (record.verification_token) {
+                await this.loadVerificationStats(record.verification_token);
             }
 
         } catch (error) {
-            console.error("Error generating QR code:", error);
-            this.state.error = error.message || _t("Failed to generate QR code");
-            this.notification.add(
-                _t("Error generating QR code: %s", this.state.error),
-                { type: "danger" }
-            );
+            console.error("Error loading QR data:", error);
+            this.state.error = error.message || _t("Failed to load QR code data");
         } finally {
             this.state.isLoading = false;
+        }
+    }
+
+    async loadVerificationStats(token) {
+        try {
+            const stats = await this.orm.call(
+                "account.payment",
+                "get_qr_verification_stats",
+                [],
+                { token: token }
+            );
+            
+            if (stats.success) {
+                this.state.verificationStats = stats.stats;
+            }
+        } catch (error) {
+            console.warn("Could not load verification stats:", error);
         }
     }
 
     async regenerateQRCode() {
-        if (this.props.readonly) return;
-        
         this.state.isLoading = true;
-        this.state.error = null;
-
+        
         try {
-            const result = await this.orm.call(
-                "account.payment",
-                "regenerate_qr_code",
+            // Trigger QR code regeneration
+            await this.orm.call(
+                this.props.record.resModel,
+                "generate_new_qr_code",
                 [this.props.record.resId]
             );
-
-            if (result.success) {
-                this.state.qrCodeData = result.qr_code_data;
-                this.state.verificationToken = result.verification_token;
-                
-                // Update the record
-                this.props.record.update({
-                    [this.props.name]: result.qr_code_data,
-                    verification_token: result.verification_token
-                });
-
-                this.notification.add(_t("QR code regenerated successfully"), { type: "success" });
-            } else {
-                throw new Error(result.error || _t("Failed to regenerate QR code"));
+            
+            // Reload the record
+            if (this.props.record.model && this.props.record.model.load) {
+                await this.props.record.model.load();
             }
-
+            
+            // Reload QR data
+            await this.loadQRData();
+            
+            this.notification.add(_t("QR code regenerated successfully"), { type: "success" });
+            
         } catch (error) {
             console.error("Error regenerating QR code:", error);
-            this.state.error = error.message || _t("Failed to regenerate QR code");
             this.notification.add(
-                _t("Error regenerating QR code: %s", this.state.error),
+                _t("Failed to regenerate QR code: %s", error.message),
                 { type: "danger" }
             );
         } finally {
@@ -118,89 +106,154 @@ export class QRCodeWidget extends Component {
         }
     }
 
-    copyVerificationLink() {
-        if (!this.state.verificationToken) {
-            this.notification.add(_t("No verification token available"), { type: "warning" });
-            return;
-        }
-
-        const baseUrl = window.location.origin;
-        const verificationUrl = `${baseUrl}/payment/verify/${this.state.verificationToken}`;
-        
-        navigator.clipboard.writeText(verificationUrl).then(() => {
-            this.notification.add(_t("Verification link copied to clipboard"), { type: "success" });
-        }).catch(() => {
-            // Fallback for older browsers
-            const textArea = document.createElement("textarea");
-            textArea.value = verificationUrl;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                this.notification.add(_t("Verification link copied to clipboard"), { type: "success" });
-            } catch (err) {
-                this.notification.add(_t("Failed to copy verification link"), { type: "danger" });
-            }
-            
-            document.body.removeChild(textArea);
-        });
-    }
-
-    openVerificationPage() {
-        if (!this.state.verificationToken) {
-            this.notification.add(_t("No verification token available"), { type: "warning" });
-            return;
-        }
-
-        const baseUrl = window.location.origin;
-        const verificationUrl = `${baseUrl}/payment/verify/${this.state.verificationToken}`;
-        window.open(verificationUrl, '_blank');
-    }
-
     downloadQRCode() {
         if (!this.state.qrCodeData) {
-            this.notification.add(_t("No QR code available to download"), { type: "warning" });
+            this.notification.add(_t("No QR code available for download"), { type: "warning" });
             return;
         }
-
+        
         try {
             // Create download link
             const link = document.createElement('a');
             link.href = this.state.qrCodeData;
-            link.download = `Payment_QR_${this.props.record.data.voucher_number || 'DRAFT'}.png`;
-            
-            // Trigger download
+            link.download = `payment_${this.props.record.data.voucher_number || 'unknown'}_qr.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            this.notification.add(_t("QR code downloaded successfully"), { type: "success" });
+            this.notification.add(_t("QR code downloaded"), { type: "success" });
+            
         } catch (error) {
             console.error("Error downloading QR code:", error);
             this.notification.add(_t("Failed to download QR code"), { type: "danger" });
         }
     }
 
-    get qrCodeSize() {
+    copyVerificationUrl() {
+        if (!this.state.verificationUrl) {
+            this.notification.add(_t("No verification URL available"), { type: "warning" });
+            return;
+        }
+        
+        try {
+            navigator.clipboard.writeText(this.state.verificationUrl).then(() => {
+                this.notification.add(_t("Verification URL copied to clipboard"), { type: "success" });
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = this.state.verificationUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                this.notification.add(_t("Verification URL copied to clipboard"), { type: "success" });
+            });
+            
+        } catch (error) {
+            console.error("Error copying URL:", error);
+            this.notification.add(_t("Failed to copy URL"), { type: "danger" });
+        }
+    }
+
+    openQRModal() {
+        this.state.showModal = true;
+    }
+
+    closeQRModal() {
+        this.state.showModal = false;
+    }
+
+    openVerificationPage() {
+        if (!this.state.verificationUrl) {
+            this.notification.add(_t("No verification URL available"), { type: "warning" });
+            return;
+        }
+        
+        window.open(this.state.verificationUrl, '_blank');
+    }
+
+    async testVerification() {
+        if (!this.props.record.data.verification_token) {
+            this.notification.add(_t("No verification token available"), { type: "warning" });
+            return;
+        }
+        
+        this.state.isLoading = true;
+        
+        try {
+            // Test verification endpoint
+            const response = await fetch(`/payment/verify/api/${this.props.record.data.verification_token}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                this.notification.add(_t("QR verification test successful"), { type: "success" });
+                
+                // Reload verification stats
+                await this.loadVerificationStats(this.props.record.data.verification_token);
+            } else {
+                this.notification.add(
+                    _t("QR verification test failed: %s", result.message),
+                    { type: "danger" }
+                );
+            }
+            
+        } catch (error) {
+            console.error("Error testing verification:", error);
+            this.notification.add(_t("QR verification test failed"), { type: "danger" });
+        } finally {
+            this.state.isLoading = false;
+        }
+    }
+
+    _getQRSize() {
         return this.props.size || 200;
     }
 
-    get hasQRCode() {
-        return !!this.state.qrCodeData;
+    _formatVerificationCount() {
+        if (!this.state.verificationStats) return _t("No data");
+        
+        const count = this.state.verificationStats.verification_count || 0;
+        return count === 1 ? _t("1 verification") : _t("%s verifications", count);
     }
 
-    get canGenerate() {
-        return !this.props.readonly && this.props.record.resId;
+    _formatLastVerification() {
+        if (!this.state.verificationStats || !this.state.verificationStats.last_verification) {
+            return _t("Never verified");
+        }
+        
+        const date = new Date(this.state.verificationStats.last_verification);
+        return _t("Last verified: %s", date.toLocaleString());
     }
 
-    get verificationUrl() {
-        if (!this.state.verificationToken) return '';
-        const baseUrl = window.location.origin;
-        return `${baseUrl}/payment/verify/${this.state.verificationToken}`;
+    _getStatusClass() {
+        const state = this.props.record.data.approval_state;
+        const statusClasses = {
+            'draft': 'text-secondary',
+            'submitted': 'text-info',
+            'under_review': 'text-warning',
+            'approved': 'text-success',
+            'authorized': 'text-primary',
+            'posted': 'text-success',
+            'rejected': 'text-danger',
+            'cancelled': 'text-secondary'
+        };
+        return statusClasses[state] || 'text-muted';
+    }
+
+    _canRegenerate() {
+        // Only allow regeneration for certain states and if user has permission
+        const allowedStates = ['draft', 'submitted'];
+        const currentState = this.props.record.data.approval_state;
+        return allowedStates.includes(currentState);
     }
 }
 
-// Register the QR code widget
-registry.category("fields").add("qr_code_widget", QRCodeWidget);
+registry.category("fields").add("qr_code", QRCodeWidget);
