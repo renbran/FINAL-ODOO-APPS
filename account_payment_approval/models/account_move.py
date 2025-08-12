@@ -1,479 +1,181 @@
 # -*- coding: utf-8 -*-
 #############################################################################
 #
-#    Account Move Integration for Payment Approval
-#    Copyright (C) 2025 OSUS Properties
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Jumana Haseen (odoo@cybrosys.com)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-
-from odoo import fields, models, api, _
+from odoo import fields, models, _
+from odoo.exceptions import UserError
 
 
 class AccountMove(models.Model):
-    """Extend Account Move for payment approval integration"""
+    """This class inherits "account.move" and add state for approval """
     _inherit = "account.move"
-    
-    # Payment approval related fields
-    has_approval_payments = fields.Boolean(
-        string='Has Approval Payments',
-        compute='_compute_has_approval_payments',
-        store=True,
-        help="Whether this move has associated payments in approval workflow"
-    )
-    
-    approval_payment_count = fields.Integer(
-        string='Approval Payments',
-        compute='_compute_has_approval_payments',
-        store=True,
-        help="Number of payments in approval workflow"
-    )
-    
-    pending_approval_amount = fields.Monetary(
-        string='Pending Approval Amount',
-        compute='_compute_has_approval_payments',
-        store=True,
-        help="Total amount of payments pending approval"
-    )
-    
-    @api.depends('payment_id', 'line_ids.payment_id')
-    def _compute_has_approval_payments(self):
-        """Compute approval payment statistics"""
-        for move in self:
-            # Get all payments related to this move
-            payments = move.payment_id
-            if not payments:
-                # Check for payments in line_ids
-                payment_lines = move.line_ids.filtered(lambda l: l.payment_id)
-                payments = payment_lines.mapped('payment_id')
-            
-            # Filter payments that require approval
-            approval_payments = payments.filtered('requires_approval')
-            
-            move.has_approval_payments = bool(approval_payments)
-            move.approval_payment_count = len(approval_payments)
-            
-            # Calculate pending approval amount
-            pending_payments = approval_payments.filtered(
-                lambda p: p.voucher_state in ['submitted', 'under_review', 'approved']
-            )
-            move.pending_approval_amount = sum(pending_payments.mapped('amount'))
-    
-    def action_view_approval_payments(self):
-        """Open approval payments related to this move"""
-        self.ensure_one()
-        
-        # Get all related payments
-        payments = self.payment_id
-        if not payments:
-            payment_lines = self.line_ids.filtered(lambda l: l.payment_id)
-            payments = payment_lines.mapped('payment_id')
-        
-        approval_payments = payments.filtered('requires_approval')
-        
-        if not approval_payments:
-            return
-        
-        if len(approval_payments) == 1:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'account.payment',
-                'res_id': approval_payments.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-        else:
-            return {
-                'type': 'ir.actions.act_window',
-                'name': _('Approval Payments'),
-                'res_model': 'account.payment',
-                'view_mode': 'tree,form',
-                'domain': [('id', 'in', approval_payments.ids)],
-                'target': 'current',
-            }
 
-    # Additional fields for enhanced tracking
-    fully_reconciled = fields.Boolean(
-        string='Fully Reconciled',
-        compute='_compute_reconciliation_status',
-        help="Whether all lines in this move are fully reconciled"
-    )
+    state = fields.Selection(
+        selection_add=[('submit_review', 'Submit for Review'),
+                       ('waiting_approval', 'Waiting For Approval'),
+                       ('approved', 'Approved'),
+                       ('rejected', 'Rejected')],
+        ondelete={'submit_review': 'set default', 'waiting_approval': 'set default', 'approved': 'set default',
+                  'rejected': 'set default'}, help="States of approval.")
     
-    total_matched_amount = fields.Monetary(
-        string='Total Matched Amount',
-        compute='_compute_reconciliation_status',
-        help="Total amount that has been reconciled"
-    )
-    
-    total_outstanding_amount = fields.Monetary(
-        string='Total Outstanding Amount',
-        compute='_compute_reconciliation_status',
-        help="Total amount still outstanding"
-    )
-    
-    reconciliation_summary = fields.Html(
-        string='Reconciliation Summary',
-        compute='_compute_reconciliation_summary',
-        help="HTML summary of reconciliation status"
-    )
-    
-    approval_timeline = fields.Json(
-        string='Approval Timeline',
-        compute='_compute_approval_timeline',
-        help="Timeline data for approval workflow visualization"
+    journal_restrict_mode = fields.Boolean(
+        string="Journal Restrict Mode",
+        related="journal_id.restrict_mode_hash_table",
+        help="Indicates if the journal has strict mode enabled"
     )
 
-    @api.depends('line_ids.full_reconcile_id', 'line_ids.matched_debit_ids', 'line_ids.matched_credit_ids')
-    def _compute_reconciliation_status(self):
-        """Compute reconciliation status information"""
-        for move in self:
-            reconciled_lines = move.line_ids.filtered('full_reconcile_id')
-            partially_reconciled_lines = move.line_ids.filtered(
-                lambda l: l.matched_debit_ids or l.matched_credit_ids
-            )
+    def _check_journal_hash_restriction(self):
+        """Check if journal has strict mode enabled and provide helpful error message"""
+        for record in self:
+            if record.journal_id.restrict_mode_hash_table and record.state == 'posted':
+                raise UserError(_(
+                    "Cannot modify posted entry from journal '%s' because it is in strict mode.\n\n"
+                    "Solutions:\n"
+                    "1. Create a Credit Note/Reverse Entry instead of modifying the original entry\n"
+                    "2. Ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in the journal settings\n"
+                    "3. Use the 'Reset to Draft' button before making changes (if available)\n\n"
+                    "This restriction exists to maintain data integrity and compliance requirements."
+                ) % record.journal_id.name)
+
+    def _is_user_authorized_approver_move(self, user_id=None):
+        """Helper method to check if a user is authorized to approve vendor bills.
+        Uses the same approval configuration as payments.
+        
+        Args:
+            user_id (int): User ID to check. If None, uses current user.
             
-            move.fully_reconciled = len(reconciled_lines) == len(move.line_ids.filtered(lambda l: l.account_id.reconcile))
+        Returns:
+            bool: True if user is authorized to approve vendor bills
+        """
+        if user_id is None:
+            user_id = self.env.user.id
             
-            # Calculate matched amounts
-            matched_amount = sum(reconciled_lines.mapped('debit')) + sum(reconciled_lines.mapped('credit'))
-            move.total_matched_amount = matched_amount / 2  # Avoid double counting
+        approval = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.payment_approval')
+        
+        if not approval:
+            return False
             
-            # Calculate outstanding amounts
-            outstanding_lines = move.line_ids.filtered(
-                lambda l: l.account_id.reconcile and not l.full_reconcile_id
-            )
-            move.total_outstanding_amount = sum(outstanding_lines.mapped('amount_residual'))
+        # Check for multiple approvers first (takes precedence)
+        multiple_approvers_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_ids', '')
+        
+        if multiple_approvers_param:
+            try:
+                # Parse the comma-separated string of user IDs
+                approver_ids = [int(x.strip()) for x in multiple_approvers_param.split(',') if x.strip()]
+                if approver_ids:  # Only use if we actually have IDs
+                    return user_id in approver_ids
+            except (ValueError, AttributeError):
+                # If parsing fails, fall back to single approver
+                pass
+        
+        # Fall back to single approver configuration
+        single_approver_param = self.env['ir.config_parameter'].sudo().get_param(
+            'account_payment_approval.approval_user_id', '')
+        if single_approver_param:
+            try:
+                approver_id = int(single_approver_param)
+                return user_id == approver_id
+            except (ValueError, TypeError):
+                return False
+        
+        return False
 
-    def _compute_reconciliation_summary(self):
-        """Generate HTML reconciliation summary"""
-        for move in self:
-            html_content = []
-            html_content.append('<div class="o_reconciliation_summary_content">')
+    def action_submit_review(self):
+        """Submit vendor bills for review"""
+        for record in self:
+            if record.move_type in ['in_invoice', 'in_refund'] and record.state == 'draft':
+                record.state = 'waiting_approval'
+
+    def approve_transfer(self):
+        """Approve vendor bills - only for authorized users"""
+        for record in self:
+            if (record.move_type in ['in_invoice', 'in_refund'] and 
+                record.state == 'waiting_approval' and 
+                record._is_user_authorized_approver_move()):
+                record.state = 'approved'
+
+    def reject_transfer(self):
+        """Reject vendor bills - only for authorized users"""
+        for record in self:
+            if (record.move_type in ['in_invoice', 'in_refund'] and 
+                record.state == 'waiting_approval' and 
+                record._is_user_authorized_approver_move()):
+                record.state = 'rejected'
+
+    def button_cancel(self):
+        """Override button_cancel to handle strict mode journals properly"""
+        for record in self:
+            # Check for strict mode before attempting to cancel
+            if record.state == 'posted' and record.journal_id.restrict_mode_hash_table:
+                raise UserError(_(
+                    "Cannot cancel posted entry from journal '%s' because it is in strict mode.\n\n"
+                    "To cancel this entry:\n"
+                    "1. Create a Credit Note/Reverse Entry using the 'Credit Note' button instead\n"
+                    "2. Or ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in journal settings\n\n"
+                    "This restriction protects the integrity of your accounting records."
+                ) % record.journal_id.name)
             
-            # Reconciliation overview
-            reconciled_count = len(move.line_ids.filtered('full_reconcile_id'))
-            total_reconcilable = len(move.line_ids.filtered(lambda l: l.account_id.reconcile))
+            # Allow cancellation from new approval states for vendor bills
+            if (record.move_type in ['in_invoice', 'in_refund'] and 
+                record.state in ['waiting_approval', 'approved', 'rejected']):
+                # Set to cancel state directly for vendor bills
+                record.state = 'cancel'
+                return True
+        
+        # Call parent method for other cases
+        return super(AccountMove, self).button_cancel()
+
+    def button_draft(self):
+        """Override button_draft to handle strict mode journals properly"""
+        for record in self:
+            # Check for strict mode before attempting to reset to draft
+            if record.state == 'posted' and record.journal_id.restrict_mode_hash_table:
+                raise UserError(_(
+                    "Cannot reset posted entry from journal '%s' to draft because it is in strict mode.\n\n"
+                    "To modify this entry:\n"
+                    "1. Create a Credit Note/Reverse Entry to cancel the original entry\n"
+                    "2. Create a new entry with the correct information\n"
+                    "3. Or ask your Administrator to temporarily disable 'Lock Posted Entries with Hash' in journal settings\n\n"
+                    "This restriction maintains audit compliance and data integrity."
+                ) % record.journal_id.name)
             
-            html_content.append(f'<h5>Reconciliation Overview</h5>')
-            html_content.append(f'<p><strong>Reconciled Lines:</strong> {reconciled_count}/{total_reconcilable}</p>')
-            html_content.append(f'<p><strong>Status:</strong> {"Fully Reconciled" if move.fully_reconciled else "Partially Reconciled"}</p>')
-            
-            # Line by line breakdown
-            if move.line_ids:
-                html_content.append('<h6>Line Details:</h6>')
-                html_content.append('<table class="table table-sm">')
-                html_content.append('<thead><tr><th>Account</th><th>Amount</th><th>Status</th><th>Matched Invoice</th></tr></thead>')
-                html_content.append('<tbody>')
-                
-                for line in move.line_ids.filtered(lambda l: l.account_id.reconcile):
-                    full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
-                    status = "Reconciled" if full_reconcile else "Outstanding"
-                    status_class = "text-success" if full_reconcile else "text-warning"
-                    matched_invoice = line.matched_invoice_id.name if hasattr(line, 'matched_invoice_id') and line.matched_invoice_id else "None"
-                    
-                    html_content.append(
-                        f'<tr>'
-                        f'<td>{line.account_id.name}</td>'
-                        f'<td>{abs(line.debit or line.credit):.2f}</td>'
-                        f'<td><span class="{status_class}">{status}</span></td>'
-                        f'<td>{matched_invoice}</td>'
-                        f'</tr>'
-                    )
-                
-                html_content.append('</tbody></table>')
-            
-            html_content.append('</div>')
-            move.reconciliation_summary = ''.join(html_content)
+            # Allow setting to draft from rejected state for vendor bills
+            if (record.move_type in ['in_invoice', 'in_refund'] and 
+                record.state == 'rejected'):
+                record.state = 'draft'
+                return True
+        
+        # Call parent method for other cases
+        return super(AccountMove, self).button_draft()
 
-    def _compute_approval_timeline(self):
-        """Generate approval timeline data for visualization"""
-        for move in self:
-            timeline_data = []
-            
-            # Get related payments
-            payments = move.payment_id
-            if not payments:
-                payment_lines = move.line_ids.filtered(lambda l: l.payment_id)
-                payments = payment_lines.mapped('payment_id')
-            
-            approval_payments = payments.filtered('requires_approval')
-            
-            for payment in approval_payments:
-                timeline_data.append({
-                    'payment_id': payment.id,
-                    'payment_name': payment.name,
-                    'voucher_number': payment.voucher_number,
-                    'amount': payment.amount,
-                    'current_state': payment.voucher_state,
-                    'timeline': [
-                        {
-                            'state': 'draft',
-                            'date': payment.create_date.strftime('%Y-%m-%d %H:%M') if payment.create_date else None,
-                            'user': payment.create_uid.name if payment.create_uid else None,
-                            'completed': True
-                        },
-                        {
-                            'state': 'submitted',
-                            'date': payment.submitted_date.strftime('%Y-%m-%d %H:%M') if payment.submitted_date else None,
-                            'user': payment.create_uid.name if payment.create_uid else None,
-                            'completed': payment.voucher_state in ['submitted', 'under_review', 'approved', 'authorized', 'posted']
-                        },
-                        {
-                            'state': 'under_review',
-                            'date': payment.reviewed_date.strftime('%Y-%m-%d %H:%M') if payment.reviewed_date else None,
-                            'user': payment.reviewer_id.name if payment.reviewer_id else None,
-                            'completed': payment.voucher_state in ['under_review', 'approved', 'authorized', 'posted']
-                        },
-                        {
-                            'state': 'approved',
-                            'date': payment.approved_date.strftime('%Y-%m-%d %H:%M') if payment.approved_date else None,
-                            'user': payment.approver_id.name if payment.approver_id else None,
-                            'completed': payment.voucher_state in ['approved', 'authorized', 'posted']
-                        },
-                        {
-                            'state': 'authorized',
-                            'date': payment.authorized_date.strftime('%Y-%m-%d %H:%M') if payment.authorized_date else None,
-                            'user': payment.authorizer_id.name if payment.authorizer_id else None,
-                            'completed': payment.voucher_state in ['authorized', 'posted']
-                        },
-                        {
-                            'state': 'posted',
-                            'date': payment.post_date.strftime('%Y-%m-%d %H:%M') if hasattr(payment, 'post_date') and payment.post_date else None,
-                            'user': payment.write_uid.name if payment.write_uid else None,
-                            'completed': payment.voucher_state == 'posted'
-                        }
-                    ]
-                })
-            
-            move.approval_timeline = timeline_data
-
-    def action_view_reconciliation_navigator(self):
-        """Open reconciliation navigator for this move"""
-        self.ensure_one()
+    def action_post(self):
+        """Override action_post to allow posting from approved state for vendor bills"""
+        for record in self:
+            # Allow posting from approved state for vendor bills
+            if (record.move_type in ['in_invoice', 'in_refund'] and 
+                record.state == 'approved'):
+                # Set to draft temporarily to allow normal posting
+                record.state = 'draft'
         
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Reconciliation Navigator - %s') % self.name,
-            'res_model': 'account.move.line',
-            'view_mode': 'tree,form',
-            'domain': [('move_id', '=', self.id)],
-            'context': {
-                'search_default_account_reconcile': 1,
-                'default_move_id': self.id,
-            },
-            'target': 'current',
-        }
-
-    def action_view_matched_invoices(self):
-        """View invoices matched through reconciliation"""
-        self.ensure_one()
-        
-        matched_moves = self.env['account.move']
-        for line in self.line_ids:
-            full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
-            if full_reconcile:
-                reconciled_lines = full_reconcile.reconciled_line_ids
-                matched_moves |= reconciled_lines.mapped('move_id') - self
-        
-        if not matched_moves:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('No Matched Invoices'),
-                    'message': _('No invoices have been matched through reconciliation.'),
-                    'type': 'info',
-                }
-            }
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Matched Invoices'),
-            'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', matched_moves.ids)],
-            'target': 'current',
-        }
-
-    def action_refresh_approval_status(self):
-        """Refresh approval status computation"""
-        self._compute_has_approval_payments()
-        self._compute_reconciliation_status()
-        self._compute_reconciliation_summary()
-        self._compute_approval_timeline()
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Status Refreshed'),
-                'message': _('Approval and reconciliation status has been refreshed.'),
-                'type': 'success',
-            }
-        }
-
-
-class AccountMoveLine(models.Model):
-    """Enhanced Account Move Line with payment approval and reconciliation navigation"""
-    _inherit = "account.move.line"
-    
-    # Payment tracking fields
-    payment_state = fields.Selection(
-        related='payment_id.state',
-        string='Payment State',
-        readonly=True,
-        store=True,
-        help="State of the associated payment"
-    )
-    
-    payment_voucher_state = fields.Selection(
-        related='payment_id.voucher_state',
-        string='Payment Approval State',
-        readonly=True,
-        store=True,
-        help="Approval state of the associated payment"
-    )
-    
-    # Reconciliation navigation fields
-    matched_invoice_id = fields.Many2one(
-        comodel_name='account.move',
-        string='Matched Invoice',
-        compute='_compute_matched_invoice',
-        help="Invoice matched through reconciliation"
-    )
-    
-    reconcile_status = fields.Selection([
-        ('unreconciled', 'Unreconciled'),
-        ('partially_reconciled', 'Partially Reconciled'),
-        ('fully_reconciled', 'Fully Reconciled'),
-    ], string='Reconcile Status', compute='_compute_reconcile_status')
-    
-    outstanding_amount = fields.Monetary(
-        string='Outstanding Amount',
-        compute='_compute_outstanding_amount',
-        help="Amount still to be reconciled"
-    )
-
-    @api.depends('matched_debit_ids', 'matched_credit_ids')
-    def _compute_matched_invoice(self):
-        """Find the main invoice matched through reconciliation"""
-        for line in self:
-            matched_invoice = self.env['account.move']
-            
-            # Check if full_reconcile_id field exists
-            full_reconcile = getattr(line, 'full_reconcile_id', None) if hasattr(line, 'full_reconcile_id') else None
-            if full_reconcile:
-                # Get all reconciled lines
-                reconciled_lines = full_reconcile.reconciled_line_ids
-                # Find invoice moves (excluding current move)
-                invoice_moves = reconciled_lines.mapped('move_id').filtered(
-                    lambda m: m != line.move_id and m.move_type in ['out_invoice', 'in_invoice', 'out_refund', 'in_refund']
-                )
-                if invoice_moves:
-                    matched_invoice = invoice_moves[0]  # Take the first one
-            elif line.matched_debit_ids or line.matched_credit_ids:
-                # Fallback to matched lines
-                matched_lines = line.matched_debit_ids + line.matched_credit_ids
-                invoice_moves = matched_lines.mapped('move_id').filtered(
-                    lambda m: m != line.move_id and m.move_type in ['out_invoice', 'in_invoice', 'out_refund', 'in_refund']
-                )
-                if invoice_moves:
-                    matched_invoice = invoice_moves[0]
-            
-            line.matched_invoice_id = matched_invoice
-
-    @api.depends('matched_debit_ids', 'matched_credit_ids', 'amount_residual')
-    def _compute_reconcile_status(self):
-        """Compute reconciliation status"""
-        for line in self:
-            if not line.account_id.reconcile:
-                line.reconcile_status = 'unreconciled'
-            elif hasattr(line, 'full_reconcile_id') and line.full_reconcile_id:
-                line.reconcile_status = 'fully_reconciled'
-            elif line.matched_debit_ids or line.matched_credit_ids:
-                line.reconcile_status = 'partially_reconciled'
-            else:
-                line.reconcile_status = 'unreconciled'
-
-    @api.depends('amount_residual')
-    def _compute_outstanding_amount(self):
-        """Compute outstanding amount for reconciliation"""
-        for line in self:
-            line.outstanding_amount = abs(line.amount_residual) if line.account_id.reconcile else 0.0
-
-    def action_view_payment(self):
-        """Navigate to associated payment"""
-        self.ensure_one()
-        if not self.payment_id:
-            return
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.payment',
-            'res_id': self.payment_id.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-
-    def action_view_matched_invoice(self):
-        """Navigate to matched invoice"""
-        self.ensure_one()
-        if not self.matched_invoice_id:
-            return
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.move',
-            'res_id': self.matched_invoice_id.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-
-    def action_view_reconciliation_history(self):
-        """View reconciliation history for this line"""
-        self.ensure_one()
-        
-        domain = []
-        if self.full_reconcile_id:
-            domain = [('full_reconcile_id', '=', self.full_reconcile_id.id)]
-        elif self.matched_debit_ids or self.matched_credit_ids:
-            matched_ids = self.matched_debit_ids.ids + self.matched_credit_ids.ids
-            domain = ['|', ('matched_debit_ids', 'in', matched_ids), ('matched_credit_ids', 'in', matched_ids)]
-        else:
-            domain = [('id', '=', self.id)]
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Reconciliation History'),
-            'res_model': 'account.move.line',
-            'view_mode': 'tree,form',
-            'domain': domain,
-            'context': {'search_default_account_reconcile': 1},
-            'target': 'current',
-        }
-
-    def get_payment_approval_badge_data(self):
-        """Get badge data for payment approval status"""
-        self.ensure_one()
-        
-        payment_lines = self.line_ids.filtered(lambda l: l.payment_id)
-        if not payment_lines:
-            return {'status': 'no_payments', 'count': 0}
-        
-        payments = payment_lines.mapped('payment_id')
-        approval_payments = payments.filtered('requires_approval')
-        
-        if not approval_payments:
-            return {'status': 'no_payments', 'count': 0}
-        
-        # Get the most common status
-        status_counts = {}
-        for payment in approval_payments:
-            status = payment.voucher_state
-            status_counts[status] = status_counts.get(status, 0) + 1
-        
-        most_common_status = max(status_counts, key=status_counts.get)
-        
-        return {
-            'status': most_common_status,
-            'count': len(approval_payments),
-        }
+        # Call parent method
+        result = super(AccountMove, self).action_post()
+        return result

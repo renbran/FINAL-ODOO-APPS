@@ -1,246 +1,305 @@
 # -*- coding: utf-8 -*-
 
-from odoo import http, fields
+from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import AccessError, UserError
-import json
 import logging
+import json
 
 _logger = logging.getLogger(__name__)
 
 
-class PaymentApprovalController(http.Controller):
-    """Main controller for payment approval functionality."""
+class AccountPaymentController(http.Controller):
+    """Controller for payment approval operations"""
 
     @http.route('/payment/approval/dashboard', type='http', auth='user', website=True)
     def payment_approval_dashboard(self, **kwargs):
-        """Render the payment approval dashboard."""
-        if not request.env.user.has_group('account_payment_approval.payment_approval_user'):
-            raise AccessError("You don't have access to the payment approval dashboard.")
-        
-        return request.render('account_payment_approval.payment_approval_dashboard_template', {
-            'page_name': 'payment_approval_dashboard',
-        })
-
-    @http.route('/payment/approval/stats', type='json', auth='user', methods=['POST'])
-    def get_approval_stats(self, **kwargs):
-        """Get payment approval statistics for dashboard."""
+        """Dashboard for payment approval overview"""
         try:
-            domain = [('company_id', '=', request.env.company.id)]
-            
-            # Get user's role to filter appropriate payments
-            user = request.env.user
-            if user.has_group('account_payment_approval.payment_approval_manager'):
-                pass  # Managers can see all payments
-            elif user.has_group('account_payment_approval.payment_approval_authorizer'):
-                domain.append(('state', 'in', ['approved', 'authorized', 'posted']))
-            elif user.has_group('account_payment_approval.payment_approval_approver'):
-                domain.append(('state', 'in', ['under_review', 'approved']))
-            else:
-                domain.append(('create_uid', '=', user.id))
+            # Check if user has access to payments
+            if not request.env.user.has_group('account_payment_approval.group_payment_voucher_user'):
+                raise AccessError(_("You don't have access to payment approvals."))
 
+            # Get payment statistics
             Payment = request.env['account.payment']
             
             stats = {
-                'pending_review': Payment.search_count(domain + [('state', '=', 'under_review')]),
-                'pending_approval': Payment.search_count(domain + [('state', '=', 'submitted')]),
-                'pending_authorization': Payment.search_count(domain + [('state', '=', 'approved')]),
-                'total_today': Payment.search_count(domain + [
-                    ('create_date', '>=', fields.Date.today()),
-                    ('create_date', '<', fields.Date.today() + fields.timedelta(days=1))
+                'pending_review': Payment.search_count([('voucher_state', '=', 'submitted')]),
+                'pending_approval': Payment.search_count([('voucher_state', '=', 'reviewed')]),
+                'pending_authorization': Payment.search_count([('voucher_state', '=', 'approved')]),
+                'posted_today': Payment.search_count([
+                    ('voucher_state', '=', 'posted'),
+                    ('date', '=', request.env.context.get('today', fields.Date.today()))
                 ]),
-                'total_amount_pending': sum(Payment.search(domain + [
-                    ('state', 'in', ['submitted', 'under_review', 'approved'])
-                ]).mapped('amount')),
             }
-            
-            return {'status': 'success', 'data': stats}
-            
+
+            # Get recent payments for current user
+            user_payments = Payment.search([
+                ('create_uid', '=', request.env.user.id)
+            ], order='create_date desc', limit=10)
+
+            return request.render('account_payment_approval.payment_dashboard_template', {
+                'stats': stats,
+                'user_payments': user_payments,
+                'page_name': 'Payment Approval Dashboard'
+            })
+
         except Exception as e:
-            _logger.error(f"Error getting approval stats: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
+            _logger.error("Error in payment approval dashboard: %s", str(e))
+            return request.render('website.404')
 
-    @http.route('/payment/approval/recent', type='json', auth='user', methods=['POST'])
-    def get_recent_payments(self, limit=10, **kwargs):
-        """Get recent payments for dashboard."""
+    @http.route('/payment/approval/submit', type='json', auth='user', methods=['POST'], csrf=False)
+    def submit_payment_approval(self, payment_id=None, **kwargs):
+        """Submit payment for approval"""
         try:
-            domain = [('company_id', '=', request.env.company.id)]
-            
-            # Apply user permissions
-            user = request.env.user
-            if not user.has_group('account_payment_approval.payment_approval_manager'):
-                if user.has_group('account_payment_approval.payment_approval_authorizer'):
-                    domain.append(('state', 'in', ['approved', 'authorized', 'posted']))
-                elif user.has_group('account_payment_approval.payment_approval_approver'):
-                    domain.append(('state', 'in', ['under_review', 'approved']))
-                else:
-                    domain.append(('create_uid', '=', user.id))
+            if not payment_id:
+                return {'error': 'Payment ID is required'}
 
-            payments = request.env['account.payment'].search(
-                domain, 
-                order='create_date desc', 
-                limit=limit
-            )
-            
-            payment_data = []
-            for payment in payments:
-                payment_data.append({
-                    'id': payment.id,
-                    'name': payment.name or f"Payment {payment.id}",
-                    'partner_name': payment.partner_id.name,
-                    'amount': payment.amount,
-                    'currency': payment.currency_id.name,
-                    'state': payment.state,
-                    'state_label': dict(payment._fields['state'].selection)[payment.state],
-                    'create_date': payment.create_date.isoformat() if payment.create_date else '',
-                    'urgency_level': getattr(payment, 'urgency_level', 'normal'),
-                })
-            
-            return {'status': 'success', 'data': payment_data}
-            
-        except Exception as e:
-            _logger.error(f"Error getting recent payments: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
-
-    @http.route('/payment/approval/action', type='json', auth='user', methods=['POST'])
-    def payment_action(self, payment_id, action, **kwargs):
-        """Execute payment approval actions."""
-        try:
-            payment = request.env['account.payment'].browse(payment_id)
+            payment = request.env['account.payment'].browse(int(payment_id))
             if not payment.exists():
-                return {'status': 'error', 'message': 'Payment not found'}
+                return {'error': 'Payment not found'}
 
-            # Check user permissions for the action
-            user = request.env.user
-            if action == 'submit' and payment.state == 'draft':
-                if user.has_group('account_payment_approval.payment_approval_user'):
-                    payment.action_submit_for_approval()
-                else:
-                    return {'status': 'error', 'message': 'Permission denied'}
-                    
-            elif action == 'review' and payment.state == 'submitted':
-                if user.has_group('account_payment_approval.payment_approval_reviewer'):
-                    payment.action_mark_as_reviewed()
-                else:
-                    return {'status': 'error', 'message': 'Permission denied'}
-                    
-            elif action == 'approve' and payment.state == 'under_review':
-                if user.has_group('account_payment_approval.payment_approval_approver'):
-                    payment.action_approve_payment()
-                else:
-                    return {'status': 'error', 'message': 'Permission denied'}
-                    
-            elif action == 'authorize' and payment.state == 'approved':
-                if user.has_group('account_payment_approval.payment_approval_authorizer'):
-                    payment.action_authorize_payment()
-                else:
-                    return {'status': 'error', 'message': 'Permission denied'}
-                    
-            elif action == 'post' and payment.state == 'authorized':
-                if user.has_group('account_payment_approval.payment_approval_manager'):
-                    payment.action_post()
-                else:
-                    return {'status': 'error', 'message': 'Permission denied'}
+            # Check if user can submit
+            if not payment.can_submit_for_approval():
+                return {'error': 'Cannot submit this payment for approval'}
+
+            result = payment.action_submit_for_approval()
+            
+            return {
+                'success': True,
+                'message': _('Payment submitted for approval successfully'),
+                'new_state': payment.voucher_state
+            }
+
+        except Exception as e:
+            _logger.error("Error submitting payment approval: %s", str(e))
+            return {'error': str(e)}
+
+    @http.route('/payment/approval/review', type='json', auth='user', methods=['POST'], csrf=False)
+    def review_payment(self, payment_id=None, action=None, **kwargs):
+        """Review payment (approve or reject)"""
+        try:
+            if not payment_id or not action:
+                return {'error': 'Payment ID and action are required'}
+
+            payment = request.env['account.payment'].browse(int(payment_id))
+            if not payment.exists():
+                return {'error': 'Payment not found'}
+
+            if action == 'approve':
+                if not payment.can_review():
+                    return {'error': 'Cannot review this payment'}
+                result = payment.action_review()
+                message = _('Payment reviewed successfully')
+            elif action == 'reject':
+                if not payment.can_reject():
+                    return {'error': 'Cannot reject this payment'}
+                result = payment.action_reject()
+                message = _('Payment rejected')
             else:
-                return {'status': 'error', 'message': f'Invalid action {action} for current state {payment.state}'}
+                return {'error': 'Invalid action'}
 
             return {
-                'status': 'success', 
-                'message': f'Payment {action} successful',
-                'new_state': payment.state
+                'success': True,
+                'message': message,
+                'new_state': payment.voucher_state
             }
-            
-        except Exception as e:
-            _logger.error(f"Error executing payment action: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
 
-    @http.route('/payment/approval/bulk_action', type='json', auth='user', methods=['POST'])
-    def bulk_payment_action(self, payment_ids, action, **kwargs):
-        """Execute bulk payment actions."""
+        except Exception as e:
+            _logger.error("Error reviewing payment: %s", str(e))
+            return {'error': str(e)}
+
+    @http.route('/payment/approval/authorize', type='json', auth='user', methods=['POST'], csrf=False)
+    def authorize_payment(self, payment_id=None, **kwargs):
+        """Authorize payment"""
         try:
+            if not payment_id:
+                return {'error': 'Payment ID is required'}
+
+            payment = request.env['account.payment'].browse(int(payment_id))
+            if not payment.exists():
+                return {'error': 'Payment not found'}
+
+            if not payment.can_authorize():
+                return {'error': 'Cannot authorize this payment'}
+
+            result = payment.action_authorize()
+            
+            return {
+                'success': True,
+                'message': _('Payment authorized successfully'),
+                'new_state': payment.voucher_state
+            }
+
+        except Exception as e:
+            _logger.error("Error authorizing payment: %s", str(e))
+            return {'error': str(e)}
+
+    @http.route('/payment/signature/capture', type='http', auth='user', website=True)
+    def signature_capture_page(self, payment_id=None, **kwargs):
+        """Page for capturing digital signatures"""
+        try:
+            if not payment_id:
+                return request.render('website.404')
+
+            payment = request.env['account.payment'].browse(int(payment_id))
+            if not payment.exists():
+                return request.render('website.404')
+
+            # Check if user can sign this payment
+            can_sign = False
+            signature_type = None
+
+            if payment.can_review() and request.env.user.has_group('account_payment_approval.group_payment_voucher_reviewer'):
+                can_sign = True
+                signature_type = 'reviewer'
+            elif payment.can_approve() and request.env.user.has_group('account_payment_approval.group_payment_voucher_approver'):
+                can_sign = True
+                signature_type = 'approver'
+            elif payment.can_authorize() and request.env.user.has_group('account_payment_approval.group_payment_voucher_authorizer'):
+                can_sign = True
+                signature_type = 'authorizer'
+
+            if not can_sign:
+                return request.render('account_payment_approval.signature_access_denied', {
+                    'payment': payment
+                })
+
+            return request.render('account_payment_approval.signature_capture_template', {
+                'payment': payment,
+                'signature_type': signature_type,
+                'page_name': f'Sign Payment {payment.voucher_number}'
+            })
+
+        except Exception as e:
+            _logger.error("Error in signature capture page: %s", str(e))
+            return request.render('website.404')
+
+    @http.route('/payment/signature/save', type='json', auth='user', methods=['POST'], csrf=False)
+    def save_signature(self, payment_id=None, signature_data=None, signature_type=None, **kwargs):
+        """Save digital signature"""
+        try:
+            if not all([payment_id, signature_data, signature_type]):
+                return {'error': 'Missing required parameters'}
+
+            payment = request.env['account.payment'].browse(int(payment_id))
+            if not payment.exists():
+                return {'error': 'Payment not found'}
+
+            # Validate signature type and permissions
+            if signature_type == 'reviewer' and not payment.can_review():
+                return {'error': 'Cannot sign as reviewer'}
+            elif signature_type == 'approver' and not payment.can_approve():
+                return {'error': 'Cannot sign as approver'}
+            elif signature_type == 'authorizer' and not payment.can_authorize():
+                return {'error': 'Cannot sign as authorizer'}
+
+            # Save signature
+            result = payment.save_digital_signature(signature_data, signature_type)
+            
+            if result:
+                return {
+                    'success': True,
+                    'message': _('Signature saved successfully'),
+                    'new_state': payment.voucher_state
+                }
+            else:
+                return {'error': 'Failed to save signature'}
+
+        except Exception as e:
+            _logger.error("Error saving signature: %s", str(e))
+            return {'error': str(e)}
+
+    @http.route('/payment/bulk/action', type='json', auth='user', methods=['POST'], csrf=False)
+    def bulk_payment_action(self, payment_ids=None, action=None, **kwargs):
+        """Bulk actions on payments"""
+        try:
+            if not payment_ids or not action:
+                return {'error': 'Payment IDs and action are required'}
+
             payments = request.env['account.payment'].browse(payment_ids)
             if not payments:
-                return {'status': 'error', 'message': 'No payments found'}
+                return {'error': 'No valid payments found'}
 
             results = []
             for payment in payments:
                 try:
-                    result = self.payment_action(payment.id, action)
-                    results.append({
-                        'payment_id': payment.id,
-                        'payment_name': payment.name,
-                        'status': result['status'],
-                        'message': result.get('message', ''),
-                    })
+                    if action == 'submit' and payment.can_submit_for_approval():
+                        payment.action_submit_for_approval()
+                        results.append({'id': payment.id, 'success': True})
+                    elif action == 'review' and payment.can_review():
+                        payment.action_review()
+                        results.append({'id': payment.id, 'success': True})
+                    elif action == 'approve' and payment.can_approve():
+                        payment.action_approve()
+                        results.append({'id': payment.id, 'success': True})
+                    elif action == 'authorize' and payment.can_authorize():
+                        payment.action_authorize()
+                        results.append({'id': payment.id, 'success': True})
+                    else:
+                        results.append({'id': payment.id, 'success': False, 'error': 'Action not allowed'})
                 except Exception as e:
-                    results.append({
-                        'payment_id': payment.id,
-                        'payment_name': payment.name,
-                        'status': 'error',
-                        'message': str(e),
-                    })
+                    results.append({'id': payment.id, 'success': False, 'error': str(e)})
 
-            successful = len([r for r in results if r['status'] == 'success'])
-            failed = len([r for r in results if r['status'] == 'error'])
+            success_count = len([r for r in results if r['success']])
             
             return {
-                'status': 'success',
-                'message': f'Bulk action completed: {successful} successful, {failed} failed',
-                'results': results,
-                'summary': {'successful': successful, 'failed': failed}
+                'success': True,
+                'message': f'{success_count} of {len(payment_ids)} payments processed successfully',
+                'results': results
             }
-            
+
         except Exception as e:
-            _logger.error(f"Error executing bulk payment action: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
+            _logger.error("Error in bulk payment action: %s", str(e))
+            return {'error': str(e)}
 
-    @http.route('/payment/signature/verify', type='json', auth='user', methods=['POST'])
-    def verify_signature(self, payment_id, signature_data, **kwargs):
-        """Verify digital signature for payment."""
+    @http.route('/payment/approval/api/stats', type='json', auth='user', methods=['GET'], csrf=False)
+    def get_approval_stats(self, **kwargs):
+        """API endpoint for approval statistics"""
         try:
-            payment = request.env['account.payment'].browse(payment_id)
-            if not payment.exists():
-                return {'status': 'error', 'message': 'Payment not found'}
-
-            # Here you would implement signature verification logic
-            # For now, we'll simulate verification
-            is_valid = bool(signature_data and len(signature_data) > 10)
+            Payment = request.env['account.payment']
             
-            if is_valid:
-                # Store signature if valid
-                payment.write({
-                    'digital_signature': signature_data,
-                    'signature_date': fields.Datetime.now(),
-                    'signature_user_id': request.env.user.id,
+            # Get user's permissions
+            user_groups = {
+                'can_submit': request.env.user.has_group('account_payment_approval.group_payment_voucher_user'),
+                'can_review': request.env.user.has_group('account_payment_approval.group_payment_voucher_reviewer'),
+                'can_approve': request.env.user.has_group('account_payment_approval.group_payment_voucher_approver'),
+                'can_authorize': request.env.user.has_group('account_payment_approval.group_payment_voucher_authorizer'),
+                'can_post': request.env.user.has_group('account_payment_approval.group_payment_voucher_poster'),
+                'is_manager': request.env.user.has_group('account_payment_approval.group_payment_voucher_manager'),
+            }
+
+            # Get statistics based on user permissions
+            stats = {}
+            
+            if user_groups['can_review']:
+                stats['pending_review'] = Payment.search_count([('voucher_state', '=', 'submitted')])
+            
+            if user_groups['can_approve']:
+                stats['pending_approval'] = Payment.search_count([('voucher_state', '=', 'reviewed')])
+            
+            if user_groups['can_authorize']:
+                stats['pending_authorization'] = Payment.search_count([('voucher_state', '=', 'approved')])
+            
+            if user_groups['can_post']:
+                stats['pending_posting'] = Payment.search_count([('voucher_state', '=', 'authorized')])
+
+            # Overall statistics for managers
+            if user_groups['is_manager']:
+                stats.update({
+                    'total_draft': Payment.search_count([('voucher_state', '=', 'draft')]),
+                    'total_submitted': Payment.search_count([('voucher_state', '=', 'submitted')]),
+                    'total_in_process': Payment.search_count([('voucher_state', 'in', ['submitted', 'reviewed', 'approved', 'authorized'])]),
+                    'total_posted': Payment.search_count([('voucher_state', '=', 'posted')]),
+                    'total_rejected': Payment.search_count([('voucher_state', '=', 'rejected')]),
                 })
-                
-                return {
-                    'status': 'success',
-                    'message': 'Digital signature verified and stored',
-                    'verified': True
-                }
-            else:
-                return {
-                    'status': 'error',
-                    'message': 'Invalid digital signature',
-                    'verified': False
-                }
-            
-        except Exception as e:
-            _logger.error(f"Error verifying signature: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
 
-    @http.route('/payment/notifications/mark_read', type='json', auth='user', methods=['POST'])
-    def mark_notifications_read(self, notification_ids, **kwargs):
-        """Mark payment notifications as read."""
-        try:
-            # This would integrate with Odoo's notification system
-            # For now, we'll return success
             return {
-                'status': 'success',
-                'message': f'Marked {len(notification_ids)} notifications as read'
+                'success': True,
+                'stats': stats,
+                'user_permissions': user_groups
             }
-            
+
         except Exception as e:
-            _logger.error(f"Error marking notifications as read: {str(e)}")
-            return {'status': 'error', 'message': str(e)}
+            _logger.error("Error getting approval stats: %s", str(e))
+            return {'error': str(e)}
