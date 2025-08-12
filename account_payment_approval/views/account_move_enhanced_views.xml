@@ -159,7 +159,7 @@
         <field name="arch" type="xml">
 
             <!-- Add Payment Information Group -->
-            <xpath expr="//group[@name='amount_group']" position="after">
+            <xpath expr="//form//sheet" position="inside">
                 <group string="Payment Information" invisible="not payment_id">
                     <field name="payment_id" readonly="1"/>
                     <field name="payment_state" readonly="1" widget="badge"/>
@@ -172,26 +172,6 @@
                     <field name="reconcile_status" readonly="1" widget="badge"/>
                     <field name="outstanding_amount" readonly="1" widget="monetary"/>
                 </group>
-            </xpath>
-
-            <!-- Add Navigation Buttons -->
-            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                <!-- Navigate to Payment -->
-                <button name="action_view_payment" type="object" class="oe_stat_button" icon="fa-credit-card" invisible="not payment_id">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_text">View Payment</span>
-                    </div>
-                </button>
-
-                <!-- Navigate to Matched Invoice -->
-                <button name="action_view_matched_invoice" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="not matched_invoice_id">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_text">Matched Invoice</span>
-                    </div>
-                </button>
-
-                <!-- Reconciliation History -->
-                <button name="action_view_reconciliation_history" type="object" class="oe_stat_button" icon="fa-history" string="Reconciliation History"/>
             </xpath>
 
             <!-- Add computed fields for display -->
