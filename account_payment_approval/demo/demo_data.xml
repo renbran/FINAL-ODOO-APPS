@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Payment Data -->
+        <record id="demo_payment_1" model="account.payment">
+            <field name="payment_type">outbound</field>
+            <field name="partner_type">supplier</field>
+            <field name="partner_id" ref="base.res_partner_12"/>
+            <field name="amount">1500.00</field>
+            <field name="journal_id" ref="account.bank_journal"/>
+            <field name="voucher_state">draft</field>
+        </record>
+        
+        <record id="demo_payment_2" model="account.payment">
+            <field name="payment_type">inbound</field>
+            <field name="partner_type">customer</field>
+            <field name="partner_id" ref="base.res_partner_1"/>
+            <field name="amount">2500.00</field>
+            <field name="journal_id" ref="account.bank_journal"/>
+            <field name="voucher_state">submitted</field>
+        </record>
+    </data>
+</odoo>

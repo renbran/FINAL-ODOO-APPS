@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Payment Voucher Report -->
+        <record id="action_report_payment_voucher" model="ir.actions.report">
+            <field name="name">Payment Voucher</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">account_payment_approval.report_payment_voucher</field>
+            <field name="report_file">account_payment_approval.report_payment_voucher</field>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+        
+        <!-- Payment Voucher Template -->
+        <template id="report_payment_voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <div class="row">
+                                <div class="col-12">
+                                    <h2>
+                                        <span t-if="doc.voucher_type == 'payment'">Payment Voucher</span>
+                                        <span t-if="doc.voucher_type == 'receipt'">Receipt Voucher</span>
+                                    </h2>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt32 mb32">
+                                <div class="col-6">
+                                    <strong>Voucher Number:</strong> <span t-field="doc.voucher_number"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Date:</strong> <span t-field="doc.date"/>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Partner:</strong> <span t-field="doc.partner_id"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Amount:</strong> <span t-field="doc.amount"/> <span t-field="doc.currency_id.name"/>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt32">
+                                <div class="col-12">
+                                    <strong>Status:</strong> <span t-field="doc.voucher_state"/>
+                                </div>
+                            </div>
+                            
+                            <!-- Signatures Section -->
+                            <div class="row mt32" t-if="doc.creator_signature_date">
+                                <div class="col-12">
+                                    <h4>Signatures</h4>
+                                    <table class="table table-sm">
+                                        <tr t-if="doc.creator_signature_date">
+                                            <td><strong>Created by:</strong></td>
+                                            <td><span t-field="doc.create_uid.name"/></td>
+                                            <td><span t-field="doc.creator_signature_date"/></td>
+                                        </tr>
+                                        <tr t-if="doc.reviewer_signature_date">
+                                            <td><strong>Reviewed by:</strong></td>
+                                            <td><span t-field="doc.reviewer_id.name"/></td>
+                                            <td><span t-field="doc.reviewer_signature_date"/></td>
+                                        </tr>
+                                        <tr t-if="doc.approver_signature_date">
+                                            <td><strong>Approved by:</strong></td>
+                                            <td><span t-field="doc.approver_id.name"/></td>
+                                            <td><span t-field="doc.approver_signature_date"/></td>
+                                        </tr>
+                                        <tr t-if="doc.authorizer_signature_date">
+                                            <td><strong>Authorized by:</strong></td>
+                                            <td><span t-field="doc.authorizer_id.name"/></td>
+                                            <td><span t-field="doc.authorizer_signature_date"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Code Section -->
+                            <div class="row mt32" t-if="doc.qr_code">
+                                <div class="col-12 text-center">
+                                    <h5>Verification QR Code</h5>
+                                    <img t-att-src="image_data_uri(doc.qr_code)" style="max-width: 150px;"/>
+                                    <br/>
+                                    <small><span t-field="doc.verification_url"/></small>
+                                </div>
+                            </div>
+                            
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
