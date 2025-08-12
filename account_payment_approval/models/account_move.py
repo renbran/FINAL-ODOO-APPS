@@ -17,18 +17,21 @@ class AccountMove(models.Model):
     has_approval_payments = fields.Boolean(
         string='Has Approval Payments',
         compute='_compute_has_approval_payments',
+        store=True,
         help="Whether this move has associated payments in approval workflow"
     )
     
     approval_payment_count = fields.Integer(
         string='Approval Payments',
         compute='_compute_has_approval_payments',
+        store=True,
         help="Number of payments in approval workflow"
     )
     
     pending_approval_amount = fields.Monetary(
         string='Pending Approval Amount',
         compute='_compute_has_approval_payments',
+        store=True,
         help="Total amount of payments pending approval"
     )
     
