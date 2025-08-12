@@ -1,7 +1,0 @@
-
-# Add this to __manifest__.py if needed:
-    'assets': {
-        'web.assets_backend': [
-            'account_payment_final/static/src/scss/minimal_fix.scss',
-        ],
-    },
