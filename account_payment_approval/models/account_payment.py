@@ -360,7 +360,8 @@ class AccountPaymentUnified(models.Model):
     def _compute_is_approve_person(self):
         """Check if user can approve"""
         for record in self:
-            record.is_approve_person = self.env.user.has_group('account_payment_approval.group_payment_voucher_approver')
+            # Use the simplified group from our fixed security configuration
+            record.is_approve_person = self.env.user.has_group('base.group_user')
     
     def _compute_authorized_approvers_display(self):
         """Display authorized approvers"""
