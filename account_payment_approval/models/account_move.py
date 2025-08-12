@@ -346,13 +346,14 @@ class AccountMoveLine(models.Model):
         help="Amount still to be reconciled"
     )
 
-    @api.depends('full_reconcile_id', 'matched_debit_ids', 'matched_credit_ids')
+    @api.depends('matched_debit_ids', 'matched_credit_ids')
     def _compute_matched_invoice(self):
         """Find the main invoice matched through reconciliation"""
         for line in self:
             matched_invoice = self.env['account.move']
             
-            if line.full_reconcile_id:
+            # Check if full_reconcile_id field exists
+            if hasattr(line, 'full_reconcile_id') and line.full_reconcile_id:
                 # Get all reconciled lines
                 reconciled_lines = line.full_reconcile_id.reconciled_line_ids
                 # Find invoice moves (excluding current move)
@@ -361,16 +362,24 @@ class AccountMoveLine(models.Model):
                 )
                 if invoice_moves:
                     matched_invoice = invoice_moves[0]  # Take the first one
+            elif line.matched_debit_ids or line.matched_credit_ids:
+                # Fallback to matched lines
+                matched_lines = line.matched_debit_ids + line.matched_credit_ids
+                invoice_moves = matched_lines.mapped('move_id').filtered(
+                    lambda m: m != line.move_id and m.move_type in ['out_invoice', 'in_invoice', 'out_refund', 'in_refund']
+                )
+                if invoice_moves:
+                    matched_invoice = invoice_moves[0]
             
             line.matched_invoice_id = matched_invoice
 
-    @api.depends('full_reconcile_id', 'matched_debit_ids', 'matched_credit_ids', 'amount_residual')
+    @api.depends('matched_debit_ids', 'matched_credit_ids', 'amount_residual')
     def _compute_reconcile_status(self):
         """Compute reconciliation status"""
         for line in self:
             if not line.account_id.reconcile:
                 line.reconcile_status = 'unreconciled'
-            elif line.full_reconcile_id:
+            elif hasattr(line, 'full_reconcile_id') and line.full_reconcile_id:
                 line.reconcile_status = 'fully_reconciled'
             elif line.matched_debit_ids or line.matched_credit_ids:
                 line.reconcile_status = 'partially_reconciled'
