@@ -93,10 +93,10 @@ class MailTemplate(models.Model):
         }
         
         # Approval workflow information
-        if hasattr(payment, 'approval_state'):
+        if hasattr(payment, 'voucher_state'):
             context.update({
-                'approval_state': payment.approval_state,
-                'approval_state_name': dict(payment._fields['approval_state'].selection)[payment.approval_state],
+                'voucher_state': payment.voucher_state,
+                'voucher_state_name': dict(payment._fields['voucher_state'].selection)[payment.voucher_state],
                 'submission_date': payment.submission_date,
                 'approval_date': payment.approval_date,
                 'authorization_date': payment.authorization_date,
@@ -195,7 +195,7 @@ class MailTemplate(models.Model):
                 email_values['attachments'].append(qr_attachment)
         
         # Add payment voucher PDF if posted
-        if payment.approval_state == 'posted' and hasattr(payment, '_generate_payment_voucher'):
+        if payment.voucher_state == 'posted' and hasattr(payment, '_generate_payment_voucher'):
             voucher_attachment = payment._generate_payment_voucher_attachment()
             if voucher_attachment:
                 if 'attachments' not in email_values:

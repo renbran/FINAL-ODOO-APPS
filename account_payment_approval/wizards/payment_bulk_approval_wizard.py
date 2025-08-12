@@ -133,19 +133,19 @@ class PaymentBulkApprovalWizard(models.TransientModel):
                 can_perform = False
                 
                 if wizard.action_type == 'submit':
-                    can_perform = payment.approval_state == 'draft'
+                    can_perform = payment.voucher_state == 'draft'
                 elif wizard.action_type == 'review':
-                    can_perform = payment.approval_state == 'submitted'
+                    can_perform = payment.voucher_state == 'submitted'
                 elif wizard.action_type == 'approve':
-                    can_perform = payment.approval_state == 'under_review'
+                    can_perform = payment.voucher_state == 'under_review'
                 elif wizard.action_type == 'authorize':
-                    can_perform = payment.approval_state == 'approved'
+                    can_perform = payment.voucher_state == 'approved'
                 elif wizard.action_type == 'post':
-                    can_perform = payment.approval_state == 'authorized'
+                    can_perform = payment.voucher_state == 'authorized'
                 elif wizard.action_type == 'reject':
-                    can_perform = payment.approval_state in ['submitted', 'under_review', 'approved']
+                    can_perform = payment.voucher_state in ['submitted', 'under_review', 'approved']
                 elif wizard.action_type == 'cancel':
-                    can_perform = payment.approval_state not in ['posted', 'cancelled']
+                    can_perform = payment.voucher_state not in ['posted', 'cancelled']
                 
                 # Apply urgency filter
                 if can_perform and wizard.urgency_filter != 'all':
@@ -218,7 +218,7 @@ class PaymentBulkApprovalWizard(models.TransientModel):
         # Set default action based on payments state
         if payment_ids:
             payments = self.env['account.payment'].browse(payment_ids)
-            states = payments.mapped('approval_state')
+            states = payments.mapped('voucher_state')
             
             # Determine most common next action
             if 'under_review' in states:
@@ -330,7 +330,7 @@ class PaymentBulkApprovalWizard(models.TransientModel):
                 'payment_name': payment.name or payment.ref,
                 'partner_name': payment.partner_id.name,
                 'amount': payment.amount,
-                'current_state': payment.approval_state,
+                'current_state': payment.voucher_state,
                 'new_state': self._get_target_state(payment),
             })
         
@@ -382,7 +382,7 @@ class PaymentBulkApprovalWizard(models.TransientModel):
             return 'rejected'
         elif self.action_type == 'cancel':
             return 'cancelled'
-        return payment.approval_state
+        return payment.voucher_state
     
     def _create_bulk_approval_history(self, processed_count, failed_payments):
         """Create history entry for bulk action"""

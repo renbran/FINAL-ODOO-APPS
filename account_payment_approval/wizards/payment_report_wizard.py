@@ -78,7 +78,7 @@ class PaymentReportWizard(models.TransientModel):
         help="Filter by specific partners"
     )
     
-    approval_states = fields.Many2many(
+    voucher_states = fields.Many2many(
         'payment.approval.state',
         string='Approval States',
         help="Filter by approval states"
@@ -365,7 +365,7 @@ class PaymentReportWizard(models.TransientModel):
         # State distribution
         state_counts = {}
         for payment in payments:
-            state = payment.approval_state
+            state = payment.voucher_state
             state_counts[state] = state_counts.get(state, 0) + 1
         data['state_distribution'] = state_counts
         
@@ -454,7 +454,7 @@ class PaymentReportWizard(models.TransientModel):
                 user_stats[approver]['approved'] += 1
             
             # Rejection tracking
-            if payment.approval_state == 'rejected':
+            if payment.voucher_state == 'rejected':
                 if payment.rejected_by_id:
                     rejector = payment.rejected_by_id
                     if rejector not in user_stats:
@@ -484,7 +484,7 @@ class PaymentReportWizard(models.TransientModel):
         issues = []
         for payment in payments:
             # Check for missing signatures
-            if payment.approval_state in ['approved', 'authorized', 'posted']:
+            if payment.voucher_state in ['approved', 'authorized', 'posted']:
                 if not payment.digital_signature_ids:
                     issues.append({
                         'payment': payment,
@@ -493,7 +493,7 @@ class PaymentReportWizard(models.TransientModel):
                     })
             
             # Check for overdue approvals
-            if payment.approval_state in ['submitted', 'under_review', 'approved']:
+            if payment.voucher_state in ['submitted', 'under_review', 'approved']:
                 # This would need actual time limit calculations
                 pass
             
@@ -583,7 +583,7 @@ class PaymentReportWizard(models.TransientModel):
         
         today = fields.Date.today()
         for payment in payments:
-            if payment.approval_state not in ['posted', 'cancelled', 'rejected']:
+            if payment.voucher_state not in ['posted', 'cancelled', 'rejected']:
                 days_old = (today - payment.date).days
                 
                 if days_old <= 7:

@@ -442,7 +442,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 8px 0; font-weight: bold;">Current State:</td>
-                    <td style="padding: 8px 0;">${dict(object._fields['approval_state'].selection)[object.approval_state] if hasattr(object, 'approval_state') else 'Unknown'}</td>
+                    <td style="padding: 8px 0;">${dict(object._fields['voucher_state'].selection)[object.voucher_state] if hasattr(object, 'voucher_state') else 'Unknown'}</td>
                 </tr>
                 <tr>
                     <td style="padding: 8px 0; font-weight: bold;">Days Pending:</td>

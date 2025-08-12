@@ -118,7 +118,7 @@ Technical Features:
             
             # JavaScript Components (load in dependency order)
             'account_payment_approval/static/src/js/components/payment_approval_dashboard.js',
-            'account_payment_approval/static/src/js/fields/approval_state_field.js',
+            'account_payment_approval/static/src/js/fields/voucher_state_field.js',
             'account_payment_approval/static/src/js/widgets/digital_signature_widget.js',
             'account_payment_approval/static/src/js/widgets/qr_code_widget.js',
             'account_payment_approval/static/src/js/widgets/bulk_approval_widget.js',

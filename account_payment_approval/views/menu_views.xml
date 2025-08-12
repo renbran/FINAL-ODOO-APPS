@@ -92,9 +92,9 @@
         <field name="name">Pending Review</field>
         <field name="res_model">account.payment</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('approval_state', '=', 'submitted')]</field>
+        <field name="domain">[('voucher_state', '=', 'submitted')]</field>
         <field name="context">{
-            'search_default_approval_state_submitted': 1,
+            'search_default_voucher_state_submitted': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -118,9 +118,9 @@
         <field name="name">Pending Approval</field>
         <field name="res_model">account.payment</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('approval_state', '=', 'under_review')]</field>
+        <field name="domain">[('voucher_state', '=', 'under_review')]</field>
         <field name="context">{
-            'search_default_approval_state_under_review': 1,
+            'search_default_voucher_state_under_review': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -144,9 +144,9 @@
         <field name="name">Pending Authorization</field>
         <field name="res_model">account.payment</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('approval_state', '=', 'approved')]</field>
+        <field name="domain">[('voucher_state', '=', 'approved')]</field>
         <field name="context">{
-            'search_default_approval_state_approved': 1,
+            'search_default_voucher_state_approved': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -196,9 +196,9 @@
         <field name="name">Rejected Payments</field>
         <field name="res_model">account.payment</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('approval_state', '=', 'rejected')]</field>
+        <field name="domain">[('voucher_state', '=', 'rejected')]</field>
         <field name="context">{
-            'search_default_approval_state_rejected': 1,
+            'search_default_voucher_state_rejected': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

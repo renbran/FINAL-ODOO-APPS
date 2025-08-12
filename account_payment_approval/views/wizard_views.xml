@@ -51,13 +51,13 @@
                     <notebook>
                         <page string="Selected Payments" name="selected_payments">
                             <field name="payment_ids" nolabel="1">
-                                <tree decoration-success="approval_state == 'posted'" decoration-info="approval_state in ['approved', 'authorized']" decoration-warning="approval_state in ['submitted', 'under_review']" decoration-danger="approval_state == 'rejected'">
+                                <tree decoration-success="voucher_state == 'posted'" decoration-info="voucher_state in ['approved', 'authorized']" decoration-warning="voucher_state in ['submitted', 'under_review']" decoration-danger="voucher_state == 'rejected'">
                                     <field name="name"/>
                                     <field name="partner_id"/>
                                     <field name="amount" sum="Total Amount"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="date"/>
-                                    <field name="approval_state"/>
+                                    <field name="voucher_state"/>
                                     <field name="urgency"/>
                                 </tree>
                             </field>
@@ -71,7 +71,7 @@
                                     <field name="amount" sum="Eligible Amount"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="date"/>
-                                    <field name="approval_state"/>
+                                    <field name="voucher_state"/>
                                     <field name="urgency"/>
                                 </tree>
                             </field>
@@ -85,7 +85,7 @@
                                     <field name="amount"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="date"/>
-                                    <field name="approval_state"/>
+                                    <field name="voucher_state"/>
                                     <field name="urgency"/>
                                 </tree>
                             </field>
@@ -242,7 +242,7 @@
                                         <field name="partner_id"/>
                                         <field name="amount"/>
                                         <field name="date"/>
-                                        <field name="approval_state"/>
+                                        <field name="voucher_state"/>
                                     </tree>
                                 </field>
                             </group>

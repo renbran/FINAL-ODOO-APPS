@@ -243,14 +243,14 @@ class ResConfigSettings(models.TransientModel):
             # Count pending approvals
             pending_count = self.env['account.payment'].search_count([
                 ('company_id', '=', record.company_id.id),
-                ('approval_state', 'in', ['submitted', 'under_review', 'approved'])
+                ('voucher_state', 'in', ['submitted', 'under_review', 'approved'])
             ])
             record.total_pending_approvals = pending_count
             
             # Calculate efficiency rate (simplified)
             total_approved = self.env['account.payment'].search_count([
                 ('company_id', '=', record.company_id.id),
-                ('approval_state', '=', 'posted'),
+                ('voucher_state', '=', 'posted'),
                 ('create_date', '>=', fields.Date.subtract(fields.Date.today(), days=30))
             ])
             

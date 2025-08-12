@@ -92,7 +92,7 @@ export class PaymentApprovalDashboard extends Component {
     static template = "account_payment_approval.DashboardTemplate";
 }
 ''',
-        'static/src/js/fields/approval_state_field.js': '''/** @odoo-module **/
+        'static/src/js/fields/voucher_state_field.js': '''/** @odoo-module **/
 // Approval State Field Widget - Placeholder
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
@@ -101,7 +101,7 @@ export class ApprovalStateField extends CharField {
     static template = "account_payment_approval.ApprovalStateField";
 }
 
-registry.category("fields").add("approval_state", ApprovalStateField);
+registry.category("fields").add("voucher_state", ApprovalStateField);
 ''',
         'static/src/js/widgets/digital_signature_widget.js': '''/** @odoo-module **/
 // Digital Signature Widget - Placeholder

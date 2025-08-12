@@ -1,10 +1,12 @@
 /** @odoo-module **/
-// Approval State Field Widget - Placeholder
+// Voucher State Field Widget (formerly approval_state)
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 
-export class ApprovalStateField extends CharField {
-    static template = "account_payment_approval.ApprovalStateField";
+export class VoucherStateField extends CharField {
+    static template = "account_payment_approval.VoucherStateField";
 }
 
-registry.category("fields").add("approval_state", ApprovalStateField);
+// Register under both names for backward compatibility
+registry.category("fields").add("voucher_state", VoucherStateField);
+registry.category("fields").add("approval_state", VoucherStateField);

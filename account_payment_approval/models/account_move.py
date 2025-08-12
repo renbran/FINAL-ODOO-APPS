@@ -51,7 +51,7 @@ class AccountMove(models.Model):
             
             # Calculate pending approval amount
             pending_payments = approval_payments.filtered(
-                lambda p: p.approval_state in ['submitted', 'under_review', 'approved']
+                lambda p: p.voucher_state in ['submitted', 'under_review', 'approved']
             )
             move.pending_approval_amount = sum(pending_payments.mapped('amount'))
     
@@ -319,7 +319,7 @@ class AccountMoveLine(models.Model):
         help="State of the associated payment"
     )
     
-    payment_approval_state = fields.Selection(
+    payment_voucher_state = fields.Selection(
         related='payment_id.voucher_state',
         string='Payment Approval State',
         readonly=True,
@@ -451,7 +451,7 @@ class AccountMoveLine(models.Model):
         # Get the most common status
         status_counts = {}
         for payment in approval_payments:
-            status = payment.approval_state
+            status = payment.voucher_state
             status_counts[status] = status_counts.get(status, 0) + 1
         
         most_common_status = max(status_counts, key=status_counts.get)

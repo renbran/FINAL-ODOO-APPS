@@ -35,7 +35,7 @@ class PaymentQRVerification(http.Controller):
                 })
             
             # Check if payment is in verifiable state
-            if payment.approval_state not in ['authorized', 'posted']:
+            if payment.voucher_state not in ['authorized', 'posted']:
                 return request.render('account_payment_approval.qr_verification_error', {
                     'error_title': _('Payment Not Yet Verified'),
                     'error_message': _('This payment has not been authorized yet and cannot be verified.'),
@@ -53,7 +53,7 @@ class PaymentQRVerification(http.Controller):
                 'currency': payment.currency_id,
                 'partner': payment.partner_id,
                 'date': payment.date,
-                'approval_state': payment.approval_state,
+                'voucher_state': payment.voucher_state,
                 'verification_count': payment.qr_verification_count,
                 'last_verification': payment.last_qr_verification,
                 'amount_in_words': payment.amount_in_words,
@@ -91,7 +91,7 @@ class PaymentQRVerification(http.Controller):
                 }
             
             # Check if payment is in verifiable state
-            if payment.approval_state not in ['authorized', 'posted']:
+            if payment.voucher_state not in ['authorized', 'posted']:
                 return {
                     'success': False,
                     'error': 'NOT_AUTHORIZED',
@@ -111,7 +111,7 @@ class PaymentQRVerification(http.Controller):
                     'currency_symbol': payment.currency_id.symbol,
                     'partner_name': payment.partner_id.name if payment.partner_id else '',
                     'date': payment.date.isoformat() if payment.date else '',
-                    'approval_state': payment.approval_state,
+                    'voucher_state': payment.voucher_state,
                     'verification_count': payment.qr_verification_count,
                     'last_verification': payment.last_qr_verification.isoformat() if payment.last_qr_verification else '',
                     'amount_in_words': payment.amount_in_words,
@@ -171,7 +171,7 @@ class PaymentVerificationPortal(http.Controller):
         """Portal page for payment verification"""
         # Get user's verifiable payments
         payments = request.env['account.payment'].search([
-            ('approval_state', 'in', ['authorized', 'posted']),
+            ('voucher_state', 'in', ['authorized', 'posted']),
             ('partner_id', '=', request.env.user.partner_id.id)
         ])
         
@@ -198,7 +198,7 @@ class PaymentVerificationPortal(http.Controller):
             # Prepare verification data
             verification_data = {
                 'payment': payment,
-                'can_verify': payment.approval_state in ['authorized', 'posted'],
+                'can_verify': payment.voucher_state in ['authorized', 'posted'],
                 'verification_url': payment.verification_url,
                 'qr_code_data': payment.qr_code,
             }
