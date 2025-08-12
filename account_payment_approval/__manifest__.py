@@ -82,6 +82,7 @@ Technical Features:
         # Views
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
+        'views/account_move_enhanced_views.xml',
         'views/payment_approval_config_views.xml',
         'views/payment_approval_dashboard_views.xml',
         'views/menu_views.xml',
@@ -96,6 +97,9 @@ Technical Features:
         'reports/payment_approval_report.xml',
         'reports/qr_verification_report.xml',
         'reports/report_actions.xml',
+        
+        # Frontend Templates
+        'static/src/xml/account_move_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [

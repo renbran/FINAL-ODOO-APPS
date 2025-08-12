@@ -2,33 +2,33 @@
 // OSUS Properties Brand Colors and Design System
 
 // ===== OSUS BRAND COLORS =====
-$osus-primary: #1f4788;           // OSUS Primary Blue
-$osus-secondary: #f8f9fa;         // Light Gray Background
-$osus-accent: #28a745;            // Success Green
-$osus-warning: #ffc107;           // Warning Amber
-$osus-danger: #dc3545;            // Error Red
-$osus-info: #17a2b8;             // Info Cyan
-$osus-dark: #343a40;             // Dark Gray
-$osus-light: #f8f9fa;            // Light Gray
+$osus-primary: #1f4788; // OSUS Primary Blue
+$osus-secondary: #f8f9fa; // Light Gray Background
+$osus-accent: #28a745; // Success Green
+$osus-warning: #ffc107; // Warning Amber
+$osus-danger: #dc3545; // Error Red
+$osus-info: #17a2b8; // Info Cyan
+$osus-dark: #343a40; // Dark Gray
+$osus-light: #f8f9fa; // Light Gray
 
 // ===== APPROVAL STATUS COLORS =====
-$state-draft: #6c757d;           // Gray for draft
-$state-submitted: #007bff;       // Blue for submitted
-$state-under-review: #ffc107;    // Yellow for under review
-$state-approved: #28a745;        // Green for approved
-$state-authorized: #17a2b8;      // Cyan for authorized
-$state-posted: #28a745;          // Green for posted
-$state-rejected: #dc3545;        // Red for rejected
-$state-cancelled: #6c757d;       // Gray for cancelled
+$state-draft: #6c757d; // Gray for draft
+$state-submitted: #007bff; // Blue for submitted
+$state-under-review: #ffc107; // Yellow for under review
+$state-approved: #28a745; // Green for approved
+$state-authorized: #17a2b8; // Cyan for authorized
+$state-posted: #28a745; // Green for posted
+$state-rejected: #dc3545; // Red for rejected
+$state-cancelled: #6c757d; // Gray for cancelled
 
 // ===== URGENCY LEVEL COLORS =====
-$urgency-low: #28a745;           // Green for low urgency
-$urgency-normal: #007bff;        // Blue for normal urgency
-$urgency-high: #ffc107;          // Yellow for high urgency
-$urgency-urgent: #dc3545;        // Red for urgent
+$urgency-low: #28a745; // Green for low urgency
+$urgency-normal: #007bff; // Blue for normal urgency
+$urgency-high: #ffc107; // Yellow for high urgency
+$urgency-urgent: #dc3545; // Red for urgent
 
 // ===== TYPOGRAPHY =====
-$font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-family-base: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 $font-size-base: 14px;
 $font-size-small: 12px;
 $font-size-large: 16px;
@@ -47,12 +47,12 @@ $line-height-relaxed: 1.75;
 
 // ===== SPACING =====
 $spacer: 1rem;
-$spacer-xs: $spacer * 0.25;      // 4px
-$spacer-sm: $spacer * 0.5;       // 8px
-$spacer-md: $spacer;              // 16px
-$spacer-lg: $spacer * 1.5;       // 24px
-$spacer-xl: $spacer * 2;         // 32px
-$spacer-xxl: $spacer * 3;        // 48px
+$spacer-xs: $spacer * 0.25; // 4px
+$spacer-sm: $spacer * 0.5; // 8px
+$spacer-md: $spacer; // 16px
+$spacer-lg: $spacer * 1.5; // 24px
+$spacer-xl: $spacer * 2; // 32px
+$spacer-xxl: $spacer * 3; // 48px
 
 // ===== BORDERS =====
 $border-width: 1px;
@@ -157,104 +157,104 @@ $alert-border-width: $border-width;
 
 // ===== MIXINS =====
 @mixin media-breakpoint-up($name) {
-  @if $name == xs {
-    @content;
-  } @else if $name == sm {
-    @media (min-width: $breakpoint-sm) {
-      @content;
+    @if $name == xs {
+        @content;
+    } @else if $name == sm {
+        @media (min-width: $breakpoint-sm) {
+            @content;
+        }
+    } @else if $name == md {
+        @media (min-width: $breakpoint-md) {
+            @content;
+        }
+    } @else if $name == lg {
+        @media (min-width: $breakpoint-lg) {
+            @content;
+        }
+    } @else if $name == xl {
+        @media (min-width: $breakpoint-xl) {
+            @content;
+        }
+    } @else if $name == xxl {
+        @media (min-width: $breakpoint-xxl) {
+            @content;
+        }
     }
-  } @else if $name == md {
-    @media (min-width: $breakpoint-md) {
-      @content;
-    }
-  } @else if $name == lg {
-    @media (min-width: $breakpoint-lg) {
-      @content;
-    }
-  } @else if $name == xl {
-    @media (min-width: $breakpoint-xl) {
-      @content;
-    }
-  } @else if $name == xxl {
-    @media (min-width: $breakpoint-xxl) {
-      @content;
-    }
-  }
 }
 
 @mixin media-breakpoint-down($name) {
-  @if $name == xs {
-    @media (max-width: $breakpoint-sm - 0.02px) {
-      @content;
+    @if $name == xs {
+        @media (max-width: $breakpoint-sm - 0.02px) {
+            @content;
+        }
+    } @else if $name == sm {
+        @media (max-width: $breakpoint-md - 0.02px) {
+            @content;
+        }
+    } @else if $name == md {
+        @media (max-width: $breakpoint-lg - 0.02px) {
+            @content;
+        }
+    } @else if $name == lg {
+        @media (max-width: $breakpoint-xl - 0.02px) {
+            @content;
+        }
+    } @else if $name == xl {
+        @media (max-width: $breakpoint-xxl - 0.02px) {
+            @content;
+        }
     }
-  } @else if $name == sm {
-    @media (max-width: $breakpoint-md - 0.02px) {
-      @content;
-    }
-  } @else if $name == md {
-    @media (max-width: $breakpoint-lg - 0.02px) {
-      @content;
-    }
-  } @else if $name == lg {
-    @media (max-width: $breakpoint-xl - 0.02px) {
-      @content;
-    }
-  } @else if $name == xl {
-    @media (max-width: $breakpoint-xxl - 0.02px) {
-      @content;
-    }
-  }
 }
 
 @mixin button-variant($background, $border, $color: #ffffff) {
-  color: $color;
-  background-color: $background;
-  border-color: $border;
-
-  &:hover {
-    color: $color;
-    background-color: darken($background, 7.5%);
-    border-color: darken($border, 10%);
-  }
-
-  &:focus,
-  &.focus {
-    color: $color;
-    background-color: darken($background, 7.5%);
-    border-color: darken($border, 10%);
-    box-shadow: 0 0 0 0.2rem rgba($border, 0.5);
-  }
-
-  &:disabled,
-  &.disabled {
     color: $color;
     background-color: $background;
     border-color: $border;
-    opacity: 0.65;
-  }
+
+    &:hover {
+        color: $color;
+        background-color: darken($background, 7.5%);
+        border-color: darken($border, 10%);
+    }
+
+    &:focus,
+    &.focus {
+        color: $color;
+        background-color: darken($background, 7.5%);
+        border-color: darken($border, 10%);
+        box-shadow: 0 0 0 0.2rem rgba($border, 0.5);
+    }
+
+    &:disabled,
+    &.disabled {
+        color: $color;
+        background-color: $background;
+        border-color: $border;
+        opacity: 0.65;
+    }
 }
 
 @mixin approval-state-badge($color) {
-  background-color: $color;
-  color: contrast-color($color);
-  border: 1px solid darken($color, 10%);
-  
-  &:before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: currentColor;
-    margin-right: 0.5rem;
-  }
+    background-color: $color;
+    color: contrast-color($color);
+    border: 1px solid darken($color, 10%);
+
+    &:before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: currentColor;
+        margin-right: 0.5rem;
+    }
 }
 
 // ===== UTILITY FUNCTIONS =====
 @function contrast-color($color) {
-  @if (lightness($color) > 50) {
-    @return #000000;
-  } @else {
-    @return #ffffff;
-  }
+    @if (lightness($color) > 50) {
+        @return #000000;
+    } @else {
+        @return #ffffff;
+    }
 }

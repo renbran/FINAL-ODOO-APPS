@@ -24,6 +24,35 @@
         <field name="sequence">1</field>
     </record>
 
+    <!-- Journal Entries with Payment Approval -->
+    <record id="action_journal_entries_with_payments" model="ir.actions.act_window">
+        <field name="name">Journal Entries - Payment Tracking</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="account_move_enhanced_tree_view"/>
+        <field name="domain">[('payment_ids', '!=', False)]</field>
+        <field name="context">{
+            'default_move_type': 'entry',
+            'search_default_posted': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                View journal entries with payment approval tracking
+            </p>
+            <p>
+                Enhanced journal entry view with payment approval integration, 
+                reconciliation navigation, and ledger verification tools.
+            </p>
+        </field>
+    </record>
+
+    <record id="menu_journal_entries_with_payments" model="ir.ui.menu">
+        <field name="name">Journal Entries - Payment Tracking</field>
+        <field name="parent_id" ref="menu_payment_approval_main"/>
+        <field name="action" ref="action_journal_entries_with_payments"/>
+        <field name="sequence">5</field>
+    </record>
+
     <!-- Payments Menu -->
     <record id="menu_payment_approval_payments" model="ir.ui.menu">
         <field name="name">Payments</field>

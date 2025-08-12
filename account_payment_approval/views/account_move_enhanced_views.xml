@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Enhanced Journal Entry Form View with Payment Approval Integration -->
+    <record id="view_move_form_payment_approval_enhanced" model="ir.ui.view">
+        <field name="name">account.move.form.payment.approval.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Payment Approval Button Box -->
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <!-- Payment Approval Status Button -->
+                <button name="action_view_approval_payments" type="object" class="oe_stat_button" icon="fa-check-circle" invisible="not has_approval_payments">
+                    <field name="approval_payment_count" widget="statinfo" string="Approval Payments"/>
+                </button>
+
+                <!-- Pending Approval Amount Button -->
+                <button name="action_view_approval_payments" type="object" class="oe_stat_button" icon="fa-clock-o" invisible="not pending_approval_amount or pending_approval_amount == 0">
+                    <field name="pending_approval_amount" widget="statinfo" string="Pending Approval"/>
+                </button>
+
+                <!-- Reconciliation Navigator -->
+                <button name="action_view_reconciliation_navigator" type="object" class="oe_stat_button" icon="fa-link" string="Reconciliation Navigator"/>
+            </xpath>
+
+            <!-- Add Payment Approval Fields (invisible for computation) -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="has_approval_payments" invisible="1"/>
+                <field name="approval_payment_count" invisible="1"/>
+                <field name="pending_approval_amount" invisible="1"/>
+            </xpath>
+
+            <!-- Enhanced Journal Entry Lines with Payment Tracking -->
+            <xpath expr="//field[@name='line_ids']/tree" position="attributes">
+                <attribute name="editable">bottom</attribute>
+                <attribute name="class">o_payment_approval_lines</attribute>
+            </xpath>
+
+            <!-- Add Payment Approval columns to journal lines -->
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='account_id']" position="after">
+                <!-- Payment Reference -->
+                <field name="payment_id" optional="hide" readonly="1" widget="many2one_button" options="{'no_open': False}"/>
+
+                <!-- Payment State -->
+                <field name="payment_state" optional="hide" readonly="1" widget="badge"/>
+
+                <!-- Payment Approval State -->
+                <field name="payment_approval_state" optional="hide" readonly="1" widget="badge"/>
+            </xpath>
+
+            <!-- Add reconciliation information -->
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='full_reconcile_id']" position="after">
+                <!-- Matched Invoice -->
+                <field name="matched_invoice_id" optional="hide" readonly="1" widget="many2one_button" options="{'no_create': True, 'no_open': False}"/>
+
+                <!-- Reconciliation Status -->
+                <field name="reconcile_status" optional="hide" readonly="1" widget="badge"/>
+
+                <!-- Outstanding Amount -->
+                <field name="outstanding_amount" optional="hide" readonly="1" widget="monetary"/>
+            </xpath>
+
+            <!-- Add Approval Information Tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Payment Approval Tracking" invisible="not has_approval_payments">
+                    <group>
+                        <group string="Approval Summary">
+                            <field name="approval_payment_count" readonly="1"/>
+                            <field name="pending_approval_amount" readonly="1"/>
+                        </group>
+                        <group string="Approval Actions">
+                            <button name="action_view_approval_payments" string="View All Approval Payments" type="object" class="btn-primary" invisible="not has_approval_payments"/>
+                            <button name="action_refresh_approval_status" string="Refresh Approval Status" type="object" class="btn-secondary"/>
+                        </group>
+                    </group>
+
+                    <!-- Approval Timeline Widget -->
+                    <div class="o_approval_timeline_widget">
+                        <field name="approval_timeline" widget="approval_timeline"/>
+                    </div>
+                </page>
+
+                <page string="Reconciliation Navigator">
+                    <group>
+                        <group string="Reconciliation Information">
+                            <field name="fully_reconciled" readonly="1"/>
+                            <field name="total_matched_amount" readonly="1"/>
+                            <field name="total_outstanding_amount" readonly="1"/>
+                        </group>
+                        <group string="Navigation Actions">
+                            <button name="action_view_reconciliation_navigator" string="Open Reconciliation Navigator" type="object" class="btn-primary"/>
+                            <button name="action_view_matched_invoices" string="View Matched Invoices" type="object" class="btn-secondary"/>
+                        </group>
+                    </group>
+
+                    <!-- Reconciliation Summary -->
+                    <div class="o_reconciliation_summary">
+                        <h4>Reconciliation Summary</h4>
+                        <field name="reconciliation_summary" widget="html" readonly="1"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Enhanced Journal Entry List View -->
+    <record id="view_account_move_tree_payment_approval_enhanced" model="ir.ui.view">
+        <field name="name">account.move.tree.payment.approval.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Payment Approval columns -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="has_approval_payments" optional="hide" widget="boolean_toggle"/>
+                <field name="approval_payment_count" optional="hide" sum="Total Approval Payments"/>
+                <field name="pending_approval_amount" optional="hide" sum="Total Pending Amount" widget="monetary"/>
+            </xpath>
+
+            <!-- Add tree view styling for approval status -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-info">has_approval_payments and pending_approval_amount > 0</attribute>
+                <attribute name="decoration-warning">has_approval_payments and approval_payment_count > 3</attribute>
+                <attribute name="decoration-success">has_approval_payments and pending_approval_amount == 0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Enhanced Search View for Journal Entries -->
+    <record id="view_account_move_filter_payment_approval_enhanced" model="ir.ui.view">
+        <field name="name">account.move.search.payment.approval.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Payment Approval Filters -->
+            <xpath expr="//filter[@name='posted']" position="after">
+                <separator/>
+                <filter name="has_approval_payments" string="Has Approval Payments" domain="[('has_approval_payments', '=', True)]"/>
+                <filter name="pending_approvals" string="Pending Approvals" domain="[('pending_approval_amount', '>', 0)]"/>
+                <filter name="high_approval_count" string="High Approval Count" domain="[('approval_payment_count', '>', 3)]"/>
+            </xpath>
+
+            <!-- Add Group By options -->
+            <xpath expr="//group" position="inside">
+                <filter string="Approval Status" name="group_by_approval_status" domain="[]" context="{'group_by': 'has_approval_payments'}"/>
+            </xpath>
+
+            <!-- Add Search Fields -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="approval_payment_count"/>
+                <field name="pending_approval_amount"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Journal Entry Lines Enhanced Form View -->
+    <record id="view_move_line_form_payment_approval_enhanced" model="ir.ui.view">
+        <field name="name">account.move.line.form.payment.approval.enhanced</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Payment Information Group -->
+            <xpath expr="//group[@name='amount_group']" position="after">
+                <group string="Payment Information" invisible="not payment_id">
+                    <field name="payment_id" readonly="1"/>
+                    <field name="payment_state" readonly="1" widget="badge"/>
+                    <field name="payment_approval_state" readonly="1" widget="badge"/>
+                    <field name="payment_method_line_id" readonly="1"/>
+                </group>
+
+                <group string="Reconciliation Information">
+                    <field name="matched_invoice_id" readonly="1"/>
+                    <field name="reconcile_status" readonly="1" widget="badge"/>
+                    <field name="outstanding_amount" readonly="1" widget="monetary"/>
+                    <field name="full_reconcile_id" readonly="1"/>
+                </group>
+            </xpath>
+
+            <!-- Add Navigation Buttons -->
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <!-- Navigate to Payment -->
+                <button name="action_view_payment" type="object" class="oe_stat_button" icon="fa-credit-card" invisible="not payment_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">View Payment</span>
+                    </div>
+                </button>
+
+                <!-- Navigate to Matched Invoice -->
+                <button name="action_view_matched_invoice" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="not matched_invoice_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Matched Invoice</span>
+                    </div>
+                </button>
+
+                <!-- Reconciliation History -->
+                <button name="action_view_reconciliation_history" type="object" class="oe_stat_button" icon="fa-history" string="Reconciliation History"/>
+            </xpath>
+
+            <!-- Add computed fields for display -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="payment_state" invisible="1"/>
+                <field name="payment_approval_state" invisible="1"/>
+                <field name="matched_invoice_id" invisible="1"/>
+                <field name="reconcile_status" invisible="1"/>
+                <field name="outstanding_amount" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Journal Entry Lines Enhanced Tree View -->
+    <record id="view_move_line_tree_payment_approval_enhanced" model="ir.ui.view">
+        <field name="name">account.move.line.tree.payment.approval.enhanced</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Payment and Reconciliation columns -->
+            <xpath expr="//field[@name='full_reconcile_id']" position="after">
+                <field name="payment_id" optional="hide" widget="many2one_button"/>
+                <field name="payment_state" optional="hide" widget="badge"/>
+                <field name="payment_approval_state" optional="hide" widget="badge"/>
+                <field name="matched_invoice_id" optional="hide" widget="many2one_button"/>
+                <field name="reconcile_status" optional="hide" widget="badge"/>
+                <field name="outstanding_amount" optional="hide" widget="monetary"/>
+            </xpath>
+
+            <!-- Add visual indicators -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-info">payment_id and payment_state in ['draft', 'pending']</attribute>
+                <attribute name="decoration-warning">payment_id and payment_approval_state in ['submitted', 'under_review']</attribute>
+                <attribute name="decoration-success">payment_id and payment_approval_state in ['approved', 'authorized', 'posted']</attribute>
+                <attribute name="decoration-danger">payment_id and payment_approval_state == 'rejected'</attribute>
+                <attribute name="decoration-muted">reconcile_status == 'fully_reconciled'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Reconciliation Navigator Action -->
+    <record id="action_reconciliation_navigator" model="ir.actions.act_window">
+        <field name="name">Reconciliation Navigator</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+        <field name="context">{
+            'search_default_group_by_account': 1,
+            'search_default_group_by_reconcile_status': 1,
+        }</field>
+        <field name="help">Navigate through reconciled and unreconciled journal entries with payment approval tracking.</field>
+    </record>
+
+    <!-- Payment Approval Dashboard Action -->
+    <record id="action_payment_approval_dashboard_from_moves" model="ir.actions.act_window">
+        <field name="name">Payment Approval Dashboard</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">kanban,tree,form,pivot,graph</field>
+        <field name="domain">[('requires_approval', '=', True)]</field>
+        <field name="context">{
+            'search_default_group_by_voucher_state': 1,
+        }</field>
+        <field name="help">Monitor payment approvals from journal entry perspective.</field>
+    </record>
+
+</odoo>
