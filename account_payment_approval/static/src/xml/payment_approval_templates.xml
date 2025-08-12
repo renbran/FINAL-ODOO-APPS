@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Approval Templates -->
+    <template id="PaymentApprovalTemplate" name="account_payment_approval.PaymentApprovalTemplate">
+        <div class="o_payment_approval">
+            <div class="payment-approval-header">
+                <h5>Payment Approval</h5>
+            </div>
+            <div class="payment-approval-content">
+                <!-- Payment approval content will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Dashboard Template -->
+    <template id="DashboardTemplate" name="account_payment_approval.DashboardTemplate">
+        <div class="o_payment_approval_dashboard">
+            <div class="dashboard-header">
+                <h4>Payment Approval Dashboard</h4>
+            </div>
+            <div class="dashboard-content">
+                <!-- Dashboard content will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Approval State Field Template -->
+    <template id="ApprovalStateField" name="account_payment_approval.ApprovalStateField">
+        <span t-attf-class="badge badge-#{props.record.data[props.name]}">
+            <t t-esc="props.record.data[props.name]"/>
+        </span>
+    </template>
+
+    <!-- Digital Signature Widget Template -->
+    <template id="DigitalSignatureWidget" name="account_payment_approval.DigitalSignatureWidget">
+        <div class="o_digital_signature_widget">
+            <div class="signature-pad">
+                <!-- Digital signature pad will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+    <!-- QR Code Widget Template -->
+    <template id="QRCodeWidget" name="account_payment_approval.QRCodeWidget">
+        <div class="o_qr_code_widget">
+            <div class="qr-code-container">
+                <!-- QR code will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Bulk Approval Widget Template -->
+    <template id="BulkApprovalWidget" name="account_payment_approval.BulkApprovalWidget">
+        <div class="o_bulk_approval_widget">
+            <div class="bulk-approval-controls">
+                <!-- Bulk approval controls will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+</odoo>

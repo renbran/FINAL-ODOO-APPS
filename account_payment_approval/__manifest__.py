@@ -97,40 +97,45 @@ Technical Features:
         'reports/payment_approval_report.xml',
         'reports/qr_verification_report.xml',
         'reports/report_actions.xml',
-        
-        # Frontend Templates
-        'static/src/xml/account_move_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            # Main CSS (compiled from modular SCSS)
-            'account_payment_approval/static/src/css/payment_approval.css',
-            
-            # SCSS Variables and Components (for development/customization)
+            # SCSS Variables and Utilities (load first)
             'account_payment_approval/static/src/scss/_variables.scss',
+            
+            # Component SCSS files
+            'account_payment_approval/static/src/scss/components/_dashboard.scss',
+            'account_payment_approval/static/src/scss/components/_badges.scss',
+            'account_payment_approval/static/src/scss/components/_signature.scss',
+            'account_payment_approval/static/src/scss/components/_qr_code.scss',
+            'account_payment_approval/static/src/scss/components/_account_move_widgets.scss',
+            
+            # Main SCSS (loads all imports and global styles)
             'account_payment_approval/static/src/scss/main.scss',
             
-            # JavaScript Components (organized structure)
+            # Compiled CSS (backup/fallback)
+            'account_payment_approval/static/src/css/payment_approval.css',
+            
+            # JavaScript Components (load in dependency order)
             'account_payment_approval/static/src/js/components/payment_approval_dashboard.js',
+            'account_payment_approval/static/src/js/fields/approval_state_field.js',
             'account_payment_approval/static/src/js/widgets/digital_signature_widget.js',
             'account_payment_approval/static/src/js/widgets/qr_code_widget.js',
             'account_payment_approval/static/src/js/widgets/bulk_approval_widget.js',
+            'account_payment_approval/static/src/js/widgets/account_move_widgets.js',
             'account_payment_approval/static/src/js/views/payment_form_view.js',
-            'account_payment_approval/static/src/js/fields/approval_state_field.js',
             
-            # XML Templates
+            # XML Templates (load after JavaScript components)
             'account_payment_approval/static/src/xml/payment_approval_templates.xml',
             'account_payment_approval/static/src/xml/dashboard_templates.xml',
             'account_payment_approval/static/src/xml/digital_signature_templates.xml',
             'account_payment_approval/static/src/xml/qr_verification_templates.xml',
+            'account_payment_approval/static/src/xml/account_move_templates.xml',
         ],
         'web.assets_frontend': [
             # Frontend styles for QR verification portal
             'account_payment_approval/static/src/css/payment_approval.css',
             'account_payment_approval/static/src/js/qr_verification.js',
-        ],
-        'web.qunit_suite_tests': [
-            'account_payment_approval/static/tests/**/*.js',
         ],
     },
     'demo': [
