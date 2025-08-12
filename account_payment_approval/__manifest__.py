@@ -50,14 +50,14 @@
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
         'views/res_config_settings_views.xml',
-        'views/payment_report_wizard_views.xml',
+        'views/payment_report_wizard.xml',
         'views/menu_items.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/receipt_voucher_report.xml',
         'reports/qr_verification_report.xml',
-        'reports/enhanced_payment_report.xml',
+        'reports/payment_summary_report.xml',
         'reports/report_actions.xml',
     ],
     'assets': {
