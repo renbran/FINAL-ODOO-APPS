@@ -57,14 +57,6 @@
         # Templates
         'templates/payment_verification_template.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'payment_approval_workflow/static/src/css/payment_approval.css',
-        ],
-        'web.assets_frontend': [
-            'payment_approval_workflow/static/src/css/verification_portal.css',
-        ],
-    },
     'demo': [],
     'installable': True,
     'auto_install': False,
