@@ -42,9 +42,12 @@
         'security/ir.model.access.csv',
         
         # Data
+        'data/system_parameters.xml',
         'data/email_templates.xml',
         'data/voucher_sequence.xml',
         'data/qr_verification_data.xml',
+        'data/cron_jobs.xml',
+        'data/server_actions.xml',
         
         # Views
         'views/account_payment_views.xml',
@@ -52,6 +55,7 @@
         'views/res_config_settings_views.xml',
         'views/payment_report_wizard.xml',
         'views/menu_items.xml',
+        'views/wizard_views.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
@@ -64,12 +68,14 @@
         'web.assets_backend': [
             'account_payment_approval/static/src/js/digital_signature_widget.js',
             'account_payment_approval/static/src/js/payment_approval_dashboard.js',
-            'account_payment_approval/static/src/js/qr_code_widget.js',
+            'account_payment_approval/static/src/js/qr_widget_enhanced.js',
             'account_payment_approval/static/src/scss/payment_approval.scss',
+            'account_payment_approval/static/src/xml/digital_signature_templates.xml',
             'account_payment_approval/static/src/xml/payment_approval_templates.xml',
         ],
         'web.assets_frontend': [
             'account_payment_approval/static/src/scss/payment_approval.scss',
+            'account_payment_approval/static/src/xml/qr_verification_templates.xml',
         ],
     },
     'demo': [

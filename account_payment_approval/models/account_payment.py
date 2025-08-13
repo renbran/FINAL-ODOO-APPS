@@ -93,11 +93,34 @@ class AccountPayment(models.Model):
         help="Whether this payment requires approval workflow"
     )
     
+    # User Permission Check Field
+    is_approve_person = fields.Boolean(
+        string='Can User Approve',
+        compute='_compute_is_approve_person',
+        help="Check if current user can approve this payment"
+    )
+    
     @api.depends('amount', 'payment_type', 'currency_id', 'company_id')
     def _compute_requires_approval(self):
         """Determine if payment requires approval based on thresholds"""
         for payment in self:
             payment.requires_approval = payment._check_approval_threshold()
+    
+    @api.depends('voucher_state')
+    def _compute_is_approve_person(self):
+        """Check if current user can perform approval actions"""
+        for payment in self:
+            user = self.env.user
+            
+            # Check based on current state and user permissions
+            if payment.voucher_state == 'submitted':
+                payment.is_approve_person = user.has_group('account_payment_approval.group_payment_voucher_reviewer')
+            elif payment.voucher_state == 'under_review':
+                payment.is_approve_person = user.has_group('account_payment_approval.group_payment_voucher_approver')
+            elif payment.voucher_state == 'approved':
+                payment.is_approve_person = user.has_group('account_payment_approval.group_payment_voucher_authorizer')
+            else:
+                payment.is_approve_person = False
     
     def _check_approval_threshold(self):
         """Check if payment amount exceeds approval threshold"""
@@ -295,6 +318,10 @@ class AccountPayment(models.Model):
     # WORKFLOW ACTION METHODS
     # =============================================================================
     
+    def action_submit_for_approval(self):
+        """Submit payment for approval - Alias for action_submit_for_review"""
+        return self.action_submit_for_review()
+    
     def action_submit_for_review(self):
         """Submit payment for review"""
         for payment in self:
@@ -309,6 +336,10 @@ class AccountPayment(models.Model):
             payment._post_activity_log('Payment submitted for review')
             payment._send_notification_email('submitted')
     
+    def action_review(self):
+        """Review payment - Alias for action_start_review"""
+        return self.action_start_review()
+
     def action_start_review(self):
         """Start review process"""
         for payment in self:
@@ -325,9 +356,7 @@ class AccountPayment(models.Model):
             })
             
             payment._post_activity_log('Payment review started')
-            payment._send_notification_email('under_review')
-    
-    def action_approve(self):
+            payment._send_notification_email('under_review')    def action_approve(self):
         """Approve payment"""
         for payment in self:
             if payment.voucher_state != 'under_review':
@@ -396,6 +425,49 @@ class AccountPayment(models.Model):
             payment._post_activity_log('Payment reset to draft')
     
     # =============================================================================
+    # REPORT & VERIFICATION ACTIONS
+    # =============================================================================
+    
+    def action_qr_verification_view(self):
+        """Open QR verification view"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.verification_url,
+            'target': 'new',
+        }
+    
+    def action_print_payment_voucher(self):
+        """Print payment voucher report"""
+        self.ensure_one()
+        return self.env.ref('account_payment_approval.action_report_payment_voucher').report_action(self)
+    
+    def action_print_receipt_voucher(self):
+        """Print receipt voucher report"""
+        self.ensure_one()
+        return self.env.ref('account_payment_approval.action_report_receipt_voucher').report_action(self)
+    
+    def action_email_payment_voucher(self):
+        """Email payment voucher"""
+        self.ensure_one()
+        template = self.env.ref('account_payment_approval.email_template_payment_voucher', raise_if_not_found=False)
+        if template:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'mail.compose.message',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_model': 'account.payment',
+                    'default_res_id': self.id,
+                    'default_template_id': template.id,
+                    'force_email': True,
+                }
+            }
+        else:
+            raise UserError(_("Email template not found"))
+
+    # =============================================================================
     # HELPER METHODS
     # =============================================================================
     
@@ -404,10 +476,10 @@ class AccountPayment(models.Model):
         user = self.env.user
         
         permission_map = {
-            'review': 'account_payment_approval.group_payment_reviewer',
-            'approve': 'account_payment_approval.group_payment_approver',
-            'authorize': 'account_payment_approval.group_payment_authorizer',
-            'reset': 'account_payment_approval.group_payment_manager',
+            'review': 'account_payment_approval.group_payment_voucher_reviewer',
+            'approve': 'account_payment_approval.group_payment_voucher_approver',
+            'authorize': 'account_payment_approval.group_payment_voucher_authorizer',
+            'reset': 'account_payment_approval.group_payment_voucher_manager',
         }
         
         group_xmlid = permission_map.get(action)

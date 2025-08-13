@@ -1,53 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Digital Signature Component Templates -->
-<templates>
+<templates xml:space="preserve">
+    
     <!-- Digital Signature Widget Template -->
     <t t-name="account_payment_approval.DigitalSignatureWidget" owl="1">
-        <div class="digital-signature-widget">
-            <div class="signature-header">
-                <h4 class="mb-3">
-                    <i class="fa fa-edit me-2"></i>
-                    Digital Signature
-                </h4>
+        <div class="o_digital_signature_widget" t-att-class="props.readonly ? 'o_readonly' : ''">
+            <div class="o_signature_header">
+                <h6 class="mb-2">
+                    <i class="fa fa-edit"/> Digital Signature
+                </h6>
+                <div class="o_signature_controls" t-if="!state.isReadonly">
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-danger" 
+                            t-on-click="clearSignature"
+                            t-att-disabled="!state.hasSignature">
+                        <i class="fa fa-trash"/> Clear
+                    </button>
+                </div>
             </div>
-
-            <div class="signature-content">
-                <div t-if="!state.signatureData" class="signature-canvas-container">
-                    <div class="signature-instructions mb-3">
-                        <p class="text-muted">
-                            <i class="fa fa-info-circle me-1"></i>
-                            Please sign in the area below to authenticate this action
-                        </p>
-                    </div>
-
-                    <div class="signature-canvas-wrapper">
-                        <canvas t-ref="signatureCanvas" class="signature-canvas" width="500" height="200"></canvas>
-                        <div class="signature-canvas-overlay" t-if="state.isEmpty">
-                            <span class="signature-placeholder">Click and drag to sign</span>
-                        </div>
-                    </div>
-
-                    <div class="signature-controls mt-3">
-                        <button class="btn btn-primary me-2" t-on-click="saveSignature" t-if="!state.isEmpty">
-                            <i class="fa fa-check me-1"></i>
-                            Save Signature
-                        </button>
-                        <button class="btn btn-secondary me-2" t-on-click="clearSignature">
-                            <i class="fa fa-eraser me-1"></i>
-                            Clear
-                        </button>
-                        <button class="btn btn-outline-secondary" t-on-click="togglePenMode">
-                            <i t-att-class="'fa fa-' + (state.penMode ? 'mouse-pointer' : 'pencil') + ' me-1'"></i>
-                            <span t-if="state.penMode">Touch Mode</span>
-                            <span t-else="">Pen Mode</span>
-                        </button>
-                    </div>
-
-                    <div class="signature-settings mt-2">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="form-label">Pen Color:</label>
-                                <input type="color" class="form-control form-control-color" t-att-value="state.penColor" t-on-change="changePenColor"/>
+            
+            <div class="o_signature_canvas_container">
+                <canvas t-ref="signatureCanvas" 
+                        class="o_signature_canvas"
+                        width="400" 
+                        height="200"
+                        t-att-class="state.isReadonly ? 'readonly' : ''">
+                </canvas>
+                
+                <div class="o_signature_placeholder" 
+                     t-if="!state.hasSignature and !state.isReadonly">
+                    <i class="fa fa-pencil-square-o fa-2x text-muted"/>
+                    <p class="text-muted mt-2">Click and drag to sign</p>
+                </div>
+                
+                <div class="o_signature_readonly_message" 
+                     t-if="state.isReadonly and !state.hasSignature">
+                    <i class="fa fa-info-circle text-muted"/>
+                    <p class="text-muted">No signature provided</p>
+                </div>
+            </div>
+            
+            <div class="o_signature_footer mt-2" t-if="state.hasSignature">
+                <small class="text-success">
+                    <i class="fa fa-check-circle"/> Signature captured
+                </small>
+            </div>
+        </div>
+    </t>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Pen Size:</label>
@@ -328,15 +327,5 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" t-on-click="closeModal">Close</button>
-                        <button type="button" class="btn btn-primary" t-on-click="downloadCertificate" t-if="state.result and state.result.valid">
-                            <i class="fa fa-download me-1"></i>
-                            Download Certificate
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </t>
 </templates>

@@ -3,23 +3,28 @@
 import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
+import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class DigitalSignatureWidget extends Component {
     static template = "account_payment_approval.DigitalSignatureWidget";
     static props = { ...standardFieldProps };
 
     setup() {
+        this.notification = useService("notification");
         this.state = useState({
             isDrawing: false,
             hasSignature: false,
             signatureData: null,
             penColor: "#000000",
             penWidth: 2,
+            isReadonly: this.props.readonly || false,
         });
 
         this.canvasRef = useRef("signatureCanvas");
         this.lastX = 0;
         this.lastY = 0;
+        this.paths = [];
 
         onMounted(() => {
             this.setupCanvas();
@@ -38,6 +43,193 @@ export class DigitalSignatureWidget extends Component {
         const ctx = canvas.getContext("2d");
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
+        ctx.strokeStyle = this.state.penColor;
+        ctx.lineWidth = this.state.penWidth;
+
+        // Set canvas dimensions
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        // Event listeners for drawing
+        if (!this.state.isReadonly) {
+            canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+            canvas.addEventListener('mousemove', this.draw.bind(this));
+            canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+            canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
+
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', this.startDrawingTouch.bind(this));
+            canvas.addEventListener('touchmove', this.drawTouch.bind(this));
+            canvas.addEventListener('touchend', this.stopDrawing.bind(this));
+        }
+    }
+
+    loadExistingSignature() {
+        const signatureData = this.props.record.data[this.props.name];
+        if (signatureData) {
+            this.state.hasSignature = true;
+            this.state.signatureData = signatureData;
+            this.displaySignature(signatureData);
+        }
+    }
+
+    displaySignature(data) {
+        const canvas = this.canvasRef.el;
+        if (!canvas || !data) return;
+
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
+        };
+        img.src = `data:image/png;base64,${data}`;
+    }
+
+    getMousePos(e) {
+        const canvas = this.canvasRef.el;
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+
+    getTouchPos(e) {
+        const canvas = this.canvasRef.el;
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    }
+
+    startDrawing(e) {
+        if (this.state.isReadonly) return;
+        
+        this.state.isDrawing = true;
+        const pos = this.getMousePos(e);
+        this.lastX = pos.x;
+        this.lastY = pos.y;
+    }
+
+    startDrawingTouch(e) {
+        e.preventDefault();
+        if (this.state.isReadonly) return;
+        
+        this.state.isDrawing = true;
+        const pos = this.getTouchPos(e);
+        this.lastX = pos.x;
+        this.lastY = pos.y;
+    }
+
+    draw(e) {
+        if (!this.state.isDrawing || this.state.isReadonly) return;
+
+        const canvas = this.canvasRef.el;
+        const ctx = canvas.getContext("2d");
+        const pos = this.getMousePos(e);
+
+        ctx.beginPath();
+        ctx.moveTo(this.lastX, this.lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+
+        this.lastX = pos.x;
+        this.lastY = pos.y;
+    }
+
+    drawTouch(e) {
+        e.preventDefault();
+        if (!this.state.isDrawing || this.state.isReadonly) return;
+
+        const canvas = this.canvasRef.el;
+        const ctx = canvas.getContext("2d");
+        const pos = this.getTouchPos(e);
+
+        ctx.beginPath();
+        ctx.moveTo(this.lastX, this.lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+
+        this.lastX = pos.x;
+        this.lastY = pos.y;
+    }
+
+    stopDrawing() {
+        if (this.state.isDrawing) {
+            this.state.isDrawing = false;
+            this.state.hasSignature = true;
+            this.saveSignature();
+        }
+    }
+
+    saveSignature() {
+        const canvas = this.canvasRef.el;
+        if (!canvas) return;
+
+        try {
+            const dataURL = canvas.toDataURL('image/png');
+            const base64Data = dataURL.split(',')[1];
+            
+            this.state.signatureData = base64Data;
+            
+            // Update the record
+            this.props.record.update({
+                [this.props.name]: base64Data
+            });
+
+            this.notification.add(_t("Signature saved successfully"), {
+                type: "success",
+            });
+        } catch (error) {
+            this.notification.add(_t("Error saving signature: %s", error.message), {
+                type: "danger",
+            });
+        }
+    }
+
+    clearSignature() {
+        if (this.state.isReadonly) return;
+
+        const canvas = this.canvasRef.el;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        this.state.hasSignature = false;
+        this.state.signatureData = null;
+        
+        // Update the record
+        this.props.record.update({
+            [this.props.name]: false
+        });
+
+        this.notification.add(_t("Signature cleared"), {
+            type: "info",
+        });
+    }
+
+    cleanup() {
+        const canvas = this.canvasRef.el;
+        if (canvas) {
+            canvas.removeEventListener('mousedown', this.startDrawing);
+            canvas.removeEventListener('mousemove', this.draw);
+            canvas.removeEventListener('mouseup', this.stopDrawing);
+            canvas.removeEventListener('mouseout', this.stopDrawing);
+            canvas.removeEventListener('touchstart', this.startDrawingTouch);
+            canvas.removeEventListener('touchmove', this.drawTouch);
+            canvas.removeEventListener('touchend', this.stopDrawing);
+        }
+    }
+}
+
+registry.category("fields").add("digital_signature", DigitalSignatureWidget);
         ctx.strokeStyle = this.state.penColor;
         ctx.lineWidth = this.state.penWidth;
 

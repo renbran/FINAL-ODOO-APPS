@@ -8,8 +8,8 @@ access_account_payment_qr_verifier,account.payment.qr.verifier,account.model_acc
 access_payment_approval_config_user,payment.approval.config.user,model_payment_approval_config,group_payment_voucher_user,1,0,0,0
 access_payment_approval_config_manager,payment.approval.config.manager,model_payment_approval_config,group_payment_voucher_manager,1,1,1,1
 access_payment_report_wizard_user,payment.report.wizard.user,model_payment_report_wizard,group_payment_voucher_user,1,1,1,1
-access_payment_bulk_report_wizard_user,payment.bulk.report.wizard.user,model_payment_bulk_report_wizard,group_payment_voucher_user,1,1,1,1
 access_payment_bulk_approval_wizard_user,payment.bulk.approval.wizard.user,model_payment_bulk_approval_wizard,group_payment_voucher_reviewer,1,1,1,1
+access_payment_rejection_wizard_user,payment.rejection.wizard.user,model_payment_rejection_wizard,group_payment_voucher_reviewer,1,1,1,1
 access_account_move_user,account.move.user,account.model_account_move,group_payment_voucher_user,1,1,1,0
 access_account_move_reviewer,account.move.reviewer,account.model_account_move,group_payment_voucher_reviewer,1,1,1,0
 access_account_move_manager,account.move.manager,account.model_account_move,group_payment_voucher_manager,1,1,1,1
