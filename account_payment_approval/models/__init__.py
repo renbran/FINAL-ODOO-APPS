@@ -21,5 +21,7 @@
 #############################################################################
 from . import account_move
 from . import account_payment
-from . import res_config_settings
+from . import mail_template
+from . import payment_approval_config
 from . import payment_report_wizard
+from . import res_config_settings

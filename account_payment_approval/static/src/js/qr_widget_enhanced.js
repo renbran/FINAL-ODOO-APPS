@@ -44,16 +44,16 @@ export class QRCodeWidget extends Component {
             textArea.value = this.state.verificationUrl;
             document.body.appendChild(textArea);
             textArea.select();
-            document.execCommand('copy');
+            document.execCommand("copy");
             document.body.removeChild(textArea);
-            
+
             this.notification.add(_t("URL copied to clipboard"), { type: "success" });
         }
     }
 
     openVerificationUrl() {
         if (this.state.verificationUrl) {
-            window.open(this.state.verificationUrl, '_blank');
+            window.open(this.state.verificationUrl, "_blank");
         }
     }
 }

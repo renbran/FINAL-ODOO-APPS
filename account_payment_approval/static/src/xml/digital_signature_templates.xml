@@ -1,331 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Digital Signature Component Templates -->
 <templates xml:space="preserve">
-    
-    <!-- Digital Signature Widget Template -->
     <t t-name="account_payment_approval.DigitalSignatureWidget" owl="1">
         <div class="o_digital_signature_widget" t-att-class="props.readonly ? 'o_readonly' : ''">
             <div class="o_signature_header">
                 <h6 class="mb-2">
-                    <i class="fa fa-edit"/> Digital Signature
+                    <i class="fa fa-edit"/>
+ Digital Signature
                 </h6>
                 <div class="o_signature_controls" t-if="!state.isReadonly">
-                    <button type="button" 
-                            class="btn btn-sm btn-outline-danger" 
-                            t-on-click="clearSignature"
-                            t-att-disabled="!state.hasSignature">
-                        <i class="fa fa-trash"/> Clear
+                    <button type="button" class="btn btn-sm btn-outline-danger" t-on-click="clearSignature" t-att-disabled="!state.hasSignature">
+                        <i class="fa fa-trash"/>
+ Clear
                     </button>
                 </div>
             </div>
-            
             <div class="o_signature_canvas_container">
-                <canvas t-ref="signatureCanvas" 
-                        class="o_signature_canvas"
-                        width="400" 
-                        height="200"
-                        t-att-class="state.isReadonly ? 'readonly' : ''">
+                <canvas t-ref="signatureCanvas" class="o_signature_canvas" width="400" height="200" t-att-class="state.isReadonly ? 'readonly' : ''">
                 </canvas>
-                
-                <div class="o_signature_placeholder" 
-                     t-if="!state.hasSignature and !state.isReadonly">
+                <div class="o_signature_placeholder" t-if="!state.hasSignature and !state.isReadonly">
                     <i class="fa fa-pencil-square-o fa-2x text-muted"/>
                     <p class="text-muted mt-2">Click and drag to sign</p>
                 </div>
-                
-                <div class="o_signature_readonly_message" 
-                     t-if="state.isReadonly and !state.hasSignature">
+                <div class="o_signature_readonly_message" t-if="state.isReadonly and !state.hasSignature">
                     <i class="fa fa-info-circle text-muted"/>
                     <p class="text-muted">No signature provided</p>
                 </div>
             </div>
-            
             <div class="o_signature_footer mt-2" t-if="state.hasSignature">
                 <small class="text-success">
-                    <i class="fa fa-check-circle"/> Signature captured
+                    <i class="fa fa-check-circle"/>
+ Signature captured
                 </small>
             </div>
         </div>
-    </t>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Pen Size:</label>
-                                <input type="range" class="form-range" min="1" max="10" t-att-value="state.penSize" t-on-input="changePenSize"/>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Background:</label>
-                                <select class="form-select" t-on-change="changeBackground">
-                                    <option value="white">White</option>
-                                    <option value="transparent">Transparent</option>
-                                    <option value="grid">Grid</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div t-if="state.signatureData" class="signature-display">
-                    <div class="signature-image-container">
-                        <img t-att-src="'data:image/png;base64,' + state.signatureData" class="signature-image" alt="Digital Signature"/>
-                    </div>
-
-                    <div class="signature-info mt-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Signed By:</strong>
-                                <p t-esc="state.signerName || props.currentUser"/>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Signed At:</strong>
-                                <p t-esc="state.signatureTime"/>
-                            </div>
-                        </div>
-                        <div class="row" t-if="state.signatureHash">
-                            <div class="col-12">
-                                <strong>Signature Hash:</strong>
-                                <p class="text-monospace small" t-esc="state.signatureHash"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="signature-actions mt-3">
-                        <button class="btn btn-success me-2" t-on-click="verifySignature">
-                            <i class="fa fa-shield-alt me-1"></i>
-                            Verify
-                        </button>
-                        <button class="btn btn-info me-2" t-on-click="downloadSignature">
-                            <i class="fa fa-download me-1"></i>
-                            Download
-                        </button>
-                        <button class="btn btn-outline-secondary me-2" t-on-click="editSignature">
-                            <i class="fa fa-edit me-1"></i>
-                            Edit
-                        </button>
-                        <button class="btn btn-danger" t-on-click="removeSignature">
-                            <i class="fa fa-trash me-1"></i>
-                            Remove
-                        </button>
-                    </div>
-                </div>
-
-                <div t-if="state.verificationResult" class="signature-verification mt-3">
-                    <div t-att-class="'alert alert-' + (state.verificationResult.valid ? 'success' : 'danger')">
-                        <h6>
-                            <i t-att-class="'fa fa-' + (state.verificationResult.valid ? 'check-circle' : 'exclamation-triangle') + ' me-2'"></i>
-                            Signature <span t-esc="state.verificationResult.valid ? 'Verified' : 'Invalid'"/>
-                        </h6>
-                        <p t-esc="state.verificationResult.message"/>
-                        <div t-if="state.verificationResult.details">
-                            <small class="text-muted">
-                                <strong>Details:</strong>
-                                <span t-esc="state.verificationResult.details"/>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Loading Overlay -->
-                <div class="signature-loading-overlay" t-if="state.loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Processing signature...</p>
-                </div>
-            </div>
-        </div>
-    </t>
-
-    <!-- Signature History Template -->
-    <t t-name="account_payment_approval.SignatureHistory" owl="1">
-        <div class="signature-history">
-            <div class="history-header">
-                <h5>
-                    <i class="fa fa-history me-2"></i>
-                    Signature History
-                </h5>
-            </div>
-
-            <div class="history-timeline">
-                <div t-foreach="state.signatures" t-as="signature" t-key="signature.id" class="timeline-item">
-                    <div class="timeline-marker">
-                        <i class="fa fa-edit"></i>
-                    </div>
-
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h6 t-esc="signature.action_type"/>
-                            <small class="text-muted" t-esc="signature.timestamp"/>
-                        </div>
-
-                        <div class="timeline-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <p>
-                                        <strong>Signed by:</strong>
-                                        <span t-esc="signature.user_name"/>
-                                    </p>
-                                    <p t-if="signature.notes">
-                                        <strong>Notes:</strong>
-                                        <span t-esc="signature.notes"/>
-                                    </p>
-                                </div>
-                                <div class="col-md-4 text-end">
-                                    <img t-att-src="'data:image/png;base64,' + signature.signature_data" class="signature-thumbnail" alt="Signature"/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="timeline-footer">
-                            <button class="btn btn-sm btn-outline-primary me-2" t-on-click="viewSignature" t-att-data-signature-id="signature.id">
-                                <i class="fa fa-eye me-1"></i>
-                                View
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" t-on-click="verifySignature" t-att-data-signature-id="signature.id">
-                                <i class="fa fa-shield-alt me-1"></i>
-                                Verify
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div t-if="state.signatures.length === 0" class="empty-history text-center py-4">
-                <i class="fa fa-edit fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No signatures found for this payment</p>
-            </div>
-        </div>
-    </t>
-
-    <!-- Mobile Signature Template -->
-    <t t-name="account_payment_approval.MobileSignature" owl="1">
-        <div class="mobile-signature-widget">
-            <div class="mobile-header text-center mb-3">
-                <h4>Digital Signature Required</h4>
-                <p class="text-muted">Please provide your signature to continue</p>
-            </div>
-
-            <div class="mobile-signature-canvas">
-                <canvas t-ref="mobileSignatureCanvas" class="mobile-canvas" width="350" height="150"></canvas>
-
-                <div class="mobile-canvas-overlay" t-if="state.isEmpty">
-                    <span class="mobile-placeholder">Touch and drag to sign</span>
-                </div>
-            </div>
-
-            <div class="mobile-controls mt-3">
-                <div class="row">
-                    <div class="col-6">
-                        <button class="btn btn-secondary w-100" t-on-click="clearMobileSignature">
-                            <i class="fa fa-eraser me-1"></i>
-                            Clear
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-primary w-100" t-on-click="saveMobileSignature" t-if="!state.isEmpty">
-                            <i class="fa fa-check me-1"></i>
-                            Save
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mobile-tips mt-3">
-                <div class="alert alert-info">
-                    <small>
-                        <i class="fa fa-lightbulb me-1"></i>
-                        <strong>Tip:</strong> For best results, use your finger or stylus to sign clearly within the box.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </t>
-
-    <!-- Signature Verification Modal Template -->
-    <t t-name="account_payment_approval.SignatureVerificationModal" owl="1">
-        <div class="modal fade" tabindex="-1" t-ref="verificationModal">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fa fa-shield-alt me-2"></i>
-                            Signature Verification
-                        </h5>
-                        <button type="button" class="btn-close" t-on-click="closeModal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div t-if="state.verifying" class="text-center py-4">
-                            <div class="spinner-border text-primary mb-3" role="status"></div>
-                            <p>Verifying signature authenticity...</p>
-                        </div>
-
-                        <div t-if="!state.verifying and state.result">
-                            <div class="verification-result">
-                                <div t-att-class="'alert alert-' + (state.result.valid ? 'success' : 'danger')">
-                                    <h6 class="mb-2">
-                                        <i t-att-class="'fa fa-' + (state.result.valid ? 'check-circle' : 'times-circle') + ' me-2'"></i>
-                                        Signature is <span t-esc="state.result.valid ? 'Valid' : 'Invalid'"/>
-                                    </h6>
-                                    <p t-esc="state.result.message"/>
-                                </div>
-
-                                <div class="signature-details mt-3">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <h6>Signature Details:</h6>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <strong>Signer:</strong>
-                                                    <span t-esc="state.result.signer"/>
-                                                </li>
-                                                <li>
-                                                    <strong>Timestamp:</strong>
-                                                    <span t-esc="state.result.timestamp"/>
-                                                </li>
-                                                <li>
-                                                    <strong>Hash:</strong>
-                                                    <span class="text-monospace small" t-esc="state.result.hash"/>
-                                                </li>
-                                                <li>
-                                                    <strong>Algorithm:</strong>
-                                                    <span t-esc="state.result.algorithm"/>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-4 text-center">
-                                            <img t-att-src="state.result.signatureImage" class="signature-preview" alt="Signature"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div t-if="state.result.certificate" class="certificate-info mt-3">
-                                    <h6>Certificate Information:</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p>
-                                                <strong>Issuer:</strong>
-                                                <span t-esc="state.result.certificate.issuer"/>
-                                            </p>
-                                            <p>
-                                                <strong>Valid From:</strong>
-                                                <span t-esc="state.result.certificate.validFrom"/>
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>
-                                                <strong>Subject:</strong>
-                                                <span t-esc="state.result.certificate.subject"/>
-                                            </p>
-                                            <p>
-                                                <strong>Valid To:</strong>
-                                                <span t-esc="state.result.certificate.validTo"/>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
     </t>
 </templates>

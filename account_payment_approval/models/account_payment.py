@@ -356,7 +356,9 @@ class AccountPayment(models.Model):
             })
             
             payment._post_activity_log('Payment review started')
-            payment._send_notification_email('under_review')    def action_approve(self):
+            payment._send_notification_email('under_review')
+    
+    def action_approve(self):
         """Approve payment"""
         for payment in self:
             if payment.voucher_state != 'under_review':
