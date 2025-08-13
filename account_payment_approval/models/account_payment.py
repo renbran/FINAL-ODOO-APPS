@@ -485,6 +485,30 @@ class AccountPayment(models.Model):
             }
         }
 
+    def action_view_signatures(self):
+        """View digital signatures for this payment"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Digital Signatures'),
+            'res_model': 'payment.digital.signature',
+            'view_mode': 'tree,form',
+            'domain': [('payment_id', '=', self.id)],
+            'context': {'default_payment_id': self.id}
+        }
+
+    def action_view_verifications(self):
+        """View QR verifications for this payment"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('QR Verifications'),
+            'res_model': 'payment.qr.verification',
+            'view_mode': 'tree,form',
+            'domain': [('payment_id', '=', self.id)],
+            'context': {'default_payment_id': self.id}
+        }
+
     # =============================================================================
     # HELPER METHODS
     # =============================================================================
