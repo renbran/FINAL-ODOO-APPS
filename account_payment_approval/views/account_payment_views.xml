@@ -104,7 +104,6 @@
                 <filter name="voucher_state_rejected" string="Rejected" domain="[('voucher_state', '=', 'rejected')]"/>
                 <separator/>
                 <filter name="requires_approval" string="Requires Approval" domain="[('requires_approval', '=', True)]"/>
-                <filter name="can_approve" string="I Can Approve" domain="[('is_approve_person', '=', True)]"/>
             </xpath>
 
             <!-- Add groupby options -->
