@@ -469,6 +469,22 @@ class AccountPayment(models.Model):
         else:
             raise UserError(_("Email template not found"))
 
+    def action_print_multiple_reports(self):
+        """Open wizard for multiple report options"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Payment Report Options'),
+            'res_model': 'payment.report.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_payment_id': self.id,
+                'default_report_types': 'enhanced',
+                'default_format_type': 'pdf',
+            }
+        }
+
     # =============================================================================
     # HELPER METHODS
     # =============================================================================
