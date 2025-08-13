@@ -8,6 +8,9 @@
 
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class PaymentRejectionWizard(models.TransientModel):
@@ -311,29 +314,32 @@ class PaymentRejectionWizard(models.TransientModel):
     
     def _escalate_to_manager(self):
         """Escalate rejection to manager"""
-        manager = self.env.user.employee_id.parent_id.user_id
-        if not manager:
-            # Find manager through approval configuration
-            config = self.payment_id._get_approval_config()
-            if config and config.escalation_manager_id:
-                manager = config.escalation_manager_id
-        
-        if manager:
-            # Create escalation record
-            escalation_vals = {
-                'payment_id': self.payment_id.id,
-                'escalated_by_id': self.env.user.id,
-                'escalated_to_id': manager.id,
-                'escalation_date': fields.Datetime.now(),
-                'escalation_reason': f"Payment rejection escalation: {self.rejection_category}",
-                'original_rejection_reason': self.rejection_reason,
-                'status': 'pending',
-            }
+        try:
+            manager = self.env.user.employee_id.parent_id.user_id
+            if not manager:
+                # Find manager through approval configuration
+                config = self.payment_id._get_approval_config()
+                if config and config.escalation_manager_id:
+                    manager = config.escalation_manager_id
             
-            escalation = self.env['payment.approval.escalation'].create(escalation_vals)
-            
-            # Send escalation notification
-            self._send_escalation_notification(escalation, manager)
+            if manager:
+                # Create escalation record
+                escalation_vals = {
+                    'payment_id': self.payment_id.id,
+                    'escalated_by_id': self.env.user.id,
+                    'escalated_to_id': manager.id,
+                    'escalation_date': fields.Datetime.now(),
+                    'escalation_reason': f"Payment rejection escalation: {self.rejection_category}",
+                    'original_rejection_reason': self.rejection_reason,
+                    'status': 'pending',
+                }
+                
+                escalation = self.env['payment.approval.escalation'].create(escalation_vals)
+                
+                # Send escalation notification
+                self._send_escalation_notification(escalation, manager)
+        except Exception as e:
+            _logger.warning("Failed to escalate to manager: %s", str(e))
     
     def _send_escalation_notification(self, escalation, manager):
         """Send escalation notification to manager"""
