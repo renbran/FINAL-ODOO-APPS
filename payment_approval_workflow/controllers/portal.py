@@ -2,7 +2,7 @@ import base64
 from odoo import http, _
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal
-from werkzeug.security import safe_str_cmp as consteq
+from odoo.tools import consteq
 import logging
 
 _logger = logging.getLogger(__name__)
