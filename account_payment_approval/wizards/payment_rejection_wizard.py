@@ -8,9 +8,6 @@
 
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
-import logging
-
-_logger = logging.getLogger(__name__)
 
 
 class PaymentRejectionWizard(models.TransientModel):
@@ -99,13 +96,13 @@ class PaymentRejectionWizard(models.TransientModel):
     payment_amount = fields.Monetary(
         related='payment_id.amount',
         string='Payment Amount',
-        readonly=True,
-        currency_field='payment_currency_id'
+        currency_field='payment_currency_id',
+        readonly=True
     )
     
     payment_currency_id = fields.Many2one(
         related='payment_id.currency_id',
-        string='Payment Currency',
+        string='Currency',
         readonly=True
     )
     
@@ -116,7 +113,7 @@ class PaymentRejectionWizard(models.TransientModel):
     )
     
     payment_state = fields.Selection(
-        related='payment_id.voucher_state',
+        related='payment_id.approval_state',
         string='Current State',
         readonly=True
     )
@@ -142,10 +139,10 @@ class PaymentRejectionWizard(models.TransientModel):
     def _check_payment_state(self):
         """Validate that payment can be rejected"""
         for wizard in self:
-            if wizard.payment_id.voucher_state not in ['submitted', 'under_review', 'approved']:
+            if wizard.payment_id.approval_state not in ['submitted', 'under_review', 'approved']:
                 raise ValidationError(_(
                     "Payment cannot be rejected in current state: %s"
-                ) % dict(wizard.payment_id._fields['voucher_state'].selection)[wizard.payment_id.voucher_state])
+                ) % dict(wizard.payment_id._fields['approval_state'].selection)[wizard.payment_id.approval_state])
     
     # ========================================
     # Default Methods
@@ -214,7 +211,7 @@ class PaymentRejectionWizard(models.TransientModel):
         
         # Handle return to creator
         if self.return_to_creator:
-            self.payment_id.voucher_state = 'draft'
+            self.payment_id.approval_state = 'draft'
             self.payment_id.message_post(
                 body=_("Payment returned to creator for corrections."),
                 subtype_xmlid='mail.mt_note'
@@ -277,7 +274,7 @@ class PaymentRejectionWizard(models.TransientModel):
             'timestamp': fields.Datetime.now(),
             'notes': f"Rejection Category: {dict(self._fields['rejection_category'].selection)[self.rejection_category]}\n"
                     f"Reason: {self.rejection_reason}",
-            'stage_from': self.payment_id.voucher_state,
+            'stage_from': self.payment_id.approval_state,
             'stage_to': 'rejected',
         }
         
@@ -314,32 +311,29 @@ class PaymentRejectionWizard(models.TransientModel):
     
     def _escalate_to_manager(self):
         """Escalate rejection to manager"""
-        try:
-            manager = self.env.user.employee_id.parent_id.user_id
-            if not manager:
-                # Find manager through approval configuration
-                config = self.payment_id._get_approval_config()
-                if config and config.escalation_manager_id:
-                    manager = config.escalation_manager_id
+        manager = self.env.user.employee_id.parent_id.user_id
+        if not manager:
+            # Find manager through approval configuration
+            config = self.payment_id._get_approval_config()
+            if config and config.escalation_manager_id:
+                manager = config.escalation_manager_id
+        
+        if manager:
+            # Create escalation record
+            escalation_vals = {
+                'payment_id': self.payment_id.id,
+                'escalated_by_id': self.env.user.id,
+                'escalated_to_id': manager.id,
+                'escalation_date': fields.Datetime.now(),
+                'escalation_reason': f"Payment rejection escalation: {self.rejection_category}",
+                'original_rejection_reason': self.rejection_reason,
+                'status': 'pending',
+            }
             
-            if manager:
-                # Create escalation record
-                escalation_vals = {
-                    'payment_id': self.payment_id.id,
-                    'escalated_by_id': self.env.user.id,
-                    'escalated_to_id': manager.id,
-                    'escalation_date': fields.Datetime.now(),
-                    'escalation_reason': f"Payment rejection escalation: {self.rejection_category}",
-                    'original_rejection_reason': self.rejection_reason,
-                    'status': 'pending',
-                }
-                
-                escalation = self.env['payment.approval.escalation'].create(escalation_vals)
-                
-                # Send escalation notification
-                self._send_escalation_notification(escalation, manager)
-        except Exception as e:
-            _logger.warning("Failed to escalate to manager: %s", str(e))
+            escalation = self.env['payment.approval.escalation'].create(escalation_vals)
+            
+            # Send escalation notification
+            self._send_escalation_notification(escalation, manager)
     
     def _send_escalation_notification(self, escalation, manager):
         """Send escalation notification to manager"""

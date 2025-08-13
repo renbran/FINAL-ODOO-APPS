@@ -104,16 +104,14 @@
                 <filter name="voucher_state_rejected" string="Rejected" domain="[('voucher_state', '=', 'rejected')]"/>
                 <separator/>
                 <filter name="requires_approval" string="Requires Approval" domain="[('requires_approval', '=', True)]"/>
+                <filter name="can_approve" string="I Can Approve" domain="[('is_approve_person', '=', True)]"/>
             </xpath>
 
             <!-- Add groupby options -->
-            <xpath expr="//filter[@name='requires_approval']" position="after">
-                <separator/>
-                <group expand="0" string="Group By">
-                    <filter string="Voucher Type" name="group_voucher_type" domain="[]" context="{'group_by': 'voucher_type'}"/>
-                    <filter string="Reviewer" name="group_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
-                    <filter string="Approver" name="group_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
-                </group>
+            <xpath expr="//group" position="inside">
+                <filter string="Voucher Type" name="group_voucher_type" domain="[]" context="{'group_by': 'voucher_type'}"/>
+                <filter string="Reviewer" name="group_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
+                <filter string="Approver" name="group_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
             </xpath>
 
             <!-- Add search fields -->

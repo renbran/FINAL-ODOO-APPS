@@ -1,304 +1,238 @@
 # -*- coding: utf-8 -*-
-from odoo import http, _
-from odoo.http import request
-from odoo.exceptions import AccessError, UserError
-import logging
 import json
+import logging
+from odoo import http, fields, _
+from odoo.http import request, Response
+from odoo.exceptions import AccessError, UserError
 
 _logger = logging.getLogger(__name__)
 
 
-class AccountPaymentController(http.Controller):
+class PaymentApprovalController(http.Controller):
     """Controller for payment approval operations"""
 
     @http.route('/payment/approval/dashboard', type='http', auth='user', website=True)
     def payment_approval_dashboard(self, **kwargs):
-        """Dashboard for payment approval overview"""
+        """Payment approval dashboard"""
+        user = request.env.user
+        
+        # Get user's approval statistics
+        payments = request.env['account.payment'].search([])
+        
+        stats = {
+            'total_payments': len(payments),
+            'pending_approval': len(payments.filtered(lambda p: p.voucher_state in ['submitted', 'under_review'])),
+            'approved_today': len(payments.filtered(lambda p: p.voucher_state == 'approved' and 
+                                                   p.write_date.date() == fields.Date.today())),
+            'my_pending': len(payments.filtered(lambda p: p.voucher_state in ['submitted', 'under_review'] and
+                                              user.id in (p.assigned_reviewer_ids + p.assigned_approver_ids).ids)),
+        }
+        
+        return request.render('account_payment_approval.payment_approval_dashboard', {
+            'stats': stats,
+            'user': user,
+        })
+
+    @http.route('/payment/approval/bulk', type='json', auth='user', methods=['POST'])
+    def bulk_approval_action(self, payment_ids, action, **kwargs):
+        """Bulk approval action"""
         try:
-            # Check if user has access to payments
-            if not request.env.user.has_group('account_payment_approval.group_payment_voucher_user'):
-                raise AccessError(_("You don't have access to payment approvals."))
-
-            # Get payment statistics
-            Payment = request.env['account.payment']
-            
-            stats = {
-                'pending_review': Payment.search_count([('voucher_state', '=', 'submitted')]),
-                'pending_approval': Payment.search_count([('voucher_state', '=', 'reviewed')]),
-                'pending_authorization': Payment.search_count([('voucher_state', '=', 'approved')]),
-                'posted_today': Payment.search_count([
-                    ('voucher_state', '=', 'posted'),
-                    ('date', '=', request.env.context.get('today', fields.Date.today()))
-                ]),
-            }
-
-            # Get recent payments for current user
-            user_payments = Payment.search([
-                ('create_uid', '=', request.env.user.id)
-            ], order='create_date desc', limit=10)
-
-            return request.render('account_payment_approval.payment_dashboard_template', {
-                'stats': stats,
-                'user_payments': user_payments,
-                'page_name': 'Payment Approval Dashboard'
-            })
-
-        except Exception as e:
-            _logger.error("Error in payment approval dashboard: %s", str(e))
-            return request.render('website.404')
-
-    @http.route('/payment/approval/submit', type='json', auth='user', methods=['POST'], csrf=False)
-    def submit_payment_approval(self, payment_id=None, **kwargs):
-        """Submit payment for approval"""
-        try:
-            if not payment_id:
-                return {'error': 'Payment ID is required'}
-
-            payment = request.env['account.payment'].browse(int(payment_id))
-            if not payment.exists():
-                return {'error': 'Payment not found'}
-
-            # Check if user can submit
-            if not payment.can_submit_for_approval():
-                return {'error': 'Cannot submit this payment for approval'}
-
-            result = payment.action_submit_for_approval()
-            
-            return {
-                'success': True,
-                'message': _('Payment submitted for approval successfully'),
-                'new_state': payment.voucher_state
-            }
-
-        except Exception as e:
-            _logger.error("Error submitting payment approval: %s", str(e))
-            return {'error': str(e)}
-
-    @http.route('/payment/approval/review', type='json', auth='user', methods=['POST'], csrf=False)
-    def review_payment(self, payment_id=None, action=None, **kwargs):
-        """Review payment (approve or reject)"""
-        try:
-            if not payment_id or not action:
-                return {'error': 'Payment ID and action are required'}
-
-            payment = request.env['account.payment'].browse(int(payment_id))
-            if not payment.exists():
-                return {'error': 'Payment not found'}
-
-            if action == 'approve':
-                if not payment.can_review():
-                    return {'error': 'Cannot review this payment'}
-                result = payment.action_review()
-                message = _('Payment reviewed successfully')
-            elif action == 'reject':
-                if not payment.can_reject():
-                    return {'error': 'Cannot reject this payment'}
-                result = payment.action_reject()
-                message = _('Payment rejected')
-            else:
-                return {'error': 'Invalid action'}
-
-            return {
-                'success': True,
-                'message': message,
-                'new_state': payment.voucher_state
-            }
-
-        except Exception as e:
-            _logger.error("Error reviewing payment: %s", str(e))
-            return {'error': str(e)}
-
-    @http.route('/payment/approval/authorize', type='json', auth='user', methods=['POST'], csrf=False)
-    def authorize_payment(self, payment_id=None, **kwargs):
-        """Authorize payment"""
-        try:
-            if not payment_id:
-                return {'error': 'Payment ID is required'}
-
-            payment = request.env['account.payment'].browse(int(payment_id))
-            if not payment.exists():
-                return {'error': 'Payment not found'}
-
-            if not payment.can_authorize():
-                return {'error': 'Cannot authorize this payment'}
-
-            result = payment.action_authorize()
-            
-            return {
-                'success': True,
-                'message': _('Payment authorized successfully'),
-                'new_state': payment.voucher_state
-            }
-
-        except Exception as e:
-            _logger.error("Error authorizing payment: %s", str(e))
-            return {'error': str(e)}
-
-    @http.route('/payment/signature/capture', type='http', auth='user', website=True)
-    def signature_capture_page(self, payment_id=None, **kwargs):
-        """Page for capturing digital signatures"""
-        try:
-            if not payment_id:
-                return request.render('website.404')
-
-            payment = request.env['account.payment'].browse(int(payment_id))
-            if not payment.exists():
-                return request.render('website.404')
-
-            # Check if user can sign this payment
-            can_sign = False
-            signature_type = None
-
-            if payment.can_review() and request.env.user.has_group('account_payment_approval.group_payment_voucher_reviewer'):
-                can_sign = True
-                signature_type = 'reviewer'
-            elif payment.can_approve() and request.env.user.has_group('account_payment_approval.group_payment_voucher_approver'):
-                can_sign = True
-                signature_type = 'approver'
-            elif payment.can_authorize() and request.env.user.has_group('account_payment_approval.group_payment_voucher_authorizer'):
-                can_sign = True
-                signature_type = 'authorizer'
-
-            if not can_sign:
-                return request.render('account_payment_approval.signature_access_denied', {
-                    'payment': payment
-                })
-
-            return request.render('account_payment_approval.signature_capture_template', {
-                'payment': payment,
-                'signature_type': signature_type,
-                'page_name': f'Sign Payment {payment.voucher_number}'
-            })
-
-        except Exception as e:
-            _logger.error("Error in signature capture page: %s", str(e))
-            return request.render('website.404')
-
-    @http.route('/payment/signature/save', type='json', auth='user', methods=['POST'], csrf=False)
-    def save_signature(self, payment_id=None, signature_data=None, signature_type=None, **kwargs):
-        """Save digital signature"""
-        try:
-            if not all([payment_id, signature_data, signature_type]):
-                return {'error': 'Missing required parameters'}
-
-            payment = request.env['account.payment'].browse(int(payment_id))
-            if not payment.exists():
-                return {'error': 'Payment not found'}
-
-            # Validate signature type and permissions
-            if signature_type == 'reviewer' and not payment.can_review():
-                return {'error': 'Cannot sign as reviewer'}
-            elif signature_type == 'approver' and not payment.can_approve():
-                return {'error': 'Cannot sign as approver'}
-            elif signature_type == 'authorizer' and not payment.can_authorize():
-                return {'error': 'Cannot sign as authorizer'}
-
-            # Save signature
-            result = payment.save_digital_signature(signature_data, signature_type)
-            
-            if result:
-                return {
-                    'success': True,
-                    'message': _('Signature saved successfully'),
-                    'new_state': payment.voucher_state
-                }
-            else:
-                return {'error': 'Failed to save signature'}
-
-        except Exception as e:
-            _logger.error("Error saving signature: %s", str(e))
-            return {'error': str(e)}
-
-    @http.route('/payment/bulk/action', type='json', auth='user', methods=['POST'], csrf=False)
-    def bulk_payment_action(self, payment_ids=None, action=None, **kwargs):
-        """Bulk actions on payments"""
-        try:
-            if not payment_ids or not action:
-                return {'error': 'Payment IDs and action are required'}
-
             payments = request.env['account.payment'].browse(payment_ids)
+            
             if not payments:
-                return {'error': 'No valid payments found'}
-
-            results = []
+                return {'error': _('No payments selected')}
+            
+            # Check permissions
+            if not request.env.user.has_group('account_payment_approval.group_payment_approval_manager'):
+                return {'error': _('Insufficient permissions for bulk operations')}
+            
+            result = {'success': 0, 'failed': 0, 'messages': []}
+            
             for payment in payments:
                 try:
-                    if action == 'submit' and payment.can_submit_for_approval():
-                        payment.action_submit_for_approval()
-                        results.append({'id': payment.id, 'success': True})
-                    elif action == 'review' and payment.can_review():
-                        payment.action_review()
-                        results.append({'id': payment.id, 'success': True})
-                    elif action == 'approve' and payment.can_approve():
+                    if action == 'approve' and payment.voucher_state == 'under_review':
                         payment.action_approve()
-                        results.append({'id': payment.id, 'success': True})
-                    elif action == 'authorize' and payment.can_authorize():
+                        result['success'] += 1
+                    elif action == 'reject' and payment.voucher_state in ['submitted', 'under_review']:
+                        payment.action_reject()
+                        result['success'] += 1
+                    elif action == 'authorize' and payment.voucher_state == 'approved':
                         payment.action_authorize()
-                        results.append({'id': payment.id, 'success': True})
+                        result['success'] += 1
                     else:
-                        results.append({'id': payment.id, 'success': False, 'error': 'Action not allowed'})
+                        result['failed'] += 1
+                        result['messages'].append(f'Payment {payment.name}: Invalid state for {action}')
                 except Exception as e:
-                    results.append({'id': payment.id, 'success': False, 'error': str(e)})
-
-            success_count = len([r for r in results if r['success']])
+                    result['failed'] += 1
+                    result['messages'].append(f'Payment {payment.name}: {str(e)}')
             
-            return {
-                'success': True,
-                'message': f'{success_count} of {len(payment_ids)} payments processed successfully',
-                'results': results
-            }
-
+            return result
+            
         except Exception as e:
-            _logger.error("Error in bulk payment action: %s", str(e))
+            _logger.error(f"Bulk approval error: {e}")
             return {'error': str(e)}
 
-    @http.route('/payment/approval/api/stats', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_approval_stats(self, **kwargs):
-        """API endpoint for approval statistics"""
+    @http.route('/payment/approval/stats', type='json', auth='user')
+    def payment_approval_stats(self, **kwargs):
+        """Get payment approval statistics"""
         try:
-            Payment = request.env['account.payment']
+            domain = []
+            if not request.env.user.has_group('account_payment_approval.group_payment_approval_administrator'):
+                # Filter based on user permissions
+                user_groups = request.env.user.groups_id
+                if request.env.ref('account_payment_approval.group_payment_approval_reviewer') in user_groups:
+                    domain.append(('voucher_state', 'in', ['submitted', 'under_review']))
             
-            # Get user's permissions
-            user_groups = {
-                'can_submit': request.env.user.has_group('account_payment_approval.group_payment_voucher_user'),
-                'can_review': request.env.user.has_group('account_payment_approval.group_payment_voucher_reviewer'),
-                'can_approve': request.env.user.has_group('account_payment_approval.group_payment_voucher_approver'),
-                'can_authorize': request.env.user.has_group('account_payment_approval.group_payment_voucher_authorizer'),
-                'can_post': request.env.user.has_group('account_payment_approval.group_payment_voucher_poster'),
-                'is_manager': request.env.user.has_group('account_payment_approval.group_payment_voucher_manager'),
-            }
-
-            # Get statistics based on user permissions
-            stats = {}
+            payments = request.env['account.payment'].search(domain)
             
-            if user_groups['can_review']:
-                stats['pending_review'] = Payment.search_count([('voucher_state', '=', 'submitted')])
+            # Group by state
+            states_data = {}
+            for state in ['draft', 'submitted', 'under_review', 'approved', 'authorized', 'posted', 'rejected']:
+                states_data[state] = len(payments.filtered(lambda p: p.voucher_state == state))
             
-            if user_groups['can_approve']:
-                stats['pending_approval'] = Payment.search_count([('voucher_state', '=', 'reviewed')])
-            
-            if user_groups['can_authorize']:
-                stats['pending_authorization'] = Payment.search_count([('voucher_state', '=', 'approved')])
-            
-            if user_groups['can_post']:
-                stats['pending_posting'] = Payment.search_count([('voucher_state', '=', 'authorized')])
-
-            # Overall statistics for managers
-            if user_groups['is_manager']:
-                stats.update({
-                    'total_draft': Payment.search_count([('voucher_state', '=', 'draft')]),
-                    'total_submitted': Payment.search_count([('voucher_state', '=', 'submitted')]),
-                    'total_in_process': Payment.search_count([('voucher_state', 'in', ['submitted', 'reviewed', 'approved', 'authorized'])]),
-                    'total_posted': Payment.search_count([('voucher_state', '=', 'posted')]),
-                    'total_rejected': Payment.search_count([('voucher_state', '=', 'rejected')]),
+            # Monthly data
+            monthly_data = []
+            for month in range(1, 13):
+                month_payments = payments.filtered(lambda p: p.date.month == month if p.date else False)
+                monthly_data.append({
+                    'month': month,
+                    'count': len(month_payments),
+                    'amount': sum(month_payments.mapped('amount'))
                 })
-
+            
             return {
-                'success': True,
-                'stats': stats,
-                'user_permissions': user_groups
+                'states': states_data,
+                'monthly': monthly_data,
+                'total_amount': sum(payments.mapped('amount')),
+                'avg_processing_time': self._calculate_avg_processing_time(payments)
             }
-
+            
         except Exception as e:
-            _logger.error("Error getting approval stats: %s", str(e))
+            _logger.error(f"Stats error: {e}")
             return {'error': str(e)}
+
+    def _calculate_avg_processing_time(self, payments):
+        """Calculate average processing time in days"""
+        processed_payments = payments.filtered(lambda p: p.voucher_state in ['approved', 'authorized', 'posted'])
+        if not processed_payments:
+            return 0
+        
+        total_days = 0
+        count = 0
+        
+        for payment in processed_payments:
+            if payment.create_date and payment.write_date:
+                delta = payment.write_date - payment.create_date
+                total_days += delta.days
+                count += 1
+        
+        return total_days / count if count > 0 else 0
+
+    @http.route('/payment/approval/export', type='http', auth='user')
+    def export_payment_report(self, **kwargs):
+        """Export payment approval report"""
+        try:
+            # Get filters from kwargs
+            date_from = kwargs.get('date_from')
+            date_to = kwargs.get('date_to')
+            state = kwargs.get('state')
+            
+            domain = []
+            if date_from:
+                domain.append(('date', '>=', date_from))
+            if date_to:
+                domain.append(('date', '<=', date_to))
+            if state:
+                domain.append(('voucher_state', '=', state))
+            
+            payments = request.env['account.payment'].search(domain)
+            
+            # Generate report
+            report_data = self._generate_payment_report_data(payments)
+            
+            # Return as Excel file
+            response = request.make_response(
+                report_data,
+                headers=[
+                    ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                    ('Content-Disposition', 'attachment; filename="payment_approval_report.xlsx"')
+                ]
+            )
+            
+            return response
+            
+        except Exception as e:
+            _logger.error(f"Export error: {e}")
+            return request.redirect('/payment/approval/dashboard?error=' + str(e))
+
+    def _generate_payment_report_data(self, payments):
+        """Generate Excel report data"""
+        try:
+            import io
+            import xlsxwriter
+            
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output)
+            worksheet = workbook.add_worksheet('Payment Approval Report')
+            
+            # Headers
+            headers = [
+                'Payment Reference', 'Partner', 'Amount', 'Currency', 
+                'Date', 'State', 'Voucher State', 'Journal',
+                'Created By', 'Create Date', 'Last Update'
+            ]
+            
+            # Write headers
+            for col, header in enumerate(headers):
+                worksheet.write(0, col, header)
+            
+            # Write data
+            for row, payment in enumerate(payments, 1):
+                worksheet.write(row, 0, payment.name or '')
+                worksheet.write(row, 1, payment.partner_id.name or '')
+                worksheet.write(row, 2, payment.amount)
+                worksheet.write(row, 3, payment.currency_id.name or '')
+                worksheet.write(row, 4, payment.date.strftime('%Y-%m-%d') if payment.date else '')
+                worksheet.write(row, 5, payment.state or '')
+                worksheet.write(row, 6, payment.voucher_state or '')
+                worksheet.write(row, 7, payment.journal_id.name or '')
+                worksheet.write(row, 8, payment.create_uid.name or '')
+                worksheet.write(row, 9, payment.create_date.strftime('%Y-%m-%d %H:%M') if payment.create_date else '')
+                worksheet.write(row, 10, payment.write_date.strftime('%Y-%m-%d %H:%M') if payment.write_date else '')
+            
+            workbook.close()
+            output.seek(0)
+            return output.read()
+            
+        except ImportError:
+            # Fallback to CSV if xlsxwriter not available
+            return self._generate_csv_report_data(payments)
+
+    def _generate_csv_report_data(self, payments):
+        """Generate CSV report data as fallback"""
+        import io
+        import csv
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Headers
+        writer.writerow([
+            'Payment Reference', 'Partner', 'Amount', 'Currency', 
+            'Date', 'State', 'Voucher State', 'Journal'
+        ])
+        
+        # Data
+        for payment in payments:
+            writer.writerow([
+                payment.name or '',
+                payment.partner_id.name or '',
+                payment.amount,
+                payment.currency_id.name or '',
+                payment.date.strftime('%Y-%m-%d') if payment.date else '',
+                payment.state or '',
+                payment.voucher_state or '',
+                payment.journal_id.name or ''
+            ])
+        
+        return output.getvalue().encode('utf-8')
