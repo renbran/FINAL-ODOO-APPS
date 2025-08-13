@@ -11,7 +11,6 @@
         <field name="report_file">account_payment_approval.report_payment_voucher_document_enhanced</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="base.paperformat_a4"/>
         <field name="print_report_name">'Payment_Voucher_' + (object.voucher_number or object.name).replace('/', '_')</field>
     </record>
 
@@ -24,7 +23,6 @@
         <field name="report_file">account_payment_approval.report_payment_voucher_document_enhanced</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="base.paperformat_a4"/>
         <field name="print_report_name">'Receipt_Voucher_' + (object.voucher_number or object.name).replace('/', '_')</field>
         <field name="domain">[('payment_type', '=', 'inbound')]</field>
     </record>
@@ -38,7 +36,6 @@
         <field name="report_file">account_payment_approval.report_payment_audit_trail</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="base.paperformat_a4"/>
     </record>
 
     <!-- Update existing report actions to set proper domains -->
