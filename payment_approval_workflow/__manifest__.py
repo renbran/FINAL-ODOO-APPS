@@ -39,9 +39,9 @@
         'python': ['qrcode', 'uuid'],
     },
     'data': [
-        # Security
-        'security/ir.model.access.csv',
+        # Security groups must be loaded first
         'data/security_groups.xml',
+        'security/ir.model.access.csv',
         
         # Data
         'data/mail_templates.xml',
