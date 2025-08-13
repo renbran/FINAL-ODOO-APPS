@@ -147,6 +147,12 @@
                     <field name="can_approve" invisible="1"/>
                     <field name="can_authorize" invisible="1"/>
                     <field name="can_reject" invisible="1"/>
+                    <field name="move_id" invisible="1"/>
+                    <field name="verification_token" invisible="1"/>
+                    <field name="verification_url" invisible="1"/>
+                    <field name="review_signature" invisible="1"/>
+                    <field name="approval_signature" invisible="1"/>
+                    <field name="authorization_signature" invisible="1"/>
                 </field>
 
             </field>

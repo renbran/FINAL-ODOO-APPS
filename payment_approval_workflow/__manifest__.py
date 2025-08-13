@@ -53,8 +53,6 @@
         
         # Reports
         'reports/payment_report.xml',
-        
-        # Templates
         'templates/payment_verification_template.xml',
     ],
     'demo': [],
