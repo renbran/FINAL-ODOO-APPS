@@ -335,6 +335,20 @@
 
 <menuitem id="menu_audit_trail_report" name="Audit Trail Reports" parent="menu_payment_voucher_reports" action="action_report_voucher_audit_trail" sequence="30"/>
 
+<!-- Report Tools Menu Items -->
+<menuitem id="menu_payment_report_tools" name="Report Tools" parent="menu_payment_reports" sequence="40"/>
+
+<menuitem id="menu_single_report_wizard" name="Single Report Generator" parent="menu_payment_report_tools" action="action_payment_report_wizard" sequence="10"/>
+
+<menuitem id="menu_bulk_report_wizard" name="Bulk Report Generator" parent="menu_payment_report_tools" action="action_payment_bulk_report_wizard" sequence="20"/>
+
+<!-- Quick Reports Menu Items -->
+<menuitem id="menu_quick_reports" name="Quick Reports" parent="menu_payment_reports" sequence="50"/>
+
+<menuitem id="menu_today_payments_report" name="Today's Payments" parent="menu_quick_reports" action="action_print_today_payments" sequence="10"/>
+
+<menuitem id="menu_pending_approvals_report" name="Pending Approvals" parent="menu_quick_reports" action="action_print_pending_approvals" sequence="20"/>
+
 <!-- Add server action for bulk report generation -->
 <record id="action_bulk_print_vouchers" model="ir.actions.server">
 <field name="name">Bulk Print Vouchers</field>
