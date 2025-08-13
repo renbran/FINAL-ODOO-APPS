@@ -191,31 +191,28 @@
             <field name="inherit_id" ref="account.view_account_payment_search"/>
             <field name="arch" type="xml">
                 
-                <!-- Add approval state search -->
-                <field name="state" position="after">
+                <!-- Add approval state search fields -->
+                <xpath expr="//search" position="inside">
                     <field name="approval_state"/>
                     <field name="reviewer_id"/>
                     <field name="approver_id"/>
                     <field name="authorizer_id"/>
-                </field>
-
-                <!-- Add filters for approval states -->
-                <filter name="draft" position="after">
+                    
+                    <!-- Add filters for approval states -->
                     <separator/>
-                    <filter string="Draft" name="approval_draft" domain="[('approval_state', '=', 'draft')]"/>
-                    <filter string="Submitted" name="approval_submitted" domain="[('approval_state', '=', 'submitted')]"/>
+                    <filter string="Draft Approvals" name="approval_draft" domain="[('approval_state', '=', 'draft')]"/>
+                    <filter string="Submitted for Review" name="approval_submitted" domain="[('approval_state', '=', 'submitted')]"/>
                     <filter string="Reviewed" name="approval_reviewed" domain="[('approval_state', '=', 'reviewed')]"/>
                     <filter string="Approved" name="approval_approved" domain="[('approval_state', '=', 'approved')]"/>
                     <filter string="Authorized" name="approval_authorized" domain="[('approval_state', '=', 'authorized')]"/>
                     <filter string="Rejected" name="approval_rejected" domain="[('approval_state', '=', 'rejected')]"/>
-                </filter>
-
-                <!-- Add group by options -->
-                <filter name="group_by_partner_id" position="after">
-                    <filter string="Approval Status" name="group_by_approval_state" domain="[]" context="{'group_by': 'approval_state'}"/>
-                    <filter string="Reviewer" name="group_by_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
-                    <filter string="Approver" name="group_by_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
-                </filter>
+                    
+                    <!-- Add group by options -->
+                    <separator/>
+                    <filter string="Group by Approval Status" name="group_by_approval_state" domain="[]" context="{'group_by': 'approval_state'}"/>
+                    <filter string="Group by Reviewer" name="group_by_reviewer" domain="[]" context="{'group_by': 'reviewer_id'}"/>
+                    <filter string="Group by Approver" name="group_by_approver" domain="[]" context="{'group_by': 'approver_id'}"/>
+                </xpath>
 
             </field>
         </record>
