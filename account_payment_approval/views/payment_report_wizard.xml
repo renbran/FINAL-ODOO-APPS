@@ -60,27 +60,11 @@
                         </group>
                     </div>
                     
-                    <!-- Payment Information Preview -->
-                    <div class="wizard-section" invisible="not payment_id">
-                        <div class="wizard-section-title">Payment Information</div>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #f8f9fa; font-weight: bold;">Voucher Number:</td>
-                                <td style="padding: 5px; border: 1px solid #ddd;"><field name="payment_id" readonly="1" nolabel="1" string="" attrs="{'invisible': [('payment_id', '=', False)]}" options="{'no_open': True}"/></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #f8f9fa; font-weight: bold;">Partner:</td>
-                                <td style="padding: 5px; border: 1px solid #ddd;"><span t-field="payment_id.partner_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #f8f9fa; font-weight: bold;">Amount:</td>
-                                <td style="padding: 5px; border: 1px solid #ddd;"><span t-field="payment_id.amount"/> <span t-field="payment_id.currency_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px; border: 1px solid #ddd; background-color: #f8f9fa; font-weight: bold;">Status:</td>
-                                <td style="padding: 5px; border: 1px solid #ddd;"><span t-esc="payment_id.voucher_state.title().replace('_', ' ')"/></td>
-                            </tr>
-                        </table>
+                    <!-- Report Configuration Summary -->
+                    <div class="wizard-section">
+                        <div class="wizard-section-title">Report Configuration</div>
+                        <p><strong>Report Type:</strong> <field name="report_type" readonly="1" nolabel="1"/></p>
+                        <p><strong>Output Format:</strong> <field name="output_format" readonly="1" nolabel="1"/></p>
                     </div>
                 </sheet>
                 
@@ -121,11 +105,11 @@
                     <!-- Selected Payments Summary -->
                     <div class="wizard-section">
                         <div class="wizard-section-title">Selected Payments Summary</div>
-                        <p><strong>Number of Payments:</strong> <span t-esc="len(payment_ids)"/> payments selected</p>
-                        <p><strong>Total Amount:</strong> <span t-esc="sum(payment_ids.mapped('amount'))"/> (mixed currencies)</p>
+                        <p><strong>Number of Payments:</strong> <field name="total_payments_count" readonly="1" nolabel="1"/> payments selected</p>
+                        <p><strong>Total Amount:</strong> <field name="total_amount" readonly="1" nolabel="1" widget="monetary"/> (mixed currencies)</p>
                         <p><strong>Date Range:</strong> 
-                            <span t-esc="min(payment_ids.mapped('date')).strftime('%B %d, %Y') if payment_ids and min(payment_ids.mapped('date')) else 'N/A'"/> - 
-                            <span t-esc="max(payment_ids.mapped('date')).strftime('%B %d, %Y') if payment_ids and max(payment_ids.mapped('date')) else 'N/A'"/>
+                            <field name="date_from" readonly="1" nolabel="1"/> - 
+                            <field name="date_to" readonly="1" nolabel="1"/>
                         </p>
                     </div>
                 </sheet>
