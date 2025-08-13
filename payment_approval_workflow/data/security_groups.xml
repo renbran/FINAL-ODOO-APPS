@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Payment Reviewer Group -->
+        <record id="group_payment_reviewer" model="res.groups">
+            <field name="name">Payment Reviewer</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="comment">Can review submitted payments and move them to reviewed state</field>
+        </record>
+
+        <!-- Payment Approver Group -->
+        <record id="group_payment_approver" model="res.groups">
+            <field name="name">Payment Approver</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="comment">Can approve reviewed payments. Must also be a Payment Reviewer.</field>
+            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_reviewer'))]"/>
+        </record>
+
+        <!-- Payment Authorizer Group -->
+        <record id="group_payment_authorizer" model="res.groups">
+            <field name="name">Payment Authorizer</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="comment">Can authorize approved vendor payments. Must also be a Payment Approver and Reviewer.</field>
+            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_approver'))]"/>
+        </record>
+
+        <!-- Payment Admin Group -->
+        <record id="group_payment_admin" model="res.groups">
+            <field name="name">Payment Administrator</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="comment">Full access to payment approval workflow including reset capabilities</field>
+            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_authorizer'))]"/>
+        </record>
+
+        <!-- Record Rules -->
+        
+        <!-- Reviewers can only see submitted payments in their company -->
+        <record id="payment_reviewer_rule" model="ir.rule">
+            <field name="name">Payment Reviewer Access</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_reviewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Approvers can see reviewed and submitted payments in their company -->
+        <record id="payment_approver_rule" model="ir.rule">
+            <field name="name">Payment Approver Access</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_approver'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Authorizers can see all payments in their company -->
+        <record id="payment_authorizer_rule" model="ir.rule">
+            <field name="name">Payment Authorizer Access</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_authorizer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

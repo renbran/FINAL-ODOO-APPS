@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Payment Signature Wizard Form View -->
+        <record id="view_payment_signature_wizard_form" model="ir.ui.view">
+            <field name="name">payment.signature.wizard.form</field>
+            <field name="model">payment.signature.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Digital Signature">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="action_type" readonly="1" widget="selection"/>
+                                <span> Payment</span>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group>
+                                <field name="payment_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <label for="signature" string="Digital Signature" class="oe_edit_only"/>
+                                <field name="signature" widget="signature" required="1"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Additional Notes">
+                            <field name="notes" placeholder="Add any additional comments or notes here..."/>
+                        </group>
+                    </sheet>
+                    
+                    <footer>
+                        <button name="action_confirm_signature" 
+                                string="Confirm" 
+                                type="object" 
+                                class="btn-primary"/>
+                        <button string="Cancel" 
+                                class="btn-secondary" 
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Payment Rejection Wizard Form View -->
+        <record id="view_payment_rejection_wizard_form" model="ir.ui.view">
+            <field name="name">payment.rejection.wizard.form</field>
+            <field name="model">payment.rejection.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Reject Payment">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Reject Payment</h1>
+                        </div>
+                        
+                        <group>
+                            <field name="payment_id" readonly="1"/>
+                        </group>
+                        
+                        <group string="Rejection Details">
+                            <field name="rejection_reason" 
+                                   required="1" 
+                                   placeholder="Please provide a detailed reason for rejecting this payment..."
+                                   nolabel="1"/>
+                        </group>
+                        
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Warning:</strong> This action will reject the payment and notify the original creator. 
+                            The payment will need to be corrected and resubmitted for approval.
+                        </div>
+                    </sheet>
+                    
+                    <footer>
+                        <button name="action_confirm_rejection" 
+                                string="Confirm Rejection" 
+                                type="object" 
+                                class="btn-danger"/>
+                        <button string="Cancel" 
+                                class="btn-secondary" 
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>
