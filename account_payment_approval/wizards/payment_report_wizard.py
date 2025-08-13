@@ -60,6 +60,12 @@ class PaymentReportWizard(models.TransientModel):
         default=lambda self: self.env.company
     )
     
+    payment_id = fields.Many2one(
+        'account.payment',
+        string='Payment',
+        help="Specific payment for single report generation"
+    )
+    
     payment_ids = fields.Many2many(
         'account.payment',
         string='Specific Payments',

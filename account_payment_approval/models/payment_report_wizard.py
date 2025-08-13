@@ -210,6 +210,28 @@ class PaymentBulkReportWizard(models.TransientModel):
     group_by_partner = fields.Boolean(string='Group by Partner', default=False)
     group_by_date = fields.Boolean(string='Group by Date', default=False)
     
+    # Computed fields for display
+    total_payments_count = fields.Integer(string='Total Payments', compute='_compute_summary_fields')
+    total_amount = fields.Float(string='Total Amount', compute='_compute_summary_fields')
+    date_from = fields.Date(string='From Date', compute='_compute_summary_fields')
+    date_to = fields.Date(string='To Date', compute='_compute_summary_fields')
+    
+    @api.depends('payment_ids')
+    def _compute_summary_fields(self):
+        """Compute summary fields for display"""
+        for wizard in self:
+            if wizard.payment_ids:
+                wizard.total_payments_count = len(wizard.payment_ids)
+                wizard.total_amount = sum(wizard.payment_ids.mapped('amount'))
+                dates = wizard.payment_ids.mapped('date')
+                wizard.date_from = min(dates) if dates else False
+                wizard.date_to = max(dates) if dates else False
+            else:
+                wizard.total_payments_count = 0
+                wizard.total_amount = 0.0
+                wizard.date_from = False
+                wizard.date_to = False
+    
     def action_generate_bulk_reports(self):
         """Generate bulk reports"""
         self.ensure_one()
