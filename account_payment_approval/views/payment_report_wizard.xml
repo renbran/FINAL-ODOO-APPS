@@ -42,21 +42,21 @@
                     <group>
                         <group>
                             <field name="payment_id" readonly="1"/>
-                            <field name="report_type" widget="radio"/>
-                            <field name="output_format" widget="radio"/>
+                            <field name="report_types" widget="radio"/>
+                            <field name="format_type" widget="radio"/>
                         </group>
                         <group>
-                            <field name="include_qr_codes"/>
+                            <field name="include_qr_code"/>
                             <field name="include_signatures"/>
-                            <field name="include_details"/>
+                            <field name="include_audit_trail"/>
                         </group>
                     </group>
 
                     <div class="wizard-section">
                         <div class="wizard-section-title">Email Options</div>
                         <group>
-                            <field name="email_report"/>
-                            <field name="email_recipients" invisible="not email_report" placeholder="recipient@example.com"/>
+                            <field name="send_email"/>
+                            <field name="email_recipient" invisible="not send_email" placeholder="recipient@example.com"/>
                         </group>
                     </div>
 
@@ -65,11 +65,11 @@
                         <div class="wizard-section-title">Report Configuration</div>
                         <p>
                             <strong>Report Type:</strong>
-                            <field name="report_type" readonly="1" nolabel="1"/>
+                            <field name="report_types" readonly="1" nolabel="1"/>
                         </p>
                         <p>
                             <strong>Output Format:</strong>
-                            <field name="output_format" readonly="1" nolabel="1"/>
+                            <field name="format_type" readonly="1" nolabel="1"/>
                         </p>
                     </div>
                 </sheet>
