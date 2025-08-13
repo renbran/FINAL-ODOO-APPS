@@ -1,74 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
         
-        <!-- Payment Reviewer Group -->
+        <!-- Security Groups for Payment Approval Workflow -->
+        
+        <!-- Payment Reviewer Group (Base Level) -->
         <record id="group_payment_reviewer" model="res.groups">
             <field name="name">Payment Reviewer</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Can review submitted payments and move them to reviewed state</field>
         </record>
 
-        <!-- Payment Approver Group -->
+        <!-- Payment Approver Group (Level 2) -->
         <record id="group_payment_approver" model="res.groups">
             <field name="name">Payment Approver</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Can approve reviewed payments. Must also be a Payment Reviewer.</field>
-            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_reviewer'))]"/>
         </record>
 
-        <!-- Payment Authorizer Group -->
+        <!-- Payment Authorizer Group (Level 3) -->
         <record id="group_payment_authorizer" model="res.groups">
             <field name="name">Payment Authorizer</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Can authorize approved vendor payments. Must also be a Payment Approver and Reviewer.</field>
-            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_approver'))]"/>
         </record>
 
-        <!-- Payment Admin Group -->
+        <!-- Payment Admin Group (Top Level) -->
         <record id="group_payment_admin" model="res.groups">
             <field name="name">Payment Administrator</field>
             <field name="category_id" ref="base.module_category_accounting"/>
             <field name="comment">Full access to payment approval workflow including reset capabilities</field>
+        </record>
+
+    </data>
+    
+    <!-- Second data section for group hierarchy setup -->
+    <data noupdate="1">
+        
+        <!-- Set up group hierarchy after all groups are created -->
+        <record id="group_payment_approver" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_reviewer'))]"/>
+        </record>
+
+        <record id="group_payment_authorizer" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_approver'))]"/>
+        </record>
+
+        <record id="group_payment_admin" model="res.groups">
             <field name="implied_ids" eval="[(4, ref('payment_approval_workflow.group_payment_authorizer'))]"/>
         </record>
 
-        <!-- Record Rules -->
+        <!-- Record Rules for Multi-Company Access -->
         
-        <!-- Reviewers can only see submitted payments in their company -->
+        <!-- Reviewers can see payments in workflow in their company -->
         <record id="payment_reviewer_rule" model="ir.rule">
-            <field name="name">Payment Reviewer Access</field>
+            <field name="name">Payment Reviewer Company Rule</field>
             <field name="model_id" ref="account.model_account_payment"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_reviewer'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- Approvers can see reviewed and submitted payments in their company -->
+        <!-- Approvers can see payments in their company -->
         <record id="payment_approver_rule" model="ir.rule">
-            <field name="name">Payment Approver Access</field>
+            <field name="name">Payment Approver Company Rule</field>
             <field name="model_id" ref="account.model_account_payment"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_approver'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- Authorizers can see all payments in their company -->
+        <!-- Authorizers can see payments in their company -->
         <record id="payment_authorizer_rule" model="ir.rule">
-            <field name="name">Payment Authorizer Access</field>
+            <field name="name">Payment Authorizer Company Rule</field>
             <field name="model_id" ref="account.model_account_payment"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_authorizer'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Admins can see all payments in their company -->
+        <record id="payment_admin_rule" model="ir.rule">
+            <field name="name">Payment Admin Company Rule</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('payment_approval_workflow.group_payment_admin'))]"/>
         </record>
 
     </data>
