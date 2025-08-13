@@ -21,35 +21,35 @@
                             string="Submit for Review" 
                             type="object" 
                             class="btn-primary"
-                            attrs="{'invisible': ['|', ('approval_state', '!=', 'draft'), ('can_submit', '=', False)]}"/>
+                            invisible="approval_state != 'draft' or not can_submit"/>
                     
                     <!-- Review -->
                     <button name="action_review" 
                             string="Review" 
                             type="object" 
                             class="btn-success"
-                            attrs="{'invisible': ['|', ('approval_state', '!=', 'submitted'), ('can_review', '=', False)]}"/>
+                            invisible="approval_state != 'submitted' or not can_review"/>
                     
                     <!-- Approve -->
                     <button name="action_approve" 
                             string="Approve" 
                             type="object" 
                             class="btn-success"
-                            attrs="{'invisible': ['|', ('approval_state', '!=', 'reviewed'), ('can_approve', '=', False)]}"/>
+                            invisible="approval_state != 'reviewed' or not can_approve"/>
                     
                     <!-- Authorize (Vendor Payments Only) -->
                     <button name="action_authorize" 
                             string="Authorize" 
                             type="object" 
                             class="btn-success"
-                            attrs="{'invisible': ['|', '|', ('approval_state', '!=', 'approved'), ('payment_type', '!=', 'outbound'), ('can_authorize', '=', False)]}"/>
+                            invisible="approval_state != 'approved' or payment_type != 'outbound' or not can_authorize"/>
                     
                     <!-- Reject -->
                     <button name="action_reject" 
                             string="Reject" 
                             type="object" 
                             class="btn-danger"
-                            attrs="{'invisible': ['|', ('approval_state', 'not in', ['submitted', 'reviewed', 'approved']), ('can_reject', '=', False)]}"/>
+                            invisible="approval_state not in ['submitted', 'reviewed', 'approved'] or not can_reject"/>
                     
                     <!-- Reset to Draft (Admin Only) -->
                     <button name="action_reset_to_draft" 
@@ -57,7 +57,7 @@
                             type="object" 
                             class="btn-warning"
                             groups="base.group_system"
-                            attrs="{'invisible': [('approval_state', '=', 'draft')]}"/>
+                            invisible="approval_state == 'draft'"/>
                 </header>
 
                 <!-- Smart Buttons -->
@@ -67,7 +67,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-book"
-                            attrs="{'invisible': [('move_id', '=', False)]}">
+                            invisible="not move_id">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_text">Journal</span>
                             <span class="o_stat_text">Entry</span>
@@ -79,7 +79,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-qrcode"
-                            attrs="{'invisible': [('verification_token', '=', False)]}">
+                            invisible="not verification_token">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_text">QR</span>
                             <span class="o_stat_text">Verification</span>
@@ -89,20 +89,20 @@
 
                 <!-- Make form readonly when not in draft -->
                 <sheet position="attributes">
-                    <attribute name="attrs">{'readonly': [('approval_state', 'not in', ['draft', 'rejected'])]}</attribute>
+                    <attribute name="readonly">approval_state not in ['draft', 'rejected']</attribute>
                 </sheet>
 
                 <!-- Add approval fields to the form -->
                 <field name="ref" position="after">
                     <!-- Verification Token and QR Code -->
-                    <field name="verification_token" readonly="1" attrs="{'invisible': [('verification_token', '=', False)]}"/>
-                    <field name="verification_url" widget="url" readonly="1" attrs="{'invisible': [('verification_url', '=', False)]}"/>
+                    <field name="verification_token" readonly="1" invisible="not verification_token"/>
+                    <field name="verification_url" widget="url" readonly="1" invisible="not verification_url"/>
                 </field>
 
                 <!-- Add approval tracking information -->
                 <field name="currency_id" position="after">
                     <!-- Approval Tracking Fields -->
-                    <group string="Approval Tracking" attrs="{'invisible': [('approval_state', '=', 'draft')]}">
+                    <group string="Approval Tracking" invisible="approval_state == 'draft'">
                         <group>
                             <field name="submitted_by_id" readonly="1"/>
                             <field name="submission_date" readonly="1"/>
@@ -112,29 +112,29 @@
                         <group>
                             <field name="approver_id" readonly="1"/>
                             <field name="approval_date" readonly="1"/>
-                            <field name="authorizer_id" readonly="1" attrs="{'invisible': [('payment_type', '!=', 'outbound')]}"/>
-                            <field name="authorization_date" readonly="1" attrs="{'invisible': [('payment_type', '!=', 'outbound')]}"/>
+                            <field name="authorizer_id" readonly="1" invisible="payment_type != 'outbound'"/>
+                            <field name="authorization_date" readonly="1" invisible="payment_type != 'outbound'"/>
                         </group>
                     </group>
                 </field>
 
                 <!-- Add rejection reason -->
                 <field name="ref" position="after">
-                    <field name="rejection_reason" readonly="1" attrs="{'invisible': [('approval_state', '!=', 'rejected')]}"/>
+                    <field name="rejection_reason" readonly="1" invisible="approval_state != 'rejected'"/>
                 </field>
 
                 <!-- Add QR Code Image -->
                 <notebook position="inside">
-                    <page string="QR Code &amp; Signatures" attrs="{'invisible': [('approval_state', '=', 'draft')]}">
+                    <page string="QR Code &amp; Signatures" invisible="approval_state == 'draft'">
                         <group>
                             <group string="QR Code Verification">
                                 <field name="qr_code_image" widget="image" class="oe_avatar"/>
                                 <field name="verification_url" widget="url" readonly="1"/>
                             </group>
                             <group string="Digital Signatures">
-                                <field name="review_signature" widget="image" attrs="{'invisible': [('review_signature', '=', False)]}"/>
-                                <field name="approval_signature" widget="image" attrs="{'invisible': [('approval_signature', '=', False)]}"/>
-                                <field name="authorization_signature" widget="image" attrs="{'invisible': [('authorization_signature', '=', False)]}"/>
+                                <field name="review_signature" widget="image" invisible="not review_signature"/>
+                                <field name="approval_signature" widget="image" invisible="not approval_signature"/>
+                                <field name="authorization_signature" widget="image" invisible="not authorization_signature"/>
                             </group>
                         </group>
                     </page>
@@ -169,7 +169,7 @@
                 </field>
 
                 <!-- Add reviewer information -->
-                <field name="amount" position="after">
+                <field name="state" position="after">
                     <field name="reviewer_id" string="Reviewed By" optional="hide"/>
                     <field name="approver_id" string="Approved By" optional="hide"/>
                     <field name="authorizer_id" string="Authorized By" optional="hide"/>
