@@ -1,169 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- System Parameters for Payment Approval -->
+    <data noupdate="1">
 
-    <!-- Default Approval Thresholds -->
-    <record id="param_payment_approval_threshold" model="ir.config_parameter">
-        <field name="key">account_payment_approval.payment_approval_threshold</field>
-        <field name="value">1000.0</field>
-    </record>
+        <!-- Payment Approval Thresholds -->
+        <record id="param_outbound_approval_threshold" model="ir.config_parameter">
+            <field name="key">account_payment_approval.outbound_approval_threshold</field>
+            <field name="value">1000.0</field>
+        </record>
 
-    <record id="param_receipt_approval_threshold" model="ir.config_parameter">
-        <field name="key">account_payment_approval.receipt_approval_threshold</field>
-        <field name="value">5000.0</field>
-    </record>
+        <record id="param_inbound_approval_threshold" model="ir.config_parameter">
+            <field name="key">account_payment_approval.inbound_approval_threshold</field>
+            <field name="value">5000.0</field>
+        </record>
 
-    <record id="param_transfer_approval_threshold" model="ir.config_parameter">
-        <field name="key">account_payment_approval.transfer_approval_threshold</field>
-        <field name="value">2000.0</field>
-    </record>
+        <!-- Multi-tier Approval Thresholds -->
+        <record id="param_tier_2_threshold" model="ir.config_parameter">
+            <field name="key">account_payment_approval.tier_2_threshold</field>
+            <field name="value">10000.0</field>
+        </record>
 
-    <!-- Multi-tier Thresholds -->
-    <record id="param_tier_2_threshold" model="ir.config_parameter">
-        <field name="key">account_payment_approval.tier_2_threshold</field>
-        <field name="value">10000.0</field>
-    </record>
+        <record id="param_tier_3_threshold" model="ir.config_parameter">
+            <field name="key">account_payment_approval.tier_3_threshold</field>
+            <field name="value">50000.0</field>
+        </record>
 
-    <record id="param_tier_3_threshold" model="ir.config_parameter">
-        <field name="key">account_payment_approval.tier_3_threshold</field>
-        <field name="value">50000.0</field>
-    </record>
+        <!-- Workflow Settings -->
+        <record id="param_auto_submit_on_create" model="ir.config_parameter">
+            <field name="key">account_payment_approval.auto_submit_on_create</field>
+            <field name="value">False</field>
+        </record>
 
-    <!-- Workflow Settings -->
-    <record id="param_auto_submit_on_create" model="ir.config_parameter">
-        <field name="key">account_payment_approval.auto_submit_on_create</field>
-        <field name="value">False</field>
-    </record>
+        <record id="param_require_signature_all_stages" model="ir.config_parameter">
+            <field name="key">account_payment_approval.require_signature_all_stages</field>
+            <field name="value">True</field>
+        </record>
 
-    <record id="param_require_signature_all_stages" model="ir.config_parameter">
-        <field name="key">account_payment_approval.require_signature_all_stages</field>
-        <field name="value">True</field>
-    </record>
+        <record id="param_enable_qr_verification" model="ir.config_parameter">
+            <field name="key">account_payment_approval.enable_qr_verification</field>
+            <field name="value">True</field>
+        </record>
 
-    <record id="param_enable_qr_verification" model="ir.config_parameter">
-        <field name="key">account_payment_approval.enable_qr_verification</field>
-        <field name="value">True</field>
-    </record>
+        <record id="param_auto_post_after_qr_validation" model="ir.config_parameter">
+            <field name="key">account_payment_approval.auto_post_after_qr_validation</field>
+            <field name="value">False</field>
+        </record>
 
-    <record id="param_enable_email_notifications" model="ir.config_parameter">
-        <field name="key">account_payment_approval.enable_email_notifications</field>
-        <field name="value">True</field>
-    </record>
+        <!-- Email Notification Settings -->
+        <record id="param_send_email_notifications" model="ir.config_parameter">
+            <field name="key">account_payment_approval.send_email_notifications</field>
+            <field name="value">True</field>
+        </record>
 
-    <!-- Time Limits (in hours) -->
-    <record id="param_review_time_limit" model="ir.config_parameter">
-        <field name="key">account_payment_approval.review_time_limit</field>
-        <field name="value">24</field>
-    </record>
+        <record id="param_notification_email_template" model="ir.config_parameter">
+            <field name="key">account_payment_approval.notification_email_template</field>
+            <field name="value">account_payment_approval.email_template_payment_submitted</field>
+        </record>
 
-    <record id="param_approval_time_limit" model="ir.config_parameter">
-        <field name="key">account_payment_approval.approval_time_limit</field>
-        <field name="value">48</field>
-    </record>
+        <!-- QR Code Settings -->
+        <record id="param_qr_code_expiry_days" model="ir.config_parameter">
+            <field name="key">account_payment_approval.qr_code_expiry_days</field>
+            <field name="value">30</field>
+        </record>
 
-    <record id="param_authorization_time_limit" model="ir.config_parameter">
-        <field name="key">account_payment_approval.authorization_time_limit</field>
-        <field name="value">72</field>
-    </record>
+        <record id="param_qr_max_scan_attempts" model="ir.config_parameter">
+            <field name="key">account_payment_approval.qr_max_scan_attempts</field>
+            <field name="value">10</field>
+        </record>
 
-    <!-- Urgency Multipliers -->
-    <record id="param_urgent_multiplier" model="ir.config_parameter">
-        <field name="key">account_payment_approval.urgent_multiplier</field>
-        <field name="value">0.5</field>
-    </record>
+        <!-- Security Settings -->
+        <record id="param_require_2fa_for_authorization" model="ir.config_parameter">
+            <field name="key">account_payment_approval.require_2fa_for_authorization</field>
+            <field name="value">False</field>
+        </record>
 
-    <record id="param_high_multiplier" model="ir.config_parameter">
-        <field name="key">account_payment_approval.high_multiplier</field>
-        <field name="value">0.7</field>
-    </record>
+        <record id="param_log_all_workflow_actions" model="ir.config_parameter">
+            <field name="key">account_payment_approval.log_all_workflow_actions</field>
+            <field name="value">True</field>
+        </record>
 
-    <record id="param_medium_multiplier" model="ir.config_parameter">
-        <field name="key">account_payment_approval.medium_multiplier</field>
-        <field name="value">1.0</field>
-    </record>
+        <!-- Company Specific Settings -->
+        <record id="param_company_logo_in_reports" model="ir.config_parameter">
+            <field name="key">account_payment_approval.company_logo_in_reports</field>
+            <field name="value">True</field>
+        </record>
 
-    <record id="param_low_multiplier" model="ir.config_parameter">
-        <field name="key">account_payment_approval.low_multiplier</field>
-        <field name="value">1.2</field>
-    </record>
+        <record id="param_default_payment_journal" model="ir.config_parameter">
+            <field name="key">account_payment_approval.default_payment_journal</field>
+            <field name="value"></field>
+        </record>
 
-    <!-- Bulk Operations -->
-    <record id="param_enable_bulk_approval" model="ir.config_parameter">
-        <field name="key">account_payment_approval.enable_bulk_approval</field>
-        <field name="value">True</field>
-    </record>
+        <!-- Bulk Operations Settings -->
+        <record id="param_max_bulk_operations" model="ir.config_parameter">
+            <field name="key">account_payment_approval.max_bulk_operations</field>
+            <field name="value">50</field>
+        </record>
 
-    <record id="param_max_bulk_approval_count" model="ir.config_parameter">
-        <field name="key">account_payment_approval.max_bulk_approval_count</field>
-        <field name="value">50</field>
-    </record>
+        <record id="param_enable_bulk_approvals" model="ir.config_parameter">
+            <field name="key">account_payment_approval.enable_bulk_approvals</field>
+            <field name="value">True</field>
+        </record>
 
-    <!-- QR Code Settings -->
-    <record id="param_qr_code_size" model="ir.config_parameter">
-        <field name="key">account_payment_approval.qr_code_size</field>
-        <field name="value">200</field>
-    </record>
-
-    <record id="param_qr_code_error_correction" model="ir.config_parameter">
-        <field name="key">account_payment_approval.qr_code_error_correction</field>
-        <field name="value">M</field>
-    </record>
-
-    <!-- Security Settings -->
-    <record id="param_token_expiry_days" model="ir.config_parameter">
-        <field name="key">account_payment_approval.token_expiry_days</field>
-        <field name="value">365</field>
-    </record>
-
-    <record id="param_max_verification_attempts" model="ir.config_parameter">
-        <field name="key">account_payment_approval.max_verification_attempts</field>
-        <field name="value">1000</field>
-    </record>
-
-    <!-- OSUS Branding -->
-    <record id="param_company_name" model="ir.config_parameter">
-        <field name="key">account_payment_approval.company_name</field>
-        <field name="value">OSUS Properties</field>
-    </record>
-
-    <record id="param_company_logo_url" model="ir.config_parameter">
-        <field name="key">account_payment_approval.company_logo_url</field>
-        <field name="value">/account_payment_approval/static/description/icon.png</field>
-    </record>
-
-    <record id="param_primary_color" model="ir.config_parameter">
-        <field name="key">account_payment_approval.primary_color</field>
-        <field name="value">#1f4788</field>
-    </record>
-
-    <record id="param_secondary_color" model="ir.config_parameter">
-        <field name="key">account_payment_approval.secondary_color</field>
-        <field name="value">#f8f9fa</field>
-    </record>
-
-    <!-- Default Payment Approval Configuration -->
-    <record id="default_payment_approval_config" model="payment.approval.config">
-        <field name="name">Default OSUS Configuration</field>
-        <field name="active">True</field>
-        <field name="sequence">1</field>
-        <field name="payment_approval_threshold">1000.0</field>
-        <field name="receipt_approval_threshold">5000.0</field>
-        <field name="transfer_approval_threshold">2000.0</field>
-        <field name="tier_2_threshold">10000.0</field>
-        <field name="tier_3_threshold">50000.0</field>
-        <field name="auto_submit_on_create">False</field>
-        <field name="require_signature_all_stages">True</field>
-        <field name="enable_qr_verification">True</field>
-        <field name="enable_email_notifications">True</field>
-        <field name="review_time_limit">24</field>
-        <field name="approval_time_limit">48</field>
-        <field name="authorization_time_limit">72</field>
-        <field name="urgent_multiplier">0.5</field>
-        <field name="high_multiplier">0.7</field>
-        <field name="medium_multiplier">1.0</field>
-        <field name="low_multiplier">1.2</field>
-        <field name="enable_bulk_approval">True</field>
-        <field name="max_bulk_approval_count">50</field>
-        <field name="require_comment_on_reject">True</field>
-    </record>
+    </data>
 </odoo>
