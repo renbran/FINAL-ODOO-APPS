@@ -1,249 +1,84 @@
-/* OSUS Branding - Clean Version */
-/* Odoo 17 compatible - no variables dependencies */
-
-/* ============================================================================ */
-/* OSUS BRAND COLORS */
-/* ============================================================================ */
+/* OSUS Branding Styles - CloudPepper Optimized */
+/* Core OSUS brand colors and styling */
 
 :root {
-    /* OSUS Brand Colors */
     --osus-primary: #722f37;
-    --osus-primary-dark: #5c252a;
-    --osus-primary-light: #8a3b43;
     --osus-secondary: #b8860b;
-    --osus-white: #ffffff;
-    --osus-gray-light: #f8f9fa;
-    --osus-gray-dark: #343a40;
-
-    /* Button hover effects */
-    --osus-hover-opacity: 0.85;
-    --osus-transition: all 0.2s ease-in-out;
+    --osus-accent: #8b3a42;
+    --osus-light: #f8f9fa;
+    --osus-border: #dee2e6;
 }
 
-/* ============================================================================ */
-/* OSUS BUTTON STYLES */
-/* ============================================================================ */
-
-.osus_primary_btn,
-.btn.osus_primary_btn {
-    background-color: var(--osus-primary) !important;
-    border-color: var(--osus-primary) !important;
-    color: var(--osus-white) !important;
-    font-weight: 600;
-    transition: var(--osus-transition);
-    text-shadow: none;
-    box-shadow: 0 2px 4px rgba(114, 47, 55, 0.2);
-}
-
-.osus_primary_btn:hover,
-.btn.osus_primary_btn:hover {
-    background-color: var(--osus-primary-dark) !important;
-    border-color: var(--osus-primary-dark) !important;
-    color: var(--osus-white) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(114, 47, 55, 0.3);
-}
-
-.osus_primary_btn:focus,
-.btn.osus_primary_btn:focus {
-    background-color: var(--osus-primary) !important;
-    border-color: var(--osus-primary) !important;
-    color: var(--osus-white) !important;
-    box-shadow: 0 0 0 0.2rem rgba(114, 47, 55, 0.5);
-}
-
-.osus_success_btn,
-.btn.osus_success_btn {
-    background-color: #198754 !important;
-    border-color: #198754 !important;
-    color: var(--osus-white) !important;
-    font-weight: 600;
-    transition: var(--osus-transition);
-    box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
-}
-
-.osus_success_btn:hover,
-.btn.osus_success_btn:hover {
-    background-color: #157347 !important;
-    border-color: #157347 !important;
-    color: var(--osus-white) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
-}
-
-.osus_danger_btn,
-.btn.osus_danger_btn {
-    background-color: #dc3545 !important;
-    border-color: #dc3545 !important;
-    color: var(--osus-white) !important;
-    font-weight: 600;
-    transition: var(--osus-transition);
-    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
-}
-
-.osus_danger_btn:hover,
-.btn.osus_danger_btn:hover {
-    background-color: #bb2d3b !important;
-    border-color: #bb2d3b !important;
-    color: var(--osus-white) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
-
-/* ============================================================================ */
-/* OSUS SMART BUTTON STYLES */
-/* ============================================================================ */
-
-.oe_stat_button.osus_primary_button {
-    background: linear-gradient(135deg, var(--osus-primary), var(--osus-primary-light));
-    border: 2px solid var(--osus-primary);
-    color: var(--osus-white) !important;
-    transition: var(--osus-transition);
-    border-radius: 8px;
-    font-weight: 600;
-}
-
-.oe_stat_button.osus_primary_button:hover {
-    background: linear-gradient(135deg, var(--osus-primary-dark), var(--osus-primary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(114, 47, 55, 0.3);
-}
-
-.oe_stat_button.osus_primary_button .o_stat_info .o_stat_value,
-.oe_stat_button.osus_primary_button .o_stat_info .o_stat_text {
-    color: var(--osus-white) !important;
-}
-
-.oe_stat_button.osus_secondary_button {
-    background: var(--osus-white);
-    border: 2px solid var(--osus-primary);
-    color: var(--osus-primary) !important;
-    transition: var(--osus-transition);
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.oe_stat_button.osus_secondary_button:hover {
-    background: var(--osus-primary);
-    color: var(--osus-white) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(114, 47, 55, 0.2);
-}
-
-.oe_stat_button.osus_secondary_button:hover .o_stat_info .o_stat_value,
-.oe_stat_button.osus_secondary_button:hover .o_stat_info .o_stat_text {
-    color: var(--osus-white) !important;
-}
-
-.oe_stat_button.osus_secondary_button .o_stat_info .o_stat_value,
-.oe_stat_button.osus_secondary_button .o_stat_info .o_stat_text {
-    color: var(--osus-primary) !important;
-}
-
-.oe_stat_button.osus_accent_button {
-    background: var(--osus-white);
-    border: 2px solid var(--osus-secondary);
-    color: var(--osus-secondary) !important;
-    transition: var(--osus-transition);
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.oe_stat_button.osus_accent_button:hover {
-    background: var(--osus-secondary);
-    color: var(--osus-white) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(184, 134, 11, 0.2);
-}
-
-.oe_stat_button.osus_accent_button:hover .o_stat_info .o_stat_value,
-.oe_stat_button.osus_accent_button:hover .o_stat_info .o_stat_text {
-    color: var(--osus-white) !important;
-}
-
-/* ============================================================================ */
-/* WORKFLOW SECTION STYLING */
-/* ============================================================================ */
-
-.osus-workflow {
-    background: var(--osus-white);
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 8px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.osus-workflow .btn {
-    margin: 4px 8px 4px 0;
-    min-width: 140px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-/* ============================================================================ */
-/* PAYMENT SHEET ENHANCEMENTS */
-/* ============================================================================ */
-
-.payment-sheet {
-    background: var(--osus-white);
+// OSUS brand application
+.osus-brand {
     color: var(--osus-primary);
+
+    &.osus-primary {
+        background-color: var(--osus-primary);
+        color: white;
+    }
+
+    &.osus-secondary {
+        background-color: var(--osus-secondary);
+        color: var(--osus-primary);
+    }
 }
 
-.payment-sheet .oe_title {
+// Button theming
+.btn-osus-primary {
+    background-color: var(--osus-primary);
+    border-color: var(--osus-primary);
+    color: white;
+
+    &:hover,
+    &:focus {
+        background-color: #5c252a;
+        border-color: #5c252a;
+        color: white;
+    }
+}
+
+.btn-osus-secondary {
+    background-color: var(--osus-secondary);
+    border-color: var(--osus-secondary);
     color: var(--osus-primary);
-    font-weight: 700;
-    border-bottom: 2px solid var(--osus-primary);
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-}
 
-/* ============================================================================ */
-/* RESPONSIVE DESIGN */
-/* ============================================================================ */
-
-@media (max-width: 768px) {
-    .osus-workflow .btn {
-        width: 100%;
-        margin: 4px 0;
-        min-width: auto;
-    }
-
-    .oe_button_box {
-        flex-direction: column;
-    }
-
-    .oe_stat_button.osus_primary_button,
-    .oe_stat_button.osus_secondary_button,
-    .oe_stat_button.osus_accent_button {
-        width: 100%;
-        margin: 4px 0;
+    &:hover,
+    &:focus {
+        background-color: #996f09;
+        border-color: #996f09;
+        color: white;
     }
 }
 
-/* ============================================================================ */
-/* ACCESSIBILITY ENHANCEMENTS */
-/* ============================================================================ */
-
-.osus_primary_btn:focus,
-.osus_success_btn:focus,
-.osus_danger_btn:focus {
-    outline: 2px solid var(--osus-secondary);
-    outline-offset: 2px;
-}
-
-@media (prefers-contrast: high) {
-    .osus_primary_btn,
-    .osus_success_btn,
-    .osus_danger_btn {
-        border-width: 2px !important;
-        font-weight: 700;
+// Form branding
+.o_form_view.osus-branded {
+    .o_form_sheet {
+        border-top: 3px solid var(--osus-primary);
     }
 
-    .oe_stat_button.osus_primary_button,
-    .oe_stat_button.osus_secondary_button,
-    .oe_stat_button.osus_accent_button {
-        border-width: 3px !important;
+    .oe_title h1 {
+        color: var(--osus-primary);
+    }
+}
+
+// List view branding
+.o_list_view.osus-branded {
+    .o_list_table thead th {
+        background-color: var(--osus-light);
+        border-bottom: 2px solid var(--osus-primary);
+    }
+}
+
+// OSUS logo and header
+.osus-header {
+    background: linear-gradient(135deg, var(--osus-primary), var(--osus-accent));
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+
+    .osus-logo {
+        height: 40px;
+        filter: brightness(0) invert(1);
     }
 }

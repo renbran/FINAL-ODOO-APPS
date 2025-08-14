@@ -1,424 +1,161 @@
-/* Table Enhancements - Clean Version */
-/* Odoo 17 compatible - no variables dependencies */
+/* Table Enhancements - CloudPepper Optimized */
+/* Enhanced table styling for better readability */
 
-/* ============================================================================ */
-/* GENERAL TABLE IMPROVEMENTS */
-/* ============================================================================ */
+.o_list_table_enhanced {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: white;
 
-.o_list_view {
-    .o_list_table {
-        border-collapse: separate;
-        border-spacing: 0;
-        width: 100%;
+    thead {
+        th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
 
-        thead {
-            th {
-                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-                color: #1e293b;
-                font-weight: 600;
-                font-size: 13px;
-                padding: 18px 14px;
-                border-bottom: 2px solid #e2e8f0;
-                text-align: left;
-                white-space: nowrap;
-                position: relative;
-            }
-
-            th.o_column_sortable {
+            &.o_column_sortable {
                 cursor: pointer;
-            }
 
-            th.o_column_sortable:hover {
-                background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            }
-
-            th:first-child {
-                border-top-left-radius: 8px;
-                padding-left: 18px;
-            }
-
-            th:last-child {
-                border-top-right-radius: 8px;
-                padding-right: 18px;
+                &:hover {
+                    background: #e9ecef;
+                }
             }
         }
+    }
 
-        tbody {
-            tr {
-                transition: background-color 0.15s ease;
+    tbody {
+        tr {
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: rgba(114, 47, 55, 0.04);
+                transform: scale(1.01);
             }
 
-            tr:hover {
-                background-color: rgba(59, 130, 246, 0.05);
-            }
-
-            tr:nth-child(even) {
-                background-color: rgba(248, 250, 252, 0.5);
+            &.o_selected_row {
+                background-color: rgba(114, 47, 55, 0.08);
             }
 
             td {
-                padding: 16px 14px;
-                border-bottom: 1px solid #f1f5f9;
+                padding: 0.875rem 0.75rem;
+                border-bottom: 1px solid #f1f3f4;
                 vertical-align: middle;
+
+                &.o_list_number {
+                    text-align: right;
+                    font-weight: 500;
+                }
+
+                &.o_payment_amount_cell {
+                    font-weight: 600;
+                    color: var(--osus-primary, #722f37);
+                    font-size: 1.1rem;
+                }
+
+                &.o_payment_status_cell {
+                    text-align: center;
+
+                    .badge {
+                        padding: 0.375rem 0.75rem;
+                        border-radius: 20px;
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                    }
+                }
             }
 
-            td:first-child {
-                padding-left: 18px;
-            }
-
-            td:last-child {
-                padding-right: 18px;
-            }
-
-            td .o_field_widget {
-                margin: 0;
-            }
-
-            td .o_field_widget input {
-                min-height: 36px;
-                padding: 8px 12px;
-                border: 1.5px solid #e2e8f0;
-                border-radius: 6px;
-                font-size: 13px;
-                width: 100%;
-                background-color: #ffffff;
-                transition: all 0.2s ease;
-            }
-
-            td .o_field_widget input:focus {
-                border-color: #722f37;
-                box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
-                outline: none;
-            }
-
-            td .o_field_widget input:hover:not(:focus) {
-                border-color: #94a3b8;
-            }
-
-            td .o_field_widget textarea {
-                min-height: 36px;
-                padding: 8px 12px;
-                border: 1.5px solid #e2e8f0;
-                border-radius: 6px;
-                font-size: 13px;
-                width: 100%;
-                resize: vertical;
-            }
-
-            td .o_field_widget textarea:focus {
-                border-color: #722f37;
-                box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
-            }
-
-            td .o_field_widget select {
-                min-height: 36px;
-                padding: 8px 12px;
-                border: 1.5px solid #e2e8f0;
-                border-radius: 6px;
-                font-size: 13px;
-                width: 100%;
-                background-color: #ffffff;
-            }
-
-            td .o_field_widget select:focus {
-                border-color: #722f37;
-                box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
-            }
-        }
-    }
-}
-
-/* ============================================================================ */
-/* INVOICE LINES SPECIFIC IMPROVEMENTS */
-/* ============================================================================ */
-
-.o_field_one2many,
-.o_field_many2many {
-    margin: 24px 0;
-
-    .o_list_view {
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row.o_selected_row {
-        background-color: rgba(114, 47, 55, 0.08);
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row.o_selected_row td {
-        border-color: rgba(114, 47, 55, 0.2);
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_data_cell {
-        position: relative;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_char,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_many2one {
-        min-width: 180px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_char input,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_many2one input {
-        min-width: 160px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_text {
-        min-width: 150px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_text textarea {
-        min-width: 130px;
-        min-height: 60px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_number,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_float,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_monetary {
-        min-width: 120px;
-        text-align: right;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_number input,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_float input,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td.o_field_cell.o_list_monetary input {
-        text-align: right;
-        min-width: 100px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="quantity"] {
-        min-width: 100px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="quantity"] input {
-        text-align: center;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_unit"],
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_subtotal"],
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_total"] {
-        min-width: 130px;
-    }
-
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_unit"] input,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_subtotal"] input,
-    .o_list_view.o_list_editable .o_list_table tbody tr.o_data_row td[data-field="price_total"] input {
-        font-weight: 500;
-    }
-
-    .o_list_view .o_field_x2many_list_row_add {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-top: 1px solid #e2e8f0;
-        padding: 16px 18px;
-    }
-
-    .o_list_view .o_field_x2many_list_row_add a {
-        color: #722f37;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 10px 18px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.2s ease;
-        background-color: rgba(114, 47, 55, 0.05);
-        border: 1px solid rgba(114, 47, 55, 0.2);
-    }
-
-    .o_list_view .o_field_x2many_list_row_add a:hover {
-        background-color: rgba(114, 47, 55, 0.1);
-        border-color: rgba(114, 47, 55, 0.3);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(114, 47, 55, 0.2);
-    }
-
-    .o_list_view .o_field_x2many_list_row_add a i {
-        margin-right: 8px;
-        font-size: 14px;
-    }
-}
-
-/* ============================================================================ */
-/* FORM VIEW TABLE IMPROVEMENTS */
-/* ============================================================================ */
-
-.o_form_view .o_field_one2many,
-.o_form_view .o_field_many2many {
-    .o_list_view {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        overflow: hidden;
-        margin: 16px 0;
-
-        .o_list_table {
-            margin: 0;
-
-            thead th {
-                background-color: #f8fafc;
-                font-weight: 600;
-                color: #374151;
-                font-size: 13px;
-                padding: 16px 12px;
-                border-bottom: 2px solid #e5e7eb;
-                text-align: left;
-            }
-
-            thead th:first-child {
-                border-radius: 8px 0 0 0;
-            }
-
-            thead th:last-child {
-                border-radius: 0 8px 0 0;
-            }
-
-            tbody tr:hover {
-                background-color: #f8fafc;
-            }
-
-            tbody tr.o_data_row {
-                border-bottom: 1px solid #f3f4f6;
-            }
-
-            tbody tr.o_data_row:last-child {
+            &:last-child td {
                 border-bottom: none;
             }
+        }
+    }
+}
 
-            tbody tr td {
-                padding: 14px 12px;
-                vertical-align: middle;
-                border-right: 1px solid #f3f4f6;
+// Enhanced pagination
+.o_pager_enhanced {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+
+    .o_pager_controller {
+        display: flex;
+        gap: 0.25rem;
+
+        button {
+            border: 1px solid #dee2e6;
+            background: white;
+            color: #495057;
+            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+
+            &:hover {
+                background: #e9ecef;
+                border-color: #adb5bd;
             }
 
-            tbody tr td:last-child {
-                border-right: none;
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
+        }
+    }
 
-            tbody tr td .o_field_widget {
-                margin: 0;
-            }
+    .o_pager_value {
+        font-weight: 500;
+        color: #495057;
+        margin: 0 0.5rem;
+    }
+}
 
-            tbody tr td .o_field_widget input,
-            tbody tr td .o_field_widget textarea,
-            tbody tr td .o_field_widget select {
-                min-height: 38px;
-                padding: 8px 12px;
-                border: 1px solid #d1d5db;
-                border-radius: 6px;
-                font-size: 13px;
-                width: 100%;
-            }
+// Responsive table improvements
+@media (max-width: 768px) {
+    .o_list_table_enhanced {
+        thead th {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
 
-            tbody tr td .o_field_widget input:focus,
-            tbody tr td .o_field_widget textarea:focus,
-            tbody tr td .o_field_widget select:focus {
-                border-color: #722f37;
+        tbody td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+}
+
+// Table filters and search
+.o_table_controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #dee2e6;
+
+    .o_search_options {
+        display: flex;
+        gap: 0.75rem;
+
+        .o_searchview_input {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            background: white;
+
+            &:focus {
+                border-color: var(--osus-primary, #722f37);
+                outline: none;
                 box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.1);
             }
-
-            tbody tr td .o_field_widget.o_field_char input,
-            tbody tr td .o_field_widget.o_field_many2one input {
-                min-width: 150px;
-            }
-
-            tbody tr td .o_field_widget.o_field_text textarea {
-                min-width: 120px;
-                resize: vertical;
-            }
-
-            tbody tr td .o_field_widget.o_field_float input,
-            tbody tr td .o_field_widget.o_field_monetary input {
-                text-align: right;
-                min-width: 100px;
-            }
         }
-
-        .o_field_x2many_list_row_add {
-            padding: 12px;
-            border-top: 1px solid #e5e7eb;
-            background-color: #f8fafc;
-
-            a {
-                color: #722f37;
-                font-weight: 500;
-                text-decoration: none;
-                padding: 8px 16px;
-                border-radius: 6px;
-                transition: all 0.2s ease;
-            }
-
-            a:hover {
-                background-color: rgba(114, 47, 55, 0.1);
-                color: #5c252a;
-            }
-
-            a i {
-                margin-right: 6px;
-            }
-        }
-    }
-}
-
-/* ============================================================================ */
-/* RESPONSIVE TABLE IMPROVEMENTS */
-/* ============================================================================ */
-
-@media (max-width: 768px) {
-    .o_list_view .o_list_table {
-        thead th,
-        tbody td {
-            padding: 12px 8px;
-            font-size: 12px;
-        }
-
-        tbody td .o_field_widget input,
-        tbody td .o_field_widget textarea,
-        tbody td .o_field_widget select {
-            min-height: 32px;
-            padding: 6px 8px;
-            font-size: 12px;
-        }
-    }
-
-    .o_field_one2many .o_list_view .o_field_x2many_list_row_add,
-    .o_field_many2many .o_list_view .o_field_x2many_list_row_add {
-        padding: 12px;
-
-        a {
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-    }
-}
-
-/* ============================================================================ */
-/* ACCESSIBILITY IMPROVEMENTS */
-/* ============================================================================ */
-
-.o_list_view .o_list_table {
-    tbody tr:focus-within {
-        outline: 2px solid #722f37;
-        outline-offset: -2px;
-    }
-
-    thead th[aria-sort]::after {
-        content: "";
-        margin-left: 8px;
-        display: inline-block;
-        width: 0;
-        height: 0;
-    }
-
-    thead th[aria-sort="ascending"]::after {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 6px solid currentColor;
-    }
-
-    thead th[aria-sort="descending"]::after {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 6px solid currentColor;
     }
 }

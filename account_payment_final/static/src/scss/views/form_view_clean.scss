@@ -237,6 +237,8 @@
     .o_form_view.o_payment_form {
         .o_payment_header {
             background: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
         }
     }
 }

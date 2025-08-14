@@ -1,410 +1,149 @@
-/* Enhanced Form Field Styling - Clean Version */
-/* Odoo 17 compatible - no variables dependencies */
+/* Enhanced Form Styling - CloudPepper Optimized */
+/* Modern form enhancements for better UX */
 
-/* ============================================================================ */
-/* FORM FIELD ENHANCEMENTS */
-/* ============================================================================ */
-
-.o_form_view {
-    .o_field_widget {
-        input,
-        textarea,
-        select {
-            min-height: 42px !important;
-            padding: 10px 14px !important;
-            border: 1.5px solid #e5e7eb !important;
-            border-radius: 8px !important;
-            font-size: 14px !important;
-            line-height: 1.5 !important;
-            background-color: #ffffff !important;
-            transition: all 0.2s ease !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #722f37 !important;
-            box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1) !important;
-            outline: none !important;
-        }
-
-        input:hover:not(:focus),
-        textarea:hover:not(:focus),
-        select:hover:not(:focus) {
-            border-color: #9ca3af !important;
-        }
-
-        input[readonly],
-        textarea[readonly],
-        select[readonly] {
-            background-color: #f8fafc !important;
-            border-color: #e2e8f0 !important;
-            color: #6b7280 !important;
-            cursor: not-allowed !important;
-        }
-
-        /* Textarea specific */
-        textarea {
-            min-height: 120px !important;
-            resize: vertical !important;
-            font-family: inherit !important;
-        }
-
-        /* Select dropdown specific */
-        select {
-            cursor: pointer !important;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
-            background-position: right 8px center !important;
-            background-repeat: no-repeat !important;
-            background-size: 16px 16px !important;
-            padding-right: 40px !important;
-        }
-    }
-
-    /* Labels */
-    .o_field_widget label,
-    .o_form_label {
-        font-weight: 500 !important;
-        color: #374151 !important;
-        margin-bottom: 6px !important;
-        display: block !important;
-        font-size: 14px !important;
-    }
-
-    /* Required field indicator */
-    .o_required_modifier label:after,
-    .o_form_label.o_form_label_required:after {
-        content: " *" !important;
-        color: #ef4444 !important;
-        font-weight: bold !important;
-    }
-}
-
-/* ============================================================================ */
-/* SPECIFIC FIELD TYPE IMPROVEMENTS */
-/* ============================================================================ */
-
-/* Monetary fields */
-.o_field_monetary input {
-    text-align: right !important;
-    font-weight: 500 !important;
-    font-family: "Roboto Mono", monospace !important;
-}
-
-/* Date and datetime fields */
-.o_field_date input,
-.o_field_datetime input {
-    min-width: 150px !important;
-}
-
-/* Boolean fields (checkboxes) */
-.o_field_boolean {
-    input[type="checkbox"] {
-        min-height: 20px !important;
-        width: 20px !important;
-        margin-right: 8px !important;
-        border-radius: 4px !important;
-    }
-
-    input[type="checkbox"]:checked {
-        background-color: #722f37 !important;
-        border-color: #722f37 !important;
-    }
-}
-
-/* Many2one fields */
-.o_field_many2one {
-    .o_input_dropdown {
-        position: relative !important;
-
-        input {
-            padding-right: 40px !important;
-        }
-
-        .o_dropdown_button {
-            position: absolute !important;
-            right: 8px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            border: none !important;
-            background: none !important;
-            color: #6b7280 !important;
-        }
-
-        .o_dropdown_button:hover {
-            color: #722f37 !important;
-        }
-    }
-}
-
-/* ============================================================================ */
-/* FORM LAYOUT IMPROVEMENTS */
-/* ============================================================================ */
-
-/* Form groups and sections */
-.o_group {
-    margin: 16px 0 !important;
-
-    .o_group_col_6 {
-        padding: 0 8px !important;
-    }
-
-    .o_form_label {
-        padding: 8px 0 !important;
-        min-width: 120px !important;
-    }
-}
-
-/* Form sheets */
-.o_form_sheet {
-    padding: 24px !important;
-    background: #ffffff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    margin: 16px !important;
-}
-
-/* Form headers */
-.o_form_sheet .oe_title {
-    margin-bottom: 24px !important;
-
-    h1 {
-        font-size: 24px !important;
-        font-weight: 600 !important;
-        color: #1f2937 !important;
-        margin: 0 0 8px 0 !important;
-    }
-
-    h2 {
-        font-size: 18px !important;
-        font-weight: 500 !important;
-        color: #4b5563 !important;
-        margin: 0 !important;
-    }
-}
-
-/* ============================================================================ */
-/* BUTTON IMPROVEMENTS */
-/* ============================================================================ */
-
-.o_form_view {
-    .btn {
-        min-height: 38px !important;
-        padding: 8px 16px !important;
-        border-radius: 6px !important;
-        font-weight: 500 !important;
-        font-size: 14px !important;
-        border: 1px solid transparent !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .btn.btn-primary {
-        background-color: #722f37 !important;
-        border-color: #722f37 !important;
-        color: #ffffff !important;
-    }
-
-    .btn.btn-primary:hover {
-        background-color: #5c252a !important;
-        border-color: #5c252a !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 2px 4px rgba(114, 47, 55, 0.2) !important;
-    }
-
-    .btn.btn-secondary {
-        background-color: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-        color: #374151 !important;
-    }
-
-    .btn.btn-secondary:hover {
-        background-color: #f1f5f9 !important;
-        border-color: #d1d5db !important;
-    }
-
-    .btn.btn-success {
-        background-color: #10b981 !important;
-        border-color: #10b981 !important;
-        color: #ffffff !important;
-    }
-
-    .btn.btn-success:hover {
-        background-color: #059669 !important;
-        border-color: #059669 !important;
-    }
-
-    .btn.btn-danger {
-        background-color: #ef4444 !important;
-        border-color: #ef4444 !important;
-        color: #ffffff !important;
-    }
-
-    .btn.btn-danger:hover {
-        background-color: #dc2626 !important;
-        border-color: #dc2626 !important;
-    }
-
-    .btn.btn-warning {
-        background-color: #f59e0b !important;
-        border-color: #f59e0b !important;
-        color: #ffffff !important;
-    }
-
-    .btn.btn-warning:hover {
-        background-color: #d97706 !important;
-        border-color: #d97706 !important;
-    }
-}
-
-/* ============================================================================ */
-/* RESPONSIVE IMPROVEMENTS */
-/* ============================================================================ */
-
-@media (max-width: 768px) {
+.o_form_enhanced {
     .o_form_sheet {
-        padding: 16px !important;
-        margin: 8px !important;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin: 1rem;
     }
 
-    .o_group .o_group_col_6 {
-        width: 100% !important;
-        padding: 0 !important;
+    .o_form_sheet_bg {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-radius: 12px;
     }
 
-    .o_form_view .o_field_widget {
-        input,
-        textarea,
-        select {
-            font-size: 16px !important; /* Prevents zoom on iOS */
+    // Enhanced field groups
+    .o_group {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+
+        .o_group_text {
+            font-weight: 600;
+            color: var(--osus-primary, #722f37);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
         }
     }
 
-    .o_form_sheet .oe_title h1 {
-        font-size: 20px !important;
+    // Enhanced notebooks/tabs
+    .o_notebook {
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+
+            .nav-link {
+                border: none;
+                border-bottom: 2px solid transparent;
+                background: none;
+                color: #6c757d;
+                font-weight: 500;
+                padding: 0.75rem 1.5rem;
+
+                &.active {
+                    border-bottom-color: var(--osus-primary, #722f37);
+                    color: var(--osus-primary, #722f37);
+                    background: none;
+                }
+
+                &:hover {
+                    border-bottom-color: #adb5bd;
+                    color: #495057;
+                }
+            }
+        }
+
+        .tab-content {
+            padding: 1.5rem 0;
+        }
     }
 
-    .btn {
-        min-height: 44px !important; /* Better touch targets */
-        font-size: 16px !important;
+    // Enhanced buttons
+    .oe_button_box {
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+        }
     }
 }
 
-/* ============================================================================ */
-/* STATUS BAR IMPROVEMENTS */
-/* ============================================================================ */
+// Enhanced field widgets
+.o_field_enhanced {
+    .o_field_widget {
+        margin-bottom: 1rem;
 
+        label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1.5px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: white;
+
+            &:focus {
+                border-color: var(--osus-primary, #722f37);
+                box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1);
+                outline: none;
+            }
+
+            &:hover {
+                border-color: #adb5bd;
+            }
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .o_field_boolean {
+            input[type="checkbox"] {
+                width: auto;
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
+
+// Enhanced status bar
 .o_form_statusbar {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-    border-bottom: 2px solid #e2e8f0 !important;
-    padding: 12px 24px !important;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+    padding: 1rem 1.5rem;
+    margin: -2rem -2rem 1.5rem -2rem;
 
     .o_statusbar_status {
-        .btn {
-            margin: 0 4px !important;
-            padding: 6px 12px !important;
-            font-size: 13px !important;
-        }
+        .o_arrow_button {
+            border-radius: 6px;
+            margin-right: 0.5rem;
 
-        .btn.btn-primary {
-            background-color: #722f37 !important;
-            color: #ffffff !important;
-        }
-
-        .btn.btn-secondary {
-            background-color: #e2e8f0 !important;
-            color: #6b7280 !important;
-        }
-    }
-}
-
-/* ============================================================================ */
-/* NOTEBOOK (TABS) IMPROVEMENTS */
-/* ============================================================================ */
-
-.o_notebook {
-    .nav-tabs {
-        border-bottom: 2px solid #e2e8f0 !important;
-
-        .nav-link {
-            padding: 12px 20px !important;
-            font-weight: 500 !important;
-            color: #6b7280 !important;
-            border: none !important;
-            border-radius: 8px 8px 0 0 !important;
-        }
-
-        .nav-link.active {
-            background-color: #ffffff !important;
-            color: #722f37 !important;
-            border-bottom: 2px solid #722f37 !important;
-        }
-
-        .nav-link:hover:not(.active) {
-            color: #374151 !important;
-            background-color: #f8fafc !important;
-        }
-    }
-
-    .tab-content {
-        padding: 24px 0 !important;
-    }
-}
-
-/* ============================================================================ */
-/* ERROR STATES AND VALIDATION */
-/* ============================================================================ */
-
-.o_form_view {
-    .o_field_invalid {
-        .o_field_widget input,
-        .o_field_widget textarea,
-        .o_field_widget select {
-            border-color: #ef4444 !important;
-            background-color: #fef2f2 !important;
-        }
-
-        .o_field_widget input:focus,
-        .o_field_widget textarea:focus,
-        .o_field_widget select:focus {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-        }
-
-        .o_form_label {
-            color: #ef4444 !important;
-        }
-    }
-
-    .o_field_widget .text-danger {
-        font-size: 12px !important;
-        margin-top: 4px !important;
-        color: #ef4444 !important;
-    }
-}
-
-/* ============================================================================ */
-/* PRINT STYLES */
-/* ============================================================================ */
-
-@media print {
-    .o_form_view {
-        .o_field_widget input,
-        .o_field_widget textarea,
-        .o_field_widget select {
-            border: 1px solid #000 !important;
-            background: #fff !important;
-            box-shadow: none !important;
-        }
-
-        .btn {
-            display: none !important;
-        }
-
-        .o_form_statusbar {
-            background: #fff !important;
-            border: 1px solid #000 !important;
+            &.btn-primary {
+                background: var(--osus-primary, #722f37);
+                border-color: var(--osus-primary, #722f37);
+            }
         }
     }
 }

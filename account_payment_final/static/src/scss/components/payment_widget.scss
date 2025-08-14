@@ -1,384 +1,132 @@
-/* Payment Approval Widget - Clean Version */
-/* Odoo 17 compatible - no variables dependencies */
+/* Payment Widget Component - CloudPepper Optimized */
+/* Specialized widget for payment displays */
 
-/* ============================================================================ */
-/* PAYMENT APPROVAL WIDGET */
-/* ============================================================================ */
+.o_payment_widget {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: all 0.2s ease;
 
-.o_payment_approval_widget {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #adb5bd;
+    }
+
+    .o_widget_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+
+        .o_widget_title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--osus-primary, #722f37);
+            margin: 0;
+        }
+
+        .o_widget_badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+
+            &.badge-draft {
+                background: #f8f9fa;
+                color: #6c757d;
+            }
+
+            &.badge-approved {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            &.badge-rejected {
+                background: #f8d7da;
+                color: #721c24;
+            }
+        }
+    }
+
+    .o_widget_content {
+        .o_payment_amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--osus-primary, #722f37);
+            margin: 0.5rem 0;
+        }
+
+        .o_payment_details {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+
+            .o_detail_row {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.25rem 0;
+
+                .o_detail_label {
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+
+    .o_widget_actions {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 0.75rem;
+
+        .btn {
+            flex: 1;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+
+            &.btn-osus-primary {
+                background: var(--osus-primary, #722f37);
+                border-color: var(--osus-primary, #722f37);
+                color: white;
+
+                &:hover {
+                    background: #5c252a;
+                    border-color: #5c252a;
+                }
+            }
+        }
+    }
+}
+
+// Payment widget variants
+.o_payment_widget_compact {
     padding: 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    margin: 0.5rem 0;
-    position: relative;
-}
 
-.o_payment_approval_widget:not(.o_readonly):hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(-1px);
-    border-color: #722f37;
-}
+    .o_widget_header {
+        margin-bottom: 0.5rem;
 
-.o_payment_approval_widget.o_loading {
-    pointer-events: none;
-}
-
-.o_payment_approval_widget.o_loading::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    z-index: 10;
-}
-
-.o_payment_approval_widget.o_readonly {
-    background: #f8f9fa;
-    pointer-events: none;
-    opacity: 0.8;
-}
-
-.o_payment_approval_widget.o_readonly .o_approval_actions {
-    display: none;
-}
-
-.o_payment_approval_widget.o_error {
-    border-color: #dc3545;
-    background: #f8d7da;
-}
-
-.o_payment_approval_widget.o_success {
-    border-color: #28a745;
-    background: #d4edda;
-}
-
-/* ============================================================================ */
-/* APPROVAL TIMELINE */
-/* ============================================================================ */
-
-.o_approval_timeline {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border-radius: 4px;
-    overflow-x: auto;
-}
-
-.o_approval_timeline .o_stage {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    min-width: max-content;
-    transition: all 0.15s ease;
-    position: relative;
-}
-
-.o_approval_timeline .o_stage i {
-    font-size: 0.875rem;
-}
-
-.o_approval_timeline .o_stage.o_stage_current {
-    background: #17a2b8;
-    color: white;
-    font-weight: 600;
-    transform: scale(1.05);
-    z-index: 2;
-}
-
-.o_approval_timeline .o_stage.o_stage_current::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background: #17a2b8;
-    bottom: -4px;
-    left: 0;
-    border-radius: 1px;
-}
-
-.o_approval_timeline .o_stage.o_stage_completed {
-    background: #28a745;
-    color: white;
-}
-
-.o_approval_timeline .o_stage.o_stage_completed i::before {
-    content: "\f00c"; /* checkmark */
-}
-
-.o_approval_timeline .o_stage.o_stage_pending {
-    background: #f8f9fa;
-    color: #6c757d;
-    border: 1px solid #dee2e6;
-}
-
-.o_approval_timeline .o_stage.o_stage_rejected {
-    background: #dc3545;
-    color: white;
-}
-
-.o_approval_timeline .o_stage.o_stage_rejected i::before {
-    content: "\f00d"; /* times */
-}
-
-.o_approval_timeline .o_stage:not(:last-child)::before {
-    content: "";
-    position: absolute;
-    right: -8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 2px;
-    background: #dee2e6;
-    z-index: 1;
-}
-
-.o_approval_timeline .o_stage.o_stage_completed:not(:last-child)::before {
-    background: #28a745;
-}
-
-/* ============================================================================ */
-/* APPROVAL ACTIONS */
-/* ============================================================================ */
-
-.o_approval_actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.o_approval_actions .btn {
-    min-width: 120px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.15s ease;
-    position: relative;
-}
-
-.o_approval_actions .btn.o_loading {
-    pointer-events: none;
-}
-
-.o_approval_actions .btn.o_loading::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 8px;
-}
-
-.o_approval_actions .btn.o_btn_approve {
-    background: #28a745;
-    border-color: #28a745;
-    color: white;
-}
-
-.o_approval_actions .btn.o_btn_approve:hover:not(:disabled) {
-    background: #218838;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-}
-
-.o_approval_actions .btn.o_btn_reject {
-    background: #dc3545;
-    border-color: #dc3545;
-    color: white;
-}
-
-.o_approval_actions .btn.o_btn_reject:hover:not(:disabled) {
-    background: #c82333;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
-
-.o_approval_actions .btn.o_btn_submit {
-    background: #17a2b8;
-    border-color: #17a2b8;
-    color: white;
-}
-
-.o_approval_actions .btn.o_btn_submit:hover:not(:disabled) {
-    background: #138496;
-    transform: translateY(-1px);
-}
-
-.o_approval_actions .btn.o_btn_authorize {
-    background: #fd7e14;
-    border-color: #fd7e14;
-    color: white;
-}
-
-.o_approval_actions .btn.o_btn_authorize:hover:not(:disabled) {
-    background: #e0690a;
-    transform: translateY(-1px);
-}
-
-.o_approval_actions .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-/* ============================================================================ */
-/* RESPONSIVE DESIGN */
-/* ============================================================================ */
-
-@media (max-width: 576px) {
-    .o_payment_approval_widget {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        padding: 0.5rem;
+        .o_widget_title {
+            font-size: 1rem;
+        }
     }
 
-    .o_approval_timeline {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .o_approval_timeline .o_stage {
-        justify-content: center;
-        min-width: auto;
-        width: 100%;
-    }
-
-    .o_approval_actions {
-        flex-direction: column;
-    }
-
-    .o_approval_actions .btn {
-        width: 100%;
-        min-width: auto;
+    .o_payment_amount {
+        font-size: 1.25rem !important;
     }
 }
 
-@media (max-width: 768px) {
-    .o_approval_timeline .o_stage {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-}
+.o_payment_widget_highlight {
+    border-color: var(--osus-primary, #722f37);
+    background: rgba(114, 47, 55, 0.02);
 
-/* ============================================================================ */
-/* ACCESSIBILITY ENHANCEMENTS */
-/* ============================================================================ */
-
-@media (prefers-contrast: high) {
-    .o_payment_approval_widget {
-        border: 2px solid;
-    }
-
-    .o_approval_timeline .o_stage {
-        border: 1px solid;
-    }
-
-    .o_approval_actions .btn {
-        border: 2px solid;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .o_payment_approval_widget {
-        transition: none;
-    }
-
-    .o_payment_approval_widget:hover {
-        transform: none;
-    }
-
-    .o_approval_timeline .o_stage {
-        transition: none;
-    }
-
-    .o_approval_timeline .o_stage.o_stage_current {
-        transform: none;
-    }
-
-    .o_approval_actions .btn {
-        transition: none;
-    }
-
-    .o_approval_actions .btn:hover {
-        transform: none;
-    }
-}
-
-.o_payment_approval_widget:focus-within {
-    outline: 2px solid #722f37;
-    outline-offset: 2px;
-}
-
-.o_approval_actions .btn:focus {
-    outline: 2px solid #722f37;
-    outline-offset: 2px;
-    z-index: 5;
-}
-
-/* ============================================================================ */
-/* ANIMATIONS */
-/* ============================================================================ */
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.o_approval_timeline .o_stage {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* ============================================================================ */
-/* DARK THEME SUPPORT */
-/* ============================================================================ */
-
-@media (prefers-color-scheme: dark) {
-    .o_payment_approval_widget:hover {
-        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
-    }
-
-    .o_approval_timeline {
-        background: #343a40;
-    }
-
-    .o_approval_timeline .o_stage.o_stage_pending {
-        background: #6c757d;
-        color: #f8f9fa;
+    .o_widget_header {
+        border-bottom-color: var(--osus-primary, #722f37);
     }
 }
