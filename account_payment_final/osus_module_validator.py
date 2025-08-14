@@ -70,7 +70,11 @@ class OSUSModuleValidator:
             assets = manifest_data.get('assets', {})
             for asset_bundle, files in assets.items():
                 for asset_file in files:
-                    if asset_file.startswith('account_payment_final/'):
+                    # Handle tuple format like ('prepend', 'file.js')
+                    if isinstance(asset_file, tuple):
+                        asset_file = asset_file[1]  # Get the file path from tuple
+                    
+                    if isinstance(asset_file, str) and asset_file.startswith('account_payment_final/'):
                         # Remove module prefix for local path checking
                         local_path = asset_file.replace('account_payment_final/', '')
                         file_path = self.module_path / local_path
