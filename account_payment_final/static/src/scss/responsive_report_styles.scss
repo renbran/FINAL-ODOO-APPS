@@ -1,0 +1,667 @@
+/* Professional Payment Report Responsive Styles */
+/* Enhanced visibility and contrast for all screen types and print */
+
+/* ============================================================================
+   REPORT VARIABLES AND THEMING
+   ============================================================================ */
+
+:root {
+    /* Color palette for professional reports */
+    --report-primary: #2c3e50;
+    --report-secondary: #3498db;
+    --report-success: #27ae60;
+    --report-warning: #f39c12;
+    --report-danger: #e74c3c;
+    --report-light: #ecf0f1;
+    --report-dark: #2c3e50;
+    --report-border: #bdc3c7;
+    --report-text: #2c3e50;
+    --report-muted: #7f8c8d;
+    
+    /* Spacing and layout */
+    --report-spacing: 1rem;
+    --report-line-height: 1.6;
+    --report-border-radius: 4px;
+    
+    /* Responsive breakpoints */
+    --report-mobile: 768px;
+    --report-tablet: 1024px;
+    --report-desktop: 1200px;
+}
+
+/* ============================================================================
+   BASE REPORT LAYOUT
+   ============================================================================ */
+
+.payment-voucher-report {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 12pt;
+    line-height: var(--report-line-height);
+    color: var(--report-text);
+    background: white;
+    margin: 0;
+    padding: var(--report-spacing);
+    max-width: 210mm; /* A4 width */
+    margin: 0 auto;
+}
+
+/* Report Header */
+.report-header {
+    border-bottom: 3px solid var(--report-primary);
+    padding-bottom: var(--report-spacing);
+    margin-bottom: calc(var(--report-spacing) * 1.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.report-title {
+    color: var(--report-primary);
+    font-size: 24pt;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.report-subtitle {
+    color: var(--report-secondary);
+    font-size: 14pt;
+    font-weight: 500;
+    margin: 0.5rem 0 0 0;
+}
+
+.company-info {
+    text-align: right;
+    color: var(--report-muted);
+    font-size: 10pt;
+    line-height: 1.4;
+}
+
+.company-info strong {
+    color: var(--report-text);
+    font-size: 11pt;
+}
+
+/* Voucher Information Section */
+.voucher-info {
+    background: var(--report-light);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-border-radius);
+    padding: var(--report-spacing);
+    margin-bottom: var(--report-spacing);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--report-spacing);
+}
+
+.voucher-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--report-border);
+}
+
+.voucher-info-item:last-child {
+    border-bottom: none;
+}
+
+.voucher-info-label {
+    font-weight: 600;
+    color: var(--report-text);
+    font-size: 11pt;
+}
+
+.voucher-info-value {
+    font-weight: 400;
+    color: var(--report-text);
+    text-align: right;
+    font-size: 11pt;
+}
+
+.voucher-number {
+    font-size: 16pt;
+    font-weight: 700;
+    color: var(--report-primary);
+    letter-spacing: 1px;
+}
+
+.amount-display {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--report-success);
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 10pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.draft {
+    background: #95a5a6;
+    color: white;
+}
+
+.status-badge.under-review {
+    background: var(--report-secondary);
+    color: white;
+}
+
+.status-badge.approved {
+    background: var(--report-success);
+    color: white;
+}
+
+.status-badge.posted {
+    background: var(--report-primary);
+    color: white;
+}
+
+.status-badge.cancelled {
+    background: var(--report-danger);
+    color: white;
+}
+
+/* Payment Details Table */
+.payment-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--report-spacing) 0;
+    font-size: 11pt;
+}
+
+.payment-details-table th {
+    background: var(--report-primary);
+    color: white;
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 10pt;
+}
+
+.payment-details-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--report-border);
+    vertical-align: top;
+}
+
+.payment-details-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.payment-details-table tr:hover {
+    background: var(--report-light);
+}
+
+/* Workflow History */
+.workflow-history {
+    margin-top: calc(var(--report-spacing) * 2);
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-border-radius);
+}
+
+.workflow-history-header {
+    background: var(--report-primary);
+    color: white;
+    padding: 0.75rem var(--report-spacing);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11pt;
+}
+
+.workflow-step {
+    padding: 0.75rem var(--report-spacing);
+    border-bottom: 1px solid var(--report-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.workflow-step:last-child {
+    border-bottom: none;
+}
+
+.workflow-step-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.workflow-step-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8pt;
+    font-weight: bold;
+    color: white;
+}
+
+.workflow-step-icon.completed {
+    background: var(--report-success);
+}
+
+.workflow-step-icon.current {
+    background: var(--report-warning);
+}
+
+.workflow-step-icon.pending {
+    background: var(--report-muted);
+}
+
+.workflow-step-text {
+    font-size: 10pt;
+    color: var(--report-text);
+}
+
+.workflow-step-user {
+    font-size: 9pt;
+    color: var(--report-muted);
+    text-align: right;
+}
+
+/* QR Code Section */
+.qr-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: calc(var(--report-spacing) * 2);
+    padding: var(--report-spacing);
+    border: 2px dashed var(--report-border);
+    border-radius: var(--report-border-radius);
+    background: var(--report-light);
+}
+
+.qr-code-container {
+    text-align: center;
+}
+
+.qr-code-image {
+    max-width: 100px;
+    max-height: 100px;
+    border: 1px solid var(--report-border);
+    border-radius: var(--report-border-radius);
+}
+
+.qr-instructions {
+    flex: 1;
+    margin-left: var(--report-spacing);
+    font-size: 10pt;
+    color: var(--report-muted);
+    line-height: 1.4;
+}
+
+.qr-instructions strong {
+    color: var(--report-text);
+}
+
+/* Footer */
+.report-footer {
+    margin-top: calc(var(--report-spacing) * 2);
+    padding-top: var(--report-spacing);
+    border-top: 1px solid var(--report-border);
+    font-size: 9pt;
+    color: var(--report-muted);
+    text-align: center;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN FOR DIFFERENT SCREEN SIZES
+   ============================================================================ */
+
+/* Mobile Styles (up to 768px) */
+@media screen and (max-width: 768px) {
+    .payment-voucher-report {
+        padding: 0.5rem;
+        font-size: 11pt;
+        max-width: 100%;
+    }
+    
+    .report-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .report-title {
+        font-size: 18pt;
+    }
+    
+    .report-subtitle {
+        font-size: 12pt;
+    }
+    
+    .company-info {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .voucher-info {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .voucher-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .voucher-info-value {
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .payment-details-table {
+        font-size: 10pt;
+    }
+    
+    .payment-details-table th,
+    .payment-details-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .qr-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .qr-instructions {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+    
+    .workflow-step {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .workflow-step-user {
+        text-align: left;
+    }
+}
+
+/* Tablet Styles (769px to 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .payment-voucher-report {
+        padding: 0.75rem;
+        font-size: 11pt;
+    }
+    
+    .report-title {
+        font-size: 20pt;
+    }
+    
+    .voucher-info {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .payment-details-table {
+        font-size: 10pt;
+    }
+}
+
+/* Desktop Styles (1025px and up) */
+@media screen and (min-width: 1025px) {
+    .payment-voucher-report {
+        padding: var(--report-spacing);
+        font-size: 12pt;
+    }
+    
+    .voucher-info {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* ============================================================================
+   HIGH CONTRAST AND ACCESSIBILITY
+   ============================================================================ */
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --report-primary: #000000;
+        --report-secondary: #000000;
+        --report-success: #000000;
+        --report-text: #000000;
+        --report-border: #000000;
+        --report-light: #ffffff;
+        --report-muted: #333333;
+    }
+    
+    .payment-voucher-report {
+        border: 3px solid black;
+    }
+    
+    .voucher-info,
+    .payment-details-table,
+    .workflow-history {
+        border: 2px solid black;
+    }
+    
+    .status-badge {
+        border: 2px solid black;
+        background: white !important;
+        color: black !important;
+    }
+    
+    .qr-section {
+        border: 3px solid black;
+        background: white;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) and (max-width: 1024px) {
+    :root {
+        --report-primary: #3498db;
+        --report-text: #ecf0f1;
+        --report-light: #34495e;
+        --report-border: #7f8c8d;
+        --report-muted: #bdc3c7;
+    }
+    
+    .payment-voucher-report {
+        background: #2c3e50;
+        color: var(--report-text);
+    }
+    
+    .payment-details-table tr:nth-child(even) {
+        background: #34495e;
+    }
+    
+    .payment-details-table tr:hover {
+        background: #3498db;
+        color: white;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    .payment-voucher-report {
+        margin: 0;
+        padding: 1cm;
+        font-size: 10pt;
+        color: black;
+        background: white;
+        max-width: none;
+        box-shadow: none;
+    }
+    
+    .report-header {
+        border-bottom: 2pt solid black;
+    }
+    
+    .report-title {
+        color: black;
+        font-size: 18pt;
+    }
+    
+    .report-subtitle {
+        color: black;
+    }
+    
+    .company-info {
+        color: black;
+    }
+    
+    .voucher-info {
+        background: transparent;
+        border: 1pt solid black;
+        page-break-inside: avoid;
+    }
+    
+    .payment-details-table {
+        page-break-inside: avoid;
+        font-size: 9pt;
+    }
+    
+    .payment-details-table th {
+        background: #f0f0f0 !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .payment-details-table tr:nth-child(even) {
+        background: #f8f8f8 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .workflow-history {
+        page-break-inside: avoid;
+        border: 1pt solid black;
+    }
+    
+    .workflow-history-header {
+        background: #e0e0e0 !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .status-badge {
+        border: 1pt solid black;
+        background: white !important;
+        color: black !important;
+    }
+    
+    .qr-section {
+        border: 1pt solid black;
+        background: white;
+        page-break-inside: avoid;
+    }
+    
+    .qr-code-image {
+        border: 1pt solid black;
+    }
+    
+    .report-footer {
+        border-top: 1pt solid black;
+        font-size: 8pt;
+        color: black;
+    }
+    
+    /* Force exact color printing for important elements */
+    .status-badge.approved {
+        background: #d4edda !important;
+        border: 1pt solid #28a745 !important;
+        color: #155724 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .status-badge.posted {
+        background: #cce7ff !important;
+        border: 1pt solid #2c3e50 !important;
+        color: #2c3e50 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
+
+/* ============================================================================
+   LANDSCAPE ORIENTATION FOR COMPLEX REPORTS
+   ============================================================================ */
+
+@media print and (orientation: landscape) {
+    .payment-voucher-report {
+        padding: 0.5cm 1cm;
+    }
+    
+    .voucher-info {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    
+    .payment-details-table {
+        font-size: 8pt;
+    }
+    
+    .qr-section {
+        flex-direction: row;
+    }
+}
+
+/* ============================================================================
+   SPECIAL PRINTER COMPATIBILITY
+   ============================================================================ */
+
+/* Thermal printer compatibility */
+@media print and (max-width: 80mm) {
+    .payment-voucher-report {
+        font-size: 8pt;
+        padding: 2mm;
+    }
+    
+    .report-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .report-title {
+        font-size: 12pt;
+    }
+    
+    .voucher-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-details-table {
+        font-size: 7pt;
+    }
+    
+    .qr-section {
+        flex-direction: column;
+    }
+    
+    .qr-code-image {
+        max-width: 60mm;
+        max-height: 60mm;
+    }
+}
