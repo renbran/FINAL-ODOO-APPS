@@ -75,15 +75,16 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # CRITICAL: Load enhanced error interceptor FIRST to prevent all JavaScript crashes
+            # NUCLEAR FIX: Load nuclear fix FIRST to prevent ALL JavaScript crashes
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
             
-            # CloudPepper optimization and console fixes
-            'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
-            'account_payment_final/static/src/js/unknown_action_handler.js',
+            # CloudPepper optimization and console fixes (REMOVED problematic import files)
+            # DISABLED: 'account_payment_final/static/src/js/cloudpepper_console_optimizer.js', # Contains import statements
+            # DISABLED: 'account_payment_final/static/src/js/unknown_action_handler.js', # Contains import statements
             
             # OSUS Branding & Core Styles (priority loading)
             'account_payment_final/static/src/scss/osus_branding.scss',
@@ -98,24 +99,25 @@
             'account_payment_final/static/src/scss/views/form_view.scss',
             'account_payment_final/static/src/scss/payment_voucher.scss',
 
-            # Core JavaScript functionality
-            'account_payment_final/static/src/js/error_handler.js',
-            'account_payment_final/static/src/js/payment_workflow.js',
-            'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
-            'account_payment_final/static/src/js/fields/qr_code_field.js',
-            'account_payment_final/static/src/js/views/payment_list_view.js',
+            # Core JavaScript functionality (REMOVED files with import statements)
+            # DISABLED: 'account_payment_final/static/src/js/error_handler.js', # Contains import statements
+            'account_payment_final/static/src/js/payment_workflow_safe.js', # Safe non-module version
+            # DISABLED: 'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js', # Contains import statements
+            # DISABLED: 'account_payment_final/static/src/js/fields/qr_code_field.js', # Contains import statements
+            # DISABLED: 'account_payment_final/static/src/js/views/payment_list_view.js', # Contains import statements
 
             # XML templates
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_web_dark': [
-            # Critical error handlers for dark theme (MUST LOAD FIRST)
+            # Nuclear fix and critical error handlers for dark theme (MUST LOAD FIRST)
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             
-            # Additional dark theme JavaScript
-            'account_payment_final/static/src/js/views/payment_list_view.js',
+            # Additional dark theme JavaScript (REMOVED problematic files)
+            # DISABLED: 'account_payment_final/static/src/js/views/payment_list_view.js', # Contains import statements
             
             # XML templates for dark theme
             'account_payment_final/static/src/xml/payment_templates.xml',
