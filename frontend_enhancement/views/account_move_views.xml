@@ -71,7 +71,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_account_invoice_kanban"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('o_kanban_record_title')]" position="after">
+            <xpath expr="//div[@class='o_kanban_record_title']" position="after">
                 <div class="o_kanban_record_subtitle" t-if="record.ref.raw_value">
                     <i class="fa fa-bookmark" title="Customer Reference"/> 
                     <field name="ref"/>

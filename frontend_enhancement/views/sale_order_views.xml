@@ -46,7 +46,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('o_kanban_record_title')]" position="after">
+            <xpath expr="//div[@class='o_kanban_record_title']" position="after">
                 <div class="o_kanban_record_subtitle" t-if="record.client_order_ref.raw_value">
                     <i class="fa fa-tag" title="Client Reference"/> 
                     <field name="client_order_ref"/>
