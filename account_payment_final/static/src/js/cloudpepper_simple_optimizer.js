@@ -33,9 +33,9 @@ const CloudPepperSimpleOptimizer = {
             
             // Handle known non-critical errors
             if (message.includes('Unknown action: undefined') || 
-                message.includes('Unknown action: is-mobile') ||;
-                message.includes('Action not found') ||;
-                message.includes('Cannot read properties of undefined') ||;
+                message.includes('Unknown action: is-mobile') ||
+                message.includes('Action not found') ||
+                message.includes('Cannot read properties of undefined') ||
                 message.includes('TypeError: Cannot read property')) {
                 console.debug('[CloudPepper] Suppressed non-critical error:', message);
                 return;
@@ -51,12 +51,12 @@ const CloudPepperSimpleOptimizer = {
             
             // Suppress known third-party warnings
             if (message.includes('Page data capture skipped') ||
-                message.includes('Fullstory: Skipped by sampling') ||;
-                message.includes('Check Redirect') ||;
-                message.includes('font preload') ||;
-                message.includes('Unknown action') ||;
+                message.includes('Fullstory: Skipped by sampling') ||
+                message.includes('Check Redirect') ||
+                message.includes('font preload') ||
+                message.includes('Unknown action') ||
                 message.includes('data-oe-')) {
-                return; // Silently suppress;
+                return; // Silently suppress
             }
             
             originalWarn.apply(console, args);
@@ -68,7 +68,7 @@ const CloudPepperSimpleOptimizer = {
             
             // Allow CloudPepper messages and important logs
             if (message.includes('[CloudPepper]') || 
-                (!message.includes('Check Redirect') &&;
+                (!message.includes('Check Redirect') &&
                 !message.includes('data-oe-'))) {
                 originalLog.apply(console, args);
             }
@@ -80,8 +80,8 @@ const CloudPepperSimpleOptimizer = {
             const errorMsg = error ? error.toString() : 'Unknown error';
             
             if (errorMsg.includes('Unknown action') || 
-                errorMsg.includes('Action not found') ||;
-                errorMsg.includes('is-mobile') ||;
+                errorMsg.includes('Action not found') ||
+                errorMsg.includes('is-mobile') ||
                 errorMsg.includes('undefined')) {
                 console.debug('[CloudPepper] Suppressed promise rejection:', errorMsg);
                 event.preventDefault();
@@ -91,10 +91,13 @@ const CloudPepperSimpleOptimizer = {
 
         console.log('[CloudPepper] Error handling initialized');
     },
-                message.includes('Fullstory: Skipped by sampling') ||;
-                message.includes('Check Redirect') ||;
+                message.includes('Fullstory: Skipped by sampling') ||
+;
+                message.includes('Check Redirect') ||
+;
                 message.includes('font preload')) {
-                return; // Silently suppress;
+                return; // Silently suppress
+;
             }
             
             originalWarn.apply(console, args);
@@ -180,8 +183,10 @@ const CloudPepperSimpleOptimizer = {
     optimizeFonts() {
         // Add font-display optimization via CSS
         const fontStyle = document.createElement('style');
-        fontStyle.textContent = '' +;
-            '@font-face { font-family: "FontAwesome"; font-display: swap; } ' +;
+        fontStyle.textContent = '' +
+;
+            '@font-face { font-family: "FontAwesome"; font-display: swap; } ' +
+;
             '.fa, .fas, .far, .fal, .fab { font-display: swap; }';
         
         if (document.head) {
