@@ -78,6 +78,7 @@
             
             # Core SCSS files (in dependency order)
             'account_payment_final/static/src/scss/emergency_fix.scss',
+            'account_payment_final/static/src/scss/enhanced_form_styling.scss',
             'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
             'account_payment_final/static/src/scss/osus_branding.scss',
@@ -85,6 +86,7 @@
             # Component-specific styles
             'account_payment_final/static/src/scss/components/payment_widget.scss',
             'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
+            'account_payment_final/static/src/scss/components/table_enhancements.scss',
             'account_payment_final/static/src/scss/views/form_view.scss',
             
             # JavaScript files

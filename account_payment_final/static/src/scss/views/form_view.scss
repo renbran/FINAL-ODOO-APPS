@@ -82,19 +82,97 @@
             }
         }
         
-        // Enhanced field layouts
+        // Enhanced field layouts with improved readability
         .o_payment_field_group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: $payment-spacing-md;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: $payment-spacing-lg;
             margin: $payment-spacing-md 0;
             
             &.o_payment_field_group_2col {
                 grid-template-columns: 1fr 1fr;
+                gap: $payment-spacing-xl;
             }
             
             &.o_payment_field_group_3col {
                 grid-template-columns: 1fr 1fr 1fr;
+                gap: $payment-spacing-lg;
+            }
+            
+            // Improved field styling for better UX
+            .o_field_widget {
+                margin-bottom: $payment-spacing-sm;
+                
+                input,
+                textarea,
+                select {
+                    width: 100%;
+                    min-height: 42px;
+                    padding: 10px 14px;
+                    border: 1.5px solid #e5e7eb;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    background-color: #ffffff;
+                    transition: all 0.2s ease;
+                    
+                    &:focus {
+                        border-color: $payment-primary-color;
+                        box-shadow: 0 0 0 3px rgba($payment-primary-color, 0.1);
+                        outline: none;
+                    }
+                    
+                    &:hover:not(:focus) {
+                        border-color: #9ca3af;
+                    }
+                    
+                    &[readonly] {
+                        background-color: #f8fafc;
+                        color: #6b7280;
+                        cursor: not-allowed;
+                    }
+                }
+                
+                // Special styling for many2one fields
+                &.o_field_many2one {
+                    .o_input_dropdown {
+                        position: relative;
+                        
+                        input {
+                            padding-right: 40px;
+                        }
+                        
+                        .o_dropdown_button {
+                            position: absolute;
+                            right: 8px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: none;
+                            border: none;
+                            color: #6b7280;
+                            font-size: 16px;
+                            
+                            &:hover {
+                                color: $payment-primary-color;
+                            }
+                        }
+                    }
+                }
+                
+                // Label improvements
+                .o_form_label {
+                    font-weight: 600;
+                    color: #374151;
+                    margin-bottom: 6px;
+                    font-size: 13px;
+                    display: block;
+                    
+                    &.o_required::after {
+                        content: " *";
+                        color: #dc2626;
+                        font-weight: bold;
+                    }
+                }
             }
         }
         
@@ -233,6 +311,131 @@
         .o_payment_approval_widget {
             border: 1px solid #000 !important;
             break-inside: avoid;
+        }
+    }
+}
+
+// Enhanced list view styling for invoice lines and related tables
+.o_form_view {
+    .o_field_one2many,
+    .o_field_many2many {
+        .o_list_view {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: $payment-spacing-md 0;
+            
+            .o_list_table {
+                margin: 0;
+                
+                thead th {
+                    background-color: #f8fafc;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 13px;
+                    padding: 16px 12px;
+                    border-bottom: 2px solid #e5e7eb;
+                    text-align: left;
+                    
+                    &:first-child {
+                        border-radius: 8px 0 0 0;
+                    }
+                    
+                    &:last-child {
+                        border-radius: 0 8px 0 0;
+                    }
+                }
+                
+                tbody tr {
+                    &:hover {
+                        background-color: #f8fafc;
+                    }
+                    
+                    &.o_data_row {
+                        border-bottom: 1px solid #f3f4f6;
+                        
+                        &:last-child {
+                            border-bottom: none;
+                        }
+                    }
+                    
+                    td {
+                        padding: 14px 12px;
+                        vertical-align: middle;
+                        border-right: 1px solid #f3f4f6;
+                        
+                        &:last-child {
+                            border-right: none;
+                        }
+                        
+                        .o_field_widget {
+                            margin: 0;
+                            
+                            input,
+                            textarea,
+                            select {
+                                min-height: 38px;
+                                padding: 8px 12px;
+                                border: 1px solid #d1d5db;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                width: 100%;
+                                
+                                &:focus {
+                                    border-color: $payment-primary-color;
+                                    box-shadow: 0 0 0 2px rgba($payment-primary-color, 0.1);
+                                }
+                            }
+                            
+                            // Specific column width improvements
+                            &.o_field_char,
+                            &.o_field_many2one {
+                                input {
+                                    min-width: 150px;
+                                }
+                            }
+                            
+                            &.o_field_text textarea {
+                                min-width: 120px;
+                                resize: vertical;
+                            }
+                            
+                            &.o_field_float,
+                            &.o_field_monetary {
+                                input {
+                                    text-align: right;
+                                    min-width: 100px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Add line button improvements
+            .o_field_x2many_list_row_add {
+                padding: 12px;
+                border-top: 1px solid #e5e7eb;
+                background-color: #f8fafc;
+                
+                a {
+                    color: $payment-primary-color;
+                    font-weight: 500;
+                    text-decoration: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                    
+                    &:hover {
+                        background-color: rgba($payment-primary-color, 0.1);
+                        color: darken($payment-primary-color, 10%);
+                    }
+                    
+                    i {
+                        margin-right: 6px;
+                    }
+                }
+            }
         }
     }
 }

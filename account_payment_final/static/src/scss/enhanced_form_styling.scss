@@ -1,0 +1,355 @@
+/* Enhanced Form Field Styling for Better UX */
+/* Addresses text readability and input field sizing issues */
+
+/* ============================================================================ */
+/* FORM FIELD ENHANCEMENTS - Better User Experience */
+/* ============================================================================ */
+
+/* Improved input field styling */
+.o_form_view {
+    .o_field_widget {
+        /* Base field styling */
+        &.o_field_char,
+        &.o_field_text,
+        &.o_field_many2one,
+        &.o_field_selection,
+        &.o_field_date,
+        &.o_field_datetime,
+        &.o_field_monetary,
+        &.o_field_float,
+        &.o_field_integer {
+            input,
+            textarea,
+            select {
+                min-height: 40px !important;
+                padding: 8px 12px !important;
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+                border: 1px solid #d1d5db !important;
+                border-radius: 6px !important;
+                background-color: #ffffff !important;
+                transition: all 0.2s ease !important;
+                min-width: 200px !important;
+                
+                &:focus {
+                    border-color: #3b82f6 !important;
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+                    outline: none !important;
+                }
+                
+                &:hover:not(:focus) {
+                    border-color: #9ca3af !important;
+                }
+                
+                &[readonly] {
+                    background-color: #f9fafb !important;
+                    color: #6b7280 !important;
+                }
+            }
+        }
+        
+        /* Special handling for many2one fields */
+        &.o_field_many2one {
+            .o_input_dropdown {
+                min-width: 250px !important;
+                
+                input {
+                    min-width: calc(100% - 32px) !important;
+                }
+            }
+        }
+        
+        /* Text area improvements */
+        &.o_field_text textarea {
+            min-height: 80px !important;
+            resize: vertical !important;
+        }
+        
+        /* Selection field improvements */
+        &.o_field_selection select {
+            min-width: 200px !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+            background-position: right 8px center !important;
+            background-repeat: no-repeat !important;
+            background-size: 16px 16px !important;
+            padding-right: 32px !important;
+        }
+    }
+    
+    /* Form group improvements */
+    .o_group {
+        .o_form_label {
+            font-weight: 500 !important;
+            color: #374151 !important;
+            margin-bottom: 4px !important;
+            font-size: 13px !important;
+        }
+        
+        .o_cell {
+            padding: 8px 4px !important;
+            
+            &.o_wrap_label {
+                .o_form_label {
+                    margin-bottom: 6px !important;
+                }
+            }
+        }
+    }
+    
+    /* Header field improvements */
+    .o_form_sheet_bg .o_form_sheet {
+        .oe_title {
+            margin-bottom: 24px !important;
+            
+            .o_field_widget {
+                input {
+                    font-size: 18px !important;
+                    font-weight: 600 !important;
+                    min-height: 48px !important;
+                    border: 2px solid #e5e7eb !important;
+                    
+                    &:focus {
+                        border-color: #3b82f6 !important;
+                        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+                    }
+                }
+            }
+        }
+    }
+    
+    /* Status bar improvements */
+    .o_form_statusbar {
+        .o_statusbar_status {
+            .o_arrow_button {
+                padding: 8px 16px !important;
+                font-weight: 500 !important;
+                border-radius: 6px !important;
+                margin-right: 8px !important;
+                
+                &.btn-primary {
+                    background-color: #3b82f6 !important;
+                    border-color: #3b82f6 !important;
+                }
+            }
+        }
+    }
+}
+
+/* ============================================================================ */
+/* INVOICE/QUOTATION FORM SPECIFIC IMPROVEMENTS */
+/* ============================================================================ */
+
+.o_form_view.o_account_move_form {
+    /* Customer and address fields */
+    .o_field_many2one {
+        .o_input_dropdown {
+            min-width: 300px !important;
+        }
+    }
+    
+    /* Date fields */
+    .o_field_date input {
+        min-width: 180px !important;
+    }
+    
+    /* Reference and journal fields */
+    .o_field_char input {
+        min-width: 200px !important;
+    }
+    
+    /* Invoice lines table improvements */
+    .o_list_view {
+        .o_list_table {
+            th {
+                padding: 12px 8px !important;
+                font-weight: 600 !important;
+                background-color: #f8fafc !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+            }
+            
+            td {
+                padding: 12px 8px !important;
+                vertical-align: middle !important;
+                
+                .o_field_widget {
+                    input,
+                    textarea {
+                        min-height: 36px !important;
+                        padding: 6px 10px !important;
+                        border: 1px solid #d1d5db !important;
+                        border-radius: 4px !important;
+                        min-width: 120px !important;
+                        
+                        &:focus {
+                            border-color: #3b82f6 !important;
+                            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+                        }
+                    }
+                }
+                
+                /* Product column - wider for better readability */
+                &:nth-child(1) .o_field_widget input {
+                    min-width: 200px !important;
+                }
+                
+                /* Label column */
+                &:nth-child(2) .o_field_widget input {
+                    min-width: 150px !important;
+                }
+                
+                /* Quantity and price columns */
+                &:nth-child(4),
+                &:nth-child(6) {
+                    .o_field_widget input {
+                        min-width: 100px !important;
+                        text-align: right !important;
+                    }
+                }
+            }
+        }
+        
+        /* Add line buttons */
+        .o_field_x2many_list_row_add a {
+            padding: 8px 16px !important;
+            font-weight: 500 !important;
+            color: #3b82f6 !important;
+            border-radius: 6px !important;
+            
+            &:hover {
+                background-color: #eff6ff !important;
+            }
+        }
+    }
+}
+
+/* ============================================================================ */
+/* RESPONSIVE IMPROVEMENTS */
+/* ============================================================================ */
+
+@media (max-width: 992px) {
+    .o_form_view {
+        .o_field_widget {
+            input,
+            textarea,
+            select {
+                min-width: 100% !important;
+                width: 100% !important;
+            }
+        }
+        
+        .o_group .o_cell {
+            padding: 6px 2px !important;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .o_form_view {
+        .o_field_widget {
+            input,
+            textarea,
+            select {
+                font-size: 16px !important; /* Prevents zoom on iOS */
+                min-height: 44px !important;
+            }
+        }
+        
+        .o_list_view .o_list_table {
+            th,
+            td {
+                padding: 8px 4px !important;
+                font-size: 13px !important;
+            }
+        }
+    }
+}
+
+/* ============================================================================ */
+/* BUTTON AND ACTION IMPROVEMENTS */
+/* ============================================================================ */
+
+.o_form_view {
+    .o_form_button_box {
+        .btn {
+            min-height: 40px !important;
+            padding: 8px 16px !important;
+            font-weight: 500 !important;
+            border-radius: 6px !important;
+            margin: 2px !important;
+            
+            &.btn-primary {
+                background-color: #3b82f6 !important;
+                border-color: #3b82f6 !important;
+                
+                &:hover {
+                    background-color: #2563eb !important;
+                    border-color: #2563eb !important;
+                }
+            }
+            
+            &.btn-secondary {
+                background-color: #6b7280 !important;
+                border-color: #6b7280 !important;
+                color: white !important;
+                
+                &:hover {
+                    background-color: #4b5563 !important;
+                    border-color: #4b5563 !important;
+                }
+            }
+        }
+    }
+    
+    /* Submit for Review button specific styling */
+    .btn-danger {
+        background-color: #dc2626 !important;
+        border-color: #dc2626 !important;
+        
+        &:hover {
+            background-color: #b91c1c !important;
+            border-color: #b91c1c !important;
+        }
+    }
+}
+
+/* ============================================================================ */
+/* ACCESSIBILITY IMPROVEMENTS */
+/* ============================================================================ */
+
+.o_form_view {
+    /* Focus indicators */
+    .o_field_widget {
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 2px solid #3b82f6 !important;
+            outline-offset: 2px !important;
+        }
+    }
+    
+    /* Error state styling */
+    .o_field_invalid {
+        .o_field_widget {
+            input,
+            textarea,
+            select {
+                border-color: #dc2626 !important;
+                
+                &:focus {
+                    border-color: #dc2626 !important;
+                    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+                }
+            }
+        }
+    }
+    
+    /* Required field indicators */
+    .o_required_modifier {
+        .o_form_label::after {
+            content: " *" !important;
+            color: #dc2626 !important;
+            font-weight: bold !important;
+        }
+    }
+}
