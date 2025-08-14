@@ -73,29 +73,23 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Variables must be loaded first for all other SCSS files
-            'account_payment_final/static/src/scss/variables.scss',
+            # Emergency hardcoded styles - no variables needed
+            'account_payment_final/static/src/scss/enhanced_form_styling_emergency.scss',
+            'account_payment_final/static/src/scss/components/table_enhancements_emergency.scss',
             
-            # Core SCSS files (in dependency order)
+            # Core SCSS files (hardcoded values only)
             'account_payment_final/static/src/scss/emergency_fix.scss',
-            'account_payment_final/static/src/scss/enhanced_form_styling.scss',
             'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
             'account_payment_final/static/src/scss/osus_branding.scss',
             
-            # Component-specific styles
-            'account_payment_final/static/src/scss/components/payment_widget.scss',
-            'account_payment_final/static/src/scss/components/payment_widget_enhanced.scss',
-            'account_payment_final/static/src/scss/components/table_enhancements.scss',
-            'account_payment_final/static/src/scss/views/form_view.scss',
-            
-            # JavaScript files
+            # JavaScript files - Emergency fix loaded first
+            'account_payment_final/static/src/js/emergency_error_fix.js',
             'account_payment_final/static/src/js/error_handler.js',
             'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
             'account_payment_final/static/src/js/unknown_action_handler.js',
             'account_payment_final/static/src/js/payment_workflow.js',
             'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
-            'account_payment_final/static/src/js/components/payment_widget.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',
             'account_payment_final/static/src/js/views/payment_list_view.js',
             
@@ -103,18 +97,12 @@
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_common': [
-            # Variables for reports (loaded first)
-            'account_payment_final/static/src/scss/variables.scss',
-            
-            # Report-specific styles
+            # Report-specific styles (hardcoded values only)
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
             'account_payment_final/static/src/scss/payment_voucher_report.scss',
         ],
         'web.assets_frontend': [
-            # Variables for frontend (loaded first)
-            'account_payment_final/static/src/scss/variables.scss',
-            
-            # Frontend verification portal
+            # Frontend verification portal (hardcoded values only)
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',
             'account_payment_final/static/src/js/frontend/qr_verification.js',
         ],
