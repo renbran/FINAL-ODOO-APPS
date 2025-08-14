@@ -52,12 +52,12 @@
     --payment-font-weight-bold: 600;
 
     /* Spacing System (Enhanced) */
-    --payment-spacing-xs: 0.25rem;  /* 4px */
-    --payment-spacing-sm: 0.5rem;   /* 8px */
-    --payment-spacing-md: 1rem;     /* 16px */
-    --payment-spacing-lg: 1.5rem;   /* 24px */
-    --payment-spacing-xl: 2rem;     /* 32px */
-    --payment-spacing-xxl: 3rem;    /* 48px */
+    --payment-spacing-xs: 0.25rem; /* 4px */
+    --payment-spacing-sm: 0.5rem; /* 8px */
+    --payment-spacing-md: 1rem; /* 16px */
+    --payment-spacing-lg: 1.5rem; /* 24px */
+    --payment-spacing-xl: 2rem; /* 32px */
+    --payment-spacing-xxl: 3rem; /* 48px */
 
     /* Responsive Breakpoints (Aligned with Bootstrap 5) */
     --bp-mobile: 576px;
@@ -112,34 +112,42 @@
 /* SCSS VARIABLES (Fallback and legacy support) */
 /* ============================================================================ */
 
-/* Legacy color variables */
-$payment-primary-color: var(--payment-primary);
-$payment-success-color: var(--payment-success);
-$payment-warning-color: var(--payment-warning);
-$payment-danger-color: var(--payment-danger);
-$payment-info-color: var(--payment-info);
+/* SCSS Variables - Direct values for compilation */
+$payment-primary-color: #3498db;
+$payment-success-color: #28a745;
+$payment-warning-color: #ffc107;
+$payment-danger-color: #dc3545;
+$payment-info-color: #17a2b8;
 
-/* Legacy design system */
-$payment-border-radius: var(--payment-border-radius);
-$payment-box-shadow: var(--payment-box-shadow);
-$payment-transition: var(--payment-transition);
+/* Design system variables */
+$payment-border-radius: 8px;
+$payment-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+$payment-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-/* Legacy breakpoints */
-$payment-mobile: var(--bp-mobile);
-$payment-tablet: var(--bp-tablet);
-$payment-desktop: var(--bp-desktop);
+/* Breakpoint variables */
+$payment-mobile: 576px;
+$payment-tablet: 768px;
+$payment-desktop: 992px;
 
-/* Legacy z-index */
-$payment-z-dropdown: var(--z-dropdown);
-$payment-z-modal: var(--z-modal);
-$payment-z-tooltip: var(--z-tooltip);
+/* Z-index variables */
+$payment-z-dropdown: 1000;
+$payment-z-modal: 1050;
+$payment-z-tooltip: 1070;
 
-/* Legacy spacing */
-$payment-spacing-xs: var(--payment-spacing-xs);
-$payment-spacing-sm: var(--payment-spacing-sm);
-$payment-spacing-md: var(--payment-spacing-md);
-$payment-spacing-lg: var(--payment-spacing-lg);
-$payment-spacing-xl: var(--payment-spacing-xl);
+/* Spacing variables */
+$payment-spacing-xs: 0.25rem; /* 4px */
+$payment-spacing-sm: 0.5rem; /* 8px */
+$payment-spacing-md: 1rem; /* 16px */
+$payment-spacing-lg: 1.5rem; /* 24px */
+$payment-spacing-xl: 2rem; /* 32px */
+
+/* Typography variables */
+$payment-font-size-sm: 0.875rem;
+$payment-font-size-base: 1rem;
+$payment-font-size-lg: 1.125rem;
+$payment-font-weight-normal: 400;
+$payment-font-weight-medium: 500;
+$payment-font-weight-bold: 600;
 
 /* Typography */
 $payment-font-size-sm: 0.875rem;
