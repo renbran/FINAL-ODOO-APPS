@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { QRCodeField } from "@account_payment_final/js/fields/qr_code_field";
 import { PaymentApprovalWidget } from "@account_payment_final/js/components/payment_approval_widget";
@@ -16,21 +16,21 @@ QUnit.module("Account Payment Final", {}, function () {
                             id: { type: "integer" },
                             name: { type: "char" },
                             state: { type: "selection" },
-                            qr_code_data: { type: "text" },
-                        },
+                            qr_code_data: { type: "text" }
+},
                         records: [
                             {
                                 id: 1,
                                 name: "PAY/001",
                                 state: "approve",
-                                qr_code_data: "test-qr-data",
-                            },
-                        ],
-                    },
-                },
-            };
-        },
-    });
+                                qr_code_data: "test-qr-data";
+}
+]
+}
+}
+};
+        }
+});
 
     QUnit.test("QR Code Field renders correctly", async function (assert) {
         assert.expect(2);
@@ -41,11 +41,11 @@ QUnit.module("Account Payment Final", {}, function () {
                 if (args.method === "generate_qr_code") {
                     return {
                         success: true,
-                        qr_code: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-                    };
+                        qr_code: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+};
                 }
-            },
-        });
+            }
+});
 
         const model = makeFakeModel(env, "account.payment", this.serverData.models["account.payment"]);
         const record = model.get(1);
@@ -54,8 +54,8 @@ QUnit.module("Account Payment Final", {}, function () {
         const component = new QRCodeField(null, {
             record: record,
             name: "qr_code_data",
-            readonly: false,
-        });
+            readonly: false;
+});
 
         await component.mount(target);
 
@@ -81,8 +81,8 @@ QUnit.module("Account Payment Final", {}, function () {
                     };
                 }
                 return element;
-            },
-        });
+            }
+});
 
         const env = await makeTestEnv({
             serverData: this.serverData,
@@ -90,11 +90,11 @@ QUnit.module("Account Payment Final", {}, function () {
                 if (args.method === "generate_qr_code") {
                     return {
                         success: true,
-                        qr_code: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-                    };
+                        qr_code: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+};
                 }
-            },
-        });
+            }
+});
 
         const model = makeFakeModel(env, "account.payment", this.serverData.models["account.payment"]);
         const record = model.get(1);
@@ -103,8 +103,8 @@ QUnit.module("Account Payment Final", {}, function () {
         const component = new QRCodeField(null, {
             record: record,
             name: "qr_code_data",
-            readonly: false,
-        });
+            readonly: false;
+});
 
         await component.mount(target);
         
@@ -127,20 +127,20 @@ QUnit.module("Account Payment Final", {}, function () {
                         fields: {
                             id: { type: "integer" },
                             name: { type: "char" },
-                            state: { type: "selection" },
-                        },
+                            state: { type: "selection" }
+},
                         records: [
                             {
                                 id: 1,
                                 name: "PAY/001",
-                                state: "review",
-                            },
-                        ],
-                    },
-                },
-            };
-        },
-    });
+                                state: "review";
+}
+]
+}
+}
+};
+        }
+});
 
     QUnit.test("Payment Approval Widget renders correctly", async function (assert) {
         assert.expect(3);
@@ -156,23 +156,23 @@ QUnit.module("Account Payment Final", {}, function () {
                                 name: "Review",
                                 icon: "fa-search",
                                 is_current: true,
-                                is_completed: false,
-                            },
+                                is_completed: false;
+},
                             {
                                 id: 2,
                                 name: "Approve",
                                 icon: "fa-check",
                                 is_current: false,
-                                is_completed: false,
-                            },
-                        ],
+                                is_completed: false;
+}
+],
                         current_stage: "review",
                         can_approve: true,
-                        can_reject: true,
-                    };
+                        can_reject: true;
+};
                 }
-            },
-        });
+            }
+});
 
         const model = makeFakeModel(env, "account.payment", this.serverData.models["account.payment"]);
         const record = model.get(1);
@@ -181,8 +181,8 @@ QUnit.module("Account Payment Final", {}, function () {
         const component = new PaymentApprovalWidget(null, {
             record: record,
             readonly: false,
-            update: () => {},
-        });
+            update: () => {}
+});
 
         await component.mount(target);
 
@@ -206,15 +206,15 @@ QUnit.module("Account Payment Final", {}, function () {
                         stages: [],
                         current_stage: "review",
                         can_approve: true,
-                        can_reject: false,
-                    };
+                        can_reject: false;
+};
                 }
                 if (args.method === "approve_payment") {
                     approveMethodCalled = true;
                     return { success: true, message: "Payment approved" };
                 }
-            },
-        });
+            }
+});
 
         const model = makeFakeModel(env, "account.payment", this.serverData.models["account.payment"]);
         const record = model.get(1);
@@ -223,8 +223,8 @@ QUnit.module("Account Payment Final", {}, function () {
         const component = new PaymentApprovalWidget(null, {
             record: record,
             readonly: false,
-            update: () => {},
-        });
+            update: () => {}
+});
 
         await component.mount(target);
         
@@ -236,3 +236,4 @@ QUnit.module("Account Payment Final", {}, function () {
         component.destroy();
     });
 });
+

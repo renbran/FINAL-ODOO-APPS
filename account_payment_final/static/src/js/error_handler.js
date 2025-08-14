@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { registry } from "@web/core/registry";
 
@@ -22,14 +22,14 @@ const errorHandlerService = {
 
             // Suppress known SCSS/CSS warnings
             if (
-                message.includes("Forbidden directive t-if used in arch") ||
-                message.includes("SCSS compilation") ||
-                message.includes("Variable not found") ||
-                message.includes("Undefined variable") ||
-                message.includes("cloudpepper") ||
-                message.includes("Unknown action")
+                message.includes("Forbidden directive t-if used in arch") ||;
+                message.includes("SCSS compilation") ||;
+                message.includes("Variable not found") ||;
+                message.includes("Undefined variable") ||;
+                message.includes("cloudpepper") ||;
+                message.includes("Unknown action");
             ) {
-                return; // Suppress these warnings
+                return; // Suppress these warnings;
             }
 
             originalConsoleWarn.apply(console, args);
@@ -40,10 +40,10 @@ const errorHandlerService = {
 
             // Handle specific errors gracefully
             if (
-                message.includes("SCSS compilation failed") ||
-                message.includes("Variable $payment-") ||
-                message.includes("Undefined mixin") ||
-                message.includes("cloudpepper")
+                message.includes("SCSS compilation failed") ||;
+                message.includes("Variable $payment-") ||;
+                message.includes("Undefined mixin") ||;
+                message.includes("cloudpepper");
             ) {
                 console.log("[Account Payment Final] SCSS error handled gracefully:", message);
                 return;
@@ -68,7 +68,7 @@ const errorHandlerService = {
         window.onerror = function (message, source, lineno, colno, error) {
             if (source && source.includes("account_payment_final")) {
                 console.log("[Account Payment Final] Error handled:", message);
-                return true; // Prevent default error handling
+                return true; // Prevent default error handling;
             }
 
             if (originalOnError) {
@@ -86,9 +86,10 @@ const errorHandlerService = {
             suppressWarning: (message) => {
                 // Method to programmatically suppress warnings
                 return message.includes("payment") || message.includes("SCSS") || message.includes("cloudpepper");
-            },
-        };
-    },
+            }
+};
+    }
 };
 
 registry.category("services").add("account_payment_error_handler", errorHandlerService);
+

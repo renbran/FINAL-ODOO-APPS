@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 /**
  * CloudPepper Performance Optimization Module
@@ -49,7 +49,7 @@ const CloudPepperOptimizer = {
             window.odoo.actions['is-mobile'] = {
                 type: 'ir.actions.client',
                 tag: 'mobile_check',
-                name: 'Mobile Device Check'
+                name: 'Mobile Device Check';
             };
         }
     },
@@ -76,7 +76,7 @@ const CloudPepperOptimizer = {
                     try {
                         window.gtag('config', 'GA_MEASUREMENT_ID', {
                             page_title: document.title,
-                            page_location: window.location.href
+                            page_location: window.location.href;
                         });
                     } catch (error) {
                         console.warn('[CloudPepper] Analytics configuration warning:', error);
@@ -109,7 +109,7 @@ const CloudPepperOptimizer = {
         // Add font-display optimization
         const optimizeFontDisplay = () => {
             const style = document.createElement('style');
-            style.textContent = `
+            style.textContent = `;
                 @font-face {
                     font-family: 'FontAwesome';
                     font-display: swap;
@@ -163,7 +163,7 @@ const CloudPepperOptimizer = {
             
             // Suppress known third-party warnings
             if (message.includes('Page data capture skipped') ||
-                message.includes('Fullstory: Skipped by sampling') ||
+                message.includes('Fullstory: Skipped by sampling') ||;
                 message.includes('Check Redirect')) {
                 return;
             }
@@ -245,7 +245,7 @@ export default CloudPepperOptimizer;
             /Long Running Recorder/,
             /Fullstory/,
             /Page data capture skipped/,
-            /fontawesome-webfont.*preload/i
+            /fontawesome-webfont.*preload/i;
         ];
 
         console.warn = function(...args) {
@@ -320,3 +320,4 @@ export default CloudPepperOptimizer;
 
 // Register the optimizer service
 registry.category("services").add("cloudpepper_optimizer", CloudPepperOptimizer);
+

@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -9,8 +9,8 @@ export class PaymentApprovalDashboard extends Component {
     static template = "account_payment_approval.PaymentApprovalDashboard";
     static props = {
         record: Object,
-        name: String,
-    };
+        name: String;
+};
 
     setup() {
         this.orm = useService("orm");
@@ -22,8 +22,8 @@ export class PaymentApprovalDashboard extends Component {
             stats: {},
             userPermissions: {},
             recentPayments: [],
-            error: null,
-        });
+            error: null;
+});
 
         onWillStart(this.loadDashboardData);
     }
@@ -34,7 +34,7 @@ export class PaymentApprovalDashboard extends Component {
 
         try {
             // Load approval statistics
-            const statsResult = await this.orm.call(
+            const statsResult = await this.orm.call(;
                 "account.payment",
                 "get_approval_dashboard_data",
                 []
@@ -51,7 +51,7 @@ export class PaymentApprovalDashboard extends Component {
         } catch (error) {
             console.error("Error loading dashboard data:", error);
             this.state.error = error.message || _t("Failed to load dashboard data");
-            this.notification.add(
+            this.notification.add(;
                 _t("Error loading dashboard: %s", this.state.error),
                 { type: "danger" }
             );
@@ -75,13 +75,13 @@ export class PaymentApprovalDashboard extends Component {
                 views: [[false, 'tree'], [false, 'form']],
                 domain: domain,
                 context: {
-                    'default_payment_type': 'outbound',
-                },
-                target: 'current',
-            });
+                    'default_payment_type': 'outbound';
+},
+                target: 'current';
+});
         } catch (error) {
             console.error("Error opening payment list:", error);
-            this.notification.add(
+            this.notification.add(;
                 _t("Failed to open payment list"),
                 { type: "danger" }
             );
@@ -89,61 +89,61 @@ export class PaymentApprovalDashboard extends Component {
     }
 
     onPendingReviewClick() {
-        this.openPaymentList(
+        this.openPaymentList(;
             [['voucher_state', '=', 'submitted']],
-            _t("Payments Pending Review")
+            _t("Payments Pending Review");
         );
     }
 
     onPendingApprovalClick() {
-        this.openPaymentList(
+        this.openPaymentList(;
             [['voucher_state', '=', 'under_review']],
-            _t("Payments Pending Approval")
+            _t("Payments Pending Approval");
         );
     }
 
     onPendingAuthorizationClick() {
-        this.openPaymentList(
+        this.openPaymentList(;
             [['voucher_state', '=', 'approved']],
-            _t("Payments Pending Authorization")
+            _t("Payments Pending Authorization");
         );
     }
 
     onPendingPostingClick() {
-        this.openPaymentList(
+        this.openPaymentList(;
             [['voucher_state', '=', 'authorized']],
-            _t("Payments Pending Posting")
+            _t("Payments Pending Posting");
         );
     }
 
     onMyPaymentsClick() {
-        this.openPaymentList(
+        this.openPaymentList(;
             [['create_uid', '=', this.env.services.user.userId]],
-            _t("My Payments")
+            _t("My Payments");
         );
     }
 
     async onQuickAction(paymentId, action) {
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 `action_${action}`,
                 [paymentId]
             );
 
             if (result) {
-                this.notification.add(
+                this.notification.add(;
                     _t("Action completed successfully"),
                     { type: "success" }
                 );
-                await this.loadDashboardData(); // Refresh data
+                await this.loadDashboardData(); // Refresh data;
             } else {
                 throw new Error(_t("Action failed"));
             }
 
         } catch (error) {
             console.error(`Error performing ${action}:`, error);
-            this.notification.add(
+            this.notification.add(;
                 _t("Failed to perform action: %s", error.message || error),
                 { type: "danger" }
             );
@@ -159,11 +159,11 @@ export class PaymentApprovalDashboard extends Component {
                 name: _t("Payment"),
                 view_mode: 'form',
                 views: [[false, 'form']],
-                target: 'current',
-            });
+                target: 'current';
+});
         } catch (error) {
             console.error("Error opening payment form:", error);
-            this.notification.add(
+            this.notification.add(;
                 _t("Failed to open payment"),
                 { type: "danger" }
             );
@@ -178,8 +178,8 @@ export class PaymentApprovalDashboard extends Component {
             'approved': _t('Approved'),
             'authorized': _t('Authorized'),
             'posted': _t('Posted'),
-            'rejected': _t('Rejected'),
-        };
+            'rejected': _t('Rejected');
+};
         return stateLabels[state] || state;
     }
 
@@ -191,8 +191,8 @@ export class PaymentApprovalDashboard extends Component {
             'approved': 'badge-warning',
             'authorized': 'badge-success',
             'posted': 'badge-success',
-            'rejected': 'badge-danger',
-        };
+            'rejected': 'badge-danger';
+};
         return `badge ${badgeClasses[state] || 'badge-secondary'}`;
     }
 
@@ -200,33 +200,34 @@ export class PaymentApprovalDashboard extends Component {
         const permissions = this.state.userPermissions;
         
         switch (action) {
-            case 'review':
+            case 'review':;
                 return payment.voucher_state === 'submitted' && permissions.can_review;
-            case 'approve':
+            case 'approve':;
                 return payment.voucher_state === 'under_review' && permissions.can_approve;
-            case 'authorize':
+            case 'authorize':;
                 return payment.voucher_state === 'approved' && permissions.can_authorize;
-            case 'post':
+            case 'post':;
                 return payment.voucher_state === 'authorized' && permissions.can_post;
-            default:
+            default:;
                 return false;
         }
     }
 
     get hasPermissions() {
         const perms = this.state.userPermissions;
-        return perms.can_submit || perms.can_review || perms.can_approve || 
+        return perms.can_submit || perms.can_review || perms.can_approve || ;
                perms.can_authorize || perms.can_post || perms.is_manager;
     }
 
     get totalPendingCount() {
         const stats = this.state.stats;
-        return (stats.pending_review || 0) + 
-               (stats.pending_approval || 0) + 
-               (stats.pending_authorization || 0) + 
+        return (stats.pending_review || 0) + ;
+               (stats.pending_approval || 0) + ;
+               (stats.pending_authorization || 0) + ;
                (stats.pending_posting || 0);
     }
 }
 
 // Register the dashboard widget
 registry.category("fields").add("payment_approval_dashboard", PaymentApprovalDashboard);
+

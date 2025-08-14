@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -17,8 +17,8 @@ export class PaymentApprovalWidget extends Component {
     static props = {
         readonly: { type: Boolean, optional: true },
         record: Object,
-        update: Function,
-    };
+        update: Function;
+};
 
     setup() {
         // Core services
@@ -51,8 +51,8 @@ export class PaymentApprovalWidget extends Component {
             // Data states
             approvalHistory: [],
             nextActions: [],
-            workflowConfig: null,
-        });
+            workflowConfig: null;
+});
 
         // Event handlers
         this.onApprovalAction = this.onApprovalAction.bind(this);
@@ -81,13 +81,13 @@ export class PaymentApprovalWidget extends Component {
         this.state.hasError = false;
         
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "get_approval_workflow_data",
                 [this.props.record.resId],
                 {
-                    context: this.user.context,
-                }
+                    context: this.user.context;
+}
             );
 
             // Update state with backend data
@@ -117,8 +117,8 @@ export class PaymentApprovalWidget extends Component {
                 
                 this.notification.add(this.state.errorMessage, {
                     type: "warning",
-                    sticky: false,
-                });
+                    sticky: false;
+});
             }
         } finally {
             this.state.isLoading = false;
@@ -129,7 +129,7 @@ export class PaymentApprovalWidget extends Component {
      * Enhanced fallback stages with better state detection
      */
     getFallbackStages() {
-        const currentState = this.props.record.data.approval_state || 
+        const currentState = this.props.record.data.approval_state || ;
                            this.props.record.data.state || 'draft';
         const paymentType = this.props.record.data.payment_type || 'outbound';
         
@@ -159,7 +159,7 @@ export class PaymentApprovalWidget extends Component {
             status: this._getStageStatus(index, currentIndex),
             is_current: index === currentIndex,
             is_completed: index < currentIndex,
-            is_pending: index > currentIndex
+            is_pending: index > currentIndex;
         }));
     }
 
@@ -180,18 +180,18 @@ export class PaymentApprovalWidget extends Component {
         const userGroups = this.user.context.user_groups || [];
         
         // Check if user has manager permissions
-        const isManager = userGroups.includes('account_payment_final.group_payment_voucher_manager') ||
+        const isManager = userGroups.includes('account_payment_final.group_payment_voucher_manager') ||;
                          userGroups.includes('account.group_account_manager');
         
         // Basic permission logic
         switch (action) {
-            case 'submit':
+            case 'submit':;
                 return currentState === 'draft';
-            case 'approve':
+            case 'approve':;
                 return isManager && ['under_review', 'for_approval', 'for_authorization'].includes(currentState);
-            case 'reject':
+            case 'reject':;
                 return isManager && ['under_review', 'for_approval', 'for_authorization'].includes(currentState);
-            default:
+            default:;
                 return false;
         }
     }
@@ -227,22 +227,22 @@ export class PaymentApprovalWidget extends Component {
         const currentIndex = Array.from(buttons).findIndex(btn => btn === document.activeElement);
         
         switch (event.key) {
-            case 'ArrowLeft':
-            case 'ArrowUp':
+            case 'ArrowLeft':;
+            case 'ArrowUp':;
                 event.preventDefault();
                 const prevIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
                 buttons[prevIndex]?.focus();
                 break;
                 
-            case 'ArrowRight':
-            case 'ArrowDown':
+            case 'ArrowRight':;
+            case 'ArrowDown':;
                 event.preventDefault();
                 const nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
                 buttons[nextIndex]?.focus();
                 break;
                 
-            case 'Enter':
-            case ' ':
+            case 'Enter':;
+            case ' ':;
                 event.preventDefault();
                 document.activeElement?.click();
                 break;
@@ -258,8 +258,8 @@ export class PaymentApprovalWidget extends Component {
         // Validate action permissions
         if (!this._validateActionPermission(actionType)) {
             this.notification.add(_t("You don't have permission to perform this action"), {
-                type: "warning",
-            });
+                type: "warning";
+});
             return;
         }
 
@@ -272,7 +272,7 @@ export class PaymentApprovalWidget extends Component {
                 'review': 'action_review_payment', 
                 'approve': 'action_approve_payment',
                 'authorize': 'action_authorize_payment',
-                'post': 'action_post_payment'
+                'post': 'action_post_payment';
             };
             
             const method = methodMap[actionType];
@@ -280,13 +280,13 @@ export class PaymentApprovalWidget extends Component {
                 throw new Error(_t("Unknown action type: %s", actionType));
             }
 
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 method,
                 [this.props.record.resId],
                 {
-                    context: this.user.context,
-                }
+                    context: this.user.context;
+}
             );
 
             // Handle different response formats
@@ -295,8 +295,8 @@ export class PaymentApprovalWidget extends Component {
                 this.state.successMessage = result.message || _t("Action completed successfully");
                 
                 this.notification.add(this.state.successMessage, {
-                    type: "success",
-                });
+                    type: "success";
+});
                 
                 // Update record and reload data
                 await this.props.update();
@@ -318,8 +318,8 @@ export class PaymentApprovalWidget extends Component {
             this.state.errorMessage = error.message || _t("An error occurred while processing the action");
             
             this.notification.add(this.state.errorMessage, {
-                type: "danger",
-            });
+                type: "danger";
+});
             
             // Auto-clear error state
             setTimeout(() => {
@@ -346,8 +346,8 @@ export class PaymentApprovalWidget extends Component {
             cancelLabel: _t("Cancel"),
             confirm: async () => {
                 await this.onApprovalAction('reject');
-            },
-        });
+            }
+});
     }
 
     /**
@@ -355,15 +355,15 @@ export class PaymentApprovalWidget extends Component {
      */
     _validateActionPermission(actionType) {
         switch (actionType) {
-            case 'submit':
+            case 'submit':;
                 return this.state.canSubmit;
-            case 'approve':
+            case 'approve':;
                 return this.state.canApprove;
-            case 'authorize':
+            case 'authorize':;
                 return this.state.canAuthorize;
-            case 'reject':
+            case 'reject':;
                 return this.state.canReject;
-            default:
+            default:;
                 return false;
         }
     }
@@ -389,7 +389,7 @@ export class PaymentApprovalWidget extends Component {
         const config = {
             name: stage.name || stage.id,
             icon: stage.icon || 'fa-circle',
-            color: stage.color || 'secondary'
+            color: stage.color || 'secondary';
         };
         
         return config;
@@ -406,7 +406,7 @@ export class PaymentApprovalWidget extends Component {
                 type: 'submit',
                 label: _t('Submit for Review'),
                 class: 'btn-info o_btn_submit',
-                icon: 'fa-paper-plane'
+                icon: 'fa-paper-plane';
             });
         }
         
@@ -415,7 +415,7 @@ export class PaymentApprovalWidget extends Component {
                 type: 'approve',
                 label: _t('Approve'),
                 class: 'btn-success o_btn_approve',
-                icon: 'fa-check'
+                icon: 'fa-check';
             });
         }
         
@@ -424,7 +424,7 @@ export class PaymentApprovalWidget extends Component {
                 type: 'authorize',
                 label: _t('Authorize'),
                 class: 'btn-warning o_btn_authorize',
-                icon: 'fa-key'
+                icon: 'fa-key';
             });
         }
         
@@ -433,7 +433,7 @@ export class PaymentApprovalWidget extends Component {
                 type: 'reject',
                 label: _t('Reject'),
                 class: 'btn-danger o_btn_reject',
-                icon: 'fa-times'
+                icon: 'fa-times';
             });
         }
         
@@ -461,8 +461,8 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
             // Only show notification for critical errors
             if (error.status !== 404 && !error.message.includes('method not found')) {
                 this.notification.add("Failed to load approval workflow data", {
-                    type: "warning",
-                });
+                    type: "warning";
+});
             }
         } finally {
             this.state.isLoading = false;
@@ -480,21 +480,21 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
                 name: 'Draft',
                 description: 'Payment created',
                 status: currentState === 'draft' ? 'current' : 'completed',
-                icon: 'fa-edit'
+                icon: 'fa-edit';
             },
             {
                 id: 'review',
                 name: 'Review',
                 description: 'Under review',
                 status: currentState === 'under_review' ? 'current' : (currentState === 'draft' ? 'pending' : 'completed'),
-                icon: 'fa-search'
+                icon: 'fa-search';
             },
             {
                 id: 'approve',
                 name: 'Approved',
                 description: 'Payment approved',
                 status: currentState === 'approved' || currentState === 'posted' ? 'completed' : 'pending',
-                icon: 'fa-check'
+                icon: 'fa-check';
             }
         ];
     }
@@ -518,8 +518,8 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
             authorize: "Authorized",
             post: "Posted",
             cancel: "Cancelled",
-            reject: "Rejected",
-        };
+            reject: "Rejected";
+};
         
         const state = this.props.record.data.state;
         return stateLabels[state] || state.charAt(0).toUpperCase() + state.slice(1);
@@ -572,7 +572,7 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
         this.state.isLoading = true;
         
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "approve_payment",
                 [this.props.record.resId]
@@ -580,22 +580,22 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
 
             if (result.success) {
                 this.notification.add(result.message || "Payment approved successfully", {
-                    type: "success",
-                });
+                    type: "success";
+});
                 
                 // Refresh the record
                 await this.props.update();
                 await this.loadApprovalData();
             } else {
                 this.notification.add(result.message || "Failed to approve payment", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             console.error("Approval failed:", error);
             this.notification.add("An error occurred while approving the payment", {
-                type: "danger",
-            });
+                type: "danger";
+});
         } finally {
             this.state.isLoading = false;
         }
@@ -615,8 +615,8 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
             cancelLabel: "Cancel",
             confirm: async () => {
                 await this._performReject();
-            },
-        });
+            }
+});
     }
 
     /**
@@ -626,7 +626,7 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
         this.state.isLoading = true;
         
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "reject_payment",
                 [this.props.record.resId]
@@ -634,22 +634,22 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
 
             if (result.success) {
                 this.notification.add(result.message || "Payment rejected successfully", {
-                    type: "warning",
-                });
+                    type: "warning";
+});
                 
                 // Refresh the record
                 await this.props.update();
                 await this.loadApprovalData();
             } else {
                 this.notification.add(result.message || "Failed to reject payment", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             console.error("Rejection failed:", error);
             this.notification.add("An error occurred while rejecting the payment", {
-                type: "danger",
-            });
+                type: "danger";
+});
         } finally {
             this.state.isLoading = false;
         }
@@ -658,3 +658,4 @@ registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget
 
 // Register the component for use in form views
 registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget);
+

@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { Component, useState, onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -15,8 +15,8 @@ export class QRCodeWidget extends Component {
         this.state = useState({
             qrCode: null,
             verificationUrl: null,
-            loading: false,
-        });
+            loading: false;
+});
 
         onMounted(() => {
             this.loadQRData();
@@ -59,3 +59,4 @@ export class QRCodeWidget extends Component {
 }
 
 registry.category("fields").add("qr_code_widget", QRCodeWidget);
+

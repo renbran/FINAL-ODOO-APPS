@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { useEffect } from "@odoo/owl";
 import { url } from "@web/core/utils/urls";
@@ -9,7 +9,7 @@ import { Dropdown } from "@web/core/dropdown/dropdown";
 export class AppsMenu extends Dropdown {
 	static template = 'muk_web_theme.AppsMenu';
     static props = {
-    	...Dropdown.props
+    	...Dropdown.props;
     };
     setup() {
     	super.setup();
@@ -20,22 +20,22 @@ export class AppsMenu extends Dropdown {
             this.backgroundImageUrl = url('/web/image', {
                 model: 'res.company',
                 field: 'background_image',
-                id: this.companyService.currentCompany.id,
-            });
+                id: this.companyService.currentCompany.id;
+});
     	} else {
     		this.backgroundImageUrl = '/muk_web_theme/static/src/img/background.png';
     	}
-        useEffect(
+        useEffect(;
             (open) => {
             	if (open) {
             		const openMainPalette = (ev) => {
             	    	if (
-            	    		!this.commandServiceOpen && 
-            	    		ev.key.length === 1 &&
-            	    		!ev.ctrlKey &&
-            	    		!ev.altKey
+            	    		!this.commandServiceOpen && ;
+            	    		ev.key.length === 1 &&;
+            	    		!ev.ctrlKey &&;
+            	    		!ev.altKey;
             	    	) {
-	            	        this.commandService.openMainPalette(
+	            	        this.commandService.openMainPalette(;
             	        		{ searchValue: `/${ev.key}` }, 
             	        		() => { this.commandPaletteOpen = false; }
             	        	);
@@ -54,3 +54,4 @@ export class AppsMenu extends Dropdown {
     	useBus(this.env.bus, "ACTION_MANAGER:UI-UPDATED", this.close);
     }
 }
+

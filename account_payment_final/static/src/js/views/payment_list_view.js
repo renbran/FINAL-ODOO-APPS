@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { ListController } from "@web/views/list/list_controller";
 import { listView } from "@web/views/list/list_view";
@@ -31,8 +31,8 @@ export class PaymentListController extends ListController {
                 description: "Approve Selected",
                 callback: () => this.bulkApprove(),
                 icon: "fa-check",
-                sequence: 10,
-            };
+                sequence: 10;
+};
         }
 
         if (this.model.root.context.can_bulk_reject) {
@@ -40,16 +40,16 @@ export class PaymentListController extends ListController {
                 description: "Reject Selected",
                 callback: () => this.bulkReject(),
                 icon: "fa-times",
-                sequence: 20,
-            };
+                sequence: 20;
+};
         }
 
         actions.export_qr_codes = {
             description: "Export QR Codes",
             callback: () => this.exportQRCodes(),
             icon: "fa-qrcode",
-            sequence: 30,
-        };
+            sequence: 30;
+};
 
         return actions;
     }
@@ -62,8 +62,8 @@ export class PaymentListController extends ListController {
         
         if (selectedIds.length === 0) {
             this.notification.add("Please select payments to approve", {
-                type: "warning",
-            });
+                type: "warning";
+});
             return;
         }
 
@@ -74,8 +74,8 @@ export class PaymentListController extends ListController {
             cancelLabel: "Cancel",
             confirm: async () => {
                 await this._performBulkApprove(selectedIds);
-            },
-        });
+            }
+});
     }
 
     /**
@@ -83,20 +83,20 @@ export class PaymentListController extends ListController {
      */
     async _performBulkApprove(paymentIds) {
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "bulk_approve_payments",
                 [paymentIds]
             );
 
             if (result.success) {
-                this.notification.add(
+                this.notification.add(;
                     `${result.approved_count} payment(s) approved successfully`,
                     { type: "success" }
                 );
                 
                 if (result.failed_count > 0) {
-                    this.notification.add(
+                    this.notification.add(;
                         `${result.failed_count} payment(s) failed to approve`,
                         { type: "warning" }
                     );
@@ -106,14 +106,14 @@ export class PaymentListController extends ListController {
                 await this.model.root.load();
             } else {
                 this.notification.add(result.message || "Bulk approval failed", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             console.error("Bulk approval failed:", error);
             this.notification.add("An error occurred during bulk approval", {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -125,8 +125,8 @@ export class PaymentListController extends ListController {
         
         if (selectedIds.length === 0) {
             this.notification.add("Please select payments to reject", {
-                type: "warning",
-            });
+                type: "warning";
+});
             return;
         }
 
@@ -137,8 +137,8 @@ export class PaymentListController extends ListController {
             cancelLabel: "Cancel",
             confirm: async () => {
                 await this._performBulkReject(selectedIds);
-            },
-        });
+            }
+});
     }
 
     /**
@@ -146,20 +146,20 @@ export class PaymentListController extends ListController {
      */
     async _performBulkReject(paymentIds) {
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "bulk_reject_payments",
                 [paymentIds]
             );
 
             if (result.success) {
-                this.notification.add(
+                this.notification.add(;
                     `${result.rejected_count} payment(s) rejected successfully`,
                     { type: "warning" }
                 );
                 
                 if (result.failed_count > 0) {
-                    this.notification.add(
+                    this.notification.add(;
                         `${result.failed_count} payment(s) failed to reject`,
                         { type: "warning" }
                     );
@@ -169,14 +169,14 @@ export class PaymentListController extends ListController {
                 await this.model.root.load();
             } else {
                 this.notification.add(result.message || "Bulk rejection failed", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             console.error("Bulk rejection failed:", error);
             this.notification.add("An error occurred during bulk rejection", {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -188,13 +188,13 @@ export class PaymentListController extends ListController {
         
         if (selectedIds.length === 0) {
             this.notification.add("Please select payments to export QR codes", {
-                type: "warning",
-            });
+                type: "warning";
+});
             return;
         }
 
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "export_qr_codes_zip",
                 [selectedIds]
@@ -214,18 +214,18 @@ export class PaymentListController extends ListController {
                 window.URL.revokeObjectURL(url);
 
                 this.notification.add("QR codes exported successfully", {
-                    type: "success",
-                });
+                    type: "success";
+});
             } else {
                 this.notification.add(result.message || "QR code export failed", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             console.error("QR code export failed:", error);
             this.notification.add("An error occurred during QR code export", {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -243,8 +243,9 @@ export class PaymentListController extends ListController {
 // Payment List View
 export const paymentListView = {
     ...listView,
-    Controller: PaymentListController,
+    Controller: PaymentListController;
 };
 
 // Register the enhanced list view
 registry.category("views").add("payment_list", paymentListView);
+

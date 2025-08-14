@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { registry } from "@web/core/registry";
 import { FormController } from "@web/views/form/form_controller";
@@ -19,7 +19,7 @@ export class PaymentVoucherFormController extends FormController {
      */
     async onApprovalAction(action, record) {
         try {
-            const result = await this.model.orm.call(
+            const result = await this.model.orm.call(;
                 "account.payment",
                 action,
                 [record.resId]
@@ -28,7 +28,7 @@ export class PaymentVoucherFormController extends FormController {
             if (result && result.type === 'ir.actions.client') {
                 this.notification.add(result.params.message, {
                     type: result.params.type,
-                    sticky: result.params.sticky
+                    sticky: result.params.sticky;
                 });
             }
             
@@ -36,7 +36,7 @@ export class PaymentVoucherFormController extends FormController {
             await this.model.load();
         } catch (error) {
             this.notification.add("Action failed: " + error.message, {
-                type: "danger"
+                type: "danger";
             });
         }
     }
@@ -66,7 +66,7 @@ export class PaymentVoucherFormController extends FormController {
 
         if (errors.length > 0) {
             this.notification.add("Validation Error: " + errors.join(", "), {
-                type: "danger"
+                type: "danger";
             });
             return false;
         }
@@ -105,20 +105,20 @@ export class PaymentVoucherListController extends FormController {
         try {
             const recordIds = selectedRecords.map(r => r.resId);
             
-            const result = await this.model.orm.call(
+            const result = await this.model.orm.call(;
                 "account.payment",
                 "action_approve_payment",
                 [recordIds]
             );
             
             this.notification.add("Payments approved successfully", {
-                type: "success"
+                type: "success";
             });
             
             await this.model.load();
         } catch (error) {
             this.notification.add("Bulk approval failed: " + error.message, {
-                type: "danger"
+                type: "danger";
             });
         }
     }
@@ -133,8 +133,8 @@ import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 export class QRCodeWidget extends Component {
     static template = "osus_payment_voucher.QRCodeWidget";
     static props = {
-        ...standardWidgetProps,
-    };
+        ...standardWidgetProps;
+};
 
     get qrCodeUrl() {
         if (this.props.record.data.qr_code) {
@@ -162,8 +162,8 @@ export class QRCodeWidget extends Component {
 export class PaymentStatusBadge extends Component {
     static template = "osus_payment_voucher.PaymentStatusBadge";
     static props = {
-        ...standardWidgetProps,
-    };
+        ...standardWidgetProps;
+};
 
     get statusClass() {
         const state = this.props.record.data.approval_state;
@@ -173,7 +173,7 @@ export class PaymentStatusBadge extends Component {
             approved: 'badge-success',
             posted: 'badge-primary',
             rejected: 'badge-danger',
-            cancelled: 'badge-dark'
+            cancelled: 'badge-dark';
         };
         return statusClasses[state] || 'badge-secondary';
     }
@@ -186,7 +186,7 @@ export class PaymentStatusBadge extends Component {
             approved: 'fa-check',
             posted: 'fa-check-circle',
             rejected: 'fa-times',
-            cancelled: 'fa-ban'
+            cancelled: 'fa-ban';
         };
         return statusIcons[state] || 'fa-question';
     }
@@ -199,7 +199,7 @@ export class PaymentStatusBadge extends Component {
             approved: 'Approved',
             posted: 'Posted',
             rejected: 'Rejected',
-            cancelled: 'Cancelled'
+            cancelled: 'Cancelled';
         };
         return statusTexts[state] || 'Unknown';
     }
@@ -224,9 +224,9 @@ export class PaymentVoucherDashboard extends Component {
             stats: {
                 submitted: 0,
                 approved: 0,
-                rejected: 0
+                rejected: 0;
             },
-            loading: true
+            loading: true;
         });
         
         this.loadStats();
@@ -234,7 +234,7 @@ export class PaymentVoucherDashboard extends Component {
 
     async loadStats() {
         try {
-            const stats = await this.orm.call(
+            const stats = await this.orm.call(;
                 "account.payment",
                 "get_approval_statistics",
                 []
@@ -249,7 +249,7 @@ export class PaymentVoucherDashboard extends Component {
     }
 
     async openPayments(state) {
-        const action = await this.orm.call(
+        const action = await this.orm.call(;
             "ir.actions.act_window",
             "for_xml_id",
             ["osus_payment_voucher", "action_payment_voucher_all"]
@@ -258,7 +258,7 @@ export class PaymentVoucherDashboard extends Component {
         action.domain = [['approval_state', '=', state]];
         action.context = {
             ...action.context,
-            search_default_filter_state: 1
+            search_default_filter_state: 1;
         };
         
         this.action.doAction(action);
@@ -276,7 +276,7 @@ export const PaymentVoucherUtils = {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency || 'USD',
-            minimumFractionDigits: 2
+            minimumFractionDigits: 2;
         }).format(amount);
     },
 
@@ -290,7 +290,7 @@ export const PaymentVoucherUtils = {
             approved: '#28a745',
             posted: '#007bff',
             rejected: '#dc3545',
-            cancelled: '#343a40'
+            cancelled: '#343a40';
         };
         return colors[state] || '#6c757d';
     },

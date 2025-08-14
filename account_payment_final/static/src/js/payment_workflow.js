@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 /**
  * Payment Workflow Helper Module
@@ -18,37 +18,37 @@ export const PaymentWorkflowHelper = {
             draft: {
                 name: "Draft",
                 icon: "fa-edit",
-                color: "secondary"
+                color: "secondary";
             },
             under_review: {
                 name: "Under Review", 
                 icon: "fa-search",
-                color: "info"
+                color: "info";
             },
             for_approval: {
                 name: "For Approval",
                 icon: "fa-check",
-                color: "warning"
+                color: "warning";
             },
             for_authorization: {
                 name: "For Authorization",
                 icon: "fa-key",
-                color: "warning"
+                color: "warning";
             },
             approved: {
                 name: "Approved",
                 icon: "fa-check-circle",
-                color: "success"
+                color: "success";
             },
             posted: {
                 name: "Posted",
                 icon: "fa-check-circle",
-                color: "success"
+                color: "success";
             },
             rejected: {
                 name: "Rejected",
                 icon: "fa-times",
-                color: "danger"
+                color: "danger";
             }
         };
     },
@@ -62,7 +62,7 @@ export const PaymentWorkflowHelper = {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency.name || 'USD',
-            minimumFractionDigits: 2
+            minimumFractionDigits: 2;
         }).format(amount);
     },
 

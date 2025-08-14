@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { Component, useState, onWillStart, onWillUpdateProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -15,8 +15,8 @@ export class QRCodeField extends Component {
     static template = "account_payment_final.QRCodeField";
     static props = {
         ...standardFieldProps,
-        readonly: { type: Boolean, optional: true },
-    };
+        readonly: { type: Boolean, optional: true }
+};
 
     setup() {
         this.orm = useService("orm");
@@ -26,8 +26,8 @@ export class QRCodeField extends Component {
         this.state = useState({
             qrCode: null,
             isLoading: false,
-            error: null,
-        });
+            error: null;
+});
 
         onWillStart(async () => {
             await this.loadQRCode();
@@ -53,7 +53,7 @@ export class QRCodeField extends Component {
         this.state.error = null;
 
         try {
-            const result = await this.orm.call(
+            const result = await this.orm.call(;
                 "account.payment",
                 "generate_qr_code",
                 [this.props.record.resId]
@@ -89,13 +89,13 @@ export class QRCodeField extends Component {
             document.body.removeChild(link);
 
             this.notification.add("QR code downloaded successfully", {
-                type: "success",
-            });
+                type: "success";
+});
         } catch (error) {
             console.error("Download failed:", error);
             this.notification.add("Failed to download QR code", {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -112,13 +112,13 @@ export class QRCodeField extends Component {
             window.open(verifyUrl, '_blank', 'noopener,noreferrer');
 
             this.notification.add("Verification portal opened in new tab", {
-                type: "info",
-            });
+                type: "info";
+});
         } catch (error) {
             console.error("Failed to open verification portal:", error);
             this.notification.add("Failed to open verification portal", {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -138,7 +138,7 @@ export class QRCodeField extends Component {
             return "QR Code not available";
         }
         
-        return null; // Will show the QR code image
+        return null; // Will show the QR code image;
     }
 }
 
@@ -156,8 +156,8 @@ export class QRCodeWidget extends Component {
         this.orm = useService("orm");
         this.state = useState({
             qrCodeUrl: null,
-            isLoading: false,
-        });
+            isLoading: false;
+});
 
         onWillStart(async () => {
             await this.generateQRCode();
@@ -170,7 +170,7 @@ export class QRCodeWidget extends Component {
         this.state.isLoading = true;
         
         try {
-            const qrData = await this.orm.call(
+            const qrData = await this.orm.call(;
                 "account.payment",
                 "get_qr_verification_url",
                 [this.props.record.resId]
@@ -187,3 +187,4 @@ export class QRCodeWidget extends Component {
 
 // Register the widget for use in reports/readonly views
 registry.category("fields").add("qr_code_widget", QRCodeWidget);
+

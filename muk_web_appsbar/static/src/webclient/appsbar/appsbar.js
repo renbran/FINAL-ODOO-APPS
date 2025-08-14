@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { url } from '@web/core/utils/urls';
 import { useService } from '@web/core/utils/hooks';
@@ -15,19 +15,20 @@ export class AppsBar extends Component {
             this.sidebarImageUrl = url('/web/image', {
                 model: 'res.company',
                 field: 'appbar_image',
-                id: this.companyService.currentCompany.id,
-            });
+                id: this.companyService.currentCompany.id;
+});
     	}
     	const renderAfterMenuChange = () => {
             this.render();
         };
-        this.env.bus.addEventListener(
-        	'MENUS:APP-CHANGED', renderAfterMenuChange
+        this.env.bus.addEventListener(;
+        	'MENUS:APP-CHANGED', renderAfterMenuChange;
         );
         onWillUnmount(() => {
-            this.env.bus.removeEventListener(
-            	'MENUS:APP-CHANGED', renderAfterMenuChange
+            this.env.bus.removeEventListener(;
+            	'MENUS:APP-CHANGED', renderAfterMenuChange;
             );
         });
     }
 }
+

@@ -1,4 +1,4 @@
-/** @odoo-module **/
+﻿/** @odoo-module **/
 
 import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -18,8 +18,8 @@ export class DigitalSignatureWidget extends Component {
             signatureData: null,
             penColor: "#000000",
             penWidth: 2,
-            isReadonly: this.props.readonly || false,
-        });
+            isReadonly: this.props.readonly || false;
+});
 
         this.canvasRef = useRef("signatureCanvas");
         this.lastX = 0;
@@ -95,7 +95,7 @@ export class DigitalSignatureWidget extends Component {
         const rect = canvas.getBoundingClientRect();
         return {
             x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            y: e.clientY - rect.top;
         };
     }
 
@@ -104,7 +104,7 @@ export class DigitalSignatureWidget extends Component {
         const rect = canvas.getBoundingClientRect();
         return {
             x: e.touches[0].clientX - rect.left,
-            y: e.touches[0].clientY - rect.top
+            y: e.touches[0].clientY - rect.top;
         };
     }
 
@@ -180,16 +180,16 @@ export class DigitalSignatureWidget extends Component {
             
             // Update the record
             this.props.record.update({
-                [this.props.name]: base64Data
+                [this.props.name]: base64Data;
             });
 
             this.notification.add(_t("Signature saved successfully"), {
-                type: "success",
-            });
+                type: "success";
+});
         } catch (error) {
             this.notification.add(_t("Error saving signature: %s", error.message), {
-                type: "danger",
-            });
+                type: "danger";
+});
         }
     }
 
@@ -207,12 +207,12 @@ export class DigitalSignatureWidget extends Component {
         
         // Update the record
         this.props.record.update({
-            [this.props.name]: false
+            [this.props.name]: false;
         });
 
         this.notification.add(_t("Signature cleared"), {
-            type: "info",
-        });
+            type: "info";
+});
     }
 
     cleanup() {
@@ -290,12 +290,12 @@ registry.category("fields").add("digital_signature", DigitalSignatureWidget);
     handleTouch(e) {
         e.preventDefault();
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent(
+        const mouseEvent = new MouseEvent(;
             e.type === "touchstart" ? "mousedown" : e.type === "touchmove" ? "mousemove" : "mouseup",
             {
                 clientX: touch.clientX,
-                clientY: touch.clientY,
-            }
+                clientY: touch.clientY;
+}
         );
 
         this.canvasRef.el.dispatchEvent(mouseEvent);
@@ -333,8 +333,8 @@ registry.category("fields").add("digital_signature", DigitalSignatureWidget);
 
         // Show success notification
         this.env.services.notification.add("Signature saved successfully!", {
-            type: "success",
-        });
+            type: "success";
+});
     }
 
     changePenColor(color) {
@@ -377,8 +377,8 @@ export class QRCodeWidget extends Component {
             showScanner: false,
             scannerActive: false,
             verificationResult: null,
-            loading: false,
-        });
+            loading: false;
+});
 
         this.notification = useService("notification");
         this.rpc = useService("rpc");
@@ -409,20 +409,20 @@ export class QRCodeWidget extends Component {
                 model: "account.payment",
                 method: "action_regenerate_qr_code",
                 args: [this.props.record.resId],
-                kwargs: {},
-            });
+                kwargs: {}
+});
 
             // Reload the record to get updated QR code
             await this.props.record.load();
             await this.loadQRCode();
 
             this.notification.add("QR code regenerated successfully!", {
-                type: "success",
-            });
+                type: "success";
+});
         } catch (error) {
             this.notification.add("Failed to regenerate QR code", {
-                type: "danger",
-            });
+                type: "danger";
+});
         } finally {
             this.state.loading = false;
         }
@@ -445,8 +445,8 @@ export class QRCodeWidget extends Component {
     async startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" },
-            });
+                video: { facingMode: "environment" }
+});
 
             const video = this.scannerVideoRef.el;
             video.srcObject = stream;
@@ -456,8 +456,8 @@ export class QRCodeWidget extends Component {
             this.startQRDetection();
         } catch (error) {
             this.notification.add("Camera access denied or not available", {
-                type: "warning",
-            });
+                type: "warning";
+});
         }
     }
 
@@ -490,26 +490,26 @@ export class QRCodeWidget extends Component {
 
         try {
             const result = await this.rpc("/payment/qr/validate", {
-                qr_data: qrData,
-            });
+                qr_data: qrData;
+});
 
             this.state.verificationResult = result;
 
             if (result.success) {
                 this.notification.add("Payment validated successfully!", {
-                    type: "success",
-                });
+                    type: "success";
+});
                 this.stopCamera();
                 this.state.showScanner = false;
             } else {
                 this.notification.add(result.message || "Validation failed", {
-                    type: "danger",
-                });
+                    type: "danger";
+});
             }
         } catch (error) {
             this.notification.add("Validation error occurred", {
-                type: "danger",
-            });
+                type: "danger";
+});
         } finally {
             this.state.loading = false;
         }
@@ -528,8 +528,8 @@ export class QRCodeWidget extends Component {
         if (this.state.verificationUrl) {
             navigator.clipboard.writeText(this.state.verificationUrl).then(() => {
                 this.notification.add("Verification URL copied to clipboard!", {
-                    type: "info",
-                });
+                    type: "info";
+});
             });
         }
     }
@@ -553,11 +553,11 @@ export class PaymentApprovalDashboard extends Component {
                 pending_review: 0,
                 pending_approval: 0,
                 pending_authorization: 0,
-                total_amount: 0,
-            },
+                total_amount: 0;
+},
             recentPayments: [],
-            loading: true,
-        });
+            loading: true;
+});
 
         this.rpc = useService("rpc");
         this.action = useService("action");
@@ -573,8 +573,8 @@ export class PaymentApprovalDashboard extends Component {
                 model: "account.payment",
                 method: "get_approval_dashboard_data",
                 args: [],
-                kwargs: {},
-            });
+                kwargs: {}
+});
 
             this.state.stats = data.stats;
             this.state.recentPayments = data.recent_payments;
@@ -594,9 +594,9 @@ export class PaymentApprovalDashboard extends Component {
             domain: [["voucher_state", "=", state]],
             views: [
                 [false, "list"],
-                [false, "form"],
-            ],
-        });
+                [false, "form"]
+]
+});
     }
 
     openPayment(paymentId) {
@@ -605,9 +605,10 @@ export class PaymentApprovalDashboard extends Component {
             res_model: "account.payment",
             res_id: paymentId,
             view_mode: "form",
-            views: [[false, "form"]],
-        });
+            views: [[false, "form"]]
+});
     }
 }
 
 registry.category("actions").add("payment_approval_dashboard", PaymentApprovalDashboard);
+
