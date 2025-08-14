@@ -75,6 +75,8 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # IMMEDIATE EMERGENCY FIX: Must load FIRST before anything else
+            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
             # NUCLEAR FIX: Load nuclear fix FIRST to prevent ALL JavaScript crashes
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
@@ -110,6 +112,8 @@
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_web_dark': [
+            # IMMEDIATE EMERGENCY FIX for dark theme
+            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
             # Nuclear fix and critical error handlers for dark theme (MUST LOAD FIRST)
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
@@ -127,6 +131,8 @@
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
         ],
         'web.assets_frontend': [
+            # IMMEDIATE EMERGENCY FIX for frontend
+            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
             # Frontend verification portal
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',
             'account_payment_final/static/src/js/frontend/qr_verification.js',
