@@ -40,7 +40,7 @@
         'views/sale_order_views.xml',
         'views/account_move_views.xml', 
         'views/res_users_views.xml',
-        'views/frontend_templates.xml',
+        'views/reference_dashboard.xml',
         
         # Data
         'data/file_upload_data.xml',

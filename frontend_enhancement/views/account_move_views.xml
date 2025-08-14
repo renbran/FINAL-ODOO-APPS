@@ -6,11 +6,14 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="ref" string="Customer Reference" optional="show"/>
-                <field name="customer_reference_display" string="Reference Display" optional="hide"/>
-                <field name="reference_source" string="Ref Source" optional="hide"/>
-                <field name="reference_validated" string="Validated" optional="hide"/>
+            <!-- Make customer reference more prominent -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="ref" string="Customer Reference" 
+                       decoration-info="ref" 
+                       decoration-bf="ref"/>
+                <field name="reference_validated" string="Validated" 
+                       decoration-success="reference_validated"
+                       widget="boolean"/>
             </xpath>
         </field>
     </record>
@@ -53,25 +56,6 @@
             <xpath expr="//button[@name='button_draft']" position="before">
                 <button name="action_validate_reference" string="Validate Reference" type="object" class="btn-primary" attrs="{'invisible': ['|', ('ref', '=', False), ('reference_validated', '=', True)]}" groups="account.group_account_manager"/>
                 <button name="action_reset_reference_validation" string="Reset Validation" type="object" class="btn-secondary" attrs="{'invisible': [('reference_validated', '=', False)]}" groups="account.group_account_manager"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Enhanced Invoice Kanban View -->
-    <record id="view_account_move_kanban_enhanced" model="ir.ui.view">
-        <field name="name">account.move.kanban.enhanced</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_invoice_kanban"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@class='o_kanban_record_title']" position="after">
-                <div class="o_kanban_record_subtitle" t-if="record.ref.raw_value">
-                    <i class="fa fa-bookmark" title="Customer Reference"/>
-                    <field name="ref"/>
-                </div>
-                <div class="o_kanban_record_subtitle" t-if="record.reference_validated.raw_value">
-                    <i class="fa fa-check-circle text-success" title="Reference Validated"/>
-                    Validated
-                </div>
             </xpath>
         </field>
     </record>

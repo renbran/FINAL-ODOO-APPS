@@ -6,10 +6,14 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="client_order_ref" string="Client Reference" optional="show"/>
-                <field name="client_order_ref_display" string="Reference Display" optional="hide"/>
-                <field name="reference_priority" string="Priority" optional="hide"/>
+            <!-- Make client reference more prominent -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="client_order_ref" string="Client Reference" 
+                       decoration-info="client_order_ref" 
+                       decoration-bf="client_order_ref"/>
+                <field name="reference_priority" string="Priority" 
+                       decoration-danger="reference_priority == 'urgent'"
+                       decoration-warning="reference_priority == 'high'"/>
             </xpath>
         </field>
     </record>
@@ -36,24 +40,6 @@
             <!-- Add computed display field -->
             <xpath expr="//field[@name='order_reference_notes']" position="after">
                 <field name="client_order_ref_display" readonly="1" class="o_field_computed"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Enhanced Sale Order Kanban View -->
-    <record id="view_sale_order_kanban_enhanced" model="ir.ui.view">
-        <field name="name">sale.order.kanban.enhanced</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@class='o_kanban_record_title']" position="after">
-                <div class="o_kanban_record_subtitle" t-if="record.client_order_ref.raw_value">
-                    <i class="fa fa-tag" title="Client Reference"/>
-                    <field name="client_order_ref"/>
-                </div>
-                <div class="o_kanban_record_subtitle" t-if="record.reference_priority.raw_value != 'normal'">
-                    <field name="reference_priority" widget="priority"/>
-                </div>
             </xpath>
         </field>
     </record>
@@ -142,7 +128,7 @@
         <field name="name">Sales Orders (Enhanced)</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="context">{}</field>
         <field name="domain">[]</field>
         <field name="help" type="html">
