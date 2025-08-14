@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Enhanced Error Handler for CloudPepper JavaScript Issues
  * Specifically addresses MutationObserver and web.assets_web.min.js errors
  */
@@ -57,7 +57,7 @@
     };
 
     // 2. Global Error Event Handler
-    window.addEventListener(
+    window.addEventListener(;
         "error",
         function (event) {
             const message = event.message || "";
@@ -74,8 +74,8 @@
                         event.preventDefault();
                         event.stopPropagation();
                         return false;
-                    },
-                },
+                    }
+},
                 {
                     pattern: /parameter 1 is not of type 'Node'/,
                     handler: () => {
@@ -83,8 +83,8 @@
                         event.preventDefault();
                         event.stopPropagation();
                         return false;
-                    },
-                },
+                    }
+},
                 {
                     pattern: /Unexpected token ';'/,
                     handler: () => {
@@ -94,8 +94,8 @@
                             event.stopPropagation();
                             return false;
                         }
-                    },
-                },
+                    }
+},
                 {
                     pattern: /index\.ts-.*\.js/,
                     handler: () => {
@@ -103,9 +103,9 @@
                         event.preventDefault();
                         event.stopPropagation();
                         return false;
-                    },
-                },
-            ];
+                    }
+}
+];
 
             // Check each pattern
             for (const errorPattern of errorPatterns) {
@@ -120,13 +120,13 @@
                     message: message,
                     filename: filename,
                     line: lineno,
-                    column: colno,
-                });
+                    column: colno;
+});
             }
 
-            return true; // Allow other handlers to process
+            return true; // Allow other handlers to process;
         },
-        true
+        true;
     );
 
     // 3. Promise Rejection Handler
@@ -135,9 +135,9 @@
         const reasonText = reason ? reason.toString() : "";
 
         if (
-            reasonText.includes("MutationObserver") ||
-            reasonText.includes("parameter 1 is not of type") ||
-            reasonText.includes("Unexpected token")
+            reasonText.includes("MutationObserver") ||;
+            reasonText.includes("parameter 1 is not of type") ||;
+            reasonText.includes("Unexpected token");
         ) {
             console.debug("[CloudPepper Enhanced] Promise rejection suppressed:", reasonText);
             event.preventDefault();
@@ -159,8 +159,8 @@
             /Content script initialised/,
             /Recorder disabled/,
             /Failed to execute 'observe' on 'MutationObserver'/,
-            /parameter 1 is not of type 'Node'/,
-        ];
+            /parameter 1 is not of type 'Node'/;
+];
 
         for (const pattern of suppressPatterns) {
             if (pattern.test(message)) {
@@ -201,8 +201,9 @@
     window.CloudPepperEnhanced = {
         safeQuery: window.CloudPepperSafeQuery,
         domReady: enhancedDOMReady,
-        version: "1.0.0",
-    };
+        version: "1.0.0";
+};
 
     console.log("[CloudPepper Enhanced] All error handlers installed successfully");
 })();
+

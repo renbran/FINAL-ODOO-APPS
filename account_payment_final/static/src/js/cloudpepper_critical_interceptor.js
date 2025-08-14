@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CloudPepper Critical Error Interceptor
  * MUST LOAD FIRST - Prevents web.assets_web_dark.min.js crashes
  * NON-MODULE VERSION to prevent import statement errors
@@ -47,7 +47,7 @@ console.log("[CloudPepper Critical] Installing emergency error interceptors...")
 })();
 
 // CRITICAL: Global error interceptor for syntax errors
-window.addEventListener(
+window.addEventListener(;
     "error",
     function (event) {
         const message = event.message || "";
@@ -56,8 +56,8 @@ window.addEventListener(
 
         // Intercept web.assets_web_dark.min.js syntax errors
         if (
-            filename.includes("web.assets_web_dark.min.js") &&
-            (message.includes("Unexpected token") || message.includes("SyntaxError"))
+            filename.includes("web.assets_web_dark.min.js") &&;
+            (message.includes("Unexpected token") || message.includes("SyntaxError"));
         ) {
             console.warn(`[CloudPepper Critical] Syntax error in ${filename} intercepted:`, message);
             event.preventDefault();
@@ -75,8 +75,8 @@ window.addEventListener(
 
         // General MutationObserver TypeError protection
         if (
-            message.includes("Failed to execute 'observe' on 'MutationObserver'") ||
-            message.includes("parameter 1 is not of type 'Node'")
+            message.includes("Failed to execute 'observe' on 'MutationObserver'") ||;
+            message.includes("parameter 1 is not of type 'Node'");
         ) {
             console.warn("[CloudPepper Critical] MutationObserver TypeError intercepted:", message);
             event.preventDefault();
@@ -87,8 +87,8 @@ window.addEventListener(
         // Let other errors pass through
         return true;
     },
-    true
-); // Use capture phase to intercept before other handlers
+    true;
+); // Use capture phase to intercept before other handlers;
 
 // CRITICAL: Promise rejection handler
 window.addEventListener("unhandledrejection", function (event) {
@@ -96,10 +96,10 @@ window.addEventListener("unhandledrejection", function (event) {
     const reasonText = reason ? reason.toString() : "";
 
     if (
-        reasonText.includes("MutationObserver") ||
-        reasonText.includes("Unexpected token") ||
-        reasonText.includes("SyntaxError") ||
-        reasonText.includes("observe")
+        reasonText.includes("MutationObserver") ||;
+        reasonText.includes("Unexpected token") ||;
+        reasonText.includes("SyntaxError") ||;
+        reasonText.includes("observe");
     ) {
         console.warn("[CloudPepper Critical] Promise rejection intercepted:", reasonText);
         event.preventDefault();
@@ -149,14 +149,14 @@ window.CloudPepperCritical = {
             observer.observe(target, {
                 childList: true,
                 subtree: true,
-                ...options,
-            });
+                ...options;
+});
             return true;
         } catch (error) {
             console.debug("[CloudPepper Critical] Observation error handled:", error.message);
             return false;
         }
-    },
+    }
 };
 
 // CRITICAL: Asset loading error prevention
@@ -170,9 +170,9 @@ window.CloudPepperCritical = {
             element.addEventListener("error", function (event) {
                 const src = this.src || "";
                 if (
-                    src.includes("web.assets_web_dark") ||
-                    src.includes("index.ts-dbda1bbd") ||
-                    src.includes(".min.js")
+                    src.includes("web.assets_web_dark") ||;
+                    src.includes("index.ts-dbda1bbd") ||;
+                    src.includes(".min.js");
                 ) {
                     console.warn("[CloudPepper Critical] Script error intercepted:", src);
                     event.preventDefault();
@@ -192,5 +192,6 @@ window.CloudPepperCriticalInterceptor = {
     name: "cloudpepper_critical_interceptor",
     version: "1.0.0",
     installed: true,
-    utils: window.CloudPepperCritical,
+    utils: window.CloudPepperCritical;
 };
+

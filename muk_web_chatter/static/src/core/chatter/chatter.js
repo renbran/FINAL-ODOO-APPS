@@ -15,5 +15,6 @@ patch(Chatter.prototype, {
         const showTracking = !this.state.showTracking;
         browser.localStorage.setItem("muk_web_chatter.tracking", showTracking);
         this.state.showTracking = showTracking;
-    },
+    }
 });
+
