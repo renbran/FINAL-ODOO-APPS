@@ -8,7 +8,8 @@
                     <div class="card bg-light">
                         <div class="card-body py-2">
                             <h6 class="card-title mb-1">
-                                <i class="fa fa-tag text-primary"/> Quick Reference Guide
+                                <i class="fa fa-tag text-primary"/>
+ Quick Reference Guide
                             </h6>
                             <p class="card-text mb-0 small text-muted">
                                 Your orders are enhanced with client reference tracking for easy identification and priority management.
@@ -18,17 +19,18 @@
                 </div>
             </div>
         </xpath>
-        
+
         <!-- Add reference column to the table -->
         <xpath expr="//table//th[contains(text(), 'Order')]" position="after">
             <th class="text-left">Client Reference</th>
         </xpath>
-        
+
         <xpath expr="//table//td[1]" position="after">
             <td class="text-left">
                 <t t-if="order.client_order_ref">
                     <span class="badge badge-info">
-                        <i class="fa fa-tag"/> <t t-esc="order.client_order_ref"/>
+                        <i class="fa fa-tag"/>
+                        <t t-esc="order.client_order_ref"/>
                     </span>
                 </t>
                 <t t-else="">
@@ -46,7 +48,8 @@
                     <div class="card">
                         <div class="card-header bg-primary text-white">
                             <h4 class="mb-0">
-                                <i class="fa fa-clipboard-list"/> Order Reference Summary
+                                <i class="fa fa-clipboard-list"/>
+ Order Reference Summary
                             </h4>
                         </div>
                         <div class="card-body">
@@ -54,7 +57,8 @@
                                 <div class="col-md-4">
                                     <div class="border rounded p-3 bg-light">
                                         <h6 class="text-primary">
-                                            <i class="fa fa-list"/> Recent Orders with References
+                                            <i class="fa fa-list"/>
+ Recent Orders with References
                                         </h6>
                                         <p class="small text-muted mb-0">
                                             View your most recent orders that include client references
@@ -64,7 +68,8 @@
                                 <div class="col-md-4">
                                     <div class="border rounded p-3 bg-light">
                                         <h6 class="text-warning">
-                                            <i class="fa fa-exclamation-triangle"/> Priority Orders
+                                            <i class="fa fa-exclamation-triangle"/>
+ Priority Orders
                                         </h6>
                                         <p class="small text-muted mb-0">
                                             Orders marked as high or urgent priority
@@ -74,7 +79,8 @@
                                 <div class="col-md-4">
                                     <div class="border rounded p-3 bg-light">
                                         <h6 class="text-success">
-                                            <i class="fa fa-check-circle"/> Validated References
+                                            <i class="fa fa-check-circle"/>
+ Validated References
                                         </h6>
                                         <p class="small text-muted mb-0">
                                             Orders with validated client references

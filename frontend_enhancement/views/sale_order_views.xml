@@ -8,12 +8,8 @@
         <field name="arch" type="xml">
             <!-- Make client reference more prominent -->
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="client_order_ref" string="Client Reference" 
-                       decoration-info="client_order_ref" 
-                       decoration-bf="client_order_ref"/>
-                <field name="reference_priority" string="Priority" 
-                       decoration-danger="reference_priority == 'urgent'"
-                       decoration-warning="reference_priority == 'high'"/>
+                <field name="client_order_ref" string="Client Reference" decoration-info="client_order_ref" decoration-bf="client_order_ref"/>
+                <field name="reference_priority" string="Priority" decoration-danger="reference_priority == 'urgent'" decoration-warning="reference_priority == 'high'"/>
             </xpath>
         </field>
     </record>

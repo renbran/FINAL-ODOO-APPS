@@ -8,12 +8,8 @@
         <field name="arch" type="xml">
             <!-- Make customer reference more prominent -->
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="ref" string="Customer Reference" 
-                       decoration-info="ref" 
-                       decoration-bf="ref"/>
-                <field name="reference_validated" string="Validated" 
-                       decoration-success="reference_validated"
-                       widget="boolean"/>
+                <field name="ref" string="Customer Reference" decoration-info="ref" decoration-bf="ref"/>
+                <field name="reference_validated" string="Validated" decoration-success="reference_validated" widget="boolean"/>
             </xpath>
         </field>
     </record>
