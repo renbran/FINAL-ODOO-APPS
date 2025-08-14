@@ -69,45 +69,47 @@
     },
     'data': [
         # Security
-        'security/payment_approval_groups.xml',
+        'security/security_groups.xml',
         'security/ir.model.access.csv',
-        'security/record_rules.xml',
+        'security/payment_voucher_security.xml',
         
         # Data
-        'data/payment_sequences.xml',
+        'data/voucher_sequence.xml',
         'data/email_templates.xml',
         'data/system_parameters.xml',
         'data/cron_jobs.xml',
+        'data/server_actions.xml',
+        'data/qr_verification_data.xml',
         
         # Views
-        'views/menu_views.xml',
+        'views/menus.xml',
+        'views/menu_items.xml',
         'views/account_payment_views.xml',
-        'views/account_move_enhanced_views.xml',
+        'views/account_move_views.xml',
         'views/wizard_views.xml',
+        'views/payment_report_wizard.xml',
         'views/qr_verification_templates.xml',
+        'views/res_config_settings_views.xml',
         
         # Reports
         'reports/payment_voucher_report.xml',
         'reports/payment_summary_report.xml',
+        'reports/receipt_voucher_report.xml',
+        'reports/qr_verification_report.xml',
+        'reports/report_actions.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'account_payment_approval/static/src/scss/payment_approval.scss',
-            'account_payment_approval/static/src/scss/digital_signature.scss',
-            'account_payment_approval/static/src/scss/qr_verification.scss',
-            'account_payment_approval/static/src/scss/dashboard.scss',
-            'account_payment_approval/static/src/js/payment_approval_widget.js',
             'account_payment_approval/static/src/js/digital_signature_widget.js',
-            'account_payment_approval/static/src/js/qr_verification_widget.js',
-            'account_payment_approval/static/src/js/bulk_approval_widget.js',
-            'account_payment_approval/static/src/js/payment_dashboard.js',
-        ],
-        'web.assets_frontend': [
-            'account_payment_approval/static/src/scss/portal.scss',
-            'account_payment_approval/static/src/js/portal.js',
-        ],
-        'web.qunit_suite_tests': [
-            'account_payment_approval/static/tests/**/*.js',
+            'account_payment_approval/static/src/js/payment_approval_dashboard.js',
+            'account_payment_approval/static/src/js/qr_verification.js',
+            'account_payment_approval/static/src/js/qr_widget_enhanced.js',
+            'account_payment_approval/static/src/xml/account_move_templates.xml',
+            'account_payment_approval/static/src/xml/dashboard_templates.xml',
+            'account_payment_approval/static/src/xml/digital_signature_templates.xml',
+            'account_payment_approval/static/src/xml/payment_approval_templates.xml',
+            'account_payment_approval/static/src/xml/qr_verification_templates.xml',
         ],
     },
     'demo': [
