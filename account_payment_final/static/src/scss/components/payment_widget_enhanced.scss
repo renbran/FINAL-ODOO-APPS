@@ -1,10 +1,8 @@
- /* Payment Approval Widget Styles - Enhanced */
+/* Payment Approval Widget Styles - Enhanced */
 /* Modular component following Odoo 17 design patterns with CSS custom properties */
 
-@import '../variables';
-
 /* ============================================================================ */
- /* PAYMENT APPROVAL WIDGET - Enhanced Component */
+/* PAYMENT APPROVAL WIDGET - Enhanced Component */
 /* ============================================================================ */
 
 .o_payment_approval_widget {
@@ -29,9 +27,9 @@
     /* Loading state */
     &.o_loading {
         pointer-events: none;
-        
+
         &::after {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
@@ -51,7 +49,7 @@
         background: var(--bs-secondary-bg);
         pointer-events: none;
         opacity: 0.8;
-        
+
         .o_approval_actions {
             display: none;
         }
@@ -71,7 +69,7 @@
 }
 
 /* ============================================================================ */
- /* APPROVAL TIMELINE COMPONENT */
+/* APPROVAL TIMELINE COMPONENT */
 /* ============================================================================ */
 
 .o_approval_timeline {
@@ -107,9 +105,9 @@
             font-weight: var(--payment-font-weight-bold);
             transform: scale(1.05);
             z-index: 2;
-            
+
             &::after {
-                content: '';
+                content: "";
                 position: absolute;
                 width: 100%;
                 height: 2px;
@@ -123,7 +121,7 @@
         &.o_stage_completed {
             background: var(--payment-success);
             color: white;
-            
+
             i::before {
                 content: "\f00c"; /* checkmark */
             }
@@ -138,7 +136,7 @@
         &.o_stage_rejected {
             background: var(--payment-danger);
             color: white;
-            
+
             i::before {
                 content: "\f00d"; /* times */
             }
@@ -146,7 +144,7 @@
 
         /* Stage connectors (progress line) */
         &:not(:last-child)::before {
-            content: '';
+            content: "";
             position: absolute;
             right: -8px;
             top: 50%;
@@ -164,7 +162,7 @@
 }
 
 /* ============================================================================ */
- /* APPROVAL ACTIONS COMPONENT */
+/* APPROVAL ACTIONS COMPONENT */
 /* ============================================================================ */
 
 .o_approval_actions {
@@ -180,13 +178,13 @@
         border-radius: var(--payment-border-radius);
         transition: var(--payment-transition-fast);
         position: relative;
-        
+
         /* Loading state for buttons */
         &.o_loading {
             pointer-events: none;
-            
+
             &::after {
-                content: '';
+                content: "";
                 position: absolute;
                 width: 16px;
                 height: 16px;
@@ -203,7 +201,7 @@
             background: var(--state-approved);
             border-color: var(--state-approved);
             color: white;
-            
+
             &:hover:not(:disabled) {
                 background: var(--bs-success-border-subtle);
                 transform: translateY(-1px);
@@ -215,7 +213,7 @@
             background: var(--state-rejected);
             border-color: var(--state-rejected);
             color: white;
-            
+
             &:hover:not(:disabled) {
                 background: var(--bs-danger-border-subtle);
                 transform: translateY(-1px);
@@ -227,7 +225,7 @@
             background: var(--state-review);
             border-color: var(--state-review);
             color: white;
-            
+
             &:hover:not(:disabled) {
                 background: var(--bs-info-border-subtle);
                 transform: translateY(-1px);
@@ -238,7 +236,7 @@
             background: var(--state-authorization);
             border-color: var(--state-authorization);
             color: white;
-            
+
             &:hover:not(:disabled) {
                 background: var(--bs-warning-border-subtle);
                 transform: translateY(-1px);
@@ -255,7 +253,7 @@
 }
 
 /* ============================================================================ */
- /* RESPONSIVE DESIGN - Mobile First */
+/* RESPONSIVE DESIGN - Mobile First */
 /* ============================================================================ */
 
 /* Mobile devices (576px and down) */
@@ -264,21 +262,21 @@
         grid-template-columns: 1fr;
         gap: var(--payment-spacing-sm);
         padding: var(--payment-spacing-sm);
-        
+
         .o_approval_timeline {
             flex-direction: column;
             gap: var(--payment-spacing-xs);
-            
+
             .o_stage {
                 justify-content: center;
                 min-width: auto;
                 width: 100%;
             }
         }
-        
+
         .o_approval_actions {
             flex-direction: column;
-            
+
             .btn {
                 width: 100%;
                 min-width: auto;
@@ -298,18 +296,18 @@
 }
 
 /* ============================================================================ */
- /* ACCESSIBILITY ENHANCEMENTS */
+/* ACCESSIBILITY ENHANCEMENTS */
 /* ============================================================================ */
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     .o_payment_approval_widget {
         border: 2px solid;
-        
+
         .o_approval_timeline .o_stage {
             border: 1px solid;
         }
-        
+
         .o_approval_actions .btn {
             border: 2px solid;
         }
@@ -320,23 +318,23 @@
 @media (prefers-reduced-motion: reduce) {
     .o_payment_approval_widget {
         transition: none;
-        
+
         &:hover {
             transform: none;
         }
     }
-    
+
     .o_approval_timeline .o_stage {
         transition: none;
-        
+
         &.o_stage_current {
             transform: none;
         }
     }
-    
+
     .o_approval_actions .btn {
         transition: none;
-        
+
         &:hover {
             transform: none;
         }
@@ -360,22 +358,38 @@
 }
 
 /* ============================================================================ */
- /* ANIMATIONS */
+/* ANIMATIONS */
 /* ============================================================================ */
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideIn {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Apply animations to new stages */
@@ -384,7 +398,7 @@
 }
 
 /* ============================================================================ */
- /* DARK THEME SUPPORT */
+/* DARK THEME SUPPORT */
 /* ============================================================================ */
 
 @media (prefers-color-scheme: dark) {
@@ -393,10 +407,10 @@
             box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
         }
     }
-    
+
     .o_approval_timeline {
         background: var(--bs-dark);
-        
+
         .o_stage.o_stage_pending {
             background: var(--bs-secondary);
             color: var(--bs-light);
