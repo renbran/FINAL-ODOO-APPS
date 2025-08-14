@@ -64,11 +64,16 @@
                     <p>Hello,</p>
                     <p>A new file has been uploaded to your account:</p>
                     <ul>
-                        <li><strong>File Name:</strong> ${object.name}</li>
-                        <li><strong>Description:</strong> ${object.description or 'No description provided'}</li>
-                        <li><strong>Upload Date:</strong> ${object.upload_date}</li>
-                        <li><strong>File Size:</strong> ${object.get_human_readable_size()}</li>
-                        <li><strong>Uploaded By:</strong> ${object.user_id.name}</li>
+                        <li>
+                            <strong>File Name:</strong> ${object.name}</li>
+                        <li>
+                            <strong>Description:</strong> ${object.description or 'No description provided'}</li>
+                        <li>
+                            <strong>Upload Date:</strong> ${object.upload_date}</li>
+                        <li>
+                            <strong>File Size:</strong> ${object.get_human_readable_size()}</li>
+                        <li>
+                            <strong>Uploaded By:</strong> ${object.user_id.name}</li>
                     </ul>
                     <p>You can access your files through the portal or contact support if you need assistance.</p>
                     <hr/>

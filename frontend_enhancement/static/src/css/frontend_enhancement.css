@@ -220,12 +220,24 @@
     text-align: center;
 }
 
-.o_file_icon.pdf { color: #dc3545; }
-.o_file_icon.word { color: #0078d4; }
-.o_file_icon.excel { color: #107c41; }
-.o_file_icon.image { color: #6f42c1; }
-.o_file_icon.archive { color: #fd7e14; }
-.o_file_icon.text { color: #6c757d; }
+.o_file_icon.pdf {
+    color: #dc3545;
+}
+.o_file_icon.word {
+    color: #0078d4;
+}
+.o_file_icon.excel {
+    color: #107c41;
+}
+.o_file_icon.image {
+    color: #6f42c1;
+}
+.o_file_icon.archive {
+    color: #fd7e14;
+}
+.o_file_icon.text {
+    color: #6c757d;
+}
 
 .o_file_details {
     flex: 1;
@@ -412,21 +424,21 @@
         padding: 20px 15px;
         min-height: 150px;
     }
-    
+
     .o_stat_card {
         margin: 2px;
         padding: 8px;
     }
-    
+
     .o_stat_number {
         font-size: 1rem;
     }
-    
+
     .o_file_meta {
         flex-direction: column;
         gap: 5px;
     }
-    
+
     .o_file_actions {
         flex-direction: column;
         gap: 4px;
@@ -447,25 +459,35 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideUp {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(20px);
     }
-    to { 
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Print Styles */
@@ -475,7 +497,7 @@
     .btn {
         display: none !important;
     }
-    
+
     .o_reference_priority_badge,
     .o_reference_validation_badge {
         color: #000 !important;

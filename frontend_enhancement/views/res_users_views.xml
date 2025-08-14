@@ -7,15 +7,9 @@
         <field name="arch" type="xml">
             <form string="File Attachment">
                 <header>
-                    <button name="action_download" string="Download" type="object" 
-                            class="btn-primary" icon="fa-download"/>
-                    <button name="action_delete" string="Archive" type="object" 
-                            class="btn-secondary" icon="fa-archive"
-                            attrs="{'invisible': [('is_active', '=', False)]}"/>
-                    <button name="action_permanent_delete" string="Delete Permanently" 
-                            type="object" class="btn-danger" icon="fa-trash"
-                            groups="base.group_system"
-                            confirm="Are you sure you want to permanently delete this file?"/>
+                    <button name="action_download" string="Download" type="object" class="btn-primary" icon="fa-download"/>
+                    <button name="action_delete" string="Archive" type="object" class="btn-secondary" icon="fa-archive" attrs="{'invisible': [('is_active', '=', False)]}"/>
+                    <button name="action_permanent_delete" string="Delete Permanently" type="object" class="btn-danger" icon="fa-trash" groups="base.group_system" confirm="Are you sure you want to permanently delete this file?"/>
                     <field name="is_active" widget="boolean_toggle"/>
                 </header>
                 <sheet>
@@ -69,8 +63,7 @@
                 <field name="download_count"/>
                 <field name="access_level"/>
                 <field name="is_active"/>
-                <button name="action_download" string="Download" type="object" 
-                        icon="fa-download" class="btn-link"/>
+                <button name="action_download" string="Download" type="object" icon="fa-download" class="btn-link"/>
             </tree>
         </field>
     </record>
@@ -137,10 +130,8 @@
                         <div class="col-md-12">
                             <div class="o_horizontal_separator">File Attachments</div>
                             <div class="text-right mb-2">
-                                <button name="action_upload_file" string="Upload File" 
-                                        type="object" class="btn btn-primary" icon="fa-upload"/>
-                                <button name="action_view_attachments" string="View All Files" 
-                                        type="object" class="btn btn-secondary" icon="fa-folder"/>
+                                <button name="action_upload_file" string="Upload File" type="object" class="btn btn-primary" icon="fa-upload"/>
+                                <button name="action_view_attachments" string="View All Files" type="object" class="btn btn-secondary" icon="fa-folder"/>
                             </div>
                             <field name="attachment_ids" nolabel="1">
                                 <tree limit="5" decoration-muted="not is_active">
@@ -150,8 +141,7 @@
                                     <field name="upload_date"/>
                                     <field name="download_count"/>
                                     <field name="is_active"/>
-                                    <button name="action_download" string="Download" 
-                                            type="object" icon="fa-download" class="btn-link"/>
+                                    <button name="action_download" string="Download" type="object" icon="fa-download" class="btn-link"/>
                                 </tree>
                             </field>
                         </div>
@@ -181,8 +171,10 @@
                                     <field name="name"/>
                                 </div>
                                 <div class="o_kanban_record_subtitle">
-                                    <i class="fa fa-file"/> <field name="file_type"/>
-                                    | <field name="file_size"/> bytes
+                                    <i class="fa fa-file"/>
+                                    <field name="file_type"/>
+                                    |                                    <field name="file_size"/>
+ bytes
                                 </div>
                                 <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
@@ -190,7 +182,8 @@
                                     </div>
                                     <div class="oe_kanban_bottom_right">
                                         <span class="badge badge-pill badge-info">
-                                            <i class="fa fa-download"/> <field name="download_count"/>
+                                            <i class="fa fa-download"/>
+                                            <field name="download_count"/>
                                         </span>
                                     </div>
                                 </div>
@@ -236,23 +229,11 @@
     </record>
 
     <!-- Menu Items -->
-    <menuitem id="menu_file_attachments_root" 
-              name="File Attachments" 
-              parent="base.menu_administration"
-              sequence="100"/>
+    <menuitem id="menu_file_attachments_root" name="File Attachments" parent="base.menu_administration" sequence="100"/>
 
-    <menuitem id="menu_my_file_attachments"
-              name="My Files"
-              parent="menu_file_attachments_root"
-              action="action_my_file_attachments"
-              sequence="10"/>
+    <menuitem id="menu_my_file_attachments" name="My Files" parent="menu_file_attachments_root" action="action_my_file_attachments" sequence="10"/>
 
-    <menuitem id="menu_all_file_attachments"
-              name="All Files"
-              parent="menu_file_attachments_root"
-              action="action_file_attachment_all"
-              groups="base.group_system"
-              sequence="20"/>
+    <menuitem id="menu_all_file_attachments" name="All Files" parent="menu_file_attachments_root" action="action_file_attachment_all" groups="base.group_system" sequence="20"/>
 
     <!-- Search View for File Attachments -->
     <record id="view_file_attachment_search" model="ir.ui.view">
@@ -265,19 +246,13 @@
                 <field name="user_id"/>
                 <field name="file_type"/>
                 <separator/>
-                <filter name="my_files" string="My Files" 
-                        domain="[('user_id', '=', uid)]"/>
-                <filter name="active_files" string="Active Files" 
-                        domain="[('is_active', '=', True)]"/>
-                <filter name="public_files" string="Public Files" 
-                        domain="[('access_level', '=', 'public')]"/>
+                <filter name="my_files" string="My Files" domain="[('user_id', '=', uid)]"/>
+                <filter name="active_files" string="Active Files" domain="[('is_active', '=', True)]"/>
+                <filter name="public_files" string="Public Files" domain="[('access_level', '=', 'public')]"/>
                 <separator/>
-                <filter name="pdf_files" string="PDF Files" 
-                        domain="[('file_type', 'ilike', 'pdf')]"/>
-                <filter name="image_files" string="Image Files" 
-                        domain="[('file_type', 'ilike', 'image')]"/>
-                <filter name="office_files" string="Office Files" 
-                        domain="['|', ('file_type', 'ilike', 'word'), ('file_type', 'ilike', 'excel')]"/>
+                <filter name="pdf_files" string="PDF Files" domain="[('file_type', 'ilike', 'pdf')]"/>
+                <filter name="image_files" string="Image Files" domain="[('file_type', 'ilike', 'image')]"/>
+                <filter name="office_files" string="Office Files" domain="['|', ('file_type', 'ilike', 'word'), ('file_type', 'ilike', 'excel')]"/>
                 <group name="group_by">
                     <filter name="group_by_user" string="User" context="{'group_by': 'user_id'}"/>
                     <filter name="group_by_file_type" string="File Type" context="{'group_by': 'file_type'}"/>

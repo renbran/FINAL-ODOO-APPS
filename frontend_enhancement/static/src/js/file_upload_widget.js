@@ -23,10 +23,10 @@ export class FileUploadWidget extends Component {
             uploadProgress: 0,
             userStats: null,
         });
-        
+
         this.fileInputRef = useRef("fileInput");
         this.dropAreaRef = useRef("dropArea");
-        
+
         onMounted(() => {
             this.loadUserStats();
             this.setupDragAndDrop();
@@ -49,26 +49,26 @@ export class FileUploadWidget extends Component {
         if (!dropArea) return;
 
         // Prevent default drag behaviors
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
             dropArea.addEventListener(eventName, this.preventDefaults.bind(this));
             document.body.addEventListener(eventName, this.preventDefaults.bind(this));
         });
 
         // Highlight drop area when item is dragged over it
-        ['dragenter', 'dragover'].forEach(eventName => {
+        ["dragenter", "dragover"].forEach((eventName) => {
             dropArea.addEventListener(eventName, () => {
                 this.state.isDragging = true;
             });
         });
 
-        ['dragleave', 'drop'].forEach(eventName => {
+        ["dragleave", "drop"].forEach((eventName) => {
             dropArea.addEventListener(eventName, () => {
                 this.state.isDragging = false;
             });
         });
 
         // Handle dropped files
-        dropArea.addEventListener('drop', this.handleDrop.bind(this));
+        dropArea.addEventListener("drop", this.handleDrop.bind(this));
     }
 
     preventDefaults(e) {
@@ -93,7 +93,7 @@ export class FileUploadWidget extends Component {
         if (this.props.readonly) return;
 
         const fileArray = Array.from(files);
-        
+
         // Validate files
         for (const file of fileArray) {
             const validation = await this.validateFile(file);
@@ -108,33 +108,23 @@ export class FileUploadWidget extends Component {
         this.state.uploadProgress = 0;
 
         try {
-            const uploadPromises = fileArray.map(file => this.uploadFile(file));
+            const uploadPromises = fileArray.map((file) => this.uploadFile(file));
             const results = await Promise.all(uploadPromises);
-            
-            const successful = results.filter(r => r.success);
-            const failed = results.filter(r => !r.success);
+
+            const successful = results.filter((r) => r.success);
+            const failed = results.filter((r) => !r.success);
 
             if (successful.length > 0) {
-                this.notification.add(
-                    _t("Successfully uploaded %s file(s)", successful.length),
-                    { type: "success" }
-                );
+                this.notification.add(_t("Successfully uploaded %s file(s)", successful.length), { type: "success" });
                 await this.loadUserStats();
-                this.trigger('files-uploaded', { files: successful });
+                this.trigger("files-uploaded", { files: successful });
             }
 
             if (failed.length > 0) {
-                this.notification.add(
-                    _t("Failed to upload %s file(s)", failed.length),
-                    { type: "warning" }
-                );
+                this.notification.add(_t("Failed to upload %s file(s)", failed.length), { type: "warning" });
             }
-
         } catch (error) {
-            this.notification.add(
-                _t("Upload failed: %s", error.message),
-                { type: "danger" }
-            );
+            this.notification.add(_t("Upload failed: %s", error.message), { type: "danger" });
         } finally {
             this.state.isUploading = false;
             this.state.uploadProgress = 0;
@@ -152,7 +142,7 @@ export class FileUploadWidget extends Component {
         } catch (error) {
             return {
                 success: false,
-                error: _t("Validation failed: %s", error.message)
+                error: _t("Validation failed: %s", error.message),
             };
         }
     }
@@ -160,11 +150,11 @@ export class FileUploadWidget extends Component {
     async uploadFile(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
-            
+
             reader.onload = async (e) => {
                 try {
                     const fileData = btoa(e.target.result);
-                    
+
                     const result = await this.rpc("/web/file_upload/create", {
                         file_data: fileData,
                         name: file.name,
@@ -173,24 +163,23 @@ export class FileUploadWidget extends Component {
                         related_model: this.props.record.resModel,
                         related_record_id: this.props.record.resId,
                     });
-                    
+
                     resolve(result);
-                    
                 } catch (error) {
                     resolve({
                         success: false,
-                        error: error.message
+                        error: error.message,
                     });
                 }
             };
-            
+
             reader.onerror = () => {
                 resolve({
                     success: false,
-                    error: _t("Failed to read file")
+                    error: _t("Failed to read file"),
                 });
             };
-            
+
             reader.readAsBinaryString(file);
         });
     }
@@ -218,28 +207,28 @@ export class FileUploadWidget extends Component {
     }
 
     formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0) return "0 Bytes";
         const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const sizes = ["Bytes", "KB", "MB", "GB"];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     }
 
     getFileTypeIcon(mimeType) {
         const iconMap = {
-            'application/pdf': 'fa-file-pdf-o',
-            'application/msword': 'fa-file-word-o',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'fa-file-word-o',
-            'application/vnd.ms-excel': 'fa-file-excel-o',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'fa-file-excel-o',
-            'text/plain': 'fa-file-text-o',
-            'image/jpeg': 'fa-file-image-o',
-            'image/png': 'fa-file-image-o',
-            'image/gif': 'fa-file-image-o',
-            'application/zip': 'fa-file-archive-o',
+            "application/pdf": "fa-file-pdf-o",
+            "application/msword": "fa-file-word-o",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "fa-file-word-o",
+            "application/vnd.ms-excel": "fa-file-excel-o",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "fa-file-excel-o",
+            "text/plain": "fa-file-text-o",
+            "image/jpeg": "fa-file-image-o",
+            "image/png": "fa-file-image-o",
+            "image/gif": "fa-file-image-o",
+            "application/zip": "fa-file-archive-o",
         };
-        
-        return iconMap[mimeType] || 'fa-file-o';
+
+        return iconMap[mimeType] || "fa-file-o";
     }
 }
 

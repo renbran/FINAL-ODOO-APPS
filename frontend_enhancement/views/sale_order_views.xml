@@ -27,12 +27,12 @@
                     <field name="reference_priority" widget="priority"/>
                 </div>
             </xpath>
-            
+
             <!-- Add reference notes section -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="order_reference_notes" placeholder="Additional notes about the order reference..." class="o_field_text"/>
             </xpath>
-            
+
             <!-- Add computed display field -->
             <xpath expr="//field[@name='order_reference_notes']" position="after">
                 <field name="client_order_ref_display" readonly="1" class="o_field_computed"/>
@@ -48,7 +48,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@class='o_kanban_record_title']" position="after">
                 <div class="o_kanban_record_subtitle" t-if="record.client_order_ref.raw_value">
-                    <i class="fa fa-tag" title="Client Reference"/> 
+                    <i class="fa fa-tag" title="Client Reference"/>
                     <field name="client_order_ref"/>
                 </div>
                 <div class="o_kanban_record_subtitle" t-if="record.reference_priority.raw_value != 'normal'">
@@ -66,27 +66,21 @@
         <field name="arch" type="xml">
             <!-- Add client reference search -->
             <xpath expr="//field[@name='name']" position="after">
-                <field name="client_order_ref" string="Client Reference" 
-                       filter_domain="[('client_order_ref', 'ilike', self)]"/>
-                <field name="client_order_ref_display" string="Reference Display"
-                       filter_domain="[('client_order_ref_display', 'ilike', self)]"/>
+                <field name="client_order_ref" string="Client Reference" filter_domain="[('client_order_ref', 'ilike', self)]"/>
+                <field name="client_order_ref_display" string="Reference Display" filter_domain="[('client_order_ref_display', 'ilike', self)]"/>
             </xpath>
-            
+
             <!-- Add reference priority filter -->
             <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
                 <separator/>
-                <filter name="urgent_references" string="Urgent Priority" 
-                        domain="[('reference_priority', '=', 'urgent')]"/>
-                <filter name="high_references" string="High Priority" 
-                        domain="[('reference_priority', '=', 'high')]"/>
-                <filter name="with_client_ref" string="Has Client Reference" 
-                        domain="[('client_order_ref', '!=', False)]"/>
+                <filter name="urgent_references" string="Urgent Priority" domain="[('reference_priority', '=', 'urgent')]"/>
+                <filter name="high_references" string="High Priority" domain="[('reference_priority', '=', 'high')]"/>
+                <filter name="with_client_ref" string="Has Client Reference" domain="[('client_order_ref', '!=', False)]"/>
             </xpath>
-            
+
             <!-- Add groupby options -->
             <xpath expr="//group[@name='group_by']" position="inside">
-                <filter name="group_by_reference_priority" string="Reference Priority" 
-                        context="{'group_by': 'reference_priority'}"/>
+                <filter name="group_by_reference_priority" string="Reference Priority" context="{'group_by': 'reference_priority'}"/>
             </xpath>
         </field>
     </record>
@@ -103,24 +97,24 @@
                         <div class="card">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">
-                                    <i class="fa fa-tag"/> Order Reference Information
+                                    <i class="fa fa-tag"/>
+ Order Reference Information
                                 </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <strong>Client Order Reference:</strong>
-                                        <p class="text-primary"><t t-esc="sale_order.client_order_ref"/></p>
+                                        <p class="text-primary">
+                                            <t t-esc="sale_order.client_order_ref"/>
+                                        </p>
                                     </div>
                                     <div class="col-md-6" t-if="sale_order.reference_priority != 'normal'">
                                         <strong>Priority:</strong>
                                         <p>
-                                            <span t-if="sale_order.reference_priority == 'urgent'" 
-                                                  class="badge badge-danger">Urgent</span>
-                                            <span t-elif="sale_order.reference_priority == 'high'" 
-                                                  class="badge badge-warning">High</span>
-                                            <span t-elif="sale_order.reference_priority == 'low'" 
-                                                  class="badge badge-info">Low</span>
+                                            <span t-if="sale_order.reference_priority == 'urgent'" class="badge badge-danger">Urgent</span>
+                                            <span t-elif="sale_order.reference_priority == 'high'" class="badge badge-warning">High</span>
+                                            <span t-elif="sale_order.reference_priority == 'low'" class="badge badge-info">Low</span>
                                             <span t-else="" class="badge badge-secondary">
                                                 <t t-esc="sale_order.reference_priority.title()"/>
                                             </span>
@@ -130,7 +124,9 @@
                                 <div class="row" t-if="sale_order.order_reference_notes">
                                     <div class="col-12">
                                         <strong>Reference Notes:</strong>
-                                        <p><t t-esc="sale_order.order_reference_notes"/></p>
+                                        <p>
+                                            <t t-esc="sale_order.order_reference_notes"/>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -160,9 +156,5 @@
     </record>
 
     <!-- Menu item for enhanced view -->
-    <menuitem id="menu_sale_orders_enhanced"
-              name="Sales Orders (Enhanced)"
-              parent="sale.sale_menu_root"
-              action="action_orders_enhanced"
-              sequence="10"/>
+    <menuitem id="menu_sale_orders_enhanced" name="Sales Orders (Enhanced)" parent="sale.sale_menu_root" action="action_orders_enhanced" sequence="10"/>
 </odoo>

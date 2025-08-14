@@ -24,23 +24,21 @@
             <!-- Enhance customer reference section -->
             <xpath expr="//field[@name='ref']" position="replace">
                 <div class="o_row">
-                    <field name="ref" placeholder="Enter customer reference..." 
-                           class="o_field_highlight" style="width: 60%;"/>
+                    <field name="ref" placeholder="Enter customer reference..." class="o_field_highlight" style="width: 60%;"/>
                     <field name="reference_source" style="width: 35%;"/>
                 </div>
             </xpath>
-            
+
             <!-- Add computed display field -->
             <xpath expr="//field[@name='ref']" position="after">
                 <field name="customer_reference_display" readonly="1" class="o_field_computed"/>
             </xpath>
-            
+
             <!-- Add validation section -->
             <xpath expr="//field[@name='customer_reference_display']" position="after">
                 <div class="o_row" groups="account.group_account_manager">
                     <field name="reference_validated" readonly="1"/>
-                    <field name="reference_validation_date" readonly="1" 
-                           attrs="{'invisible': [('reference_validated', '=', False)]}"/>
+                    <field name="reference_validation_date" readonly="1" attrs="{'invisible': [('reference_validated', '=', False)]}"/>
                 </div>
             </xpath>
         </field>
@@ -53,14 +51,8 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_draft']" position="before">
-                <button name="action_validate_reference" string="Validate Reference" 
-                        type="object" class="btn-primary"
-                        attrs="{'invisible': ['|', ('ref', '=', False), ('reference_validated', '=', True)]}"
-                        groups="account.group_account_manager"/>
-                <button name="action_reset_reference_validation" string="Reset Validation" 
-                        type="object" class="btn-secondary"
-                        attrs="{'invisible': [('reference_validated', '=', False)]}"
-                        groups="account.group_account_manager"/>
+                <button name="action_validate_reference" string="Validate Reference" type="object" class="btn-primary" attrs="{'invisible': ['|', ('ref', '=', False), ('reference_validated', '=', True)]}" groups="account.group_account_manager"/>
+                <button name="action_reset_reference_validation" string="Reset Validation" type="object" class="btn-secondary" attrs="{'invisible': [('reference_validated', '=', False)]}" groups="account.group_account_manager"/>
             </xpath>
         </field>
     </record>
@@ -73,7 +65,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@class='o_kanban_record_title']" position="after">
                 <div class="o_kanban_record_subtitle" t-if="record.ref.raw_value">
-                    <i class="fa fa-bookmark" title="Customer Reference"/> 
+                    <i class="fa fa-bookmark" title="Customer Reference"/>
                     <field name="ref"/>
                 </div>
                 <div class="o_kanban_record_subtitle" t-if="record.reference_validated.raw_value">
@@ -92,31 +84,23 @@
         <field name="arch" type="xml">
             <!-- Add customer reference search -->
             <xpath expr="//field[@name='name']" position="after">
-                <field name="ref" string="Customer Reference" 
-                       filter_domain="[('ref', 'ilike', self)]"/>
-                <field name="customer_reference_display" string="Reference Display"
-                       filter_domain="[('customer_reference_display', 'ilike', self)]"/>
+                <field name="ref" string="Customer Reference" filter_domain="[('ref', 'ilike', self)]"/>
+                <field name="customer_reference_display" string="Reference Display" filter_domain="[('customer_reference_display', 'ilike', self)]"/>
             </xpath>
-            
+
             <!-- Add reference validation filters -->
             <xpath expr="//filter[@name='late']" position="after">
                 <separator/>
-                <filter name="validated_references" string="Validated References" 
-                        domain="[('reference_validated', '=', True)]"/>
-                <filter name="unvalidated_references" string="Unvalidated References" 
-                        domain="[('reference_validated', '=', False), ('ref', '!=', False)]"/>
-                <filter name="has_customer_ref" string="Has Customer Reference" 
-                        domain="[('ref', '!=', False)]"/>
-                <filter name="from_sale_order" string="From Sale Order" 
-                        domain="[('reference_source', '=', 'sale_order')]"/>
+                <filter name="validated_references" string="Validated References" domain="[('reference_validated', '=', True)]"/>
+                <filter name="unvalidated_references" string="Unvalidated References" domain="[('reference_validated', '=', False), ('ref', '!=', False)]"/>
+                <filter name="has_customer_ref" string="Has Customer Reference" domain="[('ref', '!=', False)]"/>
+                <filter name="from_sale_order" string="From Sale Order" domain="[('reference_source', '=', 'sale_order')]"/>
             </xpath>
-            
+
             <!-- Add groupby options -->
             <xpath expr="//group[@name='group_by']" position="inside">
-                <filter name="group_by_reference_source" string="Reference Source" 
-                        context="{'group_by': 'reference_source'}"/>
-                <filter name="group_by_reference_validated" string="Reference Validation" 
-                        context="{'group_by': 'reference_validated'}"/>
+                <filter name="group_by_reference_source" string="Reference Source" context="{'group_by': 'reference_source'}"/>
+                <filter name="group_by_reference_validated" string="Reference Validation" context="{'group_by': 'reference_validated'}"/>
             </xpath>
         </field>
     </record>
@@ -133,7 +117,8 @@
                         <div class="card">
                             <div class="card-header bg-info text-white">
                                 <h5 class="mb-0">
-                                    <i class="fa fa-bookmark"/> Reference Information
+                                    <i class="fa fa-bookmark"/>
+ Reference Information
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -142,25 +127,25 @@
                                         <strong>Customer Reference:</strong>
                                         <p class="text-info">
                                             <t t-esc="invoice.ref"/>
-                                            <span t-if="invoice.reference_validated" 
-                                                  class="badge badge-success ml-2">
-                                                <i class="fa fa-check"/> Validated
+                                            <span t-if="invoice.reference_validated" class="badge badge-success ml-2">
+                                                <i class="fa fa-check"/>
+ Validated
                                             </span>
                                         </p>
                                     </div>
                                     <div class="col-md-6" t-if="invoice.invoice_origin">
                                         <strong>Origin:</strong>
-                                        <p><t t-esc="invoice.invoice_origin"/></p>
+                                        <p>
+                                            <t t-esc="invoice.invoice_origin"/>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="row" t-if="invoice.reference_source">
                                     <div class="col-md-6">
                                         <strong>Reference Source:</strong>
                                         <p>
-                                            <span t-if="invoice.reference_source == 'sale_order'" 
-                                                  class="badge badge-primary">Sale Order</span>
-                                            <span t-elif="invoice.reference_source == 'manual'" 
-                                                  class="badge badge-secondary">Manual Entry</span>
+                                            <span t-if="invoice.reference_source == 'sale_order'" class="badge badge-primary">Sale Order</span>
+                                            <span t-elif="invoice.reference_source == 'manual'" class="badge badge-secondary">Manual Entry</span>
                                             <span t-else="" class="badge badge-light">
                                                 <t t-esc="invoice.reference_source.replace('_', ' ').title()"/>
                                             </span>
@@ -168,8 +153,9 @@
                                     </div>
                                     <div class="col-md-6" t-if="invoice.reference_validation_date">
                                         <strong>Validated On:</strong>
-                                        <p><t t-esc="invoice.reference_validation_date" 
-                                             t-options="{'widget': 'datetime'}"/></p>
+                                        <p>
+                                            <t t-esc="invoice.reference_validation_date" t-options="{'widget': 'datetime'}"/>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -199,11 +185,7 @@
     </record>
 
     <!-- Menu item for enhanced invoices -->
-    <menuitem id="menu_action_move_out_invoice_enhanced"
-              name="Customer Invoices (Enhanced)"
-              parent="account.menu_finance_receivables"
-              action="action_move_out_invoice_enhanced"
-              sequence="5"/>
+    <menuitem id="menu_action_move_out_invoice_enhanced" name="Customer Invoices (Enhanced)" parent="account.menu_finance_receivables" action="action_move_out_invoice_enhanced" sequence="5"/>
 
     <!-- Dashboard for Reference Statistics -->
     <record id="view_account_reference_dashboard" model="ir.ui.view">
@@ -232,9 +214,5 @@
     </record>
 
     <!-- Menu for Reference Dashboard -->
-    <menuitem id="menu_account_reference_dashboard"
-              name="Reference Dashboard"
-              parent="account.menu_finance_reports"
-              action="action_account_reference_dashboard"
-              sequence="50"/>
+    <menuitem id="menu_account_reference_dashboard" name="Reference Dashboard" parent="account.menu_finance_reports" action="action_account_reference_dashboard" sequence="50"/>
 </odoo>

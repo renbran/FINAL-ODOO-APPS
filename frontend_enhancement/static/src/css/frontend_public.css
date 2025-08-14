@@ -15,7 +15,7 @@
 
 /* Portal Layout Enhancements */
 .o_portal_wrap {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Portal Header Styling */
@@ -174,15 +174,33 @@
     text-align: center;
 }
 
-.file-icon.pdf { color: #dc3545; }
-.file-icon.word { color: #0078d4; }
-.file-icon.excel { color: #107c41; }
-.file-icon.powerpoint { color: #d04423; }
-.file-icon.image { color: #6f42c1; }
-.file-icon.archive { color: #fd7e14; }
-.file-icon.text { color: #6c757d; }
-.file-icon.video { color: #e83e8c; }
-.file-icon.audio { color: #20c997; }
+.file-icon.pdf {
+    color: #dc3545;
+}
+.file-icon.word {
+    color: #0078d4;
+}
+.file-icon.excel {
+    color: #107c41;
+}
+.file-icon.powerpoint {
+    color: #d04423;
+}
+.file-icon.image {
+    color: #6f42c1;
+}
+.file-icon.archive {
+    color: #fd7e14;
+}
+.file-icon.text {
+    color: #6c757d;
+}
+.file-icon.video {
+    color: #e83e8c;
+}
+.file-icon.audio {
+    color: #20c997;
+}
 
 /* Button Enhancements */
 .btn-portal-primary {
@@ -430,7 +448,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive Design */
@@ -438,31 +458,31 @@
     .portal-card .card-body {
         padding: 15px;
     }
-    
+
     .file-upload-area {
         padding: 30px 15px;
         min-height: 140px;
     }
-    
+
     .table-enhanced {
         font-size: 0.9rem;
     }
-    
+
     .btn-portal-primary,
     .btn-portal-secondary {
         padding: 8px 15px;
         font-size: 0.9rem;
     }
-    
+
     .reference-info-card {
         padding: 15px;
         margin: 10px 0;
     }
-    
+
     .empty-state {
         padding: 40px 15px;
     }
-    
+
     .empty-state-icon {
         font-size: 3rem;
     }
@@ -472,23 +492,23 @@
     .portal-card .card-header {
         padding: 15px;
     }
-    
+
     .table-enhanced thead th {
         padding: 10px 8px;
         font-size: 0.8rem;
     }
-    
+
     .table-enhanced tbody td {
         padding: 8px;
     }
-    
+
     .btn-portal-primary,
     .btn-portal-secondary {
         width: 100%;
         justify-content: center;
         margin-bottom: 10px;
     }
-    
+
     .reference-info-card .row > div {
         margin-bottom: 15px;
     }
@@ -520,17 +540,17 @@
     .empty-state {
         display: none !important;
     }
-    
+
     .portal-card {
         box-shadow: none;
         border: 1px solid #000;
     }
-    
+
     .portal-card .card-header {
         background: #f8f9fa !important;
         color: #000 !important;
     }
-    
+
     .badge-enhanced {
         color: #000 !important;
         background-color: transparent !important;
