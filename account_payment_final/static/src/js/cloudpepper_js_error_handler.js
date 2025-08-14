@@ -16,30 +16,30 @@ class CloudPepperJSErrorHandler {
 
     setupGlobalErrorHandling() {
         // Catch and handle JavaScript errors
-        window.addEventListener('error', (event) => {
+        window.addEventListener("error", (event) => {
             if (event.error && event.error.message) {
                 const message = event.error.message;
-                
+
                 // Handle specific known errors
-                if (message.includes('MutationObserver') || message.includes('parameter 1 is not of type')) {
-                    console.warn('[CloudPepper] MutationObserver error handled:', message);
+                if (message.includes("MutationObserver") || message.includes("parameter 1 is not of type")) {
+                    console.warn("[CloudPepper] MutationObserver error handled:", message);
                     event.preventDefault();
                     return false;
                 }
-                
-                if (message.includes('Unexpected token') || message.includes('SyntaxError')) {
-                    console.warn('[CloudPepper] Syntax error handled:', message);
+
+                if (message.includes("Unexpected token") || message.includes("SyntaxError")) {
+                    console.warn("[CloudPepper] Syntax error handled:", message);
                     // Allow error to be logged but prevent crash
                 }
             }
         });
 
         // Handle unhandled promise rejections
-        window.addEventListener('unhandledrejection', (event) => {
+        window.addEventListener("unhandledrejection", (event) => {
             if (event.reason && event.reason.message) {
                 const message = event.reason.message;
-                if (message.includes('MutationObserver') || message.includes('observe')) {
-                    console.warn('[CloudPepper] Promise rejection handled:', message);
+                if (message.includes("MutationObserver") || message.includes("observe")) {
+                    console.warn("[CloudPepper] Promise rejection handled:", message);
                     event.preventDefault();
                 }
             }
@@ -49,69 +49,73 @@ class CloudPepperJSErrorHandler {
     patchMutationObserver() {
         // Store original MutationObserver
         const OriginalMutationObserver = window.MutationObserver;
-        
+
         // Create safe wrapper
         window.MutationObserver = class SafeMutationObserver extends OriginalMutationObserver {
             observe(target, options) {
                 try {
                     // Validate target parameter
                     if (!target) {
-                        console.warn('[CloudPepper] MutationObserver.observe called with null/undefined target');
+                        console.warn("[CloudPepper] MutationObserver.observe called with null/undefined target");
                         return;
                     }
-                    
-                    if (typeof target !== 'object' || !target.nodeType) {
-                        console.warn('[CloudPepper] MutationObserver.observe called with invalid target:', target);
+
+                    if (typeof target !== "object" || !target.nodeType) {
+                        console.warn("[CloudPepper] MutationObserver.observe called with invalid target:", target);
                         return;
                     }
-                    
+
                     // Ensure target is a proper DOM node
-                    if (target.nodeType !== Node.ELEMENT_NODE && 
+                    if (
+                        target.nodeType !== Node.ELEMENT_NODE &&
                         target.nodeType !== Node.DOCUMENT_NODE &&
-                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
-                        console.warn('[CloudPepper] MutationObserver.observe called with invalid node type:', target.nodeType);
+                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+                    ) {
+                        console.warn(
+                            "[CloudPepper] MutationObserver.observe called with invalid node type:",
+                            target.nodeType
+                        );
                         return;
                     }
-                    
+
                     // Call original observe method
                     return super.observe(target, options);
                 } catch (error) {
-                    console.warn('[CloudPepper] MutationObserver.observe error caught:', error.message);
+                    console.warn("[CloudPepper] MutationObserver.observe error caught:", error.message);
                     // Don't re-throw, just log and continue
                 }
             }
         };
-        
-        console.debug('[CloudPepper] MutationObserver patched for safety');
+
+        console.debug("[CloudPepper] MutationObserver patched for safety");
     }
 
     setupDOMObservation() {
         // Provide safe DOM observation utility
         window.CloudPepperDOM = {
             safeObserve: (selector, callback, options = {}) => {
-                const element = typeof selector === 'string' ? 
-                    document.querySelector(selector) : selector;
-                
+                const element = typeof selector === "string" ? document.querySelector(selector) : selector;
+
                 if (!element) {
                     console.warn(`[CloudPepper] Element not found for observation: ${selector}`);
                     return null;
                 }
-                
+
                 try {
                     const observer = new MutationObserver(callback);
                     observer.observe(element, {
                         childList: true,
                         subtree: true,
                         attributes: true,
-                        ...options
+                        ...options,
                     });
                     return observer;
                 } catch (error) {
-                    console.warn('[CloudPepper] Failed to create safe observer:', error.message);
+                    console.warn("[CloudPepper] Failed to create safe observer:", error.message);
                     return null;
                 }
             },
-            
+
             waitForElement: (selector, timeout = 5000) => {
                 return new Promise((resolve, reject) => {
                     const element = document.querySelector(selector);
@@ -119,7 +123,7 @@ class CloudPepperJSErrorHandler {
                         resolve(element);
                         return;
                     }
-                    
+
                     const observer = new MutationObserver((mutations) => {
                         const element = document.querySelector(selector);
                         if (element) {
@@ -127,13 +131,13 @@ class CloudPepperJSErrorHandler {
                             resolve(element);
                         }
                     });
-                    
+
                     try {
                         observer.observe(document.body, {
                             childList: true,
-                            subtree: true
+                            subtree: true,
                         });
-                        
+
                         setTimeout(() => {
                             observer.disconnect();
                             reject(new Error(`Element ${selector} not found within ${timeout}ms`));
@@ -142,7 +146,7 @@ class CloudPepperJSErrorHandler {
                         reject(error);
                     }
                 });
-            }
+            },
         };
     }
 }
@@ -154,18 +158,18 @@ const errorHandler = new CloudPepperJSErrorHandler();
 const jsErrorHandlerService = {
     name: "js_error_handler_service",
     dependencies: [],
-    
+
     start() {
-        console.debug('[CloudPepper] JavaScript error handler service started');
+        console.debug("[CloudPepper] JavaScript error handler service started");
         return errorHandler;
-    }
+    },
 };
 
 // Register service
 try {
     registry.category("services").add("js_error_handler_service", jsErrorHandlerService);
 } catch (e) {
-    console.debug('[CloudPepper] Could not register JS error handler service:', e.message);
+    console.debug("[CloudPepper] Could not register JS error handler service:", e.message);
 }
 
 export { CloudPepperJSErrorHandler };

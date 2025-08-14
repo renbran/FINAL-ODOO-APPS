@@ -75,9 +75,13 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Emergency CloudPepper fixes (load first)
-            'account_payment_final/static/src/js/emergency_error_fix.js',
-            'account_payment_final/static/src/js/error_handler.js',
+            # CRITICAL: Load error interceptor FIRST to prevent JavaScript crashes
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
+            ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
+            ('prepend', 'account_payment_final/static/src/js/error_handler.js'),
+            
+            # CloudPepper optimization and console fixes
             'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
             'account_payment_final/static/src/js/unknown_action_handler.js',
             
@@ -101,6 +105,17 @@
             'account_payment_final/static/src/js/views/payment_list_view.js',
 
             # XML templates
+            'account_payment_final/static/src/xml/payment_templates.xml',
+        ],
+        'web.assets_web_dark': [
+            # Critical error handlers for dark theme (MUST LOAD FIRST)
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
+            
+            # Additional dark theme JavaScript
+            'account_payment_final/static/src/js/views/payment_list_view.js',
+            
+            # XML templates for dark theme
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_common': [
