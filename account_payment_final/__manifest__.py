@@ -79,7 +79,6 @@
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
-            ('prepend', 'account_payment_final/static/src/js/error_handler.js'),
             
             # CloudPepper optimization and console fixes
             'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
@@ -99,6 +98,7 @@
             'account_payment_final/static/src/scss/payment_voucher.scss',
 
             # Core JavaScript functionality
+            'account_payment_final/static/src/js/error_handler.js',
             'account_payment_final/static/src/js/payment_workflow.js',
             'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',

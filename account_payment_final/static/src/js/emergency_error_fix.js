@@ -1,11 +1,11 @@
-﻿/** @odoo-module **/
-
-/**
+﻿/**
  * Emergency CloudPepper Error Fix
  * Addresses critical console errors and rendering issues
+ * NON-MODULE VERSION to prevent import statement errors
  */
 
-import { registry } from "@web/core/registry";
+(function() {
+    'use strict';
 
 class EmergencyErrorFix {
     constructor() {
@@ -79,7 +79,8 @@ class EmergencyErrorFix {
                             nodeType: target?.nodeType,
                             nodeName: target?.nodeName,
                             isConnected: target?.isConnected,
-                            constructor: target?.constructor?.name;
+                            constructor: target?.constructor?.name
+;
                         });
                     }
                 }
@@ -126,7 +127,8 @@ class EmergencyErrorFix {
             "advertisement",
             "social media",
             "index.ts-",
-            "web.assets_web.min.js";
+            "web.assets_web.min.js"
+;
         ];
             "Could not get content for.*payment_widget.js",
             "Unknown action service",
@@ -138,7 +140,8 @@ class EmergencyErrorFix {
         console.error = function (...args) {
             const message = args.join(" ");
             if (suppressPatterns.some((pattern) => message.match(new RegExp(pattern, "i")))) {
-                return; // Suppress this error;
+                return; // Suppress this error
+;
             }
             originalError.apply(console, args);
         };
@@ -147,7 +150,8 @@ class EmergencyErrorFix {
         console.warn = function (...args) {
             const message = args.join(" ");
             if (suppressPatterns.some((pattern) => message.match(new RegExp(pattern, "i")))) {
-                return; // Suppress this warning;
+                return; // Suppress this warning
+;
             }
             originalWarn.apply(console, args);
         };
@@ -159,8 +163,10 @@ class EmergencyErrorFix {
         // Add global error handlers for MutationObserver issues
         window.addEventListener('error', (event) => {
             if (event.error && 
-                (event.error.message?.includes("MutationObserver") || ;
-                 event.error.message?.includes("parameter 1 is not of type 'Node'") ||;
+                (event.error.message?.includes("MutationObserver") || 
+;
+                 event.error.message?.includes("parameter 1 is not of type 'Node'") ||
+;
                  event.filename?.includes("index.ts-"))) {
                 
                 console.warn("[CloudPepper] Intercepted MutationObserver error:", event.error.message);
@@ -267,12 +273,11 @@ class EmergencyErrorFix {
 // Initialize emergency fixes as early as possible
 const emergencyFix = new EmergencyErrorFix();
 
-// Register as a service for proper lifecycle management
-registry.category("services").add("cloudpepper_emergency_fix", {
-    start() {
-        return emergencyFix;
-    }
-});
+// Make available globally for debugging
+window.CloudPepperEmergencyFix = EmergencyErrorFix;
+window.cloudPepperEmergencyFix = emergencyFix;
 
-export { EmergencyErrorFix };
+console.log("[CloudPepper] Emergency error fixes initialized successfully");
+
+})(); // End IIFE
 

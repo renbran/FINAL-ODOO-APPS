@@ -1,11 +1,11 @@
-/** @odoo-module **/
-
 /**
  * CloudPepper JavaScript Error Handler
  * Fixes MutationObserver errors and provides robust DOM observation
+ * NON-MODULE VERSION to prevent import statement errors
  */
 
-import { registry } from "@web/core/registry";
+(function() {
+    'use strict';
 
 class CloudPepperJSErrorHandler {
     constructor() {
@@ -151,25 +151,13 @@ class CloudPepperJSErrorHandler {
     }
 }
 
-// Initialize error handler
+// Initialize error handler immediately
 const errorHandler = new CloudPepperJSErrorHandler();
 
-// Register as service
-const jsErrorHandlerService = {
-    name: "js_error_handler_service",
-    dependencies: [],
+// Make available globally for debugging
+window.CloudPepperJSErrorHandler = CloudPepperJSErrorHandler;
+window.cloudPepperErrorHandler = errorHandler;
 
-    start() {
-        console.debug("[CloudPepper] JavaScript error handler service started");
-        return errorHandler;
-    },
-};
+console.log("[CloudPepper] JavaScript error handler initialized successfully");
 
-// Register service
-try {
-    registry.category("services").add("js_error_handler_service", jsErrorHandlerService);
-} catch (e) {
-    console.debug("[CloudPepper] Could not register JS error handler service:", e.message);
-}
-
-export { CloudPepperJSErrorHandler };
+})(); // End IIFE

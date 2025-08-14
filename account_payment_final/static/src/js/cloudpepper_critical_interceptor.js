@@ -1,8 +1,7 @@
-/** @odoo-module **/
-
 /**
  * CloudPepper Critical Error Interceptor
  * MUST LOAD FIRST - Prevents web.assets_web_dark.min.js crashes
+ * NON-MODULE VERSION to prevent import statement errors
  */
 
 console.log("[CloudPepper Critical] Installing emergency error interceptors...");
@@ -188,8 +187,8 @@ window.CloudPepperCritical = {
 
 console.log("[CloudPepper Critical] All critical error interceptors installed successfully");
 
-// Export for module system
-export default {
+// Make available globally for debugging
+window.CloudPepperCriticalInterceptor = {
     name: "cloudpepper_critical_interceptor",
     version: "1.0.0",
     installed: true,
