@@ -113,7 +113,7 @@ class PaymentRejectionWizard(models.TransientModel):
     )
     
     payment_state = fields.Selection(
-        related='payment_id.approval_state',
+        related='payment_id.voucher_state',
         string='Current State',
         readonly=True
     )
@@ -139,10 +139,10 @@ class PaymentRejectionWizard(models.TransientModel):
     def _check_payment_state(self):
         """Validate that payment can be rejected"""
         for wizard in self:
-            if wizard.payment_id.approval_state not in ['submitted', 'under_review', 'approved']:
+            if wizard.payment_id.voucher_state not in ['submitted', 'under_review', 'approved']:
                 raise ValidationError(_(
                     "Payment cannot be rejected in current state: %s"
-                ) % dict(wizard.payment_id._fields['approval_state'].selection)[wizard.payment_id.approval_state])
+                ) % dict(wizard.payment_id._fields['voucher_state'].selection)[wizard.payment_id.voucher_state])
     
     # ========================================
     # Default Methods
@@ -211,7 +211,7 @@ class PaymentRejectionWizard(models.TransientModel):
         
         # Handle return to creator
         if self.return_to_creator:
-            self.payment_id.approval_state = 'draft'
+            self.payment_id.voucher_state = 'draft'
             self.payment_id.message_post(
                 body=_("Payment returned to creator for corrections."),
                 subtype_xmlid='mail.mt_note'
@@ -274,7 +274,7 @@ class PaymentRejectionWizard(models.TransientModel):
             'timestamp': fields.Datetime.now(),
             'notes': f"Rejection Category: {dict(self._fields['rejection_category'].selection)[self.rejection_category]}\n"
                     f"Reason: {self.rejection_reason}",
-            'stage_from': self.payment_id.approval_state,
+            'stage_from': self.payment_id.voucher_state,
             'stage_to': 'rejected',
         }
         
