@@ -1,42 +1,43 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Account Payment Final - Enhanced Workflow',
+    'name': 'OSUS Payment Approval System',
     'version': '17.0.1.0.0',
     'category': 'Accounting/Payments',
-    'summary': 'Enhanced payment voucher system with 4-stage approval workflow and QR verification',
+    'summary': 'OSUS Properties - Professional Payment Voucher System with Multi-Stage Approval Workflow',
     'description': """
-        Account Payment Final - Enhanced Workflow
-        ==========================================
+        OSUS Properties Payment Approval System
+        ======================================
         
-        This module provides a comprehensive payment voucher system with:
+        Professional payment voucher management system designed specifically for 
+        OSUS Properties with comprehensive approval workflows and security features.
         
-        Features:
-        ---------
-        • 4-stage approval workflow (Reviewer → Approver → Authorizer → Poster)
-        • QR code verification system for payment authentication
-        • Enhanced security with role-based access control
-        • Professional voucher reports with company branding
-        • Automated voucher numbering with configurable sequences
-        • Email notifications for approval workflow stages
-        • Mobile-responsive design for modern browsers
-        • Comprehensive audit trail and activity logging
-        • Print-optimized layouts with professional styling
-        • Web-based QR verification portal
+        Key Features:
+        -------------
+        * 4-Stage Approval Workflow: Reviewer -> Approver -> Authorizer -> Final Approval
+        * QR Code Verification: Secure payment authentication system
+        * OSUS Branding: Professional styling with OSUS Properties brand colors
+        * Role-Based Security: Granular access control for different user roles
+        * Digital Signatures: Electronic signature capture for each approval stage
+        * Professional Reports: OSUS-branded voucher reports with QR verification
+        * Automated Sequences: Smart voucher numbering system
+        * Email Notifications: Workflow status updates for stakeholders
+        * Mobile Responsive: Optimized for desktop, tablet, and mobile devices
+        * Audit Trail: Complete payment history and approval tracking
         
-        Technical Features:
-        ------------------
-        • Odoo 17 compatible with modern ORM patterns
-        • OWL framework integration for frontend components
-        • REST API endpoints for QR verification
-        • PostgreSQL optimized database structure
-        • Docker-ready deployment configuration
-        • CloudPepper hosting compatible
+        Technical Excellence:
+        -------------------
+        * Odoo 17 Native: Built with latest ORM patterns and OWL framework
+        * CloudPepper Ready: Optimized for CloudPepper hosting environment
+        * Security First: Implements Odoo security best practices
+        * Performance Optimized: Efficient database queries and caching
+        * API Integration: REST endpoints for external system integration
+        * Test Coverage: Comprehensive automated testing suite
         
-        This module transforms standard Odoo payment vouchers into
-        a professional, secure, and user-friendly payment management system.
+        Perfect for organizations requiring professional payment processing
+        with strong approval controls and comprehensive audit capabilities.
     """,
-    'author': 'Odoo Development Team',
-    'website': 'https://www.odoo.com',
+    'author': 'OSUS Properties Development Team',
+    'website': 'https://www.osusproperties.com',
     'license': 'LGPL-3',
     'depends': [
         'base',
@@ -74,22 +75,26 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Emergency hard-coded styles – load first
-            'account_payment_final/static/src/scss/enhanced_form_styling_emergency.scss',
-            'account_payment_final/static/src/scss/components/table_enhancements_emergency.scss',
-            'account_payment_final/static/src/scss/emergency_fix.scss',
-            'account_payment_final/static/src/scss/cloudpepper_optimizations.scss',
-            'account_payment_final/static/src/scss/professional_payment_ui.scss',
-            'account_payment_final/static/src/scss/osus_branding.scss',
-
-            # Responsive / theme override – **load last**
-            'account_payment_final/static/src/scss/views/responsive_neat.scss',
-
-            # JavaScript files
+            # Emergency CloudPepper fixes (load first)
             'account_payment_final/static/src/js/emergency_error_fix.js',
             'account_payment_final/static/src/js/error_handler.js',
             'account_payment_final/static/src/js/cloudpepper_console_optimizer.js',
             'account_payment_final/static/src/js/unknown_action_handler.js',
+            
+            # OSUS Branding & Core Styles (priority loading)
+            'account_payment_final/static/src/scss/osus_branding.scss',
+            'account_payment_final/static/src/scss/professional_payment_ui.scss',
+            'account_payment_final/static/src/scss/enhanced_form_styling.scss',
+            
+            # Component-specific styles
+            'account_payment_final/static/src/scss/components/payment_widget.scss',
+            'account_payment_final/static/src/scss/components/table_enhancements.scss',
+            
+            # View-specific styles
+            'account_payment_final/static/src/scss/views/form_view.scss',
+            'account_payment_final/static/src/scss/payment_voucher.scss',
+
+            # Core JavaScript functionality
             'account_payment_final/static/src/js/payment_workflow.js',
             'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js',
             'account_payment_final/static/src/js/fields/qr_code_field.js',
@@ -99,9 +104,8 @@
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_common': [
-            # Report-specific styles (hard-coded values only)
+            # Report-specific styles for PDF generation
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
-            'account_payment_final/static/src/scss/payment_voucher_report.scss',
         ],
         'web.assets_frontend': [
             # Frontend verification portal
@@ -109,7 +113,7 @@
             'account_payment_final/static/src/js/frontend/qr_verification.js',
         ],
         'web.qunit_suite_tests': [
-            'account_payment_final/static/tests/**/*.js',
+            'account_payment_final/static/tests/payment_widgets_tests.js',
         ],
     },
     'external_dependencies': {

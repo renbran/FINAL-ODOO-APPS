@@ -1,55 +1,29 @@
-/* OSUS Branding and Dark/Light Mode Compatibility */
+/* OSUS Branding - Clean Version */
+/* Odoo 17 compatible - no variables dependencies */
 
-/* ============================================================================
-   OSUS BRAND COLORS AND VARIABLES
-   ============================================================================ */
+/* ============================================================================ */
+/* OSUS BRAND COLORS */
+/* ============================================================================ */
 
 :root {
-    /* OSUS Brand Colors - Burgundy & White Theme */
-    --osus-primary: #722F37;         /* Burgundy */
-    --osus-primary-dark: #5C252A;    /* Darker burgundy */
-    --osus-primary-light: #8A3B43;   /* Lighter burgundy */
-    --osus-secondary: #B8860B;       /* Dark golden rod (accent) */
-    --osus-white: #FFFFFF;           /* Pure white */
-    --osus-gray-light: #F8F9FA;      /* Light gray for backgrounds */
-    --osus-gray-dark: #343A40;       /* Dark gray */
-    
-    /* Dynamic colors for dark/light mode */
-    --osus-text-color: var(--bs-body-color, #212529);
-    --osus-bg-color: var(--bs-body-bg, #ffffff);
-    --osus-border-color: var(--bs-border-color, #dee2e6);
-    --osus-card-bg: var(--bs-card-bg, #ffffff);
-    
+    /* OSUS Brand Colors */
+    --osus-primary: #722f37;
+    --osus-primary-dark: #5c252a;
+    --osus-primary-light: #8a3b43;
+    --osus-secondary: #b8860b;
+    --osus-white: #ffffff;
+    --osus-gray-light: #f8f9fa;
+    --osus-gray-dark: #343a40;
+
     /* Button hover effects */
     --osus-hover-opacity: 0.85;
     --osus-transition: all 0.2s ease-in-out;
 }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --osus-gray-light: #2D3436;
-        --osus-text-color: #FFFFFF;
-        --osus-bg-color: #1A1A1A;
-        --osus-border-color: #404040;
-        --osus-card-bg: #2D3436;
-    }
-}
+/* ============================================================================ */
+/* OSUS BUTTON STYLES */
+/* ============================================================================ */
 
-/* Force dark mode compatibility when body has dark class */
-body.o_dark {
-    --osus-gray-light: #2D3436;
-    --osus-text-color: #FFFFFF;
-    --osus-bg-color: #1A1A1A;
-    --osus-border-color: #404040;
-    --osus-card-bg: #2D3436;
-}
-
-/* ============================================================================
-   OSUS BUTTON STYLES
-   ============================================================================ */
-
-/* Primary OSUS Button - Burgundy */
 .osus_primary_btn,
 .btn.osus_primary_btn {
     background-color: var(--osus-primary) !important;
@@ -78,7 +52,6 @@ body.o_dark {
     box-shadow: 0 0 0 0.2rem rgba(114, 47, 55, 0.5);
 }
 
-/* Success Button - Success Green with OSUS styling */
 .osus_success_btn,
 .btn.osus_success_btn {
     background-color: #198754 !important;
@@ -98,7 +71,6 @@ body.o_dark {
     box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
 }
 
-/* Danger Button - Red with OSUS styling */
 .osus_danger_btn,
 .btn.osus_danger_btn {
     background-color: #dc3545 !important;
@@ -118,11 +90,10 @@ body.o_dark {
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
-/* ============================================================================
-   OSUS SMART BUTTON STYLES
-   ============================================================================ */
+/* ============================================================================ */
+/* OSUS SMART BUTTON STYLES */
+/* ============================================================================ */
 
-/* Primary Smart Button - For main actions like Journal Items */
 .oe_stat_button.osus_primary_button {
     background: linear-gradient(135deg, var(--osus-primary), var(--osus-primary-light));
     border: 2px solid var(--osus-primary);
@@ -143,9 +114,8 @@ body.o_dark {
     color: var(--osus-white) !important;
 }
 
-/* Secondary Smart Button - For supporting actions */
 .oe_stat_button.osus_secondary_button {
-    background: var(--osus-card-bg);
+    background: var(--osus-white);
     border: 2px solid var(--osus-primary);
     color: var(--osus-primary) !important;
     transition: var(--osus-transition);
@@ -170,9 +140,8 @@ body.o_dark {
     color: var(--osus-primary) !important;
 }
 
-/* Accent Smart Button - For auxiliary features like QR */
 .oe_stat_button.osus_accent_button {
-    background: var(--osus-card-bg);
+    background: var(--osus-white);
     border: 2px solid var(--osus-secondary);
     color: var(--osus-secondary) !important;
     transition: var(--osus-transition);
@@ -192,13 +161,13 @@ body.o_dark {
     color: var(--osus-white) !important;
 }
 
-/* ============================================================================
-   WORKFLOW SECTION STYLING
-   ============================================================================ */
+/* ============================================================================ */
+/* WORKFLOW SECTION STYLING */
+/* ============================================================================ */
 
 .osus-workflow {
-    background: var(--osus-card-bg);
-    border: 1px solid var(--osus-border-color);
+    background: var(--osus-white);
+    border: 1px solid #dee2e6;
     border-radius: 8px;
     padding: 16px;
     margin: 8px 0;
@@ -213,13 +182,13 @@ body.o_dark {
     font-size: 14px;
 }
 
-/* ============================================================================
-   PAYMENT SHEET ENHANCEMENTS
-   ============================================================================ */
+/* ============================================================================ */
+/* PAYMENT SHEET ENHANCEMENTS */
+/* ============================================================================ */
 
 .payment-sheet {
-    background: var(--osus-bg-color);
-    color: var(--osus-text-color);
+    background: var(--osus-white);
+    color: var(--osus-primary);
 }
 
 .payment-sheet .oe_title {
@@ -230,48 +199,9 @@ body.o_dark {
     margin-bottom: 16px;
 }
 
-/* ============================================================================
-   DARK MODE SPECIFIC OVERRIDES
-   ============================================================================ */
-
-@media (prefers-color-scheme: dark) {
-    .oe_stat_button.osus_secondary_button,
-    .oe_stat_button.osus_accent_button {
-        background: var(--osus-card-bg);
-        border-color: var(--osus-primary);
-    }
-    
-    .osus-workflow {
-        background: var(--osus-card-bg);
-        border-color: var(--osus-border-color);
-    }
-    
-    .payment-sheet .oe_title {
-        color: var(--osus-primary-light);
-        border-bottom-color: var(--osus-primary-light);
-    }
-}
-
-/* Force compatibility with Odoo dark theme */
-.o_dark .oe_stat_button.osus_secondary_button,
-.o_dark .oe_stat_button.osus_accent_button {
-    background: var(--osus-card-bg);
-    border-color: var(--osus-primary);
-}
-
-.o_dark .osus-workflow {
-    background: var(--osus-card-bg);
-    border-color: var(--osus-border-color);
-}
-
-.o_dark .payment-sheet .oe_title {
-    color: var(--osus-primary-light);
-    border-bottom-color: var(--osus-primary-light);
-}
-
-/* ============================================================================
-   RESPONSIVE DESIGN
-   ============================================================================ */
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
 
 @media (max-width: 768px) {
     .osus-workflow .btn {
@@ -279,11 +209,11 @@ body.o_dark {
         margin: 4px 0;
         min-width: auto;
     }
-    
+
     .oe_button_box {
         flex-direction: column;
     }
-    
+
     .oe_stat_button.osus_primary_button,
     .oe_stat_button.osus_secondary_button,
     .oe_stat_button.osus_accent_button {
@@ -292,9 +222,9 @@ body.o_dark {
     }
 }
 
-/* ============================================================================
-   ACCESSIBILITY ENHANCEMENTS
-   ============================================================================ */
+/* ============================================================================ */
+/* ACCESSIBILITY ENHANCEMENTS */
+/* ============================================================================ */
 
 .osus_primary_btn:focus,
 .osus_success_btn:focus,
@@ -303,7 +233,6 @@ body.o_dark {
     outline-offset: 2px;
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
     .osus_primary_btn,
     .osus_success_btn,
@@ -311,7 +240,7 @@ body.o_dark {
         border-width: 2px !important;
         font-weight: 700;
     }
-    
+
     .oe_stat_button.osus_primary_button,
     .oe_stat_button.osus_secondary_button,
     .oe_stat_button.osus_accent_button {

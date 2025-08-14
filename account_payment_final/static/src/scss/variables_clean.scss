@@ -1,87 +1,70 @@
-/* Account Payment Final - Enhanced SCSS Variables */
-/* Following Odoo 17 best practices and theme integration */
-/* Enhanced with CSS custom properties for modern theming */
-
-/* ============================================================================ */
-/* CSS CUSTOM PROPERTIES (Enhanced with Odoo 17 framework) */
-/* ============================================================================ */
-
 :root {
-    /* Payment Module Color Palette - Integrated with Bootstrap 5 */
-    --payment-primary: var(--bs-primary, #3498db);
-    --payment-success: var(--bs-success, #28a745);
-    --payment-warning: var(--bs-warning, #ffc107);
-    --payment-danger: var(--bs-danger, #dc3545);
-    --payment-info: var(--bs-info, #17a2b8);
-    --payment-secondary: var(--bs-secondary, #6c757d);
+    /* OSUS Brand Colors */
+    --osus-primary: #722f37;
+    --osus-primary-dark: #5c252a;
+    --osus-primary-light: #8a3b43;
+    --osus-secondary: #b8860b;
+    --osus-white: #ffffff;
+    --osus-gray-light: #f8f9fa;
+    --osus-gray-dark: #343a40;
 
-    /* OSUS Brand Colors (Enhanced) */
-    --osus-primary: #2c3e50;
-    --osus-secondary: #34495e;
-    --osus-accent: #3498db;
-    --osus-light: #ecf0f1;
-    --osus-dark: #1a252f;
+    /* Payment state colors */
+    --state-draft: #6c757d;
+    --state-review: #17a2b8;
+    --state-approval: #ffc107;
+    --state-authorization: #fd7e14;
+    --state-approved: #28a745;
+    --state-posted: #20c997;
+    --state-rejected: #dc3545;
+    --state-cancelled: #343a40;
 
-    /* Approval State Colors (Consistent with workflow) */
-    --state-draft: var(--bs-secondary, #6c757d);
-    --state-review: var(--bs-info, #17a2b8);
-    --state-approval: var(--bs-warning, #ffc107);
-    --state-authorization: var(--bs-warning, #fd7e14);
-    --state-approved: var(--bs-success, #28a745);
-    --state-posted: var(--bs-success, #20c997);
-    --state-rejected: var(--bs-danger, #dc3545);
-    --state-cancelled: var(--bs-dark, #343a40);
+    /* Design system */
+    --border-radius: 8px;
+    --border-radius-sm: 4px;
+    --border-radius-lg: 12px;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
 
-    /* Component Design System */
-    --payment-border-radius: 8px;
-    --payment-border-radius-sm: 4px;
-    --payment-border-radius-lg: 12px;
-    --payment-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --payment-box-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
-    --payment-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --payment-transition-fast: all 0.15s ease;
+    /* Typography */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 600;
 
-    /* Typography Scale */
-    --payment-font-size-xs: 0.75rem;
-    --payment-font-size-sm: 0.875rem;
-    --payment-font-size-base: 1rem;
-    --payment-font-size-lg: 1.125rem;
-    --payment-font-size-xl: 1.25rem;
-    --payment-font-weight-normal: 400;
-    --payment-font-weight-medium: 500;
-    --payment-font-weight-bold: 600;
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
 
-    /* Spacing System (Enhanced) */
-    --payment-spacing-xs: 0.25rem;  /* 4px */
-    --payment-spacing-sm: 0.5rem;   /* 8px */
-    --payment-spacing-md: 1rem;     /* 16px */
-    --payment-spacing-lg: 1.5rem;   /* 24px */
-    --payment-spacing-xl: 2rem;     /* 32px */
-    --payment-spacing-xxl: 3rem;    /* 48px */
-
-    /* Responsive Breakpoints (Aligned with Bootstrap 5) */
+    /* Responsive breakpoints */
     --bp-mobile: 576px;
     --bp-tablet: 768px;
     --bp-desktop: 992px;
     --bp-wide: 1200px;
 
-    /* Z-index Layer System */
+    /* Z-index */
     --z-dropdown: 1000;
     --z-sticky: 1020;
     --z-fixed: 1030;
-    --z-modal-backdrop: 1040;
     --z-modal: 1050;
-    --z-popover: 1060;
     --z-tooltip: 1070;
-    --z-notification: 1080;
 
-    /* Component-specific variables */
-    --payment-widget-padding: var(--payment-spacing-md);
-    --payment-widget-border: 1px solid var(--bs-border-color);
-    --payment-widget-bg: var(--bs-body-bg);
-    --payment-widget-border-radius: var(--payment-border-radius);
+    /* Component specific */
+    --widget-padding: var(--spacing-md);
+    --widget-border: 1px solid #dee2e6;
+    --widget-bg: #ffffff;
+    --widget-border-radius: var(--border-radius);
 
-    /* Button enhancements */
+    /* Button */
     --btn-min-width: 120px;
     --btn-padding-y: 0.5rem;
     --btn-padding-x: 1rem;
@@ -90,73 +73,18 @@
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
     :root {
-        --payment-bg: var(--bs-dark, #212529);
-        --payment-surface: #2d3748;
-        --payment-border: #4a5568;
-        --osus-primary: #4a90e2;
-        --payment-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        --payment-box-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+        --osus-gray-light: #2d3436;
+        --widget-bg: #2d3436;
+        --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --box-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 }
 
 /* High contrast support */
 @media (prefers-contrast: high) {
     :root {
-        --payment-border-radius: 2px;
-        --payment-box-shadow: 0 0 0 2px currentColor;
-        --payment-widget-border: 2px solid;
+        --border-radius: 2px;
+        --box-shadow: 0 0 0 2px currentColor;
+        --widget-border: 2px solid;
     }
 }
-
-/* ============================================================================ */
-/* SCSS VARIABLES (Fallback and legacy support) */
-/* ============================================================================ */
-
-/* Legacy color variables */
-$payment-primary-color: var(--payment-primary);
-$payment-success-color: var(--payment-success);
-$payment-warning-color: var(--payment-warning);
-$payment-danger-color: var(--payment-danger);
-$payment-info-color: var(--payment-info);
-
-/* Legacy design system */
-$payment-border-radius: var(--payment-border-radius);
-$payment-box-shadow: var(--payment-box-shadow);
-$payment-transition: var(--payment-transition);
-
-/* Legacy breakpoints */
-$payment-mobile: var(--bp-mobile);
-$payment-tablet: var(--bp-tablet);
-$payment-desktop: var(--bp-desktop);
-
-/* Legacy z-index */
-$payment-z-dropdown: var(--z-dropdown);
-$payment-z-modal: var(--z-modal);
-$payment-z-tooltip: var(--z-tooltip);
-
-/* Legacy spacing */
-$payment-spacing-xs: var(--payment-spacing-xs);
-$payment-spacing-sm: var(--payment-spacing-sm);
-$payment-spacing-md: var(--payment-spacing-md);
-$payment-spacing-lg: var(--payment-spacing-lg);
-$payment-spacing-xl: var(--payment-spacing-xl);
-
-/* Typography */
-$payment-font-size-sm: 0.875rem;
-$payment-font-size-base: 1rem;
-$payment-font-size-lg: 1.125rem;
-$payment-font-weight-normal: 400;
-$payment-font-weight-medium: 500;
-$payment-font-weight-bold: 600;
-
-/* QR Code specific */
-$qr-code-size: 150px;
-$qr-code-border: 2px solid var(--bs-border-color);
-
-/* Approval workflow colors */
-$approval-draft: #6c757d;
-$approval-review: #fd7e14;
-$approval-approve: #ffc107;
-$approval-authorize: #0d6efd;
-$approval-post: #198754;
-$approval-reject: #dc3545;
