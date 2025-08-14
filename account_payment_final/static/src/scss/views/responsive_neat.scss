@@ -1,0 +1,173 @@
+// =======================================================================
+//  Responsive Neat – Odoo 17
+//  Burgundy #800020 | Light-gold #D4AF37 | Montserrat
+//  Zero text-shrink, zero padding-loss, ORM-safe
+// =======================================================================
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+
+:root {
+    /* Brand palette */
+    --brand-burgundy: #800020;
+    --brand-gold: #d4af37;
+    --brand-white: #ffffff;
+    --brand-bg: #fdfbf8;
+
+    /* Typography – clamp() keeps 14-16 px on every screen */
+    --font-base: clamp(14px, 1rem + 0.25vw, 16px);
+    --font-family: "Montserrat", system-ui, sans-serif;
+
+    /* Spacing – inherits original token names, never shrinks < 14 px */
+    --space-xs: clamp(4px, 0.25rem, 6px);
+    --space-sm: clamp(8px, 0.5rem, 12px);
+    --space-md: clamp(16px, 1rem, 24px);
+    --space-lg: clamp(24px, 1.5rem, 32px);
+
+    /* Animation micro-interaction */
+    --trans: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* -----------------------------------------------------------------------
+   1. Global font swap – safe override
+----------------------------------------------------------------------- */
+body,
+.o_form_view,
+.payment-voucher-report,
+.o_payment_voucher_container {
+    font-family: var(--font-family);
+    font-size: var(--font-base);
+    line-height: 1.5;
+    color: var(--brand-burgundy);
+}
+
+/* -----------------------------------------------------------------------
+   2. Buttons – fixed 44 px hit-area, fixed font-size
+----------------------------------------------------------------------- */
+.btn,
+.oe_stat_button,
+.osus_primary_btn {
+    font-size: var(--font-base);
+    min-height: 44px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    transition: var(--trans);
+    &:hover {
+        transform: translateY(-1px);
+    }
+}
+
+/* Burgundy primary */
+.btn-primary,
+.osus_primary_btn {
+    background: var(--brand-burgundy);
+    border-color: var(--brand-burgundy);
+    color: var(--brand-white);
+    &:hover {
+        background: #9e0028; /* lighten #800020 8 % */
+        border-color: #9e0028;
+    }
+}
+
+/* Light-gold accent */
+.btn-warning,
+.osus_accent_button {
+    background: var(--brand-gold);
+    border-color: var(--brand-gold);
+    color: var(--brand-burgundy);
+    &:hover {
+        background: #e6c158; /* lighten #D4AF37 8 % */
+        border-color: #e6c158;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   3. Form fields – fixed height, fixed font-size
+----------------------------------------------------------------------- */
+.o_field_widget input,
+.o_field_widget select,
+.o_field_widget textarea {
+    font-size: var(--font-base);
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    transition: var(--trans);
+    &:focus {
+        border-color: var(--brand-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+    }
+}
+
+/* -----------------------------------------------------------------------
+   4. Layout – elastic grid, padding & margin never shrink
+----------------------------------------------------------------------- */
+@media (max-width: 576px) {
+    .o_form_sheet,
+    .payment-sheet {
+        margin: 0;
+        padding: var(--space-md);
+        border-radius: 0;
+    }
+    .o_group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+    .o_form_sheet,
+    .payment-sheet {
+        margin: var(--space-sm);
+        padding: var(--space-lg);
+    }
+    .o_group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+    }
+}
+
+@media (min-width: 993px) {
+    .o_form_sheet,
+    .payment-sheet {
+        max-width: 1140px;
+        margin: var(--space-lg) auto;
+        padding: var(--space-lg);
+    }
+    .o_group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-md);
+    }
+}
+
+/* -----------------------------------------------------------------------
+   5. Print – keep font-size, hide shadows
+----------------------------------------------------------------------- */
+@media print {
+    body,
+    .o_form_view,
+    .payment-voucher-report {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+    .btn,
+    .oe_stat_button {
+        display: none;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   6. Accessibility helpers
+----------------------------------------------------------------------- */
+@media (prefers-contrast: high) {
+    :root {
+        --brand-gold: #b8860b;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}

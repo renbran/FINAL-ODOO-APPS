@@ -22,37 +22,37 @@
             transition: all 0.2s ease !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            
+
             &:focus {
                 border-color: #1f4788 !important;
                 box-shadow: 0 0 0 3px rgba(31, 71, 136, 0.1) !important;
                 outline: none !important;
             }
-            
+
             &:hover:not(:focus) {
                 border-color: #9ca3af !important;
             }
-            
+
             &[readonly] {
                 background-color: #f8fafc !important;
                 border-color: #e2e8f0 !important;
                 color: #6b7280 !important;
                 cursor: not-allowed !important;
             }
-            
+
             &.o_field_invalid {
                 border-color: #ef4444 !important;
                 background-color: #fef2f2 !important;
             }
         }
-        
+
         /* Textarea specific */
         textarea {
             min-height: 120px !important;
             resize: vertical !important;
             font-family: inherit !important;
         }
-        
+
         /* Select dropdown specific */
         select {
             cursor: pointer !important;
@@ -63,7 +63,7 @@
             padding-right: 40px !important;
         }
     }
-    
+
     /* Labels */
     .o_field_widget label,
     .o_form_label {
@@ -73,7 +73,7 @@
         display: block !important;
         font-size: 14px !important;
     }
-    
+
     /* Required field indicator */
     .o_required_modifier label:after,
     .o_form_label.o_form_label_required:after {
@@ -91,7 +91,7 @@
 .o_field_monetary input {
     text-align: right !important;
     font-weight: 500 !important;
-    font-family: 'Roboto Mono', monospace !important;
+    font-family: "Roboto Mono", monospace !important;
 }
 
 /* Date and datetime fields */
@@ -107,7 +107,7 @@
         width: 20px !important;
         margin-right: 8px !important;
         border-radius: 4px !important;
-        
+
         &:checked {
             background-color: #1f4788 !important;
             border-color: #1f4788 !important;
@@ -119,11 +119,11 @@
 .o_field_many2one {
     .o_input_dropdown {
         position: relative !important;
-        
+
         input {
             padding-right: 40px !important;
         }
-        
+
         .o_dropdown_button {
             position: absolute !important;
             right: 8px !important;
@@ -132,7 +132,7 @@
             border: none !important;
             background: none !important;
             color: #6b7280 !important;
-            
+
             &:hover {
                 color: #1f4788 !important;
             }
@@ -147,11 +147,11 @@
 /* Form groups and sections */
 .o_group {
     margin: 16px 0 !important;
-    
+
     .o_group_col_6 {
         padding: 0 8px !important;
     }
-    
+
     .o_form_label {
         padding: 8px 0 !important;
         min-width: 120px !important;
@@ -170,14 +170,14 @@
 /* Form headers */
 .o_form_sheet .oe_title {
     margin-bottom: 24px !important;
-    
+
     h1 {
         font-size: 24px !important;
         font-weight: 600 !important;
         color: #1f2937 !important;
         margin: 0 0 8px 0 !important;
     }
-    
+
     h2 {
         font-size: 18px !important;
         font-weight: 500 !important;
@@ -199,12 +199,12 @@
         font-size: 14px !important;
         border: 1px solid transparent !important;
         transition: all 0.2s ease !important;
-        
+
         &.btn-primary {
             background-color: #1f4788 !important;
             border-color: #1f4788 !important;
             color: #ffffff !important;
-            
+
             &:hover {
                 background-color: #1a3d6b !important;
                 border-color: #1a3d6b !important;
@@ -212,45 +212,45 @@
                 box-shadow: 0 2px 4px rgba(31, 71, 136, 0.2) !important;
             }
         }
-        
+
         &.btn-secondary {
             background-color: #f8fafc !important;
             border-color: #e2e8f0 !important;
             color: #374151 !important;
-            
+
             &:hover {
                 background-color: #f1f5f9 !important;
                 border-color: #d1d5db !important;
             }
         }
-        
+
         &.btn-success {
             background-color: #10b981 !important;
             border-color: #10b981 !important;
             color: #ffffff !important;
-            
+
             &:hover {
                 background-color: #059669 !important;
                 border-color: #059669 !important;
             }
         }
-        
+
         &.btn-danger {
             background-color: #ef4444 !important;
             border-color: #ef4444 !important;
             color: #ffffff !important;
-            
+
             &:hover {
                 background-color: #dc2626 !important;
                 border-color: #dc2626 !important;
             }
         }
-        
+
         &.btn-warning {
             background-color: #f59e0b !important;
             border-color: #f59e0b !important;
             color: #ffffff !important;
-            
+
             &:hover {
                 background-color: #d97706 !important;
                 border-color: #d97706 !important;
@@ -268,22 +268,24 @@
         padding: 16px !important;
         margin: 8px !important;
     }
-    
+
     .o_group .o_group_col_6 {
         width: 100% !important;
         padding: 0 !important;
     }
-    
+
     .o_form_view .o_field_widget {
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             font-size: 16px !important; /* Prevents zoom on iOS */
         }
     }
-    
+
     .o_form_sheet .oe_title h1 {
         font-size: 20px !important;
     }
-    
+
     .btn {
         min-height: 44px !important; /* Better touch targets */
         font-size: 16px !important;
@@ -298,18 +300,18 @@
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
     border-bottom: 2px solid #e2e8f0 !important;
     padding: 12px 24px !important;
-    
+
     .o_statusbar_status {
         .btn {
             margin: 0 4px !important;
             padding: 6px 12px !important;
             font-size: 13px !important;
-            
+
             &.btn-primary {
                 background-color: #1f4788 !important;
                 color: #ffffff !important;
             }
-            
+
             &.btn-secondary {
                 background-color: #e2e8f0 !important;
                 color: #6b7280 !important;
@@ -325,27 +327,27 @@
 .o_notebook {
     .nav-tabs {
         border-bottom: 2px solid #e2e8f0 !important;
-        
+
         .nav-link {
             padding: 12px 20px !important;
             font-weight: 500 !important;
             color: #6b7280 !important;
             border: none !important;
             border-radius: 8px 8px 0 0 !important;
-            
+
             &.active {
                 background-color: #ffffff !important;
                 color: #1f4788 !important;
                 border-bottom: 2px solid #1f4788 !important;
             }
-            
+
             &:hover:not(.active) {
                 color: #374151 !important;
                 background-color: #f8fafc !important;
             }
         }
     }
-    
+
     .tab-content {
         padding: 24px 0 !important;
     }
@@ -362,18 +364,18 @@
         .o_field_widget select {
             border-color: #ef4444 !important;
             background-color: #fef2f2 !important;
-            
+
             &:focus {
                 border-color: #ef4444 !important;
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
             }
         }
-        
+
         .o_form_label {
             color: #ef4444 !important;
         }
     }
-    
+
     .o_field_widget .text-danger {
         font-size: 12px !important;
         margin-top: 4px !important;
@@ -389,9 +391,9 @@
     .o_field_widget.o_field_loading {
         opacity: 0.6 !important;
         pointer-events: none !important;
-        
+
         &::after {
-            content: '' !important;
+            content: "" !important;
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
@@ -425,11 +427,11 @@
             background: #fff !important;
             box-shadow: none !important;
         }
-        
+
         .btn {
             display: none !important;
         }
-        
+
         .o_form_statusbar {
             background: #fff !important;
             border: 1px solid #000 !important;
