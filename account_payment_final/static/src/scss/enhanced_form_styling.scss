@@ -30,41 +30,41 @@
                 background-color: #ffffff !important;
                 transition: all 0.2s ease !important;
                 min-width: 200px !important;
-                
+
                 &:focus {
                     border-color: #3b82f6 !important;
                     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
                     outline: none !important;
                 }
-                
+
                 &:hover:not(:focus) {
                     border-color: #9ca3af !important;
                 }
-                
+
                 &[readonly] {
                     background-color: #f9fafb !important;
                     color: #6b7280 !important;
                 }
             }
         }
-        
+
         /* Special handling for many2one fields */
         &.o_field_many2one {
             .o_input_dropdown {
                 min-width: 250px !important;
-                
+
                 input {
                     min-width: calc(100% - 32px) !important;
                 }
             }
         }
-        
+
         /* Text area improvements */
         &.o_field_text textarea {
             min-height: 80px !important;
             resize: vertical !important;
         }
-        
+
         /* Selection field improvements */
         &.o_field_selection select {
             min-width: 200px !important;
@@ -76,7 +76,7 @@
             padding-right: 32px !important;
         }
     }
-    
+
     /* Form group improvements */
     .o_group {
         .o_form_label {
@@ -85,10 +85,10 @@
             margin-bottom: 4px !important;
             font-size: 13px !important;
         }
-        
+
         .o_cell {
             padding: 8px 4px !important;
-            
+
             &.o_wrap_label {
                 .o_form_label {
                     margin-bottom: 6px !important;
@@ -96,19 +96,19 @@
             }
         }
     }
-    
+
     /* Header field improvements */
     .o_form_sheet_bg .o_form_sheet {
         .oe_title {
             margin-bottom: 24px !important;
-            
+
             .o_field_widget {
                 input {
                     font-size: 18px !important;
                     font-weight: 600 !important;
                     min-height: 48px !important;
                     border: 2px solid #e5e7eb !important;
-                    
+
                     &:focus {
                         border-color: #3b82f6 !important;
                         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
@@ -117,7 +117,7 @@
             }
         }
     }
-    
+
     /* Status bar improvements */
     .o_form_statusbar {
         .o_statusbar_status {
@@ -126,7 +126,7 @@
                 font-weight: 500 !important;
                 border-radius: 6px !important;
                 margin-right: 8px !important;
-                
+
                 &.btn-primary {
                     background-color: #3b82f6 !important;
                     border-color: #3b82f6 !important;
@@ -147,17 +147,17 @@
             min-width: 300px !important;
         }
     }
-    
+
     /* Date fields */
     .o_field_date input {
         min-width: 180px !important;
     }
-    
+
     /* Reference and journal fields */
     .o_field_char input {
         min-width: 200px !important;
     }
-    
+
     /* Invoice lines table improvements */
     .o_list_view {
         .o_list_table {
@@ -167,11 +167,11 @@
                 background-color: #f8fafc !important;
                 border-bottom: 2px solid #e2e8f0 !important;
             }
-            
+
             td {
                 padding: 12px 8px !important;
                 vertical-align: middle !important;
-                
+
                 .o_field_widget {
                     input,
                     textarea {
@@ -180,24 +180,24 @@
                         border: 1px solid #d1d5db !important;
                         border-radius: 4px !important;
                         min-width: 120px !important;
-                        
+
                         &:focus {
                             border-color: #3b82f6 !important;
                             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
                         }
                     }
                 }
-                
+
                 /* Product column - wider for better readability */
                 &:nth-child(1) .o_field_widget input {
                     min-width: 200px !important;
                 }
-                
+
                 /* Label column */
                 &:nth-child(2) .o_field_widget input {
                     min-width: 150px !important;
                 }
-                
+
                 /* Quantity and price columns */
                 &:nth-child(4),
                 &:nth-child(6) {
@@ -208,14 +208,14 @@
                 }
             }
         }
-        
+
         /* Add line buttons */
         .o_field_x2many_list_row_add a {
             padding: 8px 16px !important;
             font-weight: 500 !important;
             color: #3b82f6 !important;
             border-radius: 6px !important;
-            
+
             &:hover {
                 background-color: #eff6ff !important;
             }
@@ -237,7 +237,7 @@
                 width: 100% !important;
             }
         }
-        
+
         .o_group .o_cell {
             padding: 6px 2px !important;
         }
@@ -254,7 +254,7 @@
                 min-height: 44px !important;
             }
         }
-        
+
         .o_list_view .o_list_table {
             th,
             td {
@@ -277,22 +277,22 @@
             font-weight: 500 !important;
             border-radius: 6px !important;
             margin: 2px !important;
-            
+
             &.btn-primary {
                 background-color: #3b82f6 !important;
                 border-color: #3b82f6 !important;
-                
+
                 &:hover {
                     background-color: #2563eb !important;
                     border-color: #2563eb !important;
                 }
             }
-            
+
             &.btn-secondary {
                 background-color: #6b7280 !important;
                 border-color: #6b7280 !important;
                 color: white !important;
-                
+
                 &:hover {
                     background-color: #4b5563 !important;
                     border-color: #4b5563 !important;
@@ -300,12 +300,12 @@
             }
         }
     }
-    
+
     /* Submit for Review button specific styling */
     .btn-danger {
         background-color: #dc2626 !important;
         border-color: #dc2626 !important;
-        
+
         &:hover {
             background-color: #b91c1c !important;
             border-color: #b91c1c !important;
@@ -327,7 +327,7 @@
             outline-offset: 2px !important;
         }
     }
-    
+
     /* Error state styling */
     .o_field_invalid {
         .o_field_widget {
@@ -335,7 +335,7 @@
             textarea,
             select {
                 border-color: #dc2626 !important;
-                
+
                 &:focus {
                     border-color: #dc2626 !important;
                     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
@@ -343,7 +343,7 @@
             }
         }
     }
-    
+
     /* Required field indicators */
     .o_required_modifier {
         .o_form_label::after {
