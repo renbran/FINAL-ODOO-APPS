@@ -75,7 +75,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # CRITICAL: Load error interceptor FIRST to prevent JavaScript crashes
+            # CRITICAL: Load enhanced error interceptor FIRST to prevent all JavaScript crashes
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
@@ -109,6 +110,7 @@
         ],
         'web.assets_web_dark': [
             # Critical error handlers for dark theme (MUST LOAD FIRST)
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             
