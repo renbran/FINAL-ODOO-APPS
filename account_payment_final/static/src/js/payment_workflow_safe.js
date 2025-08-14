@@ -4,87 +4,89 @@
  * Compatible with CloudPepper environment
  */
 
-(function() {
-    'use strict';
+(function () {
+    "use strict";
 
     // Payment Workflow Helper - Global Object
     window.PaymentWorkflowHelper = {
         /**
          * Get workflow stage configuration
          */
-        getStageConfig: function() {
+        getStageConfig: function () {
             return {
                 draft: {
                     name: "Draft",
                     icon: "fa-edit",
-                    color: "secondary"
+                    color: "secondary",
                 },
                 under_review: {
-                    name: "Under Review", 
+                    name: "Under Review",
                     icon: "fa-search",
-                    color: "info"
+                    color: "info",
                 },
                 for_approval: {
                     name: "For Approval",
                     icon: "fa-check",
-                    color: "warning"
+                    color: "warning",
                 },
                 for_authorization: {
                     name: "For Authorization",
                     icon: "fa-key",
-                    color: "warning"
+                    color: "warning",
                 },
                 approved: {
                     name: "Approved",
                     icon: "fa-check-circle",
-                    color: "success"
+                    color: "success",
                 },
                 posted: {
                     name: "Posted",
                     icon: "fa-check-circle",
-                    color: "success"
+                    color: "success",
                 },
                 cancelled: {
                     name: "Cancelled",
                     icon: "fa-times-circle",
-                    color: "danger"
-                }
+                    color: "danger",
+                },
             };
         },
 
         /**
          * Get stage display information
          */
-        getStageInfo: function(stage) {
+        getStageInfo: function (stage) {
             const config = this.getStageConfig();
-            return config[stage] || {
-                name: "Unknown",
-                icon: "fa-question",
-                color: "secondary"
-            };
+            return (
+                config[stage] || {
+                    name: "Unknown",
+                    icon: "fa-question",
+                    color: "secondary",
+                }
+            );
         },
 
         /**
          * Get next possible stages for a current stage
          */
-        getNextStages: function(currentStage) {
+        getNextStages: function (currentStage) {
             const transitions = {
-                draft: ['under_review', 'cancelled'],
-                under_review: ['for_approval', 'draft', 'cancelled'],
-                for_approval: ['for_authorization', 'under_review', 'cancelled'],
-                for_authorization: ['approved', 'for_approval', 'cancelled'],
-                approved: ['posted', 'cancelled'],
+                draft: ["under_review", "cancelled"],
+                under_review: ["for_approval", "draft", "cancelled"],
+                for_approval: ["for_authorization", "under_review", "cancelled"],
+                for_authorization: ["approved", "for_approval", "cancelled"],
+                approved: ["posted", "cancelled"],
                 posted: [], // Final state
-                cancelled: ['draft'] // Can restart
+                cancelled: ["draft"], // Can restart
             };
-            
+
             return transitions[currentStage] || [];
         },
 
         /**
          * Check if a stage transition is valid
          */
-        isValidTransition: function(fromStage, toStage) {
+        isValidTransition: function (fromStage, toStage) {
             const nextStages = this.getNextStages(fromStage);
             return nextStages.includes(toStage);
         },
@@ -92,7 +94,7 @@
         /**
          * Get stage CSS class for styling
          */
-        getStageClass: function(stage) {
+        getStageClass: function (stage) {
             const info = this.getStageInfo(stage);
             return `badge badge-${info.color} payment-stage-${stage}`;
         },
@@ -100,7 +102,7 @@
         /**
          * Get stage HTML representation
          */
-        getStageHTML: function(stage) {
+        getStageHTML: function (stage) {
             const info = this.getStageInfo(stage);
             return `<span class="${this.getStageClass(stage)}">
                 <i class="fa ${info.icon}"></i> ${info.name}
@@ -110,12 +112,12 @@
         /**
          * Initialize workflow UI enhancements
          */
-        initWorkflowUI: function() {
+        initWorkflowUI: function () {
             console.log("[Payment Workflow] Initializing UI enhancements...");
-            
+
             // Add workflow styling
             this.addWorkflowStyles();
-            
+
             // Initialize workflow buttons
             this.initWorkflowButtons();
         },
@@ -123,13 +125,13 @@
         /**
          * Add workflow-specific CSS styles
          */
-        addWorkflowStyles: function() {
-            if (document.getElementById('payment-workflow-styles')) {
+        addWorkflowStyles: function () {
+            if (document.getElementById("payment-workflow-styles")) {
                 return; // Already added
             }
 
-            const style = document.createElement('style');
-            style.id = 'payment-workflow-styles';
+            const style = document.createElement("style");
+            style.id = "payment-workflow-styles";
             style.textContent = `
                 .payment-stage-draft { background-color: #6c757d !important; }
                 .payment-stage-under_review { background-color: #17a2b8 !important; }
@@ -156,15 +158,15 @@
         /**
          * Initialize workflow transition buttons
          */
-        initWorkflowButtons: function() {
+        initWorkflowButtons: function () {
             // This would be called by form views to add workflow buttons
             console.log("[Payment Workflow] Workflow buttons initialized");
-        }
+        },
     };
 
     // Auto-initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
             window.PaymentWorkflowHelper.initWorkflowUI();
         });
     } else {
@@ -173,5 +175,4 @@
     }
 
     console.log("[Payment Workflow] CloudPepper-compatible workflow helper loaded");
-
 })();
