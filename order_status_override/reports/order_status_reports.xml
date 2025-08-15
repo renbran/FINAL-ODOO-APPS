@@ -2,16 +2,6 @@
 <odoo>
     <data>
         <!-- Report Actions -->
-        <record id="report_customer_invoice" model="ir.actions.report">
-            <field name="name">Customer Invoice/Payment Receipt</field>
-            <field name="model">sale.order</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">order_status_override.customer_invoice_report_template</field>
-            <field name="report_file">order_status_override.customer_invoice_report_template</field>
-            <field name="print_report_name">'Customer Invoice - %s' % object.name</field>
-            <field name="paperformat_id" ref="base.paperformat_us"/>
-        </record>
-
         <record id="report_commission_payout" model="ir.actions.report">
             <field name="name">Commission Payout Report</field>
             <field name="model">sale.order</field>

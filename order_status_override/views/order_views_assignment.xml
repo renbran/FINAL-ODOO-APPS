@@ -8,32 +8,51 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <!-- Add workflow status bar -->
+                <!-- Add unified workflow status bar -->
                 <field name="state" position="before">
-                    <field name="custom_status_id" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']"/>
+                    <field name="order_status" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']"/>
+                    <field name="custom_status_id" invisible="1"/>
+                    <!-- Computed fields for button visibility -->
+                    <field name="show_documentation_button" invisible="1"/>
+                    <field name="show_commission_button" invisible="1"/>
+                    <field name="show_review_button" invisible="1"/>
+                    <field name="show_approve_button" invisible="1"/>
+                    <field name="show_reject_button" invisible="1"/>
                 </field>
 
                 <!-- Add commission and workflow buttons in header -->
                 <button name="action_quotation_send" position="after">
-                    <button name="action_change_status" string="Change Status" type="object" class="btn-secondary" icon="fa-exchange"/>
+                    <button name="action_change_status" string="Change Status" type="object" class="btn-secondary" icon="fa-exchange" invisible="1"/>
                     <button name="action_view_order_reports" string="Generate Reports" type="object" class="btn-info" icon="fa-file-pdf-o"/>
+                    <button name="%(report_sale_commission)d" string="Commission Report" type="action" class="btn-success" icon="fa-money" invisible="state not in ['sale', 'done']"/>
                 </button>
 
-                <!-- Add workflow action buttons based on status -->
+                <!-- Add unified workflow action buttons synchronized with status bar -->
                 <button name="action_quotation_send" position="after">
                     <!-- Draft to Documentation -->
-                    <button name="action_request_documentation" string="Request Documentation" type="object" class="btn-primary" icon="fa-file-text-o" invisible="custom_status_id.code != 'draft' or not documentation_user_id"/>
+                    <button name="action_move_to_documentation" string="Start Documentation" type="object" 
+                            class="btn-primary" icon="fa-file-text-o" 
+                            invisible="not show_documentation_button"/>
 
                     <!-- Documentation to Commission -->
-                    <button name="action_start_commission_calculation" string="Start Commission Calculation" type="object" class="btn-warning" icon="fa-calculator" invisible="custom_status_id.code != 'documentation_progress' or not commission_user_id"/>
+                    <button name="action_move_to_commission" string="Start Commission Calculation" type="object" 
+                            class="btn-warning" icon="fa-calculator" 
+                            invisible="not show_commission_button"/>
 
                     <!-- Commission to Final Review -->
-                    <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn-info" icon="fa-search" invisible="custom_status_id.code != 'commission_calculation' or not final_review_user_id"/>
+                    <button name="action_move_to_review" string="Submit for Review" type="object" 
+                            class="btn-info" icon="fa-search" 
+                            invisible="not show_review_button"/>
 
                     <!-- Final Review Actions -->
-                    <button name="action_approve_and_post_order" string="Approve &amp; Post Order" type="object" class="btn-success" icon="fa-check" invisible="custom_status_id.code != 'final_review'"/>
+                    <button name="action_approve_order" string="Approve Order" type="object" 
+                            class="btn-success" icon="fa-check" 
+                            invisible="not show_approve_button"/>
 
-                    <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger" icon="fa-times" invisible="custom_status_id.code != 'final_review'"/>
+                    <!-- Reject button (available in all stages except approved) -->
+                    <button name="action_reject_order" string="Reject Order" type="object" 
+                            class="btn-danger" icon="fa-times" 
+                            invisible="not show_reject_button"/>
                 </button>
 
                 <!-- Add workflow assignment fields using xpath -->
@@ -142,9 +161,11 @@
             <field name="inherit_id" ref="sale.view_quotation_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="before">
-                    <field name="custom_status_id" optional="show"/>
+                    <field name="order_status" optional="show"/>
+                    <field name="custom_status_id" optional="hide"/>
                 </field>
                 <field name="amount_total" position="after">
+                    <field name="booking_date" optional="show"/>
                     <field name="total_commission_amount" optional="hide" widget="monetary"/>
                 </field>
             </field>
@@ -157,6 +178,8 @@
             <field name="inherit_id" ref="sale.view_sales_order_filter"/>
             <field name="arch" type="xml">
                 <field name="name" position="after">
+                    <field name="order_status"/>
+                    <field name="booking_date"/>
                     <field name="custom_status_id"/>
                     <field name="documentation_user_id"/>
                     <field name="commission_user_id"/>
@@ -164,13 +187,25 @@
                 </field>
                 <xpath expr="//search" position="inside">
                     <separator/>
-                    <filter name="draft_status" string="Draft Orders" domain="[('custom_status_id.name', '=', 'Draft')]"/>
-                    <filter name="documentation_pending" string="Documentation Pending" domain="[('custom_status_id.name', '=', 'Documentation In-progress')]"/>
-                    <filter name="commission_pending" string="Commission Pending" domain="[('custom_status_id.name', '=', 'Commission Calculation In-progress')]"/>
-                    <filter name="review_pending" string="Review Pending" domain="[('custom_status_id.name', '=', 'Final Review')]"/>
-                    <filter name="approved_orders" string="Approved Orders" domain="[('custom_status_id.name', '=', 'Approved')]"/>
+                    <!-- Unified Status Filters -->
+                    <filter name="draft_status" string="Draft Orders" domain="[('order_status', '=', 'draft')]"/>
+                    <filter name="documentation_status" string="Documentation In-Progress" domain="[('order_status', '=', 'documentation')]"/>
+                    <filter name="commission_status" string="Commission Calculation" domain="[('order_status', '=', 'commission')]"/>
+                    <filter name="review_status" string="Final Review" domain="[('order_status', '=', 'review')]"/>
+                    <filter name="approved_status" string="Approved Orders" domain="[('order_status', '=', 'approved')]"/>
+                    
+                    <!-- Date Filters for Reports -->
+                    <separator/>
+                    <filter name="this_month_bookings" string="This Month Bookings" 
+                            domain="[('booking_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
+                                     ('booking_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter name="this_year_bookings" string="This Year Bookings" 
+                            domain="[('booking_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                     ('booking_date', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                    
                     <group string="Group By">
-                        <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
+                        <filter name="group_by_order_status" string="Order Status" context="{'group_by': 'order_status'}"/>
+                        <filter name="group_by_booking_date" string="Booking Date" context="{'group_by': 'booking_date:month'}"/>
                         <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
                         <filter name="group_by_commission_user" string="Commission User" context="{'group_by': 'commission_user_id'}"/>
                     </group>

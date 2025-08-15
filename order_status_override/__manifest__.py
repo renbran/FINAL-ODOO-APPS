@@ -32,6 +32,8 @@
         'views/report_wizard_views.xml',
         'reports/order_status_reports.xml',
         'reports/commission_report_enhanced.xml',
+        'reports/sale_commission_report.xml',
+        'reports/sale_commission_template.xml',
     ],
     'installable': True,
     'application': False,

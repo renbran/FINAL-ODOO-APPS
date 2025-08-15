@@ -248,7 +248,7 @@
                                                 <h1 class="report-title">Commission Report</h1>
                                                 <div class="report-subtitle">
                                                     <strong>Order: <span t-field="o.name"/>
- | Date: <span t-field="o.booking_date"/>
+ | Date: <span t-field="o.date_order"/>
                                                 </strong>
                                             </div>
                                         </div>
@@ -283,9 +283,9 @@
                                         </div>
 
                                         <div class="info-section">
-                                            <div class="info-label">Booking Date:</div>
+                                            <div class="info-label">Order Date:</div>
                                             <div class="info-value">
-                                                <span t-field="o.booking_date"/>
+                                                <span t-field="o.date_order"/>
                                             </div>
                                         </div>
                                     </div>

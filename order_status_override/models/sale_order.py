@@ -11,9 +11,19 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Core workflow fields
+    # Unified Status Field - Professional Workflow
+    order_status = fields.Selection([
+        ('draft', 'Draft'),
+        ('documentation', 'Documentation In-Progress'),
+        ('commission', 'Commission Calculation'),
+        ('review', 'Final Review'),
+        ('approved', 'Approved'),
+    ], string='Order Status', default='draft', tracking=True, copy=False,
+       help="Current status of the order in the workflow")
+    
+    # Legacy field (kept for backward compatibility)
     custom_status_id = fields.Many2one('order.status', string='Custom Status', 
-                                      tracking=True, copy=False)
+                                      tracking=True, copy=False, readonly=True)
     custom_status_history_ids = fields.One2many('order.status.history', 'order_id', 
                                             string='Status History', copy=False)
     
@@ -22,8 +32,16 @@ class SaleOrder(models.Model):
     commission_user_id = fields.Many2one('res.users', string='Commission Responsible')
     final_review_user_id = fields.Many2one('res.users', string='Final Review Responsible')
     
+    # Stage visibility computed fields
+    show_documentation_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_commission_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_review_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_approve_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_reject_button = fields.Boolean(compute='_compute_workflow_buttons')
+    
     # Real Estate specific fields
-    booking_date = fields.Date(string='Booking Date', default=fields.Date.today, tracking=True)
+    booking_date = fields.Date(string='Booking Date', default=fields.Date.today, tracking=True, 
+                              help="Date when the property was booked/reserved")
     project_id = fields.Many2one('product.template', string='Project', tracking=True)
     unit_id = fields.Many2one('product.product', string='Unit', tracking=True)
     
@@ -206,22 +224,31 @@ class SaleOrder(models.Model):
             else:
                 order.qr_code = False
     
-    # Report fields - Legacy compatibility
-    related_purchase_orders = fields.One2many(
-        'purchase.order', 
-        compute='_compute_related_documents',
-        string='Related Purchase Orders'
-    )
-    related_vendor_bills = fields.One2many(
-        'account.move',
-        compute='_compute_related_documents', 
-        string='Related Vendor Bills'
-    )
-    total_payment_out = fields.Monetary(
-        string='Total Payment Out',
-        compute='_compute_total_payment_out',
-        currency_field='currency_id'
-    )
+    @api.depends('order_status', 'state')
+    def _compute_workflow_buttons(self):
+        """Compute visibility of workflow transition buttons"""
+        for order in self:
+            # Default all buttons to hidden
+            order.show_documentation_button = False
+            order.show_commission_button = False  
+            order.show_review_button = False
+            order.show_approve_button = False
+            order.show_reject_button = False
+            
+            # Show buttons based on current status
+            if order.order_status == 'draft':
+                order.show_documentation_button = True
+                order.show_reject_button = True
+            elif order.order_status == 'documentation':
+                order.show_commission_button = True
+                order.show_reject_button = True
+            elif order.order_status == 'commission':
+                order.show_review_button = True
+                order.show_reject_button = True
+            elif order.order_status == 'review':
+                order.show_approve_button = True
+                order.show_reject_button = True
+            # Approved status - no further actions needed
 
     @api.depends('partner_id', 'order_line', 'order_line.product_id')
     def _compute_related_documents(self):
@@ -498,6 +525,72 @@ class SaleOrder(models.Model):
             user_id=self.documentation_user_id.id
         )
         
+        return True
+    
+    # === UNIFIED WORKFLOW ACTIONS ===
+    def action_move_to_documentation(self):
+        """Move order to documentation stage"""
+        self.ensure_one()
+        if self.order_status != 'draft':
+            raise UserError(_("Order must be in draft status to move to documentation."))
+        
+        self.order_status = 'documentation'
+        self.message_post(
+            body=_("Order moved to Documentation stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Documentation"),
+        )
+        return True
+
+    def action_move_to_commission(self):
+        """Move order to commission calculation stage"""
+        self.ensure_one()
+        if self.order_status != 'documentation':
+            raise UserError(_("Order must be in documentation status to move to commission calculation."))
+        
+        self.order_status = 'commission'
+        self.message_post(
+            body=_("Order moved to Commission Calculation stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Commission Calculation"),
+        )
+        return True
+
+    def action_move_to_review(self):
+        """Move order to final review stage"""
+        self.ensure_one()
+        if self.order_status != 'commission':
+            raise UserError(_("Order must be in commission status to move to final review."))
+        
+        self.order_status = 'review'
+        self.message_post(
+            body=_("Order moved to Final Review stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Final Review"),
+        )
+        return True
+
+    def action_approve_order(self):
+        """Approve the order"""
+        self.ensure_one()
+        if self.order_status != 'review':
+            raise UserError(_("Order must be in review status to be approved."))
+        
+        self.order_status = 'approved'
+        self.message_post(
+            body=_("Order approved by %s") % self.env.user.name,
+            subject=_("Status Changed: Approved"),
+        )
+        return True
+
+    def action_reject_order(self):
+        """Reject order - move back to draft"""
+        self.ensure_one()
+        if self.order_status == 'approved':
+            raise UserError(_("Cannot reject an already approved order."))
+        
+        self.order_status = 'draft'
+        self.message_post(
+            body=_("Order rejected and moved back to draft by %s") % self.env.user.name,
+            subject=_("Status Changed: Rejected to Draft"),
+        )
         return True
     
     def _change_status(self, new_status_id, notes=False):
