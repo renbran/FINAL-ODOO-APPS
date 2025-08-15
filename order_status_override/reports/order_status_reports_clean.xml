@@ -372,9 +372,10 @@
                                     • This commission report is generated automatically based on the sales order configuration.<br/>
                                     • Please verify all commission amounts before processing payments.<br/>
                                     • For inquiries, contact the finance department.<br/>
-                                                                        • Generated on <span t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
+                                    • Generated on <span t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
 </div>
 </div>
+</t>
 
 <div class="oe_structure"/>
 </div>

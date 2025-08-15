@@ -22,6 +22,7 @@
     'depends': ['sale', 'mail'],
     'data': [
         'security/security.xml',
+        'security/security_enhanced.xml',
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
         'views/order_status_views.xml',
@@ -29,6 +30,7 @@
         'views/email_template_views.xml',
         'views/report_wizard_views.xml',
         'reports/order_status_reports.xml',
+        'reports/commission_report_enhanced.xml',
     ],
     'installable': True,
     'application': False,

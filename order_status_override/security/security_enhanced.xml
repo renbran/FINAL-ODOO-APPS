@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Order Status Workflow Security Groups -->
+
+        <!-- Draft Stage Group -->
+        <record id="group_order_draft_user" model="res.groups">
+            <field name="name">Order Draft Users</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Users who can create and edit draft orders</field>
+        </record>
+
+        <!-- Documentation Review Group -->
+        <record id="group_order_documentation_reviewer" model="res.groups">
+            <field name="name">Order Documentation Reviewers</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Users responsible for reviewing and preparing order documentation</field>
+        </record>
+
+        <!-- Commission Calculation Group -->
+        <record id="group_order_commission_calculator" model="res.groups">
+            <field name="name">Order Commission Calculators</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Users responsible for calculating commission amounts</field>
+        </record>
+
+        <!-- Final Review and Approval Group -->
+        <record id="group_order_approval_manager" model="res.groups">
+            <field name="name">Order Approval Managers</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Managers who can approve/reject orders for posting</field>
+        </record>
+
+        <!-- Sales Order Posting Group -->
+        <record id="group_order_posting_manager" model="res.groups">
+            <field name="name">Order Posting Managers</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Managers who can post approved orders as sales orders</field>
+        </record>
+
+        <!-- Super Admin Group for Order Status Override -->
+        <record id="group_order_status_admin" model="res.groups">
+            <field name="name">Order Status System Administrator</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Full administrative access to order status system</field>
+            <field name="implied_ids" eval="[(4, ref('group_order_draft_user')), 
+                                           (4, ref('group_order_documentation_reviewer')), 
+                                           (4, ref('group_order_commission_calculator')), 
+                                           (4, ref('group_order_approval_manager')), 
+                                           (4, ref('group_order_posting_manager'))]"/>
+        </record>
+
+        <!-- Record Rules for Order Status Workflow -->
+
+        <!-- Draft Stage: Users can only see/edit orders they created or are assigned to -->
+        <record id="order_status_rule_draft_users" model="ir.rule">
+            <field name="name">Draft Orders: Own Orders Only</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[
+                '|', 
+                ('create_uid', '=', user.id),
+                '|',
+                ('documentation_user_id', '=', user.id),
+                '|',
+                ('commission_user_id', '=', user.id),
+                ('final_review_user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_order_draft_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Documentation Reviewers: Can see orders assigned to them for documentation -->
+        <record id="order_status_rule_documentation_reviewers" model="ir.rule">
+            <field name="name">Documentation: Assigned Orders</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[('documentation_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_order_documentation_reviewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Commission Calculators: Can see orders assigned to them for commission calculation -->
+        <record id="order_status_rule_commission_calculators" model="ir.rule">
+            <field name="name">Commission: Assigned Orders</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[('commission_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_order_commission_calculator'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Approval Managers: Can see all orders in final review stage -->
+        <record id="order_status_rule_approval_managers" model="ir.rule">
+            <field name="name">Approval: All Orders for Review</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">['|', ('final_review_user_id', '=', user.id), ('custom_status_id.code', '=', 'final_review')]</field>
+            <field name="groups" eval="[(4, ref('group_order_approval_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Admin Group: Can see all orders -->
+        <record id="order_status_rule_admin" model="ir.rule">
+            <field name="name">Admin: All Orders</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_order_status_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Automated Email Templates for Workflow Notifications -->
+
+        <!-- Documentation Review Notification -->
+        <record id="email_template_documentation_review" model="mail.template">
+            <field name="name">Order Documentation Review Required</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Order ${object.name} - Documentation Review Required</field>
+            <field name="email_to">${object.documentation_user_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: Arial, sans-serif;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="margin: auto; background: white; width: 100%; max-width: 600px;">
+                        <tr>
+                            <td style="background: linear-gradient(135deg, #6B2B47, #8B1538); padding: 20px;">
+                                <h2 style="color: white; text-align: center; margin: 0;">Documentation Review Required</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p>Dear ${object.documentation_user_id.name},</p>
+
+                                <p>Order <strong>${object.name}</strong> has been assigned to you for documentation review.</p>
+
+                                <h3>Order Details:</h3>
+                                <ul>
+                                    <li>
+                                        <strong>Customer:</strong> ${object.partner_id.name}</li>
+                                    <li>
+                                        <strong>Order Amount:</strong> ${object.amount_total} ${object.currency_id.name}</li>
+                                    <li>
+                                        <strong>Order Date:</strong> ${object.date_order}</li>
+                                    <li>
+                                        <strong>Current Status:</strong> ${object.custom_status_id.name}</li>
+                                </ul>
+
+                                <p>Please review and prepare all required documentation for this order.</p>
+
+                                <p style="text-align: center; margin: 20px 0;">
+                                    <a href="/web#id=${object.id}&amp;model=sale.order&amp;view_type=form" style="background: #6B2B47; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                                        View Order
+                                    </a>
+                                </p>
+
+                                <p>Best regards,<br/>
+OSUS Properties Team</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <!-- Commission Calculation Notification -->
+        <record id="email_template_commission_calculation" model="mail.template">
+            <field name="name">Order Commission Calculation Required</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Order ${object.name} - Commission Calculation Required</field>
+            <field name="email_to">${object.commission_user_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: Arial, sans-serif;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="margin: auto; background: white; width: 100%; max-width: 600px;">
+                        <tr>
+                            <td style="background: linear-gradient(135deg, #b19024, #8B6F00); padding: 20px;">
+                                <h2 style="color: white; text-align: center; margin: 0;">Commission Calculation Required</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p>Dear ${object.commission_user_id.name},</p>
+
+                                <p>Order <strong>${object.name}</strong> has been assigned to you for commission calculation.</p>
+
+                                <h3>Order Details:</h3>
+                                <ul>
+                                    <li>
+                                        <strong>Customer:</strong> ${object.partner_id.name}</li>
+                                    <li>
+                                        <strong>Order Amount:</strong> ${object.amount_total} ${object.currency_id.name}</li>
+                                    <li>
+                                        <strong>Order Date:</strong> ${object.date_order}</li>
+                                    <li>
+                                        <strong>Current Status:</strong> ${object.custom_status_id.name}</li>
+                                </ul>
+
+                                <p>Please calculate all commission amounts for agents, brokers, and other parties.</p>
+
+                                <p style="text-align: center; margin: 20px 0;">
+                                    <a href="/web#id=${object.id}&amp;model=sale.order&amp;view_type=form" style="background: #b19024; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                                        View Order
+                                    </a>
+                                </p>
+
+                                <p>Best regards,<br/>
+OSUS Properties Team</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <!-- Order Approved Notification -->
+        <record id="email_template_order_approved" model="mail.template">
+            <field name="name">Order Approved and Posted</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Order ${object.name} - Approved and Posted</field>
+            <field name="email_to">${object.create_uid.email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: Arial, sans-serif;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="margin: auto; background: white; width: 100%; max-width: 600px;">
+                        <tr>
+                            <td style="background: linear-gradient(135deg, #28a745, #20c997); padding: 20px;">
+                                <h2 style="color: white; text-align: center; margin: 0;">Order Approved and Posted</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p>Dear ${object.create_uid.name},</p>
+
+                                <p>Order <strong>${object.name}</strong> has been approved and posted as a Sales Order.</p>
+
+                                <h3>Order Summary:</h3>
+                                <ul>
+                                    <li>
+                                        <strong>Customer:</strong> ${object.partner_id.name}</li>
+                                    <li>
+                                        <strong>Order Amount:</strong> ${object.amount_total} ${object.currency_id.name}</li>
+                                    <li>
+                                        <strong>Total Commission:</strong> ${object.total_commission_amount} ${object.currency_id.name}</li>
+                                    <li>
+                                        <strong>Status:</strong> ${object.custom_status_id.name}</li>
+                                </ul>
+
+                                <p style="text-align: center; margin: 20px 0;">
+                                    <a href="/web#id=${object.id}&amp;model=sale.order&amp;view_type=form" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                                        View Order
+                                    </a>
+                                </p>
+
+                                <p>Congratulations on the successful completion of this order!</p>
+
+                                <p>Best regards,<br/>
+OSUS Properties Management Team</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

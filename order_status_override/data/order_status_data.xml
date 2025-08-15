@@ -36,12 +36,24 @@
             <field name="is_final">false</field>
         </record>
 
+        <!-- Final Review Status -->
+        <record id="order_status_final_review" model="order.status">
+            <field name="name">Posted</field>
+            <field name="code">final_review</field>
+            <field name="sequence">35</field>
+            <field name="description">Final management review and approval</field>
+            <field name="responsible_type">management</field>
+            <field name="color">6</field>
+            <field name="is_initial" eval="False"/>
+            <field name="is_final">false</field>
+        </record>
+
         <!-- Approved Status (Final) -->
         <record id="order_status_approved" model="order.status">
-            <field name="name">Approved (Posted as Sales Order)</field>
+            <field name="name">Done</field>
             <field name="code">approved</field>
             <field name="sequence">40</field>
-            <field name="description">Order has been approved and posted as Sales Order</field>
+            <field name="description">Order has been approved and completed</field>
             <field name="is_initial">false</field>
             <field name="is_final" eval="True"/>
             <field name="color">10</field>
@@ -58,9 +70,14 @@
             <field name="next_status_ids" eval="[(6, 0, [ref('order_status_commission'), ref('order_status_draft')])]"/>
         </record>
 
-        <record id="workflow_commission_to_approved" model="order.status">
+        <record id="workflow_commission_to_final_review" model="order.status">
             <field name="name" ref="order_status_commission"/>
-            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_approved'), ref('order_status_documentation')])]"/>
+            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_final_review'), ref('order_status_documentation')])]"/>
+        </record>
+
+        <record id="workflow_final_review_to_approved" model="order.status">
+            <field name="name" ref="order_status_final_review"/>
+            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_approved'), ref('order_status_commission')])]"/>
         </record>
     </data>
 </odoo>
