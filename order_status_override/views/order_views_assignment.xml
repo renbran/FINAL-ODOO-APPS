@@ -37,7 +37,7 @@
                 </button>
 
                 <!-- Add workflow assignment fields -->
-                <page string="Other Information" position="after">
+                <xpath expr="//notebook" position="inside">
                     <page string="Workflow &amp; Assignment" name="workflow_assignment">
                         <group>
                             <group string="Stage Assignments" name="stage_assignments">
@@ -65,10 +65,10 @@
                             </field>
                         </group>
                     </page>
-                </page>
+                </xpath>
 
                 <!-- Enhanced Commission Configuration -->
-                <page string="Other Information" position="after">
+                <xpath expr="//notebook" position="inside">
                     <page string="Commission Configuration" name="commission_config">
                         <group>
                             <!-- External Commissions -->
@@ -131,7 +131,7 @@
                             </group>
                         </group>
                     </page>
-                </page>
+                </xpath>
             </field>
         </record>
 
