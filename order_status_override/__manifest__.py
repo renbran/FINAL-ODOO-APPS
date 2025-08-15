@@ -26,7 +26,7 @@
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
         'data/email_templates.xml',
-i       'data/paperformat.xml',
+        'data/paperformat.xml',
         'reports/order_status_reports.xml',
         'reports/commission_report_enhanced.xml',
         'reports/sale_commission_report.xml',
