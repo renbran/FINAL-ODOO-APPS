@@ -140,6 +140,63 @@ class SaleOrder(models.Model):
         )
         
         return True
+
+    def action_return_to_previous(self):
+        """Return order to previous stage in workflow"""
+        self.ensure_one()
+        
+        # Get current status code
+        current_code = self.custom_status_id.code
+        
+        # Define previous status mapping
+        previous_status_map = {
+            'documentation_progress': 'draft',
+            'commission_progress': 'documentation_progress', 
+            'final_review': 'commission_progress',
+            'review': 'commission_progress'
+        }
+        
+        if current_code not in previous_status_map:
+            raise UserError(_("Cannot return to previous stage from current status."))
+        
+        # Find the previous status
+        previous_code = previous_status_map[current_code]
+        previous_status = self.env['order.status'].search([('code', '=', previous_code)], limit=1)
+        if not previous_status:
+            raise UserError(_("Previous status '%s' not found in the system.") % previous_code)
+        
+        # Change to previous status
+        self._change_status(previous_status.id, _("Order returned to previous stage by %s") % self.env.user.name)
+        
+        # Send notification
+        self.message_post(
+            body=_("Order has been returned to previous stage: %s") % previous_status.name,
+            subject=_("Order Returned to Previous Stage"),
+            message_type='notification'
+        )
+        
+        return True
+
+    def action_request_documentation(self):
+        """Start the documentation process"""
+        self.ensure_one()
+        
+        # Find the documentation status
+        doc_status = self.env['order.status'].search([('code', '=', 'documentation_progress')], limit=1)
+        if not doc_status:
+            raise UserError(_("Documentation progress status not found in the system."))
+        
+        # Change to documentation status
+        self._change_status(doc_status.id, _("Documentation process started by %s") % self.env.user.name)
+        
+        # Send notification
+        self.message_post(
+            body=_("Documentation process has been started."),
+            subject=_("Documentation Started"),
+            message_type='notification'
+        )
+        
+        return True
     
     def _change_status(self, status_id, notes=None):
         """Helper method to change status and log history"""
