@@ -38,11 +38,11 @@
 
         <!-- Final Review Status -->
         <record id="order_status_final_review" model="order.status">
-            <field name="name">Posted</field>
+            <field name="name">Final Review</field>
             <field name="code">final_review</field>
             <field name="sequence">35</field>
             <field name="description">Final management review and approval</field>
-            <field name="responsible_type">management</field>
+            <field name="responsible_type">final_review</field>
             <field name="color">6</field>
             <field name="is_initial" eval="False"/>
             <field name="is_final">false</field>
@@ -59,25 +59,5 @@
             <field name="color">10</field>
         </record>
 
-        <!-- Define workflow transitions -->
-        <record id="workflow_draft_to_documentation" model="order.status">
-            <field name="name" ref="order_status_draft"/>
-            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_documentation')])]"/>
-        </record>
-
-        <record id="workflow_documentation_to_commission" model="order.status">
-            <field name="name" ref="order_status_documentation"/>
-            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_commission'), ref('order_status_draft')])]"/>
-        </record>
-
-        <record id="workflow_commission_to_final_review" model="order.status">
-            <field name="name" ref="order_status_commission"/>
-            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_final_review'), ref('order_status_documentation')])]"/>
-        </record>
-
-        <record id="workflow_final_review_to_approved" model="order.status">
-            <field name="name" ref="order_status_final_review"/>
-            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_approved'), ref('order_status_commission')])]"/>
-        </record>
     </data>
 </odoo>
