@@ -27,9 +27,8 @@
         'views/order_status_views.xml',
         'views/order_views_assignment.xml',
         'views/email_template_views.xml',
-        # Temporarily commented out to fix loading issues
-        # 'views/report_wizard_views.xml',
-        # 'reports/order_status_reports.xml',
+        'views/report_wizard_views.xml',
+        'reports/order_status_reports.xml',
     ],
     'installable': True,
     'application': False,
