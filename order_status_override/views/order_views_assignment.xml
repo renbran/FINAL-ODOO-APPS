@@ -162,14 +162,14 @@
                     <field name="commission_user_id"/>
                     <field name="final_review_user_id"/>
                 </field>
-                <filter name="my_quotation" position="after">
+                <xpath expr="//search" position="inside">
                     <separator/>
                     <filter name="draft_status" string="Draft Orders" domain="[('custom_status_id.name', '=', 'Draft')]"/>
                     <filter name="documentation_pending" string="Documentation Pending" domain="[('custom_status_id.name', '=', 'Documentation In-progress')]"/>
                     <filter name="commission_pending" string="Commission Pending" domain="[('custom_status_id.name', '=', 'Commission Calculation In-progress')]"/>
                     <filter name="review_pending" string="Review Pending" domain="[('custom_status_id.name', '=', 'Final Review')]"/>
                     <filter name="approved_orders" string="Approved Orders" domain="[('custom_status_id.name', '=', 'Approved')]"/>
-                </filter>
+                </xpath>
                 <group name="group_by" position="inside">
                     <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
                     <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
