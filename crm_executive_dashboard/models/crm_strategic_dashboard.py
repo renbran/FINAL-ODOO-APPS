@@ -162,76 +162,76 @@ class CRMStrategicDashboard(models.Model):
             if team_ids:
                 domain.append(('team_id', 'in', team_ids))
 
-        # Previous period for comparison
-        period_length = (date_to - date_from).days
-        prev_date_to = date_from - timedelta(days=1)
-        prev_date_from = prev_date_to - timedelta(days=period_length)
-        
-        prev_domain = [
-            ('create_date', '>=', prev_date_from),
-            ('create_date', '<=', prev_date_to)
-        ]
-        if team_ids:
-            prev_domain.append(('team_id', 'in', team_ids))
+            # Previous period for comparison
+            period_length = (date_to - date_from).days
+            prev_date_to = date_from - timedelta(days=1)
+            prev_date_from = prev_date_to - timedelta(days=period_length)
+            
+            prev_domain = [
+                ('create_date', '>=', prev_date_from),
+                ('create_date', '<=', prev_date_to)
+            ]
+            if team_ids:
+                prev_domain.append(('team_id', 'in', team_ids))
 
-        # Current period metrics
-        total_pipeline_value = sum(self.env['crm.lead'].search(
-            domain + [('type', '=', 'opportunity'), ('active', '=', True)]
-        ).mapped('planned_revenue'))
-        
-        won_revenue = sum(self.env['crm.lead'].search(
-            domain + [('stage_id.is_won', '=', True)]
-        ).mapped('planned_revenue'))
-        
-        # Previous period metrics for comparison
-        prev_won_revenue = sum(self.env['crm.lead'].search(
-            prev_domain + [('stage_id.is_won', '=', True)]
-        ).mapped('planned_revenue'))
-        
-        # Revenue growth
-        revenue_growth = ((won_revenue - prev_won_revenue) / prev_won_revenue * 100) if prev_won_revenue > 0 else 0
-        
-        # Customer acquisition cost
-        marketing_activities = self.env['mail.activity'].search_count([
-            ('create_date', '>=', date_from),
-            ('create_date', '<=', date_to),
-            ('activity_type_id.name', 'ilike', 'marketing')
-        ])
-        
-        new_customers = self.env['crm.lead'].search_count(
-            domain + [('stage_id.is_won', '=', True), ('type', '=', 'lead')]
-        )
-        
-        # Sales velocity (time from lead to close)
-        won_leads = self.env['crm.lead'].search(
-            domain + [('stage_id.is_won', '=', True)]
-        )
-        
-        total_days = 0
-        for lead in won_leads:
-            if lead.date_closed and lead.create_date:
-                days = (lead.date_closed.date() - lead.create_date.date()).days
-                total_days += days
-        
-        avg_sales_cycle = total_days / len(won_leads) if won_leads else 0
-        
-        # Market share indicators
-        total_market_leads = self.env['crm.lead'].search_count([
-            ('create_date', '>=', date_from),
-            ('create_date', '<=', date_to)
-        ])
-        
-        our_leads = self.env['crm.lead'].search_count(domain)
-        market_penetration = (our_leads / total_market_leads * 100) if total_market_leads > 0 else 0
+            # Current period metrics
+            total_pipeline_value = sum(self.env['crm.lead'].search(
+                domain + [('type', '=', 'opportunity'), ('active', '=', True)]
+            ).mapped('planned_revenue'))
+            
+            won_revenue = sum(self.env['crm.lead'].search(
+                domain + [('stage_id.is_won', '=', True)]
+            ).mapped('planned_revenue'))
+            
+            # Previous period metrics for comparison
+            prev_won_revenue = sum(self.env['crm.lead'].search(
+                prev_domain + [('stage_id.is_won', '=', True)]
+            ).mapped('planned_revenue'))
+            
+            # Revenue growth
+            revenue_growth = ((won_revenue - prev_won_revenue) / prev_won_revenue * 100) if prev_won_revenue > 0 else 0
+            
+            # Customer acquisition cost
+            marketing_activities = self.env['mail.activity'].search_count([
+                ('create_date', '>=', date_from),
+                ('create_date', '<=', date_to),
+                ('activity_type_id.name', 'ilike', 'marketing')
+            ])
+            
+            new_customers = self.env['crm.lead'].search_count(
+                domain + [('stage_id.is_won', '=', True), ('type', '=', 'lead')]
+            )
+            
+            # Sales velocity (time from lead to close)
+            won_leads = self.env['crm.lead'].search(
+                domain + [('stage_id.is_won', '=', True)]
+            )
+            
+            total_days = 0
+            for lead in won_leads:
+                if lead.date_closed and lead.create_date:
+                    days = (lead.date_closed.date() - lead.create_date.date()).days
+                    total_days += days
+            
+            avg_sales_cycle = total_days / len(won_leads) if won_leads else 0
+            
+            # Market share indicators
+            total_market_leads = self.env['crm.lead'].search_count([
+                ('create_date', '>=', date_from),
+                ('create_date', '<=', date_to)
+            ])
+            
+            our_leads = self.env['crm.lead'].search_count(domain)
+            market_penetration = (our_leads / total_market_leads * 100) if total_market_leads > 0 else 0
 
-        return {
-            'total_pipeline_value': total_pipeline_value,
-            'won_revenue': won_revenue,
-            'revenue_growth': round(revenue_growth, 2),
-            'avg_sales_cycle': round(avg_sales_cycle, 1),
-            'market_penetration': round(market_penetration, 2),
-            'new_customers': new_customers,
-        }
+            return {
+                'total_pipeline_value': total_pipeline_value,
+                'won_revenue': won_revenue,
+                'revenue_growth': round(revenue_growth, 2),
+                'avg_sales_cycle': round(avg_sales_cycle, 1),
+                'market_penetration': round(market_penetration, 2),
+                'new_customers': new_customers,
+            }
         except Exception as e:
             _logger.error(f"Error in _get_strategic_kpis: {str(e)}")
             return {}

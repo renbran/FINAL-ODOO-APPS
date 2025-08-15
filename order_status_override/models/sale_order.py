@@ -4,17 +4,37 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
     
-    custom_status_id = fields.Many2one('order.status', string='Custom Status', 
-                                      tracking=True, copy=False)
-    custom_status_history_ids = fields.One2many('order.status.history', 'order_id', 
-                                            string='Status History', copy=False)
+    # Custom Status Management
+    custom_status_id = fields.Many2one(
+        'order.status', 
+        string='Custom Status', 
+        tracking=True, 
+        copy=False
+    )
+    custom_status_history_ids = fields.One2many(
+        'order.status.history', 
+        'order_id', 
+        string='Status History', 
+        copy=False
+    )
     
-    documentation_user_id = fields.Many2one('res.users', string='Documentation Responsible')
-    commission_user_id = fields.Many2one('res.users', string='Commission Responsible')
-    final_review_user_id = fields.Many2one('res.users', string='Final Review Responsible')
+    # Responsible Users
+    documentation_user_id = fields.Many2one(
+        'res.users', 
+        string='Documentation Responsible'
+    )
+    commission_user_id = fields.Many2one(
+        'res.users', 
+        string='Commission Responsible'
+    )
+    final_review_user_id = fields.Many2one(
+        'res.users', 
+        string='Final Review Responsible'
+    )
     
     @api.model_create_multi
     def create(self, vals_list):
+        """Override create to set initial status"""
         records = super(SaleOrder, self).create(vals_list)
         initial_status = self.env['order.status'].search([('is_initial', '=', True)], limit=1)
         if initial_status:
@@ -28,10 +48,7 @@ class SaleOrder(models.Model):
         return records
     
     def action_change_status(self):
-        """
-        Open the status change wizard
-        :return: Action dictionary
-        """
+        """Open the status change wizard"""
         self.ensure_one()
         return {
             'name': _('Change Order Status'),
@@ -44,7 +61,6 @@ class SaleOrder(models.Model):
                 'default_current_status_id': self.custom_status_id.id,
             }
         }
-
 
     def action_approve_order(self):
         """Approve the order and move to final approved status"""
@@ -99,105 +115,51 @@ class SaleOrder(models.Model):
     def action_submit_for_review(self):
         """Submit order for final review"""
         self.ensure_one()
-        if not self.final_review_user_id:
-            raise UserError(_("Please assign a user for final review before submitting."))
         
-        # Find the final review status
-        review_status = self.env['order.status'].search([('code', '=', 'final_review')], limit=1)
+        # Find the review status
+        review_status = self.env['order.status'].search([('code', '=', 'review')], limit=1)
         if not review_status:
-            raise UserError(_("Final review status not found in the system."))
+            raise UserError(_("Review status not found in the system."))
         
-        # Change to final review status
-        self._change_status(review_status.id, _("Order submitted for final review by %s") % self.env.user.name)
+        # Change to review status
+        self._change_status(review_status.id, _("Order submitted for review by %s") % self.env.user.name)
         
-        # Create activity for reviewer
-        self.activity_schedule(
-            'mail.mail_activity_data_todo',
-            summary=_("Review Order %s") % self.name,
-            note=_("This order is ready for final review and approval/rejection."),
-            user_id=self.final_review_user_id.id
+        # Send notification
+        self.message_post(
+            body=_("Order has been submitted for final review."),
+            subject=_("Order Submitted for Review"),
+            message_type='notification'
         )
         
         return True
     
-    def action_return_to_previous(self):
-        """Return order to previous stage"""
+    def _change_status(self, status_id, notes=None):
+        """Helper method to change status and log history"""
         self.ensure_one()
-        # Get previous status from history
-        last_history = self.env['order.status.history'].search([
-            ('order_id', '=', self.id)
-        ], order='create_date desc', limit=2)
         
-        if len(last_history) < 2:
-            raise UserError(_("No previous status found to return to."))
+        # Update the status
+        self.custom_status_id = status_id
         
-        previous_status = last_history[1].status_id
-        
-        # Change to previous status
-        self._change_status(previous_status.id, _("Order returned to previous stage by %s") % self.env.user.name)
-        
-        return True
-    
-    def action_request_documentation(self):
-        """Start documentation process"""
-        self.ensure_one()
-        if not self.documentation_user_id:
-            raise UserError(_("Please assign a user for documentation before starting the process."))
-        
-        # Find the documentation status
-        doc_status = self.env['order.status'].search([('code', '=', 'documentation_progress')], limit=1)
-        if not doc_status:
-            raise UserError(_("Documentation progress status not found in the system."))
-        
-        # Change to documentation status
-        self._change_status(doc_status.id, _("Documentation process started by %s") % self.env.user.name)
-        
-        # Create activity for documentation user
-        self.activity_schedule(
-            'mail.mail_activity_data_todo',
-            summary=_("Prepare Documentation for Order %s") % self.name,
-            note=_("Please prepare all required documentation for this order."),
-            user_id=self.documentation_user_id.id
-        )
-        
-        return True
-    
-    def _change_status(self, new_status_id, notes=False):
-        """Helper method to change status and create history entry"""
-        old_status_id = self.custom_status_id.id
-        self.custom_status_id = new_status_id
-        
-        # Create history entry
+        # Create history record
         self.env['order.status.history'].create({
             'order_id': self.id,
-            'status_id': new_status_id,
-            'previous_status_id': old_status_id,
-            'notes': notes or _('Status changed')
+            'status_id': status_id,
+            'notes': notes or _('Status changed'),
+            'user_id': self.env.user.id,
+            'date': fields.Datetime.now()
         })
-        
-        # Create activity based on the responsible type
-        new_status = self.env['order.status'].browse(new_status_id)
-        self._create_activity_for_status(new_status)
         
         return True
     
-    def _create_activity_for_status(self, status):
-        """Create an activity for the responsible user based on status"""
-        user_id = False
-        summary = _("Process Sale Order ") + self.name
-        note = _("Please process the sale order as per the '%s' stage.") % status.name
-        
-        if status.responsible_type == 'documentation':
-            user_id = self.documentation_user_id.id
-        elif status.responsible_type == 'commission':
-            user_id = self.commission_user_id.id
-        elif status.responsible_type == 'final_review':
-            user_id = self.final_review_user_id.id
-        
-        if user_id:
-            self.activity_schedule(
-                'mail.mail_activity_data_todo',
-                summary=summary,
-                note=note,
-                user_id=user_id
-            )
+    def get_status_history(self):
+        """Get formatted status history"""
+        self.ensure_one()
+        history = []
+        for record in self.custom_status_history_ids.sorted('date', reverse=True):
+            history.append({
+                'status': record.status_id.name,
+                'date': record.date,
+                'user': record.user_id.name,
+                'notes': record.notes
+            })
+        return history
