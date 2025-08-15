@@ -45,17 +45,17 @@ class OdooDashboardDiagnostic:
             if response.status_code == 200:
                 result = response.json()
                 if 'result' in result and result['result']:
-                    print("✅ Authentication successful")
+                    print("‚úÖ Authentication successful")
                     return True
                 else:
-                    print("❌ Authentication failed")
+                    print("‚ùå Authentication failed")
                     return False
             else:
-                print(f"❌ HTTP Error: {response.status_code}")
+                print(f"‚ùå HTTP Error: {response.status_code}")
                 return False
                 
         except Exception as e:
-            print(f"❌ Authentication error: {str(e)}")
+            print(f"‚ùå Authentication error: {str(e)}")
             return False
     
     def test_module_installed(self):
@@ -90,19 +90,19 @@ class OdooDashboardDiagnostic:
                 result = response.json()
                 if 'result' in result and result['result']:
                     module = result['result'][0]
-                    print(f"✅ Module found: {module['name']}")
+                    print(f"‚úÖ Module found: {module['name']}")
                     print(f"   State: {module['state']}")
                     print(f"   Version: {module.get('installed_version', 'N/A')}")
                     return module['state'] == 'installed'
                 else:
-                    print("❌ CRM Executive Dashboard module not found")
+                    print("‚ùå CRM Executive Dashboard module not found")
                     return False
             else:
-                print(f"❌ HTTP Error: {response.status_code}")
+                print(f"‚ùå HTTP Error: {response.status_code}")
                 return False
                 
         except Exception as e:
-            print(f"❌ Module check error: {str(e)}")
+            print(f"‚ùå Module check error: {str(e)}")
             return False
     
     def test_dashboard_model(self):
@@ -136,17 +136,17 @@ class OdooDashboardDiagnostic:
                 result = response.json()
                 if 'result' in result:
                     count = result['result']
-                    print(f"✅ Dashboard model accessible: {count} records found")
+                    print(f"‚úÖ Dashboard model accessible: {count} records found")
                     return True
                 else:
-                    print("❌ Dashboard model error:", result.get('error', 'Unknown error'))
+                    print("‚ùå Dashboard model error:", result.get('error', 'Unknown error'))
                     return False
             else:
-                print(f"❌ HTTP Error: {response.status_code}")
+                print(f"‚ùå HTTP Error: {response.status_code}")
                 return False
                 
         except Exception as e:
-            print(f"❌ Model test error: {str(e)}")
+            print(f"‚ùå Model test error: {str(e)}")
             return False
     
     def test_dashboard_endpoints(self):
@@ -178,20 +178,20 @@ class OdooDashboardDiagnostic:
                     try:
                         result = response.json()
                         if result.get('success', False):
-                            print(f"✅ Endpoint {endpoint}: Working")
+                            print(f"‚úÖ Endpoint {endpoint}: Working")
                             results[endpoint] = 'success'
                         else:
-                            print(f"⚠️  Endpoint {endpoint}: Returned error - {result.get('error', 'Unknown')}")
+                            print(f"‚ö†Ô∏è  Endpoint {endpoint}: Returned error - {result.get('error', 'Unknown')}")
                             results[endpoint] = 'error'
                     except json.JSONDecodeError:
-                        print(f"❌ Endpoint {endpoint}: Invalid JSON response")
+                        print(f"‚ùå Endpoint {endpoint}: Invalid JSON response")
                         results[endpoint] = 'invalid_json'
                 else:
-                    print(f"❌ Endpoint {endpoint}: HTTP {response.status_code}")
+                    print(f"‚ùå Endpoint {endpoint}: HTTP {response.status_code}")
                     results[endpoint] = f'http_{response.status_code}'
                     
             except Exception as e:
-                print(f"❌ Endpoint {endpoint}: Exception - {str(e)}")
+                print(f"‚ùå Endpoint {endpoint}: Exception - {str(e)}")
                 results[endpoint] = 'exception'
         
         return results
@@ -211,42 +211,42 @@ class OdooDashboardDiagnostic:
                 response = self.session.get(f"{self.odoo_url}{asset}")
                 
                 if response.status_code == 200:
-                    print(f"✅ Asset {asset}: Loading OK")
+                    print(f"‚úÖ Asset {asset}: Loading OK")
                     results[asset] = 'success'
                 elif response.status_code == 404:
-                    print(f"❌ Asset {asset}: Not found (404)")
+                    print(f"‚ùå Asset {asset}: Not found (404)")
                     results[asset] = 'not_found'
                 else:
-                    print(f"⚠️  Asset {asset}: HTTP {response.status_code}")
+                    print(f"‚ö†Ô∏è  Asset {asset}: HTTP {response.status_code}")
                     results[asset] = f'http_{response.status_code}'
                     
             except Exception as e:
-                print(f"❌ Asset {asset}: Exception - {str(e)}")
+                print(f"‚ùå Asset {asset}: Exception - {str(e)}")
                 results[asset] = 'exception'
         
         return results
     
     def run_full_diagnostic(self):
         """Run complete diagnostic suite"""
-        print("🔍 Starting CRM Executive Dashboard Diagnostic")
+        print("üîç Starting CRM Executive Dashboard Diagnostic")
         print("=" * 50)
         
         # Test 1: Authentication
         print("\n1. Testing Authentication...")
         if not self.authenticate():
-            print("❌ Cannot proceed without authentication")
+            print("‚ùå Cannot proceed without authentication")
             return
         
         # Test 2: Module Installation
         print("\n2. Testing Module Installation...")
         if not self.test_module_installed():
-            print("❌ Module not installed properly")
+            print("‚ùå Module not installed properly")
             return
         
         # Test 3: Model Access
         print("\n3. Testing Dashboard Model...")
         if not self.test_dashboard_model():
-            print("⚠️  Dashboard model has issues")
+            print("‚ö†Ô∏è  Dashboard model has issues")
         
         # Test 4: API Endpoints
         print("\n4. Testing API Endpoints...")
@@ -258,36 +258,36 @@ class OdooDashboardDiagnostic:
         
         # Summary
         print("\n" + "=" * 50)
-        print("📊 DIAGNOSTIC SUMMARY")
+        print("üìä DIAGNOSTIC SUMMARY")
         print("=" * 50)
         
         print("\nAPI Endpoints:")
         for endpoint, status in endpoint_results.items():
-            status_icon = "✅" if status == 'success' else "❌"
+            status_icon = "‚úÖ" if status == 'success' else "‚ùå"
             print(f"  {status_icon} {endpoint}: {status}")
         
         print("\nStatic Assets:")
         for asset, status in asset_results.items():
-            status_icon = "✅" if status == 'success' else "❌"
+            status_icon = "‚úÖ" if status == 'success' else "‚ùå"
             print(f"  {status_icon} {asset}: {status}")
         
         # Recommendations
-        print("\n🔧 RECOMMENDATIONS:")
+        print("\nüîß RECOMMENDATIONS:")
         failed_endpoints = [k for k, v in endpoint_results.items() if v != 'success']
         failed_assets = [k for k, v in asset_results.items() if v != 'success']
         
         if failed_endpoints:
-            print("• Check server logs for endpoint errors")
-            print("• Verify user permissions (sales_team.group_sale_salesman)")
-            print("• Ensure module is properly installed and updated")
+            print("‚Ä¢ Check server logs for endpoint errors")
+            print("‚Ä¢ Verify user permissions (sales_team.group_sale_salesman)")
+            print("‚Ä¢ Ensure module is properly installed and updated")
         
         if failed_assets:
-            print("• Check if static files exist in module directory")
-            print("• Verify assets are properly declared in __manifest__.py")
-            print("• Try updating the module or restarting Odoo")
+            print("‚Ä¢ Check if static files exist in module directory")
+            print("‚Ä¢ Verify assets are properly declared in __manifest__.py")
+            print("‚Ä¢ Try updating the module or restarting Odoo")
         
         if not failed_endpoints and not failed_assets:
-            print("✅ All tests passed! Dashboard should be working properly.")
+            print("‚úÖ All tests passed! Dashboard should be working properly.")
 
 def main():
     """Main diagnostic function"""
@@ -301,7 +301,7 @@ def main():
     PASSWORD = input("Enter password: ").strip()
     
     if not all([ODOO_URL, DATABASE, USERNAME, PASSWORD]):
-        print("❌ Please provide all required information")
+        print("‚ùå Please provide all required information")
         return
     
     # Run diagnostic

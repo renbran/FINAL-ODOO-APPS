@@ -109,11 +109,11 @@ def main():
     print("1. Validating module structure...")
     structure_issues = validate_module_structure()
     if structure_issues:
-        print("   ❌ Structure Issues:")
+        print("   ‚ùå Structure Issues:")
         for issue in structure_issues:
             print(f"      - {issue}")
     else:
-        print("   ✅ Module structure is valid")
+        print("   ‚úÖ Module structure is valid")
     
     print()
     
@@ -139,13 +139,13 @@ def main():
     for xml_file in xml_files:
         issues = validate_xml_syntax(xml_file)
         if issues:
-            print(f"   ❌ {xml_file}:")
+            print(f"   ‚ùå {xml_file}:")
             for issue in issues:
                 print(f"      - {issue}")
             xml_issues += len(issues)
     
     if xml_issues == 0:
-        print("   ✅ All XML files use modern Odoo 17 syntax")
+        print("   ‚úÖ All XML files use modern Odoo 17 syntax")
     
     print()
     
@@ -155,13 +155,13 @@ def main():
     for py_file in py_files:
         issues = validate_python_syntax(py_file)
         if issues:
-            print(f"   ❌ {py_file}:")
+            print(f"   ‚ùå {py_file}:")
             for issue in issues:
                 print(f"      - {issue}")
             py_issues += len(issues)
     
     if py_issues == 0:
-        print("   ✅ All Python files use modern Odoo 17 syntax")
+        print("   ‚úÖ All Python files use modern Odoo 17 syntax")
     
     print()
     
@@ -173,12 +173,12 @@ def main():
     print(f"Total issues found: {total_issues}")
     
     if total_issues == 0:
-        print("🎉 ALL VALIDATIONS PASSED!")
-        print("✅ Module is compatible with Odoo 17")
-        print("✅ No deprecated syntax found")
-        print("✅ Ready for deployment")
+        print("üéâ ALL VALIDATIONS PASSED!")
+        print("‚úÖ Module is compatible with Odoo 17")
+        print("‚úÖ No deprecated syntax found")
+        print("‚úÖ Ready for deployment")
     else:
-        print("⚠️  Issues found that need attention")
+        print("‚ö†Ô∏è  Issues found that need attention")
     
     return total_issues == 0
 

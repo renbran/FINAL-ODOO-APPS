@@ -18,7 +18,7 @@ def demonstrate_enhancement():
     print("REPORT FONT ENHANCEMENT MODULE DEMONSTRATION")
     print("=" * 60)
     
-    print("\n✨ FEATURES DEMONSTRATED:")
+    print("\n‚ú® FEATURES DEMONSTRATED:")
     print("-" * 30)
     
     features = [
@@ -35,7 +35,7 @@ def demonstrate_enhancement():
     for i, feature in enumerate(features, 1):
         print(f"{i:2d}. {feature}")
     
-    print("\n🎨 VISUAL IMPROVEMENTS:")
+    print("\nüé® VISUAL IMPROVEMENTS:")
     print("-" * 30)
     
     improvements = [
@@ -50,9 +50,9 @@ def demonstrate_enhancement():
     ]
     
     for improvement in improvements:
-        print(f"  • {improvement}")
+        print(f"  ‚Ä¢ {improvement}")
     
-    print("\n⚙️ CONFIGURATION OPTIONS:")
+    print("\n‚öôÔ∏è CONFIGURATION OPTIONS:")
     print("-" * 30)
     
     config_options = {
@@ -69,7 +69,7 @@ def demonstrate_enhancement():
         for option in options:
             print(f"    - {option}")
     
-    print("\n📊 ENHANCED ELEMENTS:")
+    print("\nüìä ENHANCED ELEMENTS:")
     print("-" * 30)
     
     elements = [
@@ -84,9 +84,9 @@ def demonstrate_enhancement():
     ]
     
     for element in elements:
-        print(f"  ✓ {element}")
+        print(f"  ‚úì {element}")
     
-    print("\n🔧 TECHNICAL IMPLEMENTATION:")
+    print("\nüîß TECHNICAL IMPLEMENTATION:")
     print("-" * 30)
     
     technical = [
@@ -101,24 +101,24 @@ def demonstrate_enhancement():
     ]
     
     for tech in technical:
-        print(f"  🛠  {tech}")
+        print(f"  üõ†  {tech}")
     
-    print("\n📱 RESPONSIVE DESIGN:")
+    print("\nüì± RESPONSIVE DESIGN:")
     print("-" * 30)
     
     print("  Desktop (>768px):  Base 12px, Header 16px, Title 20px")
-    print("  Tablet (≤768px):   Base 14px, Header 18px, Title 22px") 
-    print("  Mobile (≤480px):   Base 16px, Header 20px, Title 24px")
+    print("  Tablet (‚â§768px):   Base 14px, Header 18px, Title 22px") 
+    print("  Mobile (‚â§480px):   Base 16px, Header 20px, Title 24px")
     
-    print("\n🖨️  PRINT OPTIMIZATION:")
+    print("\nüñ®Ô∏è  PRINT OPTIMIZATION:")
     print("-" * 30)
     
-    print("  • Force high contrast black/white")
-    print("  • Optimized font sizes for PDF")
-    print("  • Page break handling")
-    print("  • Ink-saving color schemes")
+    print("  ‚Ä¢ Force high contrast black/white")
+    print("  ‚Ä¢ Optimized font sizes for PDF")
+    print("  ‚Ä¢ Page break handling")
+    print("  ‚Ä¢ Ink-saving color schemes")
     
-    print("\n♿ ACCESSIBILITY FEATURES:")
+    print("\n‚ôø ACCESSIBILITY FEATURES:")
     print("-" * 30)
     
     accessibility = [
@@ -131,9 +131,9 @@ def demonstrate_enhancement():
     ]
     
     for access in accessibility:
-        print(f"  ♿ {access}")
+        print(f"  ‚ôø {access}")
     
-    print("\n🚀 PERFORMANCE OPTIMIZATIONS:")
+    print("\nüöÄ PERFORMANCE OPTIMIZATIONS:")
     print("-" * 30)
     
     performance = [
@@ -146,9 +146,9 @@ def demonstrate_enhancement():
     ]
     
     for perf in performance:
-        print(f"  ⚡ {perf}")
+        print(f"  ‚ö° {perf}")
     
-    print("\n✅ INSTALLATION COMPLETE!")
+    print("\n‚úÖ INSTALLATION COMPLETE!")
     print("=" * 60)
     print("The Report Font Enhancement module is ready to use.")
     print("Navigate to Settings > Report Enhancement > Font Settings")
@@ -159,7 +159,7 @@ def show_css_example():
     """
     Show example CSS that would be generated
     """
-    print("\n📝 EXAMPLE GENERATED CSS:")
+    print("\nüìù EXAMPLE GENERATED CSS:")
     print("-" * 40)
     
     css_example = '''
@@ -205,5 +205,5 @@ if __name__ == "__main__":
         print("\n\nDemo interrupted by user.")
         sys.exit(0)
     except Exception as e:
-        print(f"\n❌ Error running demo: {e}")
+        print(f"\n‚ùå Error running demo: {e}")
         sys.exit(1)

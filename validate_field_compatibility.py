@@ -115,11 +115,11 @@ def main():
     view_issues = validate_view_field_references()
     
     if view_issues:
-        print("   ❌ View Issues Found:")
+        print("   ‚ùå View Issues Found:")
         for issue in view_issues:
             print(f"      - {issue}")
     else:
-        print("   ✅ All view field references are safe")
+        print("   ‚úÖ All view field references are safe")
     
     print()
     
@@ -128,11 +128,11 @@ def main():
     model_issues = validate_model_field_dependencies()
     
     if model_issues:
-        print("   ❌ Model Issues Found:")
+        print("   ‚ùå Model Issues Found:")
         for issue in model_issues:
             print(f"      - {issue}")
     else:
-        print("   ✅ All model field dependencies are safe")
+        print("   ‚úÖ All model field dependencies are safe")
     
     print()
     
@@ -141,13 +141,13 @@ def main():
     
     print("=== COMPATIBILITY SUMMARY ===")
     if total_issues == 0:
-        print("🎉 ALL FIELD REFERENCES ARE COMPATIBLE!")
-        print("✅ Views use reliable field targets")
-        print("✅ Models handle optional fields safely")
-        print("✅ Ready for deployment on any Odoo 17 installation")
+        print("üéâ ALL FIELD REFERENCES ARE COMPATIBLE!")
+        print("‚úÖ Views use reliable field targets")
+        print("‚úÖ Models handle optional fields safely")
+        print("‚úÖ Ready for deployment on any Odoo 17 installation")
     else:
-        print(f"⚠️  {total_issues} compatibility issue(s) found")
-        print("❌ Manual review required before deployment")
+        print(f"‚ö†Ô∏è  {total_issues} compatibility issue(s) found")
+        print("‚ùå Manual review required before deployment")
     
     return total_issues == 0
 

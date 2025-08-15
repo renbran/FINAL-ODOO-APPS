@@ -1,0 +1,971 @@
+{
+  "total_modules": 62,
+  "clean_modules": [],
+  "problematic_modules": [],
+  "modules_with_warnings": [],
+  "modules_with_errors": [
+    {
+      "name": "account_payment_approval",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\account_payment_approval",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\voucher_sequence.xml",
+        "Missing UTF-8 encoding declaration in security\\payment_voucher_security.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\dashboard_templates.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\digital_signature_templates.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\payment_approval_templates.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\qr_verification_templates.xml",
+        "Missing UTF-8 encoding declaration in views\\wizard_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "account_payment_final",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\account_payment_final",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['__pycache__', 'controllers\\\\__pycache__', 'models\\\\__pycache__', 'reports\\\\__pycache__', 'tests\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "commission_ax",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\commission_ax",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "comprehensive_greetings",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\comprehensive_greetings",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "XML parse error in data\\email_templates.xml: no element found: line 1, column 0",
+        "XML parse error in data\\greeting_categories.xml: no element found: line 1, column 0",
+        "XML parse error in data\\greeting_sequences.xml: no element found: line 1, column 0",
+        "XML parse error in data\\greeting_templates.xml: no element found: line 1, column 0",
+        "XML parse error in static\\src\\xml\\greeting_templates.xml: no element found: line 1, column 0",
+        "XML parse error in views\\greeting_views.xml: no element found: line 1, column 0",
+        "XML parse error in views\\menu_items.xml: no element found: line 1, column 0"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\ir_cron.xml",
+        "Missing UTF-8 encoding declaration in data\\mail_template_anniversary.xml",
+        "Missing UTF-8 encoding declaration in data\\mail_template_birthday.xml",
+        "Missing UTF-8 encoding declaration in views\\hr_employee_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "contact_kyc",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\contact_kyc",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "crm_executive_dashboard",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\crm_executive_dashboard",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "eg_mo_today_yesterday_filter",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\eg_mo_today_yesterday_filter",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Missing required file: __init__.py"
+      ],
+      "warnings": [
+        "No 'models' directory found - unusual for Odoo modules",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "enhanced_rest_api",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\enhanced_rest_api",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "event_so_trigger",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\event_so_trigger",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "form_edit_button_restore",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\form_edit_button_restore",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\js\\form_controller.xml",
+        "No 'models' directory found - unusual for Odoo modules",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "frontend_enhancement",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\frontend_enhancement",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "hr_uae",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\hr_uae",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "hrms_dashboard",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\hrms_dashboard",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\hrms_dashboard.xml",
+        "Missing UTF-8 encoding declaration in views\\hrms_dashboard_menus.xml",
+        "Missing UTF-8 encoding declaration in views\\hr_leave_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "import_bank_statement_odoo",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\import_bank_statement_odoo",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\account_journal_views.xml",
+        "Missing UTF-8 encoding declaration in wizard\\import_bank_statement_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "ingenuity_invoice_qr_code",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\ingenuity_invoice_qr_code",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in report\\account_invoice_report_template.xml",
+        "Missing UTF-8 encoding declaration in views\\qr_code_invoice_view.xml",
+        "Missing UTF-8 encoding declaration in views\\qr_code_payment_view.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "invoice_bill_select_orderlines",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\invoice_bill_select_orderlines",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\purchase_order_views.xml",
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "invoice_report_for_realestate",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\invoice_report_for_realestate",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in report\\payment_voucher_report.xml",
+        "Missing UTF-8 encoding declaration in report\\payment_voucher_report_action.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "ks_dynamic_financial_report",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\ks_dynamic_financial_report",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in security\\ks_access_file.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\ks_dynamic_financial_report.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\ks_many2many_widget.xml",
+        "Missing UTF-8 encoding declaration in views\\ks_res_config_settings.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "le_sale_type",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\le_sale_type",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\sale_order_type_views.xml",
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "muk_web_appsbar",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\muk_web_appsbar",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\webclient\\webclient.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\webclient\\appsbar\\appsbar.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\webclient\\navbar\\navbar.xml",
+        "Missing UTF-8 encoding declaration in templates\\webclient.xml",
+        "Missing UTF-8 encoding declaration in views\\res_config_settings.xml",
+        "Missing UTF-8 encoding declaration in views\\res_users.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "muk_web_chatter",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\muk_web_chatter",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\res_users.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "muk_web_colors",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\muk_web_colors",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in templates\\webclient.xml",
+        "Missing UTF-8 encoding declaration in views\\res_config_settings.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "muk_web_dialog",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\muk_web_dialog",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\core\\dialog\\dialog.xml",
+        "Missing UTF-8 encoding declaration in views\\res_users.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "muk_web_theme",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\muk_web_theme",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\webclient\\appsmenu\\appsmenu.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\webclient\\navbar\\navbar.xml",
+        "Missing UTF-8 encoding declaration in templates\\web_layout.xml",
+        "Missing UTF-8 encoding declaration in views\\res_config_settings.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "mx_elearning_plus",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\mx_elearning_plus",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\comment_button_composer_extend.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\comment_composer.xml",
+        "Missing UTF-8 encoding declaration in views\\website_slides_templates_course.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "odoo_accounting_dashboard",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\odoo_accounting_dashboard",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\account_move_data.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\accounting_dashboard.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "odoo_crm_dashboard",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\odoo_crm_dashboard",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\crm_dashboard.xml",
+        "Missing UTF-8 encoding declaration in views\\crm_dashboard.xml",
+        "Missing UTF-8 encoding declaration in views\\crm_leads_view.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "odoo_dynamic_dashboard",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\odoo_dynamic_dashboard",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\dashboard_theme_data.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\dynamic_dashboard_template.xml",
+        "Missing UTF-8 encoding declaration in wizard\\dashboard_mail_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "oe_sale_dashboard_17",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\oe_sale_dashboard_17",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "XML parse error in static\\src\\xml\\sales_dashboard_main.xml: junk after document element: line 246, column 24",
+        "Found unwanted files: ['__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "om_account_accountant_v17",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\om_account_accountant_v17",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in security\\group.xml",
+        "Missing UTF-8 encoding declaration in views\\account_bank_statement.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "om_account_followup",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\om_account_followup",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\data.xml",
+        "Missing UTF-8 encoding declaration in views\\account_move.xml",
+        "Missing UTF-8 encoding declaration in views\\followup_view.xml",
+        "Missing UTF-8 encoding declaration in views\\reports.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "om_data_remove",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\om_data_remove",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in renbran_realestate\\views\\property_property_views.xml",
+        "Missing UTF-8 encoding declaration in renbran_realestate\\views\\property_sale_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "order_invoice_manual_link",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\order_invoice_manual_link",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\account_move_views.xml",
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml",
+        "Missing UTF-8 encoding declaration in wizard\\link_invoice_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "order_status_override",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\order_status_override",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__\\\\order_status.cpython-311.pyc', 'models\\\\__pycache__\\\\sale_order.cpython-311.pyc', 'models\\\\__pycache__\\\\status_change_wizard.cpython-311.pyc', 'models\\\\__pycache__\\\\__init__.cpython-311.pyc', '__pycache__\\\\__init__.cpython-311.pyc', '__pycache__\\\\__manifest__.cpython-311.pyc']",
+        "Found unwanted files: ['__pycache__', 'models\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "pretty_buttons",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\pretty_buttons",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "print_contact",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\print_contact",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\print_buttons.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "reconcilation_fields",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\reconcilation_fields",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "rental_management",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\rental_management",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in report\\property_details_report_v2.xml",
+        "Missing UTF-8 encoding declaration in security\\groups.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\views\\rental_property_list\\rental_property_list_view.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\template.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "report_font_enhancement",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\report_font_enhancement",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "report_pdf_options",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\report_pdf_options",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "report_xlsx",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\report_xlsx",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in demo\\report.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "rest_api_odoo",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\rest_api_odoo",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "sale_invoice_detail",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\sale_invoice_detail",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\sale_order.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "sale_invoice_due_date_reminder",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\sale_invoice_due_date_reminder",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "sale_order_invoicing_qty_percentage",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\sale_order_invoicing_qty_percentage",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in wizards\\sale_advance_payment_inv_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "sales_target_vs_achievement",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\sales_target_vs_achievement",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "statement_report",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\statement_report",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in report\\res_partner_reports.xml",
+        "Missing UTF-8 encoding declaration in report\\res_partner_templates.xml",
+        "Missing UTF-8 encoding declaration in views\\res_partner_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "subscription_package",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\subscription_package",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\mail_activity_views.xml",
+        "Missing UTF-8 encoding declaration in views\\product_product_views.xml",
+        "Missing UTF-8 encoding declaration in views\\recurrence_period_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "tk_partner_ledger",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\tk_partner_ledger",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in report\\partner_ledger_pdf_report.xml",
+        "Missing UTF-8 encoding declaration in wizard\\partner_ledger_report_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "tk_portal_partner_leads",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\tk_portal_partner_leads",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\portal_leads_templates.xml",
+        "No 'models' directory found - unusual for Odoo modules"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "tk_sale_split_invoice",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\tk_sale_split_invoice",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\account_move_views.xml",
+        "Missing UTF-8 encoding declaration in views\\res_config_setting_views.xml",
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "upper_unicity_partner_product",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\upper_unicity_partner_product",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "web_login_styles",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\web_login_styles",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "webhook_crm",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\webhook_crm",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [],
+      "manifest": {}
+    },
+    {
+      "name": "website_custom_contact_us",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\website_custom_contact_us",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\website_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "website_menu_fix",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\website_menu_fix",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Missing required file: __init__.py"
+      ],
+      "warnings": [
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "website_subscription_package",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\website_subscription_package",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data",
+        "Found unwanted files: ['models\\\\__pycache__']"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\mail_template_data.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\subscription_close_modal.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "whatsapp_mail_messaging",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\whatsapp_mail_messaging",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\mail_icon_template.xml",
+        "Missing UTF-8 encoding declaration in static\\src\\xml\\whatsapp_icon_template.xml",
+        "Missing UTF-8 encoding declaration in views\\account_move_views.xml",
+        "Missing UTF-8 encoding declaration in views\\res_company_views.xml",
+        "Missing UTF-8 encoding declaration in views\\res_config_settings_views.xml",
+        "Missing UTF-8 encoding declaration in views\\sale_order_views.xml",
+        "Missing UTF-8 encoding declaration in wizard\\whatsapp_send_message_views.xml",
+        "No 'models' directory found - unusual for Odoo modules"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "whatsapp_redirect",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\whatsapp_redirect",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in views\\res_partner_views.xml",
+        "Missing UTF-8 encoding declaration in wizard\\whatsapp_send_message_views.xml"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "work_anniversary_reminder",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\work_anniversary_reminder",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\ir_cron_data.xml",
+        "Missing UTF-8 encoding declaration in data\\mail_template_data.xml",
+        "Missing UTF-8 encoding declaration in views\\hr_employee_views.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "wt_birthday_reminder",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\wt_birthday_reminder",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [
+        "Missing UTF-8 encoding declaration in data\\mail_template_osus.xml",
+        "No 'security' directory found - may need access control files"
+      ],
+      "manifest": {}
+    },
+    {
+      "name": "zehntech_main_menu",
+      "path": "d:\\GitHub\\osus_main\\cleanup osus\\odoo17_final\\zehntech_main_menu",
+      "issues": [
+        "Missing required field: name",
+        "Missing required field: version",
+        "Missing required field: depends",
+        "Missing required field: data"
+      ],
+      "warnings": [],
+      "manifest": {}
+    }
+  ],
+  "cleanup_summary": {
+    "files_removed": [],
+    "directories_cleaned": [],
+    "issues_fixed": []
+  }
+}

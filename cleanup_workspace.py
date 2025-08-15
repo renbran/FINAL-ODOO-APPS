@@ -13,7 +13,7 @@ from pathlib import Path
 def cleanup_workspace():
     """Clean up the entire workspace"""
     
-    print("🧹 Starting Comprehensive Workspace Cleanup...")
+    print("üßπ Starting Comprehensive Workspace Cleanup...")
     
     root_dir = Path(".")
     removed_count = 0
@@ -90,7 +90,7 @@ def cleanup_workspace():
     }
     
     # Step 1: Remove empty files
-    print("\n🗑️  Removing empty files...")
+    print("\nüóëÔ∏è  Removing empty files...")
     for file_path in root_dir.rglob("*"):
         if file_path.is_file() and file_path.stat().st_size == 0:
             if file_path.name not in keep_files:
@@ -101,7 +101,7 @@ def cleanup_workspace():
     # Step 2: Remove files by patterns
     for category, patterns in cleanup_patterns.items():
         if patterns:
-            print(f"\n🗑️  Removing {category}...")
+            print(f"\nüóëÔ∏è  Removing {category}...")
             for pattern in patterns:
                 for file_path in root_dir.glob(pattern):
                     if file_path.is_file() and file_path.name not in keep_files:
@@ -112,7 +112,7 @@ def cleanup_workspace():
     # Step 3: Clean up account_payment_approval module empty files
     payment_module = root_dir / "account_payment_approval"
     if payment_module.exists():
-        print(f"\n🧹 Cleaning account_payment_approval module...")
+        print(f"\nüßπ Cleaning account_payment_approval module...")
         
         # Remove empty files in module
         for file_path in payment_module.rglob("*"):
@@ -145,7 +145,7 @@ def cleanup_workspace():
                 dir_path.rmdir()
     
     # Step 4: Remove __pycache__ directories
-    print(f"\n🗑️  Removing __pycache__ directories...")
+    print(f"\nüóëÔ∏è  Removing __pycache__ directories...")
     for pycache_dir in root_dir.rglob("__pycache__"):
         if pycache_dir.is_dir():
             print(f"   Removing: {pycache_dir}")
@@ -153,22 +153,22 @@ def cleanup_workspace():
             removed_count += 1
     
     # Step 5: Remove .pyc files
-    print(f"\n🗑️  Removing .pyc files...")
+    print(f"\nüóëÔ∏è  Removing .pyc files...")
     for pyc_file in root_dir.rglob("*.pyc"):
         print(f"   Removing: {pyc_file}")
         pyc_file.unlink()
         removed_count += 1
     
-    print(f"\n✅ Cleanup Complete!")
-    print(f"📊 Total files/directories removed: {removed_count}")
+    print(f"\n‚úÖ Cleanup Complete!")
+    print(f"üìä Total files/directories removed: {removed_count}")
     
     # Show what's left
-    print(f"\n📂 Remaining files in root:")
+    print(f"\nüìÇ Remaining files in root:")
     remaining_files = sorted([f.name for f in root_dir.iterdir() if f.is_file()])
     for remaining_file in remaining_files:
-        print(f"   ✅ {remaining_file}")
+        print(f"   ‚úÖ {remaining_file}")
     
-    print(f"\n🚀 Workspace is now clean and production-ready!")
+    print(f"\nüöÄ Workspace is now clean and production-ready!")
 
 if __name__ == "__main__":
     cleanup_workspace()

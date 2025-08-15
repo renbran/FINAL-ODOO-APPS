@@ -11,19 +11,19 @@ def validate_account_move_views():
     
     file_path = 'account_payment_approval/views/account_move_enhanced_views.xml'
     
-    print("🔍 Validating account_move_enhanced_views.xml...")
+    print("üîç Validating account_move_enhanced_views.xml...")
     
     try:
         # Parse XML
         tree = ET.parse(file_path)
         root = tree.getroot()
-        print("✅ XML is valid and parseable")
+        print("‚úÖ XML is valid and parseable")
         
         # Check each view record
         views_checked = 0
         for record in root.findall('.//record[@model="ir.ui.view"]'):
             view_id = record.get('id')
-            print(f"\n📋 Checking view: {view_id}")
+            print(f"\nüìã Checking view: {view_id}")
             views_checked += 1
             
             # Get model
@@ -45,23 +45,23 @@ def validate_account_move_views():
                         
                         # Check for problematic patterns
                         if 'amount_group' in expr:
-                            print(f"   ⚠️  WARNING: amount_group pattern found!")
+                            print(f"   ‚ö†Ô∏è  WARNING: amount_group pattern found!")
                         elif 'oe_button_box' in expr and model_name == 'account.move.line':
-                            print(f"   ⚠️  WARNING: button_box in move.line view!")
+                            print(f"   ‚ö†Ô∏è  WARNING: button_box in move.line view!")
                         else:
-                            print(f"   ✅ XPath looks good")
+                            print(f"   ‚úÖ XPath looks good")
         
-        print(f"\n✅ Validation complete! Checked {views_checked} views")
+        print(f"\n‚úÖ Validation complete! Checked {views_checked} views")
         return True
         
     except ET.ParseError as e:
-        print(f"❌ XML Parse Error: {e}")
+        print(f"‚ùå XML Parse Error: {e}")
         return False
     except FileNotFoundError:
-        print(f"❌ File not found: {file_path}")
+        print(f"‚ùå File not found: {file_path}")
         return False
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"‚ùå Unexpected error: {e}")
         return False
 
 if __name__ == "__main__":

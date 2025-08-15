@@ -15,7 +15,7 @@ def final_comprehensive_validation():
     
     module_path = Path("account_payment_approval")
     if not module_path.exists():
-        print("❌ Module directory not found!")
+        print("‚ùå Module directory not found!")
         return False
     
     issues = []
@@ -26,7 +26,7 @@ def final_comprehensive_validation():
     for dir_name in required_dirs:
         dir_path = module_path / dir_name
         if dir_path.exists():
-            print(f"   ✅ {dir_name}/ directory exists")
+            print(f"   ‚úÖ {dir_name}/ directory exists")
         else:
             issues.append(f"Missing directory: {dir_name}/")
     
@@ -50,7 +50,7 @@ def final_comprehensive_validation():
     for file_path in essential_files:
         full_path = module_path / file_path
         if full_path.exists():
-            print(f"   ✅ {file_path}")
+            print(f"   ‚úÖ {file_path}")
         else:
             issues.append(f"Missing file: {file_path}")
     
@@ -66,7 +66,7 @@ def final_comprehensive_validation():
         try:
             ET.parse(xml_file)
             rel_path = xml_file.relative_to(module_path)
-            print(f"   ✅ {rel_path} - Valid XML")
+            print(f"   ‚úÖ {rel_path} - Valid XML")
         except ET.ParseError as e:
             rel_path = xml_file.relative_to(module_path)
             issues.append(f"XML Parse Error in {rel_path}: {e}")
@@ -85,7 +85,7 @@ def final_comprehensive_validation():
                 content = f.read()
             compile(content, py_file, 'exec')
             rel_path = py_file.relative_to(module_path)
-            print(f"   ✅ {rel_path} - Valid Python")
+            print(f"   ‚úÖ {rel_path} - Valid Python")
         except SyntaxError as e:
             rel_path = py_file.relative_to(module_path)
             issues.append(f"Python Syntax Error in {rel_path}: {e}")
@@ -107,7 +107,7 @@ def final_comprehensive_validation():
         for data_file in data_matches:
             file_path = module_path / data_file
             if file_path.exists():
-                print(f"   ✅ {data_file} - Referenced and exists")
+                print(f"   ‚úÖ {data_file} - Referenced and exists")
             else:
                 issues.append(f"Manifest references missing file: {data_file}")
         
@@ -128,7 +128,7 @@ def final_comprehensive_validation():
                 model_name = line.split('import')[-1].strip()
                 model_file = module_path / 'models' / f'{model_name}.py'
                 if model_file.exists():
-                    print(f"   ✅ {model_name}.py - Imported and exists")
+                    print(f"   ‚úÖ {model_name}.py - Imported and exists")
                 else:
                     issues.append(f"Model import references missing file: {model_name}.py")
         
@@ -138,27 +138,27 @@ def final_comprehensive_validation():
     # 7. Summary
     print("\n=== VALIDATION SUMMARY ===")
     if not issues:
-        print("🎉 ALL VALIDATIONS PASSED!")
-        print("✅ Module structure is complete")
-        print("✅ All files exist and are valid")
-        print("✅ All references are satisfied")
-        print("✅ Ready for deployment")
+        print("üéâ ALL VALIDATIONS PASSED!")
+        print("‚úÖ Module structure is complete")
+        print("‚úÖ All files exist and are valid")
+        print("‚úÖ All references are satisfied")
+        print("‚úÖ Ready for deployment")
         
         # Show module summary
-        print("\n📋 MODULE SUMMARY:")
-        print("   📁 Models: account_payment.py (main), account_move.py, res_config_settings.py")
-        print("   📁 Views: payment views, menu views, move views, wizard views, QR templates")
-        print("   📁 Security: groups, access rights, record rules")
-        print("   📁 Data: sequences, email templates, system parameters, cron jobs")
-        print("   📁 Controllers: main controller, QR verification")
-        print("   📁 Reports: payment voucher report, payment summary report")
-        print("   📁 Wizards: bulk approval wizard, rejection wizard")
-        print("   📁 Static: SCSS styles, JavaScript widgets")
-        print("   📁 Demo: sample payment data")
+        print("\nüìã MODULE SUMMARY:")
+        print("   üìÅ Models: account_payment.py (main), account_move.py, res_config_settings.py")
+        print("   üìÅ Views: payment views, menu views, move views, wizard views, QR templates")
+        print("   üìÅ Security: groups, access rights, record rules")
+        print("   üìÅ Data: sequences, email templates, system parameters, cron jobs")
+        print("   üìÅ Controllers: main controller, QR verification")
+        print("   üìÅ Reports: payment voucher report, payment summary report")
+        print("   üìÅ Wizards: bulk approval wizard, rejection wizard")
+        print("   üìÅ Static: SCSS styles, JavaScript widgets")
+        print("   üìÅ Demo: sample payment data")
         
         return True
     else:
-        print(f"❌ Found {len(issues)} issues:")
+        print(f"‚ùå Found {len(issues)} issues:")
         for issue in issues:
             print(f"   - {issue}")
         return False

@@ -50,17 +50,17 @@ def main():
     print(f'Problematic local imports: {len(problematic_imports)}')
 
     if problematic_imports:
-        print('\n❌ REMAINING ISSUES:')
+        print('\n‚ùå REMAINING ISSUES:')
         for issue in problematic_imports:
             print(f'  {issue["file"]} - {issue["import"]}')
-        print('\n⚠️  These imports will cause Odoo 17 compilation errors:')
+        print('\n‚ö†Ô∏è  These imports will cause Odoo 17 compilation errors:')
         print('   "Local import is forbidden for security reasons"')
         print('   Please remove @import statements and use CSS custom properties')
     else:
-        print('\n✅ ALL LOCAL IMPORT ISSUES FIXED!')
-        print('   ✓ No more @import variables or @import components statements')
-        print('   ✓ Database loading should work without SCSS compilation errors')
-        print('   ✓ Module ready for production deployment')
+        print('\n‚úÖ ALL LOCAL IMPORT ISSUES FIXED!')
+        print('   ‚úì No more @import variables or @import components statements')
+        print('   ‚úì Database loading should work without SCSS compilation errors')
+        print('   ‚úì Module ready for production deployment')
         
         # Additional checks
         print(f'\n=== ADDITIONAL VALIDATION ===')
@@ -74,14 +74,14 @@ def main():
                 vars_found = len(re.findall(r'\$[a-zA-Z-]+', content))
                 total_scss_vars += vars_found
                 if vars_found > 0:
-                    print(f'   ⚠️  {file_path}: {vars_found} SCSS variables (consider converting to CSS custom properties)')
+                    print(f'   ‚ö†Ô∏è  {file_path}: {vars_found} SCSS variables (consider converting to CSS custom properties)')
             except:
                 pass
         
         if total_scss_vars == 0:
-            print('   ✓ No SCSS variables found - all properly converted to CSS custom properties')
+            print('   ‚úì No SCSS variables found - all properly converted to CSS custom properties')
         
-        print(f'\n🎉 EMERGENCY FIX COMPLETE!')
+        print(f'\nüéâ EMERGENCY FIX COMPLETE!')
         print('   The TypeError: "Local import ../variables is forbidden" should be resolved')
         print('   Database should now load successfully without SCSS compilation errors')
 

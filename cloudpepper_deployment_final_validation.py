@@ -20,7 +20,7 @@ class CloudPepperDeploymentValidator:
         
     def run_validation(self):
         """Run all CloudPepper specific validations"""
-        print("🌩️  CLOUDPEPPER DEPLOYMENT VALIDATION")
+        print("üå©Ô∏è  CLOUDPEPPER DEPLOYMENT VALIDATION")
         print("=" * 60)
         
         self._check_python_dependencies()
@@ -32,7 +32,7 @@ class CloudPepperDeploymentValidator:
         
     def _check_python_dependencies(self):
         """Check required Python dependencies are available"""
-        print("\\n📦 Checking Python Dependencies...")
+        print("\\nüì¶ Checking Python Dependencies...")
         self.total_checks += 3
         
         dependencies = ['qrcode', 'num2words', 'PIL']
@@ -41,19 +41,19 @@ class CloudPepperDeploymentValidator:
             try:
                 if dep == 'PIL':
                     import PIL
-                    print(f"  ✅ {dep} (Pillow) - Available")
+                    print(f"  ‚úÖ {dep} (Pillow) - Available")
                     self.passed_checks += 1
                 else:
                     __import__(dep)
-                    print(f"  ✅ {dep} - Available")
+                    print(f"  ‚úÖ {dep} - Available")
                     self.passed_checks += 1
             except ImportError:
-                print(f"  ❌ {dep} - NOT AVAILABLE")
+                print(f"  ‚ùå {dep} - NOT AVAILABLE")
                 print(f"     Install with: pip install {dep if dep != 'PIL' else 'pillow'}")
                 
     def _check_module_structure(self):
         """Validate essential module structure"""
-        print("\\n📁 Checking Module Structure...")
+        print("\\nüìÅ Checking Module Structure...")
         
         essential_files = [
             '__manifest__.py',
@@ -69,14 +69,14 @@ class CloudPepperDeploymentValidator:
         for file_path in essential_files:
             full_path = self.module_path / file_path
             if full_path.exists():
-                print(f"  ✅ {file_path}")
+                print(f"  ‚úÖ {file_path}")
                 self.passed_checks += 1
             else:
-                print(f"  ❌ {file_path} - MISSING")
+                print(f"  ‚ùå {file_path} - MISSING")
                 
     def _check_security_configuration(self):
         """Validate security configuration"""
-        print("\\n🔒 Checking Security Configuration...")
+        print("\\nüîí Checking Security Configuration...")
         self.total_checks += 2
         
         # Check access rules
@@ -85,12 +85,12 @@ class CloudPepperDeploymentValidator:
             with open(access_file, 'r') as f:
                 lines = f.readlines()
                 if len(lines) > 1:  # Header + at least one rule
-                    print(f"  ✅ Access rules: {len(lines)-1} rules defined")
+                    print(f"  ‚úÖ Access rules: {len(lines)-1} rules defined")
                     self.passed_checks += 1
                 else:
-                    print("  ❌ No access rules defined")
+                    print("  ‚ùå No access rules defined")
         else:
-            print("  ❌ Access file missing")
+            print("  ‚ùå Access file missing")
             
         # Check security groups
         security_file = self.module_path / 'security' / 'payment_voucher_security.xml'
@@ -98,16 +98,16 @@ class CloudPepperDeploymentValidator:
             with open(security_file, 'r') as f:
                 content = f.read()
                 if 'res.groups' in content:
-                    print("  ✅ Security groups defined")
+                    print("  ‚úÖ Security groups defined")
                     self.passed_checks += 1
                 else:
-                    print("  ❌ No security groups found")
+                    print("  ‚ùå No security groups found")
         else:
-            print("  ❌ Security groups file missing")
+            print("  ‚ùå Security groups file missing")
             
     def _check_report_dependencies(self):
         """Check report dependencies and external references"""
-        print("\\n📊 Checking Report Dependencies...")
+        print("\\nüìä Checking Report Dependencies...")
         self.total_checks += 1
         
         # Check for problematic external references
@@ -121,20 +121,20 @@ class CloudPepperDeploymentValidator:
                 with open(report_file, 'r') as f:
                     content = f.read()
                     if 'base.paperformat' in content:
-                        print(f"  ⚠️  Paper format reference in {report_file.name}")
+                        print(f"  ‚ö†Ô∏è  Paper format reference in {report_file.name}")
                         has_paper_format_issues = True
             except:
                 pass
                 
         if not has_paper_format_issues:
-            print("  ✅ No problematic paper format references")
+            print("  ‚úÖ No problematic paper format references")
             self.passed_checks += 1
         else:
-            print("  ❌ Paper format references may cause issues")
+            print("  ‚ùå Paper format references may cause issues")
             
     def _check_external_references(self):
         """Check for external ID references that might not exist"""
-        print("\\n🔗 Checking External References...")
+        print("\\nüîó Checking External References...")
         self.total_checks += 1
         
         xml_files = list(self.module_path.rglob("*.xml"))
@@ -155,45 +155,45 @@ class CloudPepperDeploymentValidator:
                 pass
                 
         if not potential_issues:
-            print("  ✅ No problematic external references found")
+            print("  ‚úÖ No problematic external references found")
             self.passed_checks += 1
         else:
-            print("  ❌ Potential external reference issues:")
+            print("  ‚ùå Potential external reference issues:")
             for issue in potential_issues:
                 print(f"    - {issue}")
                 
     def _final_assessment(self):
         """Provide final deployment assessment"""
         print("\\n" + "=" * 60)
-        print("🎯 CLOUDPEPPER DEPLOYMENT ASSESSMENT")
+        print("üéØ CLOUDPEPPER DEPLOYMENT ASSESSMENT")
         print("=" * 60)
         
         success_rate = (self.passed_checks / self.total_checks) * 100
         
-        print(f"📊 Validation Results: {self.passed_checks}/{self.total_checks} checks passed ({success_rate:.1f}%)")
+        print(f"üìä Validation Results: {self.passed_checks}/{self.total_checks} checks passed ({success_rate:.1f}%)")
         
         if success_rate >= 100:
-            print("\\n🟢 STATUS: READY FOR DEPLOYMENT")
-            print("✅ All critical checks passed")
-            print("✅ Module is CloudPepper compatible")
-            print("✅ Proceed with confidence")
+            print("\\nüü¢ STATUS: READY FOR DEPLOYMENT")
+            print("‚úÖ All critical checks passed")
+            print("‚úÖ Module is CloudPepper compatible")
+            print("‚úÖ Proceed with confidence")
             
         elif success_rate >= 80:
-            print("\\n🟡 STATUS: READY WITH MINOR FIXES")
-            print("⚠️  Some non-critical issues detected")
-            print("✅ Safe to deploy with monitoring")
-            print("📝 Address warnings post-deployment")
+            print("\\nüü° STATUS: READY WITH MINOR FIXES")
+            print("‚ö†Ô∏è  Some non-critical issues detected")
+            print("‚úÖ Safe to deploy with monitoring")
+            print("üìù Address warnings post-deployment")
             
         else:
-            print("\\n🔴 STATUS: NOT READY - FIXES REQUIRED")
-            print("❌ Critical issues must be resolved")
-            print("❌ Do not deploy until all errors fixed")
-            print("📝 Review and fix all failed checks")
+            print("\\nüî¥ STATUS: NOT READY - FIXES REQUIRED")
+            print("‚ùå Critical issues must be resolved")
+            print("‚ùå Do not deploy until all errors fixed")
+            print("üìù Review and fix all failed checks")
             
-        print("\\n🚀 DEPLOYMENT COMMANDS:")
+        print("\\nüöÄ DEPLOYMENT COMMANDS:")
         print("1. Install dependencies: pip install qrcode num2words pillow")
         print("2. Upload module to CloudPepper addons directory")
-        print("3. Install: Apps → Search 'Enhanced Payment Voucher' → Install")
+        print("3. Install: Apps ‚Üí Search 'Enhanced Payment Voucher' ‚Üí Install")
         print("4. Verify: Check Accounting menu for Payment Vouchers")
         
         return success_rate >= 80
@@ -205,10 +205,10 @@ def main():
     
     print("\\n" + "=" * 60)
     if is_ready:
-        print("🎉 CLOUDPEPPER DEPLOYMENT APPROVED!")
+        print("üéâ CLOUDPEPPER DEPLOYMENT APPROVED!")
         print("Your module is ready for production deployment.")
     else:
-        print("⚠️  DEPLOYMENT ON HOLD")
+        print("‚ö†Ô∏è  DEPLOYMENT ON HOLD")
         print("Please fix the identified issues before deployment.")
     print("=" * 60)
     

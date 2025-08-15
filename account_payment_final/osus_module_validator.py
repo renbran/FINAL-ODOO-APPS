@@ -25,18 +25,18 @@ class OSUSModuleValidator:
         self.success_count = 0
         
     def log_error(self, message):
-        self.errors.append(f"❌ ERROR: {message}")
+        self.errors.append(f"‚ùå ERROR: {message}")
         
     def log_warning(self, message):
-        self.warnings.append(f"⚠️  WARNING: {message}")
+        self.warnings.append(f"‚ö†Ô∏è  WARNING: {message}")
         
     def log_success(self, message):
         self.success_count += 1
-        print(f"✅ {message}")
+        print(f"‚úÖ {message}")
         
     def validate_manifest(self):
         """Validate manifest file and referenced assets"""
-        print("\n🔍 Validating Manifest File...")
+        print("\nüîç Validating Manifest File...")
         manifest_path = self.module_path / "__manifest__.py"
         
         if not manifest_path.exists():
@@ -88,7 +88,7 @@ class OSUSModuleValidator:
             
     def validate_python_files(self):
         """Check Python files for syntax and import issues"""
-        print("\n🐍 Validating Python Files...")
+        print("\nüêç Validating Python Files...")
         
         python_files = list(self.module_path.rglob("*.py"))
         for py_file in python_files:
@@ -111,7 +111,7 @@ class OSUSModuleValidator:
                 
     def validate_static_assets(self):
         """Validate CSS/JS/XML files in static directory"""
-        print("\n🎨 Validating Static Assets...")
+        print("\nüé® Validating Static Assets...")
         
         static_path = self.module_path / "static"
         if not static_path.exists():
@@ -154,7 +154,7 @@ class OSUSModuleValidator:
             
     def validate_security(self):
         """Check security files"""
-        print("\n🔒 Validating Security Configuration...")
+        print("\nüîí Validating Security Configuration...")
         
         security_path = self.module_path / "security"
         if not security_path.exists():
@@ -173,39 +173,39 @@ class OSUSModuleValidator:
     def generate_report(self):
         """Generate final validation report"""
         print("\n" + "="*60)
-        print("🏢 OSUS PAYMENT MODULE VALIDATION REPORT")
+        print("üè¢ OSUS PAYMENT MODULE VALIDATION REPORT")
         print("="*60)
         
-        print(f"\n✅ SUCCESSES: {self.success_count}")
+        print(f"\n‚úÖ SUCCESSES: {self.success_count}")
         
         if self.warnings:
-            print(f"\n⚠️  WARNINGS ({len(self.warnings)}):")
+            print(f"\n‚ö†Ô∏è  WARNINGS ({len(self.warnings)}):")
             for warning in self.warnings:
                 print(f"   {warning}")
                 
         if self.errors:
-            print(f"\n❌ ERRORS ({len(self.errors)}):")
+            print(f"\n‚ùå ERRORS ({len(self.errors)}):")
             for error in self.errors:
                 print(f"   {error}")
         else:
-            print("\n🎉 NO CRITICAL ERRORS FOUND!")
+            print("\nüéâ NO CRITICAL ERRORS FOUND!")
             
         # Final recommendation
-        print("\n📋 DEPLOYMENT READINESS:")
+        print("\nüìã DEPLOYMENT READINESS:")
         if len(self.errors) == 0:
             if len(self.warnings) <= 2:
-                print("✅ MODULE IS PRODUCTION READY")
+                print("‚úÖ MODULE IS PRODUCTION READY")
                 print("   - All critical checks passed")
                 print("   - OSUS branding implemented")
                 print("   - CloudPepper optimizations applied")
             else:
-                print("⚠️  MODULE NEEDS MINOR FIXES")
+                print("‚ö†Ô∏è  MODULE NEEDS MINOR FIXES")
                 print("   - Address warnings before deployment")
         else:
-            print("❌ MODULE NEEDS CRITICAL FIXES")
+            print("‚ùå MODULE NEEDS CRITICAL FIXES")
             print("   - Resolve all errors before deployment")
             
-        print("\n🔗 OSUS Properties - Professional Payment Solutions")
+        print("\nüîó OSUS Properties - Professional Payment Solutions")
         print("="*60)
 
 def main():
@@ -215,8 +215,8 @@ def main():
     else:
         module_path = os.path.dirname(os.path.abspath(__file__))
         
-    print("🏢 OSUS Payment Module Validator")
-    print(f"📁 Module Path: {module_path}")
+    print("üè¢ OSUS Payment Module Validator")
+    print(f"üìÅ Module Path: {module_path}")
     
     validator = OSUSModuleValidator(module_path)
     

@@ -11,8 +11,8 @@ def validate_payment_views():
         tree = ET.parse(file_path)
         root = tree.getroot()
         
-        print("🔍 Validating account_payment_views.xml...")
-        print("✅ XML is syntactically valid")
+        print("üîç Validating account_payment_views.xml...")
+        print("‚úÖ XML is syntactically valid")
         
         # Check for problematic XPath patterns
         problematic_patterns = []
@@ -28,29 +28,29 @@ def validate_payment_views():
                         if expr == '//group' or expr == '//group[@name="amount_group"]':
                             problematic_patterns.append(f"{view_id}: {expr}")
                         elif 'group[@expand=' in expr and 'requires_approval' not in expr:
-                            print(f"⚠️  {view_id}: {expr} (might be problematic)")
+                            print(f"‚ö†Ô∏è  {view_id}: {expr} (might be problematic)")
                         else:
-                            print(f"✅ {view_id}: {expr} (looks good)")
+                            print(f"‚úÖ {view_id}: {expr} (looks good)")
         
         if problematic_patterns:
-            print("❌ Found problematic patterns:")
+            print("‚ùå Found problematic patterns:")
             for pattern in problematic_patterns:
                 print(f"   {pattern}")
             return False
         else:
-            print("✅ No problematic XPath patterns found")
+            print("‚úÖ No problematic XPath patterns found")
             return True
             
     except ET.ParseError as e:
-        print(f"❌ XML Parse Error: {e}")
+        print(f"‚ùå XML Parse Error: {e}")
         return False
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"‚ùå Error: {e}")
         return False
 
 if __name__ == "__main__":
     result = validate_payment_views()
     if result:
-        print("\n🎉 VALIDATION PASSED - Module should install without RPC_ERROR")
+        print("\nüéâ VALIDATION PASSED - Module should install without RPC_ERROR")
     else:
-        print("\n💥 VALIDATION FAILED - Issues need to be resolved")
+        print("\nüí• VALIDATION FAILED - Issues need to be resolved")

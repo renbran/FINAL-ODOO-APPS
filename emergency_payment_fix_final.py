@@ -21,28 +21,28 @@ def emergency_fix_payment_module():
     if views_file.exists():
         backup_file = views_file.with_suffix('.xml.backup')
         shutil.copy2(views_file, backup_file)
-        print(f"✅ Backed up views to {backup_file}")
+        print(f"‚úÖ Backed up views to {backup_file}")
     
     # 2. Create minimal working view
-    print("🔧 Creating minimal working view...")
+    print("üîß Creating minimal working view...")
     create_minimal_view(views_file)
     
     # 3. Validate the fix
-    print("🔍 Validating fix...")
+    print("üîç Validating fix...")
     try:
         ET.parse(views_file)
-        print("✅ XML syntax valid")
+        print("‚úÖ XML syntax valid")
     except Exception as e:
-        print(f"❌ XML error: {e}")
+        print(f"‚ùå XML error: {e}")
         return False
     
     # 4. Create update script
     create_update_script()
     
     print("\n=== FIX COMPLETE ===")
-    print("✅ Minimal working view created")
-    print("✅ All field references validated")
-    print("✅ XML syntax confirmed valid")
+    print("‚úÖ Minimal working view created")
+    print("‚úÖ All field references validated")
+    print("‚úÖ XML syntax confirmed valid")
     print("\nNext steps:")
     print("1. Restart Odoo server to clear view cache")
     print("2. Update the module")
@@ -160,7 +160,7 @@ def create_minimal_view(views_file):
     with open(views_file, 'w', encoding='utf-8') as f:
         f.write(minimal_view_content)
     
-    print(f"✅ Created minimal view: {views_file}")
+    print(f"‚úÖ Created minimal view: {views_file}")
 
 def create_update_script():
     """Create a script to update the module in Odoo"""
@@ -196,7 +196,7 @@ def update_payment_module():
             os.system(cmd)
     
     print("\\n=== UPDATE COMPLETE ===")
-    print("✅ Module should now load without field reference errors")
+    print("‚úÖ Module should now load without field reference errors")
 
 if __name__ == "__main__":
     update_payment_module()
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     with open("odoo_update_payment_module.py", 'w') as f:
         f.write(update_script)
     
-    print("✅ Created update script: odoo_update_payment_module.py")
+    print("‚úÖ Created update script: odoo_update_payment_module.py")
 
 if __name__ == "__main__":
     success = emergency_fix_payment_module()

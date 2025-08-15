@@ -15,7 +15,7 @@ def aggressive_cleanup():
     
     module_path = Path("account_payment_approval")
     if not module_path.exists():
-        print("❌ Module not found!")
+        print("‚ùå Module not found!")
         return False
     
     # Define what to keep (essential files only)
@@ -51,9 +51,9 @@ def aggressive_cleanup():
             try:
                 shutil.rmtree(dir_path)
                 removed_dirs.append(dir_name)
-                print(f"   ✅ Removed directory: {dir_name}")
+                print(f"   ‚úÖ Removed directory: {dir_name}")
             except Exception as e:
-                print(f"   ❌ Error removing {dir_name}: {e}")
+                print(f"   ‚ùå Error removing {dir_name}: {e}")
     
     # 2. Remove unused models
     print("\n2. REMOVING UNUSED MODELS...")
@@ -65,9 +65,9 @@ def aggressive_cleanup():
                 try:
                     model_file.unlink()
                     removed_files.append(rel_path)
-                    print(f"   ✅ Removed model: {model_file.name}")
+                    print(f"   ‚úÖ Removed model: {model_file.name}")
                 except Exception as e:
-                    print(f"   ❌ Error removing {model_file.name}: {e}")
+                    print(f"   ‚ùå Error removing {model_file.name}: {e}")
     
     # 3. Remove unused security files
     print("\n3. CLEANING SECURITY DIRECTORY...")
@@ -79,9 +79,9 @@ def aggressive_cleanup():
                     if security_file.is_file():
                         security_file.unlink()
                         removed_files.append(f"security/{security_file.name}")
-                        print(f"   ✅ Removed security file: {security_file.name}")
+                        print(f"   ‚úÖ Removed security file: {security_file.name}")
                 except Exception as e:
-                    print(f"   ❌ Error removing {security_file.name}: {e}")
+                    print(f"   ‚ùå Error removing {security_file.name}: {e}")
     
     # 4. Remove unused view files
     print("\n4. CLEANING VIEWS DIRECTORY...")
@@ -92,9 +92,9 @@ def aggressive_cleanup():
                 try:
                     view_file.unlink()
                     removed_files.append(f"views/{view_file.name}")
-                    print(f"   ✅ Removed view file: {view_file.name}")
+                    print(f"   ‚úÖ Removed view file: {view_file.name}")
                 except Exception as e:
-                    print(f"   ❌ Error removing {view_file.name}: {e}")
+                    print(f"   ‚ùå Error removing {view_file.name}: {e}")
     
     # 5. Update models/__init__.py to only import account_payment
     print("\n5. UPDATING MODELS __INIT__.PY...")
@@ -103,9 +103,9 @@ def aggressive_cleanup():
         try:
             with open(models_init, 'w', encoding='utf-8') as f:
                 f.write('# -*- coding: utf-8 -*-\\nfrom . import account_payment\\n')
-            print("   ✅ Updated models/__init__.py")
+            print("   ‚úÖ Updated models/__init__.py")
         except Exception as e:
-            print(f"   ❌ Error updating models/__init__.py: {e}")
+            print(f"   ‚ùå Error updating models/__init__.py: {e}")
     
     # 6. Create minimal manifest
     print("\n6. CREATING MINIMAL MANIFEST...")
@@ -117,8 +117,8 @@ def aggressive_cleanup():
     
     # Summary
     print("\n=== AGGRESSIVE CLEANUP SUMMARY ===")
-    print(f"🗑️  Directories removed: {len(removed_dirs)}")
-    print(f"🗑️  Files removed: {len(removed_files)}")
+    print(f"üóëÔ∏è  Directories removed: {len(removed_dirs)}")
+    print(f"üóëÔ∏è  Files removed: {len(removed_files)}")
     
     if removed_dirs:
         print("\\nRemoved directories:")
@@ -130,7 +130,7 @@ def aggressive_cleanup():
         for file_name in removed_files:
             print(f"   - {file_name}")
     
-    print("\\n✅ AGGRESSIVE CLEANUP COMPLETE!")
+    print("\\n‚úÖ AGGRESSIVE CLEANUP COMPLETE!")
     print("\\nModule now contains only:")
     print("   - models/account_payment.py (main model)")
     print("   - views/account_payment_views.xml (main view)")
@@ -152,10 +152,10 @@ def create_minimal_manifest(module_path):
 Payment Approval System
 
 Features:
-• Multi-level payment approval workflow
-• Digital signatures and QR verification
-• Status tracking and audit trails
-• OSUS Properties branding
+‚Ä¢ Multi-level payment approval workflow
+‚Ä¢ Digital signatures and QR verification
+‚Ä¢ Status tracking and audit trails
+‚Ä¢ OSUS Properties branding
     """,
     'author': 'OSUS Properties',
     'website': 'https://www.osusproperties.com',
@@ -179,9 +179,9 @@ Features:
     try:
         with open(manifest_file, 'w', encoding='utf-8') as f:
             f.write(manifest_content)
-        print("   ✅ Created minimal manifest")
+        print("   ‚úÖ Created minimal manifest")
     except Exception as e:
-        print(f"   ❌ Error creating manifest: {e}")
+        print(f"   ‚ùå Error creating manifest: {e}")
 
 def ensure_description_icon(module_path):
     """Ensure description directory and icon exist"""
@@ -195,9 +195,9 @@ def ensure_description_icon(module_path):
         try:
             with open(icon_file, 'wb') as f:
                 f.write(png_data)
-            print("   ✅ Created placeholder icon")
+            print("   ‚úÖ Created placeholder icon")
         except Exception as e:
-            print(f"   ❌ Error creating icon: {e}")
+            print(f"   ‚ùå Error creating icon: {e}")
 
 if __name__ == "__main__":
     success = aggressive_cleanup()

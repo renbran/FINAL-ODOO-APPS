@@ -6,7 +6,7 @@
         Professional Tax Invoice Reports with Advanced Features - Now Default for Accounting
         =================================================================================
         
-        🎯 DEFAULT ACCOUNTING REPORTS OVERRIDE
+        üéØ DEFAULT ACCOUNTING REPORTS OVERRIDE
         =====================================
         This module now automatically becomes the default for ALL invoice and bill printing in Odoo:
         - Customer Invoices: Use enhanced invoice template with professional formatting
@@ -14,7 +14,7 @@
         - Smart Auto-Detection: Automatically chooses correct template based on document type
         - Bulk Printing Compatible: All QR codes removed for reliable bulk printing
         
-        ✨ ENHANCED INVOICE FEATURES
+        ‚ú® ENHANCED INVOICE FEATURES
         ==========================
         - UAE VAT compliant invoice layout
         - Real estate commission specific fields
@@ -24,7 +24,7 @@
         - Multi-company support
         - Inheritance-safe implementation
         
-        🖨️ BULK PRINTING FEATURES
+        üñ®Ô∏è BULK PRINTING FEATURES
         =========================
         - Bulk print multiple customer invoices in single PDF
         - Bulk print multiple vendor bills in single PDF
@@ -36,7 +36,7 @@
         - Error handling and validation
         - NO QR CODES for reliable bulk printing
         
-        💡 SMART BILL TEMPLATE
+        üí° SMART BILL TEMPLATE
         ======================
         - Simplified structure optimized for vendor bills
         - Default Odoo table structure and dates maintained
@@ -44,7 +44,7 @@
         - Automatic vendor/customer detection
         - Consistent styling across all document types
         
-        🔧 TECHNICAL IMPROVEMENTS
+        üîß TECHNICAL IMPROVEMENTS
         =========================
         - Overrides default Odoo invoice reports automatically
         - Smart template dispatcher based on move_type

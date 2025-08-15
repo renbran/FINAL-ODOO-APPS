@@ -77,13 +77,13 @@ def main():
         issues = validate_module_structure(module_path)
         
         if issues:
-            print(f"  ❌ Issues found:")
+            print(f"  ‚ùå Issues found:")
             for issue in issues:
                 print(f"    - {issue}")
             total_issues += len(issues)
             problematic_modules.append(module_path.name)
         else:
-            print(f"  ✅ Module structure is valid")
+            print(f"  ‚úÖ Module structure is valid")
         print()
     
     # Summary
@@ -93,11 +93,11 @@ def main():
     
     if problematic_modules:
         print(f"Problematic modules: {', '.join(problematic_modules)}")
-        print("\n⚠️  These modules may cause registry loading errors!")
-        print("💡 Consider fixing missing files or removing incomplete modules.")
+        print("\n‚ö†Ô∏è  These modules may cause registry loading errors!")
+        print("üí° Consider fixing missing files or removing incomplete modules.")
     else:
-        print("🎉 All modules have valid structure!")
-        print("✅ Ready for Odoo deployment")
+        print("üéâ All modules have valid structure!")
+        print("‚úÖ Ready for Odoo deployment")
     
     return total_issues == 0
 

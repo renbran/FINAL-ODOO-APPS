@@ -25,7 +25,7 @@ class OdooModuleDebugger:
         
     def debug_and_analyze(self):
         """Main debugging and analysis method"""
-        print("🔍 ODOO 17 MODULE DEBUGGING & PRODUCTION READINESS ANALYSIS")
+        print("üîç ODOO 17 MODULE DEBUGGING & PRODUCTION READINESS ANALYSIS")
         print("=" * 80)
         
         # 1. Module Structure Analysis
@@ -60,7 +60,7 @@ class OdooModuleDebugger:
         
     def _analyze_module_structure(self):
         """Analyze module directory structure"""
-        print("📁 Analyzing Module Structure...")
+        print("üìÅ Analyzing Module Structure...")
         
         required_files = [
             '__init__.py',
@@ -81,22 +81,22 @@ class OdooModuleDebugger:
             if not (self.module_path / file).exists():
                 self.errors.append(f"Missing required file: {file}")
             else:
-                print(f"  ✅ {file}")
+                print(f"  ‚úÖ {file}")
         
         # Check recommended directories
         for dir_name in recommended_dirs:
             dir_path = self.module_path / dir_name
             if dir_path.exists():
-                print(f"  ✅ {dir_name}/")
+                print(f"  ‚úÖ {dir_name}/")
                 # Count files in directory
                 files = list(dir_path.rglob("*.py")) + list(dir_path.rglob("*.xml"))
-                print(f"    📄 {len(files)} files")
+                print(f"    üìÑ {len(files)} files")
             else:
                 self.warnings.append(f"Recommended directory missing: {dir_name}/")
                 
     def _analyze_manifest(self):
         """Analyze __manifest__.py file"""
-        print("\\n📋 Analyzing Manifest File...")
+        print("\\nüìã Analyzing Manifest File...")
         
         manifest_path = self.module_path / '__manifest__.py'
         if not manifest_path.exists():
@@ -121,7 +121,7 @@ class OdooModuleDebugger:
             required_fields = ['name', 'version', 'depends', 'data']
             for field in required_fields:
                 if field in manifest:
-                    print(f"  ✅ {field}: {manifest[field]}")
+                    print(f"  ‚úÖ {field}: {manifest[field]}")
                 else:
                     self.errors.append(f"Missing required manifest field: {field}")
             
@@ -152,7 +152,7 @@ class OdooModuleDebugger:
             
     def _analyze_python_code(self):
         """Analyze Python code for syntax and best practices"""
-        print("\\n🐍 Analyzing Python Code...")
+        print("\\nüêç Analyzing Python Code...")
         
         python_files = list(self.module_path.rglob("*.py"))
         
@@ -160,7 +160,7 @@ class OdooModuleDebugger:
             try:
                 # Syntax check
                 py_compile.compile(py_file, doraise=True)
-                print(f"  ✅ {py_file.relative_to(self.module_path)}")
+                print(f"  ‚úÖ {py_file.relative_to(self.module_path)}")
                 
                 # AST analysis for advanced checks
                 with open(py_file, 'r', encoding='utf-8') as f:
@@ -201,14 +201,14 @@ class OdooModuleDebugger:
                                 
     def _analyze_xml_files(self):
         """Analyze XML files for structure and references"""
-        print("\\n🗃️  Analyzing XML Files...")
+        print("\\nüóÉÔ∏è  Analyzing XML Files...")
         
         xml_files = list(self.module_path.rglob("*.xml"))
         
         for xml_file in xml_files:
             try:
                 ET.parse(xml_file)
-                print(f"  ✅ {xml_file.relative_to(self.module_path)}")
+                print(f"  ‚úÖ {xml_file.relative_to(self.module_path)}")
                 
                 # Check for external references
                 self._check_external_references(xml_file)
@@ -235,53 +235,53 @@ class OdooModuleDebugger:
             
     def _analyze_dependencies(self):
         """Analyze module dependencies"""
-        print("\\n🔗 Analyzing Dependencies...")
+        print("\\nüîó Analyzing Dependencies...")
         
         manifest = self.analysis_results.get('manifest', {})
         depends = manifest.get('depends', [])
         
         # Check for circular dependencies
-        print(f"  📦 Dependencies: {depends}")
+        print(f"  üì¶ Dependencies: {depends}")
         
         # Check for external dependencies
         external_deps = manifest.get('external_dependencies', {})
         if external_deps:
             python_deps = external_deps.get('python', [])
             if python_deps:
-                print(f"  🐍 Python dependencies: {python_deps}")
+                print(f"  üêç Python dependencies: {python_deps}")
                 for dep in python_deps:
                     try:
                         __import__(dep)
-                        print(f"    ✅ {dep}")
+                        print(f"    ‚úÖ {dep}")
                     except ImportError:
                         self.warnings.append(f"Python dependency not available: {dep}")
                         
     def _analyze_security(self):
         """Analyze security configuration"""
-        print("\\n🔒 Analyzing Security Configuration...")
+        print("\\nüîí Analyzing Security Configuration...")
         
         security_dir = self.module_path / 'security'
         if security_dir.exists():
             # Check for access rights
             access_file = security_dir / 'ir.model.access.csv'
             if access_file.exists():
-                print("  ✅ ir.model.access.csv found")
+                print("  ‚úÖ ir.model.access.csv found")
                 with open(access_file, 'r') as f:
                     lines = f.readlines()
-                    print(f"    📊 {len(lines)-1} access rules defined")
+                    print(f"    üìä {len(lines)-1} access rules defined")
             else:
                 self.warnings.append("No ir.model.access.csv found")
                 
             # Check for security groups
             security_files = list(security_dir.glob("*.xml"))
             for sec_file in security_files:
-                print(f"  ✅ {sec_file.name}")
+                print(f"  ‚úÖ {sec_file.name}")
         else:
             self.warnings.append("No security directory found")
             
     def _analyze_performance(self):
         """Analyze potential performance issues"""
-        print("\\n⚡ Analyzing Performance Considerations...")
+        print("\\n‚ö° Analyzing Performance Considerations...")
         
         python_files = list(self.module_path.rglob("*.py"))
         
@@ -302,7 +302,7 @@ class OdooModuleDebugger:
                 
     def _check_odoo17_compliance(self):
         """Check Odoo 17 specific compliance"""
-        print("\\n🔧 Checking Odoo 17 Compliance...")
+        print("\\nüîß Checking Odoo 17 Compliance...")
         
         python_files = list(self.module_path.rglob("*.py"))
         
@@ -334,7 +334,7 @@ class OdooModuleDebugger:
         
     def _check_production_readiness(self):
         """Check production readiness criteria"""
-        print("\\n🚀 Checking Production Readiness...")
+        print("\\nüöÄ Checking Production Readiness...")
         
         manifest = self.analysis_results.get('manifest', {})
         
@@ -349,7 +349,7 @@ class OdooModuleDebugger:
         
         for check, status in readiness_checks.items():
             if status:
-                print(f"  ✅ {check}")
+                print(f"  ‚úÖ {check}")
             else:
                 self.warnings.append(f"Production readiness: {check} not satisfied")
                 
@@ -358,55 +358,55 @@ class OdooModuleDebugger:
     def _generate_report(self):
         """Generate comprehensive debugging report"""
         print("\\n" + "=" * 80)
-        print("📊 COMPREHENSIVE DEBUGGING REPORT")
+        print("üìä COMPREHENSIVE DEBUGGING REPORT")
         print("=" * 80)
         
         # Summary
         total_issues = len(self.errors) + len(self.warnings)
         if total_issues == 0:
-            print("🎉 EXCELLENT! No issues found. Module is production-ready!")
+            print("üéâ EXCELLENT! No issues found. Module is production-ready!")
         else:
-            print(f"📈 ANALYSIS SUMMARY: {len(self.errors)} errors, {len(self.warnings)} warnings")
+            print(f"üìà ANALYSIS SUMMARY: {len(self.errors)} errors, {len(self.warnings)} warnings")
             
         # Errors
         if self.errors:
-            print("\\n❌ CRITICAL ERRORS (Must Fix):")
+            print("\\n‚ùå CRITICAL ERRORS (Must Fix):")
             for i, error in enumerate(self.errors, 1):
                 print(f"  {i}. {error}")
                 
         # Warnings
         if self.warnings:
-            print("\\n⚠️  WARNINGS (Recommended Fixes):")
+            print("\\n‚ö†Ô∏è  WARNINGS (Recommended Fixes):")
             for i, warning in enumerate(self.warnings, 1):
                 print(f"  {i}. {warning}")
                 
         # Recommendations
         if self.recommendations:
-            print("\\n💡 RECOMMENDATIONS:")
+            print("\\nüí° RECOMMENDATIONS:")
             for i, rec in enumerate(self.recommendations, 1):
                 print(f"  {i}. {rec}")
                 
         # Best Practices Summary
-        print("\\n🏆 BEST PRACTICES SUMMARY:")
-        print("  ✅ Follow Odoo 17 new API patterns")
-        print("  ✅ Use proper field definitions with help text")
-        print("  ✅ Implement proper security access controls")
-        print("  ✅ Add comprehensive docstrings to methods")
-        print("  ✅ Use computed fields efficiently")
-        print("  ✅ Implement proper error handling")
-        print("  ✅ Follow PEP 8 coding standards")
-        print("  ✅ Use proper XML namespacing")
-        print("  ✅ Implement proper test coverage")
-        print("  ✅ Document module functionality")
+        print("\\nüèÜ BEST PRACTICES SUMMARY:")
+        print("  ‚úÖ Follow Odoo 17 new API patterns")
+        print("  ‚úÖ Use proper field definitions with help text")
+        print("  ‚úÖ Implement proper security access controls")
+        print("  ‚úÖ Add comprehensive docstrings to methods")
+        print("  ‚úÖ Use computed fields efficiently")
+        print("  ‚úÖ Implement proper error handling")
+        print("  ‚úÖ Follow PEP 8 coding standards")
+        print("  ‚úÖ Use proper XML namespacing")
+        print("  ‚úÖ Implement proper test coverage")
+        print("  ‚úÖ Document module functionality")
         
         # Final Assessment
-        print("\\n🎯 FINAL ASSESSMENT:")
+        print("\\nüéØ FINAL ASSESSMENT:")
         if not self.errors:
-            print("  🟢 PRODUCTION READY - Module can be deployed")
+            print("  üü¢ PRODUCTION READY - Module can be deployed")
         elif len(self.errors) <= 3:
-            print("  🟡 NEEDS MINOR FIXES - Address errors before deployment")
+            print("  üü° NEEDS MINOR FIXES - Address errors before deployment")
         else:
-            print("  🔴 NEEDS MAJOR FIXES - Significant issues require resolution")
+            print("  üî¥ NEEDS MAJOR FIXES - Significant issues require resolution")
             
         return total_issues == 0
 
@@ -415,7 +415,7 @@ def main():
     module_path = "account_payment_approval"
     
     if not os.path.exists(module_path):
-        print("❌ Module directory not found!")
+        print("‚ùå Module directory not found!")
         return False
         
     debugger = OdooModuleDebugger(module_path)

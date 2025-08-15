@@ -9,37 +9,37 @@ import sys
 import xml.etree.ElementTree as ET
 
 def main():
-    print("🔧 ACCOUNT PAYMENT APPROVAL - QUICK FIX VALIDATION")
+    print("üîß ACCOUNT PAYMENT APPROVAL - QUICK FIX VALIDATION")
     print("=" * 60)
     
     module_path = "account_payment_approval"
     
     # Test 1: Check manifest structure
-    print("\n📋 TEST 1: Manifest Structure")
+    print("\nüìã TEST 1: Manifest Structure")
     try:
         with open(f"{module_path}/__manifest__.py", 'r') as f:
             manifest = f.read()
-        print("✅ Manifest file readable")
+        print("‚úÖ Manifest file readable")
         
         # Check for obvious syntax issues
         if "depends" in manifest and "data" in manifest:
-            print("✅ Manifest has required sections")
+            print("‚úÖ Manifest has required sections")
         else:
-            print("❌ Manifest missing required sections")
+            print("‚ùå Manifest missing required sections")
     except Exception as e:
-        print(f"❌ Manifest error: {e}")
+        print(f"‚ùå Manifest error: {e}")
         return False
     
     # Test 2: Security files validation
-    print("\n🛡️  TEST 2: Security Configuration")
+    print("\nüõ°Ô∏è  TEST 2: Security Configuration")
     
     # Check groups XML
     try:
         groups_file = f"{module_path}/security/payment_approval_groups.xml"
         ET.parse(groups_file)
-        print("✅ Security groups XML valid")
+        print("‚úÖ Security groups XML valid")
     except Exception as e:
-        print(f"❌ Groups XML error: {e}")
+        print(f"‚ùå Groups XML error: {e}")
         return False
     
     # Check access CSV
@@ -48,16 +48,16 @@ def main():
         with open(access_file, 'r') as f:
             lines = f.readlines()
         if len(lines) >= 2:  # Header + at least one data line
-            print(f"✅ Access CSV valid ({len(lines)-1} access rules)")
+            print(f"‚úÖ Access CSV valid ({len(lines)-1} access rules)")
         else:
-            print("❌ Access CSV has no data")
+            print("‚ùå Access CSV has no data")
             return False
     except Exception as e:
-        print(f"❌ Access CSV error: {e}")
+        print(f"‚ùå Access CSV error: {e}")
         return False
     
     # Test 3: Views validation
-    print("\n📱 TEST 3: View Files")
+    print("\nüì± TEST 3: View Files")
     view_files = [
         "views/account_payment_views.xml",
         "views/account_move_enhanced_views.xml", 
@@ -70,16 +70,16 @@ def main():
             full_path = f"{module_path}/{view_file}"
             if os.path.exists(full_path):
                 ET.parse(full_path)
-                print(f"✅ {view_file}")
+                print(f"‚úÖ {view_file}")
             else:
-                print(f"❌ Missing: {view_file}")
+                print(f"‚ùå Missing: {view_file}")
                 return False
         except Exception as e:
-            print(f"❌ {view_file}: {str(e)[:50]}...")
+            print(f"‚ùå {view_file}: {str(e)[:50]}...")
             return False
     
     # Test 4: Data files validation
-    print("\n💾 TEST 4: Data Files")
+    print("\nüíæ TEST 4: Data Files")
     data_files = [
         "data/payment_sequences.xml",
         "data/email_templates.xml",
@@ -91,16 +91,16 @@ def main():
             full_path = f"{module_path}/{data_file}"
             if os.path.exists(full_path):
                 ET.parse(full_path)
-                print(f"✅ {data_file}")
+                print(f"‚úÖ {data_file}")
             else:
-                print(f"❌ Missing: {data_file}")
+                print(f"‚ùå Missing: {data_file}")
                 return False
         except Exception as e:
-            print(f"❌ {data_file}: {str(e)[:50]}...")
+            print(f"‚ùå {data_file}: {str(e)[:50]}...")
             return False
     
     # Test 5: Python files validation
-    print("\n🐍 TEST 5: Python Code")
+    print("\nüêç TEST 5: Python Code")
     python_files = [
         "__init__.py",
         "models/__init__.py",
@@ -118,26 +118,26 @@ def main():
                 with open(full_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 compile(content, full_path, 'exec')
-                print(f"✅ {py_file}")
+                print(f"‚úÖ {py_file}")
             else:
-                print(f"❌ Missing: {py_file}")
+                print(f"‚ùå Missing: {py_file}")
                 return False
         except SyntaxError as e:
-            print(f"❌ {py_file}: Syntax error line {e.lineno}")
+            print(f"‚ùå {py_file}: Syntax error line {e.lineno}")
             return False
         except Exception as e:
-            print(f"❌ {py_file}: {str(e)[:50]}...")
+            print(f"‚ùå {py_file}: {str(e)[:50]}...")
             return False
     
     # Final assessment
     print("\n" + "=" * 60)
-    print("🎉 ALL TESTS PASSED!")
-    print("✅ Module structure is valid")
-    print("✅ All referenced files exist")
-    print("✅ XML files are well-formed")  
-    print("✅ Python files have valid syntax")
-    print("✅ Security configuration is complete")
-    print("\n🚀 MODULE IS READY FOR DEPLOYMENT!")
+    print("üéâ ALL TESTS PASSED!")
+    print("‚úÖ Module structure is valid")
+    print("‚úÖ All referenced files exist")
+    print("‚úÖ XML files are well-formed")  
+    print("‚úÖ Python files have valid syntax")
+    print("‚úÖ Security configuration is complete")
+    print("\nüöÄ MODULE IS READY FOR DEPLOYMENT!")
     print("   Database loading should now work without errors")
     return True
 

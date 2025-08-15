@@ -31,10 +31,10 @@ def main():
     module_path = Path("account_payment_approval")
     
     if not module_path.exists():
-        print("❌ Module directory not found!")
+        print("‚ùå Module directory not found!")
         return False
     
-    print("🔍 Starting comprehensive module validation...")
+    print("üîç Starting comprehensive module validation...")
     print("=" * 60)
     
     # Track validation results
@@ -42,47 +42,47 @@ def main():
     warnings = []
     
     # Validate Python files
-    print("\n📝 Validating Python files...")
+    print("\nüìù Validating Python files...")
     python_files = list(module_path.rglob("*.py"))
     
     for py_file in python_files:
         print(f"  Checking: {py_file}")
         success, error = validate_python_syntax(py_file)
         if success:
-            print(f"    ✅ Syntax OK")
+            print(f"    ‚úÖ Syntax OK")
         else:
-            print(f"    ❌ Syntax Error: {error}")
+            print(f"    ‚ùå Syntax Error: {error}")
             errors.append(f"Python syntax error in {py_file}: {error}")
     
     # Validate XML files
-    print("\n🗃️  Validating XML files...")
+    print("\nüóÉÔ∏è  Validating XML files...")
     xml_files = list(module_path.rglob("*.xml"))
     
     for xml_file in xml_files:
         print(f"  Checking: {xml_file}")
         success, error = validate_xml_syntax(xml_file)
         if success:
-            print(f"    ✅ XML OK")
+            print(f"    ‚úÖ XML OK")
         else:
-            print(f"    ❌ XML Error: {error}")
+            print(f"    ‚ùå XML Error: {error}")
             errors.append(f"XML syntax error in {xml_file}: {error}")
     
     # Check manifest
-    print("\n📋 Validating manifest...")
+    print("\nüìã Validating manifest...")
     manifest_file = module_path / "__manifest__.py"
     if manifest_file.exists():
         success, error = validate_python_syntax(manifest_file)
         if success:
-            print("    ✅ Manifest syntax OK")
+            print("    ‚úÖ Manifest syntax OK")
         else:
-            print(f"    ❌ Manifest error: {error}")
+            print(f"    ‚ùå Manifest error: {error}")
             errors.append(f"Manifest error: {error}")
     else:
-        print("    ⚠️  No manifest file found")
+        print("    ‚ö†Ô∏è  No manifest file found")
         warnings.append("No __manifest__.py file found")
     
     # Check key files exist
-    print("\n🗂️  Checking key files...")
+    print("\nüóÇÔ∏è  Checking key files...")
     key_files = [
         "models/__init__.py",
         "wizards/__init__.py", 
@@ -93,35 +93,35 @@ def main():
     for key_file in key_files:
         file_path = module_path / key_file
         if file_path.exists():
-            print(f"    ✅ {key_file}")
+            print(f"    ‚úÖ {key_file}")
         else:
-            print(f"    ❌ Missing: {key_file}")
+            print(f"    ‚ùå Missing: {key_file}")
             errors.append(f"Missing key file: {key_file}")
     
     # Summary
     print("\n" + "=" * 60)
-    print("📊 VALIDATION SUMMARY")
+    print("üìä VALIDATION SUMMARY")
     print("=" * 60)
     
     if not errors and not warnings:
-        print("🎉 ALL VALIDATIONS PASSED!")
-        print("✅ Module appears ready for deployment")
+        print("üéâ ALL VALIDATIONS PASSED!")
+        print("‚úÖ Module appears ready for deployment")
         return True
     
     if warnings:
-        print(f"⚠️  {len(warnings)} WARNING(S):")
+        print(f"‚ö†Ô∏è  {len(warnings)} WARNING(S):")
         for warning in warnings:
-            print(f"   • {warning}")
+            print(f"   ‚Ä¢ {warning}")
     
     if errors:
-        print(f"❌ {len(errors)} ERROR(S):")
+        print(f"‚ùå {len(errors)} ERROR(S):")
         for error in errors:
-            print(f"   • {error}")
-        print("\n💡 Please fix these errors before deployment")
+            print(f"   ‚Ä¢ {error}")
+        print("\nüí° Please fix these errors before deployment")
         return False
     
     if warnings and not errors:
-        print("⚠️  Module has warnings but may still work")
+        print("‚ö†Ô∏è  Module has warnings but may still work")
         return True
 
 if __name__ == "__main__":

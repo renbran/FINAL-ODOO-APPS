@@ -299,7 +299,7 @@ class PaymentBulkApprovalWizard(models.TransientModel):
             # Show failed payments details
             if len(failed_payments) <= 5:  # Show details for few failures
                 failed_details = '\n'.join([
-                    f"• {p.name}: {error}" for p, error in failed_payments
+                    f"â€¢ {p.name}: {error}" for p, error in failed_payments
                 ])
                 message += f"\n\nFailed payments:\n{failed_details}"
         else:

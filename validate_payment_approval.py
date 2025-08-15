@@ -13,10 +13,10 @@ def validate_account_payment_approval():
     module_path = "account_payment_approval"
     
     if not os.path.exists(module_path):
-        print("❌ Module directory not found")
+        print("‚ùå Module directory not found")
         return False
     
-    print("🔍 Validating Account Payment Approval Module...")
+    print("üîç Validating Account Payment Approval Module...")
     
     # Check required files
     required_files = [
@@ -59,9 +59,9 @@ def validate_account_payment_approval():
             with open(manifest_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 ast.parse(content)
-            print("✅ Manifest file syntax is valid")
+            print("‚úÖ Manifest file syntax is valid")
         except SyntaxError as e:
-            print(f"❌ Manifest syntax error: {e}")
+            print(f"‚ùå Manifest syntax error: {e}")
             return False
     
     # Check __init__.py files
@@ -84,17 +84,17 @@ def validate_account_payment_approval():
     
     # Report results
     if missing_files:
-        print("❌ Missing files:")
+        print("‚ùå Missing files:")
         for file in missing_files:
             print(f"   - {file}")
     
     if empty_files:
-        print("⚠️  Empty or minimal files:")
+        print("‚ö†Ô∏è  Empty or minimal files:")
         for file in empty_files:
             print(f"   - {file}")
     
     if not missing_files and not empty_files:
-        print("✅ All required files present and non-empty")
+        print("‚úÖ All required files present and non-empty")
         
         # Check file counts
         python_files = []
@@ -107,13 +107,13 @@ def validate_account_payment_approval():
                 elif file.endswith('.xml'):
                     xml_files.append(os.path.join(root, file))
         
-        print(f"📊 Module Statistics:")
+        print(f"üìä Module Statistics:")
         print(f"   - Python files: {len(python_files)}")
         print(f"   - XML files: {len(xml_files)}")
         print(f"   - Total size: {sum(os.path.getsize(f) for f in python_files + xml_files):,} bytes")
         
-        print("\n✅ Account Payment Approval module structure is COMPLETE!")
-        print("🚀 Ready for deployment in Odoo 17")
+        print("\n‚úÖ Account Payment Approval module structure is COMPLETE!")
+        print("üöÄ Ready for deployment in Odoo 17")
         return True
     
     return False

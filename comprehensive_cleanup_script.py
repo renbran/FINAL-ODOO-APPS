@@ -17,7 +17,7 @@ def comprehensive_cleanup():
     
     module_path = Path("account_payment_approval")
     if not module_path.exists():
-        print("❌ Module not found!")
+        print("‚ùå Module not found!")
         return False
     
     # 1. Analyze current manifest references
@@ -50,16 +50,16 @@ def comprehensive_cleanup():
     
     # 8. Summary
     print("\n=== CLEANUP SUMMARY ===")
-    print(f"✅ Files analyzed: {len(existing_files)}")
-    print(f"🗑️  Files removed: {len(removed_files)}")
-    print(f"📝 Manifest cleaned")
+    print(f"‚úÖ Files analyzed: {len(existing_files)}")
+    print(f"üóëÔ∏è  Files removed: {len(removed_files)}")
+    print(f"üìù Manifest cleaned")
     
     if removed_files:
         print("\nRemoved files:")
         for file_path in removed_files:
             print(f"   - {file_path}")
     
-    print("\n✅ CLEANUP COMPLETE!")
+    print("\n‚úÖ CLEANUP COMPLETE!")
     return True
 
 def analyze_manifest_references(module_path):
@@ -327,23 +327,23 @@ Enterprise Payment Approval System for OSUS Properties
 
 Key Features:
 ============
-• Multi-level approval workflow with configurable tiers
-• Digital signature capture for all approval stages
-• QR code generation with secure verification portal
-• Role-based permission system
-• Real-time workflow tracking
-• Email notifications and activity tracking
-• Comprehensive audit trails and reporting
-• Integration with accounting workflows
-• OSUS branded professional interface
+‚Ä¢ Multi-level approval workflow with configurable tiers
+‚Ä¢ Digital signature capture for all approval stages
+‚Ä¢ QR code generation with secure verification portal
+‚Ä¢ Role-based permission system
+‚Ä¢ Real-time workflow tracking
+‚Ä¢ Email notifications and activity tracking
+‚Ä¢ Comprehensive audit trails and reporting
+‚Ä¢ Integration with accounting workflows
+‚Ä¢ OSUS branded professional interface
 
 Workflow Stages:
 ===============
-1. Draft → Submit for Review
-2. Under Review → Approve/Reject
-3. Approved → Authorize (for payments above threshold)
-4. Authorized → Post to Accounting
-5. Posted → Complete
+1. Draft ‚Üí Submit for Review
+2. Under Review ‚Üí Approve/Reject
+3. Approved ‚Üí Authorize (for payments above threshold)
+4. Authorized ‚Üí Post to Accounting
+5. Posted ‚Üí Complete
     """,
     'author': 'OSUS Properties',
     'company': 'OSUS Properties',
@@ -376,7 +376,7 @@ Workflow Stages:
         with open(manifest_file, 'w', encoding='utf-8') as f:
             f.write(new_manifest)
         
-        print("   ✅ Manifest cleaned and simplified")
+        print("   ‚úÖ Manifest cleaned and simplified")
         
     except Exception as e:
         print(f"   Error cleaning manifest: {e}")

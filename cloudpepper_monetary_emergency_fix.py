@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 
 def main():
-    print("🚨 CLOUDPEPPER EMERGENCY FIX: Monetary @ Operator TypeError")
+    print("üö® CLOUDPEPPER EMERGENCY FIX: Monetary @ Operator TypeError")
     
     # Define target file path
     target_file = "/var/odoo/osusbck/extra-addons/odoo17_final.git-6880b7fcd4844/order_status_override/models/sale_order.py"
@@ -22,14 +22,14 @@ def main():
     backup_file = f"{target_file}.backup.{timestamp}"
     
     try:
-        print(f"📋 Creating backup: {backup_file}")
+        print(f"üìã Creating backup: {backup_file}")
         shutil.copy2(target_file, backup_file)
         
         # Read current file
         with open(target_file, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        print("🔍 Analyzing current content...")
+        print("üîç Analyzing current content...")
         
         # Fixed content for sale_order.py
         fixed_content = '''from odoo import models, fields, api, _
@@ -208,39 +208,39 @@ class SaleOrder(models.Model):
 '''
         
         # Write fixed content
-        print("🔧 Applying emergency fix...")
+        print("üîß Applying emergency fix...")
         with open(target_file, 'w', encoding='utf-8') as f:
             f.write(fixed_content)
         
-        print("✅ EMERGENCY FIX APPLIED SUCCESSFULLY")
-        print(f"📄 File updated: {target_file}")
-        print(f"📋 Backup created: {backup_file}")
+        print("‚úÖ EMERGENCY FIX APPLIED SUCCESSFULLY")
+        print(f"üìÑ File updated: {target_file}")
+        print(f"üìã Backup created: {backup_file}")
         
         # Restart Odoo service
-        print("🔄 Restarting Odoo service...")
+        print("üîÑ Restarting Odoo service...")
         try:
             subprocess.run(['sudo', 'systemctl', 'restart', 'odoo'], check=True)
-            print("✅ Odoo service restarted successfully")
+            print("‚úÖ Odoo service restarted successfully")
         except subprocess.CalledProcessError as e:
-            print(f"⚠️  Failed to restart Odoo service: {e}")
-            print("🔧 Manual restart required: sudo systemctl restart odoo")
+            print(f"‚ö†Ô∏è  Failed to restart Odoo service: {e}")
+            print("üîß Manual restart required: sudo systemctl restart odoo")
         
-        print("⚡ CLOUDPEPPER EMERGENCY FIX COMPLETE")
-        print("🎯 Fixed: TypeError: unsupported operand type(s) for @: 'Monetary' and 'function'")
+        print("‚ö° CLOUDPEPPER EMERGENCY FIX COMPLETE")
+        print("üéØ Fixed: TypeError: unsupported operand type(s) for @: 'Monetary' and 'function'")
         
         return True
         
     except Exception as e:
-        print(f"❌ ERROR: {e}")
+        print(f"‚ùå ERROR: {e}")
         
         # Restore from backup if it exists
         if os.path.exists(backup_file):
-            print("🔄 Restoring from backup...")
+            print("üîÑ Restoring from backup...")
             try:
                 shutil.copy2(backup_file, target_file)
-                print("✅ Backup restored successfully")
+                print("‚úÖ Backup restored successfully")
             except Exception as restore_error:
-                print(f"❌ Failed to restore backup: {restore_error}")
+                print(f"‚ùå Failed to restore backup: {restore_error}")
         
         return False
 

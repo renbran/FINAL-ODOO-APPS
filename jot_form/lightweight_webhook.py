@@ -223,15 +223,15 @@ def main():
     # Start server
     server = HTTPServer((host, port), JotFormWebhookHandler)
     
-    print(f"🚀 JotForm Webhook Server starting on {host}:{port}")
-    print(f"📍 Health check: http://{host}:{port}/health")
-    print("🔗 Configure this URL in your JotForm webhook settings")
-    print("⏹️  Press Ctrl+C to stop")
+    print(f"üöÄ JotForm Webhook Server starting on {host}:{port}")
+    print(f"üìç Health check: http://{host}:{port}/health")
+    print("üîó Configure this URL in your JotForm webhook settings")
+    print("‚èπÔ∏è  Press Ctrl+C to stop")
     
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n🛑 Shutting down webhook server...")
+        print("\nüõë Shutting down webhook server...")
         server.shutdown()
 
 if __name__ == "__main__":

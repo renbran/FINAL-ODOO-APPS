@@ -38,9 +38,9 @@ def test_module_structure():
         full_path = os.path.join(base_path, file_path)
         if not os.path.exists(full_path):
             missing_files.append(file_path)
-            logger.error(f"❌ Missing file: {file_path}")
+            logger.error(f"‚ùå Missing file: {file_path}")
         else:
-            logger.info(f"✅ Found: {file_path}")
+            logger.info(f"‚úÖ Found: {file_path}")
     
     return len(missing_files) == 0, missing_files
 
@@ -61,28 +61,28 @@ def test_javascript_syntax():
                     
                 # Basic syntax checks
                 if 'export class' not in content:
-                    logger.error(f"❌ {js_file}: Missing export class declaration")
+                    logger.error(f"‚ùå {js_file}: Missing export class declaration")
                     return False
                     
                 if 'registry.category("actions").add(' not in content:
-                    logger.error(f"❌ {js_file}: Missing registry registration")
+                    logger.error(f"‚ùå {js_file}: Missing registry registration")
                     return False
                     
                 if content.count('{') != content.count('}'):
-                    logger.error(f"❌ {js_file}: Unmatched braces")
+                    logger.error(f"‚ùå {js_file}: Unmatched braces")
                     return False
                     
                 if content.count('(') != content.count(')'):
-                    logger.error(f"❌ {js_file}: Unmatched parentheses")
+                    logger.error(f"‚ùå {js_file}: Unmatched parentheses")
                     return False
                     
-                logger.info(f"✅ {js_file}: Basic syntax OK")
+                logger.info(f"‚úÖ {js_file}: Basic syntax OK")
                 
             except Exception as e:
-                logger.error(f"❌ {js_file}: Error reading file - {str(e)}")
+                logger.error(f"‚ùå {js_file}: Error reading file - {str(e)}")
                 return False
         else:
-            logger.error(f"❌ {js_file}: File not found")
+            logger.error(f"‚ùå {js_file}: File not found")
             return False
     
     return True
@@ -103,17 +103,17 @@ def test_manifest():
         required_keys = ['name', 'version', 'depends', 'data', 'assets']
         for key in required_keys:
             if f"'{key}'" not in content and f'"{key}"' not in content:
-                logger.error(f"❌ Manifest missing key: {key}")
+                logger.error(f"‚ùå Manifest missing key: {key}")
                 return False
         
-        logger.info("✅ Manifest file syntax OK")
+        logger.info("‚úÖ Manifest file syntax OK")
         return True
         
     except SyntaxError as e:
-        logger.error(f"❌ Manifest syntax error: {str(e)}")
+        logger.error(f"‚ùå Manifest syntax error: {str(e)}")
         return False
     except Exception as e:
-        logger.error(f"❌ Manifest error: {str(e)}")
+        logger.error(f"‚ùå Manifest error: {str(e)}")
         return False
 
 def test_xml_files():
@@ -135,20 +135,20 @@ def test_xml_files():
                 
                 # Basic XML checks
                 if not content.strip().startswith('<?xml'):
-                    logger.error(f"❌ {xml_file}: Missing XML declaration")
+                    logger.error(f"‚ùå {xml_file}: Missing XML declaration")
                     return False
                 
                 if '<odoo>' not in content and '<templates' not in content:
-                    logger.error(f"❌ {xml_file}: Missing root element")
+                    logger.error(f"‚ùå {xml_file}: Missing root element")
                     return False
                 
-                logger.info(f"✅ {xml_file}: Basic XML OK")
+                logger.info(f"‚úÖ {xml_file}: Basic XML OK")
                 
             except Exception as e:
-                logger.error(f"❌ {xml_file}: Error reading file - {str(e)}")
+                logger.error(f"‚ùå {xml_file}: Error reading file - {str(e)}")
                 return False
         else:
-            logger.error(f"❌ {xml_file}: File not found")
+            logger.error(f"‚ùå {xml_file}: File not found")
             return False
     
     return True
@@ -156,16 +156,16 @@ def test_xml_files():
 def generate_fix_summary():
     """Generate a summary of fixes applied"""
     fixes = [
-        "✅ Removed external Chart.js CDN dependency",
-        "✅ Added local Chart.js library",
-        "✅ Added comprehensive error handling for chart initialization",
-        "✅ Added fallback content when Chart.js fails to load",
-        "✅ Fixed async script loading issues",
-        "✅ Added try-catch blocks around chart rendering",
-        "✅ Improved component initialization timing",
-        "✅ Added defensive programming for missing DOM elements",
-        "✅ Enhanced error messages for debugging",
-        "✅ Fixed JavaScript syntax errors"
+        "‚úÖ Removed external Chart.js CDN dependency",
+        "‚úÖ Added local Chart.js library",
+        "‚úÖ Added comprehensive error handling for chart initialization",
+        "‚úÖ Added fallback content when Chart.js fails to load",
+        "‚úÖ Fixed async script loading issues",
+        "‚úÖ Added try-catch blocks around chart rendering",
+        "‚úÖ Improved component initialization timing",
+        "‚úÖ Added defensive programming for missing DOM elements",
+        "‚úÖ Enhanced error messages for debugging",
+        "‚úÖ Fixed JavaScript syntax errors"
     ]
     
     logger.info("\n" + "="*60)
@@ -182,28 +182,28 @@ def main():
     # Test module structure
     structure_ok, missing = test_module_structure()
     if not structure_ok:
-        logger.error(f"❌ Module structure test failed. Missing files: {missing}")
+        logger.error(f"‚ùå Module structure test failed. Missing files: {missing}")
         return False
     
     # Test manifest
     if not test_manifest():
-        logger.error("❌ Manifest test failed")
+        logger.error("‚ùå Manifest test failed")
         return False
     
     # Test XML files
     if not test_xml_files():
-        logger.error("❌ XML files test failed")
+        logger.error("‚ùå XML files test failed")
         return False
     
     # Test JavaScript
     if not test_javascript_syntax():
-        logger.error("❌ JavaScript syntax test failed")
+        logger.error("‚ùå JavaScript syntax test failed")
         return False
     
     # Generate fix summary
     generate_fix_summary()
     
-    logger.info("\n🎉 ALL TESTS PASSED! Module should load without white screen issues.")
+    logger.info("\nüéâ ALL TESTS PASSED! Module should load without white screen issues.")
     logger.info("\nNext steps:")
     logger.info("1. Restart your Odoo server")
     logger.info("2. Update the module: python odoo-bin -u crm_executive_dashboard")

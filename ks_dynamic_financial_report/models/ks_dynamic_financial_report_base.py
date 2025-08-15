@@ -2255,7 +2255,7 @@ class ks_dynamic_financial_base(models.Model):
     @api.model
     def ks_fetch_tax_report_data_prefill_record(self, ks_df_informations):
         """ Generator to prefill tax report data, depending on the selected options
-        (use of generic report or not). This function yields account.tax.repôrt.line
+        (use of generic report or not). This function yields account.tax.rep√¥rt.line
         objects if the options required the use of a tax report template (account.tax.report) ;
         else, it yields account.tax records.
         """
