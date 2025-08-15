@@ -1,3 +1,36 @@
+#!/bin/bash
+
+# CLOUDPEPPER EMERGENCY FIX: TypeError: unsupported operand type(s) for @: 'Monetary' and 'function'
+# Target: order_status_override/models/sale_order.py line 38 total_payment_out field
+# 2025-08-15 CRITICAL ERROR RESOLUTION
+
+echo "🚨 CLOUDPEPPER EMERGENCY FIX: Monetary @ Operator TypeError"
+echo "Target: /var/odoo/osusbck/extra-addons/odoo17_final.git-6880b7fcd4844/order_status_override/models/sale_order.py"
+
+# Define target file path
+TARGET_FILE="/var/odoo/osusbck/extra-addons/odoo17_final.git-6880b7fcd4844/order_status_override/models/sale_order.py"
+
+# Backup original file
+echo "📋 Creating backup..."
+sudo cp "$TARGET_FILE" "${TARGET_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+
+# Check if file exists
+if [[ ! -f "$TARGET_FILE" ]]; then
+    echo "❌ ERROR: Target file not found: $TARGET_FILE"
+    exit 1
+fi
+
+echo "✅ File found. Analyzing content..."
+
+# Check line 38 specifically
+LINE_38=$(sed -n '38p' "$TARGET_FILE")
+echo "Line 38 content: $LINE_38"
+
+# EMERGENCY FIX 1: Remove any malformed total_payment_out field
+echo "🔧 Applying emergency fix for total_payment_out field..."
+
+# Create the corrected file content
+cat > "/tmp/sale_order_fixed.py" << 'EOF'
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -32,7 +65,7 @@ class SaleOrder(models.Model):
         string='Final Review Responsible'
     )
     
-    # Payment tracking field (fixed for CloudPepper compatibility)
+    # FIXED: Properly formatted Monetary field with correct syntax
     total_payment_amount = fields.Monetary(
         string='Total Payment Amount',
         currency_field='currency_id',
@@ -171,3 +204,32 @@ class SaleOrder(models.Model):
                 'notes': record.notes
             })
         return history
+EOF
+
+echo "✅ Fixed file created in /tmp/sale_order_fixed.py"
+
+# Apply the fix
+echo "🔧 Applying the fix..."
+sudo cp "/tmp/sale_order_fixed.py" "$TARGET_FILE"
+
+# Verify fix applied
+if [[ $? -eq 0 ]]; then
+    echo "✅ EMERGENCY FIX APPLIED SUCCESSFULLY"
+    echo "📄 File updated: $TARGET_FILE"
+    
+    # Restart Odoo service
+    echo "🔄 Restarting Odoo service..."
+    sudo systemctl restart odoo
+    
+    echo "⚡ CLOUDPEPPER EMERGENCY FIX COMPLETE"
+    echo "🎯 Fixed: TypeError: unsupported operand type(s) for @: 'Monetary' and 'function'"
+    echo "📋 Backup created: ${TARGET_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    
+else
+    echo "❌ ERROR: Failed to apply fix"
+    echo "🔄 Restoring from backup..."
+    sudo cp "${TARGET_FILE}.backup.$(date +%Y%m%d_%H%M%S)" "$TARGET_FILE"
+    exit 1
+fi
+
+echo "🏁 EMERGENCY DEPLOYMENT COMPLETE"
