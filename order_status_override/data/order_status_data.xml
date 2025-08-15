@@ -12,22 +12,22 @@
             <field name="color">1</field>
         </record>
 
-        <!-- Documentation Status -->
+        <!-- Documentation Review Status -->
         <record id="order_status_documentation" model="order.status">
-            <field name="name">Documentation In Progress</field>
-            <field name="code">documentation_progress</field>
+            <field name="name">Documentation Review</field>
+            <field name="code">documentation_review</field>
             <field name="sequence">20</field>
-            <field name="description">Documentation is being prepared</field>
+            <field name="description">Documentation is being reviewed and prepared</field>
             <field name="responsible_type">documentation</field>
             <field name="color">2</field>
             <field name="is_initial" eval="False"/>
             <field name="is_final">false</field>
         </record>
 
-        <!-- Commission Status (is_initial=False is now allowed for multiple records) -->
+        <!-- Commission Calculation Status -->
         <record id="order_status_commission" model="order.status">
             <field name="name">Commission Calculation</field>
-            <field name="code">commission_progress</field>
+            <field name="code">commission_calculation</field>
             <field name="sequence">30</field>
             <field name="description">Commission calculations are being processed</field>
             <field name="responsible_type">commission</field>
@@ -36,52 +36,31 @@
             <field name="is_final">false</field>
         </record>
 
-        <!-- Final Review Status -->
-        <record id="order_status_final_review" model="order.status">
-            <field name="name">Final Review</field>
-            <field name="code">final_review</field>
-            <field name="sequence">40</field>
-            <field name="description">Order is under final review for approval</field>
-            <field name="responsible_type">final_review</field>
-            <field name="color">4</field>
-            <field name="is_initial" eval="False"/>
-            <field name="is_final">false</field>
-        </record>
-
-        <!-- Final Status (Only one should have is_final=True) -->
+        <!-- Approved Status (Final) -->
         <record id="order_status_approved" model="order.status">
-            <field name="name">Approved</field>
+            <field name="name">Approved (Posted as Sales Order)</field>
             <field name="code">approved</field>
-            <field name="sequence">50</field>
-            <field name="description">Order has been approved and ready for posting</field>
-            <field name="is_initial" eval="False"/>
-            <field name="is_final" eval="False"/>
-            <field name="color">10</field>
-            <field name="requires_approval" eval="True"/>
-        </record>
-
-        <!-- Posted Status (Final) -->
-        <record id="order_status_posted" model="order.status">
-            <field name="name">Posted</field>
-            <field name="code">posted</field>
-            <field name="sequence">60</field>
-            <field name="description">Order has been posted and finalized</field>
-            <field name="color">5</field>
-            <field name="is_initial" eval="False"/>
+            <field name="sequence">40</field>
+            <field name="description">Order has been approved and posted as Sales Order</field>
+            <field name="is_initial">false</field>
             <field name="is_final" eval="True"/>
-            <field name="requires_approval" eval="False"/>
+            <field name="color">10</field>
         </record>
 
-        <!-- Rejected Status (Alternative flow) -->
-        <record id="order_status_rejected" model="order.status">
-            <field name="name">Rejected</field>
-            <field name="code">rejected</field>
-            <field name="sequence">99</field>
-            <field name="description">Order has been rejected and requires revision</field>
-            <field name="color">1</field>
-            <field name="is_initial" eval="False"/>
-            <field name="is_final" eval="False"/>
-            <field name="requires_approval" eval="False"/>
+        <!-- Define workflow transitions -->
+        <record id="workflow_draft_to_documentation" model="order.status">
+            <field name="name" ref="order_status_draft"/>
+            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_documentation')])]"/>
+        </record>
+
+        <record id="workflow_documentation_to_commission" model="order.status">
+            <field name="name" ref="order_status_documentation"/>
+            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_commission'), ref('order_status_draft')])]"/>
+        </record>
+
+        <record id="workflow_commission_to_approved" model="order.status">
+            <field name="name" ref="order_status_commission"/>
+            <field name="next_status_ids" eval="[(6, 0, [ref('order_status_approved'), ref('order_status_documentation')])]"/>
         </record>
     </data>
 </odoo>

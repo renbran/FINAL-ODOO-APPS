@@ -1,59 +1,35 @@
 {
-    'name': 'OSUS Enhanced Sales Order Workflow',
-    'version': '17.0.2.0.0',
-    'summary': 'Enterprise Sales Order Workflow with Commission Integration',
+    'name': 'Custom Sales Order Status Workflow',
+    'version': '17.0',
+    'summary': 'Custom status bar workflow for Sales Orders',
     'description': '''
-        OSUS Enhanced Sales Order Workflow Management System
+        This module adds a custom status bar workflow to Sales Orders with the following stages:
+        - Draft (initial stage)
+        - Documentation In-progress
+        - Commission Calculation In-progress
+        - Final Review
+        - Approved
         
-        Core Workflow: Draft -> Documentation -> Commission Calculation -> Approved -> Post
-        
-        Key Features:
-        - Modern UI/UX with OSUS branding (#800020, white, gold)
-        - Seamless integration with commission_ax for commission calculations
-        - Mobile-responsive design for desktop and mobile users
-        - Advanced workflow automation with proper access controls
-        - Real-time deal summaries and commission tracking
-        - Digital signatures and approval workflows
-        - Comprehensive audit trails and notifications
-        - Performance-optimized status transitions
-        
-        Technical Excellence:
-        - Enterprise-grade error handling and logging
-        - Scalable architecture with proper inheritance
-        - RESTful API endpoints for external integrations
-        - Advanced reporting and analytics
-        - Multi-user collaboration features
-        
-        Transform your sales process with this professional, scalable solution
-        designed for modern business workflows.
+        Features:
+        - Each stage can be assigned to a specific user
+        - Activities are created automatically when moving to a new stage
+        - Final review stage has options to reject or approve
+        - Rejection returns the order to draft stage
     ''',
-    'category': 'Sales/Workflow',
-    'author': 'OSUS Properties Development Team',
-    'website': 'https://www.osusproperties.com',
-    'depends': ['sale', 'mail', 'commission_ax', 'account', 'web'],
+    'category': 'Sales',
+    'author': 'Your Company',
+    'website': 'https://www.yourcompany.com',
+    'depends': ['sale', 'mail', 'commission_ax'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
-        'data/email_templates.xml',
-        'views/assets.xml',
         'views/order_status_views.xml',
-        'views/order_views_enhanced.xml',
-        'views/commission_integration_views.xml',
-        'views/dashboard_views.xml',
-        'views/email_template_views.xml',
         'views/order_views_assignment.xml',
+        'views/email_template_views.xml',
+        'views/report_wizard_views.xml',
+        'reports/order_status_reports.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'order_status_override/static/src/scss/osus_branding.scss',
-            'order_status_override/static/src/scss/workflow_components.scss',
-            'order_status_override/static/src/scss/mobile_responsive.scss',
-            'order_status_override/static/src/js/workflow_manager_minimal.js',
-            'order_status_override/static/src/js/commission_calculator_minimal.js',
-            'order_status_override/static/src/js/status_dashboard_minimal.js',
-        ],
-    },
     'installable': True,
     'application': False,
     'auto_install': False,

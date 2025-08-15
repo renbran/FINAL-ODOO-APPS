@@ -7,65 +7,53 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <!-- Add status bar at the top -->
-                <xpath expr="//field[@name='state']" position="before">
-                    <field name="custom_status_id" widget="statusbar" options="{'clickable': '1'}"/>
+                <!-- Hide default status bar and replace with custom one -->
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
-                
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="custom_status_id" widget="statusbar" options="{'clickable': '1'}" statusbar_visible="draft,documentation_review,commission_calculation,approved"/>
+                </xpath>
+
                 <!-- Add status change button in header -->
                 <xpath expr="//header" position="inside">
-                    <button name="action_change_status" 
-                            string="Change Status" 
-                            type="object" 
-                            class="btn-primary"
-                            invisible="state in ['sale', 'done', 'cancel']"/>
-                    
-                    <button name="action_submit_for_review" 
-                            string="Submit for Review" 
-                            type="object" 
-                            class="btn-info"
-                            invisible="custom_status_id.code != 'commission_progress' or state in ['sale', 'done', 'cancel']"/>
-                    
-                    <button name="action_approve_order" 
-                            string="✓ Approve Order" 
-                            type="object" 
-                            class="btn-success"
-                            invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
-                            confirm="Are you sure you want to approve this order? This action cannot be undone."/>
-                    
-                    <button name="action_reject_order" 
-                            string="✗ Reject Order" 
-                            type="object" 
-                            class="btn-danger"
-                            invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
-                            confirm="Are you sure you want to reject this order? It will be returned to draft status."/>
-                    
-                    <button name="action_return_to_previous" 
-                            string="Return to Previous Stage" 
-                            type="object" 
-                            class="btn-warning"
-                            invisible="custom_status_id.code in ['draft', 'approved'] or state in ['sale', 'done', 'cancel']"
-                            confirm="Return this order to the previous stage?"/>
-                    
-                    <button name="action_request_documentation" 
-                            string="Start Documentation" 
-                            type="object" 
-                            class="btn-secondary"
-                            invisible="custom_status_id.code != 'draft' or state in ['sale', 'done', 'cancel']"/>
+                    <button name="action_change_status" string="Change Status" type="object" class="btn-primary" invisible="state in ['sale', 'done', 'cancel']"/>
+
+                    <button name="action_start_documentation_review" string="Start Documentation Review" type="object" class="btn-info" invisible="custom_status_id.code != 'draft' or state in ['sale', 'done', 'cancel']"/>
+
+                    <button name="action_start_commission_calculation" string="Start Commission Calculation" type="object" class="btn-warning" invisible="custom_status_id.code != 'documentation_review' or state in ['sale', 'done', 'cancel']"/>
+
+                    <button name="action_approve_and_post_order" string="✓ Approve &amp; Post Order" type="object" class="btn-success" invisible="custom_status_id.code != 'commission_calculation' or state in ['sale', 'done', 'cancel']" confirm="Are you sure you want to approve and post this order? This action will confirm the sales order."/>
+
+                    <button name="action_reject_order" string="✗ Reject Order" type="object" class="btn-danger" invisible="custom_status_id.code in ['draft', 'approved'] or state in ['sale', 'done', 'cancel']" confirm="Are you sure you want to reject this order? It will be returned to draft status."/>
+
+                    <button name="action_return_to_previous" string="Return to Previous Stage" type="object" class="btn-warning" invisible="custom_status_id.code in ['draft', 'approved'] or state in ['sale', 'done', 'cancel']" confirm="Return this order to the previous stage?"/>
                 </xpath>
-                
+
+                <!-- Add Smart Buttons Section -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_order_reports" type="object" class="oe_stat_button" icon="fa-file-pdf-o" invisible="custom_status_id.code == 'draft'">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Order</span>
+                            <span class="o_stat_text">Reports</span>
+                        </div>
+                    </button>
+                </xpath>
+
                 <!-- Add Status Assignment Tab -->
                 <xpath expr="//notebook" position="inside">
                     <page string="Workflow Assignment" name="workflow_assignment">
                         <div class="row">
                             <div class="col-md-6">
                                 <group string="Stage Assignments">
-                                    <field name="documentation_user_id" 
-                                           required="custom_status_id.code in ['documentation_progress']"/>
-                                    <field name="commission_user_id"
-                                           required="custom_status_id.code in ['commission_progress']"/>
-                                    <field name="final_review_user_id"
-                                           required="custom_status_id.code in ['final_review']"/>
+                                    <field name="documentation_user_id" required="custom_status_id.code in ['documentation_review']"/>
+                                    <field name="commission_user_id" required="custom_status_id.code in ['commission_calculation']"/>
+                                    <field name="final_review_user_id" required="custom_status_id.code in ['approved']"/>
+                                </group>
+
+                                <group string="Commission Summary" invisible="custom_status_id.code == 'draft'">
+                                    <field name="total_commission_amount" readonly="1"/>
+                                    <field name="total_payment_out" readonly="1"/>
                                 </group>
                             </div>
                             <div class="col-md-6">
@@ -75,28 +63,46 @@
                                 </group>
                                 <group string="Quick Actions" invisible="state in ['sale', 'done', 'cancel']">
                                     <div class="d-flex flex-column gap-2">
-                                        <button name="action_request_documentation" 
-                                                string="Start Documentation Process" 
-                                                type="object" 
-                                                class="btn btn-info btn-sm"
-                                                invisible="custom_status_id.code != 'draft'"/>
-                                        
-                                        <button name="action_submit_for_review" 
-                                                string="Submit for Final Review" 
-                                                type="object" 
-                                                class="btn btn-warning btn-sm"
-                                                invisible="custom_status_id.code != 'commission_progress'"/>
-                                        
-                                        <button name="action_return_to_previous" 
-                                                string="Return to Previous Stage" 
-                                                type="object" 
-                                                class="btn btn-secondary btn-sm"
-                                                invisible="custom_status_id.code in ['draft', 'approved']"/>
+                                        <button name="action_start_documentation_review" string="Start Documentation Review" type="object" class="btn btn-info btn-sm" invisible="custom_status_id.code != 'draft'"/>
+
+                                        <button name="action_start_commission_calculation" string="Start Commission Calculation" type="object" class="btn btn-warning btn-sm" invisible="custom_status_id.code != 'documentation_review'"/>
+
+                                        <button name="action_approve_and_post_order" string="Approve &amp; Post Order" type="object" class="btn btn-success btn-sm" invisible="custom_status_id.code != 'commission_calculation'"/>
+
+                                        <button name="action_return_to_previous" string="Return to Previous Stage" type="object" class="btn btn-secondary btn-sm" invisible="custom_status_id.code in ['draft', 'approved']"/>
                                     </div>
                                 </group>
                             </div>
                         </div>
-                        
+
+                        <!-- Related Documents Section -->
+                        <group string="Related Documents" invisible="custom_status_id.code == 'draft'">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="related_purchase_orders" string="Related Purchase Orders"/>
+                                    <field name="related_purchase_orders" nolabel="1" readonly="1">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="partner_id"/>
+                                            <field name="amount_total"/>
+                                            <field name="state"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="related_vendor_bills" string="Related Vendor Bills"/>
+                                    <field name="related_vendor_bills" nolabel="1" readonly="1">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="partner_id"/>
+                                            <field name="amount_total"/>
+                                            <field name="state"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                            </div>
+                        </group>
+
                         <group string="Status History">
                             <field name="custom_status_history_ids" nolabel="1" readonly="1">
                                 <tree decoration-info="status_id.is_initial" decoration-success="status_id.is_final">
@@ -111,7 +117,7 @@
                 </xpath>
             </field>
         </record>
-        
+
         <!-- Enhanced Status Change Wizard Form -->
         <record id="view_order_status_change_wizard" model="ir.ui.view">
             <field name="name">order.status.change.wizard.form</field>
@@ -132,48 +138,38 @@
                                 <field name="order_id" readonly="1" class="oe_inline"/>
                             </h2>
                         </div>
-                        
+
                         <group>
                             <group string="Status Transition">
                                 <field name="current_status_id" readonly="1"/>
                                 <field name="new_status_id" options="{'no_create': True}"/>
                             </group>
                         </group>
-                        
+
                         <!-- Dynamic Assignment Section -->
-                        <group string="User Assignments" 
-                               invisible="requires_documentation_user == False and requires_commission_user == False and requires_review_user == False">>
+                        <group string="User Assignments" invisible="requires_documentation_user == False and requires_commission_user == False and requires_review_user == False">
                             <group>
-                                <field name="documentation_user_id" 
-                                       invisible="requires_documentation_user == False" 
-                                       required="requires_documentation_user == True"
-                                       string="Assign Documentation User"/>
-                                <field name="commission_user_id" 
-                                       invisible="requires_commission_user == False" 
-                                       required="requires_commission_user == True"
-                                       string="Assign Commission User"/>
-                                <field name="final_review_user_id" 
-                                       invisible="requires_review_user == False" 
-                                       required="requires_review_user == True"
-                                       string="Assign Review User"/>
+                                <field name="documentation_user_id" invisible="requires_documentation_user == False" required="requires_documentation_user == True" string="Assign Documentation User"/>
+                                <field name="commission_user_id" invisible="requires_commission_user == False" required="requires_commission_user == True" string="Assign Commission User"/>
+                                <field name="final_review_user_id" invisible="requires_review_user == False" required="requires_review_user == True" string="Assign Review User"/>
                             </group>
                         </group>
-                        
+
                         <group string="Notes">
                             <field name="notes" nolabel="1" placeholder="Add notes about this status change..."/>
                         </group>
-                        
+
                         <!-- Quick Status Info -->
-                        <div class="alert alert-info" role="alert" invisible="new_status_id == False">>
+                        <div class="alert alert-info" role="alert" invisible="new_status_id == False">
                             <strong>Status Info:</strong>
                             <ul class="mb-0">
-                                <li invisible="requires_documentation_user == False">>
+                                <li invisible="requires_documentation_user == False">
                                     This status requires documentation preparation
                                 </li>
-                                <li invisible="requires_commission_user == False">>
+                                <li invisible="requires_commission_user == False">
                                     This status requires commission calculations
                                 </li>
-                                <li invisible="requires_review_user == False">>
+                                <li invisible="requires_review_user == False">
                                     This status requires final review and approval
                                 </li>
                             </ul>
