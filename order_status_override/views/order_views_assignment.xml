@@ -150,134 +150,33 @@
             </field>
         </record>
 
-        <!-- Order Status Model Views -->
-        <record id="view_order_status_form" model="ir.ui.view">
-            <field name="name">order.status.form</field>
-            <field name="model">order.status</field>
-            <field name="arch" type="xml">
-                <form string="Order Status">
-                    <sheet>
-                        <div class="oe_title">
-                            <h1>
-                                <field name="name"/>
-                            </h1>
-                        </div>
-
-                        <group>
-                            <group>
-                                <field name="code"/>
-                                <field name="sequence"/>
-                                <field name="color"/>
-                                <field name="is_initial"/>
-                                <field name="is_final"/>
-                            </group>
-                            <group>
-                                <field name="responsible_type"/>
-                                <field name="active"/>
-                            </group>
-                        </group>
-
-                        <group string="Description">
-                            <field name="description" nolabel="1"/>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <record id="view_order_status_tree" model="ir.ui.view">
-            <field name="name">order.status.tree</field>
-            <field name="model">order.status</field>
-            <field name="arch" type="xml">
-                <tree string="Order Statuses" default_order="sequence">
-                    <field name="sequence"/>
-                    <field name="name"/>
-                    <field name="code"/>
-                    <field name="responsible_type"/>
-                    <field name="is_initial"/>
-                    <field name="is_final"/>
-                    <field name="active"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- Order Status History View -->
-        <record id="view_order_status_history_tree" model="ir.ui.view">
-            <field name="name">order.status.history.tree</field>
-            <field name="model">order.status.history</field>
-            <field name="arch" type="xml">
-                <tree string="Order Status History" create="false" delete="false" edit="false">
-                    <field name="order_id"/>
-                    <field name="status_id"/>
-                    <field name="previous_status_id"/>
-                    <field name="create_date"/>
-                    <field name="create_uid"/>
-                    <field name="notes"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- Sales Order Filters for Workflow -->
+        <!-- Enhanced Search View -->
         <record id="view_sales_order_filter_enhanced" model="ir.ui.view">
-            <field name="name">sale.order.select.enhanced</field>
+            <field name="name">sale.order.search.enhanced</field>
             <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
             <field name="arch" type="xml">
-                <filter name="my_quotation" position="after">
-                    <separator/>
-                    <filter string="Draft Status" name="status_draft" domain="[('custom_status_id.code', '=', 'draft')]"/>
-                    <filter string="Documentation Review" name="status_documentation" domain="[('custom_status_id.code', '=', 'documentation_progress')]"/>
-                    <filter string="Commission Calculation" name="status_commission" domain="[('custom_status_id.code', '=', 'commission_calculation')]"/>
-                    <filter string="Final Review" name="status_final_review" domain="[('custom_status_id.code', '=', 'final_review')]"/>
-                    <filter string="Approved" name="status_approved" domain="[('custom_status_id.code', '=', 'approved')]"/>
-                    <separator/>
-                    <filter string="My Assigned Orders" name="my_assigned" domain="['|', '|', ('documentation_user_id', '=', uid), ('commission_user_id', '=', uid), ('final_review_user_id', '=', uid)]"/>
-                </filter>
-
-                <group expand="0" string="Group By" position="inside">
-                    <filter string="Workflow Status" name="group_workflow_status" context="{'group_by': 'custom_status_id'}"/>
-                    <filter string="Documentation Responsible" name="group_documentation_user" context="{'group_by': 'documentation_user_id'}"/>
-                    <filter string="Commission Responsible" name="group_commission_user" context="{'group_by': 'commission_user_id'}"/>
-                    <filter string="Review Responsible" name="group_review_user" context="{'group_by': 'final_review_user_id'}"/>
-                </group>
-
-                <field name="partner_id" position="after">
+                <field name="name" position="after">
                     <field name="custom_status_id"/>
                     <field name="documentation_user_id"/>
                     <field name="commission_user_id"/>
                     <field name="final_review_user_id"/>
                 </field>
+                <filter name="my_quotation" position="after">
+                    <separator/>
+                    <filter name="draft_status" string="Draft Orders" domain="[('custom_status_id.name', '=', 'Draft')]"/>
+                    <filter name="documentation_pending" string="Documentation Pending" domain="[('custom_status_id.name', '=', 'Documentation In-progress')]"/>
+                    <filter name="commission_pending" string="Commission Pending" domain="[('custom_status_id.name', '=', 'Commission Calculation In-progress')]"/>
+                    <filter name="review_pending" string="Review Pending" domain="[('custom_status_id.name', '=', 'Final Review')]"/>
+                    <filter name="approved_orders" string="Approved Orders" domain="[('custom_status_id.name', '=', 'Approved')]"/>
+                </filter>
+                <group name="group_by" position="inside">
+                    <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
+                    <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
+                    <filter name="group_by_commission_user" string="Commission User" context="{'group_by': 'commission_user_id'}"/>
+                </group>
             </field>
         </record>
-
-        <!-- Enhanced Menu Items -->
-        <menuitem id="menu_order_status_config" name="Order Status Configuration" parent="sale.sale_menu_root" sequence="100"/>
-
-        <!-- Order Status Actions -->
-        <record id="action_order_status" model="ir.actions.act_window">
-            <field name="name">Order Statuses</field>
-            <field name="res_model">order.status</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create your first order status
-                </p>
-                <p>
-                    Define the workflow stages for your sales orders with custom statuses.
-                </p>
-            </field>
-        </record>
-
-        <record id="action_order_status_history" model="ir.actions.act_window">
-            <field name="name">Order Status History</field>
-            <field name="res_model">order.status.history</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <!-- Update menu actions -->
-        <menuitem id="menu_order_status_master" name="Order Statuses" parent="menu_order_status_config" sequence="1" action="action_order_status"/>
-
-        <menuitem id="menu_order_status_history" name="Status History" parent="menu_order_status_config" sequence="2" action="action_order_status_history"/>
 
     </data>
 </odoo>
