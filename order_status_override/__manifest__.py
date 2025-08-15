@@ -5,9 +5,9 @@
     'description': '''
         OSUS Enhanced Sales Order Workflow Management System
         
-        🎯 Core Workflow: Draft → Documentation → Commission Calculation → Approved → Post
+        Core Workflow: Draft -> Documentation -> Commission Calculation -> Approved -> Post
         
-        ✨ Key Features:
+        Key Features:
         - Modern UI/UX with OSUS branding (#800020, white, gold)
         - Seamless integration with commission_ax for commission calculations
         - Mobile-responsive design for desktop and mobile users
@@ -17,7 +17,7 @@
         - Comprehensive audit trails and notifications
         - Performance-optimized status transitions
         
-        🔧 Technical Excellence:
+        Technical Excellence:
         - Enterprise-grade error handling and logging
         - Scalable architecture with proper inheritance
         - RESTful API endpoints for external integrations

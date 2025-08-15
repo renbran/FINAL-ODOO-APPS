@@ -54,6 +54,66 @@ class SaleOrder(models.Model):
         help='Total commission amount from commission_ax integration'
     )
     
+    # Commission Related Fields for commission_ax integration
+    # External Commission Totals (computed from commission_ax fields)
+    total_external_commission_amount = fields.Monetary(
+        string='Total External Commission',
+        currency_field='currency_id',
+        compute='_compute_commission_totals',
+        store=True,
+        help='Total external commission from commission_ax integration'
+    )
+    total_internal_commission_amount = fields.Monetary(
+        string='Total Internal Commission',
+        currency_field='currency_id', 
+        compute='_compute_commission_totals',
+        store=True,
+        help='Total internal commission from commission_ax integration'
+    )
+    
+    # Commission Management Fields
+    commission_percentage = fields.Float(
+        string='Commission Percentage',
+        default=0.0,
+        help='Overall commission percentage for this order'
+    )
+    commission_external = fields.Boolean(
+        string='Has External Commission',
+        compute='_compute_commission_flags',
+        help='Whether this order has external commission'
+    )
+    commission_notes = fields.Text(
+        string='Commission Notes',
+        help='Additional notes about commission calculation'
+    )
+    commission_approved = fields.Boolean(
+        string='Commission Approved',
+        default=False,
+        help='Whether commission has been approved'
+    )
+    commission_calculated_date = fields.Datetime(
+        string='Commission Calculated Date',
+        help='Date when commission was calculated'
+    )
+    commission_approved_date = fields.Datetime(
+        string='Commission Approved Date',
+        help='Date when commission was approved'
+    )
+    commission_status = fields.Selection([
+        ('draft', 'Draft'),
+        ('calculated', 'Calculated'),
+        ('approved', 'Approved'),
+        ('paid', 'Paid')
+    ], string='Commission Status', default='draft', help='Status of commission processing')
+    commission_calculation_method = fields.Char(
+        string='Calculation Method',
+        help='Method used for commission calculation'
+    )
+    commission_calculation_log = fields.Text(
+        string='Calculation Log',
+        help='Log of commission calculation process'
+    )
+    
     # Deal Summary Fields  
     deal_summary = fields.Text(
         string='Deal Summary',
@@ -101,13 +161,63 @@ class SaleOrder(models.Model):
         help='Total payment amount for this order'
     )
     
-    @api.depends('external_commission_ids', 'internal_commission_ids')
+    @api.depends('total_external_commission_amount', 'total_internal_commission_amount')
     def _compute_total_commission(self):
-        """Compute total commission from commission_ax module"""
+        """Compute total commission from commission_ax module fields"""
         for order in self:
-            total_external = sum(order.external_commission_ids.mapped('amount_fixed'))
-            total_internal = sum(order.internal_commission_ids.mapped('amount_fixed'))
-            order.total_commission_amount = total_external + total_internal
+            # Try to get commission from commission_ax computed fields
+            external_total = 0.0
+            internal_total = 0.0
+            
+            try:
+                # Check if commission_ax fields are available
+                if hasattr(order, 'total_external_commission_amount'):
+                    external_total = order.total_external_commission_amount or 0.0
+                if hasattr(order, 'total_internal_commission_amount'):
+                    internal_total = order.total_internal_commission_amount or 0.0
+                    
+            except Exception as e:
+                _logger.warning(f"Commission calculation fallback for order {order.name}: {e}")
+                external_total = 0.0
+                internal_total = 0.0
+                
+            order.total_commission_amount = external_total + internal_total
+    
+    @api.depends('broker_amount', 'referrer_amount', 'cashback_amount', 'other_external_amount',
+                 'agent1_amount', 'agent2_amount', 'manager_amount', 'director_amount',
+                 'salesperson_commission', 'manager_commission', 'second_agent_commission', 'director_commission')
+    def _compute_commission_totals(self):
+        """Compute commission totals from commission_ax individual fields"""
+        for order in self:
+            # External commissions from commission_ax
+            external_total = 0.0
+            internal_total = 0.0
+            
+            try:
+                # External commission fields from commission_ax
+                external_fields = ['broker_amount', 'referrer_amount', 'cashback_amount', 'other_external_amount']
+                for field_name in external_fields:
+                    if hasattr(order, field_name):
+                        external_total += getattr(order, field_name, 0.0) or 0.0
+                
+                # Internal commission fields from commission_ax  
+                internal_fields = ['agent1_amount', 'agent2_amount', 'manager_amount', 'director_amount',
+                                 'salesperson_commission', 'manager_commission', 'second_agent_commission', 'director_commission']
+                for field_name in internal_fields:
+                    if hasattr(order, field_name):
+                        internal_total += getattr(order, field_name, 0.0) or 0.0
+                        
+            except Exception as e:
+                _logger.warning(f"Commission totals calculation error for order {order.name}: {e}")
+                
+            order.total_external_commission_amount = external_total
+            order.total_internal_commission_amount = internal_total
+    
+    @api.depends('total_external_commission_amount')
+    def _compute_commission_flags(self):
+        """Compute commission flags"""
+        for order in self:
+            order.commission_external = (order.total_external_commission_amount or 0.0) > 0.0
     
     @api.depends('custom_status_id')
     def _compute_workflow_progress(self):
@@ -640,23 +750,21 @@ class SaleOrder(models.Model):
         """Initialize commission data from commission_ax module"""
         self.ensure_one()
         
-        # Create default external commission if none exist
-        if not self.external_commission_ids:
-            self.env['sale.order.external.commission'].create({
-                'order_id': self.id,
-                'commission_group': 'broker',
-                'calculation_method': 'percentage',
-                'rate_amount': 0.0,
-            })
+        # Initialize commission status and calculation method
+        if not self.commission_calculation_method:
+            self.commission_calculation_method = 'commission_ax_integration'
         
-        # Create default internal commission if none exist  
-        if not self.internal_commission_ids:
-            self.env['sale.order.internal.commission'].create({
-                'order_id': self.id,
-                'commission_group': 'agent_1',
-                'calculation_method': 'percentage', 
-                'rate_amount': 0.0,
-            })
+        # Set initial commission status if not set
+        if not self.commission_status or self.commission_status == 'draft':
+            self.commission_status = 'calculated'
+            self.commission_calculated_date = fields.Datetime.now()
+            
+        # Log initialization
+        log_msg = f"Commission data initialized for order {self.name}"
+        if not self.commission_calculation_log:
+            self.commission_calculation_log = log_msg
+        else:
+            self.commission_calculation_log += f"\n{fields.Datetime.now()}: {log_msg}"
     
     def _is_documentation_complete(self):
         """Check if documentation is complete"""
@@ -793,29 +901,57 @@ class SaleOrder(models.Model):
         if not order.exists():
             return {'success': False, 'message': 'Order not found'}
         
-        # Get commission data from commission_ax module
+        # Get commission data from commission_ax module individual fields
         external_commissions = []
         internal_commissions = []
         
-        if hasattr(order, 'external_commission_ids'):
-            external_commissions = [{
-                'id': comm.id,
-                'commission_group': comm.commission_group,
-                'calculation_method': comm.calculation_method,
-                'rate_amount': comm.rate_amount,
-                'amount_fixed': comm.amount_fixed,
-                'partner_name': comm.partner_id.name if comm.partner_id else '',
-            } for comm in order.external_commission_ids]
+        # External commission fields from commission_ax
+        external_fields = [
+            ('broker_amount', 'broker_partner_id', 'Broker'),
+            ('referrer_amount', 'referrer_partner_id', 'Referrer'),
+            ('cashback_amount', 'cashback_partner_id', 'Cashback'),
+            ('other_external_amount', 'other_external_partner_id', 'Other External')
+        ]
         
-        if hasattr(order, 'internal_commission_ids'):
-            internal_commissions = [{
-                'id': comm.id,
-                'commission_group': comm.commission_group,
-                'calculation_method': comm.calculation_method,
-                'rate_amount': comm.rate_amount,
-                'amount_fixed': comm.amount_fixed,
-                'user_name': comm.user_id.name if comm.user_id else '',
-            } for comm in order.internal_commission_ids]
+        for amount_field, partner_field, label in external_fields:
+            if hasattr(order, amount_field) and getattr(order, amount_field, 0.0) > 0:
+                partner_name = ''
+                if hasattr(order, partner_field):
+                    partner = getattr(order, partner_field)
+                    partner_name = partner.name if partner else ''
+                
+                external_commissions.append({
+                    'commission_group': label.lower().replace(' ', '_'),
+                    'amount_fixed': getattr(order, amount_field, 0.0),
+                    'partner_name': partner_name,
+                    'label': label
+                })
+        
+        # Internal commission fields from commission_ax  
+        internal_fields = [
+            ('agent1_amount', 'agent1_partner_id', 'Agent 1'),
+            ('agent2_amount', 'agent2_partner_id', 'Agent 2'),
+            ('manager_amount', 'manager_partner_id', 'Manager'),
+            ('director_amount', 'director_partner_id', 'Director'),
+            ('salesperson_commission', 'consultant_id', 'Consultant'),
+            ('manager_commission', 'manager_id', 'Manager'),
+            ('second_agent_commission', 'second_agent_id', 'Second Agent'),
+            ('director_commission', 'director_id', 'Director')
+        ]
+        
+        for amount_field, partner_field, label in internal_fields:
+            if hasattr(order, amount_field) and getattr(order, amount_field, 0.0) > 0:
+                partner_name = ''
+                if hasattr(order, partner_field):
+                    partner = getattr(order, partner_field)
+                    partner_name = partner.name if partner else ''
+                
+                internal_commissions.append({
+                    'commission_group': label.lower().replace(' ', '_'),
+                    'amount_fixed': getattr(order, amount_field, 0.0),
+                    'partner_name': partner_name,
+                    'label': label
+                })
         
         total_external = sum(comm['amount_fixed'] for comm in external_commissions)
         total_internal = sum(comm['amount_fixed'] for comm in internal_commissions)
