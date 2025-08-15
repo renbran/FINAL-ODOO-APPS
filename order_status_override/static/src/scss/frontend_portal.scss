@@ -1,0 +1,66 @@
+/* Frontend Portal Styles for Order Status Override */
+
+.o_portal_order_status {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.o_portal_order_status h3 {
+    color: #800020;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.o_portal_status_badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.o_portal_status_badge.draft {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.o_portal_status_badge.documentation {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.o_portal_status_badge.commission {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.o_portal_status_badge.approved {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.o_portal_status_badge.posted {
+    background-color: #e2e3e5;
+    color: #41464b;
+    border: 1px solid #ced4da;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .o_portal_order_status {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .o_portal_status_badge {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}

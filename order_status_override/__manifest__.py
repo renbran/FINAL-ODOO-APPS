@@ -41,6 +41,8 @@
         'views/order_views_enhanced.xml',
         'views/commission_integration_views.xml',
         'views/dashboard_views.xml',
+        'views/email_template_views.xml',
+        'views/order_views_assignment.xml',
     ],
     'assets': {
         'web.assets_backend': [
