@@ -52,11 +52,36 @@
         <record id="order_status_approved" model="order.status">
             <field name="name">Approved</field>
             <field name="code">approved</field>
-            <field name="sequence">100</field>
-            <field name="description">Order has been approved</field>
-            <field name="is_initial">false</field>
-            <field name="is_final" eval="True"/>
+            <field name="sequence">50</field>
+            <field name="description">Order has been approved and ready for posting</field>
+            <field name="is_initial" eval="False"/>
+            <field name="is_final" eval="False"/>
             <field name="color">10</field>
+            <field name="requires_approval" eval="True"/>
+        </record>
+
+        <!-- Posted Status (Final) -->
+        <record id="order_status_posted" model="order.status">
+            <field name="name">Posted</field>
+            <field name="code">posted</field>
+            <field name="sequence">60</field>
+            <field name="description">Order has been posted and finalized</field>
+            <field name="color">5</field>
+            <field name="is_initial" eval="False"/>
+            <field name="is_final" eval="True"/>
+            <field name="requires_approval" eval="False"/>
+        </record>
+
+        <!-- Rejected Status (Alternative flow) -->
+        <record id="order_status_rejected" model="order.status">
+            <field name="name">Rejected</field>
+            <field name="code">rejected</field>
+            <field name="sequence">99</field>
+            <field name="description">Order has been rejected and requires revision</field>
+            <field name="color">1</field>
+            <field name="is_initial" eval="False"/>
+            <field name="is_final" eval="False"/>
+            <field name="requires_approval" eval="False"/>
         </record>
     </data>
 </odoo>

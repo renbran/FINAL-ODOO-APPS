@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Enhanced Sale Order Form View with OSUS Branding -->
+        <record id="view_order_form_enhanced_workflow" model="ir.ui.view">
+            <field name="name">sale.order.form.enhanced.workflow</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add OSUS Branding Header -->
+                <xpath expr="//form" position="before">
+                    <div class="osus-branding-header">
+                        <div class="osus-logo">
+                            <div class="osus-icon">O</div>
+                            <div class="osus-title">OSUS Enhanced Sales Workflow</div>
+                        </div>
+                    </div>
+                </xpath>
+                
+                <!-- Enhanced Status Bar -->
+                <xpath expr="//field[@name='state']" position="replace">
+                    <div class="osus-workflow-section">
+                        <field name="custom_status_id" 
+                               widget="statusbar" 
+                               options="{'clickable': '1', 'fold_field': 'fold'}"
+                               class="osus-status-bar"/>
+                        
+                        <!-- Workflow Progress Visualization -->
+                        <div class="osus-workflow-progress">
+                            <div class="workflow-steps">
+                                <div class="workflow-step" data-status="draft">
+                                    <div class="step-circle">1</div>
+                                    <div class="step-label">Draft</div>
+                                </div>
+                                <div class="workflow-step" data-status="documentation_progress">
+                                    <div class="step-circle">2</div>
+                                    <div class="step-label">Documentation</div>
+                                </div>
+                                <div class="workflow-step" data-status="commission_progress">
+                                    <div class="step-circle">3</div>
+                                    <div class="step-label">Commission</div>
+                                </div>
+                                <div class="workflow-step" data-status="final_review">
+                                    <div class="step-circle">4</div>
+                                    <div class="step-label">Review</div>
+                                </div>
+                                <div class="workflow-step" data-status="approved">
+                                    <div class="step-circle">5</div>
+                                    <div class="step-label">Approved</div>
+                                </div>
+                                <div class="workflow-step" data-status="posted">
+                                    <div class="step-circle">6</div>
+                                    <div class="step-label">Posted</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+                
+                <!-- Enhanced Action Buttons -->
+                <xpath expr="//header" position="inside">
+                    <div class="osus-workflow-actions">
+                        <div class="action-header">
+                            <div class="action-icon">⚡</div>
+                            <div class="action-title">Workflow Actions</div>
+                        </div>
+                        <div class="action-buttons">
+                            <!-- Draft Stage Actions -->
+                            <button name="action_request_documentation" 
+                                    string="Start Documentation" 
+                                    type="object" 
+                                    class="btn btn-osus-primary workflow-action-btn"
+                                    data-action="action_request_documentation"
+                                    invisible="custom_status_id.code != 'draft' or state in ['sale', 'done', 'cancel']"/>
+                            
+                            <!-- Documentation Stage Actions -->
+                            <button name="action_start_commission_calculation" 
+                                    string="Start Commission Calculation" 
+                                    type="object" 
+                                    class="btn btn-osus-primary workflow-action-btn"
+                                    data-action="action_start_commission_calculation"
+                                    invisible="custom_status_id.code != 'documentation_progress' or state in ['sale', 'done', 'cancel']"/>
+                            
+                            <!-- Commission Stage Actions -->
+                            <button name="action_submit_for_review" 
+                                    string="Submit for Review" 
+                                    type="object" 
+                                    class="btn btn-osus-primary workflow-action-btn"
+                                    data-action="action_submit_for_review"
+                                    invisible="custom_status_id.code != 'commission_progress' or state in ['sale', 'done', 'cancel']"/>
+                            
+                            <!-- Review Stage Actions -->
+                            <button name="action_approve_order" 
+                                    string="✓ Approve Order" 
+                                    type="object" 
+                                    class="btn btn-osus-primary workflow-action-btn"
+                                    data-action="action_approve_order"
+                                    data-confirm="true"
+                                    invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
+                                    confirm="Are you sure you want to approve this order?"/>
+                            
+                            <button name="action_reject_order" 
+                                    string="✗ Reject Order" 
+                                    type="object" 
+                                    class="btn btn-danger workflow-action-btn"
+                                    data-action="action_reject_order"
+                                    data-confirm="true"
+                                    invisible="custom_status_id.code != 'final_review' or state in ['sale', 'done', 'cancel']"
+                                    confirm="Are you sure you want to reject this order?"/>
+                            
+                            <!-- Approved Stage Actions -->
+                            <button name="action_post_order" 
+                                    string="📋 Post Order" 
+                                    type="object" 
+                                    class="btn btn-osus-gold workflow-action-btn"
+                                    data-action="action_post_order"
+                                    data-confirm="true"
+                                    invisible="custom_status_id.code != 'approved' or state in ['sale', 'done', 'cancel']"
+                                    confirm="Post this order? This action cannot be undone."/>
+                            
+                            <!-- Universal Actions -->
+                            <button name="action_return_to_previous" 
+                                    string="⬅ Return to Previous" 
+                                    type="object" 
+                                    class="btn btn-osus-secondary workflow-action-btn"
+                                    data-action="action_return_to_previous"
+                                    data-confirm="true"
+                                    invisible="custom_status_id.code in ['draft', 'posted'] or state in ['sale', 'done', 'cancel']"
+                                    confirm="Return this order to the previous stage?"/>
+                            
+                            <button name="action_change_status" 
+                                    string="⚙ Advanced Status Change" 
+                                    type="object" 
+                                    class="btn btn-osus-secondary workflow-action-btn"
+                                    data-action="action_change_status"
+                                    invisible="state in ['sale', 'done', 'cancel']"/>
+                        </div>
+                    </div>
+                </xpath>
+                
+                <!-- Enhanced Notebook with Workflow Tabs -->
+                <xpath expr="//notebook" position="inside">
+                    
+                    <!-- Deal Summary Tab -->
+                    <page string="📊 Deal Summary" name="deal_summary" class="osus-deal-summary-tab">
+                        <div class="osus-deal-summary">
+                            <div class="summary-grid">
+                                <div class="summary-metric">
+                                    <span class="metric-value"><field name="amount_total" widget="monetary"/></span>
+                                    <div class="metric-label">Order Total</div>
+                                </div>
+                                <div class="summary-metric">
+                                    <span class="metric-value"><field name="total_commission_amount" widget="monetary"/></span>
+                                    <div class="metric-label">Commission</div>
+                                </div>
+                                <div class="summary-metric">
+                                    <span class="metric-value"><field name="workflow_progress"/>%</span>
+                                    <div class="metric-label">Progress</div>
+                                </div>
+                                <div class="summary-metric">
+                                    <span class="metric-value"><field name="custom_status_id" readonly="1"/></span>
+                                    <div class="metric-label">Current Status</div>
+                                </div>
+                                <div class="summary-metric">
+                                    <span class="metric-value"><field name="user_id" readonly="1"/></span>
+                                    <div class="metric-label">Salesperson</div>
+                                </div>
+                            </div>
+                            
+                            <group string="Deal Information" class="osus-deal-info">
+                                <field name="deal_summary" widget="text" readonly="1"/>
+                            </group>
+                        </div>
+                    </page>
+                    
+                    <!-- Workflow Assignment Tab -->
+                    <page string="👥 Workflow Assignment" name="workflow_assignment" class="osus-assignment-tab">
+                        <div class="osus-assignment-panel">
+                            <div class="assignment-header">
+                                <span class="header-icon">👥</span>
+                                Stage Assignments
+                            </div>
+                            <div class="assignment-body">
+                                <div class="assignment-row">
+                                    <div class="assignment-role">
+                                        Documentation Responsible
+                                        <span class="role-badge">DOC</span>
+                                    </div>
+                                    <div class="assignment-user">
+                                        <field name="documentation_user_id" 
+                                               widget="many2one_avatar_user"
+                                               required="custom_status_id.code in ['documentation_progress']"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="assignment-row">
+                                    <div class="assignment-role">
+                                        Commission Responsible
+                                        <span class="role-badge">COM</span>
+                                    </div>
+                                    <div class="assignment-user">
+                                        <field name="commission_user_id"
+                                               widget="many2one_avatar_user"
+                                               required="custom_status_id.code in ['commission_progress']"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="assignment-row">
+                                    <div class="assignment-role">
+                                        Final Review Responsible
+                                        <span class="role-badge">REV</span>
+                                    </div>
+                                    <div class="assignment-user">
+                                        <field name="final_review_user_id"
+                                               widget="many2one_avatar_user"
+                                               required="custom_status_id.code in ['final_review']"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Workflow Status Information -->
+                        <group string="Workflow Information" class="osus-workflow-info">
+                            <field name="commission_calculated" widget="boolean_toggle"/>
+                            <field name="requires_approval" readonly="1" widget="boolean_toggle"/>
+                            <field name="workflow_progress" widget="progressbar" readonly="1"/>
+                        </group>
+                        
+                        <!-- Digital Signatures -->
+                        <group string="Digital Signatures" class="osus-signatures">
+                            <field name="documentation_signature" widget="image" 
+                                   invisible="custom_status_id.code in ['draft']"/>
+                            <field name="commission_signature" widget="image"
+                                   invisible="custom_status_id.code in ['draft', 'documentation_progress']"/>
+                            <field name="final_approval_signature" widget="image"
+                                   invisible="custom_status_id.code in ['draft', 'documentation_progress', 'commission_progress']"/>
+                        </group>
+                    </page>
+                    
+                    <!-- Commission Calculator Tab -->
+                    <page string="💰 Commission Calculator" name="commission_calculator" 
+                          class="osus-commission-tab"
+                          invisible="custom_status_id.code in ['draft', 'documentation_progress']">
+                        <div class="osus-commission-calculator">
+                            <div class="calculator-header">
+                                Commission Calculation &amp; Management
+                            </div>
+                            
+                            <!-- Commission Integration Widget -->
+                            <field name="id" widget="osus_commission_calculator" nolabel="1"/>
+                            
+                            <!-- Commission Summary -->
+                            <div class="commission-summary">
+                                <div class="summary-item">
+                                    <div class="summary-label">Total Commission</div>
+                                    <div class="summary-value">
+                                        <field name="total_commission_amount" widget="monetary" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Commission Status</div>
+                                    <div class="summary-value">
+                                        <field name="commission_calculated" widget="boolean_toggle" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </page>
+                    
+                    <!-- Status History Tab -->
+                    <page string="📋 Status History" name="status_history" class="osus-history-tab">
+                        <div class="osus-card">
+                            <div class="osus-card-header">
+                                📋 Workflow Status History
+                            </div>
+                            <div class="osus-card-body">
+                                <field name="custom_status_history_ids" readonly="1">
+                                    <tree>
+                                        <field name="status_id"/>
+                                        <field name="user_id"/>
+                                        <field name="date"/>
+                                        <field name="notes"/>
+                                    </tree>
+                                </field>
+                            </div>
+                        </div>
+                    </page>
+                </xpath>
+                
+                <!-- Add Workflow Manager Widget -->
+                <xpath expr="//field[@name='custom_status_id']" position="after">
+                    <field name="id" widget="osus_workflow_manager" nolabel="1"/>
+                </xpath>
+                
+            </field>
+        </record>
+        
+        <!-- Enhanced List View with Status Colors -->
+        <record id="view_order_tree_enhanced_workflow" model="ir.ui.view">
+            <field name="name">sale.order.tree.enhanced.workflow</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="custom_status_id" optional="show"/>
+                    <field name="workflow_progress" widget="progressbar" optional="show"/>
+                    <field name="total_commission_amount" widget="monetary" optional="hide"/>
+                    <field name="commission_calculated" widget="boolean_toggle" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Search View Enhancement -->
+        <record id="view_sales_order_filter_enhanced" model="ir.ui.view">
+            <field name="name">sale.order.search.enhanced</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                    <separator/>
+                    <filter string="Draft Status" name="draft_status" 
+                            domain="[('custom_status_id.code', '=', 'draft')]"/>
+                    <filter string="In Documentation" name="documentation_status" 
+                            domain="[('custom_status_id.code', '=', 'documentation_progress')]"/>
+                    <filter string="Commission Calculation" name="commission_status" 
+                            domain="[('custom_status_id.code', '=', 'commission_progress')]"/>
+                    <filter string="Pending Review" name="review_status" 
+                            domain="[('custom_status_id.code', '=', 'final_review')]"/>
+                    <filter string="Approved" name="approved_status" 
+                            domain="[('custom_status_id.code', '=', 'approved')]"/>
+                    <filter string="Posted" name="posted_status" 
+                            domain="[('custom_status_id.code', '=', 'posted')]"/>
+                    <separator/>
+                    <filter string="Commission Calculated" name="commission_calculated" 
+                            domain="[('commission_calculated', '=', True)]"/>
+                    <filter string="Pending Commission" name="pending_commission" 
+                            domain="[('commission_calculated', '=', False)]"/>
+                </xpath>
+                
+                <xpath expr="//group" position="inside">
+                    <filter string="Workflow Status" name="group_by_status" 
+                            context="{'group_by': 'custom_status_id'}"/>
+                    <filter string="Documentation User" name="group_by_doc_user" 
+                            context="{'group_by': 'documentation_user_id'}"/>
+                    <filter string="Commission User" name="group_by_commission_user" 
+                            context="{'group_by': 'commission_user_id'}"/>
+                    <filter string="Review User" name="group_by_review_user" 
+                            context="{'group_by': 'final_review_user_id'}"/>
+                </xpath>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

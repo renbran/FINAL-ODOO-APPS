@@ -1,0 +1,410 @@
+/* OSUS Workflow Components - Enhanced UI Components */
+
+/* Workflow Progress Bar */
+.osus-workflow-progress {
+    background: var(--osus-secondary);
+    border-radius: var(--osus-border-radius);
+    padding: 20px;
+    margin: 16px 0;
+    box-shadow: var(--osus-shadow-light);
+    
+    .workflow-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        
+        &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ecf0f1;
+            z-index: 1;
+        }
+        
+        .workflow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            background: var(--osus-secondary);
+            padding: 8px;
+            border-radius: var(--osus-border-radius);
+            
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: var(--osus-font-weight-bold);
+                color: white;
+                margin-bottom: 8px;
+                transition: var(--osus-transition);
+                
+                &.active {
+                    background: var(--osus-primary);
+                    box-shadow: var(--osus-shadow-medium);
+                    transform: scale(1.1);
+                }
+                
+                &.completed {
+                    background: var(--osus-success);
+                }
+                
+                &.pending {
+                    background: #bdc3c7;
+                }
+            }
+            
+            .step-label {
+                font-size: 12px;
+                text-align: center;
+                color: var(--osus-text-dark);
+                font-weight: var(--osus-font-weight-medium);
+                max-width: 80px;
+            }
+        }
+    }
+}
+
+/* Workflow Action Panel */
+.osus-workflow-actions {
+    background: var(--osus-secondary);
+    border-radius: var(--osus-border-radius);
+    padding: 20px;
+    margin: 16px 0;
+    box-shadow: var(--osus-shadow-light);
+    
+    .action-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--osus-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--osus-text-dark);
+            font-weight: var(--osus-font-weight-bold);
+        }
+        
+        .action-title {
+            font-size: 16px;
+            font-weight: var(--osus-font-weight-medium);
+            color: var(--osus-text-dark);
+        }
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            font-weight: var(--osus-font-weight-medium);
+            border-radius: var(--osus-border-radius);
+            transition: var(--osus-transition);
+            
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: var(--osus-shadow-light);
+            }
+        }
+    }
+}
+
+/* Commission Calculator Widget */
+.osus-commission-calculator {
+    background: var(--osus-secondary);
+    border: 1px solid rgba(128, 0, 32, 0.1);
+    border-radius: var(--osus-border-radius);
+    padding: 20px;
+    margin: 16px 0;
+    
+    .calculator-header {
+        background: linear-gradient(135deg, var(--osus-commission) 0%, #8e44ad 100%);
+        color: white;
+        padding: 12px 16px;
+        margin: -20px -20px 16px -20px;
+        border-radius: var(--osus-border-radius) var(--osus-border-radius) 0 0;
+        font-weight: var(--osus-font-weight-medium);
+    }
+    
+    .commission-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+        
+        .summary-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: var(--osus-border-radius);
+            text-align: center;
+            
+            .summary-label {
+                font-size: 12px;
+                color: #6c757d;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .summary-value {
+                font-size: 20px;
+                font-weight: var(--osus-font-weight-bold);
+                color: var(--osus-text-dark);
+            }
+        }
+    }
+    
+    .commission-details {
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            
+            &:last-child {
+                border-bottom: none;
+            }
+            
+            .detail-label {
+                font-weight: var(--osus-font-weight-medium);
+                color: var(--osus-text-dark);
+            }
+            
+            .detail-value {
+                font-weight: var(--osus-font-weight-bold);
+                color: var(--osus-primary);
+            }
+        }
+    }
+}
+
+/* Deal Summary Panel */
+.osus-deal-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: var(--osus-border-radius);
+    padding: 20px;
+    margin: 16px 0;
+    border-left: 4px solid var(--osus-accent);
+    
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        
+        .summary-metric {
+            text-align: center;
+            
+            .metric-value {
+                font-size: 24px;
+                font-weight: var(--osus-font-weight-bold);
+                color: var(--osus-primary);
+                display: block;
+            }
+            
+            .metric-label {
+                font-size: 12px;
+                color: #6c757d;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-top: 4px;
+            }
+        }
+    }
+}
+
+/* Status Transition Animations */
+.osus-status-transition {
+    &.entering {
+        animation: slideInRight 0.3s ease-out;
+    }
+    
+    &.leaving {
+        animation: slideOutLeft 0.3s ease-in;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+/* Assignment Panel */
+.osus-assignment-panel {
+    background: var(--osus-secondary);
+    border-radius: var(--osus-border-radius);
+    margin: 16px 0;
+    overflow: hidden;
+    box-shadow: var(--osus-shadow-light);
+    
+    .assignment-header {
+        background: linear-gradient(135deg, var(--osus-text-dark) 0%, #34495e 100%);
+        color: white;
+        padding: 16px 20px;
+        font-weight: var(--osus-font-weight-medium);
+        
+        .header-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+    }
+    
+    .assignment-body {
+        padding: 20px;
+        
+        .assignment-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            
+            &:last-child {
+                border-bottom: none;
+            }
+            
+            .assignment-role {
+                font-weight: var(--osus-font-weight-medium);
+                color: var(--osus-text-dark);
+                
+                .role-badge {
+                    background: var(--osus-primary);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 10px;
+                    margin-left: 8px;
+                }
+            }
+            
+            .assignment-user {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                
+                .user-avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: var(--osus-accent);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: var(--osus-font-weight-bold);
+                    color: var(--osus-text-dark);
+                }
+                
+                .user-name {
+                    font-weight: var(--osus-font-weight-medium);
+                    color: var(--osus-text-dark);
+                }
+            }
+        }
+    }
+}
+
+/* Notification Toast */
+.osus-toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--osus-secondary);
+    border-radius: var(--osus-border-radius);
+    box-shadow: var(--osus-shadow-heavy);
+    padding: 16px 20px;
+    z-index: 9999;
+    animation: slideInFromRight 0.3s ease-out;
+    
+    &.success {
+        border-left: 4px solid var(--osus-success);
+    }
+    
+    &.warning {
+        border-left: 4px solid var(--osus-warning);
+    }
+    
+    &.error {
+        border-left: 4px solid var(--osus-danger);
+    }
+    
+    .toast-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .toast-message {
+            flex: 1;
+            font-weight: var(--osus-font-weight-medium);
+            color: var(--osus-text-dark);
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            
+            &:hover {
+                color: var(--osus-text-dark);
+            }
+        }
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
