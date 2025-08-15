@@ -26,6 +26,7 @@
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
         'data/email_templates.xml',
+i       'data/paperformat.xml',
         'reports/order_status_reports.xml',
         'reports/commission_report_enhanced.xml',
         'reports/sale_commission_report.xml',
@@ -35,6 +36,11 @@
         'views/email_template_views.xml',
         'views/report_wizard_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'order_status_override/static/src/css/commission_report.css',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
