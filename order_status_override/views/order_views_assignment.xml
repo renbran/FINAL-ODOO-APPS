@@ -239,12 +239,12 @@
                     <filter name="commission_pending" string="Commission Pending" domain="[('custom_status_id.name', '=', 'Commission Calculation In-progress')]"/>
                     <filter name="review_pending" string="Review Pending" domain="[('custom_status_id.name', '=', 'Final Review')]"/>
                     <filter name="approved_orders" string="Approved Orders" domain="[('custom_status_id.name', '=', 'Approved')]"/>
+                    <group string="Group By">
+                        <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
+                        <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
+                        <filter name="group_by_commission_user" string="Commission User" context="{'group_by': 'commission_user_id'}"/>
+                    </group>
                 </xpath>
-                <group name="group_by" position="inside">
-                    <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
-                    <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
-                    <filter name="group_by_commission_user" string="Commission User" context="{'group_by': 'commission_user_id'}"/>
-                </group>
             </field>
         </record>
 
