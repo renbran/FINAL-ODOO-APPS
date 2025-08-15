@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
     
     # Real Estate specific fields
     booking_date = fields.Date(string='Booking Date', default=fields.Date.today, tracking=True)
-    project_id = fields.Many2one('project.project', string='Project', tracking=True)
+    project_id = fields.Many2one('product.template', string='Project', tracking=True)
     unit_id = fields.Many2one('product.product', string='Unit', tracking=True)
     
     # Commission fields - External
@@ -222,86 +222,8 @@ class SaleOrder(models.Model):
         compute='_compute_total_payment_out',
         currency_field='currency_id'
     )
-    
-    @api.depends('broker_rate', 'broker_commission_type', 'referrer_rate', 'referrer_commission_type',
-                 'cashback_rate', 'cashback_commission_type', 'agent1_rate', 'agent1_commission_type',
-                 'agent2_rate', 'agent2_commission_type', 'manager_rate', 'manager_commission_type',
-                 'director_rate', 'director_commission_type', 'amount_untaxed', 'order_line.price_unit')
-    def _compute_commissions(self):
-        """Calculate all commission amounts based on configured rates and types"""
-        for order in self:
-            # External commissions
-            order.broker_amount = order._calculate_commission_amount(
-                order.broker_rate, order.broker_commission_type, order)
-            order.referrer_amount = order._calculate_commission_amount(
-                order.referrer_rate, order.referrer_commission_type, order)
-            order.cashback_amount = order._calculate_commission_amount(
-                order.cashback_rate, order.cashback_commission_type, order)
-            
-            # Internal commissions
-            order.agent1_amount = order._calculate_commission_amount(
-                order.agent1_rate, order.agent1_commission_type, order)
-            order.agent2_amount = order._calculate_commission_amount(
-                order.agent2_rate, order.agent2_commission_type, order)
-            order.manager_amount = order._calculate_commission_amount(
-                order.manager_rate, order.manager_commission_type, order)
-            order.director_amount = order._calculate_commission_amount(
-                order.director_rate, order.director_commission_type, order)
-            
-            # Summary totals
-            order.total_external_commission_amount = (
-                order.broker_amount + order.referrer_amount + order.cashback_amount)
-            order.total_internal_commission_amount = (
-                order.agent1_amount + order.agent2_amount + 
-                order.manager_amount + order.director_amount)
-            order.total_commission_amount = (
-                order.total_external_commission_amount + order.total_internal_commission_amount)
 
-    def _calculate_commission_amount(self, rate, commission_type, order):
-        """Calculate commission amount based on rate and type"""
-        if not rate or rate <= 0:
-            return 0.0
-        
-        if commission_type == 'fixed':
-            return rate
-        elif commission_type == 'percent_unit_price':
-            # Calculate based on unit price of first line
-            if order.order_line:
-                unit_price = order.order_line[0].price_unit
-                return (rate / 100) * unit_price
-            return 0.0
-        elif commission_type == 'percent_untaxed_total':
-            return (rate / 100) * order.amount_untaxed
-        
-        return 0.0
-
-    @api.depends('name', 'partner_id.name')
-    def _compute_qr_code(self):
-        """Generate QR code for order verification"""
-        for order in self:
-            if order.name:
-                qr_data = f"Order: {order.name}\nCustomer: {order.partner_id.name}\nAmount: {order.amount_total} {order.currency_id.name}"
-                
-                try:
-                    qr = qrcode.QRCode(
-                        version=1,
-                        error_correction=qrcode.constants.ERROR_CORRECT_L,
-                        box_size=10,
-                        border=4,
-                    )
-                    qr.add_data(qr_data)
-                    qr.make(fit=True)
-                    
-                    img = qr.make_image(fill_color="black", back_color="white")
-                    buffer = io.BytesIO()
-                    img.save(buffer, format='PNG')
-                    order.qr_code = base64.b64encode(buffer.getvalue())
-                except Exception as e:
-                    _logger.warning(f"Failed to generate QR code for order {order.name}: {e}")
-                    order.qr_code = False
-            else:
-                order.qr_code = False
-
+    @api.depends('partner_id', 'order_line', 'order_line.product_id')
     def _compute_related_documents(self):
         """Compute related purchase orders and vendor bills"""
         for order in self:
