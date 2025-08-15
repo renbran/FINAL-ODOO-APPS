@@ -6,15 +6,15 @@
     .osus-workflow-progress {
         padding: 16px 12px;
         margin: 12px 0;
-        
+
         .workflow-steps {
             flex-direction: column;
             gap: 16px;
-            
+
             &::before {
                 display: none;
             }
-            
+
             .workflow-step {
                 width: 100%;
                 flex-direction: row;
@@ -22,7 +22,7 @@
                 padding: 12px;
                 background: #f8f9fa;
                 border-radius: var(--osus-border-radius);
-                
+
                 .step-circle {
                     margin-bottom: 0;
                     margin-right: 12px;
@@ -30,7 +30,7 @@
                     height: 32px;
                     font-size: 12px;
                 }
-                
+
                 .step-label {
                     text-align: left;
                     max-width: none;
@@ -39,15 +39,15 @@
             }
         }
     }
-    
+
     /* Workflow Actions - Mobile */
     .osus-workflow-actions {
         padding: 16px 12px;
-        
+
         .action-buttons {
             flex-direction: column;
             gap: 8px;
-            
+
             .btn {
                 min-width: auto;
                 width: 100%;
@@ -56,37 +56,37 @@
             }
         }
     }
-    
+
     /* Commission Calculator - Mobile */
     .osus-commission-calculator {
         padding: 16px 12px;
-        
+
         .calculator-header {
             margin: -16px -12px 16px -12px;
             padding: 12px;
             font-size: 14px;
         }
-        
+
         .commission-summary {
             grid-template-columns: 1fr;
             gap: 12px;
-            
+
             .summary-item {
                 padding: 12px;
-                
+
                 .summary-value {
                     font-size: 18px;
                 }
             }
         }
-        
+
         .commission-details {
             .detail-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 4px;
                 padding: 12px 0;
-                
+
                 .detail-label,
                 .detail-value {
                     font-size: 14px;
@@ -94,46 +94,46 @@
             }
         }
     }
-    
+
     /* Deal Summary - Mobile */
     .osus-deal-summary {
         padding: 16px 12px;
-        
+
         .summary-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            
+
             .summary-metric {
                 .metric-value {
                     font-size: 20px;
                 }
-                
+
                 .metric-label {
                     font-size: 11px;
                 }
             }
         }
     }
-    
+
     /* Assignment Panel - Mobile */
     .osus-assignment-panel {
         .assignment-body {
             padding: 16px 12px;
-            
+
             .assignment-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
                 padding: 12px 0;
-                
+
                 .assignment-role {
                     width: 100%;
-                    
+
                     .role-badge {
                         float: right;
                     }
                 }
-                
+
                 .assignment-user {
                     width: 100%;
                     justify-content: flex-start;
@@ -141,13 +141,13 @@
             }
         }
     }
-    
+
     /* Form Layout - Mobile */
     .o_form_view {
         .osus-workflow-section {
             .row {
                 margin: 0;
-                
+
                 .col-md-6 {
                     padding: 0;
                     margin-bottom: 16px;
@@ -155,21 +155,21 @@
             }
         }
     }
-    
+
     /* Notification Toast - Mobile */
     .osus-toast-notification {
         left: 12px;
         right: 12px;
         top: 12px;
         padding: 12px 16px;
-        
+
         .toast-content {
             .toast-message {
                 font-size: 14px;
             }
         }
     }
-    
+
     /* Status Bar - Mobile */
     .o_statusbar_status {
         .o_arrow_button {
@@ -178,16 +178,16 @@
             margin: 2px;
         }
     }
-    
+
     /* Card Components - Mobile */
     .osus-card {
         margin: 8px 0;
-        
+
         .osus-card-header {
             padding: 12px 16px;
             font-size: 14px;
         }
-        
+
         .osus-card-body {
             padding: 16px;
         }
@@ -206,19 +206,19 @@
             }
         }
     }
-    
+
     .osus-commission-calculator {
         .commission-summary {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
+
     .osus-deal-summary {
         .summary-grid {
             grid-template-columns: repeat(3, 1fr);
         }
     }
-    
+
     .osus-workflow-actions {
         .action-buttons {
             .btn {
@@ -232,7 +232,7 @@
 @media (min-width: 1024px) {
     .osus-workflow-progress {
         padding: 24px;
-        
+
         .workflow-steps {
             .workflow-step {
                 .step-circle {
@@ -240,7 +240,7 @@
                     height: 48px;
                     font-size: 16px;
                 }
-                
+
                 .step-label {
                     font-size: 13px;
                     max-width: 90px;
@@ -248,13 +248,13 @@
             }
         }
     }
-    
+
     .osus-commission-calculator {
         .commission-summary {
             grid-template-columns: repeat(4, 1fr);
         }
     }
-    
+
     .osus-deal-summary {
         .summary-grid {
             grid-template-columns: repeat(5, 1fr);
@@ -266,7 +266,7 @@
 @media (min-width: 1400px) {
     .osus-workflow-progress {
         padding: 28px;
-        
+
         .workflow-steps {
             .workflow-step {
                 .step-circle {
@@ -274,7 +274,7 @@
                     height: 52px;
                     font-size: 18px;
                 }
-                
+
                 .step-label {
                     font-size: 14px;
                     max-width: 100px;
@@ -290,7 +290,7 @@
         min-height: 44px; /* Apple's recommended minimum touch target */
         padding: 12px 16px;
     }
-    
+
     .osus-workflow-actions {
         .action-buttons {
             .btn {
@@ -299,14 +299,14 @@
             }
         }
     }
-    
+
     .workflow-step {
         .step-circle {
             min-width: 44px;
             min-height: 44px;
         }
     }
-    
+
     /* Larger tap targets for better usability */
     .o_statusbar_status {
         .o_arrow_button {
@@ -322,7 +322,7 @@
     .osus-toast-notification {
         display: none !important;
     }
-    
+
     .osus-workflow-progress,
     .osus-commission-calculator,
     .osus-deal-summary {
@@ -330,18 +330,18 @@
         border: 1px solid #ddd;
         page-break-inside: avoid;
     }
-    
+
     .osus-card {
         box-shadow: none !important;
         border: 1px solid #ddd;
     }
-    
+
     /* Print-friendly colors */
     .osus-card-header {
         background: #f5f5f5 !important;
         color: #333 !important;
     }
-    
+
     .btn-osus-primary,
     .btn-osus-secondary,
     .btn-osus-gold {
@@ -360,7 +360,7 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .workflow-step .step-circle,
     .btn,
     .osus-card {
@@ -377,14 +377,14 @@
         --osus-text-dark: #000000;
         --osus-text-light: #ffffff;
     }
-    
+
     .osus-card,
     .osus-workflow-progress,
     .osus-commission-calculator,
     .osus-deal-summary {
         border: 2px solid #000000;
     }
-    
+
     .btn {
         border: 2px solid #000000;
     }

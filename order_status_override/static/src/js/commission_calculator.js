@@ -47,11 +47,9 @@ export class OSUSCommissionCalculator extends Component {
         this.state.isLoading = true;
         try {
             // Get commission data from commission_ax module
-            const commissionResult = await this.orm.call(
-                "sale.order",
-                "get_commission_calculation_data",
-                [this.props.record.resId]
-            );
+            const commissionResult = await this.orm.call("sale.order", "get_commission_calculation_data", [
+                this.props.record.resId,
+            ]);
 
             if (commissionResult.success) {
                 this.state.commissionData = commissionResult.data;
@@ -60,20 +58,13 @@ export class OSUSCommissionCalculator extends Component {
             // Load calculation methods and users
             const [methods, users] = await Promise.all([
                 this.orm.call("sale.order", "get_commission_calculation_methods", []),
-                this.orm.call("res.users", "search_read", [
-                    [["active", "=", true]],
-                    ["id", "name", "email"]
-                ])
+                this.orm.call("res.users", "search_read", [[["active", "=", true]], ["id", "name", "email"]]),
             ]);
 
             this.state.calculationMethods = methods;
             this.state.availableUsers = users;
-
         } catch (error) {
-            this.notification.add(
-                _t("Failed to load commission data: %s", error.message),
-                { type: "danger" }
-            );
+            this.notification.add(_t("Failed to load commission data: %s", error.message), { type: "danger" });
         } finally {
             this.state.isLoading = false;
         }
@@ -84,13 +75,11 @@ export class OSUSCommissionCalculator extends Component {
      */
     async calculatePreview() {
         this.state.isLoading = true;
-        
+
         try {
-            const result = await this.orm.call(
-                "sale.order",
-                "preview_commission_calculation",
-                [this.props.record.resId]
-            );
+            const result = await this.orm.call("sale.order", "preview_commission_calculation", [
+                this.props.record.resId,
+            ]);
 
             if (result.success) {
                 this.state.commissionData = result.data;
@@ -98,7 +87,6 @@ export class OSUSCommissionCalculator extends Component {
             } else {
                 this.showErrorNotification(result.message || _t("Calculation failed"));
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to calculate preview: %s", error.message));
         } finally {
@@ -122,26 +110,22 @@ export class OSUSCommissionCalculator extends Component {
         this.state.isLoading = true;
 
         try {
-            const result = await this.orm.call(
-                "sale.order",
-                "apply_commission_calculations",
-                [this.props.record.resId]
-            );
+            const result = await this.orm.call("sale.order", "apply_commission_calculations", [
+                this.props.record.resId,
+            ]);
 
             if (result.success) {
                 this.showSuccessNotification(_t("Commission calculations applied successfully"));
-                
+
                 // Trigger workflow transition to next stage
                 await this.triggerWorkflowTransition();
-                
+
                 // Reload data
                 await this.loadCommissionData();
                 await this.props.record.load();
-                
             } else {
                 this.showErrorNotification(result.message || _t("Failed to apply calculations"));
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to apply commissions: %s", error.message));
         } finally {
@@ -156,22 +140,20 @@ export class OSUSCommissionCalculator extends Component {
         if (this.props.readonly) return;
 
         try {
-            const result = await this.orm.call(
-                "sale.order",
-                "add_external_commission",
-                [this.props.record.resId, {
-                    commission_group: 'broker',
-                    calculation_method: 'percentage',
+            const result = await this.orm.call("sale.order", "add_external_commission", [
+                this.props.record.resId,
+                {
+                    commission_group: "broker",
+                    calculation_method: "percentage",
                     rate_amount: 0.0,
                     partner_id: null,
-                }]
-            );
+                },
+            ]);
 
             if (result.success) {
                 await this.loadCommissionData();
                 this.showSuccessNotification(_t("External commission added"));
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to add commission: %s", error.message));
         }
@@ -184,22 +166,20 @@ export class OSUSCommissionCalculator extends Component {
         if (this.props.readonly) return;
 
         try {
-            const result = await this.orm.call(
-                "sale.order",
-                "add_internal_commission",
-                [this.props.record.resId, {
-                    commission_group: 'agent_1',
-                    calculation_method: 'percentage',
+            const result = await this.orm.call("sale.order", "add_internal_commission", [
+                this.props.record.resId,
+                {
+                    commission_group: "agent_1",
+                    calculation_method: "percentage",
                     rate_amount: 0.0,
                     user_id: null,
-                }]
-            );
+                },
+            ]);
 
             if (result.success) {
                 await this.loadCommissionData();
                 this.showSuccessNotification(_t("Internal commission added"));
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to add commission: %s", error.message));
         }
@@ -219,14 +199,13 @@ export class OSUSCommissionCalculator extends Component {
         if (!confirmed) return;
 
         try {
-            const method = type === 'external' ? 'remove_external_commission' : 'remove_internal_commission';
+            const method = type === "external" ? "remove_external_commission" : "remove_internal_commission";
             const result = await this.orm.call("sale.order", method, [this.props.record.resId, commissionId]);
 
             if (result.success) {
                 await this.loadCommissionData();
                 this.showSuccessNotification(_t("Commission removed"));
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to remove commission: %s", error.message));
         }
@@ -239,13 +218,12 @@ export class OSUSCommissionCalculator extends Component {
         if (this.props.readonly) return;
 
         try {
-            const method = type === 'external' ? 'update_external_commission' : 'update_internal_commission';
+            const method = type === "external" ? "update_external_commission" : "update_internal_commission";
             const result = await this.orm.call("sale.order", method, [this.props.record.resId, commissionId, data]);
 
             if (result.success) {
                 await this.calculatePreview();
             }
-
         } catch (error) {
             this.showErrorNotification(_t("Failed to update commission: %s", error.message));
         }
@@ -256,11 +234,7 @@ export class OSUSCommissionCalculator extends Component {
      */
     async triggerWorkflowTransition() {
         try {
-            await this.orm.call(
-                "sale.order",
-                "action_commission_completed",
-                [this.props.record.resId]
-            );
+            await this.orm.call("sale.order", "action_commission_completed", [this.props.record.resId]);
         } catch (error) {
             console.error("Failed to trigger workflow transition:", error);
         }
@@ -305,9 +279,9 @@ export class OSUSCommissionCalculator extends Component {
      * Format currency display
      */
     formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: this.props.record.data.currency_id?.data?.name || 'USD'
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: this.props.record.data.currency_id?.data?.name || "USD",
         }).format(amount || 0);
     }
 
@@ -331,10 +305,10 @@ export class OSUSCommissionCalculator extends Component {
      */
     get externalCommissionGroups() {
         return [
-            { value: 'broker', label: _t('Broker') },
-            { value: 'referrer', label: _t('Referrer') },
-            { value: 'cashback', label: _t('Cashback') },
-            { value: 'others', label: _t('Others') },
+            { value: "broker", label: _t("Broker") },
+            { value: "referrer", label: _t("Referrer") },
+            { value: "cashback", label: _t("Cashback") },
+            { value: "others", label: _t("Others") },
         ];
     }
 
@@ -343,10 +317,10 @@ export class OSUSCommissionCalculator extends Component {
      */
     get internalCommissionGroups() {
         return [
-            { value: 'agent_1', label: _t('Agent 1') },
-            { value: 'agent_2', label: _t('Agent 2') },
-            { value: 'manager', label: _t('Manager') },
-            { value: 'director', label: _t('Director') },
+            { value: "agent_1", label: _t("Agent 1") },
+            { value: "agent_2", label: _t("Agent 2") },
+            { value: "manager", label: _t("Manager") },
+            { value: "director", label: _t("Director") },
         ];
     }
 
@@ -357,7 +331,7 @@ export class OSUSCommissionCalculator extends Component {
         return (
             !this.props.readonly &&
             (this.state.commissionData.external_commissions.length > 0 ||
-             this.state.commissionData.internal_commissions.length > 0) &&
+                this.state.commissionData.internal_commissions.length > 0) &&
             this.state.commissionData.total_commission > 0
         );
     }

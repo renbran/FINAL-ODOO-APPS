@@ -1,33 +1,33 @@
 /* OSUS Properties Branding - Custom Variables and Colors */
 :root {
     /* OSUS Brand Colors */
-    --osus-primary: #800020;      /* Deep Wine Red - Primary Brand Color */
-    --osus-secondary: #ffffff;    /* Pure White - Clean Background */
-    --osus-accent: #ffd700;       /* Gold - Luxury Accent */
-    --osus-text-dark: #2c3e50;    /* Professional Dark Text */
-    --osus-text-light: #ecf0f1;   /* Light Text for Dark Backgrounds */
-    --osus-success: #27ae60;      /* Success Green */
-    --osus-warning: #f39c12;      /* Warning Orange */
-    --osus-danger: #e74c3c;       /* Error Red */
-    
+    --osus-primary: #800020; /* Deep Wine Red - Primary Brand Color */
+    --osus-secondary: #ffffff; /* Pure White - Clean Background */
+    --osus-accent: #ffd700; /* Gold - Luxury Accent */
+    --osus-text-dark: #2c3e50; /* Professional Dark Text */
+    --osus-text-light: #ecf0f1; /* Light Text for Dark Backgrounds */
+    --osus-success: #27ae60; /* Success Green */
+    --osus-warning: #f39c12; /* Warning Orange */
+    --osus-danger: #e74c3c; /* Error Red */
+
     /* Workflow Status Colors */
-    --osus-draft: #95a5a6;        /* Neutral Gray */
+    --osus-draft: #95a5a6; /* Neutral Gray */
     --osus-documentation: #3498db; /* Professional Blue */
-    --osus-commission: #9b59b6;   /* Calculation Purple */
-    --osus-review: #f39c12;       /* Review Orange */
-    --osus-approved: #27ae60;     /* Approved Green */
-    --osus-posted: #2c3e50;       /* Posted Dark */
-    --osus-rejected: #e74c3c;     /* Rejected Red */
-    
+    --osus-commission: #9b59b6; /* Calculation Purple */
+    --osus-review: #f39c12; /* Review Orange */
+    --osus-approved: #27ae60; /* Approved Green */
+    --osus-posted: #2c3e50; /* Posted Dark */
+    --osus-rejected: #e74c3c; /* Rejected Red */
+
     /* UI Enhancement Variables */
     --osus-border-radius: 8px;
     --osus-shadow-light: 0 2px 8px rgba(128, 0, 32, 0.1);
     --osus-shadow-medium: 0 4px 16px rgba(128, 0, 32, 0.15);
     --osus-shadow-heavy: 0 8px 32px rgba(128, 0, 32, 0.2);
     --osus-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* Typography */
-    --osus-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --osus-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     --osus-font-weight-light: 300;
     --osus-font-weight-normal: 400;
     --osus-font-weight-medium: 500;
@@ -43,13 +43,13 @@
     border-radius: var(--osus-border-radius);
     box-shadow: var(--osus-shadow-light);
     transition: var(--osus-transition);
-    
+
     &:hover {
         background: linear-gradient(135deg, #9a1932 0%, var(--osus-primary) 100%);
         box-shadow: var(--osus-shadow-medium);
         transform: translateY(-1px);
     }
-    
+
     &:active {
         transform: translateY(0);
         box-shadow: var(--osus-shadow-light);
@@ -64,7 +64,7 @@
     font-weight: var(--osus-font-weight-medium);
     border-radius: var(--osus-border-radius);
     transition: var(--osus-transition);
-    
+
     &:hover {
         background: var(--osus-primary);
         color: var(--osus-text-light);
@@ -81,7 +81,7 @@
     border-radius: var(--osus-border-radius);
     box-shadow: var(--osus-shadow-light);
     transition: var(--osus-transition);
-    
+
     &:hover {
         background: linear-gradient(135deg, #ffed4e 0%, var(--osus-accent) 100%);
         box-shadow: var(--osus-shadow-medium);
@@ -96,12 +96,12 @@
     border-radius: var(--osus-border-radius);
     box-shadow: var(--osus-shadow-light);
     transition: var(--osus-transition);
-    
+
     &:hover {
         box-shadow: var(--osus-shadow-medium);
         transform: translateY(-2px);
     }
-    
+
     .osus-card-header {
         background: linear-gradient(135deg, var(--osus-primary) 0%, #9a1932 100%);
         color: var(--osus-text-light);
@@ -109,7 +109,7 @@
         border-radius: var(--osus-border-radius) var(--osus-border-radius) 0 0;
         font-weight: var(--osus-font-weight-medium);
     }
-    
+
     .osus-card-body {
         padding: 20px;
     }
@@ -122,32 +122,32 @@
             background-color: var(--osus-draft);
             color: white;
         }
-        
+
         &.btn-osus-documentation {
             background-color: var(--osus-documentation);
             color: white;
         }
-        
+
         &.btn-osus-commission {
             background-color: var(--osus-commission);
             color: white;
         }
-        
+
         &.btn-osus-review {
             background-color: var(--osus-review);
             color: white;
         }
-        
+
         &.btn-osus-approved {
             background-color: var(--osus-approved);
             color: white;
         }
-        
+
         &.btn-osus-posted {
             background-color: var(--osus-posted);
             color: white;
         }
-        
+
         &.btn-osus-rejected {
             background-color: var(--osus-rejected);
             color: white;
@@ -165,7 +165,7 @@
                         .o_arrow_button {
                             font-weight: var(--osus-font-weight-medium);
                             transition: var(--osus-transition);
-                            
+
                             &:hover {
                                 transform: scale(1.05);
                             }
@@ -184,12 +184,12 @@
     padding: 12px 20px;
     border-radius: var(--osus-border-radius);
     margin-bottom: 16px;
-    
+
     .osus-logo {
         display: inline-flex;
         align-items: center;
         gap: 12px;
-        
+
         .osus-icon {
             width: 32px;
             height: 32px;
@@ -201,7 +201,7 @@
             font-weight: var(--osus-font-weight-bold);
             color: var(--osus-text-dark);
         }
-        
+
         .osus-title {
             font-size: 18px;
             font-weight: var(--osus-font-weight-medium);
@@ -216,13 +216,13 @@
         color: white;
         border: none;
     }
-    
+
     &.warning {
         background: linear-gradient(135deg, var(--osus-warning) 0%, #e67e22 100%);
         color: white;
         border: none;
     }
-    
+
     &.danger {
         background: linear-gradient(135deg, var(--osus-danger) 0%, #c0392b 100%);
         color: white;

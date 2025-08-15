@@ -2,7 +2,7 @@
 <odoo>
     <data>
         <!-- Commission Integration Views for OSUS Enhanced Workflow -->
-        
+
         <!-- Commission Summary View -->
         <record id="view_commission_summary_form" model="ir.ui.view">
             <field name="name">osus.commission.summary.form</field>
@@ -10,17 +10,11 @@
             <field name="arch" type="xml">
                 <form string="Commission Summary" class="osus-commission-form">
                     <header>
-                        <button name="action_recalculate_commission" type="object" 
-                                string="Recalculate Commission" 
-                                class="btn-osus-primary"
-                                attrs="{'invisible': [('commission_calculated', '=', True)]}"/>
-                        <button name="action_approve_commission" type="object" 
-                                string="Approve Commission" 
-                                class="btn-osus-success"
-                                attrs="{'invisible': [('commission_approved', '=', True)]}"/>
+                        <button name="action_recalculate_commission" type="object" string="Recalculate Commission" class="btn-osus-primary" attrs="{'invisible': [('commission_calculated', '=', True)]}"/>
+                        <button name="action_approve_commission" type="object" string="Approve Commission" class="btn-osus-success" attrs="{'invisible': [('commission_approved', '=', True)]}"/>
                         <field name="commission_status" widget="statusbar"/>
                     </header>
-                    
+
                     <sheet>
                         <div class="osus-commission-header">
                             <div class="osus-branding-card">
@@ -35,7 +29,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <group>
                             <group string="Order Information">
                                 <field name="name" readonly="1"/>
@@ -44,7 +38,7 @@
                                 <field name="amount_total" readonly="1"/>
                                 <field name="currency_id" invisible="1"/>
                             </group>
-                            
+
                             <group string="Commission Details">
                                 <field name="commission_calculated" widget="boolean_toggle"/>
                                 <field name="commission_calculated_date" readonly="1"/>
@@ -53,24 +47,22 @@
                                 <field name="commission_approved_date" readonly="1"/>
                             </group>
                         </group>
-                        
+
                         <group string="Commission Calculation">
                             <group>
                                 <field name="total_commission_amount" widget="monetary" readonly="1" class="osus-commission-amount"/>
                                 <field name="commission_percentage" widget="percentage" readonly="1"/>
                                 <field name="commission_external" widget="boolean_toggle"/>
-                                <field name="external_commission_amount" widget="monetary" 
-                                       attrs="{'invisible': [('commission_external', '=', False)]}"/>
+                                <field name="external_commission_amount" widget="monetary" attrs="{'invisible': [('commission_external', '=', False)]}"/>
                             </group>
-                            
+
                             <group>
                                 <field name="internal_commission_amount" widget="monetary" readonly="1"/>
-                                <field name="commission_split_percentage" widget="percentage"
-                                       attrs="{'invisible': [('commission_external', '=', False)]}"/>
+                                <field name="commission_split_percentage" widget="percentage" attrs="{'invisible': [('commission_external', '=', False)]}"/>
                                 <field name="commission_notes" placeholder="Commission calculation notes..."/>
                             </group>
                         </group>
-                        
+
                         <!-- Commission Breakdown Section -->
                         <notebook>
                             <page string="Commission Breakdown" name="commission_breakdown">
@@ -82,28 +74,32 @@
                                                 <label>Internal Commission</label>
                                                 <div class="bar-container">
                                                     <div class="bar internal" style="width: 60%"></div>
-                                                    <span class="amount"><field name="internal_commission_amount" widget="monetary" readonly="1"/></span>
+                                                    <span class="amount">
+                                                        <field name="internal_commission_amount" widget="monetary" readonly="1"/>
+                                                    </span>
                                                 </div>
                                             </div>
                                             <div class="commission-bar" attrs="{'invisible': [('commission_external', '=', False)]}">
                                                 <label>External Commission</label>
                                                 <div class="bar-container">
                                                     <div class="bar external" style="width: 40%"></div>
-                                                    <span class="amount"><field name="external_commission_amount" widget="monetary" readonly="1"/></span>
+                                                    <span class="amount">
+                                                        <field name="external_commission_amount" widget="monetary" readonly="1"/>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </page>
-                            
+
                             <page string="Calculation Details" name="calculation_details">
                                 <group>
                                     <field name="commission_calculation_method" readonly="1"/>
                                     <field name="commission_calculation_log" widget="text" readonly="1"/>
                                 </group>
                             </page>
-                            
+
                             <page string="Integration Status" name="integration_status">
                                 <div class="osus-integration-status">
                                     <h4>Commission_AX Integration</h4>
@@ -123,7 +119,7 @@
                             </page>
                         </notebook>
                     </sheet>
-                    
+
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>
                         <field name="activity_ids"/>
@@ -132,7 +128,7 @@
                 </form>
             </field>
         </record>
-        
+
         <!-- Commission List View -->
         <record id="view_commission_summary_tree" model="ir.ui.view">
             <field name="name">osus.commission.summary.tree</field>
@@ -153,7 +149,7 @@
                 </tree>
             </field>
         </record>
-        
+
         <!-- Commission Kanban View -->
         <record id="view_commission_summary_kanban" model="ir.ui.view">
             <field name="name">osus.commission.summary.kanban</field>
@@ -170,13 +166,15 @@
                     <field name="commission_calculated"/>
                     <field name="commission_approved"/>
                     <field name="commission_external"/>
-                    
+
                     <templates>
                         <t t-name="kanban-box">
                             <div class="osus-commission-card kanban-card">
                                 <div class="osus-card-header">
                                     <div class="card-title">
-                                        <strong><field name="name"/></strong>
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
                                         <div class="commission-badges float-end">
                                             <span class="badge badge-success" t-if="record.commission_calculated.raw_value">✓ Calculated</span>
                                             <span class="badge badge-primary" t-if="record.commission_approved.raw_value">✓ Approved</span>
@@ -184,43 +182,41 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="osus-card-body">
                                     <div class="commission-details">
                                         <div class="detail-row">
-                                            <strong>Customer:</strong> <field name="partner_id"/>
+                                            <strong>Customer:</strong>
+                                            <field name="partner_id"/>
                                         </div>
                                         <div class="detail-row">
-                                            <strong>Sales Person:</strong> <field name="user_id"/>
+                                            <strong>Sales Person:</strong>
+                                            <field name="user_id"/>
                                         </div>
                                         <div class="detail-row">
-                                            <strong>Order Amount:</strong> 
+                                            <strong>Order Amount:</strong>
                                             <field name="amount_total" widget="monetary"/>
                                         </div>
                                         <div class="detail-row commission-highlight">
-                                            <strong>Commission:</strong> 
+                                            <strong>Commission:</strong>
                                             <span class="osus-commission-amount">
                                                 <field name="total_commission_amount" widget="monetary"/>
                                             </span>
                                             <span class="commission-rate">
-                                                (<field name="commission_percentage" widget="percentage"/>)
+                                                (                                                <field name="commission_percentage" widget="percentage"/>
+)
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="kanban-actions">
-                                        <button name="action_recalculate_commission" type="object" 
-                                                class="btn btn-osus-secondary btn-sm"
-                                                t-if="!record.commission_calculated.raw_value">
+                                        <button name="action_recalculate_commission" type="object" class="btn btn-osus-secondary btn-sm" t-if="!record.commission_calculated.raw_value">
                                             Calculate
                                         </button>
-                                        <button name="action_approve_commission" type="object" 
-                                                class="btn btn-osus-success btn-sm"
-                                                t-if="record.commission_calculated.raw_value and !record.commission_approved.raw_value">
+                                        <button name="action_approve_commission" type="object" class="btn btn-osus-success btn-sm" t-if="record.commission_calculated.raw_value and !record.commission_approved.raw_value">
                                             Approve
                                         </button>
-                                        <button name="%(action_commission_summary_form)d" type="action" 
-                                                class="btn btn-osus-primary btn-sm">
+                                        <button name="%(action_commission_summary_form)d" type="action" class="btn btn-osus-primary btn-sm">
                                             Details
                                         </button>
                                     </div>
@@ -231,7 +227,7 @@
                 </kanban>
             </field>
         </record>
-        
+
         <!-- Commission Graph View -->
         <record id="view_commission_summary_graph" model="ir.ui.view">
             <field name="name">osus.commission.summary.graph</field>
@@ -244,7 +240,7 @@
                 </graph>
             </field>
         </record>
-        
+
         <!-- Commission Pivot View -->
         <record id="view_commission_summary_pivot" model="ir.ui.view">
             <field name="name">osus.commission.summary.pivot</field>
@@ -259,7 +255,7 @@
                 </pivot>
             </field>
         </record>
-        
+
         <!-- Actions -->
         <record id="action_commission_summary_form" model="ir.actions.act_window">
             <field name="name">Commission Summary</field>
@@ -268,7 +264,7 @@
             <field name="view_id" ref="view_commission_summary_form"/>
             <field name="target">current</field>
         </record>
-        
+
         <record id="action_commission_management" model="ir.actions.act_window">
             <field name="name">Commission Management</field>
             <field name="res_model">sale.order</field>
@@ -298,7 +294,7 @@
                 </div>
             </field>
         </record>
-        
+
         <!-- Search Views -->
         <record id="view_commission_search" model="ir.ui.view">
             <field name="name">osus.commission.search</field>
@@ -308,17 +304,17 @@
                     <field name="name" string="Order"/>
                     <field name="partner_id" string="Customer"/>
                     <field name="user_id" string="Salesperson"/>
-                    
+
                     <filter string="Calculated" name="calculated" domain="[('commission_calculated', '=', True)]"/>
                     <filter string="Not Calculated" name="not_calculated" domain="[('commission_calculated', '=', False)]"/>
                     <filter string="Approved" name="approved" domain="[('commission_approved', '=', True)]"/>
                     <filter string="Pending Approval" name="pending_approval" domain="[('commission_calculated', '=', True), ('commission_approved', '=', False)]"/>
                     <filter string="External Commission" name="external" domain="[('commission_external', '=', True)]"/>
-                    
+
                     <separator/>
                     <filter string="This Month" name="this_month" domain="[('commission_calculated_date', '&gt;=', datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d'))]"/>
                     <filter string="Last Month" name="last_month" domain="[('commission_calculated_date', '&gt;=', (datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1)).replace(day=1).strftime('%Y-%m-%d')), ('commission_calculated_date', '&lt;', datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d'))]"/>
-                    
+
                     <group expand="0" string="Group By">
                         <filter string="Salesperson" name="group_by_salesperson" context="{'group_by': 'user_id'}"/>
                         <filter string="Customer" name="group_by_customer" context="{'group_by': 'partner_id'}"/>
@@ -329,13 +325,9 @@
                 </search>
             </field>
         </record>
-        
+
         <!-- Menu Items -->
-        <menuitem id="menu_osus_commission_management" 
-                  name="Commission Management"
-                  parent="menu_osus_workflow_root"
-                  action="action_commission_management"
-                  sequence="25"/>
-        
+        <menuitem id="menu_osus_commission_management" name="Commission Management" parent="menu_osus_workflow_root" action="action_commission_management" sequence="25"/>
+
     </data>
 </odoo>

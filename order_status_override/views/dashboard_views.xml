@@ -18,7 +18,7 @@
                 </dashboard>
             </field>
         </record>
-        
+
         <!-- Workflow Graph View -->
         <record id="view_workflow_graph" model="ir.ui.view">
             <field name="name">sale.order.workflow.graph</field>
@@ -31,7 +31,7 @@
                 </graph>
             </field>
         </record>
-        
+
         <!-- Workflow Pivot View -->
         <record id="view_workflow_pivot" model="ir.ui.view">
             <field name="name">sale.order.workflow.pivot</field>
@@ -46,7 +46,7 @@
                 </pivot>
             </field>
         </record>
-        
+
         <!-- Workflow Kanban View -->
         <record id="view_workflow_kanban" model="ir.ui.view">
             <field name="name">sale.order.workflow.kanban</field>
@@ -65,13 +65,15 @@
                     <field name="documentation_user_id"/>
                     <field name="commission_user_id"/>
                     <field name="final_review_user_id"/>
-                    
+
                     <templates>
                         <t t-name="kanban-box">
                             <div class="osus-card kanban-card">
                                 <div class="osus-card-header">
                                     <div class="card-title">
-                                        <strong><field name="name"/></strong>
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
                                         <span class="float-end">
                                             <field name="workflow_progress" widget="progressbar"/>
                                         </span>
@@ -80,21 +82,23 @@
                                 <div class="osus-card-body">
                                     <div class="kanban-details">
                                         <div class="detail-row">
-                                            <strong>Customer:</strong> <field name="partner_id"/>
+                                            <strong>Customer:</strong>
+                                            <field name="partner_id"/>
                                         </div>
                                         <div class="detail-row">
-                                            <strong>Amount:</strong> 
+                                            <strong>Amount:</strong>
                                             <field name="amount_total" widget="monetary"/>
                                         </div>
                                         <div class="detail-row" t-if="record.total_commission_amount.raw_value > 0">
-                                            <strong>Commission:</strong> 
+                                            <strong>Commission:</strong>
                                             <field name="total_commission_amount" widget="monetary"/>
                                         </div>
                                         <div class="detail-row">
-                                            <strong>Salesperson:</strong> <field name="user_id"/>
+                                            <strong>Salesperson:</strong>
+                                            <field name="user_id"/>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="kanban-assignments">
                                         <div class="assignment-badges">
                                             <span class="badge badge-info" t-if="record.documentation_user_id.raw_value">
@@ -108,14 +112,12 @@
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="kanban-actions">
-                                        <button name="action_change_status" type="object" 
-                                                class="btn btn-osus-secondary btn-sm">
+                                        <button name="action_change_status" type="object" class="btn btn-osus-secondary btn-sm">
                                             Change Status
                                         </button>
-                                        <button name="%(action_sale_order_enhanced_form)d" type="action" 
-                                                class="btn btn-osus-primary btn-sm">
+                                        <button name="%(action_sale_order_enhanced_form)d" type="action" class="btn btn-osus-primary btn-sm">
                                             Open
                                         </button>
                                     </div>
@@ -126,7 +128,7 @@
                 </kanban>
             </field>
         </record>
-        
+
         <!-- Enhanced Action for Sale Orders -->
         <record id="action_sale_order_enhanced_workflow" model="ir.actions.act_window">
             <field name="name">OSUS Enhanced Sales Orders</field>
@@ -157,7 +159,7 @@
                 </div>
             </field>
         </record>
-        
+
         <!-- Enhanced Form Action -->
         <record id="action_sale_order_enhanced_form" model="ir.actions.act_window">
             <field name="name">Enhanced Order</field>
@@ -166,7 +168,7 @@
             <field name="view_id" ref="view_order_form_enhanced_workflow"/>
             <field name="target">current</field>
         </record>
-        
+
         <!-- Workflow Dashboard Action -->
         <record id="action_workflow_dashboard" model="ir.actions.act_window">
             <field name="name">Workflow Dashboard</field>
@@ -177,42 +179,20 @@
                 'search_default_current_month': 1,
             }</field>
         </record>
-        
+
         <!-- Menu Items -->
-        <menuitem id="menu_osus_workflow_root" 
-                  name="OSUS Workflow" 
-                  sequence="15"
-                  web_icon="order_status_override,static/description/icon.png"/>
-        
-        <menuitem id="menu_osus_enhanced_orders" 
-                  name="Enhanced Sales Orders"
-                  parent="menu_osus_workflow_root"
-                  action="action_sale_order_enhanced_workflow"
-                  sequence="10"/>
-        
-        <menuitem id="menu_osus_workflow_dashboard" 
-                  name="Workflow Dashboard"
-                  parent="menu_osus_workflow_root"
-                  action="action_workflow_dashboard"
-                  sequence="20"/>
-        
-        <menuitem id="menu_osus_workflow_config" 
-                  name="Configuration"
-                  parent="menu_osus_workflow_root"
-                  sequence="30"/>
-        
-        <menuitem id="menu_osus_order_status" 
-                  name="Order Statuses"
-                  parent="menu_osus_workflow_config"
-                  action="order_status_override.action_order_status"
-                  sequence="10"/>
-        
+        <menuitem id="menu_osus_workflow_root" name="OSUS Workflow" sequence="15" web_icon="order_status_override,static/description/icon.png"/>
+
+        <menuitem id="menu_osus_enhanced_orders" name="Enhanced Sales Orders" parent="menu_osus_workflow_root" action="action_sale_order_enhanced_workflow" sequence="10"/>
+
+        <menuitem id="menu_osus_workflow_dashboard" name="Workflow Dashboard" parent="menu_osus_workflow_root" action="action_workflow_dashboard" sequence="20"/>
+
+        <menuitem id="menu_osus_workflow_config" name="Configuration" parent="menu_osus_workflow_root" sequence="30"/>
+
+        <menuitem id="menu_osus_order_status" name="Order Statuses" parent="menu_osus_workflow_config" action="order_status_override.action_order_status" sequence="10"/>
+
         <!-- Sales Menu Integration -->
-        <menuitem id="menu_sales_enhanced_orders" 
-                  name="Enhanced Orders"
-                  parent="sale.sale_menu_root"
-                  action="action_sale_order_enhanced_workflow"
-                  sequence="5"/>
-        
+        <menuitem id="menu_sales_enhanced_orders" name="Enhanced Orders" parent="sale.sale_menu_root" action="action_sale_order_enhanced_workflow" sequence="5"/>
+
     </data>
 </odoo>

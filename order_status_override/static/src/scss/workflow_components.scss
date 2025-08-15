@@ -7,15 +7,15 @@
     padding: 20px;
     margin: 16px 0;
     box-shadow: var(--osus-shadow-light);
-    
+
     .workflow-steps {
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: relative;
-        
+
         &::before {
-            content: '';
+            content: "";
             position: absolute;
             top: 50%;
             left: 0;
@@ -24,7 +24,7 @@
             background: #ecf0f1;
             z-index: 1;
         }
-        
+
         .workflow-step {
             display: flex;
             flex-direction: column;
@@ -34,7 +34,7 @@
             background: var(--osus-secondary);
             padding: 8px;
             border-radius: var(--osus-border-radius);
-            
+
             .step-circle {
                 width: 40px;
                 height: 40px;
@@ -46,22 +46,22 @@
                 color: white;
                 margin-bottom: 8px;
                 transition: var(--osus-transition);
-                
+
                 &.active {
                     background: var(--osus-primary);
                     box-shadow: var(--osus-shadow-medium);
                     transform: scale(1.1);
                 }
-                
+
                 &.completed {
                     background: var(--osus-success);
                 }
-                
+
                 &.pending {
                     background: #bdc3c7;
                 }
             }
-            
+
             .step-label {
                 font-size: 12px;
                 text-align: center;
@@ -80,13 +80,13 @@
     padding: 20px;
     margin: 16px 0;
     box-shadow: var(--osus-shadow-light);
-    
+
     .action-header {
         display: flex;
         align-items: center;
         gap: 12px;
         margin-bottom: 16px;
-        
+
         .action-icon {
             width: 32px;
             height: 32px;
@@ -98,19 +98,19 @@
             color: var(--osus-text-dark);
             font-weight: var(--osus-font-weight-bold);
         }
-        
+
         .action-title {
             font-size: 16px;
             font-weight: var(--osus-font-weight-medium);
             color: var(--osus-text-dark);
         }
     }
-    
+
     .action-buttons {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        
+
         .btn {
             flex: 1;
             min-width: 120px;
@@ -118,7 +118,7 @@
             font-weight: var(--osus-font-weight-medium);
             border-radius: var(--osus-border-radius);
             transition: var(--osus-transition);
-            
+
             &:hover {
                 transform: translateY(-1px);
                 box-shadow: var(--osus-shadow-light);
@@ -134,7 +134,7 @@
     border-radius: var(--osus-border-radius);
     padding: 20px;
     margin: 16px 0;
-    
+
     .calculator-header {
         background: linear-gradient(135deg, var(--osus-commission) 0%, #8e44ad 100%);
         color: white;
@@ -143,19 +143,19 @@
         border-radius: var(--osus-border-radius) var(--osus-border-radius) 0 0;
         font-weight: var(--osus-font-weight-medium);
     }
-    
+
     .commission-summary {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 16px;
         margin-bottom: 16px;
-        
+
         .summary-item {
             background: #f8f9fa;
             padding: 16px;
             border-radius: var(--osus-border-radius);
             text-align: center;
-            
+
             .summary-label {
                 font-size: 12px;
                 color: #6c757d;
@@ -163,7 +163,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            
+
             .summary-value {
                 font-size: 20px;
                 font-weight: var(--osus-font-weight-bold);
@@ -171,7 +171,7 @@
             }
         }
     }
-    
+
     .commission-details {
         .detail-row {
             display: flex;
@@ -179,16 +179,16 @@
             align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid #e9ecef;
-            
+
             &:last-child {
                 border-bottom: none;
             }
-            
+
             .detail-label {
                 font-weight: var(--osus-font-weight-medium);
                 color: var(--osus-text-dark);
             }
-            
+
             .detail-value {
                 font-weight: var(--osus-font-weight-bold);
                 color: var(--osus-primary);
@@ -204,22 +204,22 @@
     padding: 20px;
     margin: 16px 0;
     border-left: 4px solid var(--osus-accent);
-    
+
     .summary-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 16px;
-        
+
         .summary-metric {
             text-align: center;
-            
+
             .metric-value {
                 font-size: 24px;
                 font-weight: var(--osus-font-weight-bold);
                 color: var(--osus-primary);
                 display: block;
             }
-            
+
             .metric-label {
                 font-size: 12px;
                 color: #6c757d;
@@ -236,7 +236,7 @@
     &.entering {
         animation: slideInRight 0.3s ease-out;
     }
-    
+
     &.leaving {
         animation: slideOutLeft 0.3s ease-in;
     }
@@ -271,37 +271,37 @@
     margin: 16px 0;
     overflow: hidden;
     box-shadow: var(--osus-shadow-light);
-    
+
     .assignment-header {
         background: linear-gradient(135deg, var(--osus-text-dark) 0%, #34495e 100%);
         color: white;
         padding: 16px 20px;
         font-weight: var(--osus-font-weight-medium);
-        
+
         .header-icon {
             margin-right: 8px;
             font-size: 16px;
         }
     }
-    
+
     .assignment-body {
         padding: 20px;
-        
+
         .assignment-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #e9ecef;
-            
+
             &:last-child {
                 border-bottom: none;
             }
-            
+
             .assignment-role {
                 font-weight: var(--osus-font-weight-medium);
                 color: var(--osus-text-dark);
-                
+
                 .role-badge {
                     background: var(--osus-primary);
                     color: white;
@@ -311,12 +311,12 @@
                     margin-left: 8px;
                 }
             }
-            
+
             .assignment-user {
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                
+
                 .user-avatar {
                     width: 32px;
                     height: 32px;
@@ -328,7 +328,7 @@
                     font-weight: var(--osus-font-weight-bold);
                     color: var(--osus-text-dark);
                 }
-                
+
                 .user-name {
                     font-weight: var(--osus-font-weight-medium);
                     color: var(--osus-text-dark);
@@ -349,24 +349,24 @@
     padding: 16px 20px;
     z-index: 9999;
     animation: slideInFromRight 0.3s ease-out;
-    
+
     &.success {
         border-left: 4px solid var(--osus-success);
     }
-    
+
     &.warning {
         border-left: 4px solid var(--osus-warning);
     }
-    
+
     &.error {
         border-left: 4px solid var(--osus-danger);
     }
-    
+
     .toast-content {
         display: flex;
         align-items: center;
         gap: 12px;
-        
+
         .toast-icon {
             width: 24px;
             height: 24px;
@@ -377,20 +377,20 @@
             color: white;
             font-size: 12px;
         }
-        
+
         .toast-message {
             flex: 1;
             font-weight: var(--osus-font-weight-medium);
             color: var(--osus-text-dark);
         }
-        
+
         .toast-close {
             background: none;
             border: none;
             color: #6c757d;
             cursor: pointer;
             padding: 0;
-            
+
             &:hover {
                 color: var(--osus-text-dark);
             }
