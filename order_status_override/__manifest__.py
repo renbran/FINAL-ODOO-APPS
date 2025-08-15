@@ -25,6 +25,7 @@
         'security/security_enhanced.xml',
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
+        'data/email_templates.xml',
         'views/order_status_views.xml',
         'views/order_views_assignment.xml',
         'views/email_template_views.xml',
