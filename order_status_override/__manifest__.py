@@ -19,7 +19,7 @@
     'category': 'Sales',
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'mail', 'commission_ax'],
+    'depends': ['sale', 'mail'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -27,8 +27,9 @@
         'views/order_status_views.xml',
         'views/order_views_assignment.xml',
         'views/email_template_views.xml',
-        'views/report_wizard_views.xml',
-        'reports/order_status_reports.xml',
+        # Temporarily commented out to fix loading issues
+        # 'views/report_wizard_views.xml',
+        # 'reports/order_status_reports.xml',
     ],
     'installable': True,
     'application': False,
