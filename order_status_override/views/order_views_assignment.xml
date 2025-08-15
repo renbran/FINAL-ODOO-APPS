@@ -24,7 +24,7 @@
                 <button name="action_quotation_send" position="after">
                     <button name="action_change_status" string="Change Status" type="object" class="btn-secondary" icon="fa-exchange" invisible="1"/>
                     <button name="action_view_order_reports" string="Generate Reports" type="object" class="btn-info" icon="fa-file-pdf-o"/>
-                    <button name="%(report_sale_commission)d" string="Commission Report" type="action" class="btn-success" icon="fa-money" invisible="state not in ['sale', 'done']"/>
+                    <button name="%(order_status_override.report_sale_commission)d" string="Commission Report" type="action" class="btn-success" icon="fa-money" invisible="state not in ['sale', 'done']"/>
                 </button>
 
                 <!-- Add unified workflow action buttons synchronized with status bar -->
