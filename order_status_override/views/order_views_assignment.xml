@@ -10,7 +10,7 @@
             <field name="arch" type="xml">
                 <!-- Add workflow status bar -->
                 <field name="state" position="before">
-                    <field name="custom_status_id" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']"/>
+                    <field name="custom_status_id" widget="statusbar" options="{'clickable': '1'}" attrs="{'readonly': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
                 </field>
 
                 <!-- Add commission and workflow buttons in header -->
@@ -22,41 +22,41 @@
                 <!-- Add workflow action buttons based on status -->
                 <button name="action_quotation_send" position="after">
                     <!-- Draft to Documentation -->
-                    <button name="action_request_documentation" string="Request Documentation" type="object" class="btn-primary" icon="fa-file-text-o" invisible="custom_status_id.code != 'draft' or not documentation_user_id"/>
+                    <button name="action_request_documentation" string="Request Documentation" type="object" class="btn-primary" icon="fa-file-text-o" attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'draft'), ('documentation_user_id', '=', False)]}"/>
 
                     <!-- Documentation to Commission -->
-                    <button name="action_start_commission_calculation" string="Start Commission Calculation" type="object" class="btn-warning" icon="fa-calculator" invisible="custom_status_id.code != 'documentation_progress' or not commission_user_id"/>
+                    <button name="action_start_commission_calculation" string="Start Commission Calculation" type="object" class="btn-warning" icon="fa-calculator" attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'documentation_progress'), ('commission_user_id', '=', False)]}"/>
 
                     <!-- Commission to Final Review -->
-                    <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn-info" icon="fa-search" invisible="custom_status_id.code != 'commission_calculation' or not final_review_user_id"/>
+                    <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn-info" icon="fa-search" attrs="{'invisible': ['|', ('custom_status_id.code', '!=', 'commission_calculation'), ('final_review_user_id', '=', False)]}"/>
 
                     <!-- Final Review Actions -->
-                    <button name="action_approve_and_post_order" string="Approve &amp; Post Order" type="object" class="btn-success" icon="fa-check" invisible="custom_status_id.code != 'final_review'"/>
+                    <button name="action_approve_and_post_order" string="Approve &amp; Post Order" type="object" class="btn-success" icon="fa-check" attrs="{'invisible': [('custom_status_id.code', '!=', 'final_review')]}"/>
 
-                    <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger" icon="fa-times" invisible="custom_status_id.code != 'final_review'"/>
+                    <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger" icon="fa-times" attrs="{'invisible': [('custom_status_id.code', '!=', 'final_review')]}"/>
                 </button>
 
                 <!-- Add workflow assignment fields -->
-                <xpath expr="//notebook" position="inside">
+                <page string="Other Information" position="after">
                     <page string="Workflow &amp; Assignment" name="workflow_assignment">
                         <group>
                             <group string="Stage Assignments" name="stage_assignments">
-                                <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
-                                <field name="commission_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
-                                <field name="final_review_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="documentation_user_id" options="{'no_create': True}"/>
+                                <field name="commission_user_id" options="{'no_create': True}"/>
+                                <field name="final_review_user_id" options="{'no_create': True}"/>
                             </group>
 
                             <group string="Real Estate Details" name="real_estate_details">
                                 <field name="booking_date"/>
-                                <field name="project_id" options="{'no_create': True, 'no_quick_create': True}"/>
-                                <field name="unit_id" options="{'no_create': True, 'no_quick_create': True}" domain="[('type', '=', 'product')]"/>
+                                <field name="project_id" options="{'no_create': True}"/>
+                                <field name="unit_id" options="{'no_create': True}" domain="[('type', '=', 'product')]"/>
                             </group>
                         </group>
 
                         <!-- Status History -->
                         <group string="Status History" name="status_history">
                             <field name="custom_status_history_ids" nolabel="1">
-                                <tree editable="false" create="false" delete="false">
+                                <tree>
                                     <field name="status_id"/>
                                     <field name="create_date"/>
                                     <field name="create_uid"/>
@@ -65,28 +65,28 @@
                             </field>
                         </group>
                     </page>
-                </xpath>
+                </page>
 
                 <!-- Enhanced Commission Configuration -->
-                <xpath expr="//notebook" position="inside">
+                <page string="Other Information" position="after">
                     <page string="Commission Configuration" name="commission_config">
                         <group>
                             <!-- External Commissions -->
                             <group string="External Commissions" name="external_commissions">
                                 <separator string="Broker Commission" colspan="2"/>
-                                <field name="broker_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="broker_partner_id" options="{'no_create': True}"/>
                                 <field name="broker_commission_type"/>
                                 <field name="broker_rate"/>
                                 <field name="broker_amount" readonly="1" widget="monetary"/>
 
                                 <separator string="Referrer Commission" colspan="2"/>
-                                <field name="referrer_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="referrer_partner_id" options="{'no_create': True}"/>
                                 <field name="referrer_commission_type"/>
                                 <field name="referrer_rate"/>
                                 <field name="referrer_amount" readonly="1" widget="monetary"/>
 
                                 <separator string="Cashback" colspan="2"/>
-                                <field name="cashback_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="cashback_partner_id" options="{'no_create': True}"/>
                                 <field name="cashback_commission_type"/>
                                 <field name="cashback_rate"/>
                                 <field name="cashback_amount" readonly="1" widget="monetary"/>
@@ -95,25 +95,25 @@
                             <!-- Internal Commissions -->
                             <group string="Internal Commissions" name="internal_commissions">
                                 <separator string="Agent 1 Commission" colspan="2"/>
-                                <field name="agent1_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="agent1_partner_id" options="{'no_create': True}"/>
                                 <field name="agent1_commission_type"/>
                                 <field name="agent1_rate"/>
                                 <field name="agent1_amount" readonly="1" widget="monetary"/>
 
                                 <separator string="Agent 2 Commission" colspan="2"/>
-                                <field name="agent2_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="agent2_partner_id" options="{'no_create': True}"/>
                                 <field name="agent2_commission_type"/>
                                 <field name="agent2_rate"/>
                                 <field name="agent2_amount" readonly="1" widget="monetary"/>
 
                                 <separator string="Manager Commission" colspan="2"/>
-                                <field name="manager_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="manager_partner_id" options="{'no_create': True}"/>
                                 <field name="manager_commission_type"/>
                                 <field name="manager_rate"/>
                                 <field name="manager_amount" readonly="1" widget="monetary"/>
 
                                 <separator string="Director Commission" colspan="2"/>
-                                <field name="director_partner_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                                <field name="director_partner_id" options="{'no_create': True}"/>
                                 <field name="director_commission_type"/>
                                 <field name="director_rate"/>
                                 <field name="director_amount" readonly="1" widget="monetary"/>
@@ -131,7 +131,7 @@
                             </group>
                         </group>
                     </page>
-                </xpath>
+                </page>
             </field>
         </record>
 
@@ -162,14 +162,14 @@
                     <field name="commission_user_id"/>
                     <field name="final_review_user_id"/>
                 </field>
-                <xpath expr="//search" position="inside">
+                <filter name="my_quotation" position="after">
                     <separator/>
                     <filter name="draft_status" string="Draft Orders" domain="[('custom_status_id.name', '=', 'Draft')]"/>
                     <filter name="documentation_pending" string="Documentation Pending" domain="[('custom_status_id.name', '=', 'Documentation In-progress')]"/>
                     <filter name="commission_pending" string="Commission Pending" domain="[('custom_status_id.name', '=', 'Commission Calculation In-progress')]"/>
                     <filter name="review_pending" string="Review Pending" domain="[('custom_status_id.name', '=', 'Final Review')]"/>
                     <filter name="approved_orders" string="Approved Orders" domain="[('custom_status_id.name', '=', 'Approved')]"/>
-                </xpath>
+                </filter>
                 <group name="group_by" position="inside">
                     <filter name="group_by_status" string="Custom Status" context="{'group_by': 'custom_status_id'}"/>
                     <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
