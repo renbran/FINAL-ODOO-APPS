@@ -77,8 +77,8 @@
                                 nodeType: target?.nodeType,
                                 nodeName: target?.nodeName,
                                 isConnected: target?.isConnected,
-                                constructor: target?.constructor?.name,
-                            });
+                                constructor: target?.constructor?.name;
+});
                         }
                     }
                 }
@@ -124,21 +124,21 @@
                 "advertisement",
                 "social media",
                 "index.ts-",
-                "web.assets_web.min.js",
-            ];
+                "web.assets_web.min.js";
+];
 
             const suppressErrors = [
                 "Could not get content for.*payment_widget.js",
                 "Unknown action service",
                 "Content script initialised",
-                "Recorder disabled",
-            ];
+                "Recorder disabled";
+];
 
             // Override console.error
             console.error = function (...args) {
                 const message = args.join(" ");
                 if (suppressPatterns.some((pattern) => message.match(new RegExp(pattern, "i")))) {
-                    return; // Suppress this error
+                    return; // Suppress this error;
                 }
                 originalError.apply(console, args);
             };
@@ -147,7 +147,7 @@
             console.warn = function (...args) {
                 const message = args.join(" ");
                 if (suppressPatterns.some((pattern) => message.match(new RegExp(pattern, "i")))) {
-                    return; // Suppress this warning
+                    return; // Suppress this warning;
                 }
                 originalWarn.apply(console, args);
             };
@@ -159,10 +159,10 @@
             // Add global error handlers for MutationObserver issues
             window.addEventListener("error", (event) => {
                 if (
-                    event.error &&
-                    (event.error.message?.includes("MutationObserver") ||
-                        event.error.message?.includes("parameter 1 is not of type 'Node'") ||
-                        event.filename?.includes("index.ts-"))
+                    event.error &&;
+                    (event.error.message?.includes("MutationObserver") ||;
+                        event.error.message?.includes("parameter 1 is not of type 'Node'") ||;
+                        event.filename?.includes("index.ts-"));
                 ) {
                     console.warn("[CloudPepper] Intercepted MutationObserver error:", event.error.message);
                     event.preventDefault();
@@ -245,8 +245,8 @@
             // Remove any elements that might cause issues
             const problematicSelectors = [
                 '[data-menu-xmlid="hr_expense.menu_hr_expense_root"]',
-                '.o_app[data-menu-xmlid*="expense"]',
-            ];
+                '.o_app[data-menu-xmlid*="expense"]';
+];
 
             problematicSelectors.forEach((selector) => {
                 try {
@@ -272,4 +272,5 @@
     window.cloudPepperEmergencyFix = emergencyFix;
 
     console.log("[CloudPepper] Emergency error fixes initialized successfully");
-})(); // End IIFE
+})(); // End IIFE;
+

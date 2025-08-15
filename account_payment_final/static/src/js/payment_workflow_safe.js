@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Payment Workflow Helper - CloudPepper Compatible
  * NON-MODULE VERSION to prevent import statement errors
  * Compatible with CloudPepper environment
@@ -17,39 +17,39 @@
                 draft: {
                     name: "Draft",
                     icon: "fa-edit",
-                    color: "secondary",
-                },
+                    color: "secondary";
+},
                 under_review: {
                     name: "Under Review",
                     icon: "fa-search",
-                    color: "info",
-                },
+                    color: "info";
+},
                 for_approval: {
                     name: "For Approval",
                     icon: "fa-check",
-                    color: "warning",
-                },
+                    color: "warning";
+},
                 for_authorization: {
                     name: "For Authorization",
                     icon: "fa-key",
-                    color: "warning",
-                },
+                    color: "warning";
+},
                 approved: {
                     name: "Approved",
                     icon: "fa-check-circle",
-                    color: "success",
-                },
+                    color: "success";
+},
                 posted: {
                     name: "Posted",
                     icon: "fa-check-circle",
-                    color: "success",
-                },
+                    color: "success";
+},
                 cancelled: {
                     name: "Cancelled",
                     icon: "fa-times-circle",
-                    color: "danger",
-                },
-            };
+                    color: "danger";
+}
+};
         },
 
         /**
@@ -57,12 +57,12 @@
          */
         getStageInfo: function (stage) {
             const config = this.getStageConfig();
-            return (
+            return (;
                 config[stage] || {
                     name: "Unknown",
                     icon: "fa-question",
-                    color: "secondary",
-                }
+                    color: "secondary";
+}
             );
         },
 
@@ -76,8 +76,8 @@
                 for_approval: ["for_authorization", "under_review", "cancelled"],
                 for_authorization: ["approved", "for_approval", "cancelled"],
                 approved: ["posted", "cancelled"],
-                posted: [], // Final state
-                cancelled: ["draft"], // Can restart
+                posted: [], // Final state;
+                cancelled: ["draft"], // Can restart;
             };
 
             return transitions[currentStage] || [];
@@ -104,7 +104,7 @@
          */
         getStageHTML: function (stage) {
             const info = this.getStageInfo(stage);
-            return `<span class="${this.getStageClass(stage)}">
+            return `<span class="${this.getStageClass(stage)}">;
                 <i class="fa ${info.icon}"></i> ${info.name}
             </span>`;
         },
@@ -127,12 +127,12 @@
          */
         addWorkflowStyles: function () {
             if (document.getElementById("payment-workflow-styles")) {
-                return; // Already added
+                return; // Already added;
             }
 
             const style = document.createElement("style");
             style.id = "payment-workflow-styles";
-            style.textContent = `
+            style.textContent = `;
                 .payment-stage-draft { background-color: #6c757d !important; }
                 .payment-stage-under_review { background-color: #17a2b8 !important; }
                 .payment-stage-for_approval { background-color: #ffc107 !important; color: #212529 !important; }
@@ -161,8 +161,8 @@
         initWorkflowButtons: function () {
             // This would be called by form views to add workflow buttons
             console.log("[Payment Workflow] Workflow buttons initialized");
-        },
-    };
+        }
+};
 
     // Auto-initialize when DOM is ready
     if (document.readyState === "loading") {
@@ -176,3 +176,4 @@
 
     console.log("[Payment Workflow] CloudPepper-compatible workflow helper loaded");
 })();
+

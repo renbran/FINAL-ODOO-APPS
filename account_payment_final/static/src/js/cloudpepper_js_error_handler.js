@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CloudPepper JavaScript Error Handler
  * Fixes MutationObserver errors and provides robust DOM observation
  * NON-MODULE VERSION to prevent import statement errors
@@ -67,13 +67,13 @@ class CloudPepperJSErrorHandler {
 
                     // Ensure target is a proper DOM node
                     if (
-                        target.nodeType !== Node.ELEMENT_NODE &&
-                        target.nodeType !== Node.DOCUMENT_NODE &&
-                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+                        target.nodeType !== Node.ELEMENT_NODE &&;
+                        target.nodeType !== Node.DOCUMENT_NODE &&;
+                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE;
                     ) {
-                        console.warn(
+                        console.warn(;
                             "[CloudPepper] MutationObserver.observe called with invalid node type:",
-                            target.nodeType
+                            target.nodeType;
                         );
                         return;
                     }
@@ -107,8 +107,8 @@ class CloudPepperJSErrorHandler {
                         childList: true,
                         subtree: true,
                         attributes: true,
-                        ...options,
-                    });
+                        ...options;
+});
                     return observer;
                 } catch (error) {
                     console.warn("[CloudPepper] Failed to create safe observer:", error.message);
@@ -135,8 +135,8 @@ class CloudPepperJSErrorHandler {
                     try {
                         observer.observe(document.body, {
                             childList: true,
-                            subtree: true,
-                        });
+                            subtree: true;
+});
 
                         setTimeout(() => {
                             observer.disconnect();
@@ -146,8 +146,8 @@ class CloudPepperJSErrorHandler {
                         reject(error);
                     }
                 });
-            },
-        };
+            }
+};
     }
 }
 
@@ -160,4 +160,5 @@ window.cloudPepperErrorHandler = errorHandler;
 
 console.log("[CloudPepper] JavaScript error handler initialized successfully");
 
-})(); // End IIFE
+})(); // End IIFE;
+

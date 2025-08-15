@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CloudPepper Nuclear JavaScript Fix
  * Ultimate solution for all JavaScript errors in CloudPepper environment
  * MUST LOAD FIRST - Prevents all known JS crashes
@@ -37,9 +37,9 @@
 
                     // Node type range validation (1-12 are valid DOM node types)
                     if (target.nodeType < 1 || target.nodeType > 12) {
-                        console.debug(
+                        console.debug(;
                             "[CloudPepper Nuclear] MutationObserver: invalid nodeType blocked:",
-                            target.nodeType
+                            target.nodeType;
                         );
                         return;
                     }
@@ -105,7 +105,7 @@
     window.Error.prototype.constructor = window.Error;
 
     // 3. COMPREHENSIVE ERROR EVENT HANDLING
-    window.addEventListener(
+    window.addEventListener(;
         "error",
         function (event) {
             const message = event.message || "";
@@ -136,8 +136,8 @@
                 // Third-party errors
                 /extension/i,
                 /chrome-extension/,
-                /moz-extension/,
-            ];
+                /moz-extension/;
+];
 
             // Check if error should be suppressed
             for (const pattern of suppressPatterns) {
@@ -152,8 +152,8 @@
             // Let other errors pass through
             return true;
         },
-        true
-    ); // Capture phase to intercept early
+        true;
+    ); // Capture phase to intercept early;
 
     // 4. PROMISE REJECTION HANDLING
     window.addEventListener("unhandledrejection", function (event) {
@@ -166,8 +166,8 @@
             /Unexpected token/,
             /Module loading/,
             /Script error/,
-            /Loading failed/,
-        ];
+            /Loading failed/;
+];
 
         for (const pattern of suppressPromisePatterns) {
             if (pattern.test(reasonText)) {
@@ -194,8 +194,8 @@
             /Content script initialised/,
             /Recorder disabled/,
             /Loading failed for the <script>/,
-            /index\.ts-.*\.js/,
-        ];
+            /index\.ts-.*\.js/;
+];
 
         for (const pattern of suppressConsolePatterns) {
             if (pattern.test(message)) {
@@ -240,8 +240,8 @@
             } else {
                 setTimeout(callback, 0);
             }
-        },
-    };
+        }
+};
 
     // 7. MODULE LOADING OVERRIDE for problematic files
     if (window.define && typeof window.define === "function") {
@@ -261,3 +261,4 @@
 
     console.log("[CloudPepper Nuclear] All comprehensive fixes applied successfully");
 })();
+

@@ -148,12 +148,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
+                        "X-Requested-With": "XMLHttpRequest";
+},
                     body: JSON.stringify({
-                        verification_code: verificationCode,
-                    }),
-                });
+                        verification_code: verificationCode;
+});
+});
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -166,8 +166,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 this.showResult({
                     success: false,
                     message: "Network error occurred. Please try again.",
-                    error: error.message,
-                });
+                    error: error.message;
+});
             } finally {
                 this.setLoadingState(false);
             }
@@ -214,15 +214,15 @@ document.addEventListener("DOMContentLoaded", function () {
         createResultHTML(result, type) {
             const icon = type === "success" ? "fa-check-circle" : "fa-exclamation-circle";
             const title = type === "success" ? "Payment Verified" : "Verification Failed";
-            let html = `
+            let html = `;
 ;
-                <div class="o_result_header">
+                <div class="o_result_header">;
 ;
-                    <i class="fa ${icon} o_result_icon"></i>
+                    <i class="fa ${icon} o_result_icon"></i>;
 ;
-                    <h3>${title}</h3>
+                    <h3>${title}</h3>;
 ;
-                </div>
+                </div>;
 ;
             `;
 
@@ -246,20 +246,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 { label: "Partner", value: paymentData.partner_name },
                 { label: "Date", value: this.formatDate(paymentData.date) },
                 { label: "State", value: this.formatState(paymentData.state) },
-                { label: "Journal", value: paymentData.journal_name },
-            ];
+                { label: "Journal", value: paymentData.journal_name }
+];
 
             details.forEach((detail) => {
                 if (detail.value) {
-                    html += `
+                    html += `;
 ;
-                        <div class="o_detail_row">
+                        <div class="o_detail_row">;
 ;
-                            <span class="o_detail_label">${detail.label}:</span>
+                            <span class="o_detail_label">${detail.label}:</span>;
 ;
-                            <span class="o_detail_value">${this.escapeHtml(detail.value)}</span>
+                            <span class="o_detail_value">${this.escapeHtml(detail.value)}</span>;
 ;
-                        </div>
+                        </div>;
 ;
                     `;
                 }
@@ -288,8 +288,8 @@ document.addEventListener("DOMContentLoaded", function () {
             try {
                 return new Intl.NumberFormat("en-US", {
                     style: "currency",
-                    currency: currency || "USD",
-                }).format(amount);
+                    currency: currency || "USD";
+}).format(amount);
             } catch (error) {
                 return `${amount} ${currency || ""}`;
             }
@@ -302,8 +302,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 return date.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
-                    day: "numeric",
-                });
+                    day: "numeric";
+});
             } catch (error) {
                 return dateString;
             }
@@ -318,12 +318,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 authorize: "Authorized",
                 post: "Posted",
                 cancel: "Cancelled",
-                reject: "Rejected",
-            };
+                reject: "Rejected";
+};
 
             return stateLabels[state] || state.charAt(0).toUpperCase() + state.slice(1);
-        },
-    };
+        }
+};
 
     // Initialize the verification portal
     VerificationPortal.init();
@@ -331,3 +331,4 @@ document.addEventListener("DOMContentLoaded", function () {
     // Export to global scope for debugging
     window.VerificationPortal = VerificationPortal;
 });
+

@@ -1330,6 +1330,61 @@ Verify at: {base_url}/payment/qr-guide"""
         
         return stats
 
+    def get_related_document_info(self):
+        """Get related document information for voucher template"""
+        self.ensure_one()
+        info = {
+            'references': 'N/A',
+            'count': 0
+        }
+        
+        try:
+            # Get reconciled move lines and their invoices
+            if self.reconciled_invoice_ids:
+                invoice_refs = []
+                for invoice in self.reconciled_invoice_ids:
+                    invoice_refs.append(invoice.name or invoice.payment_reference or f"INV-{invoice.id}")
+                info['references'] = ', '.join(invoice_refs)
+                info['count'] = len(self.reconciled_invoice_ids)
+            elif self.ref:
+                info['references'] = self.ref
+                info['count'] = 1
+        except Exception as e:
+            _logger.warning(f"Error getting document info: {e}")
+        
+        return info
+
+    def get_payment_summary(self):
+        """Get payment summary for voucher template"""
+        self.ensure_one()
+        summary = {
+            'total_invoice_amount': 0.0,
+            'currency': self.currency_id,
+            'is_full_payment': False
+        }
+        
+        try:
+            if self.reconciled_invoice_ids:
+                total_amount = sum(self.reconciled_invoice_ids.mapped('amount_total'))
+                summary['total_invoice_amount'] = total_amount
+                summary['is_full_payment'] = abs(self.amount - total_amount) < 0.01
+        except Exception as e:
+            _logger.warning(f"Error getting payment summary: {e}")
+        
+        return summary
+
+    def get_voucher_description(self):
+        """Get voucher description for payment summary"""
+        self.ensure_one()
+        if self.payment_type == 'inbound':
+            return f"Payment received from {self.partner_id.name}"
+        else:
+            return f"Payment made to {self.partner_id.name}"
+
+    def _get_amount_in_words(self):
+        """Get amount in words - alias for backward compatibility"""
+        return self._amount_in_words()
+
 
 class AccountPaymentRegister(models.TransientModel):
     """Enhanced payment registration wizard"""
