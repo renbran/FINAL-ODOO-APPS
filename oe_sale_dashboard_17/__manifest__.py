@@ -99,4 +99,5 @@ All enhancements are contained within the dashboard interface only.
     'auto_install': False,
     'application': False,
     'license': 'LGPL-3',
+    'license': 'LGPL-3',
 }
