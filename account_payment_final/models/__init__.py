@@ -8,6 +8,7 @@ Models are organized following Odoo 17 best practices for maintainability.
 
 # Core payment models
 from . import account_payment
+from . import account_payment_register
 from . import account_move
 
 # Configuration models  

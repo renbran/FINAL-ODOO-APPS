@@ -409,6 +409,32 @@ Verify at: {base_url}/payment/qr-guide"""
             self.state = 'posted'
         elif self.approval_state == 'cancelled' and self.state != 'cancel':
             self.state = 'cancel'
+        
+        # Trigger UI updates for button visibility and field states
+        return {
+            'domain': {},
+            'warning': {},
+            'value': {
+                'state': self.state,
+            }
+        }
+
+    @api.onchange('state')
+    def _onchange_state_sync_approval(self):
+        """Synchronize Odoo state with approval state for real-time updates"""
+        if self.state == 'posted' and self.approval_state != 'posted':
+            # Don't automatically change approval_state unless user has permissions
+            if self.env.user.has_group('account_payment_final.group_payment_poster'):
+                self.approval_state = 'posted'
+        elif self.state == 'cancel' and self.approval_state != 'cancelled':
+            self.approval_state = 'cancelled'
+        
+        # Real-time UI refresh notification
+        if self._origin and self._origin.id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+            }
 
     @api.onchange('journal_id')
     def _onchange_journal_id_destination_account(self):
@@ -428,6 +454,145 @@ Verify at: {base_url}/payment/qr-guide"""
             # Set destination account for vendor payments
             if self.payment_type == 'outbound' and not self.destination_account_id:
                 self.destination_account_id = self.partner_id.property_account_payable_id
+
+    @api.onchange('reviewer_id', 'approver_id', 'authorizer_id')
+    def _onchange_workflow_users(self):
+        """Real-time updates when workflow users are assigned"""
+        current_time = fields.Datetime.now()
+        
+        # Update corresponding dates when users are assigned
+        if self.reviewer_id and not self.reviewer_date:
+            self.reviewer_date = current_time
+        if self.approver_id and not self.approver_date:
+            self.approver_date = current_time
+        if self.authorizer_id and not self.authorizer_date:
+            self.authorizer_date = current_time
+        
+        # Real-time workflow progress update
+        return {
+            'value': {
+                'reviewer_date': self.reviewer_date,
+                'approver_date': self.approver_date,
+                'authorizer_date': self.authorizer_date,
+            }
+        }
+
+    @api.onchange('amount', 'currency_id', 'date')
+    def _onchange_amount_validation(self):
+        """Real-time amount validation and approval requirement checking"""
+        if self.amount <= 0:
+            return {
+                'warning': {
+                    'title': _('Invalid Amount'),
+                    'message': _('Payment amount must be greater than zero.')
+                }
+            }
+        
+        # Check if amount requires special approval workflow
+        if self.amount and self.currency_id:
+            company_currency = self.company_id.currency_id or self.env.company.currency_id
+            amount_in_company_currency = self.amount
+            
+            if self.currency_id != company_currency:
+                rate_date = self.date or fields.Date.today()
+                amount_in_company_currency = self.currency_id._convert(
+                    self.amount, company_currency, self.company_id, rate_date
+                )
+            
+            # High amount threshold warning
+            high_amount_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
+                'account_payment_final.high_amount_threshold', '10000.0'))
+            
+            if amount_in_company_currency > high_amount_threshold:
+                return {
+                    'warning': {
+                        'title': _('High Amount Payment'),
+                        'message': _('This payment amount exceeds %s %s and will require enhanced approval workflow.') % (
+                            high_amount_threshold, company_currency.name
+                        )
+                    }
+                }
+
+    @api.onchange('payment_method_line_id')
+    def _onchange_payment_method_enhanced(self):
+        """Enhanced payment method change handling"""
+        if self.payment_method_line_id:
+            # Auto-set bank account if payment method requires it
+            if self.payment_method_line_id.payment_method_id.code in ['electronic', 'check_printing']:
+                if not self.journal_id.bank_account_id:
+                    return {
+                        'warning': {
+                            'title': _('Bank Account Required'),
+                            'message': _('The selected payment method requires a bank account to be configured in the journal.')
+                        }
+                    }
+
+    # ============================================================================
+    # CONSTRAINTS
+    # ============================================================================
+
+    @api.constrains('state', 'approval_state')
+    def _check_payment_posting_constraints(self):
+        """Ensure payments follow approval workflow before posting"""
+        for payment in self:
+            # Skip constraint for system-generated payments or internal transfers
+            if (self.env.context.get('bypass_approval_workflow') or 
+                self.env.context.get('is_system_payment') or
+                payment.is_internal_transfer):
+                continue
+            
+            # If payment state is posted but approval_state is not approved/posted
+            if (payment.state == 'posted' and 
+                payment.approval_state not in ['approved', 'posted']):
+                
+                # Check if user has bypass permissions
+                bypass_check = payment._can_bypass_approval_workflow()
+                if not bypass_check['can_bypass']:
+                    raise ValidationError(_(
+                        "Payment cannot be posted without proper approval workflow completion. "
+                        "Current approval state: %s. Please complete the approval process first."
+                    ) % payment.approval_state)
+            
+            # Special validation for payments created from invoices
+            if (payment.reconciled_invoice_ids and 
+                payment.state == 'posted' and 
+                payment.approval_state != 'posted'):
+                
+                # More strict validation for invoice payments
+                if not self.env.user.has_group('account.group_account_manager'):
+                    raise ValidationError(_(
+                        "Payments registered from invoices must complete the approval workflow. "
+                        "Current state: %s. Only account managers can override this constraint."
+                    ) % payment.approval_state)
+
+    @api.constrains('approval_state', 'reviewer_id', 'approver_id', 'authorizer_id')
+    def _check_approval_workflow_integrity(self):
+        """Ensure approval workflow integrity and user permissions"""
+        for payment in self:
+            # Check reviewer permissions
+            if (payment.approval_state in ['under_review', 'for_approval', 'for_authorization', 'approved', 'posted'] and
+                payment.reviewer_id):
+                if not payment.reviewer_id.has_group('account_payment_final.group_payment_voucher_reviewer'):
+                    raise ValidationError(_(
+                        "User %s does not have reviewer permissions for payment workflow."
+                    ) % payment.reviewer_id.name)
+            
+            # Check approver permissions
+            if (payment.approval_state in ['for_approval', 'for_authorization', 'approved', 'posted'] and
+                payment.approver_id):
+                if not payment.approver_id.has_group('account_payment_final.group_payment_voucher_approver'):
+                    raise ValidationError(_(
+                        "User %s does not have approver permissions for payment workflow."
+                    ) % payment.approver_id.name)
+            
+            # Check authorizer permissions (for vendor payments)
+            if (payment.payment_type == 'outbound' and
+                payment.approval_state in ['for_authorization', 'approved', 'posted'] and
+                payment.authorizer_id):
+                if not payment.authorizer_id.has_group('account_payment_final.group_payment_voucher_authorizer'):
+                    raise ValidationError(_(
+                        "User %s does not have authorizer permissions for payment workflow."
+                    ) % payment.authorizer_id.name)
 
     # ============================================================================
     # UTILITY METHODS
@@ -1179,9 +1344,8 @@ Verify at: {base_url}/payment/qr-guide"""
         return res
 
     @api.model
-    @api.model
     def create(self, vals):
-        """Enhanced create method with voucher number generation"""
+        """Enhanced create method with voucher number generation and approval workflow enforcement"""
         # Generate voucher number if not provided or is default '/'
         if not vals.get('voucher_number') or vals.get('voucher_number') == '/':
             payment_type = vals.get('payment_type', 'outbound')
@@ -1217,17 +1381,58 @@ Verify at: {base_url}/payment/qr-guide"""
                 vals['voucher_number'] = f"{prefix}{now.strftime('%Y%m%d%H%M%S')}"
                 _logger.warning(f"Fallback voucher number generated: {vals['voucher_number']} due to error: {e}")
 
+        # CRITICAL: Ensure all payments created through any method go through approval workflow
+        # Only allow direct posting if explicitly bypassed by authorized users
+        bypass_approval = self.env.context.get('bypass_approval_workflow', False)
+        is_internal_transfer = vals.get('is_internal_transfer', False)
+        is_system_payment = self.env.context.get('is_system_payment', False)
+        
+        # Force approval workflow unless explicitly bypassed
+        if not bypass_approval and not is_system_payment:
+            # Always start with draft state for manual payments
+            vals['approval_state'] = 'draft'
+            
+            # If state is set to posted, change it to draft
+            if vals.get('state') == 'posted':
+                vals['state'] = 'draft'
+                _logger.info(f"Payment creation: Forced draft state for approval workflow")
+        
+        # Check if this is a payment from invoice registration
+        from_invoice_registration = (
+            vals.get('reconciled_invoice_ids') or 
+            vals.get('invoice_ids') or
+            self.env.context.get('active_model') == 'account.move' or
+            self.env.context.get('from_invoice_payment', False)
+        )
+        
+        if from_invoice_registration and not bypass_approval:
+            # MANDATORY: All invoice payments must go through approval workflow
+            vals['approval_state'] = 'draft'
+            vals['state'] = 'draft'
+            
+            # Add context message for user notification
+            self = self.with_context(
+                payment_requires_approval=True,
+                approval_reason="Payment registered from invoice/bill - approval required"
+            )
+            
+            _logger.info(f"Invoice payment creation: Forced approval workflow for payment from invoice")
+
         payment = super(AccountPayment, self).create(vals)
         
         # Ensure voucher number is set if somehow missed
         if not payment.voucher_number or payment.voucher_number == '/':
             payment._generate_voucher_number()
         
-        # Log the creation
+        # Log the creation and notify if approval workflow is required
         if vals.get('remarks'):
             payment._post_workflow_message(f"created with remarks: {vals['remarks']}")
         
         payment._post_workflow_message(f"voucher {payment.voucher_number} created")
+        
+        # Post notification if payment requires approval
+        if payment.approval_state == 'draft' and not is_system_payment:
+            payment._post_workflow_message("payment created - approval workflow required before posting")
         
         return payment
 

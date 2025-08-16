@@ -354,7 +354,7 @@ class AccountMove(models.Model):
     # ============================================================================
 
     def action_register_payment(self):
-        """Override register payment to check approval state"""
+        """Override register payment to enforce approval workflow for all payments"""
         for record in self:
             # Only check approval for invoices and bills
             if record.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
@@ -366,5 +366,73 @@ class AccountMove(models.Model):
                 if hasattr(record, 'approval_state') and record.approval_state != 'posted':
                     raise UserError(_("Cannot register payment for unapproved invoice/bill. Current approval state: %s") % record.approval_state)
         
-        # Call the original register payment method
-        return super(AccountMove, self).action_register_payment()
+        # Get the original register payment action
+        action = super(AccountMove, self).action_register_payment()
+        
+        # Modify context to ensure payment goes through approval workflow
+        if isinstance(action, dict) and 'context' in action:
+            # Add context flags to force approval workflow
+            action['context'].update({
+                'from_invoice_payment': True,
+                'force_approval_workflow': True,
+                'default_approval_state': 'draft',
+                'payment_requires_approval': True,
+            })
+        
+        return action
+
+    @api.onchange('approval_state')
+    def _onchange_approval_state_move(self):
+        """Real-time status updates for invoice/bill approval workflow"""
+        if self.approval_state == 'posted' and self.state != 'posted':
+            # Don't automatically post - require explicit action
+            return {
+                'warning': {
+                    'title': _('Ready to Post'),
+                    'message': _('This invoice/bill has been approved and is ready to be posted. Please use the Post button to complete the process.')
+                }
+            }
+        
+        # Trigger UI refresh for real-time updates
+        return {
+            'domain': {},
+            'value': {},
+        }
+
+    @api.onchange('state')
+    def _onchange_state_move_sync(self):
+        """Synchronize move state with approval state"""
+        if self.state == 'posted' and hasattr(self, 'approval_state') and self.approval_state != 'posted':
+            if self.env.user.has_group('account.group_account_manager'):
+                self.approval_state = 'posted'
+
+    @api.onchange('amount_total', 'partner_id')
+    def _onchange_invoice_validation(self):
+        """Real-time validation for invoice/bill amounts and partners"""
+        if self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
+            # Validate amount
+            if self.amount_total <= 0:
+                return {
+                    'warning': {
+                        'title': _('Invalid Amount'),
+                        'message': _('Invoice/bill amount must be greater than zero.')
+                    }
+                }
+            
+            # Check if high amount requires special approval
+            if self.amount_total > 50000:  # High amount threshold
+                return {
+                    'warning': {
+                        'title': _('High Amount Invoice/Bill'),
+                        'message': _('This invoice/bill amount is high and may require enhanced approval workflow.')
+                    }
+                }
+            
+            # Validate partner
+            if not self.partner_id:
+                return {
+                    'warning': {
+                        'title': _('Partner Required'),
+                        'message': _('Please select a partner for this invoice/bill.')
+                    }
+                }

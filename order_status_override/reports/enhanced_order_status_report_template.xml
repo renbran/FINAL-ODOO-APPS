@@ -84,90 +84,102 @@
                                     <!-- Header Section -->
                                     <div class="report-header">
                                         <h1 class="report-title">Order Status Report</h1>
-                                        <div>Order: <span t-field="o.name"/> | Date: <span t-field="o.date_order" t-options="{'widget': 'date'}"/></div>
+                                        <div>Order: <span t-field="o.name"/>
+ | Date: <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
                                     </div>
+                                </div>
 
-                                    <!-- Order Information -->
-                                    <div class="order-info">
-                                        <h3 style="color: #1f4788; margin-bottom: 15px;">Order Details</h3>
-                                        <div class="info-grid">
-                                            <div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Customer:</span>
-                                                    <span t-field="o.partner_id.name"/>
-                                                </div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Email:</span>
-                                                    <span t-field="o.partner_id.email"/>
-                                                </div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Phone:</span>
-                                                    <span t-field="o.partner_id.phone"/>
-                                                </div>
+                                <!-- Order Information -->
+                                <div class="order-info">
+                                    <h3 style="color: #1f4788; margin-bottom: 15px;">Order Details</h3>
+                                    <div class="info-grid">
+                                        <div>
+                                            <div class="info-item">
+                                                <span class="info-label">Customer:</span>
+                                                <span t-field="o.partner_id.name"/>
                                             </div>
-                                            <div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Order Status:</span>
-                                                    <span t-attf-class="status-badge status-#{o.order_status or 'draft'}">
-                                                        <span t-field="o.order_status"/>
-                                                    </span>
-                                                </div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Total Amount:</span>
-                                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                                </div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Salesperson:</span>
-                                                    <span t-field="o.user_id.name"/>
-                                                </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Email:</span>
+                                                <span t-field="o.partner_id.email"/>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Phone:</span>
+                                                <span t-field="o.partner_id.phone"/>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="info-item">
+                                                <span class="info-label">Order Status:</span>
+                                                <span t-attf-class="status-badge status-#{o.order_status or 'draft'}">
+                                                    <span t-field="o.order_status"/>
+                                                </span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Total Amount:</span>
+                                                <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Salesperson:</span>
+                                                <span t-field="o.user_id.name"/>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Order Lines -->
-                                    <h3 style="color: #1f4788; margin: 20px 0 10px 0;">Order Items</h3>
-                                    <table class="table table-sm">
-                                        <thead style="background-color: #1f4788; color: white;">
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Description</th>
-                                                <th>Qty</th>
-                                                <th>Unit Price</th>
-                                                <th>Subtotal</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr t-foreach="o.order_line" t-as="line">
-                                                <td><span t-field="line.product_id.name"/></td>
-                                                <td><span t-field="line.name"/></td>
-                                                <td><span t-field="line.product_uom_qty"/></td>
-                                                <td><span t-field="line.price_unit"/></td>
-                                                <td><span t-field="line.price_subtotal"/></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <!-- Order Lines -->
+                                <h3 style="color: #1f4788; margin: 20px 0 10px 0;">Order Items</h3>
+                                <table class="table table-sm">
+                                    <thead style="background-color: #1f4788; color: white;">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Description</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.order_line" t-as="line">
+                                            <td>
+                                                <span t-field="line.product_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.product_uom_qty"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.price_unit"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.price_subtotal"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
-                                    <!-- Footer -->
-                                    <div style="margin-top: 30px; text-align: center; font-size: 11px; color: #666;">
+                                <!-- Footer -->
+                                <div style="margin-top: 30px; text-align: center; font-size: 11px; color: #666;">
                                         Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
                                         by <span t-field="o.create_uid.name"/>
-                                    </div>
-                                </div>
                             </div>
-                        </t>
-                    </t>
+                        </div>
+                    </div>
                 </t>
             </t>
-        </template>
+        </t>
+    </t>
+</template>
 
-        <!-- Professional Single-Page Commission Report Template -->
-        <template id="commission_payout_report_template_professional">
-            <t t-name="order_status_override.commission_report_document">
-                <t t-call="web.html_container">
-                    <t t-foreach="docs" t-as="o">
-                        <t t-call="web.external_layout">
-                            <div class="page">
-                                <style>
+<!-- Professional Single-Page Commission Report Template -->
+<template id="commission_payout_report_template_professional">
+    <t t-name="order_status_override.commission_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
                                     @page {
                                         margin: 8mm;
                                         size: A4;
@@ -473,249 +485,249 @@
                                             padding: 0;
                                         }
                                     }
-                                </style>
+                        </style>
 
-                                <div class="commission-container">
-                                    <!-- Header Section -->
-                                    <div class="report-header">
-                                        <div class="qr-section">
-                                            <t t-if="o.qr_code">
-                                                <img t-att-src="'data:image/png;base64,' + o.qr_code.decode('utf-8')" style="width: 50px; height: 50px; border-radius: 4px;"/>
-                                            </t>
-                                            <t t-else="">
-                                                <div class="qr-placeholder">QR</div>
-                                            </t>
-                                        </div>
+                        <div class="commission-container">
+                            <!-- Header Section -->
+                            <div class="report-header">
+                                <div class="qr-section">
+                                    <t t-if="o.qr_code">
+                                        <img t-att-src="'data:image/png;base64,' + o.qr_code.decode('utf-8')" style="width: 50px; height: 50px; border-radius: 4px;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="qr-placeholder">QR</div>
+                                    </t>
+                                </div>
 
-                                        <div class="header-content">
-                                            <div style="flex: 1; text-align: center; margin-left: 80px;">
-                                                <h1 class="report-title">Commission Report</h1>
-                                                <div class="report-subtitle">
+                                <div class="header-content">
+                                    <div style="flex: 1; text-align: center; margin-left: 80px;">
+                                        <h1 class="report-title">Commission Report</h1>
+                                        <div class="report-subtitle">
                                                     Order: <strong>
-                                                    <span t-field="o.name"/>
-                                                </strong> | 
+                                            <span t-field="o.name"/>
+                                        </strong> | 
                                                     Date: <strong>
-                                                <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
-                                            </strong>
-                                        </div>
-                                    </div>
-
-                                    <div class="company-info">
-                                        <div class="company-name">OSUS Real Estate</div>
-                                        <div>Business Bay, Dubai</div>
-                                        <div>+971-4-366-4500</div>
-                                        <div style="margin-top: 5px; font-size: 10px; color: #ffd700;">www.osusrealestate.com</div>
-                                    </div>
+                                        <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                                    </strong>
                                 </div>
                             </div>
 
-                            <!-- Deal Information Section -->
-                            <div class="section-header">Deal Information</div>
-                            <div class="deal-info-grid">
-                                <div class="info-column">
-                                    <div class="info-item">
-                                        <div class="info-label">Customer:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.partner_id.name"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Email:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.partner_id.email"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Phone:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.partner_id.phone"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Status:</div>
-                                        <div class="info-value">
-                                            <span t-if="o.state == 'draft'" class="status-badge status-draft">Draft</span>
-                                            <span t-elif="o.state == 'sale'" class="status-badge status-confirmed">Confirmed</span>
-                                            <span t-else="" class="status-badge">
-                                                <span t-field="o.state"/>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="info-column">
-                                    <div class="info-item">
-                                        <div class="info-label">Project:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.project_id.name"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Unit:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.unit_id.name"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Order Total:</div>
-                                        <div class="info-value highlight-value">
-                                            <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div class="info-label">Currency:</div>
-                                        <div class="info-value">
-                                            <span t-field="o.currency_id.name"/>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="company-info">
+                                <div class="company-name">OSUS Real Estate</div>
+                                <div>Business Bay, Dubai</div>
+                                <div>+971-4-366-4500</div>
+                                <div style="margin-top: 5px; font-size: 10px; color: #ffd700;">www.osusrealestate.com</div>
                             </div>
-
-                            <!-- Commission Breakdown Section -->
-                            <div class="section-header">Commission Breakdown</div>
-                            <div class="commission-grid">
-                                <!-- External Parties Commission -->
-                                <div class="commission-box">
-                                    <div class="box-title">External Parties</div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Broker (<span t-field="o.broker_partner_id.name"/>
-):</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:.1f}%'.format(o.broker_rate if o.broker_rate else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Broker Amount:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.broker_amount if o.broker_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Referrer Commission:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.referrer_amount if o.referrer_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Cashback:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.cashback_amount if o.cashback_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-total">
-                                        <span>Total External:</span>
-                                        <span>
-                                            <t t-esc="'{:,.0f} AED'.format(o.total_external_commission_amount or 0)"/>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Internal Parties Commission -->
-                                <div class="commission-box">
-                                    <div class="box-title">Internal Parties</div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Agent 1 (<span t-field="o.agent1_partner_id.name"/>
-):</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:.1f}%'.format(o.agent1_rate if o.agent1_rate else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Agent 1 Amount:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.agent1_amount if o.agent1_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Agent 2 Amount:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.agent2_amount if o.agent2_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Manager Commission:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.manager_amount if o.manager_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-item">
-                                        <span class="commission-label">Director Commission:</span>
-                                        <span class="commission-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.director_amount if o.director_amount else 0)"/>
-                                        </span>
-                                    </div>
-
-                                    <div class="commission-total">
-                                        <span>Total Internal:</span>
-                                        <span>
-                                            <t t-esc="'{:,.0f} AED'.format(o.total_internal_commission_amount or 0)"/>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Overall Totals Section -->
-                            <div class="totals-section">
-                                <div style="font-size: 16px; font-weight: bold; color: #ffd700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Financial Summary</div>
-                                <div class="totals-grid">
-                                    <div class="total-item">
-                                        <div class="total-label">Order Total</div>
-                                        <div class="total-amount">
-                                            <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                        </div>
-                                    </div>
-                                    <div class="total-item">
-                                        <div class="total-label">Total Commissions</div>
-                                        <div class="total-amount">
-                                            <t t-esc="'{:,.0f} AED'.format(o.total_commission_amount or 0)"/>
-                                        </div>
-                                    </div>
-                                    <div class="total-item">
-                                        <div class="total-label">Net Amount</div>
-                                        <div class="total-amount">
-                                            <t t-esc="'{:,.0f} AED'.format((o.amount_total or 0) - (o.total_commission_amount or 0))"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Creator Information -->
-                            <div class="creator-info">
-                                        Generated by: <strong>
-                                <span t-field="o.create_uid.name"/>
-                            </strong> on 
-                            <strong>
-                                <span t-field="o.create_date" t-options="{'widget': 'datetime'}"/>
-                            </strong>
-                            <t t-if="o.write_uid != o.create_uid">
-                                            | Last modified by: <strong>
-                                <span t-field="o.write_uid.name"/>
-                            </strong>
-                        </t>
-                    </div>
-
-                    <!-- Footer Section -->
-                    <div class="footer-section">
-                        <div class="footer-title">Commission Report - Confidential Document</div>
-                        <div>This is a computer-generated commission report. All amounts are subject to verification and final approval.</div>
-                        <div style="font-size: 9px; margin-top: 4px; opacity: 0.8; color: #ffd700;">
-                                            OSUS Real Estate Brokerage LLC | Dubai, UAE | License No: RERA-1234567
                         </div>
                     </div>
+
+                    <!-- Deal Information Section -->
+                    <div class="section-header">Deal Information</div>
+                    <div class="deal-info-grid">
+                        <div class="info-column">
+                            <div class="info-item">
+                                <div class="info-label">Customer:</div>
+                                <div class="info-value">
+                                    <span t-field="o.partner_id.name"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Email:</div>
+                                <div class="info-value">
+                                    <span t-field="o.partner_id.email"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Phone:</div>
+                                <div class="info-value">
+                                    <span t-field="o.partner_id.phone"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value">
+                                    <span t-if="o.state == 'draft'" class="status-badge status-draft">Draft</span>
+                                    <span t-elif="o.state == 'sale'" class="status-badge status-confirmed">Confirmed</span>
+                                    <span t-else="" class="status-badge">
+                                        <span t-field="o.state"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-column">
+                            <div class="info-item">
+                                <div class="info-label">Project:</div>
+                                <div class="info-value">
+                                    <span t-field="o.project_id.name"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Unit:</div>
+                                <div class="info-value">
+                                    <span t-field="o.unit_id.name"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Order Total:</div>
+                                <div class="info-value highlight-value">
+                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Currency:</div>
+                                <div class="info-value">
+                                    <span t-field="o.currency_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commission Breakdown Section -->
+                    <div class="section-header">Commission Breakdown</div>
+                    <div class="commission-grid">
+                        <!-- External Parties Commission -->
+                        <div class="commission-box">
+                            <div class="box-title">External Parties</div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Broker (<span t-field="o.broker_partner_id.name"/>
+):</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:.1f}%'.format(o.broker_rate if o.broker_rate else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Broker Amount:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.broker_amount if o.broker_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Referrer Commission:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.referrer_amount if o.referrer_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Cashback:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.cashback_amount if o.cashback_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-total">
+                                <span>Total External:</span>
+                                <span>
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_external_commission_amount or 0)"/>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Internal Parties Commission -->
+                        <div class="commission-box">
+                            <div class="box-title">Internal Parties</div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Agent 1 (<span t-field="o.agent1_partner_id.name"/>
+):</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:.1f}%'.format(o.agent1_rate if o.agent1_rate else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Agent 1 Amount:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.agent1_amount if o.agent1_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Agent 2 Amount:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.agent2_amount if o.agent2_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Manager Commission:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.manager_amount if o.manager_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-item">
+                                <span class="commission-label">Director Commission:</span>
+                                <span class="commission-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.director_amount if o.director_amount else 0)"/>
+                                </span>
+                            </div>
+
+                            <div class="commission-total">
+                                <span>Total Internal:</span>
+                                <span>
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_internal_commission_amount or 0)"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Totals Section -->
+                    <div class="totals-section">
+                        <div style="font-size: 16px; font-weight: bold; color: #ffd700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Financial Summary</div>
+                        <div class="totals-grid">
+                            <div class="total-item">
+                                <div class="total-label">Order Total</div>
+                                <div class="total-amount">
+                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </div>
+                            </div>
+                            <div class="total-item">
+                                <div class="total-label">Total Commissions</div>
+                                <div class="total-amount">
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_commission_amount or 0)"/>
+                                </div>
+                            </div>
+                            <div class="total-item">
+                                <div class="total-label">Net Amount</div>
+                                <div class="total-amount">
+                                    <t t-esc="'{:,.0f} AED'.format((o.amount_total or 0) - (o.total_commission_amount or 0))"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Creator Information -->
+                    <div class="creator-info">
+                                        Generated by: <strong>
+                        <span t-field="o.create_uid.name"/>
+                    </strong> on 
+                    <strong>
+                        <span t-field="o.create_date" t-options="{'widget': 'datetime'}"/>
+                    </strong>
+                    <t t-if="o.write_uid != o.create_uid">
+                                            | Last modified by: <strong>
+                        <span t-field="o.write_uid.name"/>
+                    </strong>
+                </t>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="footer-section">
+                <div class="footer-title">Commission Report - Confidential Document</div>
+                <div>This is a computer-generated commission report. All amounts are subject to verification and final approval.</div>
+                <div style="font-size: 9px; margin-top: 4px; opacity: 0.8; color: #ffd700;">
+                                            OSUS Real Estate Brokerage LLC | Dubai, UAE | License No: RERA-1234567
                 </div>
             </div>
-        </t>
-    </t>
+        </div>
+    </div>
+</t>
+</t>
 </t>
 </t>
 </template>

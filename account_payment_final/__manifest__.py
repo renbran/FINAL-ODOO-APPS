@@ -84,6 +84,9 @@
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
             ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
             
+            # Real-time workflow enhancements (NEW)
+            'account_payment_final/static/src/js/payment_workflow_realtime.js',
+            
             # CloudPepper optimization and console fixes (REMOVED problematic import files)
             # DISABLED: 'account_payment_final/static/src/js/cloudpepper_console_optimizer.js', # Contains import statements
             # DISABLED: 'account_payment_final/static/src/js/unknown_action_handler.js', # Contains import statements
@@ -92,6 +95,7 @@
             'account_payment_final/static/src/scss/osus_branding.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
             'account_payment_final/static/src/scss/enhanced_form_styling.scss',
+            'account_payment_final/static/src/scss/realtime_workflow.scss',
             
             # Component-specific styles
             'account_payment_final/static/src/scss/components/payment_widget.scss',
