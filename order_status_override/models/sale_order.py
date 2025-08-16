@@ -261,41 +261,46 @@ class SaleOrder(models.Model):
             # Show buttons based on current status and user groups
             current_user = self.env.user
             
+            # Check if user is admin or has system access (CloudPepper compatibility)
+            is_admin = (current_user.has_group('base.group_system') or 
+                       current_user.has_group('base.group_erp_manager') or
+                       current_user.has_group('order_status_override.group_order_status_admin'))
+            
             if order.order_status == 'draft':
-                # Can move to document review if user has documentation rights
-                if current_user.has_group('order_status_override.group_order_documentation_reviewer'):
+                # Can move to document review if user has documentation rights or is admin
+                if (current_user.has_group('order_status_override.group_order_documentation_reviewer') or is_admin):
                     order.show_document_review_button = True
                 order.show_reject_button = False  # No reject from draft
                 
             elif order.order_status == 'document_review':
-                # Can move to commission calculation if user has commission rights
-                if current_user.has_group('order_status_override.group_order_commission_calculator'):
+                # Can move to commission calculation if user has commission rights or is admin
+                if (current_user.has_group('order_status_override.group_order_commission_calculator') or is_admin):
                     order.show_commission_calculation_button = True
                     order.show_commission_calc_button = True  # Alias for compatibility
                 order.show_reject_button = True
                 
             elif order.order_status == 'commission_calculation':
-                # Can move to allocation if user has allocation rights
-                if current_user.has_group('order_status_override.group_order_allocation_manager'):
+                # Can move to allocation if user has allocation rights or is admin
+                if (current_user.has_group('order_status_override.group_order_allocation_manager') or is_admin):
                     order.show_allocation_button = True
                 order.show_reject_button = True
                 
             elif order.order_status == 'allocation':
-                # Can move to final review if user has allocation rights
-                if current_user.has_group('order_status_override.group_order_allocation_manager'):
+                # Can move to final review if user has allocation rights or is admin
+                if (current_user.has_group('order_status_override.group_order_allocation_manager') or is_admin):
                     order.show_final_review_button = True
                 order.show_reject_button = True
                 
             elif order.order_status == 'final_review':
-                # Can move to approved if user has approval rights
+                # Can move to approved if user has approval rights or is admin
                 if (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
-                    current_user.id == order.final_review_user_id.id):
+                    current_user.id == order.final_review_user_id.id or is_admin):
                     order.show_approve_button = True
                 order.show_reject_button = True
                 
             elif order.order_status == 'approved':
-                # Can post if user has posting rights
-                if current_user.has_group('order_status_override.group_order_posting_manager'):
+                # Can post if user has posting rights or is admin
+                if (current_user.has_group('order_status_override.group_order_posting_manager') or is_admin):
                     order.show_post_button = True
                 order.show_reject_button = False  # Cannot reject approved orders
                 

@@ -1,552 +1,78 @@
-/* Enhanced Sales Order Form Styling - Order Status Override Module */
-/* Namespace: .o_order_status_override to prevent conflicts with core Odoo */
+/* CloudPepper Compatible Sales Order Form Styling */
+/* Minimal styling to prevent RPC errors while maintaining functionality */
 
-/* ===== ENHANCED BUTTON CONTAINERS ===== */
+/* ===== WORKFLOW BUTTON VISIBILITY FIX ===== */
 
-/* Enhanced Button Section Container */
-.o_enhanced_button_section {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin: 8px 0 !important;
-    padding: 12px 16px !important;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    border-radius: 8px !important;
-    border: 2px solid #dee2e6 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+/* Ensure workflow buttons are visible with correct names */
+.o_form_view button[name="action_move_to_document_review"],
+.o_form_view button[name="action_move_to_commission_calculation"],
+.o_form_view button[name="action_move_to_allocation"],
+.o_form_view button[name="action_move_to_final_review"],
+.o_form_view button[name="action_approve_order"],
+.o_form_view button[name="action_move_to_post"],
+.o_form_view button[name="action_post_order"],
+.o_form_view button[name="action_reject_order"],
+.o_form_view button[name="action_reassign_workflow_users"] {
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
 }
 
-/* Workflow Buttons Container */
-.o_workflow_buttons_container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-    margin: 12px 0 !important;
-    padding: 16px 20px !important;
-    background: linear-gradient(135deg, #fff3cd 0%, #fef9e7 100%) !important;
-    border-radius: 10px !important;
-    border: 3px solid #ffc107 !important;
-    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.2) !important;
-    position: relative !important;
-}
-
-.o_workflow_buttons_container::before {
-    content: "🔄 Workflow Actions" !important;
-    position: absolute !important;
-    top: -12px !important;
-    left: 16px !important;
-    background: #ffc107 !important;
-    color: #212529 !important;
-    padding: 4px 12px !important;
-    border-radius: 4px !important;
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-}
-
-/* Enhanced Button Classes */
-.o_enhanced_btn,
-.o_workflow_btn {
-    margin: 4px 6px !important;
-    padding: 12px 20px !important;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
-    transition: all 0.3s ease !important;
-    min-height: 44px !important;
-    font-size: 0.9rem !important;
-    border: 2px solid transparent !important;
-    position: relative !important;
-    overflow: hidden !important;
-    letter-spacing: 0.3px !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.o_workflow_btn {
-    min-width: 160px !important;
-    padding: 14px 24px !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-}
-
-/* ===== ENHANCED STATUS BAR ===== */
-
-/* Enhanced Status Bar Visibility */
+/* Enhanced Status Bar - Minimal Version */
 .o_enhanced_statusbar .o_statusbar_status {
-    padding: 10px 18px !important;
-    margin: 0 6px !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    border-radius: 8px !important;
-    border: 3px solid transparent !important;
-    transition: all 0.3s ease !important;
-    min-height: 42px !important;
-    display: flex !important;
-    align-items: center !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-.o_enhanced_statusbar .o_statusbar_status::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: -100% !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;
-    transition: left 0.5s !important;
-}
-
-.o_enhanced_statusbar .o_statusbar_status:hover::before {
-    left: 100% !important;
+    padding: 8px 14px;
+    margin: 0 3px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    color: #495057;
 }
 
 .o_enhanced_statusbar .o_statusbar_status.o_arrow_button_current {
-    background: linear-gradient(135deg, #1f4788 0%, #2c5b9e 100%) !important;
-    color: white !important;
-    box-shadow: 0 6px 20px rgba(31, 71, 136, 0.4) !important;
-    transform: translateY(-2px) scale(1.05) !important;
-    border-color: #1f4788 !important;
+    background-color: #1f4788;
+    color: white;
+    border-color: #1f4788;
 }
 
-.o_enhanced_statusbar .o_statusbar_status:not(.o_arrow_button_current) {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    color: #495057 !important;
-    border-color: #ced4da !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+/* Order Status Labels */
+.o_order_status_label {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-.o_enhanced_statusbar .o_statusbar_status:hover:not(.o_arrow_button_current) {
-    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;
-    border-color: #1f4788 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    color: #1f4788 !important;
-}
+.o_order_status_draft { background-color: #f8f9fa; color: #6c757d; }
+.o_order_status_document_review { background-color: #fff3cd; color: #856404; }
+.o_order_status_commission_calculation { background-color: #d4edda; color: #155724; }
+.o_order_status_allocation { background-color: #d1ecf1; color: #0c5460; }
+.o_order_status_final_review { background-color: #ffeaa7; color: #6c5ce7; }
+.o_order_status_approved { background-color: #d4edda; color: #155724; }
+.o_order_status_posted { background-color: #1f4788; color: white; }
+.o_order_status_rejected { background-color: #f8d7da; color: #721c24; }
 
-/* ===== SALES ORDER FORM ENHANCEMENTS ===== */
-
-/* Enhanced Status Bar Visibility */
-.o_form_view .o_form_statusbar .o_statusbar_status {
-    padding: 8px 16px !important;
-    margin: 0 4px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    border-radius: 6px !important;
-    border: 2px solid transparent !important;
-    transition: all 0.3s ease !important;
-    min-height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-/* Custom Status Bar - More Prominent */
-.o_form_view .o_form_statusbar .o_statusbar_status.o_arrow_button_current {
-    background: linear-gradient(135deg, #1f4788 0%, #2c5b9e 100%) !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(31, 71, 136, 0.3) !important;
-    transform: translateY(-1px) !important;
-}
-
-.o_form_view .o_form_statusbar .o_statusbar_status:not(.o_arrow_button_current) {
-    background: #f8f9fa !important;
-    color: #6c757d !important;
-    border-color: #dee2e6 !important;
-}
-
-.o_form_view .o_form_statusbar .o_statusbar_status:hover {
-    background: #e9ecef !important;
-    border-color: #1f4788 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-}
-
-/* ===== ENHANCED FORM PADDING AND SPACING ===== */
-
-/* Main Form Container */
+/* Form View Enhancements - Minimal */
 .o_form_view .o_form_sheet {
-    padding: 24px 32px !important;
-    margin: 16px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
-    background: white !important;
+    max-width: none;
 }
 
-/* Enhanced Header Section */
-.o_form_view .o_form_sheet .oe_title {
-    margin-bottom: 24px !important;
-    padding-bottom: 16px !important;
-    border-bottom: 2px solid #f1f3f4 !important;
+.o_form_view .o_form_sheet .o_group {
+    margin-bottom: 16px;
 }
 
-/* Group Containers - Better Spacing */
-.o_form_view .o_group {
-    margin-bottom: 20px !important;
-    padding: 16px !important;
-    background: #fbfbfb !important;
-    border-radius: 8px !important;
-    border: 1px solid #e9ecef !important;
-}
-
-.o_form_view .o_group .o_group {
-    margin-bottom: 12px !important;
-    padding: 12px !important;
-    background: white !important;
-    border: 1px solid #dee2e6 !important;
-    border-radius: 6px !important;
-}
-
-/* Field Spacing */
-.o_form_view .o_row {
-    margin-bottom: 12px !important;
-}
-
-.o_form_view .o_field_widget {
-    margin-bottom: 8px !important;
-}
-
-/* ===== ENHANCED BUTTON SECTION STYLING ===== */
-
-/* Button Container - More Prominent */
-.o_form_view .oe_button_box {
-    padding: 16px 20px !important;
-    margin: 16px -32px 24px -32px !important;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    border-bottom: 3px solid #1f4788 !important;
-    border-radius: 0 0 12px 12px !important;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05) !important;
-}
-
-/* Workflow Action Buttons - Enhanced Visibility */
-.o_form_view .oe_button_box button {
-    margin: 6px 8px !important;
-    padding: 10px 20px !important;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
-    transition: all 0.3s ease !important;
-    min-height: 42px !important;
-    font-size: 0.9rem !important;
-    border: 2px solid transparent !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-/* Primary Action Buttons */
-.o_form_view .oe_button_box .btn-primary {
-    background: linear-gradient(135deg, #1f4788 0%, #2c5b9e 100%) !important;
-    border-color: #1f4788 !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(31, 71, 136, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-primary:hover {
-    background: linear-gradient(135deg, #164063 0%, #1f4788 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(31, 71, 136, 0.4) !important;
-}
-
-/* Success Buttons */
-.o_form_view .oe_button_box .btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #34d058 100%) !important;
-    border-color: #28a745 !important;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-success:hover {
-    background: linear-gradient(135deg, #1e7e34 0%, #28a745 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4) !important;
-}
-
-/* Info Buttons */
-.o_form_view .oe_button_box .btn-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%) !important;
-    border-color: #17a2b8 !important;
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-info:hover {
-    background: linear-gradient(135deg, #117a8b 0%, #17a2b8 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4) !important;
-}
-
-/* Warning Buttons */
-.o_form_view .oe_button_box .btn-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #ffdb4d 100%) !important;
-    border-color: #ffc107 !important;
-    color: #212529 !important;
-    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-warning:hover {
-    background: linear-gradient(135deg, #e0a800 0%, #ffc107 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4) !important;
-}
-
-/* Danger Buttons */
-.o_form_view .oe_button_box .btn-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%) !important;
-    border-color: #dc3545 !important;
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-danger:hover {
-    background: linear-gradient(135deg, #c82333 0%, #dc3545 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
-}
-
-/* Secondary Buttons */
-.o_form_view .oe_button_box .btn-secondary {
-    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%) !important;
-    border-color: #6c757d !important;
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
-}
-
-.o_form_view .oe_button_box .btn-secondary:hover {
-    background: linear-gradient(135deg, #545b62 0%, #6c757d 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4) !important;
-}
-
-/* Button Icons Enhancement */
-.o_form_view .oe_button_box button i {
-    margin-right: 8px !important;
-    font-size: 1.1em !important;
-    opacity: 0.9 !important;
-}
-
-/* Button Text Enhancement */
-.o_form_view .oe_button_box button:not(.btn-sm) {
-    letter-spacing: 0.3px !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-}
-
-/* ===== NOTEBOOK TABS ENHANCEMENT ===== */
-
-/* Tab Navigation */
-.o_form_view .o_notebook .nav-tabs {
-    border-bottom: 2px solid #1f4788 !important;
-    margin-bottom: 20px !important;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    padding: 8px 16px 0 16px !important;
-    border-radius: 8px 8px 0 0 !important;
-}
-
-.o_form_view .o_notebook .nav-tabs .nav-link {
-    padding: 12px 20px !important;
-    margin: 0 4px !important;
-    border-radius: 8px 8px 0 0 !important;
-    font-weight: 600 !important;
-    color: #495057 !important;
-    background: transparent !important;
-    border: none !important;
-    transition: all 0.3s ease !important;
-}
-
-.o_form_view .o_notebook .nav-tabs .nav-link.active {
-    background: white !important;
-    color: #1f4788 !important;
-    border-bottom: 3px solid #1f4788 !important;
-    transform: translateY(2px) !important;
-}
-
-.o_form_view .o_notebook .nav-tabs .nav-link:hover:not(.active) {
-    background: rgba(31, 71, 136, 0.1) !important;
-    color: #1f4788 !important;
-}
-
-/* Tab Content */
-.o_form_view .o_notebook .tab-content {
-    padding: 20px !important;
-    background: white !important;
-    border-radius: 0 0 8px 8px !important;
-    min-height: 400px !important;
-}
-
-/* ===== RESPONSIVE ENHANCEMENTS ===== */
-
-/* Mobile and Tablet Responsiveness */
+/* Responsive Design */
 @media (max-width: 768px) {
-    .o_form_view .o_form_sheet {
-        padding: 16px 20px !important;
-        margin: 8px !important;
-    }
-    
-    .o_form_view .oe_button_box {
-        padding: 12px 16px !important;
-        margin: 12px -20px 16px -20px !important;
-    }
-    
-    .o_form_view .oe_button_box button {
-        margin: 4px 2px !important;
-        padding: 8px 12px !important;
-        font-size: 0.8rem !important;
-        min-height: 36px !important;
-    }
-    
-    .o_form_view .o_group {
-        padding: 12px !important;
-        margin-bottom: 16px !important;
-    }
-    
-    /* Enhanced containers mobile styles */
-    .o_enhanced_button_section {
-        flex-direction: column !important;
-        gap: 6px !important;
-        padding: 10px 12px !important;
-    }
-    
-    .o_workflow_buttons_container {
-        flex-direction: column !important;
-        gap: 8px !important;
-        padding: 16px 12px !important;
-        margin: 10px 0 !important;
-    }
-    
-    .o_enhanced_btn,
-    .o_workflow_btn {
-        width: 100% !important;
-        min-width: auto !important;
-        margin: 2px 0 !important;
-        padding: 12px 16px !important;
-        font-size: 0.9rem !important;
-        min-height: 40px !important;
-    }
-    
-    /* Enhanced status bar mobile styles */
     .o_enhanced_statusbar .o_statusbar_status {
-        padding: 8px 12px !important;
-        margin: 0 2px !important;
-        font-size: 0.8rem !important;
-        min-height: 36px !important;
-        letter-spacing: 0.5px !important;
+        padding: 6px 10px;
+        margin: 0 1px;
+        font-size: 11px;
     }
     
-    .o_workflow_buttons_container::before {
-        font-size: 0.7rem !important;
-        padding: 3px 8px !important;
-        top: -10px !important;
-        left: 12px !important;
+    .o_order_status_label {
+        padding: 3px 6px;
+        font-size: 10px;
     }
-}
-
-/* Large desktop enhancements */
-@media (min-width: 1200px) {
-    .o_enhanced_button_section {
-        justify-content: space-between !important;
-        padding: 16px 24px !important;
-    }
-    
-    .o_workflow_buttons_container {
-        justify-content: space-around !important;
-        padding: 20px 32px !important;
-    }
-    
-    .o_workflow_btn {
-        min-width: 180px !important;
-        padding: 16px 28px !important;
-        font-size: 1.1rem !important;
-    }
-    
-    .o_enhanced_statusbar .o_statusbar_status {
-        padding: 12px 24px !important;
-        font-size: 1.1rem !important;
-        min-height: 48px !important;
-    }
-}
-
-/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
-
-/* Focus States */
-.o_form_view button:focus,
-.o_form_view .o_field_widget:focus {
-    outline: 2px solid #1f4788 !important;
-    outline-offset: 2px !important;
-    box-shadow: 0 0 0 3px rgba(31, 71, 136, 0.2) !important;
-}
-
-/* High Contrast Support */
-@media (prefers-contrast: high) {
-    .o_form_view .oe_button_box button {
-        border-width: 3px !important;
-    }
-    
-    .o_form_view .o_form_statusbar .o_statusbar_status {
-        border-width: 3px !important;
-    }
-}
-
-/* ===== COMMISSION CONFIGURATION PAGE ENHANCEMENTS ===== */
-
-/* Enhanced commission section styling */
-.o_form_view .tab-pane[data-name="commission_config"] .o_group {
-    background: linear-gradient(135deg, #f8fff9 0%, #f0fff4 100%) !important;
-    border: 2px solid #28a745 !important;
-    border-radius: 10px !important;
-    padding: 20px !important;
-    margin-bottom: 24px !important;
-}
-
-.o_form_view .tab-pane[data-name="commission_config"] .o_group separator {
-    color: #1f4788 !important;
-    font-weight: 700 !important;
-    font-size: 1.1em !important;
-    margin: 16px 0 12px 0 !important;
-    padding-bottom: 8px !important;
-    border-bottom: 2px solid #1f4788 !important;
-}
-
-/* Workflow Assignment Page Enhancements */
-.o_form_view .tab-pane[data-name="workflow_assignment"] .o_group {
-    background: linear-gradient(135deg, #fff8f0 0%, #fef3e2 100%) !important;
-    border: 2px solid #ffc107 !important;
-    border-radius: 10px !important;
-    padding: 20px !important;
-    margin-bottom: 24px !important;
-}
-
-/* Enhanced field labels */
-.o_form_view .o_form_label {
-    font-weight: 600 !important;
-    color: #495057 !important;
-    margin-bottom: 4px !important;
-}
-
-/* Status history tree styling */
-.o_form_view .o_list_table {
-    border-radius: 8px !important;
-    overflow: hidden !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-}
-
-.o_form_view .o_list_table th {
-    background: linear-gradient(135deg, #1f4788 0%, #2c5b9e 100%) !important;
-    color: white !important;
-    font-weight: 600 !important;
-    padding: 12px !important;
-}
-
-.o_form_view .o_list_table td {
-    padding: 10px 12px !important;
-    border-bottom: 1px solid #dee2e6 !important;
-}
-
-.o_form_view .o_list_table tr:nth-child(even) {
-    background: #f8f9fa !important;
-}
-
-.o_form_view .o_list_table tr:hover {
-    background: #e3f2fd !important;
 }
