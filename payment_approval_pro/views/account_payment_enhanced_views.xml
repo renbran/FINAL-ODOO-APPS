@@ -7,7 +7,7 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//header/button[@name='action_post'][last()]" position="after">
+                <xpath expr="//header" position="inside">
                     <!-- Enhanced Print Menu for Account Payments -->
                     <div class="btn-group" invisible="state == 'draft'">
                         <button name="osus_reports_dropdown" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
