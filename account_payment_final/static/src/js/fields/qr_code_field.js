@@ -16,7 +16,7 @@ export class QRCodeField extends Component {
     static props = {
         ...standardFieldProps,
         readonly: { type: Boolean, optional: true }
-    };
+};
 
     setup() {
         this.orm = useService("orm");

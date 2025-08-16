@@ -75,7 +75,7 @@ export function debounce(func, wait, immediate = false) {
         const callNow = immediate && !timeout;
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
-        if (callNow) return func.apply(this, args);
+        if (callNow) func.apply(this, args);
     };
 }
 

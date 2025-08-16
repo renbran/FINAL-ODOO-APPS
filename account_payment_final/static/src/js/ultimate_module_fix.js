@@ -10,7 +10,7 @@
 (function() {
     'use strict';
     
-    console.log("[CloudPepper] ULTIMATE module fix loading...");
+    console.debug("[CloudPepper] ULTIMATE module fix loading...");
     
     // Track problematic assets
     const problematicAssets = [
@@ -251,7 +251,7 @@
         setupEnhancedMutationObserverFix();
         setupDOMContentLoadedFix();
         
-        console.log("[CloudPepper] ULTIMATE JavaScript fixes active");
+        console.debug("[CloudPepper] ULTIMATE JavaScript fixes active");
     }
     
     // Execute immediately

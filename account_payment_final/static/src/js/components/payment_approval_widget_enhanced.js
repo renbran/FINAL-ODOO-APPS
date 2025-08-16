@@ -17,8 +17,8 @@ export class PaymentApprovalWidget extends Component {
     static props = {
         readonly: { type: Boolean, optional: true },
         record: Object,
-        update: Function
-    };
+        update: Function;
+};
 
     setup() {
         // Core services

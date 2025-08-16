@@ -10,7 +10,7 @@
 (function() {
     'use strict';
     
-    console.log("[CloudPepper] LEGACY-compatible error prevention loading...");
+    console.debug("[CloudPepper] LEGACY-compatible error prevention loading...");
     
     // Error patterns - ES5 compatible array
     var criticalErrorPatterns = [
@@ -237,5 +237,5 @@
     // Mark as loaded
     window.CloudPepperLegacyCompatibleFixLoaded = true;
     
-    console.log("[CloudPepper] LEGACY-compatible error prevention ACTIVE");
+    console.debug("[CloudPepper] LEGACY-compatible error prevention ACTIVE");
 })();

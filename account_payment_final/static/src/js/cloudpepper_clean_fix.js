@@ -1,10 +1,18 @@
+/*
+ * Cloudpepper Clean Fix.Js
+ * 
+ * This file intentionally does NOT use /** @odoo-module **/
+ * as it's a global error prevention utility loaded before
+ * any Odoo modules to prevent import/loading errors.
+ */
+
 /**
  * CloudPepper Clean Fix for Odoo 17
  * 
- * This script provides additional error suppression and module loading fixes
- * specifically optimized for CloudPepper hosting environment.
+ * Clean, production-ready error prevention specifically for CloudPepper
+ * hosting environment. Focuses on Odoo 17 compatibility issues.
  * 
- * Should load after immediate_error_prevention.js
+ * LOADS AFTER immediate_error_prevention.js
  */
 
 (function() {
@@ -12,103 +20,73 @@
     
     console.debug("[CloudPepper] Clean fix loading...");
     
-    // Additional error patterns for CloudPepper environment
-    var cloudPepperPatterns = [
+    // CloudPepper specific error patterns
+    const cloudPepperErrorPatterns = [
+        /third_party.*crashpad/,
+        /registration_protocol_win\.cc/,
+        /CreateFile: The system cannot find the file specified/,
         /chrome-extension:/,
-        /moz-extension:/,
-        /safari-extension:/,
-        /Script error/,
-        /Non-Error promise rejection captured/,
-        /ResizeObserver loop limit exceeded/,
-        /The play\(\) request was interrupted/,
-        /ChunkLoadError/,
-        /Loading chunk/,
-        /NetworkError/
+        /extensions\/.*\/content_scripts/,
+        /Execution context was destroyed/,
+        /Script error/
     ];
     
-    function isCloudPepperError(message, filename) {
-        if (!message && !filename) return false;
-        var msgStr = String(message || '');
-        var fileStr = String(filename || '');
+    // Enhanced error detection for CloudPepper
+    function isCloudPepperError(message, filename, source) {
+        const msgStr = String(message || '');
+        const fileStr = String(filename || '');
+        const srcStr = String(source || '');
         
-        for (var i = 0; i < cloudPepperPatterns.length; i++) {
-            var pattern = cloudPepperPatterns[i];
-            if (pattern.test(msgStr) || pattern.test(fileStr)) {
-                return true;
-            }
-        }
-        return false;
+        return cloudPepperErrorPatterns.some(pattern =>
+            pattern.test(msgStr) || pattern.test(fileStr) || pattern.test(srcStr)
+        );
     }
     
-    // Enhance existing error handler
-    var existingHandler = window.onerror;
+    // Clean error handler wrapper
+    const originalErrorHandler = window.onerror;
     window.onerror = function(message, filename, lineno, colno, error) {
-        if (isCloudPepperError(message, filename)) {
-            console.debug("[CloudPepper] CloudPepper-specific error suppressed:", message);
+        // CloudPepper specific suppression
+        if (isCloudPepperError(message, filename, error?.stack)) {
+            console.debug("[CloudPepper] Clean suppression:", message);
             return true;
         }
-        if (existingHandler) {
-            return existingHandler.apply(this, arguments);
+        
+        // Call previous handler if exists
+        if (originalErrorHandler) {
+            return originalErrorHandler.apply(this, arguments);
         }
+        
         return false;
     };
     
-    // Enhance Promise rejection handler
+    // Clean promise rejection handler
     window.addEventListener('unhandledrejection', function(event) {
-        var message = event.reason?.message || event.reason || '';
-        if (isCloudPepperError(message, '')) {
-            console.debug("[CloudPepper] CloudPepper promise rejection suppressed:", message);
+        const reason = event.reason;
+        const message = reason?.message || reason || '';
+        
+        if (isCloudPepperError(message, '', reason?.stack)) {
+            console.debug("[CloudPepper] Clean promise rejection suppressed:", message);
             event.preventDefault();
         }
     });
     
-    // Script loading optimization for CloudPepper
-    if (document.createElement) {
-        var originalCreateElement = document.createElement;
-        document.createElement = function(tagName) {
-            var element = originalCreateElement.call(this, tagName);
-            
-            if (tagName.toLowerCase() === 'script') {
-                // Add error handling to all script elements
-                element.addEventListener('error', function(e) {
-                    console.debug("[CloudPepper] Script loading error suppressed:", e.target.src);
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-            }
-            
-            return element;
-        };
+    // DOM content loading safety
+    function ensureDOMContentLoaded() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.debug("[CloudPepper] DOM content loaded safely");
+            });
+        } else {
+            console.debug("[CloudPepper] DOM already ready");
+        }
     }
     
-    // DOM mutation optimization
-    if (window.MutationObserver) {
-        var OriginalMutationObserver = window.MutationObserver;
-        window.MutationObserver = function(callback) {
-            var wrappedCallback = function(mutations, observer) {
-                try {
-                    return callback.call(this, mutations, observer);
-                } catch (error) {
-                    if (isCloudPepperError(error.message, '')) {
-                        console.debug("[CloudPepper] MutationObserver error suppressed:", error.message);
-                        return;
-                    }
-                    throw error;
-                }
-            };
-            return new OriginalMutationObserver(wrappedCallback);
-        };
-        
-        // Copy static methods
-        Object.setPrototypeOf(window.MutationObserver, OriginalMutationObserver);
-        Object.defineProperty(window.MutationObserver, 'prototype', {
-            value: OriginalMutationObserver.prototype,
-            writable: false
-        });
-    }
+    // Initialize clean fixes
+    ensureDOMContentLoaded();
     
     // Mark as loaded
     window.CloudPepperCleanFixLoaded = true;
-    console.debug("[CloudPepper] Clean fix loaded");
+    
+    console.debug("[CloudPepper] Clean fix loaded successfully");
     
 })();

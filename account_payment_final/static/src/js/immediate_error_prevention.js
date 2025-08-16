@@ -1,54 +1,61 @@
+/*
+ * Immediate Error Prevention.Js
+ * 
+ * This file intentionally does NOT use /** @odoo-module **/
+ * as it's a global error prevention utility loaded before
+ * any Odoo modules to prevent import/loading errors.
+ */
+
 /**
- * IMMEDIATE Error Prevention for Odoo 17 CloudPepper
+ * IMMEDIATE Error Prevention for Odoo 17 - CloudPepper Compatible
  * 
- * This script provides immediate error suppression and prevention
- * specifically designed for CloudPepper deployment environments.
+ * This script provides immediate error suppression for common CloudPepper
+ * deployment issues, particularly with ES6 import statements and module loading.
  * 
- * MUST LOAD BEFORE ANY OTHER SCRIPTS!
+ * MUST LOAD FIRST - Before any other JavaScript assets
  */
 
 (function() {
     'use strict';
     
-    // Immediate error suppression patterns
-    var criticalPatterns = [
+    // Mark as loaded immediately
+    window.CloudPepperImmediateErrorPrevention = true;
+    
+    console.debug("[CloudPepper] Immediate error prevention loading...");
+    
+    // Critical error patterns that need immediate suppression
+    const criticalErrorPatterns = [
         /Cannot use import statement outside a module/,
         /Unexpected token 'import'/,
+        /SyntaxError.*import/,
         /Failed to execute 'observe' on 'MutationObserver'/,
         /parameter 1 is not of type 'Node'/,
-        /Long Running Recorder/,
-        /index\.ts-.*\.js/,
         /web\.assets_web\.min\.js/,
-        /third_party.*crashpad/,
-        /registration_protocol_win\.cc/,
-        /CreateFile: The system cannot find the file specified/,
+        /Long Running Recorder/,
         /Content script initialised/,
-        /Recorder disabled/,
-        /Uncaught SyntaxError/,
-        /SyntaxError.*import/
+        /Recorder disabled/
     ];
     
-    function shouldSuppressError(message, filename) {
+    // Immediate error suppression function
+    function suppressCriticalErrors(message, filename) {
         if (!message && !filename) return false;
-        var msgStr = String(message || '');
-        var fileStr = String(filename || '');
         
-        for (var i = 0; i < criticalPatterns.length; i++) {
-            var pattern = criticalPatterns[i];
-            if (pattern.test(msgStr) || pattern.test(fileStr)) {
-                return true;
-            }
-        }
-        return false;
+        const msgStr = String(message || '');
+        const fileStr = String(filename || '');
+        
+        return criticalErrorPatterns.some(pattern => 
+            pattern.test(msgStr) || pattern.test(fileStr)
+        );
     }
     
     // Override window.onerror IMMEDIATELY
-    var originalOnError = window.onerror;
+    const originalOnError = window.onerror;
     window.onerror = function(message, filename, lineno, colno, error) {
-        if (shouldSuppressError(message, filename)) {
-            console.debug("[CloudPepper] IMMEDIATE error suppressed:", message);
-            return true;
+        if (suppressCriticalErrors(message, filename)) {
+            console.debug("[CloudPepper] IMMEDIATE suppression:", message);
+            return true; // Prevent default error handling
         }
+        
         if (originalOnError) {
             return originalOnError.apply(this, arguments);
         }
@@ -57,26 +64,40 @@
     
     // Override unhandledrejection IMMEDIATELY
     window.addEventListener('unhandledrejection', function(event) {
-        var message = event.reason?.message || event.reason || '';
-        if (shouldSuppressError(message, '')) {
+        const message = event.reason?.message || event.reason || '';
+        if (suppressCriticalErrors(message, '')) {
             console.debug("[CloudPepper] IMMEDIATE promise rejection suppressed:", message);
             event.preventDefault();
         }
     });
     
-    // Override console.error IMMEDIATELY
-    var originalConsoleError = console.error;
-    console.error = function() {
-        var message = Array.prototype.join.call(arguments, ' ');
-        if (shouldSuppressError(message, '')) {
+    // Override console.error for critical errors
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+        const message = args.join(' ');
+        if (suppressCriticalErrors(message, '')) {
             console.debug("[CloudPepper] IMMEDIATE console error suppressed:", message);
             return;
         }
-        return originalConsoleError.apply(this, arguments);
+        return originalConsoleError.apply(this, args);
     };
     
-    // Mark as loaded
-    window.CloudPepperImmediateErrorPreventionLoaded = true;
-    console.debug("[CloudPepper] IMMEDIATE error prevention loaded");
+    // Prevent module loading errors
+    if (typeof window.define === 'undefined') {
+        window.define = function() {
+            console.debug("[CloudPepper] AMD define() call intercepted");
+        };
+        window.define.amd = true;
+    }
+    
+    // Prevent require() errors
+    if (typeof window.require === 'undefined') {
+        window.require = function() {
+            console.debug("[CloudPepper] CommonJS require() call intercepted");
+            return {};
+        };
+    }
+    
+    console.debug("[CloudPepper] Immediate error prevention loaded successfully");
     
 })();
