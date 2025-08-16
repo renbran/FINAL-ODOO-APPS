@@ -8,37 +8,26 @@
             <field name="arch" type="xml">
                 <!-- Add commission buttons in header -->
                 <xpath expr="//header" position="inside">
-                    <button name="action_process_commissions" 
-                            type="object" 
-                            string="Calculate Commissions" 
-                            class="btn-primary" 
-                            invisible="commission_status != 'draft'"
-                            help="Calculate and create commission purchase orders"/>
-                    <button name="action_confirm_commissions" 
-                            type="object" 
-                            string="Confirm Commissions" 
-                            class="btn-primary" 
-                            invisible="commission_status != 'calculated'"
-                            help="Confirm the calculated commissions"/>
-                    <button name="action_reset_commissions" 
-                            type="object" 
-                            string="Reset to Draft" 
-                            invisible="commission_status == 'draft'"
-                            help="Reset commission status to draft"/>
+                    <button name="action_process_commissions" type="object" string="Calculate Commissions" class="btn-primary" invisible="commission_status != 'draft'" help="Calculate and create commission purchase orders"/>
+                    <button name="action_confirm_commissions" type="object" string="Confirm Commissions" class="btn-primary" invisible="commission_status != 'calculated'" help="Confirm the calculated commissions"/>
+                    <button name="action_reset_commissions" type="object" string="Reset to Draft" invisible="commission_status == 'draft'" help="Reset commission status to draft"/>
                 </xpath>
 
                 <!-- Add commission status field in header area -->
                 <xpath expr="//field[@name='client_order_ref']" position="after">
                     <field name="commission_status" widget="statusbar" statusbar_visible="draft,calculated,confirmed"/>
                 </xpath>
-                
+
                 <!-- Add smart button for commission purchase orders -->
                 <xpath expr="//div[@name='button_box']" position="inside">
-                    <button type="object" name="action_view_commission_pos" 
-                            class="oe_stat_button" icon="fa-shopping-cart"
-                            invisible="purchase_order_count == 0">
-                        <field name="purchase_order_count" widget="statinfo" 
-                               string="Commission POs"/>
+                    <button type="object" name="action_view_commission_pos" class="oe_stat_button" icon="fa-shopping-cart" invisible="purchase_order_count == 0">
+                        <field name="purchase_order_count" widget="statinfo" string="Commission POs"/>
+                        <div class="o_field_widget o_stat_info" style="padding-top: 4px;">
+                            <span class="o_stat_value" style="font-size: 14px; color: #28a745;">
+                                <field name="purchase_order_total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                            <span class="o_stat_text" style="font-size: 11px;">Total Amount</span>
+                        </div>
                     </button>
                 </xpath>
 
@@ -56,6 +45,7 @@
                             <group string="Commission Controls">
                                 <field name="commission_processed" readonly="1"/>
                                 <field name="purchase_order_count" string="Generated POs"/>
+                                <field name="purchase_order_total_amount" string="Total PO Amount" readonly="1"/>
                                 <field name="sales_value" readonly="1"/>
                             </group>
                         </group>
