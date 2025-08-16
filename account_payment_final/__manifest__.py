@@ -77,7 +77,11 @@
     'assets': {
         # Core Backend Assets - Optimized Loading Order
         'web.assets_backend': [
-            # Critical Error Prevention (Must Load First)
+            # ULTIMATE Module Fix (Must Load FIRST - Before Everything Else)
+            ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
+            # IMMEDIATE Error Prevention (Must Load First - Before Everything)
+            ('prepend', 'account_payment_final/static/src/js/immediate_error_prevention.js'),
+            # Critical Error Prevention (Secondary)
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
             # Core OSUS Branding (Priority)
@@ -102,6 +106,10 @@
         
         # Frontend Assets (Public Portal)
         'web.assets_frontend': [
+            # ULTIMATE Module Fix for Public Pages
+            ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
+            # IMMEDIATE Error Prevention for Public Pages
+            ('prepend', 'account_payment_final/static/src/js/immediate_error_prevention.js'),
             # Error Prevention for Public Pages
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
@@ -118,15 +126,19 @@
             'account_payment_final/static/src/xml/**/*.xml',
         ],
         
-        # Report Styles (PDF Generation)
-        'web.assets_common': [
-            'account_payment_final/static/src/scss/responsive_report_styles.scss',
-        ],
-        
         # Dark Theme Support
         'web.assets_web_dark': [
+            ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
+            ('prepend', 'account_payment_final/static/src/js/immediate_error_prevention.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             'account_payment_final/static/src/xml/**/*.xml',
+        ],
+        
+        # Core Web Assets (Load Before Standard Web Assets)
+        'web.assets_common': [
+            ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
+            ('prepend', 'account_payment_final/static/src/js/immediate_error_prevention.js'),
+            'account_payment_final/static/src/scss/responsive_report_styles.scss',
         ],
         
         # Test Suite
