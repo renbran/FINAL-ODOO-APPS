@@ -119,6 +119,11 @@ Verify: {verification_url}"""
             # Multiple records - show summary table
             return self.env.ref('payment_approval_pro.action_report_multiple_payments').report_action(self)
 
+    def action_print_voucher(self):
+        """Print standard payment voucher report"""
+        self.ensure_one()
+        return self.action_print_enhanced_voucher()
+
     # ================================
     # REPORT DATA METHODS
     # ================================
