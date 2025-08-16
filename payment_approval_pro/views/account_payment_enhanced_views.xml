@@ -10,7 +10,7 @@
                 <xpath expr="//header/button[@name='action_post'][last()]" position="after">
                     <!-- Enhanced Print Menu for Account Payments -->
                     <div class="btn-group" invisible="state == 'draft'">
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button name="osus_reports_dropdown" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-print"/> OSUS Reports
                         </button>
                         <ul class="dropdown-menu">
