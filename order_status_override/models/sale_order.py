@@ -32,6 +32,10 @@ class SaleOrder(models.Model):
                                            help="User responsible for document review stage")
     allocation_user_id = fields.Many2one('res.users', string='Allocation Responsible',
                                         help="User responsible for allocation stage")
+    commission_user_id = fields.Many2one('res.users', string='Commission Responsible',
+                                        help="User responsible for commission calculations")
+    final_review_user_id = fields.Many2one('res.users', string='Final Review Responsible',
+                                          help="User responsible for final review stage")
     approval_user_id = fields.Many2one('res.users', string='Approval Responsible',
                                           help="User responsible for final approval")
     posting_user_id = fields.Many2one('res.users', string='Posting Responsible',
