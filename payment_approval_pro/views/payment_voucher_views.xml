@@ -61,7 +61,7 @@
                                    options="{'no_create': True, 'no_edit': True}"/>
                             <field name="payment_date" attrs="{'readonly': [('is_readonly', '=', True)]}"/>
                             <field name="journal_id" attrs="{'readonly': [('is_readonly', '=', True)]}" 
-                                   domain="[('type', 'in', ('bank', 'cash')), ('company_id', '=', company_id)]"/>
+                                   domain="[('type', 'in', ('bank', 'cash'))]"/>
                             <field name="reference" attrs="{'readonly': [('is_readonly', '=', True)]}"/>
                         </group>
                         
