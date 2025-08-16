@@ -41,6 +41,7 @@
     'assets': {
         'web.assets_backend': [
             'order_status_override/static/src/css/commission_report.css',
+            'order_status_override/static/src/css/enhanced_sales_order_form.css',
         ],
     },
     'installable': True,

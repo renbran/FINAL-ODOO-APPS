@@ -8,9 +8,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <!-- Add unified workflow status bar -->
+                <!-- Add unified workflow status bar with enhanced visibility -->
                 <field name="state" position="before">
-                    <field name="order_status" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']"/>
+                    <field name="order_status" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']" class="o_enhanced_statusbar"/>
                     <field name="custom_status_id" invisible="1"/>
                     <!-- Enhanced computed fields for button visibility -->
                     <field name="show_document_review_button" invisible="1"/>
@@ -28,41 +28,45 @@
                     <attribute name="invisible">1</attribute>
                 </field>
 
-                <!-- Add commission and workflow buttons in header -->
+                <!-- Add commission and workflow buttons in header with enhanced container -->
                 <button name="action_quotation_send" position="after">
-                    <button name="action_change_status" string="Change Status" type="object" class="btn-secondary" icon="fa-exchange" invisible="1"/>
-                    <button name="action_view_order_reports" string="Generate Reports" type="object" class="btn-info" icon="fa-file-pdf-o"/>
-                    <button name="%(order_status_override.report_sale_commission)d" string="Commission Report" type="action" class="btn-success" icon="fa-money" invisible="state not in ['sale', 'done']"/>
+                    <div class="o_enhanced_button_section">
+                        <button name="action_change_status" string="Change Status" type="object" class="btn-secondary o_enhanced_btn" icon="fa-exchange" invisible="1"/>
+                        <button name="action_view_order_reports" string="Generate Reports" type="object" class="btn-info o_enhanced_btn" icon="fa-file-pdf-o"/>
+                        <button name="%(order_status_override.report_sale_commission)d" string="Commission Report" type="action" class="btn-success o_enhanced_btn" icon="fa-money" invisible="state not in ['sale', 'done']"/>
+                    </div>
                 </button>
 
-                <!-- Add enhanced unified workflow action buttons -->
+                <!-- Add enhanced unified workflow action buttons with improved spacing -->
                 <button name="action_quotation_send" position="after">
-                    <!-- Draft to Document Review -->
-                    <button name="action_move_to_document_review" string="Start Document Review" type="object" class="btn-primary" icon="fa-file-text-o" invisible="not show_document_review_button"/>
+                    <div class="o_workflow_buttons_container">
+                        <!-- Draft to Document Review -->
+                        <button name="action_move_to_document_review" string="Start Document Review" type="object" class="btn-primary o_workflow_btn" icon="fa-file-text-o" invisible="not show_document_review_button"/>
 
-                    <!-- Document Review to Commission Calculation -->
-                    <button name="action_move_to_commission_calculation" string="Start Commission Calculation" type="object" class="btn-info" icon="fa-calculator" invisible="not show_commission_calculation_button"/>
+                        <!-- Document Review to Commission Calculation -->
+                        <button name="action_move_to_commission_calculation" string="Start Commission Calculation" type="object" class="btn-info o_workflow_btn" icon="fa-calculator" invisible="not show_commission_calculation_button"/>
 
-                    <!-- Commission Calculation to Allocation -->
-                    <button name="action_move_to_allocation" string="Start Allocation" type="object" class="btn-warning" icon="fa-sitemap" invisible="not show_allocation_button"/>
+                        <!-- Commission Calculation to Allocation -->
+                        <button name="action_move_to_allocation" string="Start Allocation" type="object" class="btn-warning o_workflow_btn" icon="fa-sitemap" invisible="not show_allocation_button"/>
 
-                    <!-- Allocation to Final Review -->
-                    <button name="action_move_to_final_review" string="Move to Final Review" type="object" class="btn-info" icon="fa-eye" invisible="not show_final_review_button"/>
+                        <!-- Allocation to Final Review -->
+                        <button name="action_move_to_final_review" string="Move to Final Review" type="object" class="btn-info o_workflow_btn" icon="fa-eye" invisible="not show_final_review_button"/>
 
-                    <!-- Final Review to Approved -->
-                    <button name="action_approve_order" string="Approve Order" type="object" class="btn-success" icon="fa-check" invisible="not show_approve_button"/>
+                        <!-- Final Review to Approved -->
+                        <button name="action_approve_order" string="Approve Order" type="object" class="btn-success o_workflow_btn" icon="fa-check" invisible="not show_approve_button"/>
 
-                    <!-- Approved to Post -->
-                    <button name="action_move_to_post" string="Post Order" type="object" class="btn-primary" icon="fa-paper-plane" invisible="not show_post_button"/>
+                        <!-- Approved to Post -->
+                        <button name="action_move_to_post" string="Post Order" type="object" class="btn-primary o_workflow_btn" icon="fa-paper-plane" invisible="not show_post_button"/>
 
-                    <!-- Approved to Posted -->
-                    <button name="action_post_order" string="Post Order" type="object" class="btn-success" icon="fa-paper-plane" invisible="not show_post_button"/>
+                        <!-- Approved to Posted -->
+                        <button name="action_post_order" string="Post Order" type="object" class="btn-success o_workflow_btn" icon="fa-paper-plane" invisible="not show_post_button"/>
 
-                    <!-- Reject button (available in most stages) -->
-                    <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger" icon="fa-times" invisible="not show_reject_button"/>
+                        <!-- Reject button (available in most stages) -->
+                        <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger o_workflow_btn" icon="fa-times" invisible="not show_reject_button"/>
 
-                    <!-- Auto-reassign users button -->
-                    <button name="action_reassign_workflow_users" string="Reassign Users" type="object" class="btn-secondary" icon="fa-users" help="Automatically reassign workflow users based on current group memberships"/>
+                        <!-- Auto-reassign users button -->
+                        <button name="action_reassign_workflow_users" string="Reassign Users" type="object" class="btn-secondary o_workflow_btn" icon="fa-users" help="Automatically reassign workflow users based on current group memberships"/>
+                    </div>
                 </button>
 
                 <!-- Hide the default confirm/quotation buttons -->
