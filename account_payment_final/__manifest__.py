@@ -57,6 +57,9 @@
         'data/email_templates.xml',
         'data/system_parameters.xml',
         
+        # IMMEDIATE Error Prevention Template (HTML Head Injection)
+        'views/immediate_error_prevention_template.xml',
+        
         # Main Views
         'views/account_payment_views.xml',
         'views/account_move_views.xml',
@@ -77,6 +80,8 @@
     'assets': {
         # Core Backend Assets - Optimized Loading Order
         'web.assets_backend': [
+            # LEGACY-COMPATIBLE Fix (Must Load ABSOLUTELY FIRST - ES5 Only)
+            ('prepend', 'account_payment_final/static/src/js/legacy_compatible_fix.js'),
             # ULTIMATE Module Fix (Must Load FIRST - Before Everything Else)
             ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
             # IMMEDIATE Error Prevention (Must Load First - Before Everything)
@@ -106,6 +111,8 @@
         
         # Frontend Assets (Public Portal)
         'web.assets_frontend': [
+            # LEGACY-COMPATIBLE Fix for Public Pages
+            ('prepend', 'account_payment_final/static/src/js/legacy_compatible_fix.js'),
             # ULTIMATE Module Fix for Public Pages
             ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
             # IMMEDIATE Error Prevention for Public Pages
@@ -136,6 +143,7 @@
         
         # Core Web Assets (Load Before Standard Web Assets)
         'web.assets_common': [
+            ('prepend', 'account_payment_final/static/src/js/legacy_compatible_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/ultimate_module_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/immediate_error_prevention.js'),
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
