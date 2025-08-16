@@ -24,6 +24,20 @@
             <field name="comment">Users responsible for calculating commission amounts</field>
         </record>
 
+        <!-- Allocation Management Group -->
+        <record id="group_order_allocation_manager" model="res.groups">
+            <field name="name">Order Allocation Managers</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Users responsible for managing order allocation stage</field>
+        </record>
+
+        <!-- Order Approval Group (Standard) -->
+        <record id="group_order_approval_manager" model="res.groups">
+            <field name="name">Order Approval Managers</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Managers who can approve orders</field>
+        </record>
+
         <!-- Final Review and Approval Group -->
         <record id="group_order_approval_manager_enhanced" model="res.groups">
             <field name="name">Order Approval Managers Enhanced</field>
@@ -45,7 +59,9 @@
             <field name="comment">Full administrative access to order status system</field>
             <field name="implied_ids" eval="[(4, ref('group_order_draft_user')), 
                                            (4, ref('group_order_documentation_reviewer')), 
-                                           (4, ref('group_order_commission_calculator')), 
+                                           (4, ref('group_order_commission_calculator')),
+                                           (4, ref('group_order_allocation_manager')),
+                                           (4, ref('group_order_approval_manager')),
                                            (4, ref('group_order_approval_manager_enhanced')), 
                                            (4, ref('group_order_posting_manager'))]"/>
         </record>

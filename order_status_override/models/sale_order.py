@@ -729,26 +729,6 @@ class SaleOrder(models.Model):
         )
         return True
 
-    def action_approve_order(self):
-        """Approve the order (replaces confirm functionality)"""
-        self.ensure_one()
-        if self.order_status != 'final_review':
-            raise UserError(_("Order must be in final review status to be approved."))
-        
-        # Check user permissions
-        current_user = self.env.user
-        if not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
-                current_user.id == self.final_review_user_id.id):
-            raise UserError(_("You don't have permission to approve orders."))
-        
-        self.order_status = 'approved'
-        self._create_workflow_activity('approved')
-        self.message_post(
-            body=_("Order approved by %s - Ready for posting") % self.env.user.name,
-            subject=_("Status Changed: Approved"),
-        )
-        return True
-
     def action_move_to_post(self):
         """Move order from Approved to Post stage"""
         self.ensure_one()
@@ -786,29 +766,6 @@ class SaleOrder(models.Model):
         self.message_post(
             body=_("Order posted as Sales Order by %s") % self.env.user.name,
             subject=_("Status Changed: Posted"),
-        )
-        return True
-
-    def action_reject_order(self):
-        """Reject order - move back to draft with enhanced logic"""
-        self.ensure_one()
-        if self.order_status in ['posted']:
-            raise UserError(_("Cannot reject a posted order."))
-        
-        # Check permissions based on current stage
-        current_user = self.env.user
-        if self.order_status == 'document_review' and not current_user.has_group('order_status_override.group_order_documentation_reviewer'):
-            raise UserError(_("You don't have permission to reject orders from document review stage."))
-        elif self.order_status == 'allocation' and not current_user.has_group('order_status_override.group_order_commission_calculator'):
-            raise UserError(_("You don't have permission to reject orders from allocation stage."))
-        elif self.order_status in ['approved', 'post'] and not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or current_user.id == self.approval_user_id.id):
-            raise UserError(_("You don't have permission to reject orders from this stage."))
-        
-        old_status = self.order_status
-        self.order_status = 'draft'
-        self.message_post(
-            body=_("Order rejected from %s stage and moved back to draft by %s") % (old_status.replace('_', ' ').title(), self.env.user.name),
-            subject=_("Status Changed: Rejected to Draft"),
         )
         return True
 
@@ -882,101 +839,3 @@ class SaleOrder(models.Model):
                 note=note,
                 user_id=user_id
             )
-    # ============================================================================
-    # NEW WORKFLOW ACTION METHODS - Updated per Requirements
-    # ============================================================================
-    
-    def action_move_to_document_review(self):
-        """Move order from Draft to Document Review"""
-        self.ensure_one()
-        if self.order_status != 'draft':
-            raise UserError(_("Order must be in Draft status to move to Document Review."))
-        
-        self.order_status = 'document_review'
-        self._send_workflow_notification('document_review')
-        self.message_post(
-            body=_("Order moved to Document Review stage by %s") % self.env.user.name,
-            subject=_("Status Changed: Document Review")
-        )
-        return True
-    
-    def action_move_to_allocation(self):
-        """Move order from Document Review to Allocation"""
-        self.ensure_one()
-        if self.order_status != 'document_review':
-            raise UserError(_("Order must be in Document Review status to move to Allocation."))
-        
-        self.order_status = 'allocation'
-        self._send_workflow_notification('allocation')
-        self.message_post(
-            body=_("Order moved to Allocation stage by %s") % self.env.user.name,
-            subject=_("Status Changed: Allocation")
-        )
-        return True
-    
-    def action_approve_order(self):
-        """Move order from Allocation to Approved"""
-        self.ensure_one()
-        if self.order_status != 'allocation':
-            raise UserError(_("Order must be in Allocation status to approve."))
-        
-        self.order_status = 'approved'
-        self._send_workflow_notification('approved')
-        self.message_post(
-            body=_("Order approved by %s") % self.env.user.name,
-            subject=_("Status Changed: Approved")
-        )
-        return True
-    
-    def action_post_order(self):
-        """Move order from Approved to Post and confirm as Sales Order"""
-        self.ensure_one()
-        if self.order_status != 'approved':
-            raise UserError(_("Order must be in Approved status to post."))
-        
-        # Post the order (confirm as sales order)
-        self.order_status = 'post'
-        
-        # Confirm the sales order if not already confirmed
-        if self.state in ['draft', 'sent']:
-            self.action_confirm()
-        
-        self.message_post(
-            body=_("Order posted and confirmed as Sales Order by %s") % self.env.user.name,
-            subject=_("Status Changed: Posted")
-        )
-        return True
-    
-    def action_post_order(self):
-        """Move order to post stage - final stage"""
-        self.ensure_one()
-        if self.order_status != 'approved':
-            raise UserError(_("Order must be approved before posting."))
-        
-        # Check user permissions
-        current_user = self.env.user
-        if not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
-                current_user.id == self.approval_user_id.id):
-            raise UserError(_("You don't have permission to post orders."))
-        
-        self.order_status = 'post'
-        self._create_workflow_activity('post')
-        self.message_post(
-            body=_("Order posted by %s - workflow complete") % self.env.user.name,
-            subject=_("Status Changed: Posted"),
-        )
-        return True
-    
-    def action_reject_order(self):
-        """Reject the order and return to draft"""
-        self.ensure_one()
-        if self.order_status == 'post':
-            raise UserError(_("Cannot reject a posted order."))
-        
-        self.order_status = 'draft'
-        self.message_post(
-            body=_("Order rejected by %s and returned to draft status for revision.") % self.env.user.name,
-            subject=_("Order Rejected"),
-            message_type='notification'
-        )
-        return True
