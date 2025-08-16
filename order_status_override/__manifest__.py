@@ -19,7 +19,7 @@
     'category': 'Sales',
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'mail'],
+    'depends': ['sale', 'mail', 'web'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
