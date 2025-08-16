@@ -46,6 +46,9 @@ class SaleOrder(models.Model):
     # Enhanced stage visibility computed fields with new workflow
     show_document_review_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_commission_calculation_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_commission_calc_button = fields.Boolean(compute='_compute_workflow_buttons', 
+                                                string='Commission Calc Button',
+                                                help='Alias for show_commission_calculation_button for backward compatibility')
     show_allocation_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_final_review_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_approve_button = fields.Boolean(compute='_compute_workflow_buttons')
@@ -248,6 +251,7 @@ class SaleOrder(models.Model):
             # Default all buttons to hidden
             order.show_document_review_button = False
             order.show_commission_calculation_button = False
+            order.show_commission_calc_button = False  # Alias field
             order.show_allocation_button = False
             order.show_final_review_button = False
             order.show_approve_button = False
@@ -267,6 +271,7 @@ class SaleOrder(models.Model):
                 # Can move to commission calculation if user has commission rights
                 if current_user.has_group('order_status_override.group_order_commission_calculator'):
                     order.show_commission_calculation_button = True
+                    order.show_commission_calc_button = True  # Alias for compatibility
                 order.show_reject_button = True
                 
             elif order.order_status == 'commission_calculation':
