@@ -32,6 +32,7 @@
         'reports/sale_commission_report.xml',
         'reports/sale_commission_template.xml',
         'reports/enhanced_order_status_report_template.xml',
+        'reports/enhanced_order_status_report_template_updated.xml',
         'reports/enhanced_order_status_report_actions.xml',
         'views/order_status_views.xml',
         'views/order_views_assignment.xml',

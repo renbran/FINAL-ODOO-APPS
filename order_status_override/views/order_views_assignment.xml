@@ -14,12 +14,16 @@
                     <field name="custom_status_id" invisible="1"/>
                     <!-- Enhanced computed fields for button visibility -->
                     <field name="show_document_review_button" invisible="1"/>
-                    <field name="show_commission_calc_button" invisible="1"/>
-                    <field name="show_final_review_button" invisible="1"/>
+                    <field name="show_allocation_button" invisible="1"/>
                     <field name="show_approve_button" invisible="1"/>
                     <field name="show_post_button" invisible="1"/>
                     <field name="show_reject_button" invisible="1"/>
                     <field name="auto_assigned_users" invisible="1"/>
+                </field>
+
+                <!-- Hide the default sales order status bar -->
+                <field name="state" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </field>
 
                 <!-- Add commission and workflow buttons in header -->
@@ -36,27 +40,22 @@
                             class="btn-primary" icon="fa-file-text-o" 
                             invisible="not show_document_review_button"/>
 
-                    <!-- Document Review to Commission Calculation -->
-                    <button name="action_move_to_commission_calculation" string="Start Commission Calculation" type="object" 
-                            class="btn-warning" icon="fa-calculator" 
-                            invisible="not show_commission_calc_button"/>
+                    <!-- Document Review to Allocation -->
+                    <button name="action_move_to_allocation" string="Start Allocation" type="object" 
+                            class="btn-warning" icon="fa-sitemap" 
+                            invisible="not show_allocation_button"/>
 
-                    <!-- Commission to Final Review -->
-                    <button name="action_move_to_final_review" string="Submit for Final Review" type="object" 
-                            class="btn-info" icon="fa-search" 
-                            invisible="not show_final_review_button"/>
-
-                    <!-- Final Review to Approved -->
+                    <!-- Allocation to Approved -->
                     <button name="action_approve_order" string="Approve Order" type="object" 
                             class="btn-success" icon="fa-check" 
                             invisible="not show_approve_button"/>
 
-                    <!-- Approved to Posted (replaces confirm functionality) -->
+                    <!-- Approved to Posted -->
                     <button name="action_post_order" string="Post Order" type="object" 
                             class="btn-success" icon="fa-paper-plane" 
                             invisible="not show_post_button"/>
 
-                    <!-- Reject button (available in all stages except posted) -->
+                    <!-- Reject button (available in most stages) -->
                     <button name="action_reject_order" string="Reject Order" type="object" 
                             class="btn-danger" icon="fa-times" 
                             invisible="not show_reject_button"/>
@@ -66,6 +65,11 @@
                             class="btn-secondary" icon="fa-users" 
                             help="Automatically reassign workflow users based on current group memberships"/>
                 </button>
+                
+                <!-- Hide the default confirm/quotation buttons -->
+                <button name="action_confirm" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </button>
 
                 <!-- Add workflow assignment fields using xpath -->
                 <xpath expr="//notebook" position="inside">
@@ -74,10 +78,10 @@
                             <group string="Enhanced Stage Assignments" name="stage_assignments">
                                 <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}" 
                                        help="User responsible for document review stage"/>
-                                <field name="commission_user_id" options="{'no_create': True, 'no_quick_create': True}"
-                                       help="User responsible for commission calculation"/>
-                                <field name="final_review_user_id" options="{'no_create': True, 'no_quick_create': True}"
-                                       help="User responsible for final review and approval"/>
+                                <field name="allocation_user_id" options="{'no_create': True, 'no_quick_create': True}"
+                                       help="User responsible for allocation stage"/>
+                                <field name="approval_user_id" options="{'no_create': True, 'no_quick_create': True}"
+                                       help="User responsible for final approval"/>
                                 <field name="posting_user_id" options="{'no_create': True, 'no_quick_create': True}"
                                        help="User responsible for posting approved orders"/>
                                 <field name="auto_assigned_users" readonly="1" 

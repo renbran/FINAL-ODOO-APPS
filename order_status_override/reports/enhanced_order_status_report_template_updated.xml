@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Enhanced Order Status Override Report Template - New 3-Column Layout -->
+    <!-- Updated per requirements: 3-column layout, commission table, summary section -->
+    <template id="enhanced_order_status_report_template_updated">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <!-- Professional CSS Styles for Enhanced Report -->
+                    <style>
+                        @page {
+                            margin: 8mm;
+                            size: A4;
+                        }
+                        
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            font-size: 12px;
+                            line-height: 1.4;
+                            color: #333;
+                            background: #fff;
+                        }
+                        
+                        /* OSUS Properties Branding Colors */
+                        .primary-color { color: #1f4788; }
+                        .secondary-color { color: #f8f9fa; }
+                        .accent-color { color: #6b0632; }
+                        
+                        /* Report Header */
+                        .report-header {
+                            background: linear-gradient(135deg, #1f4788 0%, #2d5aa0 100%);
+                            color: white;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                            border-radius: 8px;
+                            text-align: center;
+                        }
+                        
+                        .report-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            margin-bottom: 8px;
+                            letter-spacing: 1px;
+                        }
+                        
+                        .report-subtitle {
+                            font-size: 14px;
+                            opacity: 0.9;
+                        }
+                        
+                        /* 3-Column Layout per Requirements */
+                        .deal-info-section {
+                            margin-bottom: 25px;
+                        }
+                        
+                        .section-header {
+                            background: linear-gradient(135deg, #6b0632 0%, #8B1538 100%);
+                            color: white;
+                            padding: 10px 15px;
+                            margin-bottom: 15px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            border-radius: 6px;
+                            letter-spacing: 0.5px;
+                        }
+                        
+                        .info-grid-3col {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr 1fr; /* 3-column layout */
+                            gap: 15px;
+                            margin-bottom: 20px;
+                        }
+                        
+                        .info-column {
+                            background: #f8f9fa;
+                            padding: 12px;
+                            border-radius: 8px;
+                            border-left: 4px solid #1f4788;
+                        }
+                        
+                        .info-item {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 8px;
+                            padding-bottom: 6px;
+                            border-bottom: 1px solid #dee2e6;
+                        }
+                        
+                        .info-item:last-child {
+                            margin-bottom: 0;
+                            border-bottom: none;
+                        }
+                        
+                        .info-label {
+                            font-weight: 600;
+                            color: #1f4788;
+                            font-size: 10px;
+                            text-transform: uppercase;
+                            min-width: 100px;
+                            letter-spacing: 0.5px;
+                        }
+                        
+                        .info-value {
+                            font-size: 11px;
+                            color: #333;
+                            font-weight: 500;
+                            text-align: right;
+                            flex: 1;
+                        }
+                        
+                        .info-value.highlight {
+                            color: #6b0632;
+                            font-weight: bold;
+                            font-size: 12px;
+                        }
+                        
+                        /* Commission Table - Single Table with Headers per Requirements */
+                        .commission-section {
+                            margin-bottom: 30px;
+                        }
+                        
+                        .commission-table-container {
+                            margin-bottom: 25px;
+                        }
+                        
+                        .commission-table-header {
+                            background: linear-gradient(135deg, #1f4788 0%, #2d5aa0 100%);
+                            color: white;
+                            padding: 12px 15px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            border-radius: 6px 6px 0 0;
+                            letter-spacing: 0.5px;
+                        }
+                        
+                        .table-responsive {
+                            overflow-x: auto;
+                            border-radius: 0 0 6px 6px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        }
+                        
+                        .commission-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 11px;
+                            background: white;
+                        }
+                        
+                        .commission-table th {
+                            background: linear-gradient(135deg, #6b0632 0%, #8B1538 100%);
+                            color: white;
+                            padding: 10px 8px;
+                            text-align: left;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            font-size: 10px;
+                            letter-spacing: 0.5px;
+                            border-bottom: 2px solid #fff;
+                        }
+                        
+                        .commission-table td {
+                            padding: 8px;
+                            border-bottom: 1px solid #dee2e6;
+                            font-size: 11px;
+                            vertical-align: middle;
+                        }
+                        
+                        .commission-table tr:nth-child(even) {
+                            background: #f8f9fa;
+                        }
+                        
+                        .commission-table tr:hover {
+                            background: #e9ecef;
+                        }
+                        
+                        /* Summary Section per Requirements */
+                        .summary-section {
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 2px solid #1f4788;
+                            border-radius: 8px;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                        }
+                        
+                        .summary-header {
+                            background: linear-gradient(135deg, #1f4788 0%, #2d5aa0 100%);
+                            color: white;
+                            padding: 10px 15px;
+                            margin: -20px -20px 15px -20px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            border-radius: 6px 6px 0 0;
+                            letter-spacing: 0.5px;
+                        }
+                        
+                        .summary-item {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 12px;
+                            padding: 8px;
+                            background: white;
+                            border-radius: 4px;
+                            border-left: 4px solid #6b0632;
+                        }
+                        
+                        .summary-label {
+                            font-weight: 600;
+                            color: #1f4788;
+                            font-size: 12px;
+                        }
+                        
+                        .summary-value {
+                            font-weight: bold;
+                            color: #6b0632;
+                            font-size: 14px;
+                        }
+                        
+                        /* Status Badges */
+                        .status-badge {
+                            display: inline-block;
+                            padding: 4px 8px;
+                            border-radius: 12px;
+                            font-size: 9px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            min-width: 70px;
+                            text-align: center;
+                        }
+                        
+                        .badge-pending {
+                            background-color: #ffc107;
+                            color: #000;
+                        }
+                        
+                        .badge-completed {
+                            background-color: #28a745;
+                            color: white;
+                        }
+                        
+                        .badge-processing {
+                            background-color: #007bff;
+                            color: white;
+                        }
+                        
+                        /* Footer */
+                        .report-footer {
+                            background: linear-gradient(135deg, #1f4788 0%, #2d5aa0 100%);
+                            color: white;
+                            padding: 15px;
+                            text-align: center;
+                            font-size: 10px;
+                            border-radius: 6px;
+                            margin-top: 20px;
+                        }
+                        
+                        @media print {
+                            .page {
+                                margin: 0;
+                                padding: 5mm;
+                            }
+                            .report-header, .report-footer {
+                                -webkit-print-color-adjust: exact;
+                                color-adjust: exact;
+                            }
+                        }
+                    </style>
+
+                    <!-- Report Header -->
+                    <div class="report-header">
+                        <div class="report-title">Order Status &amp; Commission Report</div>
+                        <div class="report-subtitle">
+                            Order: <span t-field="o.name"/> | Date: <span t-field="o.date_order" t-options="{'format': 'dd/MM/yyyy'}"/>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced 3-Column Deal Information Section -->
+                    <div class="deal-info-section">
+                        <div class="section-header">Deal Information</div>
+                        <div class="info-grid-3col">
+                            <!-- Column 1: Customer Information -->
+                            <div class="info-column">
+                                <div class="info-item">
+                                    <span class="info-label">Customer</span>
+                                    <span class="info-value"><span t-field="o.partner_id.name"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-value"><span t-field="o.partner_id.email"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Phone</span>
+                                    <span class="info-value"><span t-field="o.partner_id.phone"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Status</span>
+                                    <span class="info-value highlight"><span t-field="o.order_status"/></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2: Order Details -->
+                            <div class="info-column">
+                                <div class="info-item">
+                                    <span class="info-label">Order Date</span>
+                                    <span class="info-value"><span t-field="o.date_order" t-options="{'format': 'dd/MM/yyyy'}"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Booking Date</span>
+                                    <span class="info-value"><span t-field="o.booking_date" t-options="{'format': 'dd/MM/yyyy'}"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Project</span>
+                                    <span class="info-value"><span t-field="o.project_id.name"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Unit</span>
+                                    <span class="info-value"><span t-field="o.unit_id.name"/></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 3: Financial Summary -->
+                            <div class="info-column">
+                                <div class="info-item">
+                                    <span class="info-label">Order Total</span>
+                                    <span class="info-value highlight">
+                                        <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Commission Total</span>
+                                    <span class="info-value highlight">
+                                        <span t-field="o.total_commission_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Currency</span>
+                                    <span class="info-value"><span t-field="o.currency_id.name"/></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Payment Out</span>
+                                    <span class="info-value">
+                                        <span t-field="o.total_payment_out" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commission Information Table - Single Table with Required Headers -->
+                    <div class="commission-section">
+                        <div class="commission-table-container">
+                            <div class="commission-table-header">Commission Details</div>
+                            <div class="table-responsive">
+                                <table class="commission-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Specification</th>
+                                            <th>Name</th>
+                                            <th>Rate (%)</th>
+                                            <th>Total Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- External Commissions -->
+                                        <t t-if="o.broker_amount > 0">
+                                            <tr>
+                                                <td>Broker Commission</td>
+                                                <td><span t-field="o.broker_partner_id.name"/></td>
+                                                <td><span t-field="o.broker_rate"/>%</td>
+                                                <td><span t-field="o.broker_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="o.referrer_amount > 0">
+                                            <tr>
+                                                <td>Referrer Commission</td>
+                                                <td><span t-field="o.referrer_partner_id.name"/></td>
+                                                <td><span t-field="o.referrer_rate"/>%</td>
+                                                <td><span t-field="o.referrer_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="o.cashback_amount > 0">
+                                            <tr>
+                                                <td>Cashback</td>
+                                                <td><span t-field="o.cashback_partner_id.name"/></td>
+                                                <td><span t-field="o.cashback_rate"/>%</td>
+                                                <td><span t-field="o.cashback_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                            </tr>
+                                        </t>
+                                        
+                                        <!-- Internal Commissions -->
+                                        <t t-if="o.agent1_amount > 0">
+                                            <tr>
+                                                <td>Agent 1 Commission</td>
+                                                <td><span t-field="o.agent1_partner_id.name"/></td>
+                                                <td><span t-field="o.agent1_rate"/>%</td>
+                                                <td><span t-field="o.agent1_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-processing">Processing</span></td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="o.agent2_amount > 0">
+                                            <tr>
+                                                <td>Agent 2 Commission</td>
+                                                <td><span t-field="o.agent2_partner_id.name"/></td>
+                                                <td><span t-field="o.agent2_rate"/>%</td>
+                                                <td><span t-field="o.agent2_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-processing">Processing</span></td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="o.manager_amount > 0">
+                                            <tr>
+                                                <td>Manager Commission</td>
+                                                <td><span t-field="o.manager_partner_id.name"/></td>
+                                                <td><span t-field="o.manager_rate"/>%</td>
+                                                <td><span t-field="o.manager_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-processing">Processing</span></td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="o.director_amount > 0">
+                                            <tr>
+                                                <td>Director Commission</td>
+                                                <td><span t-field="o.director_partner_id.name"/></td>
+                                                <td><span t-field="o.director_rate"/>%</td>
+                                                <td><span t-field="o.director_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="status-badge badge-completed">Approved</span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Section Before Footer per Requirements -->
+                    <div class="summary-section">
+                        <div class="summary-header">Financial Summary</div>
+                        <div class="summary-item">
+                            <span class="summary-label">Total Eligible Commission</span>
+                            <span class="summary-value">
+                                <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Total Received/Invoiced</span>
+                            <span class="summary-value">
+                                <t t-if="o.state == 'sale' or o.state == 'done'">
+                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </t>
+                                <t t-else="">
+                                    <span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </t>
+                            </span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Total Eligible Payables</span>
+                            <span class="summary-value">
+                                <span t-field="o.total_commission_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="report-footer">
+                        <strong>OSUS Properties - Professional Order Management System</strong><br/>
+                        Generated on <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y at %H:%M')"/> |
+                        User: <span t-esc="user.name"/> | 
+                        This document is computer generated and does not require signature.
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
