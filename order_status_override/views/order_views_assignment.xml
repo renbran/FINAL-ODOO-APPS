@@ -12,12 +12,14 @@
                 <field name="state" position="before">
                     <field name="order_status" widget="statusbar" options="{'clickable': '1'}" readonly="state in ['sale', 'done', 'cancel']"/>
                     <field name="custom_status_id" invisible="1"/>
-                    <!-- Computed fields for button visibility -->
-                    <field name="show_documentation_button" invisible="1"/>
-                    <field name="show_commission_button" invisible="1"/>
-                    <field name="show_review_button" invisible="1"/>
+                    <!-- Enhanced computed fields for button visibility -->
+                    <field name="show_document_review_button" invisible="1"/>
+                    <field name="show_commission_calc_button" invisible="1"/>
+                    <field name="show_final_review_button" invisible="1"/>
                     <field name="show_approve_button" invisible="1"/>
+                    <field name="show_post_button" invisible="1"/>
                     <field name="show_reject_button" invisible="1"/>
+                    <field name="auto_assigned_users" invisible="1"/>
                 </field>
 
                 <!-- Add commission and workflow buttons in header -->
@@ -27,42 +29,59 @@
                     <button name="%(order_status_override.report_sale_commission)d" string="Commission Report" type="action" class="btn-success" icon="fa-money" invisible="state not in ['sale', 'done']"/>
                 </button>
 
-                <!-- Add unified workflow action buttons synchronized with status bar -->
+                <!-- Add enhanced unified workflow action buttons -->
                 <button name="action_quotation_send" position="after">
-                    <!-- Draft to Documentation -->
-                    <button name="action_move_to_documentation" string="Start Documentation" type="object" 
+                    <!-- Draft to Document Review -->
+                    <button name="action_move_to_document_review" string="Start Document Review" type="object" 
                             class="btn-primary" icon="fa-file-text-o" 
-                            invisible="not show_documentation_button"/>
+                            invisible="not show_document_review_button"/>
 
-                    <!-- Documentation to Commission -->
-                    <button name="action_move_to_commission" string="Start Commission Calculation" type="object" 
+                    <!-- Document Review to Commission Calculation -->
+                    <button name="action_move_to_commission_calculation" string="Start Commission Calculation" type="object" 
                             class="btn-warning" icon="fa-calculator" 
-                            invisible="not show_commission_button"/>
+                            invisible="not show_commission_calc_button"/>
 
                     <!-- Commission to Final Review -->
-                    <button name="action_move_to_review" string="Submit for Review" type="object" 
+                    <button name="action_move_to_final_review" string="Submit for Final Review" type="object" 
                             class="btn-info" icon="fa-search" 
-                            invisible="not show_review_button"/>
+                            invisible="not show_final_review_button"/>
 
-                    <!-- Final Review Actions -->
+                    <!-- Final Review to Approved -->
                     <button name="action_approve_order" string="Approve Order" type="object" 
                             class="btn-success" icon="fa-check" 
                             invisible="not show_approve_button"/>
 
-                    <!-- Reject button (available in all stages except approved) -->
+                    <!-- Approved to Posted (replaces confirm functionality) -->
+                    <button name="action_post_order" string="Post Order" type="object" 
+                            class="btn-success" icon="fa-paper-plane" 
+                            invisible="not show_post_button"/>
+
+                    <!-- Reject button (available in all stages except posted) -->
                     <button name="action_reject_order" string="Reject Order" type="object" 
                             class="btn-danger" icon="fa-times" 
                             invisible="not show_reject_button"/>
+
+                    <!-- Auto-reassign users button -->
+                    <button name="action_reassign_workflow_users" string="Reassign Users" type="object" 
+                            class="btn-secondary" icon="fa-users" 
+                            help="Automatically reassign workflow users based on current group memberships"/>
                 </button>
 
                 <!-- Add workflow assignment fields using xpath -->
                 <xpath expr="//notebook" position="inside">
                     <page string="Workflow &amp; Assignment" name="workflow_assignment">
                         <group>
-                            <group string="Stage Assignments" name="stage_assignments">
-                                <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
-                                <field name="commission_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
-                                <field name="final_review_user_id" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <group string="Enhanced Stage Assignments" name="stage_assignments">
+                                <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}" 
+                                       help="User responsible for document review stage"/>
+                                <field name="commission_user_id" options="{'no_create': True, 'no_quick_create': True}"
+                                       help="User responsible for commission calculation"/>
+                                <field name="final_review_user_id" options="{'no_create': True, 'no_quick_create': True}"
+                                       help="User responsible for final review and approval"/>
+                                <field name="posting_user_id" options="{'no_create': True, 'no_quick_create': True}"
+                                       help="User responsible for posting approved orders"/>
+                                <field name="auto_assigned_users" readonly="1" 
+                                       help="Indicates if users were automatically assigned based on groups"/>
                             </group>
 
                             <group string="Real Estate Details" name="real_estate_details">
@@ -184,17 +203,19 @@
                     <field name="documentation_user_id"/>
                     <field name="commission_user_id"/>
                     <field name="final_review_user_id"/>
+                    <field name="posting_user_id"/>
                 </field>
                 <xpath expr="//search" position="inside">
                     <separator/>
-                    <!-- Unified Status Filters -->
+                    <!-- Enhanced Unified Status Filters -->
                     <filter name="draft_status" string="Draft Orders" domain="[('order_status', '=', 'draft')]"/>
-                    <filter name="documentation_status" string="Documentation In-Progress" domain="[('order_status', '=', 'documentation')]"/>
-                    <filter name="commission_status" string="Commission Calculation" domain="[('order_status', '=', 'commission')]"/>
-                    <filter name="review_status" string="Final Review" domain="[('order_status', '=', 'review')]"/>
+                    <filter name="document_review_status" string="Document Review" domain="[('order_status', '=', 'document_review')]"/>
+                    <filter name="commission_calculation_status" string="Commission Calculation" domain="[('order_status', '=', 'commission_calculation')]"/>
+                    <filter name="final_review_status" string="Final Review" domain="[('order_status', '=', 'final_review')]"/>
                     <filter name="approved_status" string="Approved Orders" domain="[('order_status', '=', 'approved')]"/>
+                    <filter name="posted_status" string="Posted Orders" domain="[('order_status', '=', 'posted')]"/>
                     
-                    <!-- Date Filters for Reports -->
+                    <!-- Enhanced Date Filters for Reports -->
                     <separator/>
                     <filter name="this_month_bookings" string="This Month Bookings" 
                             domain="[('booking_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
@@ -208,6 +229,8 @@
                         <filter name="group_by_booking_date" string="Booking Date" context="{'group_by': 'booking_date:month'}"/>
                         <filter name="group_by_doc_user" string="Documentation User" context="{'group_by': 'documentation_user_id'}"/>
                         <filter name="group_by_commission_user" string="Commission User" context="{'group_by': 'commission_user_id'}"/>
+                        <filter name="group_by_review_user" string="Review User" context="{'group_by': 'final_review_user_id'}"/>
+                        <filter name="group_by_posting_user" string="Posting User" context="{'group_by': 'posting_user_id'}"/>
                     </group>
                 </xpath>
             </field>

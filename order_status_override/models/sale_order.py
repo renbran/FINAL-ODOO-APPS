@@ -11,15 +11,16 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Unified Status Field - Professional Workflow
+    # Unified Status Field - Professional Workflow with Enhanced Steps
     order_status = fields.Selection([
         ('draft', 'Draft'),
-        ('documentation', 'Documentation In-Progress'),
-        ('commission', 'Commission Calculation'),
-        ('review', 'Final Review'),
+        ('document_review', 'Documents Review'),  # NEW: Enhanced step
+        ('commission_calculation', 'Commission Calculation'),  # NEW: Enhanced step  
+        ('final_review', 'Final Review'),
         ('approved', 'Approved'),
+        ('posted', 'Posted'),  # NEW: Post functionality
     ], string='Order Status', default='draft', tracking=True, copy=False,
-       help="Current status of the order in the workflow")
+       help="Current status of the order in the professional workflow")
     
     # Legacy field (kept for backward compatibility)
     custom_status_id = fields.Many2one('order.status', string='Custom Status', 
@@ -27,17 +28,27 @@ class SaleOrder(models.Model):
     custom_status_history_ids = fields.One2many('order.status.history', 'order_id', 
                                             string='Status History', copy=False)
     
-    # User assignments for each stage
-    documentation_user_id = fields.Many2one('res.users', string='Documentation Responsible')
-    commission_user_id = fields.Many2one('res.users', string='Commission Responsible')
-    final_review_user_id = fields.Many2one('res.users', string='Final Review Responsible')
+    # Enhanced user assignments for each stage with automatic group-based assignment
+    documentation_user_id = fields.Many2one('res.users', string='Documentation Responsible',
+                                           help="User responsible for document review stage")
+    commission_user_id = fields.Many2one('res.users', string='Commission Responsible',
+                                        help="User responsible for commission calculation stage")
+    final_review_user_id = fields.Many2one('res.users', string='Final Review Responsible',
+                                          help="User responsible for final review and approval")
+    posting_user_id = fields.Many2one('res.users', string='Posting Responsible',
+                                     help="User responsible for posting approved orders")
     
-    # Stage visibility computed fields
-    show_documentation_button = fields.Boolean(compute='_compute_workflow_buttons')
-    show_commission_button = fields.Boolean(compute='_compute_workflow_buttons')
-    show_review_button = fields.Boolean(compute='_compute_workflow_buttons')
+    # Enhanced stage visibility computed fields with new workflow
+    show_document_review_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_commission_calc_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_final_review_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_approve_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_post_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_reject_button = fields.Boolean(compute='_compute_workflow_buttons')
+    
+    # Group-based assignment tracking
+    auto_assigned_users = fields.Boolean(string='Auto-assigned Users', default=False,
+                                        help="Indicates if users were automatically assigned based on groups")
     
     # Real Estate specific fields
     booking_date = fields.Date(string='Booking Date', default=fields.Date.today, tracking=True, 
@@ -226,29 +237,52 @@ class SaleOrder(models.Model):
     
     @api.depends('order_status', 'state')
     def _compute_workflow_buttons(self):
-        """Compute visibility of workflow transition buttons"""
+        """Compute visibility of workflow transition buttons with enhanced workflow"""
         for order in self:
             # Default all buttons to hidden
-            order.show_documentation_button = False
-            order.show_commission_button = False  
-            order.show_review_button = False
+            order.show_document_review_button = False
+            order.show_commission_calc_button = False  
+            order.show_final_review_button = False
             order.show_approve_button = False
+            order.show_post_button = False
             order.show_reject_button = False
             
-            # Show buttons based on current status
+            # Show buttons based on current status and user groups
+            current_user = self.env.user
+            
             if order.order_status == 'draft':
-                order.show_documentation_button = True
+                # Can move to document review if user has documentation rights
+                if current_user.has_group('order_status_override.group_order_documentation_reviewer'):
+                    order.show_document_review_button = True
+                order.show_reject_button = False  # No reject from draft
+                
+            elif order.order_status == 'document_review':
+                # Can move to commission calculation if user has commission rights
+                if current_user.has_group('order_status_override.group_order_commission_calculator'):
+                    order.show_commission_calc_button = True
                 order.show_reject_button = True
-            elif order.order_status == 'documentation':
-                order.show_commission_button = True
+                
+            elif order.order_status == 'commission_calculation':
+                # Can move to final review if user has review rights
+                if (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
+                    current_user.id == order.final_review_user_id.id):
+                    order.show_final_review_button = True
                 order.show_reject_button = True
-            elif order.order_status == 'commission':
-                order.show_review_button = True
+                
+            elif order.order_status == 'final_review':
+                # Can approve if user has approval rights
+                if (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
+                    current_user.id == order.final_review_user_id.id):
+                    order.show_approve_button = True
                 order.show_reject_button = True
-            elif order.order_status == 'review':
-                order.show_approve_button = True
-                order.show_reject_button = True
-            # Approved status - no further actions needed
+                
+            elif order.order_status == 'approved':
+                # Can post if user has posting rights
+                if current_user.has_group('order_status_override.group_order_posting_manager'):
+                    order.show_post_button = True
+                order.show_reject_button = False  # Cannot reject approved orders
+                
+            # Posted status - no further actions needed
 
     @api.depends('partner_id', 'order_line', 'order_line.product_id')
     def _compute_related_documents(self):
@@ -280,17 +314,85 @@ class SaleOrder(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Enhanced create method with auto-assignment based on groups"""
         records = super(SaleOrder, self).create(vals_list)
-        initial_status = self.env['order.status'].search([('is_initial', '=', True)], limit=1)
-        if initial_status:
-            for record in records:
+        
+        for record in records:
+            # Auto-assign users based on groups
+            record._auto_assign_workflow_users()
+            
+            # Set initial status
+            initial_status = self.env['order.status'].search([('is_initial', '=', True)], limit=1)
+            if initial_status:
                 record.custom_status_id = initial_status.id
                 self.env['order.status.history'].create({
                     'order_id': record.id,
                     'status_id': initial_status.id,
                     'notes': _('Initial status automatically set to %s') % initial_status.name
                 })
+        
         return records
+
+    def _auto_assign_workflow_users(self):
+        """Automatically assign users based on security groups"""
+        self.ensure_one()
+        
+        # Find users for each workflow stage based on groups
+        
+        # Documentation reviewers
+        if not self.documentation_user_id:
+            doc_users = self.env['res.users'].search([
+                ('groups_id', 'in', [self.env.ref('order_status_override.group_order_documentation_reviewer').id]),
+                ('active', '=', True)
+            ], limit=1)
+            if doc_users:
+                self.documentation_user_id = doc_users[0].id
+        
+        # Commission calculators
+        if not self.commission_user_id:
+            comm_users = self.env['res.users'].search([
+                ('groups_id', 'in', [self.env.ref('order_status_override.group_order_commission_calculator').id]),
+                ('active', '=', True)
+            ], limit=1)
+            if comm_users:
+                self.commission_user_id = comm_users[0].id
+        
+        # Final review managers
+        if not self.final_review_user_id:
+            review_users = self.env['res.users'].search([
+                ('groups_id', 'in', [self.env.ref('order_status_override.group_order_approval_manager_enhanced').id]),
+                ('active', '=', True)
+            ], limit=1)
+            if review_users:
+                self.final_review_user_id = review_users[0].id
+        
+        # Posting managers
+        if not self.posting_user_id:
+            posting_users = self.env['res.users'].search([
+                ('groups_id', 'in', [self.env.ref('order_status_override.group_order_posting_manager').id]),
+                ('active', '=', True)
+            ], limit=1)
+            if posting_users:
+                self.posting_user_id = posting_users[0].id
+        
+        # Mark as auto-assigned
+        self.auto_assigned_users = True
+        
+        _logger.info(f"Auto-assigned workflow users for order {self.name}: "
+                    f"Doc: {self.documentation_user_id.name if self.documentation_user_id else 'None'}, "
+                    f"Comm: {self.commission_user_id.name if self.commission_user_id else 'None'}, "
+                    f"Review: {self.final_review_user_id.name if self.final_review_user_id else 'None'}, "
+                    f"Post: {self.posting_user_id.name if self.posting_user_id else 'None'}")
+
+    def action_reassign_workflow_users(self):
+        """Manual action to reassign workflow users based on current groups"""
+        self.ensure_one()
+        self._auto_assign_workflow_users()
+        self.message_post(
+            body=_("Workflow users have been automatically reassigned based on current group memberships."),
+            subject=_("Users Reassigned")
+        )
+        return True
     
     def action_change_status(self):
         """
@@ -527,40 +629,57 @@ class SaleOrder(models.Model):
         
         return True
     
-    # === UNIFIED WORKFLOW ACTIONS ===
-    def action_move_to_documentation(self):
-        """Move order to documentation stage"""
+    # === ENHANCED UNIFIED WORKFLOW ACTIONS ===
+    def action_move_to_document_review(self):
+        """Move order to document review stage"""
         self.ensure_one()
         if self.order_status != 'draft':
-            raise UserError(_("Order must be in draft status to move to documentation."))
+            raise UserError(_("Order must be in draft status to move to document review."))
         
-        self.order_status = 'documentation'
+        # Check user permissions
+        if not self.env.user.has_group('order_status_override.group_order_documentation_reviewer'):
+            raise UserError(_("You don't have permission to move orders to document review stage."))
+        
+        self.order_status = 'document_review'
+        self._create_workflow_activity('document_review')
         self.message_post(
-            body=_("Order moved to Documentation stage by %s") % self.env.user.name,
-            subject=_("Status Changed: Documentation"),
+            body=_("Order moved to Document Review stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Document Review"),
         )
         return True
 
-    def action_move_to_commission(self):
+    def action_move_to_commission_calculation(self):
         """Move order to commission calculation stage"""
         self.ensure_one()
-        if self.order_status != 'documentation':
-            raise UserError(_("Order must be in documentation status to move to commission calculation."))
+        if self.order_status != 'document_review':
+            raise UserError(_("Order must be in document review status to move to commission calculation."))
         
-        self.order_status = 'commission'
+        # Check user permissions
+        if not self.env.user.has_group('order_status_override.group_order_commission_calculator'):
+            raise UserError(_("You don't have permission to move orders to commission calculation stage."))
+        
+        self.order_status = 'commission_calculation'
+        self._create_workflow_activity('commission_calculation')
         self.message_post(
             body=_("Order moved to Commission Calculation stage by %s") % self.env.user.name,
             subject=_("Status Changed: Commission Calculation"),
         )
         return True
 
-    def action_move_to_review(self):
+    def action_move_to_final_review(self):
         """Move order to final review stage"""
         self.ensure_one()
-        if self.order_status != 'commission':
-            raise UserError(_("Order must be in commission status to move to final review."))
+        if self.order_status != 'commission_calculation':
+            raise UserError(_("Order must be in commission calculation status to move to final review."))
         
-        self.order_status = 'review'
+        # Check user permissions
+        current_user = self.env.user
+        if not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
+                current_user.id == self.final_review_user_id.id):
+            raise UserError(_("You don't have permission to move orders to final review stage."))
+        
+        self.order_status = 'final_review'
+        self._create_workflow_activity('final_review')
         self.message_post(
             body=_("Order moved to Final Review stage by %s") % self.env.user.name,
             subject=_("Status Changed: Final Review"),
@@ -568,30 +687,104 @@ class SaleOrder(models.Model):
         return True
 
     def action_approve_order(self):
-        """Approve the order"""
+        """Approve the order (replaces confirm functionality)"""
         self.ensure_one()
-        if self.order_status != 'review':
-            raise UserError(_("Order must be in review status to be approved."))
+        if self.order_status != 'final_review':
+            raise UserError(_("Order must be in final review status to be approved."))
+        
+        # Check user permissions
+        current_user = self.env.user
+        if not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
+                current_user.id == self.final_review_user_id.id):
+            raise UserError(_("You don't have permission to approve orders."))
         
         self.order_status = 'approved'
+        self._create_workflow_activity('approved')
         self.message_post(
-            body=_("Order approved by %s") % self.env.user.name,
+            body=_("Order approved by %s - Ready for posting") % self.env.user.name,
             subject=_("Status Changed: Approved"),
         )
         return True
 
-    def action_reject_order(self):
-        """Reject order - move back to draft"""
+    def action_post_order(self):
+        """Post the approved order as sales order (replaces confirm to post)"""
         self.ensure_one()
-        if self.order_status == 'approved':
-            raise UserError(_("Cannot reject an already approved order."))
+        if self.order_status != 'approved':
+            raise UserError(_("Order must be approved before posting."))
         
+        # Check user permissions
+        if not self.env.user.has_group('order_status_override.group_order_posting_manager'):
+            raise UserError(_("You don't have permission to post orders."))
+        
+        # Confirm the sales order in Odoo (standard workflow)
+        if self.state == 'draft':
+            self.action_confirm()
+        
+        self.order_status = 'posted'
+        self.message_post(
+            body=_("Order posted as Sales Order by %s") % self.env.user.name,
+            subject=_("Status Changed: Posted"),
+        )
+        return True
+
+    def action_reject_order(self):
+        """Reject order - move back to draft with enhanced logic"""
+        self.ensure_one()
+        if self.order_status in ['posted']:
+            raise UserError(_("Cannot reject a posted order."))
+        
+        # Check permissions based on current stage
+        current_user = self.env.user
+        if self.order_status == 'document_review' and not current_user.has_group('order_status_override.group_order_documentation_reviewer'):
+            raise UserError(_("You don't have permission to reject orders from document review stage."))
+        elif self.order_status == 'commission_calculation' and not current_user.has_group('order_status_override.group_order_commission_calculator'):
+            raise UserError(_("You don't have permission to reject orders from commission calculation stage."))
+        elif self.order_status in ['final_review', 'approved'] and not (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or current_user.id == self.final_review_user_id.id):
+            raise UserError(_("You don't have permission to reject orders from this stage."))
+        
+        old_status = self.order_status
         self.order_status = 'draft'
         self.message_post(
-            body=_("Order rejected and moved back to draft by %s") % self.env.user.name,
+            body=_("Order rejected from %s stage and moved back to draft by %s") % (old_status.replace('_', ' ').title(), self.env.user.name),
             subject=_("Status Changed: Rejected to Draft"),
         )
         return True
+
+    def _create_workflow_activity(self, stage):
+        """Create activities for workflow stages with enhanced targeting"""
+        self.ensure_one()
+        
+        user_id = False
+        summary = _("Process Sale Order: %s") % self.name
+        note = ""
+        
+        if stage == 'document_review':
+            user_id = self.documentation_user_id.id
+            note = _("Please review and prepare all required documentation for this order.")
+            summary = _("Document Review Required: %s") % self.name
+            
+        elif stage == 'commission_calculation':
+            user_id = self.commission_user_id.id
+            note = _("Please calculate and verify commission amounts for this order.")
+            summary = _("Commission Calculation Required: %s") % self.name
+            
+        elif stage == 'final_review':
+            user_id = self.final_review_user_id.id
+            note = _("Please perform final review and approve/reject this order.")
+            summary = _("Final Review Required: %s") % self.name
+            
+        elif stage == 'approved':
+            user_id = self.posting_user_id.id
+            note = _("Order has been approved and is ready for posting as Sales Order.")
+            summary = _("Order Ready for Posting: %s") % self.name
+        
+        if user_id:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=summary,
+                note=note,
+                user_id=user_id
+            )
     
     def _change_status(self, new_status_id, notes=False):
         """Helper method to change status and create history entry"""
