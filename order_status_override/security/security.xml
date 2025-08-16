@@ -5,11 +5,11 @@
         <record id="model_order_status" model="ir.model">
             <field name="model">order.status</field>
         </record>
-        
+
         <record id="model_commission_external" model="ir.model">
             <field name="model">commission.external</field>
         </record>
-        
+
         <record id="model_commission_internal" model="ir.model">
             <field name="model">commission.internal</field>
         </record>
