@@ -14,10 +14,11 @@ class SaleOrder(models.Model):
     # Unified Status Field - Updated Professional Workflow per Requirements
     order_status = fields.Selection([
         ('draft', 'Draft'),
-        ('document_review', 'Document Review'),  
-        ('allocation', 'Allocation'),  # NEW: Allocation stage per requirements
+        ('document_review', 'Document Review'),
+        ('commission_calculation', 'Commission Calculation'),  # Keep for compatibility with templates
+        ('allocation', 'Allocation'),
         ('approved', 'Approved'),
-        ('post', 'Post'),  # UPDATED: Post stage per requirements
+        ('post', 'Post'),
     ], string='Order Status', default='draft', tracking=True, copy=False,
        help="Current status of the order in the professional workflow")
     
@@ -43,6 +44,7 @@ class SaleOrder(models.Model):
     
     # Enhanced stage visibility computed fields with new workflow
     show_document_review_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_commission_calculation_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_allocation_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_approve_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_post_button = fields.Boolean(compute='_compute_workflow_buttons')
@@ -243,6 +245,7 @@ class SaleOrder(models.Model):
         for order in self:
             # Default all buttons to hidden
             order.show_document_review_button = False
+            order.show_commission_calculation_button = False
             order.show_allocation_button = False  
             order.show_approve_button = False
             order.show_post_button = False
@@ -258,6 +261,12 @@ class SaleOrder(models.Model):
                 order.show_reject_button = False  # No reject from draft
                 
             elif order.order_status == 'document_review':
+                # Can move to commission calculation if user has commission rights
+                if current_user.has_group('order_status_override.group_order_commission_calculator'):
+                    order.show_commission_calculation_button = True
+                order.show_reject_button = True
+                
+            elif order.order_status == 'commission_calculation':
                 # Can move to allocation if user has allocation rights
                 if current_user.has_group('order_status_override.group_order_allocation_manager'):
                     order.show_allocation_button = True
@@ -637,11 +646,29 @@ class SaleOrder(models.Model):
         )
         return True
 
-    def action_move_to_allocation(self):
-        """Move order to allocation stage (replaces commission calculation)"""
+    def action_move_to_commission_calculation(self):
+        """Move order from Document Review to Commission Calculation"""
         self.ensure_one()
         if self.order_status != 'document_review':
-            raise UserError(_("Order must be in document review status to move to allocation."))
+            raise UserError(_("Order must be in Document Review status to move to Commission Calculation."))
+        
+        # Check user permissions
+        if not self.env.user.has_group('order_status_override.group_order_commission_calculator'):
+            raise UserError(_("You don't have permission to move orders to commission calculation stage."))
+        
+        self.order_status = 'commission_calculation'
+        self._create_workflow_activity('commission_calculation')
+        self.message_post(
+            body=_("Order moved to Commission Calculation stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Commission Calculation"),
+        )
+        return True
+
+    def action_move_to_allocation(self):
+        """Move order from Commission Calculation to allocation stage"""
+        self.ensure_one()
+        if self.order_status != 'commission_calculation':
+            raise UserError(_("Order must be in commission calculation status to move to allocation."))
         
         # Check user permissions
         if not self.env.user.has_group('order_status_override.group_order_commission_calculator'):

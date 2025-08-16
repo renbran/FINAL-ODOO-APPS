@@ -14,6 +14,7 @@
                     <field name="custom_status_id" invisible="1"/>
                     <!-- Enhanced computed fields for button visibility -->
                     <field name="show_document_review_button" invisible="1"/>
+                    <field name="show_commission_calculation_button" invisible="1"/>
                     <field name="show_allocation_button" invisible="1"/>
                     <field name="show_approve_button" invisible="1"/>
                     <field name="show_post_button" invisible="1"/>
@@ -38,7 +39,10 @@
                     <!-- Draft to Document Review -->
                     <button name="action_move_to_document_review" string="Start Document Review" type="object" class="btn-primary" icon="fa-file-text-o" invisible="not show_document_review_button"/>
 
-                    <!-- Document Review to Allocation -->
+                    <!-- Document Review to Commission Calculation -->
+                    <button name="action_move_to_commission_calculation" string="Start Commission Calculation" type="object" class="btn-info" icon="fa-calculator" invisible="not show_commission_calculation_button"/>
+
+                    <!-- Commission Calculation to Allocation -->
                     <button name="action_move_to_allocation" string="Start Allocation" type="object" class="btn-warning" icon="fa-sitemap" invisible="not show_allocation_button"/>
 
                     <!-- Allocation to Approved -->
