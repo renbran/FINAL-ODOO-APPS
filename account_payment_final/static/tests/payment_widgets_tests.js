@@ -1,7 +1,7 @@
 ﻿/** @odoo-module **/
 
-import { QRCodeField } from "@account_payment_final/js/fields/qr_code_field";
-import { PaymentApprovalWidget } from "@account_payment_final/js/components/payment_approval_widget";
+import { QRCodeField } from "../src/js/fields/qr_code_field";
+import { PaymentApprovalWidget } from "../src/js/components/payment_approval_widget";
 import { makeTestEnv } from "@web/../tests/helpers/mock_env";
 import { makeFakeModel } from "@web/../tests/helpers/mock_model";
 import { patchWithCleanup } from "@web/../tests/helpers/utils";

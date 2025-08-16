@@ -1,11 +1,13 @@
 /** @odoo-module **/
 
+
+import { Component } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { makeTestEnv } from "@web/../tests/helpers/mock_env";
 import { makeFakeLocalizationService } from "@web/../tests/helpers/mock_services";
 import { 
     PaymentApprovalWidgetModern 
-} from "@account_payment_final/js/components/payment_approval_widget_modern";
+} from "../src/js/components/payment_approval_widget_modern";
 import { 
     formatCurrency, 
     formatDate, 
@@ -13,7 +15,7 @@ import {
     generateQRData,
     parseQRData,
     getStatusConfig
-} from "@account_payment_final/js/utils/payment_utils";
+} from "../src/js/utils/payment_utils";
 
 const { Component, mount } = owl;
 const { QUnit } = window;

@@ -83,20 +83,23 @@ export class PaymentListController extends ListController {
      */
     async _performBulkApprove(paymentIds) {
         try {
-            const result = await this.orm.call(;
+            const result = await this.orm.call(;
+;
                 "account.payment",
                 "bulk_approve_payments",
                 [paymentIds]
             );
 
             if (result.success) {
-                this.notification.add(;
+                this.notification.add(
+;
                     `${result.approved_count} payment(s) approved successfully`,
                     { type: "success" }
                 );
                 
                 if (result.failed_count > 0) {
-                    this.notification.add(;
+                    this.notification.add(
+;
                         `${result.failed_count} payment(s) failed to approve`,
                         { type: "warning" }
                     );
@@ -146,20 +149,23 @@ export class PaymentListController extends ListController {
      */
     async _performBulkReject(paymentIds) {
         try {
-            const result = await this.orm.call(;
+            const result = await this.orm.call(;
+;
                 "account.payment",
                 "bulk_reject_payments",
                 [paymentIds]
             );
 
             if (result.success) {
-                this.notification.add(;
+                this.notification.add(
+;
                     `${result.rejected_count} payment(s) rejected successfully`,
                     { type: "warning" }
                 );
                 
                 if (result.failed_count > 0) {
-                    this.notification.add(;
+                    this.notification.add(
+;
                         `${result.failed_count} payment(s) failed to reject`,
                         { type: "warning" }
                     );
@@ -194,7 +200,8 @@ export class PaymentListController extends ListController {
         }
 
         try {
-            const result = await this.orm.call(;
+            const result = await this.orm.call(;
+;
                 "account.payment",
                 "export_qr_codes_zip",
                 [selectedIds]

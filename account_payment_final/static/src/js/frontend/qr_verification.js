@@ -1,8 +1,11 @@
-﻿/**
+/**
  * QR Code Verification Portal Frontend JavaScript
  *
  * Handles payment verification through QR codes on public portal
  * Uses vanilla JavaScript for broader compatibility
+ * 
+ * This file intentionally does NOT use /** @odoo-module **/ 
+ * as it's frontend JavaScript loaded in portal/website context
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -214,15 +217,20 @@ document.addEventListener("DOMContentLoaded", function () {
         createResultHTML(result, type) {
             const icon = type === "success" ? "fa-check-circle" : "fa-exclamation-circle";
             const title = type === "success" ? "Payment Verified" : "Verification Failed";
-            let html = `;
+            let html = `;
 ;
-                <div class="o_result_header">;
 ;
-                    <i class="fa ${icon} o_result_icon"></i>;
+                <div class="o_result_header">;
 ;
-                    <h3>${title}</h3>;
 ;
-                </div>;
+                    <i class="fa ${icon} o_result_icon"></i>;
+;
+;
+                    <h3>${title}</h3>
+;
+;
+                </div>
+;
 ;
             `;
 
@@ -240,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create payment details HTML
         createPaymentDetailsHTML(paymentData) {
             let html = '<div class="o_result_details">';
-            const details = [
+            const details = [;
                 { label: "Payment Reference", value: paymentData.name },
                 { label: "Amount", value: this.formatCurrency(paymentData.amount, paymentData.currency) },
                 { label: "Partner", value: paymentData.partner_name },
@@ -251,15 +259,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
             details.forEach((detail) => {
                 if (detail.value) {
-                    html += `;
+                    html += `;
 ;
-                        <div class="o_detail_row">;
 ;
-                            <span class="o_detail_label">${detail.label}:</span>;
+                        <div class="o_detail_row">;
 ;
-                            <span class="o_detail_value">${this.escapeHtml(detail.value)}</span>;
 ;
-                        </div>;
+                            <span class="o_detail_label">${detail.label}:</span>;
+;
+;
+                            <span class="o_detail_value">${this.escapeHtml(detail.value)}</span>;
+;
+;
+                        </div>
+;
 ;
                     `;
                 }

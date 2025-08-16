@@ -16,7 +16,7 @@ export class QRCodeField extends Component {
     static props = {
         ...standardFieldProps,
         readonly: { type: Boolean, optional: true }
-};
+    };
 
     setup() {
         this.orm = useService("orm");
@@ -53,7 +53,8 @@ export class QRCodeField extends Component {
         this.state.error = null;
 
         try {
-            const result = await this.orm.call(;
+            const result = await this.orm.call(;
+;
                 "account.payment",
                 "generate_qr_code",
                 [this.props.record.resId]
@@ -138,7 +139,8 @@ export class QRCodeField extends Component {
             return "QR Code not available";
         }
         
-        return null; // Will show the QR code image;
+        return null; // Will show the QR code image
+;
     }
 }
 
@@ -170,7 +172,8 @@ export class QRCodeWidget extends Component {
         this.state.isLoading = true;
         
         try {
-            const qrData = await this.orm.call(;
+            const qrData = await this.orm.call(;
+;
                 "account.payment",
                 "get_qr_verification_url",
                 [this.props.record.resId]

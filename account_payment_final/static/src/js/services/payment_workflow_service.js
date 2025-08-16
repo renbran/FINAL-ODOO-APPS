@@ -76,7 +76,7 @@ export const paymentWorkflowService = {
             
             state.isLoading = true;
             try {
-                const result = await orm.call(
+                const result = await orm.call(;
                     "account.payment",
                     "get_workflow_data",
                     [paymentId]
@@ -102,7 +102,7 @@ export const paymentWorkflowService = {
          */
         const executeWorkflowAction = async (paymentId, action, data = {}) => {
             try {
-                const result = await orm.call(
+                const result = await orm.call(;
                     "account.payment",
                     action,
                     [paymentId],
@@ -136,7 +136,7 @@ export const paymentWorkflowService = {
          */
         const checkPermissions = async (paymentId) => {
             try {
-                const result = await orm.call(
+                const result = await orm.call(;
                     "account.payment",
                     "check_user_permissions",
                     [paymentId]
@@ -155,7 +155,7 @@ export const paymentWorkflowService = {
          */
         const generateQRCode = async (paymentId) => {
             try {
-                const result = await orm.call(
+                const result = await orm.call(;
                     "account.payment",
                     "generate_qr_code",
                     [paymentId]

@@ -75,7 +75,7 @@ export function debounce(func, wait, immediate = false) {
         const callNow = immediate && !timeout;
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
-        if (callNow) func.apply(this, args);
+        if (callNow) return func.apply(this, args);
     };
 }
 
@@ -101,7 +101,8 @@ export function validatePaymentData(paymentData) {
     
     if (!paymentData.partner_id) {
         errors.push('Partner is required');
-    }
+        return { isValid: errors.length === 0, errors };
+}
     
     if (!paymentData.amount || paymentData.amount <= 0) {
         errors.push('Amount must be greater than zero');
