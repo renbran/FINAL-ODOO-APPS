@@ -76,18 +76,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # IMMEDIATE EMERGENCY FIX: Must load FIRST before anything else
-            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
-            # NUCLEAR FIX: Load nuclear fix FIRST to prevent ALL JavaScript crashes
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
-            ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
-            
-            # CloudPepper optimization and console fixes (REMOVED problematic import files)
-            # DISABLED: 'account_payment_final/static/src/js/cloudpepper_console_optimizer.js', # Contains import statements
-            # DISABLED: 'account_payment_final/static/src/js/unknown_action_handler.js', # Contains import statements
+            # Clean CloudPepper JavaScript error fix (replaces all emergency fixes)
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
             # OSUS Branding & Core Styles (priority loading)
             'account_payment_final/static/src/scss/osus_branding.scss',
@@ -102,27 +92,15 @@
             'account_payment_final/static/src/scss/views/form_view.scss',
             'account_payment_final/static/src/scss/payment_voucher.scss',
 
-            # Core JavaScript functionality (REMOVED files with import statements)
-            # DISABLED: 'account_payment_final/static/src/js/error_handler.js', # Contains import statements
-            'account_payment_final/static/src/js/payment_workflow_safe.js', # Safe non-module version
-            # DISABLED: 'account_payment_final/static/src/js/components/payment_approval_widget_enhanced.js', # Contains import statements
-            # DISABLED: 'account_payment_final/static/src/js/fields/qr_code_field.js', # Contains import statements
-            # DISABLED: 'account_payment_final/static/src/js/views/payment_list_view.js', # Contains import statements
+            # Core JavaScript functionality (clean, non-module versions only)
+            'account_payment_final/static/src/js/payment_workflow_safe.js',
 
             # XML templates
             'account_payment_final/static/src/xml/payment_templates.xml',
         ],
         'web.assets_web_dark': [
-            # IMMEDIATE EMERGENCY FIX for dark theme
-            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
-            # Nuclear fix and critical error handlers for dark theme (MUST LOAD FIRST)
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_nuclear_fix.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_enhanced_handler.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_critical_interceptor.js'),
-            ('prepend', 'account_payment_final/static/src/js/cloudpepper_js_error_handler.js'),
-            
-            # Additional dark theme JavaScript (REMOVED problematic files)
-            # DISABLED: 'account_payment_final/static/src/js/views/payment_list_view.js', # Contains import statements
+            # Clean error fix for dark theme
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
             # XML templates for dark theme
             'account_payment_final/static/src/xml/payment_templates.xml',
@@ -132,8 +110,9 @@
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
         ],
         'web.assets_frontend': [
-            # IMMEDIATE EMERGENCY FIX for frontend
-            ('prepend', 'account_payment_final/static/src/js/immediate_emergency_fix.js'),
+            # Clean error fix for frontend
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
+            
             # Frontend verification portal
             'account_payment_final/static/src/scss/frontend/verification_portal.scss',
             'account_payment_final/static/src/js/frontend/qr_verification.js',

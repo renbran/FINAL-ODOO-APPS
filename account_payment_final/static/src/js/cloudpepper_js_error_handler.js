@@ -67,13 +67,17 @@ class CloudPepperJSErrorHandler {
 
                     // Ensure target is a proper DOM node
                     if (
-                        target.nodeType !== Node.ELEMENT_NODE &&;
-                        target.nodeType !== Node.DOCUMENT_NODE &&;
-                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE;
+                        target.nodeType !== Node.ELEMENT_NODE &&
+
+                        target.nodeType !== Node.DOCUMENT_NODE &&
+
+                        target.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+
                     ) {
-                        console.warn(;
+                        console.warn(
                             "[CloudPepper] MutationObserver.observe called with invalid node type:",
-                            target.nodeType;
+                            target.nodeType
+
                         );
                         return;
                     }
@@ -107,8 +111,8 @@ class CloudPepperJSErrorHandler {
                         childList: true,
                         subtree: true,
                         attributes: true,
-                        ...options;
-});
+                        ...options
+                    });
                     return observer;
                 } catch (error) {
                     console.warn("[CloudPepper] Failed to create safe observer:", error.message);
@@ -160,5 +164,4 @@ window.cloudPepperErrorHandler = errorHandler;
 
 console.log("[CloudPepper] JavaScript error handler initialized successfully");
 
-})(); // End IIFE;
-
+})(); // End IIFE
