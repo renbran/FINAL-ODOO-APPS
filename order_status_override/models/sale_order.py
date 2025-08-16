@@ -15,8 +15,9 @@ class SaleOrder(models.Model):
     order_status = fields.Selection([
         ('draft', 'Draft'),
         ('document_review', 'Document Review'),
-        ('commission_calculation', 'Commission Calculation'),  # Keep for compatibility with templates
+        ('commission_calculation', 'Commission Calculation'),
         ('allocation', 'Allocation'),
+        ('final_review', 'Final Review'),
         ('approved', 'Approved'),
         ('post', 'Post'),
     ], string='Order Status', default='draft', tracking=True, copy=False,
@@ -46,6 +47,7 @@ class SaleOrder(models.Model):
     show_document_review_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_commission_calculation_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_allocation_button = fields.Boolean(compute='_compute_workflow_buttons')
+    show_final_review_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_approve_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_post_button = fields.Boolean(compute='_compute_workflow_buttons')
     show_reject_button = fields.Boolean(compute='_compute_workflow_buttons')
@@ -246,7 +248,8 @@ class SaleOrder(models.Model):
             # Default all buttons to hidden
             order.show_document_review_button = False
             order.show_commission_calculation_button = False
-            order.show_allocation_button = False  
+            order.show_allocation_button = False
+            order.show_final_review_button = False
             order.show_approve_button = False
             order.show_post_button = False
             order.show_reject_button = False
@@ -273,9 +276,15 @@ class SaleOrder(models.Model):
                 order.show_reject_button = True
                 
             elif order.order_status == 'allocation':
+                # Can move to final review if user has allocation rights
+                if current_user.has_group('order_status_override.group_order_allocation_manager'):
+                    order.show_final_review_button = True
+                order.show_reject_button = True
+                
+            elif order.order_status == 'final_review':
                 # Can move to approved if user has approval rights
                 if (current_user.has_group('order_status_override.group_order_approval_manager_enhanced') or
-                    current_user.id == order.approval_user_id.id):
+                    current_user.id == order.final_review_user_id.id):
                     order.show_approve_button = True
                 order.show_reject_button = True
                 
@@ -682,11 +691,29 @@ class SaleOrder(models.Model):
         )
         return True
 
-    def action_approve_order(self):
-        """Move order to approved stage (replaces final review)"""
+    def action_move_to_final_review(self):
+        """Move order from Allocation to Final Review"""
         self.ensure_one()
         if self.order_status != 'allocation':
-            raise UserError(_("Order must be in allocation status to approve."))
+            raise UserError(_("Order must be in Allocation status to move to Final Review."))
+        
+        # Check user permissions
+        if not self.env.user.has_group('order_status_override.group_order_allocation_manager'):
+            raise UserError(_("You don't have permission to move orders to final review stage."))
+        
+        self.order_status = 'final_review'
+        self._create_workflow_activity('final_review')
+        self.message_post(
+            body=_("Order moved to Final Review stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Final Review"),
+        )
+        return True
+
+    def action_approve_order(self):
+        """Move order from Final Review to Approved stage"""
+        self.ensure_one()
+        if self.order_status != 'final_review':
+            raise UserError(_("Order must be in final review status to approve."))
         
         # Check user permissions
         current_user = self.env.user
@@ -719,6 +746,25 @@ class SaleOrder(models.Model):
         self.message_post(
             body=_("Order approved by %s - Ready for posting") % self.env.user.name,
             subject=_("Status Changed: Approved"),
+        )
+        return True
+
+    def action_move_to_post(self):
+        """Move order from Approved to Post stage"""
+        self.ensure_one()
+        if self.order_status != 'approved':
+            raise UserError(_("Order must be approved before posting."))
+        
+        # Check user permissions
+        current_user = self.env.user
+        if not current_user.has_group('order_status_override.group_order_posting_manager'):
+            raise UserError(_("You don't have permission to post orders."))
+        
+        self.order_status = 'post'
+        self._create_workflow_activity('post')
+        self.message_post(
+            body=_("Order moved to posting stage by %s") % self.env.user.name,
+            subject=_("Status Changed: Post"),
         )
         return True
 

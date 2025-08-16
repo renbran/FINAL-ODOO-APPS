@@ -16,6 +16,7 @@
                     <field name="show_document_review_button" invisible="1"/>
                     <field name="show_commission_calculation_button" invisible="1"/>
                     <field name="show_allocation_button" invisible="1"/>
+                    <field name="show_final_review_button" invisible="1"/>
                     <field name="show_approve_button" invisible="1"/>
                     <field name="show_post_button" invisible="1"/>
                     <field name="show_reject_button" invisible="1"/>
@@ -45,8 +46,14 @@
                     <!-- Commission Calculation to Allocation -->
                     <button name="action_move_to_allocation" string="Start Allocation" type="object" class="btn-warning" icon="fa-sitemap" invisible="not show_allocation_button"/>
 
-                    <!-- Allocation to Approved -->
+                    <!-- Allocation to Final Review -->
+                    <button name="action_move_to_final_review" string="Move to Final Review" type="object" class="btn-info" icon="fa-eye" invisible="not show_final_review_button"/>
+
+                    <!-- Final Review to Approved -->
                     <button name="action_approve_order" string="Approve Order" type="object" class="btn-success" icon="fa-check" invisible="not show_approve_button"/>
+
+                    <!-- Approved to Post -->
+                    <button name="action_move_to_post" string="Post Order" type="object" class="btn-primary" icon="fa-paper-plane" invisible="not show_post_button"/>
 
                     <!-- Approved to Posted -->
                     <button name="action_post_order" string="Post Order" type="object" class="btn-success" icon="fa-paper-plane" invisible="not show_post_button"/>
