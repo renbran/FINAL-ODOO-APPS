@@ -51,6 +51,96 @@ class AccountMove(models.Model):
     )
 
     # ============================================================================
+    # COMPUTED FIELDS FOR UI ENHANCEMENT
+    # ============================================================================
+
+    can_submit_for_review = fields.Boolean(
+        string='Can Submit for Review',
+        compute='_compute_workflow_buttons',
+        help="Whether user can submit this document for review"
+    )
+
+    can_review = fields.Boolean(
+        string='Can Review',
+        compute='_compute_workflow_buttons',
+        help="Whether user can review this document"
+    )
+
+    can_approve = fields.Boolean(
+        string='Can Approve',
+        compute='_compute_workflow_buttons',
+        help="Whether user can approve this document"
+    )
+
+    can_post_manual = fields.Boolean(
+        string='Can Post Manually',
+        compute='_compute_workflow_buttons',
+        help="Whether user can manually post this document"
+    )
+
+    @api.depends('approval_state', 'move_type', 'state')
+    def _compute_workflow_buttons(self):
+        """Compute button visibility and permissions"""
+        for record in self:
+            # Check if this is an invoice/bill
+            is_invoice_bill = record.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']
+            
+            # Initialize all as False
+            record.can_submit_for_review = False
+            record.can_review = False
+            record.can_approve = False
+            record.can_post_manual = False
+            
+            if is_invoice_bill:
+                # Can submit for review
+                record.can_submit_for_review = (
+                    record.approval_state == 'draft' and
+                    record.state == 'draft'
+                )
+                
+                # Can review
+                record.can_review = (
+                    record.approval_state == 'under_review' and
+                    record._check_approval_permissions('review')
+                )
+                
+                # Can approve
+                record.can_approve = (
+                    record.approval_state == 'for_approval' and
+                    record._check_approval_permissions('approve')
+                )
+                
+                # Can post manually
+                record.can_post_manual = (
+                    record.approval_state == 'approved' and
+                    record.state == 'draft' and
+                    record._check_posting_permissions()
+                )
+
+    @api.onchange('approval_state', 'move_type')
+    def _onchange_approval_state(self):
+        """Update UI when approval state changes"""
+        if self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
+            # Trigger button recomputation
+            self._compute_workflow_buttons()
+            
+            # Show helpful messages
+            if self.approval_state == 'under_review':
+                return {
+                    'warning': {
+                        'title': _('Under Review'),
+                        'message': _('This invoice/bill is now under review. A reviewer will need to approve it before it can proceed.')
+                    }
+                }
+            elif self.approval_state == 'approved':
+                return {
+                    'warning': {
+                        'title': _('Approved'),
+                        'message': _('This invoice/bill has been approved and is ready for posting.')
+                    }
+                }
+
+    # ============================================================================
     # WORKFLOW METHODS
     # ============================================================================
 

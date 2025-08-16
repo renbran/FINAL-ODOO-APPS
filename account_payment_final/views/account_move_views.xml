@@ -7,70 +7,67 @@
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
-                
+
                 <!-- Add approval statusbar for invoices and bills -->
                 <xpath expr="//field[@name='state']" position="after">
-                    <field name="approval_state" widget="statusbar" 
-                           statusbar_visible="draft,under_review,for_approval,approved,posted"
-                           statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","approved":"success","posted":"success"}'
-                           invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
+                    <field name="approval_state" widget="statusbar" statusbar_visible="draft,under_review,for_approval,approved,posted" statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","approved":"success","posted":"success"}' invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
+
+                    <!-- Hidden computed fields for button logic -->
+                    <field name="can_submit_for_review" invisible="1"/>
+                    <field name="can_review" invisible="1"/>
+                    <field name="can_approve" invisible="1"/>
+                    <field name="can_post_manual" invisible="1"/>
                 </xpath>
 
-                <!-- Add approval workflow buttons to header with OSUS branding -->
+                <!-- Add approval workflow buttons to header with improved logic -->
                 <xpath expr="//header" position="inside">
-                    <!-- Invoice/Bill Approval Workflow Buttons - OSUS Branded -->
-                    <button name="action_submit_for_review" 
-                            string="Submit for Review" 
-                            type="object" 
-                            class="btn osus_primary_btn"
-                            invisible="approval_state != 'draft' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
-                            confirm="Submit this invoice/bill for review?"/>
-                    
-                    <button name="action_review_approve" 
-                            string="Review &amp; Forward" 
-                            type="object" 
-                            class="btn osus_success_btn"
-                            groups="account_payment_final.group_payment_reviewer"
-                            invisible="approval_state != 'under_review' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
-                    
-                    <button name="action_final_approve" 
-                            string="Approve &amp; Auto-Post" 
-                            type="object" 
-                            class="btn osus_success_btn"
-                            groups="account_payment_final.group_payment_approver"
-                            invisible="approval_state != 'for_approval' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
-                    
+                    <!-- Invoice/Bill Approval Workflow Buttons - Enhanced -->
+                    <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn btn-primary" invisible="not can_submit_for_review" confirm="Submit this invoice/bill for review?"/>
+
+                    <button name="action_review_approve" string="Review &amp; Forward" type="object" class="btn btn-success" groups="account_payment_final.group_payment_reviewer" invisible="not can_review"/>
+
+                    <button name="action_final_approve" string="Approve &amp; Auto-Post" type="object" class="btn btn-success" groups="account_payment_final.group_payment_approver" invisible="not can_approve"/>
+
                     <!-- Manual Post Button (only if auto-post failed) -->
-                    <button name="action_post_invoice_bill" 
-                            string="Post to Ledger" 
-                            type="object" 
-                            class="btn osus_primary_btn"
-                            groups="account_payment_final.group_payment_poster"
-                            invisible="approval_state != 'approved' or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
-                            confirm="Manually post this approved invoice/bill?"/>
-                    
-                    <button name="action_reject_invoice_bill" 
-                            string="Reject" 
-                            type="object" 
-                            class="btn osus_danger_btn"
-                            groups="account_payment_final.group_payment_approver"
-                            invisible="approval_state not in ['under_review', 'for_approval'] or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"
-                            confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
+                    <button name="action_post_invoice_bill" string="Post to Ledger" type="object" class="btn btn-primary" groups="account_payment_final.group_payment_poster" invisible="not can_post_manual" confirm="Manually post this approved invoice/bill?"/>
+
+                    <button name="action_reject_invoice_bill" string="Reject" type="object" class="btn btn-danger" groups="account_payment_final.group_payment_approver" invisible="approval_state not in ['under_review', 'for_approval'] or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']" confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
                 </xpath>
 
-                <!-- Add approval workflow fields to the form -->
-                <xpath expr="//page[@name='other_info']" position="inside">
-                    <group name="approval_workflow" string="Approval Workflow" 
-                           invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']">
-                        <group>
-                            <field name="reviewer_id" readonly="1"/>
-                            <field name="reviewer_date" readonly="1"/>
+                <!-- Add approval workflow fields to the form with safer xpath -->
+                <xpath expr="//notebook" position="inside">
+                    <page name="approval_workflow" string="Approval Workflow" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']">
+                        <group name="approval_workflow_details" string="Approval Details">
+                            <group>
+                                <field name="reviewer_id" readonly="1"/>
+                                <field name="reviewer_date" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="approver_id" readonly="1"/>
+                                <field name="approver_date" readonly="1"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="approver_id" readonly="1"/>
-                            <field name="approver_date" readonly="1"/>
+
+                        <!-- Workflow Status Indicators -->
+                        <group name="workflow_status" string="Workflow Status">
+                            <div class="o_row">
+                                <field name="can_submit_for_review" widget="boolean_toggle" readonly="1"/>
+                                <label for="can_submit_for_review" string="Can Submit for Review"/>
+                            </div>
+                            <div class="o_row">
+                                <field name="can_review" widget="boolean_toggle" readonly="1"/>
+                                <label for="can_review" string="Can Review"/>
+                            </div>
+                            <div class="o_row">
+                                <field name="can_approve" widget="boolean_toggle" readonly="1"/>
+                                <label for="can_approve" string="Can Approve"/>
+                            </div>
+                            <div class="o_row">
+                                <field name="can_post_manual" widget="boolean_toggle" readonly="1"/>
+                                <label for="can_post_manual" string="Can Post Manually"/>
+                            </div>
                         </group>
-                    </group>
+                    </page>
                 </xpath>
 
                 <!-- Override the default Post button to enforce approval workflow -->
@@ -78,14 +75,12 @@
                     <attribute name="invisible">move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and approval_state != 'approved'</attribute>
                 </xpath>
 
-                <!-- Hide the Post button for invoices/bills not approved -->
+                <!-- Add workflow guidance message -->
                 <xpath expr="//button[@name='action_post']" position="after">
-                    <button name="action_post_invoice_bill" 
-                            string="Post" 
-                            type="object" 
-                            class="btn-primary"
-                            invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] or approval_state == 'approved'"
-                            confirm="This invoice/bill requires approval workflow. Please submit for review first."/>
+                    <div class="alert alert-info" role="alert" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] or approval_state == 'approved'">
+                        <i class="fa fa-info-circle"/>
+ This invoice/bill requires approval workflow. Please submit for review first.
+                    </div>
                 </xpath>
 
             </field>
@@ -98,12 +93,7 @@
             <field name="inherit_id" ref="account.view_invoice_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='state']" position="after">
-                    <field name="approval_state" 
-                           decoration-info="approval_state == 'under_review'"
-                           decoration-warning="approval_state == 'for_approval'"
-                           decoration-success="approval_state == 'approved'"
-                           decoration-danger="approval_state == 'cancelled'"
-                           invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
+                    <field name="approval_state" decoration-info="approval_state == 'under_review'" decoration-warning="approval_state == 'for_approval'" decoration-success="approval_state == 'approved'" decoration-danger="approval_state == 'cancelled'" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
                 </xpath>
             </field>
         </record>
@@ -117,17 +107,13 @@
                 <!-- Add approval filters at the end of the search view - safer approach -->
                 <xpath expr="//search" position="inside">
                     <separator/>
-                    <filter string="Pending Review" name="approval_under_review" 
-                            domain="[('approval_state', '=', 'under_review')]"/>
-                    <filter string="Pending Approval" name="approval_pending" 
-                            domain="[('approval_state', '=', 'for_approval')]"/>
-                    <filter string="Approved" name="approval_approved" 
-                            domain="[('approval_state', '=', 'approved')]"/>
-                    
+                    <filter string="Pending Review" name="approval_under_review" domain="[('approval_state', '=', 'under_review')]"/>
+                    <filter string="Pending Approval" name="approval_pending" domain="[('approval_state', '=', 'for_approval')]"/>
+                    <filter string="Approved" name="approval_approved" domain="[('approval_state', '=', 'approved')]"/>
+
                     <!-- Group by approval state -->
                     <group expand="0" string="Group By">
-                        <filter string="Approval State" name="group_approval_state" 
-                                domain="[]" context="{'group_by': 'approval_state'}"/>
+                        <filter string="Approval State" name="group_approval_state" domain="[]" context="{'group_by': 'approval_state'}"/>
                     </group>
                 </xpath>
             </field>
