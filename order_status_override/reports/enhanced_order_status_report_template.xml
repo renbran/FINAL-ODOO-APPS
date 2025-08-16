@@ -1,6 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Enhanced Order Status Report Template -->
+        <template id="enhanced_order_status_report_template">
+            <t t-name="order_status_override.enhanced_order_status_report_template">
+                <t t-call="web.html_container">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-call="web.external_layout">
+                            <div class="page">
+                                <style>
+                                    @page {
+                                        margin: 8mm;
+                                        size: A4;
+                                    }
+                                    
+                                    .order-status-container {
+                                        font-family: 'Arial', sans-serif;
+                                        background: white;
+                                        font-size: 13px;
+                                        line-height: 1.4;
+                                        margin: 0;
+                                        padding: 0;
+                                        color: #000;
+                                    }
+                                    
+                                    .report-header {
+                                        background: linear-gradient(135deg, #1f4788, #2d5aa0);
+                                        color: white;
+                                        padding: 15px 20px;
+                                        margin: 0 0 15px 0;
+                                        border-radius: 8px;
+                                        text-align: center;
+                                    }
+                                    
+                                    .report-title {
+                                        font-size: 24px;
+                                        font-weight: bold;
+                                        margin: 0;
+                                    }
+                                    
+                                    .order-info {
+                                        background: #f8f9fa;
+                                        padding: 15px;
+                                        border-radius: 6px;
+                                        margin-bottom: 15px;
+                                    }
+                                    
+                                    .info-grid {
+                                        display: grid;
+                                        grid-template-columns: 1fr 1fr;
+                                        gap: 15px;
+                                    }
+                                    
+                                    .info-item {
+                                        margin-bottom: 8px;
+                                    }
+                                    
+                                    .info-label {
+                                        font-weight: bold;
+                                        color: #1f4788;
+                                    }
+                                    
+                                    .status-badge {
+                                        display: inline-block;
+                                        padding: 4px 8px;
+                                        border-radius: 4px;
+                                        font-weight: bold;
+                                        font-size: 11px;
+                                        text-transform: uppercase;
+                                    }
+                                    
+                                    .status-draft { background-color: #f8f9fa; color: #6c757d; }
+                                    .status-document_review { background-color: #fff3cd; color: #856404; }
+                                    .status-commission_calculation { background-color: #d4edda; color: #155724; }
+                                    .status-allocation { background-color: #d1ecf1; color: #0c5460; }
+                                    .status-final_review { background-color: #ffeaa7; color: #6c5ce7; }
+                                    .status-approved { background-color: #d4edda; color: #155724; }
+                                    .status-posted { background-color: #1f4788; color: white; }
+                                    .status-rejected { background-color: #f8d7da; color: #721c24; }
+                                </style>
+
+                                <div class="order-status-container">
+                                    <!-- Header Section -->
+                                    <div class="report-header">
+                                        <h1 class="report-title">Order Status Report</h1>
+                                        <div>Order: <span t-field="o.name"/> | Date: <span t-field="o.date_order" t-options="{'widget': 'date'}"/></div>
+                                    </div>
+
+                                    <!-- Order Information -->
+                                    <div class="order-info">
+                                        <h3 style="color: #1f4788; margin-bottom: 15px;">Order Details</h3>
+                                        <div class="info-grid">
+                                            <div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Customer:</span>
+                                                    <span t-field="o.partner_id.name"/>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Email:</span>
+                                                    <span t-field="o.partner_id.email"/>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Phone:</span>
+                                                    <span t-field="o.partner_id.phone"/>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Order Status:</span>
+                                                    <span t-attf-class="status-badge status-#{o.order_status or 'draft'}">
+                                                        <span t-field="o.order_status"/>
+                                                    </span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Total Amount:</span>
+                                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Salesperson:</span>
+                                                    <span t-field="o.user_id.name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Lines -->
+                                    <h3 style="color: #1f4788; margin: 20px 0 10px 0;">Order Items</h3>
+                                    <table class="table table-sm">
+                                        <thead style="background-color: #1f4788; color: white;">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Description</th>
+                                                <th>Qty</th>
+                                                <th>Unit Price</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="o.order_line" t-as="line">
+                                                <td><span t-field="line.product_id.name"/></td>
+                                                <td><span t-field="line.name"/></td>
+                                                <td><span t-field="line.product_uom_qty"/></td>
+                                                <td><span t-field="line.price_unit"/></td>
+                                                <td><span t-field="line.price_subtotal"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Footer -->
+                                    <div style="margin-top: 30px; text-align: center; font-size: 11px; color: #666;">
+                                        Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+                                        by <span t-field="o.create_uid.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </template>
+
         <!-- Professional Single-Page Commission Report Template -->
         <template id="commission_payout_report_template_professional">
             <t t-name="order_status_override.commission_report_document">
