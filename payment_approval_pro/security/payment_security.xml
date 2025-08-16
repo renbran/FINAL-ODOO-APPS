@@ -1,219 +1,283 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Payment Approval Pro Security Groups -->
-    
-    <!-- Base Payment User Group -->
-    <record id="group_payment_user" model="res.groups">
-        <field name="name">Payment User</field>
-        <field name="category_id" ref="base.module_category_accounting"/>
-        <field name="comment">Basic payment voucher access - can create and view own vouchers</field>
-    </record>
-    
-    <!-- Payment Reviewer Group -->
-    <record id="group_payment_reviewer" model="res.groups">
-        <field name="name">Payment Reviewer</field>
-        <field name="category_id" ref="base.module_category_accounting"/>
-        <field name="implied_ids" eval="[(4, ref('group_payment_user'))]"/>
-        <field name="comment">Can review payment vouchers and submit for approval</field>
-    </record>
-    
-    <!-- Payment Approver Group -->
-    <record id="group_payment_approver" model="res.groups">
-        <field name="name">Payment Approver</field>
-        <field name="category_id" ref="base.module_category_accounting"/>
-        <field name="implied_ids" eval="[(4, ref('group_payment_reviewer'))]"/>
-        <field name="comment">Can approve payment vouchers for authorization</field>
-    </record>
-    
-    <!-- Payment Authorizer Group -->
-    <record id="group_payment_authorizer" model="res.groups">
-        <field name="name">Payment Authorizer</field>
-        <field name="category_id" ref="base.module_category_accounting"/>
-        <field name="implied_ids" eval="[(4, ref('group_payment_approver'))]"/>
-        <field name="comment">Can authorize approved payments and create payment entries</field>
-    </record>
-    
-    <!-- Payment Manager Group -->
-    <record id="group_payment_manager" model="res.groups">
-        <field name="name">Payment Manager</field>
-        <field name="category_id" ref="base.module_category_accounting"/>
-        <field name="implied_ids" eval="[(4, ref('group_payment_authorizer'))]"/>
-        <field name="comment">Full payment management access - can manage all vouchers and workflows</field>
-    </record>
-    
-    <!-- Payment Administrator Group -->
-    <record id="group_payment_admin" model="res.groups">
-        <field name="name">Payment Administrator</field>
-        <field name="category_id" ref="base.module_category_administration"/>
-        <field name="implied_ids" eval="[(4, ref('group_payment_manager'))]"/>
-        <field name="comment">System administrator access for payment configuration and maintenance</field>
-    </record>
+    <!-- Payment Voucher Views -->
 
-    <!-- Record Rules for Payment Vouchers -->
-    
-    <!-- Payment User: Can only see own vouchers -->
-    <record id="payment_voucher_rule_user" model="ir.rule">
-        <field name="name">Payment Voucher: User Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">[('creator_id', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_user'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-    
-    <!-- Payment Reviewer: Can see vouchers assigned for review + own vouchers -->
-    <record id="payment_voucher_rule_reviewer" model="ir.rule">
-        <field name="name">Payment Voucher: Reviewer Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">['|', ('reviewer_id', '=', user.id), ('creator_id', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_reviewer'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-    
-    <!-- Payment Approver: Can see vouchers in review/approve states + assigned vouchers -->
-    <record id="payment_voucher_rule_approver" model="ir.rule">
-        <field name="name">Payment Voucher: Approver Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">['|', '|', ('state', 'in', ['review', 'approve']), ('approver_id', '=', user.id), ('reviewer_id', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_approver'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-    
-    <!-- Payment Authorizer: Can see approved vouchers + assigned vouchers -->
-    <record id="payment_voucher_rule_authorizer" model="ir.rule">
-        <field name="name">Payment Voucher: Authorizer Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">['|', '|', '|', ('state', 'in', ['approve', 'authorize', 'paid']), ('authorizer_id', '=', user.id), ('approver_id', '=', user.id), ('reviewer_id', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_authorizer'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-    
-    <!-- Payment Manager: Can see all vouchers -->
-    <record id="payment_voucher_rule_manager" model="ir.rule">
-        <field name="name">Payment Voucher: Manager Full Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
-    
-    <!-- Payment Administrator: Full system access -->
-    <record id="payment_voucher_rule_admin" model="ir.rule">
-        <field name="name">Payment Voucher: Administrator Full Access</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_admin'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
+    <!-- Form View -->
+    <record id="view_payment_voucher_form" model="ir.ui.view">
+        <field name="name">payment.voucher.form</field>
+        <field name="model">payment.voucher</field>
+        <field name="arch" type="xml">
+            <form string="Payment Voucher">
+                <!-- Header with status bar and workflow buttons -->
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,review,approve,authorize,paid"/>
 
-    <!-- Workflow History Rules -->
-    
-    <!-- Payment Users can see workflow history for their vouchers -->
-    <record id="payment_workflow_history_rule_user" model="ir.rule">
-        <field name="name">Payment Workflow History: User Access</field>
-        <field name="model_id" ref="model_payment_workflow_history"/>
-        <field name="domain_force">[('voucher_id.creator_id', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_user'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-    
-    <!-- Payment Managers can see all workflow history -->
-    <record id="payment_workflow_history_rule_manager" model="ir.rule">
-        <field name="name">Payment Workflow History: Manager Access</field>
-        <field name="model_id" ref="model_payment_workflow_history"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
+                    <!-- Workflow Action Buttons -->
+                    <button name="action_submit_for_review" type="object" string="Submit for Review" class="btn-primary" invisible="state != 'draft'"/>
 
-    <!-- Mail Activity Types for Payment Workflow -->
-    
-    <record id="mail_activity_payment_review" model="mail.activity.type">
-        <field name="name">Payment Review</field>
-        <field name="summary">Payment Voucher Review Required</field>
-        <field name="category">default</field>
-        <field name="delay_count">1</field>
-        <field name="delay_unit">days</field>
-        <field name="delay_from">current_date</field>
-        <field name="icon">fa-search</field>
-        <field name="decoration_type">warning</field>
-    </record>
-    
-    <record id="mail_activity_payment_authorize" model="mail.activity.type">
-        <field name="name">Payment Authorization</field>
-        <field name="summary">Payment Voucher Authorization Required</field>
-        <field name="category">default</field>
-        <field name="delay_count">1</field>
-        <field name="delay_unit">days</field>
-        <field name="delay_from">current_date</field>
-        <field name="icon">fa-check-circle</field>
-        <field name="decoration_type">danger</field>
-    </record>
+                    <button name="action_approve" type="object" string="Approve" class="btn-success" invisible="state != 'review' or not can_approve"/>
 
-    <!-- Server Actions for Workflow Management -->
-    
-    <record id="action_submit_for_review" model="ir.actions.server">
-        <field name="name">Submit for Review</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="binding_model_id" ref="model_payment_voucher"/>
-        <field name="binding_view_types">list,form</field>
-        <field name="state">code</field>
-        <field name="code">
-if records:
-    for record in records:
-        if record.state == 'draft':
-            record.action_submit_for_review()
+                    <button name="action_authorize" type="object" string="Authorize Payment" class="btn-info" invisible="state != 'approve' or not can_authorize"/>
+
+                    <button name="action_mark_paid" type="object" string="Mark as Paid" class="btn-success" invisible="state != 'authorize'"/>
+
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary" invisible="state in ('paid', 'cancel')"/>
+
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft" class="btn-warning" invisible="state in ('draft', 'paid') or payment_id"/>
+
+                    <button name="action_print_voucher" type="object" string="Print Voucher" class="btn-primary" invisible="state == 'draft'"/>
+                </header>
+
+                <sheet>
+                    <!-- Invisible fields for computed values -->
+                    <field name="can_review" invisible="1"/>
+                    <field name="can_approve" invisible="1"/>
+                    <field name="can_authorize" invisible="1"/>
+                    <field name="is_readonly" invisible="1"/>
+                    <field name="display_name" invisible="1"/>
+
+                    <!-- Title and voucher number -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="voucher_number" readonly="1" placeholder="New"/>
+                        </h1>
+                    </div>
+
+                    <!-- Main content in responsive columns -->
+                    <group col="2">
+                        <!-- Left Column - Payment Details -->
+                        <group string="Payment Information">
+                            <field name="partner_id" readonly="is_readonly" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="amount" readonly="is_readonly"/>
+                            <field name="currency_id" readonly="is_readonly" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="payment_date" readonly="is_readonly"/>
+                            <field name="journal_id" readonly="is_readonly" domain="[('type', 'in', ('bank', 'cash'))]"/>
+                            <field name="reference" readonly="is_readonly"/>
+                        </group>
+
+                        <!-- Right Column - Workflow Information -->
+                        <group string="Approval Workflow">
+                            <field name="creator_id" readonly="1"/>
+                            <field name="reviewer_id" readonly="1" invisible="not reviewer_id"/>
+                            <field name="approver_id" readonly="1" invisible="not approver_id"/>
+                            <field name="authorizer_id" readonly="1" invisible="not authorizer_id"/>
+                            <field name="payment_id" readonly="1" invisible="not payment_id"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <!-- Memo Section -->
+                    <group string="Description" invisible="not memo">
+                        <field name="memo" nolabel="1" readonly="is_readonly" placeholder="Enter payment description, invoice references, or other notes..."/>
+                    </group>
+
+                    <!-- QR Code Section -->
+                    <group string="Verification" invisible="not qr_code">
+                        <div class="d-flex align-items-center">
+                            <field name="qr_code" widget="image" class="me-3" style="max-width: 150px;"/>
+                            <div>
+                                <p>
+                                    <strong>QR Code for Verification</strong>
+                                </p>
+                                <p>Scan this QR code to verify the payment voucher authenticity.</p>
+                                <field name="qr_verification_url" readonly="1" widget="url" invisible="not qr_verification_url"/>
+                            </div>
+                        </div>
+                    </group>
+
+                    <!-- Workflow Dates -->
+                    <group string="Timeline" invisible="state == 'draft'">
+                        <group>
+                            <field name="create_date" readonly="1" string="Created"/>
+                            <field name="review_date" readonly="1" invisible="not review_date"/>
+                            <field name="approval_date" readonly="1" invisible="not approval_date"/>
+                        </group>
+                        <group>
+                            <field name="authorization_date" readonly="1" invisible="not authorization_date"/>
+                            <field name="payment_posted_date" readonly="1" invisible="not payment_posted_date"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <!-- Activity and message tracking -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
         </field>
     </record>
-    
-    <record id="action_approve_payment" model="ir.actions.server">
-        <field name="name">Approve Payment</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="binding_model_id" ref="model_payment_voucher"/>
-        <field name="binding_view_types">list,form</field>
-        <field name="state">code</field>
-        <field name="code">
-if records:
-    for record in records:
-        if record.state == 'review' and record.can_approve:
-            record.action_approve()
+
+    <!-- Tree/List View -->
+    <record id="view_payment_voucher_tree" model="ir.ui.view">
+        <field name="name">payment.voucher.tree</field>
+        <field name="model">payment.voucher</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Vouchers" decoration-muted="state=='cancel'" decoration-success="state=='paid'" decoration-info="state=='authorize'">
+
+                <field name="voucher_number"/>
+                <field name="partner_id"/>
+                <field name="amount" sum="Total Amount"/>
+                <field name="currency_id" groups="base.group_multi_currency"/>
+                <field name="payment_date"/>
+                <field name="state" widget="badge" decoration-muted="state=='draft'" decoration-warning="state in ('review', 'approve')" decoration-info="state=='authorize'" decoration-success="state=='paid'" decoration-danger="state=='cancel'"/>
+                <field name="creator_id"/>
+                <field name="reviewer_id" optional="hide"/>
+                <field name="approver_id" optional="hide"/>
+                <field name="authorizer_id" optional="hide"/>
+                <field name="reference" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+
+                <!-- Context menu actions -->
+                <button name="action_submit_for_review" type="object" string="Submit for Review" icon="fa-paper-plane" invisible="state != 'draft'"/>
+                <button name="action_print_voucher" type="object" string="Print" icon="fa-print" invisible="state == 'draft'"/>
+            </tree>
         </field>
     </record>
-    
-    <record id="action_authorize_payment" model="ir.actions.server">
-        <field name="name">Authorize Payment</field>
-        <field name="model_id" ref="model_payment_voucher"/>
-        <field name="binding_model_id" ref="model_payment_voucher"/>
-        <field name="binding_view_types">list,form</field>
-        <field name="state">code</field>
-        <field name="code">
-if records:
-    for record in records:
-        if record.state == 'approve' and record.can_authorize:
-            record.action_authorize()
+
+    <!-- Kanban View -->
+    <record id="view_payment_voucher_kanban" model="ir.ui.view">
+        <field name="name">payment.voucher.kanban</field>
+        <field name="model">payment.voucher</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="voucher_number"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <field name="currency_id"/>
+                <field name="payment_date"/>
+                <field name="state"/>
+                <field name="creator_id"/>
+                <field name="activity_ids"/>
+                <field name="activity_state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <!-- Header -->
+                                <div class="o_kanban_record_top mb-2">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="voucher_number"/>
+                                        </strong>
+                                        <br/>
+                                        <span class="o_kanban_record_subtitle text-muted">
+                                            <field name="partner_id"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Amount -->
+                                <div class="o_kanban_record_body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="text-primary">
+                                            <field name="currency_id" invisible="1"/>
+                                            <span t-esc="record.currency_id.value"/>
+                                            <span t-esc="record.amount.value"/>
+                                        </strong>
+                                        <small class="text-muted">
+                                            <field name="payment_date"/>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge" t-att-class="'badge-' + (
+                                            record.state.raw_value == 'paid' ? 'success' :
+                                            record.state.raw_value == 'authorize' ? 'info' :
+                                            record.state.raw_value == 'approve' ? 'warning' :
+                                            record.state.raw_value == 'review' ? 'primary' :
+                                            record.state.raw_value == 'cancel' ? 'danger' : 'secondary'
+                                        )">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                        <img t-att-src="kanban_image('res.users', 'avatar_128', record.creator_id.raw_value)" t-att-title="record.creator_id.value" t-att-alt="record.creator_id.value" class="oe_kanban_avatar o_image_24_cover rounded-circle"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_payment_voucher_search" model="ir.ui.view">
+        <field name="name">payment.voucher.search</field>
+        <field name="model">payment.voucher</field>
+        <field name="arch" type="xml">
+            <search string="Search Payment Vouchers">
+                <!-- Search fields -->
+                <field name="voucher_number" string="Voucher Number"/>
+                <field name="partner_id" string="Vendor/Payee"/>
+                <field name="reference" string="Reference"/>
+                <field name="creator_id" string="Created By"/>
+                <field name="reviewer_id" string="Reviewer"/>
+                <field name="approver_id" string="Approver"/>
+                <field name="authorizer_id" string="Authorizer"/>
+
+                <!-- Filters -->
+                <separator/>
+                <filter name="my_vouchers" string="My Vouchers" domain="[('creator_id', '=', uid)]"/>
+                <filter name="assigned_to_me" string="Assigned to Me" domain="['|', '|', ('reviewer_id', '=', uid), ('approver_id', '=', uid), ('authorizer_id', '=', uid)]"/>
+                <filter name="pending_review" string="Pending Review" domain="[('state', '=', 'review')]"/>
+                <filter name="pending_approval" string="Pending Approval" domain="[('state', '=', 'approve')]"/>
+                <filter name="authorized" string="Authorized" domain="[('state', '=', 'authorize')]"/>
+                <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+
+                <separator/>
+                <filter name="this_month" string="This Month" domain="[('payment_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('payment_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="overdue" string="Overdue" domain="[('payment_date', '&lt;', context_today()), ('state', 'not in', ('paid', 'cancel'))]"/>
+
+                <!-- Group by -->
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter name="group_partner" string="Vendor/Payee" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_creator" string="Created By" domain="[]" context="{'group_by': 'creator_id'}"/>
+                    <filter name="group_payment_date" string="Payment Date" domain="[]" context="{'group_by': 'payment_date:month'}"/>
+                    <filter name="group_currency" string="Currency" domain="[]" context="{'group_by': 'currency_id'}" groups="base.group_multi_currency"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Activity View -->
+    <record id="view_payment_voucher_activity" model="ir.ui.view">
+        <field name="name">payment.voucher.activity</field>
+        <field name="model">payment.voucher</field>
+        <field name="arch" type="xml">
+            <activity string="Payment Vouchers">
+                <field name="voucher_number"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <field name="state"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <img t-att-src="activity_image('res.partner', 'avatar_128', record.partner_id.raw_value)" role="img" t-att-title="record.partner_id.value" t-att-alt="record.partner_id.value"/>
+                        <div>
+                            <strong>
+                                <field name="voucher_number"/>
+                            </strong>
+                            <div>
+                                <field name="partner_id"/>
+                            </div>
+                            <div class="text-muted">
+                                <field name="currency_id"/>
+                                <field name="amount"/>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
         </field>
     </record>
 

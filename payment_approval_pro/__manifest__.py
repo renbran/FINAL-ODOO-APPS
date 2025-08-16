@@ -47,10 +47,14 @@
         # Views
         'views/payment_voucher_views.xml',
         'views/payment_menus.xml',
+        'views/account_payment_enhanced_views.xml',
+        'views/payment_report_wizard_views.xml',
+        'views/payment_verification_templates.xml',
         
-        # Reports (will be created)
-        # 'reports/payment_voucher_report.xml',
-        # 'reports/report_actions.xml',
+        # Reports - Enhanced Payment Voucher Reports
+        'reports/payment_voucher_enhanced_report.xml',
+        'reports/payment_voucher_compact_report.xml',
+        'reports/report_actions.xml',
     ],
     'assets': {
         'web.assets_backend': [

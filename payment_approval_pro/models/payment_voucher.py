@@ -679,6 +679,30 @@ class PaymentVoucher(models.Model):
         self.ensure_one()
         return self.env.ref('payment_approval_pro.action_report_payment_voucher').report_action(self)
     
+    def action_print_enhanced_voucher(self):
+        """Print enhanced payment voucher report with comprehensive details"""
+        self.ensure_one()
+        return self.env.ref('payment_approval_pro.action_report_payment_voucher_enhanced').report_action(self)
+    
+    def action_print_compact_voucher(self):
+        """Print compact payment voucher report for quick reference"""
+        self.ensure_one()
+        return self.env.ref('payment_approval_pro.action_report_payment_voucher_compact').report_action(self)
+    
+    def action_print_professional_summary(self):
+        """Print professional payment summary report"""
+        self.ensure_one()
+        return self.env.ref('payment_approval_pro.action_report_payment_summary_professional').report_action(self)
+    
+    def action_print_multiple_reports(self):
+        """Print multiple payment reports for batch processing"""
+        if len(self) == 1:
+            # Single record - show enhanced report
+            return self.action_print_enhanced_voucher()
+        else:
+            # Multiple records - show summary table
+            return self.env.ref('payment_approval_pro.action_report_multiple_payments').report_action(self)
+    
     def get_report_data(self):
         """Get data for voucher report"""
         self.ensure_one()

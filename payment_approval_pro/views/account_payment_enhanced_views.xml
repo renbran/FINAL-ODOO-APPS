@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend Account Payment Form with Enhanced Reports -->
+        <record id="view_account_payment_form_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.form.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/button[@name='action_post'][last()]" position="after">
+                    <!-- Enhanced Print Menu for Account Payments -->
+                    <div class="btn-group" invisible="state == 'draft'">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-print"/> OSUS Reports
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><button name="action_print_enhanced_voucher" type="object" class="dropdown-item">
+                                <i class="fa fa-file-pdf-o"/> Enhanced Payment Voucher
+                            </button></li>
+                            <li><button name="action_print_compact_voucher" type="object" class="dropdown-item">
+                                <i class="fa fa-file-text-o"/> Compact Payment Voucher
+                            </button></li>
+                            <li><button name="action_print_professional_summary" type="object" class="dropdown-item">
+                                <i class="fa fa-bar-chart"/> Professional Summary
+                            </button></li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li><button name="action_print_multiple_reports" type="object" class="dropdown-item">
+                                <i class="fa fa-files-o"/> Multiple Payment Reports
+                            </button></li>
+                        </ul>
+                    </div>
+                </xpath>
+                
+                <!-- Add QR Code field to the form -->
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="qr_verification_token" invisible="1"/>
+                    <field name="qr_code" widget="image" class="oe_avatar" invisible="not qr_code" options="{'size': [100, 100]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Extend Account Payment List to add Enhanced Print Actions -->
+        <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
+            <field name="name">account.payment.tree.enhanced</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="multi_edit">1</attribute>
+                </xpath>
+                
+                <!-- Add QR verification token column -->
+                <xpath expr="//field[@name='amount']" position="after">
+                    <field name="qr_verification_token" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Enhanced Payment Reports Menu -->
+        <menuitem id="menu_enhanced_payment_reports"
+                  name="Enhanced Payment Reports"
+                  parent="account.menu_finance_reports"
+                  sequence="45"
+                  groups="account.group_account_user"/>
+
+        <!-- Enhanced Payment Reports Action -->
+        <record id="action_enhanced_payment_reports" model="ir.actions.act_window">
+            <field name="name">Enhanced Payment Reports</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '!=', 'draft')]</field>
+            <field name="context">{
+                'search_default_posted': 1,
+                'search_default_group_by_journal': 1,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No payments found for enhanced reporting!
+                </p>
+                <p>
+                    Enhanced payment reports provide comprehensive documentation with:
+                    <br/>• Professional layouts with OSUS branding
+                    <br/>• QR code verification
+                    <br/>• Digital signature sections
+                    <br/>• Receipt acknowledgments
+                    <br/>• Multiple format options
+                </p>
+            </field>
+        </record>
+
+        <!-- Link menu to action -->
+        <menuitem id="menu_enhanced_payment_reports_action"
+                  name="Payment Reports"
+                  parent="menu_enhanced_payment_reports"
+                  action="action_enhanced_payment_reports"
+                  sequence="10"/>
+
+        <!-- Multiple Payment Reports Wizard Action -->
+        <record id="action_multiple_payment_reports_wizard" model="ir.actions.act_window">
+            <field name="name">Generate Multiple Payment Reports</field>
+            <field name="res_model">payment.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+        </record>
+
+        <!-- Server Action for Bulk Enhanced Reports -->
+        <record id="server_action_bulk_enhanced_reports" model="ir.actions.server">
+            <field name="name">Print Enhanced Reports (Bulk)</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+if records:
+    return records.action_print_multiple_reports()
+            </field>
+        </record>
+
+        <!-- Server Action for Bulk Compact Reports -->
+        <record id="server_action_bulk_compact_reports" model="ir.actions.server">
+            <field name="name">Print Compact Reports (Bulk)</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="binding_model_id" ref="account.model_account_payment"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+if records:
+    # Generate individual compact reports for each payment
+    reports = []
+    for payment in records:
+        report = payment.action_print_compact_voucher()
+        reports.append(report)
+    
+    # Return the last report or multiple reports action
+    if len(records) == 1:
+        action = records.action_print_compact_voucher()
+    else:
+        action = records.action_print_multiple_reports()
+    
+    return action
+            </field>
+        </record>
+    </data>
+</odoo>

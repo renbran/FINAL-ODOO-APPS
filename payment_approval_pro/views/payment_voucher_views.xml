@@ -26,6 +26,28 @@
                     <button name="action_reset_to_draft" type="object" string="Reset to Draft" class="btn-warning" invisible="state in ('draft', 'paid') or payment_id"/>
 
                     <button name="action_print_voucher" type="object" string="Print Voucher" class="btn-primary" invisible="state == 'draft'"/>
+                    
+                    <!-- Enhanced Print Menu -->
+                    <div class="btn-group" invisible="state == 'draft'">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-print"/> Enhanced Reports
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><button name="action_print_enhanced_voucher" type="object" class="dropdown-item">
+                                <i class="fa fa-file-pdf-o"/> Enhanced Voucher
+                            </button></li>
+                            <li><button name="action_print_compact_voucher" type="object" class="dropdown-item">
+                                <i class="fa fa-file-text-o"/> Compact Voucher
+                            </button></li>
+                            <li><button name="action_print_professional_summary" type="object" class="dropdown-item">
+                                <i class="fa fa-bar-chart"/> Professional Summary
+                            </button></li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li><button name="action_print_multiple_reports" type="object" class="dropdown-item">
+                                <i class="fa fa-files-o"/> Multiple Reports
+                            </button></li>
+                        </ul>
+                    </div>
                 </header>
 
                 <sheet>
