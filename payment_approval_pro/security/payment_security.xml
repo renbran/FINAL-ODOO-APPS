@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Approval Pro Security Groups -->
+    
+    <!-- Base Payment User Group -->
+    <record id="group_payment_user" model="res.groups">
+        <field name="name">Payment User</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="comment">Basic payment voucher access - can create and view own vouchers</field>
+    </record>
+    
+    <!-- Payment Reviewer Group -->
+    <record id="group_payment_reviewer" model="res.groups">
+        <field name="name">Payment Reviewer</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="implied_ids" eval="[(4, ref('group_payment_user'))]"/>
+        <field name="comment">Can review payment vouchers and submit for approval</field>
+    </record>
+    
+    <!-- Payment Approver Group -->
+    <record id="group_payment_approver" model="res.groups">
+        <field name="name">Payment Approver</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="implied_ids" eval="[(4, ref('group_payment_reviewer'))]"/>
+        <field name="comment">Can approve payment vouchers for authorization</field>
+    </record>
+    
+    <!-- Payment Authorizer Group -->
+    <record id="group_payment_authorizer" model="res.groups">
+        <field name="name">Payment Authorizer</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="implied_ids" eval="[(4, ref('group_payment_approver'))]"/>
+        <field name="comment">Can authorize approved payments and create payment entries</field>
+    </record>
+    
+    <!-- Payment Manager Group -->
+    <record id="group_payment_manager" model="res.groups">
+        <field name="name">Payment Manager</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="implied_ids" eval="[(4, ref('group_payment_authorizer'))]"/>
+        <field name="comment">Full payment management access - can manage all vouchers and workflows</field>
+    </record>
+    
+    <!-- Payment Administrator Group -->
+    <record id="group_payment_admin" model="res.groups">
+        <field name="name">Payment Administrator</field>
+        <field name="category_id" ref="base.module_category_administration"/>
+        <field name="implied_ids" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="comment">System administrator access for payment configuration and maintenance</field>
+    </record>
+
+    <!-- Record Rules for Payment Vouchers -->
+    
+    <!-- Payment User: Can only see own vouchers -->
+    <record id="payment_voucher_rule_user" model="ir.rule">
+        <field name="name">Payment Voucher: User Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">[('creator_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Payment Reviewer: Can see vouchers assigned for review + own vouchers -->
+    <record id="payment_voucher_rule_reviewer" model="ir.rule">
+        <field name="name">Payment Voucher: Reviewer Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">['|', ('reviewer_id', '=', user.id), ('creator_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_reviewer'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Payment Approver: Can see vouchers in review/approve states + assigned vouchers -->
+    <record id="payment_voucher_rule_approver" model="ir.rule">
+        <field name="name">Payment Voucher: Approver Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">['|', '|', ('state', 'in', ['review', 'approve']), ('approver_id', '=', user.id), ('reviewer_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_approver'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Payment Authorizer: Can see approved vouchers + assigned vouchers -->
+    <record id="payment_voucher_rule_authorizer" model="ir.rule">
+        <field name="name">Payment Voucher: Authorizer Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">['|', '|', '|', ('state', 'in', ['approve', 'authorize', 'paid']), ('authorizer_id', '=', user.id), ('approver_id', '=', user.id), ('reviewer_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_authorizer'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Payment Manager: Can see all vouchers -->
+    <record id="payment_voucher_rule_manager" model="ir.rule">
+        <field name="name">Payment Voucher: Manager Full Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    
+    <!-- Payment Administrator: Full system access -->
+    <record id="payment_voucher_rule_admin" model="ir.rule">
+        <field name="name">Payment Voucher: Administrator Full Access</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_admin'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Workflow History Rules -->
+    
+    <!-- Payment Users can see workflow history for their vouchers -->
+    <record id="payment_workflow_history_rule_user" model="ir.rule">
+        <field name="name">Payment Workflow History: User Access</field>
+        <field name="model_id" ref="model_payment_workflow_history"/>
+        <field name="domain_force">[('voucher_id.creator_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Payment Managers can see all workflow history -->
+    <record id="payment_workflow_history_rule_manager" model="ir.rule">
+        <field name="name">Payment Workflow History: Manager Access</field>
+        <field name="model_id" ref="model_payment_workflow_history"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_payment_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Mail Activity Types for Payment Workflow -->
+    
+    <record id="mail_activity_payment_review" model="mail.activity.type">
+        <field name="name">Payment Review</field>
+        <field name="summary">Payment Voucher Review Required</field>
+        <field name="category">default</field>
+        <field name="delay_count">1</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">current_date</field>
+        <field name="icon">fa-search</field>
+        <field name="decoration_type">warning</field>
+    </record>
+    
+    <record id="mail_activity_payment_authorize" model="mail.activity.type">
+        <field name="name">Payment Authorization</field>
+        <field name="summary">Payment Voucher Authorization Required</field>
+        <field name="category">default</field>
+        <field name="delay_count">1</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">current_date</field>
+        <field name="icon">fa-check-circle</field>
+        <field name="decoration_type">danger</field>
+    </record>
+
+    <!-- Server Actions for Workflow Management -->
+    
+    <record id="action_submit_for_review" model="ir.actions.server">
+        <field name="name">Submit for Review</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="binding_model_id" ref="model_payment_voucher"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    for record in records:
+        if record.state == 'draft':
+            record.action_submit_for_review()
+        </field>
+    </record>
+    
+    <record id="action_approve_payment" model="ir.actions.server">
+        <field name="name">Approve Payment</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="binding_model_id" ref="model_payment_voucher"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    for record in records:
+        if record.state == 'review' and record.can_approve:
+            record.action_approve()
+        </field>
+    </record>
+    
+    <record id="action_authorize_payment" model="ir.actions.server">
+        <field name="name">Authorize Payment</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="binding_model_id" ref="model_payment_voucher"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    for record in records:
+        if record.state == 'approve' and record.can_authorize:
+            record.action_authorize()
+        </field>
+    </record>
+
+</odoo>

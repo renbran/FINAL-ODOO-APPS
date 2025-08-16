@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Email Templates for Payment Workflow Notifications -->
+    
+    <!-- Payment Review Notification -->
+    <record id="email_template_payment_review" model="mail.template">
+        <field name="name">Payment Voucher - Review Required</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="subject">Payment Voucher ${object.voucher_number} - Review Required</field>
+        <field name="email_from">${(object.company_id.email or user.email) | safe}</field>
+        <field name="email_to">${object.reviewer_id.email}</field>
+        <field name="description">Notification sent when payment voucher is submitted for review</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;">
+                <div style="background-color: #1f4788; padding: 20px 0px; text-align: center;">
+                    <h2 style="margin: 0px; color: white; font-size: 24px;">OSUS Properties</h2>
+                    <p style="margin: 5px 0px 0px; color: #f8f9fa; font-size: 14px;">Payment Approval System</p>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px; border: 1px solid #dee2e6;">
+                    <h3 style="color: #1f4788; margin-top: 0px;">Payment Voucher Review Required</h3>
+                    
+                    <p>Dear ${object.reviewer_id.name},</p>
+                    
+                    <p>A payment voucher has been submitted for your review:</p>
+                    
+                    <div style="background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; margin: 20px 0px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold; width: 30%;">Voucher Number:</td>
+                                <td style="padding: 8px 0px;">${object.voucher_number}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Payee:</td>
+                                <td style="padding: 8px 0px;">${object.partner_id.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Amount:</td>
+                                <td style="padding: 8px 0px;">${object.currency_id.symbol}${'{:,.2f}'.format(object.amount)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Payment Date:</td>
+                                <td style="padding: 8px 0px;">${object.payment_date}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Reference:</td>
+                                <td style="padding: 8px 0px;">${object.reference or 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p style="text-align: center; margin: 30px 0px;">
+                        <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=payment.voucher&amp;view_type=form" 
+                           style="background-color: #1f4788; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Review Payment Voucher
+                        </a>
+                    </p>
+                    
+                    <p style="font-size: 12px; color: #6c757d; margin-top: 30px;">
+                        This is an automated notification from the OSUS Properties Payment Approval System.
+                    </p>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Payment Approved Notification -->
+    <record id="email_template_payment_approved" model="mail.template">
+        <field name="name">Payment Voucher - Approved</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="subject">Payment Voucher ${object.voucher_number} - Approved</field>
+        <field name="email_from">${(object.company_id.email or user.email) | safe}</field>
+        <field name="email_to">${object.creator_id.email}</field>
+        <field name="description">Notification sent when payment voucher is approved</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;">
+                <div style="background-color: #28a745; padding: 20px 0px; text-align: center;">
+                    <h2 style="margin: 0px; color: white; font-size: 24px;">OSUS Properties</h2>
+                    <p style="margin: 5px 0px 0px; color: white; font-size: 14px;">Payment Approval System</p>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px; border: 1px solid #dee2e6;">
+                    <h3 style="color: #28a745; margin-top: 0px;">✓ Payment Voucher Approved</h3>
+                    
+                    <p>Dear ${object.creator_id.name},</p>
+                    
+                    <p>Your payment voucher has been approved and is ready for authorization:</p>
+                    
+                    <div style="background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; margin: 20px 0px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold; width: 30%;">Voucher Number:</td>
+                                <td style="padding: 8px 0px;">${object.voucher_number}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Approved By:</td>
+                                <td style="padding: 8px 0px;">${object.approver_id.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Approval Date:</td>
+                                <td style="padding: 8px 0px;">${object.approval_date.strftime('%Y-%m-%d %H:%M') if object.approval_date else 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p>The voucher is now awaiting final authorization before payment processing.</p>
+                    
+                    <p style="text-align: center; margin: 30px 0px;">
+                        <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=payment.voucher&amp;view_type=form" 
+                           style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            View Payment Voucher
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Payment Authorized Notification -->
+    <record id="email_template_payment_authorized" model="mail.template">
+        <field name="name">Payment Voucher - Authorized</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="subject">Payment Voucher ${object.voucher_number} - Authorized and Processed</field>
+        <field name="email_from">${(object.company_id.email or user.email) | safe}</field>
+        <field name="email_to">${object.creator_id.email}</field>
+        <field name="description">Notification sent when payment voucher is authorized and payment is created</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;">
+                <div style="background-color: #17a2b8; padding: 20px 0px; text-align: center;">
+                    <h2 style="margin: 0px; color: white; font-size: 24px;">OSUS Properties</h2>
+                    <p style="margin: 5px 0px 0px; color: white; font-size: 14px;">Payment Approval System</p>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px; border: 1px solid #dee2e6;">
+                    <h3 style="color: #17a2b8; margin-top: 0px;">💳 Payment Authorized &amp; Processed</h3>
+                    
+                    <p>Dear ${object.creator_id.name},</p>
+                    
+                    <p>Your payment voucher has been authorized and the payment has been processed:</p>
+                    
+                    <div style="background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; margin: 20px 0px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold; width: 30%;">Voucher Number:</td>
+                                <td style="padding: 8px 0px;">${object.voucher_number}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Authorized By:</td>
+                                <td style="padding: 8px 0px;">${object.authorizer_id.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Authorization Date:</td>
+                                <td style="padding: 8px 0px;">${object.authorization_date.strftime('%Y-%m-%d %H:%M') if object.authorization_date else 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Payment ID:</td>
+                                <td style="padding: 8px 0px;">${object.payment_id.name if object.payment_id else 'Pending'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p>The payment has been created in the accounting system and will be processed according to your payment schedule.</p>
+                    
+                    <p style="text-align: center; margin: 30px 0px;">
+                        <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=payment.voucher&amp;view_type=form" 
+                           style="background-color: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            View Payment Details
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Payment Paid Notification -->
+    <record id="email_template_payment_paid" model="mail.template">
+        <field name="name">Payment Voucher - Paid</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="subject">Payment Voucher ${object.voucher_number} - Payment Completed</field>
+        <field name="email_from">${(object.company_id.email or user.email) | safe}</field>
+        <field name="email_to">${object.creator_id.email}</field>
+        <field name="description">Notification sent when payment is completed</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;">
+                <div style="background-color: #28a745; padding: 20px 0px; text-align: center;">
+                    <h2 style="margin: 0px; color: white; font-size: 24px;">OSUS Properties</h2>
+                    <p style="margin: 5px 0px 0px; color: white; font-size: 14px;">Payment Approval System</p>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px; border: 1px solid #dee2e6;">
+                    <h3 style="color: #28a745; margin-top: 0px;">✅ Payment Completed</h3>
+                    
+                    <p>Dear ${object.creator_id.name},</p>
+                    
+                    <p>The payment for your voucher has been successfully completed:</p>
+                    
+                    <div style="background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; margin: 20px 0px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold; width: 30%;">Voucher Number:</td>
+                                <td style="padding: 8px 0px;">${object.voucher_number}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Payment Date:</td>
+                                <td style="padding: 8px 0px;">${object.payment_posted_date.strftime('%Y-%m-%d %H:%M') if object.payment_posted_date else 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Amount Paid:</td>
+                                <td style="padding: 8px 0px;">${object.currency_id.symbol}${'{:,.2f}'.format(object.amount)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p>Thank you for using the OSUS Properties Payment Approval System.</p>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Payment Cancelled Notification -->
+    <record id="email_template_payment_cancelled" model="mail.template">
+        <field name="name">Payment Voucher - Cancelled</field>
+        <field name="model_id" ref="model_payment_voucher"/>
+        <field name="subject">Payment Voucher ${object.voucher_number} - Cancelled</field>
+        <field name="email_from">${(object.company_id.email or user.email) | safe}</field>
+        <field name="email_to">${object.creator_id.email}</field>
+        <field name="description">Notification sent when payment voucher is cancelled</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;">
+                <div style="background-color: #dc3545; padding: 20px 0px; text-align: center;">
+                    <h2 style="margin: 0px; color: white; font-size: 24px;">OSUS Properties</h2>
+                    <p style="margin: 5px 0px 0px; color: white; font-size: 14px;">Payment Approval System</p>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px; border: 1px solid #dee2e6;">
+                    <h3 style="color: #dc3545; margin-top: 0px;">❌ Payment Voucher Cancelled</h3>
+                    
+                    <p>Dear ${object.creator_id.name},</p>
+                    
+                    <p>Your payment voucher has been cancelled:</p>
+                    
+                    <div style="background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; margin: 20px 0px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold; width: 30%;">Voucher Number:</td>
+                                <td style="padding: 8px 0px;">${object.voucher_number}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Original Amount:</td>
+                                <td style="padding: 8px 0px;">${object.currency_id.symbol}${'{:,.2f}'.format(object.amount)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0px; font-weight: bold;">Payee:</td>
+                                <td style="padding: 8px 0px;">${object.partner_id.name}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p>If you believe this cancellation was made in error, please contact the Payment Manager.</p>
+                    
+                    <p style="text-align: center; margin: 30px 0px;">
+                        <a href="${ctx.get('base_url', '')}/web#id=${object.id}&amp;model=payment.voucher&amp;view_type=form" 
+                           style="background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            View Voucher Details
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </field>
+    </record>
+    
+</odoo>
