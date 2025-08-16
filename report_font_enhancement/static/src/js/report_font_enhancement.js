@@ -22,9 +22,9 @@ class ReportFontEnhancementService {
       console.log("Report Font Enhancement: Already initialized, skipping");
       return;
     }
-    
+
     console.log("🛡️ Report Font Enhancement: Starting with global protection");
-    
+
     // Add delay to ensure global protection is loaded
     setTimeout(() => {
       this.initializeEnhancements();
@@ -37,7 +37,7 @@ class ReportFontEnhancementService {
   async initializeEnhancements() {
     try {
       console.log("Report Font Enhancement: Initializing...");
-      
+
       // Add enhancement classes to existing reports
       this.enhanceExistingReports();
 
@@ -413,7 +413,9 @@ registry.category("services").add("reportFontEnhancement", {
 });
 */
 
-console.log("⚠️ Report Font Enhancement Service: DISABLED FOR EMERGENCY CLOUDPEPPER FIX");
+console.log(
+  "⚠️ Report Font Enhancement Service: DISABLED FOR EMERGENCY CLOUDPEPPER FIX"
+);
 
 // Export for use in other modules
 export { ReportFontEnhancementService };
