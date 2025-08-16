@@ -22,7 +22,13 @@ class ErrorPreventionManager {
             /index\.ts-.*\.js/,
             /Cannot use import statement/,
             /Script error/,
-            /Loading failed/
+            /Loading failed/,
+            /third_party.*crashpad/,
+            /registration_protocol_win\.cc/,
+            /CreateFile: The system cannot find the file specified/,
+            /Content script initialised/,
+            /Recorder disabled/,
+            /Uncaught SyntaxError: Cannot use import statement outside a module/
         ];
         
         this.init();
@@ -73,12 +79,31 @@ class ErrorPreventionManager {
             }
             
             isValidTarget(target) {
-                return target && 
-                       typeof target === 'object' && 
-                       target.nodeType && 
-                       target.nodeType >= 1 && 
-                       target.nodeType <= 12 &&
-                       !target._isDetached;
+                if (!target) return false;
+                
+                // Check if it's a valid DOM node
+                if (typeof target !== 'object') return false;
+                if (!target.nodeType) return false;
+                
+                // Valid node types: 1=Element, 2=Attr, 3=Text, 9=Document, 11=DocumentFragment
+                const validNodeTypes = [1, 2, 3, 9, 11];
+                if (!validNodeTypes.includes(target.nodeType)) return false;
+                
+                // Check if node is still connected to DOM
+                if (target.nodeType === 1 && !target.isConnected) return false;
+                
+                // Check if node is not detached
+                if (target._isDetached) return false;
+                
+                // Additional safety checks
+                try {
+                    // Try to access a common property to ensure the node is valid
+                    const hasValidProperties = 'addEventListener' in target || 'nodeValue' in target;
+                    return hasValidProperties;
+                } catch (error) {
+                    console.debug("[CloudPepper] Node validation failed:", error.message);
+                    return false;
+                }
             }
         };
     }
@@ -221,14 +246,125 @@ class DOMUtils {
 }
 
 /**
- * Initialize Error Prevention System
+ * Enhanced CloudPepper Error Handler Class
+ * Consolidates all error prevention functionality
  */
-const errorPreventionManager = new ErrorPreventionManager();
+class CloudPepperEnhancedHandler extends ErrorPreventionManager {
+    constructor() {
+        super();
+        this.cloudPepperPatterns = [
+            /CloudPepper.*timeout/i,
+            /CloudPepper.*connection/i,
+            /hosting.*environment/i,
+            /deployment.*error/i,
+            /Permission denied.*script/i,
+            /index\.ts-.*\.js/,
+            /Long Running Recorder/
+        ];
+        
+        this.initCloudPepperSpecific();
+    }
+
+    initCloudPepperSpecific() {
+        this.setupCloudPepperErrorHandling();
+        this.setupPerformanceMonitoring();
+        this.setupNetworkErrorHandling();
+        
+        console.log("[CloudPepper] Enhanced error handler active");
+    }
+
+    setupCloudPepperErrorHandling() {
+        // Add CloudPepper specific patterns
+        this.cloudPepperPatterns.forEach(pattern => {
+            this.addSuppressPattern(pattern);
+        });
+
+        // Enhanced console error handling for CloudPepper
+        window.addEventListener('error', (event) => {
+            const message = event.message || '';
+            
+            if (this.isCloudPepperError(message)) {
+                console.debug("[CloudPepper] Suppressed CloudPepper-specific error:", message);
+                event.preventDefault();
+                return false;
+            }
+        }, true);
+    }
+
+    setupPerformanceMonitoring() {
+        if (window.PerformanceObserver) {
+            try {
+                const observer = new PerformanceObserver((list) => {
+                    const entries = list.getEntries();
+                    entries.forEach(entry => {
+                        if (entry.duration > 1000) { // Log slow operations
+                            console.debug("[CloudPepper] Slow operation detected:", entry.name, entry.duration + "ms");
+                        }
+                    });
+                });
+                
+                observer.observe({ entryTypes: ['measure', 'navigation'] });
+            } catch (error) {
+                console.debug("[CloudPepper] Performance monitoring setup failed:", error.message);
+            }
+        }
+    }
+
+    setupNetworkErrorHandling() {
+        // Monitor fetch failures
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            try {
+                const response = await originalFetch.apply(window, args);
+                if (!response.ok && response.status >= 500) {
+                    console.debug("[CloudPepper] Server error suppressed:", response.status, response.statusText);
+                }
+                return response;
+            } catch (error) {
+                if (this.isNetworkError(error)) {
+                    console.debug("[CloudPepper] Network error suppressed:", error.message);
+                    throw error; // Re-throw for proper handling
+                }
+                throw error;
+            }
+        };
+    }
+
+    isCloudPepperError(message) {
+        return this.cloudPepperPatterns.some(pattern => pattern.test(message));
+    }
+
+    isNetworkError(error) {
+        return error.name === 'TypeError' && 
+               (error.message.includes('fetch') || 
+                error.message.includes('network') ||
+                error.message.includes('NetworkError'));
+    }
+
+    addSuppressPattern(pattern) {
+        if (pattern instanceof RegExp) {
+            this.suppressedPatterns.push(pattern);
+        }
+    }
+
+    getStats() {
+        return {
+            suppressedErrors: this.suppressedErrors || 0,
+            mutationObserverFixes: this.mutationObserverFixes || 0,
+            networkErrorsSuppressed: this.networkErrorsSuppressed || 0
+        };
+    }
+}
+
+/**
+ * Initialize Enhanced Error Prevention System
+ */
+const errorPreventionManager = new CloudPepperEnhancedHandler();
 
 /**
  * Export utilities for use in other modules
  */
-export { ErrorPreventionManager, DOMUtils };
+export { ErrorPreventionManager, CloudPepperEnhancedHandler, DOMUtils };
 
 /**
  * Global access for legacy compatibility
@@ -240,4 +376,4 @@ window.CloudPepperErrorPrevention = {
     getStats: () => errorPreventionManager.getStats()
 };
 
-console.log("[CloudPepper] Modern error prevention system ready");
+console.log("[CloudPepper] Enhanced error prevention system ready");

@@ -98,7 +98,6 @@
             
             # Non-Module Helpers (CloudPepper Compatible)
             'account_payment_final/static/src/js/payment_workflow_safe.js',
-            'account_payment_final/static/src/js/cloudpepper_js_error_handler.js',
         ],
         
         # Frontend Assets (Public Portal)
