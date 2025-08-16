@@ -1,43 +1,60 @@
 /** @odoo-module **/
 
-import { Component, onMounted, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 
 /**
  * Report Font Enhancement Service
  * Dynamically adjusts font contrast and transparency based on background
+ * IMPORTANT: This is a SERVICE, not a Component - prevents OWL lifecycle issues
  */
-export class ReportFontEnhancementService extends Component {
-  setup() {
-    this.rpc = useService("rpc");
-    onMounted(this.onMounted);
-    onWillUnmount(this.onWillUnmount);
+class ReportFontEnhancementService {
+  constructor() {
+    this.isInitialized = false;
+    this.observer = null;
+    this.isProcessing = false;
   }
 
-  onMounted() {
-    this.initializeEnhancements();
-    this.setupEventListeners();
-  }
-
-  onWillUnmount() {
-    this.removeEventListeners();
+  /**
+   * Start the service (called by service registry)
+   */
+  start() {
+    if (this.isInitialized) {
+      console.log("Report Font Enhancement: Already initialized, skipping");
+      return;
+    }
+    
+    console.log("🛡️ Report Font Enhancement: Starting with global protection");
+    
+    // Add delay to ensure global protection is loaded
+    setTimeout(() => {
+      this.initializeEnhancements();
+    }, 100);
   }
 
   /**
    * Initialize font enhancements for all reports
    */
   async initializeEnhancements() {
-    // Add enhancement classes to existing reports
-    this.enhanceExistingReports();
+    try {
+      console.log("Report Font Enhancement: Initializing...");
+      
+      // Add enhancement classes to existing reports
+      this.enhanceExistingReports();
 
-    // Setup mutation observer for dynamically loaded content
-    this.setupMutationObserver();
+      // Setup mutation observer for dynamically loaded content
+      this.setupMutationObserver();
 
-    // Apply adaptive contrast
-    this.applyAdaptiveContrast();
+      // Apply adaptive contrast
+      this.applyAdaptiveContrast();
 
-    console.log("Report Font Enhancement: Initialized");
+      // Setup event listeners
+      this.setupEventListeners();
+
+      this.isInitialized = true;
+      console.log("✅ Report Font Enhancement: Successfully initialized");
+    } catch (error) {
+      console.error("❌ Report Font Enhancement: Initialization failed", error);
+    }
   }
 
   /**
@@ -376,22 +393,27 @@ export class ReportFontEnhancementService extends Component {
   }
 }
 
-// Register the service
+// EMERGENCY DISABLE - COMPLETELY DISABLE THIS SERVICE TO STOP INFINITE RECURSION
+// Register the service properly (not as a Component)
+// IMPORTANT: Global protection should be loaded first via cloudpepper_global_protection.js
+/*
 registry.category("services").add("reportFontEnhancement", {
-  dependencies: ["rpc"],
-  start(env, { rpc }) {
+  dependencies: [],
+  start(env, deps) {
+    console.log("🛡️ Starting Report Font Enhancement with global protection");
     const service = new ReportFontEnhancementService();
-    service.rpc = rpc;
-    service.initializeEnhancements();
+    
+    // Add extra delay to ensure global protection is active
+    setTimeout(() => {
+      service.start();
+    }, 200);
+    
     return service;
   },
 });
+*/
 
-// Also initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  const enhancementService = new ReportFontEnhancementService();
-  enhancementService.initializeEnhancements();
-});
+console.log("⚠️ Report Font Enhancement Service: DISABLED FOR EMERGENCY CLOUDPEPPER FIX");
 
 // Export for use in other modules
 export { ReportFontEnhancementService };
