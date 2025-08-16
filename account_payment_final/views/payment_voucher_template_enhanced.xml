@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        
+
         <!-- Enhanced Professional Payment Voucher Template -->
         <template id="payment_voucher_enhanced" name="Enhanced Professional Payment Voucher">
             <t t-call="web.html_container">
@@ -298,245 +298,262 @@
                                                 <t t-else="">Payment Voucher</t>
                                             </h1>
                                             <div class="voucher-subtitle">
-                                                <strong>Ref: <span t-field="o.name"/> | Date: <span t-field="o.date"/></strong>
-                                            </div>
-                                        </div>
-                                        <div style="flex: 0 0 100px; text-align: right; font-size: 11px;">
-                                            <div><strong><span t-field="o.company_id.name"/></strong></div>
-                                            <div t-field="o.company_id.city" t-if="o.company_id.city"/>
-                                            <div t-field="o.company_id.phone" t-if="o.company_id.phone"/>
+                                                <strong>Ref: <span t-field="o.name"/>
+ | Date: <span t-field="o.date"/>
+                                            </strong>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Three-Column Layout -->
-                                <div class="three-column-layout">
-                                    <!-- Column 1: Issued To Details -->
-                                    <div class="column-section">
-                                        <div class="column-title">
-                                            <t t-if="o.payment_type == 'outbound'">Pay To Details</t>
-                                            <t t-else="">Received From</t>
+                                    <div style="flex: 0 0 100px; text-align: right; font-size: 11px;">
+                                        <div>
+                                            <strong>
+                                                <span t-field="o.company_id.name"/>
+                                            </strong>
                                         </div>
-                                        
-                                        <div class="field-section">
-                                            <div class="field-label">Name:</div>
-                                            <div class="field-value"><span t-field="o.partner_id.name"/></div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Contact:</div>
-                                            <div class="combined-field">
-                                                <span>
-                                                    <span t-field="o.partner_id.mobile" t-if="o.partner_id.mobile"/>
-                                                    <span t-field="o.partner_id.phone" t-if="not o.partner_id.mobile and o.partner_id.phone"/>
-                                                    <span t-if="not o.partner_id.mobile and not o.partner_id.phone">N/A</span>
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Email:</div>
-                                            <div class="field-value" style="font-size: 13px;">
-                                                <span t-field="o.partner_id.email" t-if="o.partner_id.email"/>
-                                                <span t-if="not o.partner_id.email">N/A</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Method:</div>
-                                            <div class="field-value"><span t-field="o.journal_id.name"/></div>
-                                        </div>
+                                        <div t-field="o.company_id.city" t-if="o.company_id.city"/>
+                                        <div t-field="o.company_id.phone" t-if="o.company_id.phone"/>
                                     </div>
-
-                                    <!-- Column 2: Payment Information -->
-                                    <div class="column-section">
-                                        <div class="column-title">Payment Information</div>
-                                        
-                                        <div class="field-section">
-                                            <div class="field-label">Type:</div>
-                                            <div class="field-value">
-                                                <t t-if="o.payment_type == 'inbound'">
-                                                    <span style="color: #28a745; font-weight: 600;">Receipt</span>
-                                                </t>
-                                                <t t-else="">
-                                                    <span style="color: #dc3545; font-weight: 600;">Payment</span>
-                                                </t>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Invoice Ref:</div>
-                                            <div class="field-value">
-                                                <span t-field="o.ref" t-if="o.ref"/>
-                                                <span t-if="not o.ref">N/A</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Currency:</div>
-                                            <div class="field-value"><span t-field="o.currency_id.name"/></div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Memo:</div>
-                                            <div class="field-value" style="min-height: 25px; font-size: 14px;">
-                                                <span t-field="o.memo" t-if="o.memo"/>
-                                                <span t-if="not o.memo">-</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Column 3: Document References & Summary -->
-                                    <div class="column-section">
-                                        <div class="column-title">Document Summary</div>
-                                        
-                                        <div class="field-section">
-                                            <div class="field-label">Status:</div>
-                                            <div class="field-value">
-                                                <span t-field="o.state" style="text-transform: capitalize; font-weight: 600;"/>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Created:</div>
-                                            <div class="field-value" style="font-size: 13px;">
-                                                <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy'}"/>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-section">
-                                            <div class="field-label">Creator:</div>
-                                            <div class="field-value" style="font-size: 13px;">
-                                                <span t-field="o.create_uid.name"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Mini Document Table -->
-                                        <div style="margin-top: 10px;">
-                                            <table class="document-table" style="font-size: 11px;">
-                                                <tr>
-                                                    <th style="padding: 4px;">Doc Type</th>
-                                                    <th style="padding: 4px;">Status</th>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding: 3px;">
-                                                        <t t-if="o.payment_type == 'inbound'">Receipt</t>
-                                                        <t t-else="">Voucher</t>
-                                                    </td>
-                                                    <td style="padding: 3px; text-transform: capitalize;">
-                                                        <span t-field="o.state"/>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Amount in Words -->
-                                <div class="amount-words">
-                                    <strong>Amount in Words:</strong> <span t-esc="o._amount_in_words()"/>
-                                </div>
-
-                                <!-- Total Amount -->
-                                <div class="amount-section">
-                                    <strong>TOTAL AMOUNT: <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong>
-                                </div>
-
-                                <!-- Four Signature Sections in 2x2 Grid -->
-                                <div class="signature-grid">
-                                    <!-- Prepared By -->
-                                    <div class="signature-box-compact">
-                                        <div class="signature-name">
-                                            <span t-field="o.create_uid.name" t-if="o.create_uid"/>
-                                            <span t-if="not o.create_uid">_____________</span>
-                                        </div>
-                                        <div class="signature-line">
-                                            <t t-if="o.create_uid.name">
-                                                <div class="signature-initials">
-                                                    <span t-esc="''.join([word[0].upper() for word in o.create_uid.name.split()[:2]])"/>
-                                                </div>
-                                            </t>
-                                        </div>
-                                        <div class="signature-date">
-                                            <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy'}"/>
-                                        </div>
-                                        <div class="signature-title">Prepared By</div>
-                                    </div>
-
-                                    <!-- Reviewed By -->
-                                    <div class="signature-box-compact">
-                                        <div class="signature-name">
-                                            <span t-field="o.reviewer_id.name" t-if="o.reviewer_id"/>
-                                            <span t-if="not o.reviewer_id">_____________</span>
-                                        </div>
-                                        <div class="signature-line">
-                                            <t t-if="o.reviewer_id">
-                                                <div class="signature-initials">
-                                                    <span t-esc="''.join([word[0].upper() for word in o.reviewer_id.name.split()[:2]])"/>
-                                                </div>
-                                            </t>
-                                        </div>
-                                        <div class="signature-date">
-                                            <span t-field="o.reviewer_date" t-options="{'format': 'dd/MM/yyyy'}" t-if="o.reviewer_date"/>
-                                            <span t-if="not o.reviewer_date">___/___/____</span>
-                                        </div>
-                                        <div class="signature-title">Reviewed By</div>
-                                    </div>
-
-                                    <!-- Approved By -->
-                                    <div class="signature-box-compact">
-                                        <div class="signature-name">
-                                            <span t-field="o.approver_id.name" t-if="o.approver_id"/>
-                                            <span t-if="not o.approver_id">_____________</span>
-                                        </div>
-                                        <div class="signature-line">
-                                            <t t-if="o.approver_id">
-                                                <div class="signature-initials">
-                                                    <span t-esc="''.join([word[0].upper() for word in o.approver_id.name.split()[:2]])"/>
-                                                </div>
-                                            </t>
-                                        </div>
-                                        <div class="signature-date">
-                                            <span t-field="o.approver_date" t-options="{'format': 'dd/MM/yyyy'}" t-if="o.approver_date"/>
-                                            <span t-if="not o.approver_date">___/___/____</span>
-                                        </div>
-                                        <div class="signature-title">Approved By</div>
-                                    </div>
-
-                                    <!-- Received By -->
-                                    <div class="signature-box-compact">
-                                        <div class="signature-name">
-                                            <span t-field="o.partner_id.name"/>
-                                        </div>
-                                        <div class="signature-line">
-                                            <!-- Empty for manual signature -->
-                                        </div>
-                                        <div class="signature-date">
-                                            <span t-field="o.date" t-options="{'format': 'dd/MM/yyyy'}"/>
-                                        </div>
-                                        <div class="signature-title">Received By</div>
-                                    </div>
-                                </div>
-
-                                <!-- Creator Info -->
-                                <div class="creator-info">
-                                    Document: <span t-field="o.name"/> | 
-                                    Generated: <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy HH:mm'}"/>
-                                    <t t-if="o.write_uid != o.create_uid"> | Modified: <span t-field="o.write_uid.name"/></t>
-                                </div>
-
-                                <!-- Footer -->
-                                <div class="footer-note">
-                                    <strong>OSUS Properties - Professional Payment System</strong> | 
-                                    Computer-generated document - No signature required | 
-                                    <span t-field="o.company_id.name"/>, <span t-field="o.company_id.country_id.name"/>
                                 </div>
                             </div>
-                        </div>
-                    </t>
-                </t>
-            </t>
-        </template>
 
-    </data>
+                            <!-- Three-Column Layout -->
+                            <div class="three-column-layout">
+                                <!-- Column 1: Issued To Details -->
+                                <div class="column-section">
+                                    <div class="column-title">
+                                        <t t-if="o.payment_type == 'outbound'">Pay To Details</t>
+                                        <t t-else="">Received From</t>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Name:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.partner_id.name"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Contact:</div>
+                                        <div class="combined-field">
+                                            <span>
+                                                <span t-field="o.partner_id.mobile" t-if="o.partner_id.mobile"/>
+                                                <span t-field="o.partner_id.phone" t-if="not o.partner_id.mobile and o.partner_id.phone"/>
+                                                <span t-if="not o.partner_id.mobile and not o.partner_id.phone">N/A</span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Email:</div>
+                                        <div class="field-value" style="font-size: 13px;">
+                                            <span t-field="o.partner_id.email" t-if="o.partner_id.email"/>
+                                            <span t-if="not o.partner_id.email">N/A</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Method:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.journal_id.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: Payment Information -->
+                                <div class="column-section">
+                                    <div class="column-title">Payment Information</div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Type:</div>
+                                        <div class="field-value">
+                                            <t t-if="o.payment_type == 'inbound'">
+                                                <span style="color: #28a745; font-weight: 600;">Receipt</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span style="color: #dc3545; font-weight: 600;">Payment</span>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Invoice Ref:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.ref" t-if="o.ref"/>
+                                            <span t-if="not o.ref">N/A</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Currency:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.currency_id.name"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Memo:</div>
+                                        <div class="field-value" style="min-height: 25px; font-size: 14px;">
+                                            <span t-field="o.memo" t-if="o.memo"/>
+                                            <span t-if="not o.memo">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 3: Document References & Summary -->
+                                <div class="column-section">
+                                    <div class="column-title">Document Summary</div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Status:</div>
+                                        <div class="field-value">
+                                            <span t-field="o.state" style="text-transform: capitalize; font-weight: 600;"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Created:</div>
+                                        <div class="field-value" style="font-size: 13px;">
+                                            <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="field-label">Creator:</div>
+                                        <div class="field-value" style="font-size: 13px;">
+                                            <span t-field="o.create_uid.name"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mini Document Table -->
+                                    <div style="margin-top: 10px;">
+                                        <table class="document-table" style="font-size: 11px;">
+                                            <tr>
+                                                <th style="padding: 4px;">Doc Type</th>
+                                                <th style="padding: 4px;">Status</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 3px;">
+                                                    <t t-if="o.payment_type == 'inbound'">Receipt</t>
+                                                    <t t-else="">Voucher</t>
+                                                </td>
+                                                <td style="padding: 3px; text-transform: capitalize;">
+                                                    <span t-field="o.state"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Amount in Words -->
+                            <div class="amount-words">
+                                <strong>Amount in Words:</strong>
+                                <span t-esc="o._amount_in_words()"/>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="amount-section">
+                                <strong>TOTAL AMOUNT: <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </strong>
+                            </div>
+
+                            <!-- Four Signature Sections in 2x2 Grid -->
+                            <div class="signature-grid">
+                                <!-- Prepared By -->
+                                <div class="signature-box-compact">
+                                    <div class="signature-name">
+                                        <span t-field="o.create_uid.name" t-if="o.create_uid"/>
+                                        <span t-if="not o.create_uid">_____________</span>
+                                    </div>
+                                    <div class="signature-line">
+                                        <t t-if="o.create_uid.name">
+                                            <div class="signature-initials">
+                                                <span t-esc="''.join([word[0].upper() for word in o.create_uid.name.split()[:2]])"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="signature-date">
+                                        <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </div>
+                                    <div class="signature-title">Prepared By</div>
+                                </div>
+
+                                <!-- Reviewed By -->
+                                <div class="signature-box-compact">
+                                    <div class="signature-name">
+                                        <span t-field="o.reviewer_id.name" t-if="o.reviewer_id"/>
+                                        <span t-if="not o.reviewer_id">_____________</span>
+                                    </div>
+                                    <div class="signature-line">
+                                        <t t-if="o.reviewer_id">
+                                            <div class="signature-initials">
+                                                <span t-esc="''.join([word[0].upper() for word in o.reviewer_id.name.split()[:2]])"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="signature-date">
+                                        <span t-field="o.reviewer_date" t-options="{'format': 'dd/MM/yyyy'}" t-if="o.reviewer_date"/>
+                                        <span t-if="not o.reviewer_date">___/___/____</span>
+                                    </div>
+                                    <div class="signature-title">Reviewed By</div>
+                                </div>
+
+                                <!-- Approved By -->
+                                <div class="signature-box-compact">
+                                    <div class="signature-name">
+                                        <span t-field="o.approver_id.name" t-if="o.approver_id"/>
+                                        <span t-if="not o.approver_id">_____________</span>
+                                    </div>
+                                    <div class="signature-line">
+                                        <t t-if="o.approver_id">
+                                            <div class="signature-initials">
+                                                <span t-esc="''.join([word[0].upper() for word in o.approver_id.name.split()[:2]])"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="signature-date">
+                                        <span t-field="o.approver_date" t-options="{'format': 'dd/MM/yyyy'}" t-if="o.approver_date"/>
+                                        <span t-if="not o.approver_date">___/___/____</span>
+                                    </div>
+                                    <div class="signature-title">Approved By</div>
+                                </div>
+
+                                <!-- Received By -->
+                                <div class="signature-box-compact">
+                                    <div class="signature-name">
+                                        <span t-field="o.partner_id.name"/>
+                                    </div>
+                                    <div class="signature-line">
+                                        <!-- Empty for manual signature -->
+                                    </div>
+                                    <div class="signature-date">
+                                        <span t-field="o.date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </div>
+                                    <div class="signature-title">Received By</div>
+                                </div>
+                            </div>
+
+                            <!-- Creator Info -->
+                            <div class="creator-info">
+                                    Document: <span t-field="o.name"/>
+ | 
+                                    Generated: <span t-field="o.create_date" t-options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                        <t t-if="o.write_uid != o.create_uid"> | Modified: <span t-field="o.write_uid.name"/>
+                        </t>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="footer-note">
+                        <strong>OSUS Properties - Professional Payment System</strong> | 
+                                    Computer-generated document - No signature required | 
+                        <span t-field="o.company_id.name"/>
+,                        <span t-field="o.company_id.country_id.name"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+</t>
+</template>
+
+</data>
 </odoo>

@@ -22,7 +22,6 @@
     'depends': ['sale', 'mail'],
     'data': [
         'security/security.xml',
-        'security/security_enhanced.xml',
         'security/ir.model.access.csv',
         'data/order_status_data.xml',
         'data/email_templates.xml',

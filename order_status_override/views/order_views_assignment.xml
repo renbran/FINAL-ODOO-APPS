@@ -36,36 +36,24 @@
                 <!-- Add enhanced unified workflow action buttons -->
                 <button name="action_quotation_send" position="after">
                     <!-- Draft to Document Review -->
-                    <button name="action_move_to_document_review" string="Start Document Review" type="object" 
-                            class="btn-primary" icon="fa-file-text-o" 
-                            invisible="not show_document_review_button"/>
+                    <button name="action_move_to_document_review" string="Start Document Review" type="object" class="btn-primary" icon="fa-file-text-o" invisible="not show_document_review_button"/>
 
                     <!-- Document Review to Allocation -->
-                    <button name="action_move_to_allocation" string="Start Allocation" type="object" 
-                            class="btn-warning" icon="fa-sitemap" 
-                            invisible="not show_allocation_button"/>
+                    <button name="action_move_to_allocation" string="Start Allocation" type="object" class="btn-warning" icon="fa-sitemap" invisible="not show_allocation_button"/>
 
                     <!-- Allocation to Approved -->
-                    <button name="action_approve_order" string="Approve Order" type="object" 
-                            class="btn-success" icon="fa-check" 
-                            invisible="not show_approve_button"/>
+                    <button name="action_approve_order" string="Approve Order" type="object" class="btn-success" icon="fa-check" invisible="not show_approve_button"/>
 
                     <!-- Approved to Posted -->
-                    <button name="action_post_order" string="Post Order" type="object" 
-                            class="btn-success" icon="fa-paper-plane" 
-                            invisible="not show_post_button"/>
+                    <button name="action_post_order" string="Post Order" type="object" class="btn-success" icon="fa-paper-plane" invisible="not show_post_button"/>
 
                     <!-- Reject button (available in most stages) -->
-                    <button name="action_reject_order" string="Reject Order" type="object" 
-                            class="btn-danger" icon="fa-times" 
-                            invisible="not show_reject_button"/>
+                    <button name="action_reject_order" string="Reject Order" type="object" class="btn-danger" icon="fa-times" invisible="not show_reject_button"/>
 
                     <!-- Auto-reassign users button -->
-                    <button name="action_reassign_workflow_users" string="Reassign Users" type="object" 
-                            class="btn-secondary" icon="fa-users" 
-                            help="Automatically reassign workflow users based on current group memberships"/>
+                    <button name="action_reassign_workflow_users" string="Reassign Users" type="object" class="btn-secondary" icon="fa-users" help="Automatically reassign workflow users based on current group memberships"/>
                 </button>
-                
+
                 <!-- Hide the default confirm/quotation buttons -->
                 <button name="action_confirm" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -76,16 +64,11 @@
                     <page string="Workflow &amp; Assignment" name="workflow_assignment">
                         <group>
                             <group string="Enhanced Stage Assignments" name="stage_assignments">
-                                <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}" 
-                                       help="User responsible for document review stage"/>
-                                <field name="allocation_user_id" options="{'no_create': True, 'no_quick_create': True}"
-                                       help="User responsible for allocation stage"/>
-                                <field name="approval_user_id" options="{'no_create': True, 'no_quick_create': True}"
-                                       help="User responsible for final approval"/>
-                                <field name="posting_user_id" options="{'no_create': True, 'no_quick_create': True}"
-                                       help="User responsible for posting approved orders"/>
-                                <field name="auto_assigned_users" readonly="1" 
-                                       help="Indicates if users were automatically assigned based on groups"/>
+                                <field name="documentation_user_id" options="{'no_create': True, 'no_quick_create': True}" help="User responsible for document review stage"/>
+                                <field name="allocation_user_id" options="{'no_create': True, 'no_quick_create': True}" help="User responsible for allocation stage"/>
+                                <field name="approval_user_id" options="{'no_create': True, 'no_quick_create': True}" help="User responsible for final approval"/>
+                                <field name="posting_user_id" options="{'no_create': True, 'no_quick_create': True}" help="User responsible for posting approved orders"/>
+                                <field name="auto_assigned_users" readonly="1" help="Indicates if users were automatically assigned based on groups"/>
                             </group>
 
                             <group string="Real Estate Details" name="real_estate_details">
@@ -218,16 +201,14 @@
                     <filter name="final_review_status" string="Final Review" domain="[('order_status', '=', 'final_review')]"/>
                     <filter name="approved_status" string="Approved Orders" domain="[('order_status', '=', 'approved')]"/>
                     <filter name="posted_status" string="Posted Orders" domain="[('order_status', '=', 'posted')]"/>
-                    
+
                     <!-- Enhanced Date Filters for Reports -->
                     <separator/>
-                    <filter name="this_month_bookings" string="This Month Bookings" 
-                            domain="[('booking_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
+                    <filter name="this_month_bookings" string="This Month Bookings" domain="[('booking_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), 
                                      ('booking_date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
-                    <filter name="this_year_bookings" string="This Year Bookings" 
-                            domain="[('booking_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                    <filter name="this_year_bookings" string="This Year Bookings" domain="[('booking_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
                                      ('booking_date', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
-                    
+
                     <group string="Group By">
                         <filter name="group_by_order_status" string="Order Status" context="{'group_by': 'order_status'}"/>
                         <filter name="group_by_booking_date" string="Booking Date" context="{'group_by': 'booking_date:month'}"/>

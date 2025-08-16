@@ -32,12 +32,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(enhanced_order_status_report)d"
-                        string="Enhanced Status Report"
-                        type="action"
-                        class="btn-secondary"
-                        context="{'show_address': 1}"
-                        groups="base.group_user"/>
+                <button name="%(enhanced_order_status_report)d" string="Enhanced Status Report" type="action" class="btn-secondary" context="{'show_address': 1}" groups="base.group_user"/>
             </xpath>
         </field>
     </record>
