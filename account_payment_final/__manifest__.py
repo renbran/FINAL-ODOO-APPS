@@ -75,50 +75,64 @@
         'views/payment_voucher_template_enhanced.xml',
     ],
     'assets': {
+        # Core Backend Assets - Optimized Loading Order
         'web.assets_backend': [
-            # Clean CloudPepper JavaScript error fix (replaces all emergency fixes)
+            # Critical Error Prevention (Must Load First)
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
-            # OSUS Branding & Core Styles (priority loading)
+            # Core OSUS Branding (Priority)
             'account_payment_final/static/src/scss/osus_branding.scss',
             'account_payment_final/static/src/scss/professional_payment_ui.scss',
+            
+            # Component Styles (Modular Loading)
+            'account_payment_final/static/src/scss/components/**/*.scss',
+            'account_payment_final/static/src/scss/views/**/*.scss',
             'account_payment_final/static/src/scss/enhanced_form_styling.scss',
-            
-            # Component-specific styles
-            'account_payment_final/static/src/scss/components/payment_widget.scss',
-            'account_payment_final/static/src/scss/components/table_enhancements.scss',
-            
-            # View-specific styles
-            'account_payment_final/static/src/scss/views/form_view.scss',
             'account_payment_final/static/src/scss/payment_voucher.scss',
-
-            # Core JavaScript functionality (clean, non-module versions only)
+            
+            # Core JavaScript Components (ES6 Modules)
+            'account_payment_final/static/src/js/components/**/*.js',
+            'account_payment_final/static/src/js/fields/**/*.js',
+            'account_payment_final/static/src/js/views/**/*.js',
+            'account_payment_final/static/src/js/payment_voucher.js',
+            
+            # Non-Module Helpers (CloudPepper Compatible)
             'account_payment_final/static/src/js/payment_workflow_safe.js',
-
-            # XML templates
-            'account_payment_final/static/src/xml/payment_templates.xml',
+            'account_payment_final/static/src/js/cloudpepper_js_error_handler.js',
         ],
-        'web.assets_web_dark': [
-            # Clean error fix for dark theme
+        
+        # Frontend Assets (Public Portal)
+        'web.assets_frontend': [
+            # Error Prevention for Public Pages
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
             
-            # XML templates for dark theme
-            'account_payment_final/static/src/xml/payment_templates.xml',
+            # Frontend Styles
+            'account_payment_final/static/src/scss/frontend/**/*.scss',
+            'account_payment_final/static/src/scss/osus_branding.scss',
+            
+            # Frontend JavaScript (Vanilla JS for Compatibility)
+            'account_payment_final/static/src/js/frontend/**/*.js',
         ],
+        
+        # QWeb Templates
+        'web.assets_qweb': [
+            'account_payment_final/static/src/xml/**/*.xml',
+        ],
+        
+        # Report Styles (PDF Generation)
         'web.assets_common': [
-            # Report-specific styles for PDF generation
             'account_payment_final/static/src/scss/responsive_report_styles.scss',
         ],
-        'web.assets_frontend': [
-            # Clean error fix for frontend
+        
+        # Dark Theme Support
+        'web.assets_web_dark': [
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_clean_fix.js'),
-            
-            # Frontend verification portal
-            'account_payment_final/static/src/scss/frontend/verification_portal.scss',
-            'account_payment_final/static/src/js/frontend/qr_verification.js',
+            'account_payment_final/static/src/xml/**/*.xml',
         ],
+        
+        # Test Suite
         'web.qunit_suite_tests': [
-            'account_payment_final/static/tests/payment_widgets_tests.js',
+            'account_payment_final/static/tests/**/*.js',
         ],
     },
     'external_dependencies': {

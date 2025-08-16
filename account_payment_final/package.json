@@ -1,0 +1,15 @@
+{
+  "name": "account_payment_final",
+  "version": "1.0.0",
+  "description": "The **OSUS Payment Approval System** is a comprehensive, production-ready Odoo 17 module designed specifically for OSUS Properties. It provides enterprise-level payment processing with multi-stage approval workflows, QR code verification, and full OSUS branding integration.",
+  "main": "fix_syntax.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

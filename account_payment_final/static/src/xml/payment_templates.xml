@@ -1,53 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates xml:space="preserve">
     
-    <!-- Payment Approval Widget Template -->
-    <t t-name="account_payment_final.PaymentApprovalWidget" owl="1">
-        <div class="o_payment_approval_widget" t-att-class="props.readonly ? 'o_readonly' : ''">
+    <!-- Modernized Payment Approval Widget Template -->
+    <t t-name="account_payment_final.PaymentApprovalWidgetModern" owl="1">
+        <div class="o_payment_approval_widget_modern" 
+             t-att-class="props.readonly ? 'o_readonly' : ''"
+             role="region"
+             aria-label="Payment Approval Workflow">
+             
             <div class="approval-workflow-container">
-                <h6 class="text-primary mb-3">
-                    <i class="fa fa-check-circle me-2"></i>
-                    Approval Workflow
-                </h6>
+                <div class="workflow-header d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-primary mb-0 d-flex align-items-center">
+                        <i class="fa fa-check-circle me-2" aria-hidden="true"></i>
+                        <span>Approval Workflow</span>
+                    </h6>
+                    <div t-if="currentStage" class="current-stage-badge">
+                        <span t-attf-class="badge bg-{{ currentStage.color || 'secondary' }}">
+                            <i t-attf-class="fa {{ currentStage.icon }} me-1" aria-hidden="true"></i>
+                            <t t-esc="currentStage.name"/>
+                        </span>
+                    </div>
+                </div>
                 
+                <!-- Loading State -->
                 <t t-if="state.isLoading">
-                    <div class="text-center py-3">
-                        <i class="fa fa-spinner fa-spin me-2"></i>
-                        Loading workflow data...
+                    <div class="text-center py-4" role="status" aria-live="polite">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Loading workflow data...</span>
                     </div>
                 </t>
                 
+                <!-- Error State -->
+                <t t-elif="state.hasError">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="fa fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                        <div>
+                            <strong>Error:</strong>
+                            <span t-esc="state.errorMessage"/>
+                        </div>
+                    </div>
+                </t>
+                
+                <!-- Workflow Stages -->
                 <t t-else="">
-                    <div class="workflow-stages">
-                        <t t-foreach="state.approvalStages" t-as="stage" t-key="stage.id">
-                            <div class="workflow-stage d-flex align-items-center mb-2">
-                                <div t-attf-class="stage-icon me-3 {{ stage.status }}">
-                                    <i t-attf-class="fa {{ stage.icon }}"></i>
+                    <div class="workflow-stages" role="list">
+                        <t t-foreach="formattedStages" t-as="stage" t-key="stage.id">
+                            <div t-attf-class="{{ getStageClasses(stage) }}" role="listitem">
+                                <div t-attf-class="{{ getStageIconClasses(stage) }}">
+                                    <i t-attf-class="fa {{ stage.icon }}" aria-hidden="true"></i>
                                 </div>
-                                <div class="stage-info flex-grow-1">
-                                    <div class="stage-name fw-bold" t-esc="stage.name"></div>
-                                    <div class="stage-description small text-muted" t-esc="stage.description"></div>
-                                    <div t-if="stage.user_id" class="stage-user small">
-                                        <i class="fa fa-user me-1"></i>
-                                        <span t-esc="stage.user_id[1]"></span>
+                                <div class="stage-content flex-grow-1">
+                                    <div class="stage-header d-flex align-items-center">
+                                        <h6 class="stage-name mb-1" t-esc="stage.name"/>
+                                        <span t-if="stage.status === 'completed'" 
+                                              class="ms-2 text-success" 
+                                              aria-label="Completed">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                        <span t-elif="stage.status === 'current'" 
+                                              class="ms-2 text-warning" 
+                                              aria-label="In Progress">
+                                            <i class="fa fa-clock" aria-hidden="true"></i>
+                                        </span>
                                     </div>
-                                </div>
-                                <div t-if="stage.date" class="stage-date small text-muted">
-                                    <t t-esc="stage.date"></t>
+                                    <div class="stage-description small text-muted mb-1" t-esc="stage.description"/>
+                                    <div t-if="stage.user_id" class="stage-user small d-flex align-items-center">
+                                        <i class="fa fa-user me-1" aria-hidden="true"></i>
+                                        <span t-esc="stage.user_id[1]"/>
+                                        <span t-if="stage.date" class="ms-2 text-muted">
+                                            on <t t-esc="stage.date"/>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </t>
                     </div>
                     
-                    <div t-if="!props.readonly and (state.canApprove or state.canReject)" class="workflow-actions mt-3 text-end">
-                        <button t-if="state.canReject" 
-                                class="btn btn-outline-danger btn-sm me-2" 
-                                t-on-click="onReject">
-                            <i class="fa fa-times me-1"></i>
-                            Reject
-                        </button>
-                        <button t-if="state.canApprove" 
-                                class="btn btn-primary btn-sm" 
+                    <!-- Action Buttons -->
+                    <div t-if="state.showActions" class="workflow-actions mt-4">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <!-- Submit for Review -->
+                            <button t-if="canPerformAction('submit')" 
+                                    class="btn btn-primary btn-sm" 
+                                    t-on-click="onSubmitForReview"
+                                    type="button">
+                                <i class="fa fa-paper-plane me-1" aria-hidden="true"></i>
+                                Submit for Review
+                            </button>
+                            
+                            <!-- Approve -->
+                            <button t-if="canPerformAction('approve')" 
+                                    class="btn btn-success btn-sm" 
+                                    t-on-click="onApprove"
+                                    type="button">
+                                <i class="fa fa-check me-1" aria-hidden="true"></i>
+                                Approve
+                            </button>
+                            
+                            <!-- Authorize -->
+                            <button t-if="canPerformAction('authorize')" 
+                                    class="btn btn-warning btn-sm" 
+                                    t-on-click="onAuthorize"
+                                    type="button">
+                                <i class="fa fa-key me-1" aria-hidden="true"></i>
+                                Authorize
+                            </button>
+                            
+                            <!-- Reject -->
+                            <button t-if="canPerformAction('reject')" 
+                                    class="btn btn-outline-danger btn-sm" 
+                                    t-on-click="onReject"
+                                    type="button">
+                                <i class="fa fa-times me-1" aria-hidden="true"></i>
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Rejection Reason Dialog Template -->
+    <t t-name="account_payment_final.RejectReasonDialog" owl="1">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" t-esc="props.title"/>
+                    <button type="button" class="btn-close" t-on-click="onCancel" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejection-reason" class="form-label">
+                            <strong>Reason for Rejection</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <textarea id="rejection-reason"
+                                  class="form-control" 
+                                  rows="4" 
+                                  placeholder="Please provide a detailed reason for rejecting this payment..."
+                                  t-model="state.reason"
+                                  t-on-input="onReasonChange"
+                                  required="true"></textarea>
+                        <div class="form-text">
+                            Minimum 10 characters required. Current: <span t-esc="state.reason.length"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" t-on-click="onCancel">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            class="btn btn-danger" 
+                            t-on-click="onConfirm"
+                            t-att-disabled="!state.isValid">
+                        <i class="fa fa-times me-1"></i>
+                        Reject Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
                                 t-on-click="onApprove">
                             <i class="fa fa-check me-1"></i>
                             Approve

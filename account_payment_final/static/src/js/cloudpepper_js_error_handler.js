@@ -1,53 +1,157 @@
-﻿/**
- * CloudPepper JavaScript Error Handler
- * Fixes MutationObserver errors and provides robust DOM observation
- * NON-MODULE VERSION to prevent import statement errors
+﻿/** @odoo-module **/
+
+/**
+ * CloudPepper Enhanced JavaScript Error Handler
+ * 
+ * Specialized error handling for CloudPepper hosting environment
+ * Extends the main error prevention system with specific handlers
  */
 
-(function() {
-    'use strict';
+import { ErrorPreventionManager } from "./cloudpepper_clean_fix";
 
-class CloudPepperJSErrorHandler {
+console.log("[CloudPepper] Enhanced error handler loading...");
+
+/**
+ * Enhanced Error Handler for CloudPepper Specific Issues
+ */
+class CloudPepperEnhancedHandler extends ErrorPreventionManager {
     constructor() {
-        this.setupGlobalErrorHandling();
-        this.patchMutationObserver();
-        this.setupDOMObservation();
+        super();
+        this.cloudPepperPatterns = [
+            /CloudPepper.*timeout/i,
+            /CloudPepper.*connection/i,
+            /hosting.*environment/i,
+            /deployment.*error/i,
+            /Permission denied.*script/i
+        ];
+        
+        this.initCloudPepperSpecific();
     }
 
-    setupGlobalErrorHandling() {
-        // Catch and handle JavaScript errors
-        window.addEventListener("error", (event) => {
-            if (event.error && event.error.message) {
-                const message = event.error.message;
-
-                // Handle specific known errors
-                if (message.includes("MutationObserver") || message.includes("parameter 1 is not of type")) {
-                    console.warn("[CloudPepper] MutationObserver error handled:", message);
-                    event.preventDefault();
-                    return false;
-                }
-
-                if (message.includes("Unexpected token") || message.includes("SyntaxError")) {
-                    console.warn("[CloudPepper] Syntax error handled:", message);
-                    // Allow error to be logged but prevent crash
-                }
-            }
-        });
-
-        // Handle unhandled promise rejections
-        window.addEventListener("unhandledrejection", (event) => {
-            if (event.reason && event.reason.message) {
-                const message = event.reason.message;
-                if (message.includes("MutationObserver") || message.includes("observe")) {
-                    console.warn("[CloudPepper] Promise rejection handled:", message);
-                    event.preventDefault();
-                }
-            }
-        });
+    initCloudPepperSpecific() {
+        this.setupCloudPepperErrorHandling();
+        this.setupPerformanceMonitoring();
+        this.setupNetworkErrorHandling();
+        
+        console.log("[CloudPepper] Enhanced error handler active");
     }
 
-    patchMutationObserver() {
-        // Store original MutationObserver
+    /**
+     * CloudPepper specific error handling
+     */
+    setupCloudPepperErrorHandling() {
+        // Add CloudPepper specific patterns
+        this.cloudPepperPatterns.forEach(pattern => {
+            this.addSuppressPattern(pattern);
+        });
+
+        // Enhanced console error handling for CloudPepper
+        window.addEventListener('error', (event) => {
+            const message = event.message || '';
+            
+            if (this.isCloudPepperError(message)) {
+                console.debug("[CloudPepper] Suppressed CloudPepper-specific error:", message);
+                event.preventDefault();
+                return false;
+            }
+        }, true);
+    }
+
+    /**
+     * Performance monitoring for CloudPepper
+     */
+    setupPerformanceMonitoring() {
+        if (window.PerformanceObserver) {
+            try {
+                const observer = new PerformanceObserver((list) => {
+                    const entries = list.getEntries();
+                    entries.forEach(entry => {
+                        if (entry.duration > 1000) { // Log slow operations
+                            console.debug("[CloudPepper] Slow operation detected:", entry.name, entry.duration + "ms");
+                        }
+                    });
+                });
+                
+                observer.observe({ entryTypes: ['measure', 'navigation'] });
+            } catch (error) {
+                console.debug("[CloudPepper] Performance monitoring setup failed:", error.message);
+            }
+        }
+    }
+
+    /**
+     * Network error handling
+     */
+    setupNetworkErrorHandling() {
+        // Monitor fetch failures
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            try {
+                const response = await originalFetch.apply(window, args);
+                if (!response.ok && response.status >= 500) {
+                    console.debug("[CloudPepper] Server error suppressed:", response.status, response.statusText);
+                }
+                return response;
+            } catch (error) {
+                if (this.isNetworkError(error)) {
+                    console.debug("[CloudPepper] Network error suppressed:", error.message);
+                    throw error; // Re-throw for proper handling
+                }
+                throw error;
+            }
+        };
+    }
+
+    /**
+     * Check if error is CloudPepper specific
+     */
+    isCloudPepperError(message) {
+        return this.cloudPepperPatterns.some(pattern => pattern.test(message));
+    }
+
+    /**
+     * Check if error is network related
+     */
+    isNetworkError(error) {
+        const networkPatterns = [
+            /NetworkError/i,
+            /Failed to fetch/i,
+            /Connection.*failed/i,
+            /timeout/i
+        ];
+        
+        return networkPatterns.some(pattern => pattern.test(error.message));
+    }
+
+    /**
+     * Get CloudPepper specific statistics
+     */
+    getCloudPepperStats() {
+        return {
+            ...this.getStats(),
+            cloudPepperPatterns: this.cloudPepperPatterns.length,
+            environment: "CloudPepper",
+            enhancedFeatures: ["performance", "network", "cloudpepper-specific"]
+        };
+    }
+}
+
+/**
+ * Initialize Enhanced Handler
+ */
+const enhancedHandler = new CloudPepperEnhancedHandler();
+
+/**
+ * Export for use in other modules
+ */
+export { CloudPepperEnhancedHandler };
+
+/**
+ * Global access for legacy compatibility
+ */
+window.CloudPepperEnhancedErrorHandler = enhancedHandler;
+
+console.log("[CloudPepper] Enhanced error handler ready");
         const OriginalMutationObserver = window.MutationObserver;
 
         // Create safe wrapper
