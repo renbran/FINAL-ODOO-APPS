@@ -11,26 +11,41 @@
                     <!-- Enhanced Print Menu for Account Payments -->
                     <div class="btn-group" invisible="state == 'draft'">
                         <button name="osus_reports_dropdown" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa fa-print"/> OSUS Reports
+                            <i class="fa fa-print"/>
+ OSUS Reports
                         </button>
                         <ul class="dropdown-menu">
-                            <li><button name="action_print_enhanced_voucher" type="object" class="dropdown-item">
-                                <i class="fa fa-file-pdf-o"/> Enhanced Payment Voucher
-                            </button></li>
-                            <li><button name="action_print_compact_voucher" type="object" class="dropdown-item">
-                                <i class="fa fa-file-text-o"/> Compact Payment Voucher
-                            </button></li>
-                            <li><button name="action_print_professional_summary" type="object" class="dropdown-item">
-                                <i class="fa fa-bar-chart"/> Professional Summary
-                            </button></li>
-                            <li><hr class="dropdown-divider"/></li>
-                            <li><button name="action_print_multiple_reports" type="object" class="dropdown-item">
-                                <i class="fa fa-files-o"/> Multiple Payment Reports
-                            </button></li>
+                            <li>
+                                <button name="action_print_enhanced_voucher" type="object" class="dropdown-item">
+                                    <i class="fa fa-file-pdf-o"/>
+ Enhanced Payment Voucher
+                                </button>
+                            </li>
+                            <li>
+                                <button name="action_print_compact_voucher" type="object" class="dropdown-item">
+                                    <i class="fa fa-file-text-o"/>
+ Compact Payment Voucher
+                                </button>
+                            </li>
+                            <li>
+                                <button name="action_print_professional_summary" type="object" class="dropdown-item">
+                                    <i class="fa fa-bar-chart"/>
+ Professional Summary
+                                </button>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider"/>
+                            </li>
+                            <li>
+                                <button name="action_print_multiple_reports" type="object" class="dropdown-item">
+                                    <i class="fa fa-files-o"/>
+ Multiple Payment Reports
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </xpath>
-                
+
                 <!-- Add QR Code field to the form -->
                 <xpath expr="//field[@name='ref']" position="after">
                     <field name="qr_verification_token" invisible="1"/>
@@ -48,7 +63,7 @@
                 <xpath expr="//tree" position="attributes">
                     <attribute name="multi_edit">1</attribute>
                 </xpath>
-                
+
                 <!-- Add QR verification token column -->
                 <xpath expr="//field[@name='amount']" position="after">
                     <field name="qr_verification_token" optional="hide"/>
@@ -57,11 +72,7 @@
         </record>
 
         <!-- Enhanced Payment Reports Menu -->
-        <menuitem id="menu_enhanced_payment_reports"
-                  name="Enhanced Payment Reports"
-                  parent="account.menu_finance_reports"
-                  sequence="45"
-                  groups="account.group_account_user"/>
+        <menuitem id="menu_enhanced_payment_reports" name="Enhanced Payment Reports" parent="account.menu_finance_reports" sequence="45" groups="account.group_account_user"/>
 
         <!-- Enhanced Payment Reports Action -->
         <record id="action_enhanced_payment_reports" model="ir.actions.act_window">
@@ -79,21 +90,22 @@
                 </p>
                 <p>
                     Enhanced payment reports provide comprehensive documentation with:
-                    <br/>• Professional layouts with OSUS branding
-                    <br/>• QR code verification
-                    <br/>• Digital signature sections
-                    <br/>• Receipt acknowledgments
-                    <br/>• Multiple format options
+                    <br/>
+• Professional layouts with OSUS branding
+                    <br/>
+• QR code verification
+                    <br/>
+• Digital signature sections
+                    <br/>
+• Receipt acknowledgments
+                    <br/>
+• Multiple format options
                 </p>
             </field>
         </record>
 
         <!-- Link menu to action -->
-        <menuitem id="menu_enhanced_payment_reports_action"
-                  name="Payment Reports"
-                  parent="menu_enhanced_payment_reports"
-                  action="action_enhanced_payment_reports"
-                  sequence="10"/>
+        <menuitem id="menu_enhanced_payment_reports_action" name="Payment Reports" parent="menu_enhanced_payment_reports" action="action_enhanced_payment_reports" sequence="10"/>
 
         <!-- Multiple Payment Reports Wizard Action -->
         <record id="action_multiple_payment_reports_wizard" model="ir.actions.act_window">

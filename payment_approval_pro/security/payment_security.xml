@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Payment Security Groups -->
-    
+
     <!-- Base Categories -->
     <record id="module_category_payment_approval" model="ir.module.category">
         <field name="name">Payment Approval</field>
@@ -10,7 +10,7 @@
     </record>
 
     <!-- Security Groups with 6-tier hierarchy -->
-    
+
     <!-- 1. Payment User - Can create and view own payments -->
     <record id="group_payment_user" model="res.groups">
         <field name="name">Payment User</field>
