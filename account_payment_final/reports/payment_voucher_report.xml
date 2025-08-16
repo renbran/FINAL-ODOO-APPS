@@ -284,5 +284,25 @@
                 </div>
             </t>
         </template>
+
+        <!-- Report Template Definitions -->
+        <!-- Standard OSUS Payment Voucher Report -->
+        <template id="report_payment_voucher_osus">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="account_payment_final.payment_voucher_professional" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+        <!-- Enhanced Payment Voucher Report -->
+        <template id="report_payment_voucher_enhanced">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="account_payment_final.payment_voucher_enhanced" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
     </data>
 </odoo>
