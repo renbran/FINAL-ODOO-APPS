@@ -27,8 +27,9 @@
         </field>
     </record>
 
-    <menuitem id="menu_commission_reports_action" name="Generate Reports" parent="menu_commission_reports" action="action_commission_reports" sequence="10"/>
-
-    <!-- Menu Item for Commission Reports -->
+    <!-- Menu Item for Commission Reports (Parent) -->
     <menuitem id="menu_commission_reports" name="Commission Reports" parent="sale.sale_menu_root" sequence="99"/>
+
+    <!-- Menu Item for Commission Reports Action (Child) -->
+    <menuitem id="menu_commission_reports_action" name="Generate Reports" parent="menu_commission_reports" action="action_commission_reports" sequence="10"/>
 </odoo>
