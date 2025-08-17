@@ -1,0 +1,107 @@
+{
+  "validation_time": "2025-08-17T20:32:46.731435",
+  "brand_colors": {
+    "primary_burgundy": "#800020",
+    "secondary_burgundy": "#A0002A",
+    "deep_burgundy": "#600018",
+    "gold_accent": "#FFD700",
+    "dark_gold": "#B8860B"
+  },
+  "validations": {
+    "javascript_colors": {
+      "file": "oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard.js",
+      "checks": [
+        {
+          "test": "Burgundy colors in charts",
+          "status": "PASS",
+          "message": "Found 41 burgundy color references",
+          "expected": ">=10 burgundy color uses"
+        },
+        {
+          "test": "Gold accent colors in charts",
+          "status": "PASS",
+          "message": "Found 17 gold accent references",
+          "expected": ">=5 gold accent uses"
+        },
+        {
+          "test": "Interactive hover effects",
+          "status": "PASS",
+          "message": "Found 3/3 hover effect types",
+          "expected": "Hover effects on charts"
+        }
+      ],
+      "status": "CHECKING"
+    },
+    "css_branding": {
+      "file": "oe_sale_dashboard_17/static/src/css/enhanced_dashboard.css",
+      "checks": [
+        {
+          "test": "Brand color classes",
+          "status": "PASS",
+          "message": "Found 6/6 brand classes",
+          "expected": "Brand utility classes defined"
+        },
+        {
+          "test": "Enhanced KPI scorecard styling",
+          "status": "PASS",
+          "message": "Found 4/4 KPI enhancements",
+          "expected": "Enhanced scorecard styling"
+        },
+        {
+          "test": "Enhanced chart container styling",
+          "status": "PASS",
+          "message": "Found 4/4 chart style features",
+          "expected": "Professional chart containers"
+        }
+      ],
+      "status": "CHECKING"
+    },
+    "xml_branding": {
+      "file": "oe_sale_dashboard_17/static/src/xml/enhanced_sales_dashboard.xml",
+      "checks": [
+        {
+          "test": "Brand classes in template",
+          "status": "PASS",
+          "message": "Found 4/4 brand class uses",
+          "expected": "Brand classes applied in template"
+        },
+        {
+          "test": "Responsive grid classes",
+          "status": "PASS",
+          "message": "Found 3/4 responsive grid types",
+          "expected": "Bootstrap responsive grid"
+        }
+      ],
+      "status": "CHECKING"
+    },
+    "responsive_design": {
+      "file": "oe_sale_dashboard_17/static/src/css/enhanced_dashboard.css",
+      "checks": [
+        {
+          "test": "Responsive media queries",
+          "status": "PASS",
+          "message": "Found 5 media queries",
+          "expected": ">=3 responsive breakpoints"
+        },
+        {
+          "test": "Mobile-first breakpoints",
+          "status": "PASS",
+          "message": "Found 4/4 standard breakpoints",
+          "expected": "Mobile-first responsive design"
+        },
+        {
+          "test": "Flexible layout properties",
+          "status": "PASS",
+          "message": "Found 4/5 flex properties",
+          "expected": "Modern CSS layout"
+        }
+      ],
+      "status": "CHECKING"
+    }
+  },
+  "summary": {
+    "total_checks": 11,
+    "passed": 11,
+    "failed": 0
+  }
+}

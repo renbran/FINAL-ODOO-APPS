@@ -183,13 +183,17 @@ export class EnhancedSalesDashboardView extends Component {
                     data: data.map(item => item.amount),
                     backgroundColor: 'rgba(128, 0, 32, 0.1)',
                     borderColor: '#800020',
-                    borderWidth: 3,
+                    borderWidth: 4,
                     fill: true,
                     tension: 0.4,
                     pointBackgroundColor: '#800020',
                     pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 6
+                    pointBorderWidth: 3,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointHoverBackgroundColor: '#FFD700',
+                    pointHoverBorderColor: '#800020',
+                    pointHoverBorderWidth: 4
                 }]
             },
             options: {
@@ -199,12 +203,18 @@ export class EnhancedSalesDashboardView extends Component {
                     title: {
                         display: true,
                         text: _t("Monthly Sales Trend (Booking Date)"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
+                        font: { size: 18, weight: 'bold' },
+                        color: '#800020',
+                        padding: 20
                     },
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            color: '#800020',
+                            font: { weight: 'bold', size: 12 },
+                            padding: 20
+                        }
                     }
                 },
                 scales: {
@@ -213,13 +223,29 @@ export class EnhancedSalesDashboardView extends Component {
                         ticks: {
                             callback: function(value) {
                                 return this.formatCurrency(value);
-                            }.bind(this)
+                            }.bind(this),
+                            color: '#495057',
+                            font: { weight: 'bold' }
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)',
+                            lineWidth: 1
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#495057',
+                            font: { weight: 'bold' }
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.05)',
+                            lineWidth: 1
                         }
                     }
                 },
                 elements: {
                     point: {
-                        hoverRadius: 8
+                        hoverRadius: 12
                     }
                 }
             }
@@ -240,12 +266,17 @@ export class EnhancedSalesDashboardView extends Component {
                 datasets: [{
                     data: data.counts || [],
                     backgroundColor: [
-                        '#800020',
-                        '#B8860B', 
-                        '#2E8B57'
+                        '#800020',     // Primary Burgundy
+                        '#A0002A',     // Darker Burgundy 
+                        '#FFD700',     // Gold Accent
+                        '#B8860B',     // Dark Gold
+                        '#600018',     // Deep Burgundy
+                        '#C41E3A'      // Crimson Red
                     ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverBorderWidth: 4,
+                    hoverBorderColor: '#800020'
                 }]
             },
             options: {
@@ -282,7 +313,10 @@ export class EnhancedSalesDashboardView extends Component {
                     data: data.amounts || [],
                     backgroundColor: 'rgba(128, 0, 32, 0.8)',
                     borderColor: '#800020',
-                    borderWidth: 1
+                    borderWidth: 2,
+                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
+                    hoverBorderColor: '#FFD700',
+                    hoverBorderWidth: 3
                 }]
             },
             options: {
@@ -295,6 +329,12 @@ export class EnhancedSalesDashboardView extends Component {
                         text: _t("Top Customers by Revenue"),
                         font: { size: 16, weight: 'bold' },
                         color: '#800020'
+                    },
+                    legend: {
+                        labels: {
+                            color: '#800020',
+                            font: { weight: 'bold' }
+                        }
                     }
                 },
                 scales: {
@@ -303,7 +343,19 @@ export class EnhancedSalesDashboardView extends Component {
                         ticks: {
                             callback: function(value) {
                                 return this.formatCurrency(value);
-                            }.bind(this)
+                            }.bind(this),
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
                         }
                     }
                 }
@@ -325,9 +377,12 @@ export class EnhancedSalesDashboardView extends Component {
                 datasets: [{
                     label: _t("Team Revenue"),
                     data: data.amounts || [],
-                    backgroundColor: 'rgba(184, 134, 11, 0.8)',
-                    borderColor: '#B8860B',
-                    borderWidth: 1
+                    backgroundColor: 'rgba(255, 215, 0, 0.8)',  // Gold theme for teams
+                    borderColor: '#FFD700',
+                    borderWidth: 2,
+                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
+                    hoverBorderColor: '#800020',
+                    hoverBorderWidth: 3
                 }]
             },
             options: {
@@ -339,6 +394,12 @@ export class EnhancedSalesDashboardView extends Component {
                         text: _t("Sales Team Performance"),
                         font: { size: 16, weight: 'bold' },
                         color: '#800020'
+                    },
+                    legend: {
+                        labels: {
+                            color: '#800020',
+                            font: { weight: 'bold' }
+                        }
                     }
                 },
                 scales: {
@@ -347,7 +408,19 @@ export class EnhancedSalesDashboardView extends Component {
                         ticks: {
                             callback: function(value) {
                                 return this.formatCurrency(value);
-                            }.bind(this)
+                            }.bind(this),
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
                         }
                     }
                 }
@@ -371,15 +444,21 @@ export class EnhancedSalesDashboardView extends Component {
                     data: data.total_amounts || [],
                     backgroundColor: 'rgba(128, 0, 32, 0.8)',
                     borderColor: '#800020',
-                    borderWidth: 1,
-                    yAxisID: 'y'
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
+                    hoverBorderColor: '#FFD700',
+                    hoverBorderWidth: 3
                 }, {
                     label: _t("Deal Count"),
                     data: data.deal_counts || [],
-                    backgroundColor: 'rgba(46, 139, 87, 0.8)',
-                    borderColor: '#2E8B57',
-                    borderWidth: 1,
-                    yAxisID: 'y1'
+                    backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                    borderColor: '#FFD700',
+                    borderWidth: 2,
+                    yAxisID: 'y1',
+                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
+                    hoverBorderColor: '#800020',
+                    hoverBorderWidth: 3
                 }]
             },
             options: {
@@ -391,6 +470,12 @@ export class EnhancedSalesDashboardView extends Component {
                         text: _t("Top Agents Performance"),
                         font: { size: 16, weight: 'bold' },
                         color: '#800020'
+                    },
+                    legend: {
+                        labels: {
+                            color: '#800020',
+                            font: { weight: 'bold' }
+                        }
                     }
                 },
                 scales: {
@@ -402,7 +487,11 @@ export class EnhancedSalesDashboardView extends Component {
                         ticks: {
                             callback: function(value) {
                                 return this.formatCurrency(value);
-                            }.bind(this)
+                            }.bind(this),
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
                         }
                     },
                     y1: {
@@ -410,9 +499,21 @@ export class EnhancedSalesDashboardView extends Component {
                         display: true,
                         position: 'right',
                         beginAtZero: true,
+                        ticks: {
+                            color: '#495057'
+                        },
                         grid: {
                             drawOnChartArea: false,
+                            color: 'rgba(255, 215, 0, 0.1)'
                         },
+                    },
+                    x: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
+                        }
                     }
                 }
             }
@@ -433,17 +534,23 @@ export class EnhancedSalesDashboardView extends Component {
                 datasets: [{
                     label: _t("Total Revenue"),
                     data: data.total_amounts || [],
-                    backgroundColor: 'rgba(184, 134, 11, 0.8)',
-                    borderColor: '#B8860B',
-                    borderWidth: 1,
-                    yAxisID: 'y'
+                    backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                    borderColor: '#FFD700',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
+                    hoverBorderColor: '#800020',
+                    hoverBorderWidth: 3
                 }, {
                     label: _t("Deal Count"),
                     data: data.deal_counts || [],
-                    backgroundColor: 'rgba(46, 139, 87, 0.8)',
-                    borderColor: '#2E8B57',
-                    borderWidth: 1,
-                    yAxisID: 'y1'
+                    backgroundColor: 'rgba(128, 0, 32, 0.8)',
+                    borderColor: '#800020',
+                    borderWidth: 2,
+                    yAxisID: 'y1',
+                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
+                    hoverBorderColor: '#FFD700',
+                    hoverBorderWidth: 3
                 }]
             },
             options: {
@@ -455,6 +562,12 @@ export class EnhancedSalesDashboardView extends Component {
                         text: _t("Top Brokers Performance"),
                         font: { size: 16, weight: 'bold' },
                         color: '#800020'
+                    },
+                    legend: {
+                        labels: {
+                            color: '#800020',
+                            font: { weight: 'bold' }
+                        }
                     }
                 },
                 scales: {
@@ -466,7 +579,35 @@ export class EnhancedSalesDashboardView extends Component {
                         ticks: {
                             callback: function(value) {
                                 return this.formatCurrency(value);
-                            }.bind(this)
+                            }.bind(this),
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                            color: 'rgba(255, 215, 0, 0.1)'
+                        },
+                    },
+                    x: {
+                        ticks: {
+                            color: '#495057'
+                        },
+                        grid: {
+                            color: 'rgba(128, 0, 32, 0.1)'
+                        }
+                    }
+                }
                         }
                     },
                     y1: {
