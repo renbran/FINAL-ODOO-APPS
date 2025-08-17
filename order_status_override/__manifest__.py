@@ -44,6 +44,9 @@
             # CloudPepper Error Fixes (load first)
             ('prepend', 'order_status_override/static/src/js/cloudpepper_sales_fix.js'),
             
+            # JavaScript Components
+            'order_status_override/static/src/js/order_status_widget.js',
+            
             # Styles
             'order_status_override/static/src/css/commission_report.css',
             'order_status_override/static/src/css/enhanced_sales_order_form.css',
