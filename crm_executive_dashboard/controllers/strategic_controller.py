@@ -2,6 +2,7 @@
 
 import json
 from odoo import http, _
+from odoo.exceptions import ValidationError
 from odoo.http import request
 from odoo.exceptions import AccessError, ValidationError
 import logging

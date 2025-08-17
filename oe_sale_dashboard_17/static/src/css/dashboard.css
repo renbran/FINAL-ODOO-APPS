@@ -1,21 +1,25 @@
+/* 
+WARNING: This file contains 18 !important declarations.
+Consider refactoring to use more specific selectors instead.
+*/
 /* Sales Dashboard Enhanced Styles - Custom Branding */
 
 /* Custom Brand Colors */
 :root {
-    --brand-primary: #800020;        /* Deep Maroon/Burgundy */
-    --brand-gold: #FFD700;           /* Light Gold */
-    --brand-light-gold: #FFF8DC;     /* Light Gold Background */
-    --brand-dark-gold: #B8860B;      /* Dark Gold */
-    --brand-white: #FFFFFF;          /* Pure White */
+    --brand-primary: var(--osus-primary);        /* Deep Maroon/Burgundy */
+    --brand-gold: var(--osus-gold);           /* Light Gold */
+    --brand-light-gold: var(--osus-light-gold);     /* Light Gold Background */
+    --brand-dark-gold: var(--osus-dark-gold);      /* Dark Gold */
+    --brand-white: var(--osus-white);          /* Pure White */
     --brand-light-gray: #F5F5F5;     /* Light Gray */
     --brand-dark: #2C1810;           /* Dark Brown */
-    --brand-accent: #A0522D;         /* Sienna (complementary) */
+    --brand-accent: var(--osus-accent);         /* Sienna (complementary) */
     --brand-success: #228B22;        /* Forest Green */
     --brand-warning: #FF8C00;        /* Dark Orange */
     --brand-danger: #DC143C;         /* Crimson */
     --brand-shadow: 0 4px 12px rgba(128, 0, 32, 0.15);
-    --brand-gradient: linear-gradient(135deg, #800020 0%, #A0522D 50%, #FFD700 100%);
-    --brand-card-gradient: linear-gradient(135deg, #800020 0%, #8B0000 100%);
+    --brand-gradient: linear-gradient(135deg, var(--osus-primary) 0%, var(--osus-accent) 50%, var(--osus-gold) 100%);
+    --brand-card-gradient: linear-gradient(135deg, var(--osus-primary) 0%, #8B0000 100%);
 }
 
 /* Main container visibility improvements */
@@ -36,7 +40,8 @@
 }
 
 /* Chart container visibility */
-.chart_container {
+/* Consider using BEM methodology: .o_module_name__chart_container */
+.o_module_chart_container {
     visibility: visible !important;
     opacity: 1 !important;
     display: block !important;
@@ -135,7 +140,8 @@
 }
 
 /* Fallback Chart Styles - Custom Branding */
-.fallback-chart {
+/* Consider using BEM methodology: .o_module_name__fallback-chart */
+.o_module_fallback-chart {
     padding: 20px;
     background: var(--brand-white);
     border-radius: 10px;
@@ -154,7 +160,8 @@
 }
 
 /* Bar Charts */
-.chart-bars {
+/* Consider using BEM methodology: .o_module_name__chart-bars */
+.o_module_chart-bars {
     display: flex;
     align-items: flex-end;
     justify-content: space-around;
@@ -164,7 +171,8 @@
     margin-bottom: 10px;
 }
 
-.chart-bar {
+/* Consider using BEM methodology: .o_module_name__chart-bar */
+.o_module_chart-bar {
     position: relative;
     width: 40px;
     background: var(--brand-gradient);
@@ -209,11 +217,13 @@
 }
 
 /* Horizontal Bar Charts */
-.chart-horizontal-bars {
+/* Consider using BEM methodology: .o_module_name__chart-horizontal-bars */
+.o_module_chart-horizontal-bars {
     padding: 10px 0;
 }
 
-.horizontal-bar-item {
+/* Consider using BEM methodology: .o_module_name__horizontal-bar-item */
+.o_module_horizontal-bar-item {
     margin-bottom: 15px;
     padding: 10px 0;
 }
@@ -225,7 +235,8 @@
     margin-bottom: 5px;
 }
 
-.bar-container {
+/* Consider using BEM methodology: .o_module_name__bar-container */
+.o_module_bar-container {
     position: relative;
     height: 25px;
     background: var(--brand-light-gold);
@@ -234,7 +245,8 @@
     border: 1px solid var(--brand-gold);
 }
 
-.bar-fill {
+/* Consider using BEM methodology: .o_module_name__bar-fill */
+.o_module_bar-fill {
     height: 100%;
     background: var(--brand-gradient);
     border-radius: 12px;
@@ -256,14 +268,16 @@
 }
 
 /* Pie Chart Fallback */
-.chart-pie {
+/* Consider using BEM methodology: .o_module_name__chart-pie */
+.o_module_chart-pie {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 20px 0;
 }
 
-.pie-item {
+/* Consider using BEM methodology: .o_module_name__pie-item */
+.o_module_pie-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -281,24 +295,28 @@
     box-shadow: var(--brand-shadow);
 }
 
-.pie-label {
+/* Consider using BEM methodology: .o_module_name__pie-label */
+.o_module_pie-label {
     font-weight: 600;
     color: var(--brand-primary);
 }
 
-.pie-value {
+/* Consider using BEM methodology: .o_module_name__pie-value */
+.o_module_pie-value {
     font-weight: 500;
     color: var(--brand-dark);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .chart-bars {
+/* Consider using BEM methodology: .o_module_name__chart-bars */
+    .o_module_chart-bars {
         height: 200px;
         padding: 15px 0;
     }
     
-    .chart-bar {
+/* Consider using BEM methodology: .o_module_name__chart-bar */
+    .o_module_chart-bar {
         width: 30px;
         margin: 0 3px;
     }
@@ -312,7 +330,8 @@
         max-width: 40px;
     }
     
-    .fallback-chart {
+/* Consider using BEM methodology: .o_module_name__fallback-chart */
+    .o_module_fallback-chart {
         padding: 15px;
     }
     
@@ -328,7 +347,8 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .sales_dashboard_container {
+/* Consider using BEM methodology: .o_module_name__sales_dashboard_container */
+    .o_module_sales_dashboard_container {
         padding: 15px;
     }
     
@@ -339,7 +359,8 @@
 }
 
 /* Fallback Chart Styling */
-.fallback-chart {
+/* Consider using BEM methodology: .o_module_name__fallback-chart */
+.o_module_fallback-chart {
     padding: 20px;
     background: var(--brand-white);
     border-radius: 8px;
@@ -354,7 +375,8 @@
     font-weight: 600;
 }
 
-.chart-bars {
+/* Consider using BEM methodology: .o_module_name__chart-bars */
+.o_module_chart-bars {
     display: flex;
     align-items: end;
     justify-content: space-around;
@@ -364,21 +386,24 @@
     padding: 10px;
 }
 
-.chart-group {
+/* Consider using BEM methodology: .o_module_name__chart-group */
+.o_module_chart-group {
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 60px;
 }
 
-.bar-group {
+/* Consider using BEM methodology: .o_module_name__bar-group */
+.o_module_bar-group {
     display: flex;
     align-items: end;
     gap: 2px;
     height: 180px;
 }
 
-.chart-bar {
+/* Consider using BEM methodology: .o_module_name__chart-bar */
+.o_module_chart-bar {
     width: 18px;
     min-height: 5px;
     border-radius: 4px 4px 0 0;
@@ -391,7 +416,8 @@
     box-shadow: 0 4px 8px rgba(128, 0, 32, 0.3);
 }
 
-.bar-value {
+/* Consider using BEM methodology: .o_module_name__bar-value */
+.o_module_bar-value {
     position: absolute;
     top: -25px;
     left: 50%;
@@ -402,7 +428,8 @@
     white-space: nowrap;
 }
 
-.bar-label {
+/* Consider using BEM methodology: .o_module_name__bar-label */
+.o_module_bar-label {
     margin-top: 8px;
     font-size: 12px;
     color: var(--brand-primary);
@@ -414,7 +441,8 @@
 }
 
 /* Trend Legend */
-.trend-legend {
+/* Consider using BEM methodology: .o_module_name__trend-legend */
+.o_module_trend-legend {
     display: flex;
     justify-content: center;
     gap: 20px;
@@ -424,13 +452,15 @@
 }
 
 /* Pie Chart Styling */
-.chart-pie {
+/* Consider using BEM methodology: .o_module_name__chart-pie */
+.o_module_chart-pie {
     display: grid;
     gap: 8px;
     padding: 10px;
 }
 
-.pie-item {
+/* Consider using BEM methodology: .o_module_name__pie-item */
+.o_module_pie-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -446,31 +476,36 @@
     transform: translateX(4px);
 }
 
-.pie-label {
+/* Consider using BEM methodology: .o_module_name__pie-label */
+.o_module_pie-label {
     font-weight: 500;
     color: var(--brand-primary);
 }
 
-.pie-value {
+/* Consider using BEM methodology: .o_module_name__pie-value */
+.o_module_pie-value {
     font-weight: 600;
     color: var(--brand-gold);
 }
 
 /* Horizontal Bar Chart */
-.chart-horizontal-bars {
+/* Consider using BEM methodology: .o_module_name__chart-horizontal-bars */
+.o_module_chart-horizontal-bars {
     display: grid;
     gap: 12px;
     padding: 10px;
 }
 
-.horizontal-bar-item {
+/* Consider using BEM methodology: .o_module_name__horizontal-bar-item */
+.o_module_horizontal-bar-item {
     display: grid;
     grid-template-columns: 150px 1fr;
     gap: 12px;
     align-items: center;
 }
 
-.bar-container {
+/* Consider using BEM methodology: .o_module_name__bar-container */
+.o_module_bar-container {
     position: relative;
     height: 24px;
     background: rgba(128, 0, 32, 0.1);
@@ -478,7 +513,8 @@
     overflow: hidden;
 }
 
-.bar-fill {
+/* Consider using BEM methodology: .o_module_name__bar-fill */
+.o_module_bar-fill {
     height: 100%;
     border-radius: 12px;
     transition: width 0.6s ease;
@@ -508,26 +544,31 @@
 
 /* Mobile Responsive for Fallback Charts */
 @media (max-width: 768px) {
-    .chart-bars {
+/* Consider using BEM methodology: .o_module_name__chart-bars */
+    .o_module_chart-bars {
         height: 150px;
         gap: 4px;
     }
     
-    .chart-bar {
+/* Consider using BEM methodology: .o_module_name__chart-bar */
+    .o_module_chart-bar {
         width: 14px;
     }
     
-    .bar-group {
+/* Consider using BEM methodology: .o_module_name__bar-group */
+    .o_module_bar-group {
         height: 130px;
         gap: 1px;
     }
     
-    .horizontal-bar-item {
+/* Consider using BEM methodology: .o_module_name__horizontal-bar-item */
+    .o_module_horizontal-bar-item {
         grid-template-columns: 120px 1fr;
         gap: 8px;
     }
     
-    .trend-legend {
+/* Consider using BEM methodology: .o_module_name__trend-legend */
+    .o_module_trend-legend {
         flex-direction: column;
         gap: 8px;
         font-size: 11px;
@@ -568,7 +609,8 @@
 }
 
 /* Performance Table Enhancements */
-.table_container {
+/* Consider using BEM methodology: .o_module_name__table_container */
+.o_module_table_container {
     background: var(--brand-white);
     border-radius: 15px;
     padding: 20px;
@@ -615,7 +657,8 @@
 }
 
 /* Enhanced Filter Section */
-.dashboard_filters {
+/* Consider using BEM methodology: .o_module_name__dashboard_filters */
+.o_module_dashboard_filters {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     padding: 20px;
@@ -683,7 +726,8 @@
 
 /* Responsive Enhancements for New Components */
 @media (max-width: 768px) {
-    .dashboard_filters {
+/* Consider using BEM methodology: .o_module_name__dashboard_filters */
+    .o_module_dashboard_filters {
         margin-bottom: 20px;
     }
     
@@ -691,7 +735,8 @@
         margin-bottom: 10px;
     }
     
-    .table_container {
+/* Consider using BEM methodology: .o_module_name__table_container */
+    .o_module_table_container {
         overflow-x: auto;
         padding: 15px;
     }

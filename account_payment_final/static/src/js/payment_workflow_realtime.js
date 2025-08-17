@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 // Global error handler for OWL lifecycle errors
 window.addEventListener("error", function (event) {
   if (event.message && event.message.includes("owl lifecycle")) {
@@ -177,7 +179,7 @@ window.addEventListener("unhandledrejection", function (event) {
      */
     validateAmount: function ($field) {
       var amount = parseFloat($field.val()) || 0;
-      var $warning = $(".amount-warning");
+      var $warning = document.querySelector(".$1");
 
       // Remove existing warnings
       $warning.remove();
@@ -211,7 +213,7 @@ window.addEventListener("unhandledrejection", function (event) {
      * Update workflow progress indicator
      */
     updateWorkflowProgress: function (currentState) {
-      var $progress = $(".workflow-progress");
+      var $progress = document.querySelector(".$1");
       if ($progress.length === 0) return;
 
       currentState = currentState || $('select[name="approval_state"]').val();
@@ -267,7 +269,7 @@ window.addEventListener("unhandledrejection", function (event) {
      * Update button visibility based on current state
      */
     updateButtonVisibility: function (currentState) {
-      var $buttons = $(".workflow-buttons button");
+      var $buttons = document.querySelector(".$1");
 
       // Hide all workflow buttons first
       $buttons.hide();
@@ -411,7 +413,7 @@ window.addEventListener("unhandledrejection", function (event) {
       }
 
       // Try to get from form data
-      var $form = $(".o_form_view");
+      var $form = document.querySelector(".$1");
       if ($form.length && $form.data("record-id")) {
         return $form.data("record-id");
       }
@@ -448,7 +450,7 @@ window.addEventListener("unhandledrejection", function (event) {
         duration = duration || 4000;
 
         // Remove any existing notifications first
-        $(".payment-notification").remove();
+        document.querySelector(".$1").remove();
 
         // Create notification element with error handling
         var $notification = $(
@@ -510,7 +512,7 @@ window.addEventListener("unhandledrejection", function (event) {
   };
 
   // Initialize when document is ready (CloudPepper Safe)
-  $(document).ready(function () {
+  document.addEventListener("DOMContentLoaded", function () {
     try {
       PaymentWorkflowRealtime.init();
     } catch (error) {

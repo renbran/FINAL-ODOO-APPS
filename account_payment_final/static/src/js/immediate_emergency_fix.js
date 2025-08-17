@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * IMMEDIATE EMERGENCY JAVASCRIPT FIX
  * Executes INSTANTLY to prevent ALL errors

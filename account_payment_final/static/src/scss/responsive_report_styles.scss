@@ -1,3 +1,7 @@
+/* 
+WARNING: This file contains 7 !important declarations.
+Consider refactoring to use more specific selectors instead.
+*/
 /* Responsive Report Styles - CloudPepper Optimized */
 /* Print and responsive styling for reports */
 
@@ -90,6 +94,7 @@
 
         .o_summary_row {
             display: flex;
+    /* Consider adding gap: 1rem; for modern spacing */
             justify-content: space-between;
             padding: 0.5rem 0;
             border-bottom: 1px solid #dee2e6;

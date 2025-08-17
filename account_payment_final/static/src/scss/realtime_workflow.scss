@@ -1,7 +1,8 @@
 /* Payment Workflow Real-time Updates Styling */
 
 /* Workflow Progress Indicators */
-.workflow-progress {
+/* Consider using BEM methodology: .o_module_name__workflow-progress */
+.o_module_workflow-progress {
   margin: 20px 0;
   padding: 15px;
   background: var(--bs-light);
@@ -15,14 +16,16 @@
   font-weight: 600;
 }
 
-.progress-container {
+/* Consider using BEM methodology: .o_module_name__progress-container */
+.o_module_progress-container {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.progress-step {
+/* Consider using BEM methodology: .o_module_name__progress-step */
+.o_module_progress-step {
   padding: 8px 15px;
   border-radius: 20px;
   font-size: 12px;
@@ -69,7 +72,8 @@
 }
 
 /* Real-time Notifications */
-.payment-notification {
+/* Consider using BEM methodology: .o_module_name__payment-notification */
+.o_module_payment-notification {
   max-width: 400px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -88,7 +92,8 @@
 }
 
 /* Field Warning Styles */
-.amount-warning {
+/* Consider using BEM methodology: .o_module_name__amount-warning */
+.o_module_amount-warning {
   margin-top: 5px;
   font-size: 12px;
   border-radius: 4px;
@@ -177,7 +182,8 @@
 }
 
 /* Loading States */
-.workflow-loading {
+/* Consider using BEM methodology: .o_module_name__workflow-loading */
+.o_module_workflow-loading {
   position: relative;
 }
 
@@ -217,7 +223,8 @@
 }
 
 /* Real-time Status Badges */
-.status-badge {
+/* Consider using BEM methodology: .o_module_name__status-badge */
+.o_module_status-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -261,23 +268,27 @@
 
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
-  .progress-container {
+/* Consider using BEM methodology: .o_module_name__progress-container */
+  .o_module_progress-container {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .progress-step {
+/* Consider using BEM methodology: .o_module_name__progress-step */
+  .o_module_progress-step {
     justify-content: center;
     margin-bottom: 5px;
   }
 
-  .payment-notification {
+/* Consider using BEM methodology: .o_module_name__payment-notification */
+  .o_module_payment-notification {
     left: 10px !important;
     right: 10px !important;
     max-width: none;
   }
 
-  .workflow-buttons {
+/* Consider using BEM methodology: .o_module_name__workflow-buttons */
+  .o_module_workflow-buttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -290,7 +301,8 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .workflow-progress {
+/* Consider using BEM methodology: .o_module_name__workflow-progress */
+  .o_module_workflow-progress {
     background: var(--bs-dark);
     border-left-color: #4a90e2;
   }
@@ -304,7 +316,8 @@
     color: #adb5bd;
   }
 
-  .payment-notification {
+/* Consider using BEM methodology: .o_module_name__payment-notification */
+  .o_module_payment-notification {
     background: var(--bs-dark);
     border-color: var(--bs-border-color);
   }
@@ -312,7 +325,8 @@
 
 /* High Contrast Support */
 @media (prefers-contrast: high) {
-  .progress-step {
+/* Consider using BEM methodology: .o_module_name__progress-step */
+  .o_module_progress-step {
     border: 2px solid currentColor;
   }
 
@@ -320,7 +334,8 @@
     border: 2px solid currentColor;
   }
 
-  .status-badge {
+/* Consider using BEM methodology: .o_module_name__status-badge */
+  .o_module_status-badge {
     border: 1px solid currentColor;
   }
 }

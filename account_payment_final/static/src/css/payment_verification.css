@@ -1,8 +1,8 @@
 /* OSUS Payment Verification Frontend Styles */
 
 :root {
-    --osus-primary: #800020;
-    --osus-secondary: #FFD700;
+    --osus-primary: var(--osus-primary);
+    --osus-secondary: var(--osus-gold);
     --osus-success: #28a745;
     --osus-danger: #dc3545;
     --osus-warning: #ffc107;
@@ -10,20 +10,23 @@
 }
 
 /* Verification Page Styling */
-.payment-verification-container {
+/* Consider using BEM methodology: .o_module_name__payment-verification-container */
+.o_module_payment-verification-container {
     min-height: 100vh;
     background: linear-gradient(135deg, var(--osus-light) 0%, #e9ecef 100%);
     padding: 20px 0;
 }
 
-.verification-card {
+/* Consider using BEM methodology: .o_module_name__verification-card */
+.o_module_verification-card {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(128, 0, 32, 0.15);
     border: none;
 }
 
-.verification-header {
+/* Consider using BEM methodology: .o_module_name__verification-header */
+.o_module_verification-header {
     background: linear-gradient(135deg, var(--osus-success) 0%, #20c997 100%);
     padding: 2rem;
     text-align: center;
@@ -49,12 +52,14 @@
     opacity: 0.9;
 }
 
-.verification-body {
+/* Consider using BEM methodology: .o_module_name__verification-body */
+.o_module_verification-body {
     padding: 2rem;
     background: white;
 }
 
-.info-table {
+/* Consider using BEM methodology: .o_module_name__info-table */
+.o_module_info-table {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
@@ -73,7 +78,8 @@
     width: 40%;
 }
 
-.verification-status {
+/* Consider using BEM methodology: .o_module_name__verification-status */
+.o_module_verification-status {
     padding: 1rem;
     border-radius: 10px;
     margin: 1.5rem 0;
@@ -91,14 +97,16 @@
     color: #856404;
 }
 
-.verification-footer {
+/* Consider using BEM methodology: .o_module_name__verification-footer */
+.o_module_verification-footer {
     background: linear-gradient(135deg, var(--osus-light) 0%, #e9ecef 100%);
     padding: 1.5rem;
     text-align: center;
 }
 
 /* Status Badges */
-.status-badge {
+/* Consider using BEM methodology: .o_module_name__status-badge */
+.o_module_status-badge {
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 0.9em;
@@ -135,25 +143,29 @@
 }
 
 /* QR Guide Styling */
-.qr-guide-container {
+/* Consider using BEM methodology: .o_module_name__qr-guide-container */
+.o_module_qr-guide-container {
     background: white;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(128, 0, 32, 0.15);
 }
 
-.qr-guide-header {
+/* Consider using BEM methodology: .o_module_name__qr-guide-header */
+.o_module_qr-guide-header {
     background: linear-gradient(135deg, var(--osus-primary) 0%, #a0002b 100%);
     color: white;
     text-align: center;
     padding: 3rem 2rem;
 }
 
-.qr-guide-body {
+/* Consider using BEM methodology: .o_module_name__qr-guide-body */
+.o_module_qr-guide-body {
     padding: 3rem;
 }
 
-.step-card {
+/* Consider using BEM methodology: .o_module_name__step-card */
+.o_module_step-card {
     border: 2px solid;
     border-radius: 10px;
     overflow: hidden;
@@ -173,7 +185,8 @@
     border-color: var(--osus-success);
 }
 
-.step-card-header {
+/* Consider using BEM methodology: .o_module_name__step-card-header */
+.o_module_step-card-header {
     padding: 1rem;
     color: white;
     font-weight: 600;
@@ -187,12 +200,14 @@
     background: var(--osus-success);
 }
 
-.step-card-body {
+/* Consider using BEM methodology: .o_module_name__step-card-body */
+.o_module_step-card-body {
     padding: 1.5rem;
 }
 
 /* Security Features */
-.security-alert {
+/* Consider using BEM methodology: .o_module_name__security-alert */
+.o_module_security-alert {
     background: rgba(0, 123, 255, 0.1);
     border: 1px solid #007bff;
     border-radius: 10px;
@@ -211,7 +226,8 @@
 }
 
 /* Troubleshooting */
-.troubleshooting-alert {
+/* Consider using BEM methodology: .o_module_name__troubleshooting-alert */
+.o_module_troubleshooting-alert {
     background: rgba(255, 193, 7, 0.1);
     border: 1px solid var(--osus-warning);
     border-radius: 10px;
@@ -230,7 +246,8 @@
 }
 
 /* Buttons */
-.btn-osus {
+/* Consider using BEM methodology: .o_module_name__btn-osus */
+.o_module_btn-osus {
     background: linear-gradient(135deg, var(--osus-primary) 0%, #a0002b 100%);
     border: none;
     color: white;
@@ -250,15 +267,18 @@
 @media (max-width: 768px) {
     .verification-header,
     .verification-body,
-    .qr-guide-body {
+/* Consider using BEM methodology: .o_module_name__qr-guide-body */
+    .o_module_qr-guide-body {
         padding: 1.5rem;
     }
     
-    .qr-guide-header {
+/* Consider using BEM methodology: .o_module_name__qr-guide-header */
+    .o_module_qr-guide-header {
         padding: 2rem 1.5rem;
     }
     
-    .info-table {
+/* Consider using BEM methodology: .o_module_name__info-table */
+    .o_module_info-table {
         font-size: 0.9em;
     }
     
@@ -266,13 +286,15 @@
         padding: 8px;
     }
     
-    .step-card {
+/* Consider using BEM methodology: .o_module_name__step-card */
+    .o_module_step-card {
         margin-bottom: 1.5rem;
     }
 }
 
 /* Loading Animation */
-.loading-spinner {
+/* Consider using BEM methodology: .o_module_name__loading-spinner */
+.o_module_loading-spinner {
     display: inline-block;
     width: 20px;
     height: 20px;

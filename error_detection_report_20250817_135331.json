@@ -1,0 +1,978 @@
+{
+  "timestamp": "2025-08-17T13:53:31.604896",
+  "summary": {
+    "errors_detected": 37,
+    "warnings_detected": 22,
+    "fixes_applied": 32,
+    "files_cleaned": 29
+  },
+  "errors": [
+    {
+      "id": "PY-002-account_payment_final",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in account_payment_final\\controllers\\payment_verification.py",
+      "file_path": "account_payment_final\\controllers\\payment_verification.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.124583",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\account_journal.py",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.127097",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-account_payment_final",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_move.py",
+      "file_path": "account_payment_final\\models\\account_move.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.128737",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-account_payment_final",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_payment.py",
+      "file_path": "account_payment_final\\models\\account_payment.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.139297",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-account_payment_final",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_payment_register.py",
+      "file_path": "account_payment_final\\models\\account_payment_register.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.140487",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_company.py",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.143963",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-account_payment_final",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\res_config_settings.py",
+      "file_path": "account_payment_final\\models\\res_config_settings.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.145317",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_partner.py",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.146313",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_compatibility_patch.js",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_compatibility_patch.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.154639",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_critical_interceptor.js",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_critical_interceptor.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.155075",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_enhanced_handler.js",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_enhanced_handler.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.155405",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_js_error_handler.js",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_js_error_handler.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.155697",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_nuclear_fix.js",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_nuclear_fix.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.155996",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\emergency_error_fix.js",
+      "file_path": "account_payment_final\\static\\src\\js\\emergency_error_fix.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.156939",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\immediate_emergency_fix.js",
+      "file_path": "account_payment_final\\static\\src\\js\\immediate_emergency_fix.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.157182",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.157741",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.158027",
+      "status": "detected"
+    },
+    {
+      "id": "JS-002-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "ERROR_HANDLING",
+      "description": "Missing try-catch blocks in account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.158039",
+      "status": "detected"
+    },
+    {
+      "id": "JS-001-account_payment_final",
+      "severity": "HIGH",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\frontend\\qr_verification.js",
+      "file_path": "account_payment_final\\static\\src\\js\\frontend\\qr_verification.js",
+      "line_number": 1,
+      "timestamp": "2025-08-17T13:53:31.159313",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (6) in account_payment_final\\static\\src\\scss\\main.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\main.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.161172",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (7) in account_payment_final\\static\\src\\scss\\responsive_report_styles.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\responsive_report_styles.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.162871",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-order_status_override",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in order_status_override\\models\\sale_order.py",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.186401",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-order_status_override",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in order_status_override\\models\\sale_order.py",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.186448",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-order_status_override",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (12) in order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "file_path": "order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.191281",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-oe_sale_dashboard_17",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (18) in oe_sale_dashboard_17\\static\\src\\css\\dashboard.css",
+      "file_path": "oe_sale_dashboard_17\\static\\src\\css\\dashboard.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.205660",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-commission_ax",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in commission_ax\\models\\purchase_order.py",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.209026",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-commission_ax",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in commission_ax\\models\\purchase_order.py",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.209037",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-commission_ax",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in commission_ax\\models\\sale_order.py",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.212812",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-commission_ax",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in commission_ax\\models\\sale_order.py",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.212843",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\crm_api_controller.py",
+      "file_path": "enhanced_rest_api\\controllers\\crm_api_controller.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.217771",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\main_controller.py",
+      "file_path": "enhanced_rest_api\\controllers\\main_controller.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.219180",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\payment_api_controller.py",
+      "file_path": "enhanced_rest_api\\controllers\\payment_api_controller.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.221119",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\sales_api_controller.py",
+      "file_path": "enhanced_rest_api\\controllers\\sales_api_controller.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.222703",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.223595",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.224879",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-crm_executive_dashboard",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in crm_executive_dashboard\\controllers\\main.py",
+      "file_path": "crm_executive_dashboard\\controllers\\main.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.232510",
+      "status": "detected"
+    },
+    {
+      "id": "PY-002-crm_executive_dashboard",
+      "severity": "HIGH",
+      "category": "MISSING_IMPORT",
+      "description": "ValidationError used but not imported in crm_executive_dashboard\\controllers\\strategic_controller.py",
+      "file_path": "crm_executive_dashboard\\controllers\\strategic_controller.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.234512",
+      "status": "detected"
+    }
+  ],
+  "warnings": [
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_journal.py",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.127116"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_move.py",
+      "file_path": "account_payment_final\\models\\account_move.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.128771"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_payment.py",
+      "file_path": "account_payment_final\\models\\account_payment.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.139379"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\res_company.py",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.143972"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\res_partner.py",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.146324"
+    },
+    {
+      "category": "JAVASCRIPT_LEGACY",
+      "description": "jQuery usage detected in account_payment_final\\static\\src\\js\\payment_workflow_realtime.js - consider modern alternatives",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.157755"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in account_payment_final\\static\\src\\css\\payment_verification.css",
+      "file_path": "account_payment_final\\static\\src\\css\\payment_verification.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.160341"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.163819"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.163824"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in order_status_override\\models\\sale_order.py",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.186476"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\commission_report.css",
+      "file_path": "order_status_override\\static\\src\\css\\commission_report.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.190625"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\enhanced_sales_order_form.css",
+      "file_path": "order_status_override\\static\\src\\css\\enhanced_sales_order_form.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.191047"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "file_path": "order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.191288"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in commission_ax\\models\\purchase_order.py",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.209044"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in commission_ax\\models\\sale_order.py",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.212865"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.223603"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.224886"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.247031"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.247038"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\strategic_dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\strategic_dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.247431"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.247564"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T13:53:31.247568"
+    }
+  ],
+  "fixes_applied": [
+    {
+      "error_id": "PY-002-account_payment_final",
+      "category": "MISSING_IMPORT",
+      "file_path": "account_payment_final\\controllers\\payment_verification.py",
+      "description": "ValidationError used but not imported in account_payment_final\\controllers\\payment_verification.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\account_journal.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-account_payment_final",
+      "category": "MISSING_IMPORT",
+      "file_path": "account_payment_final\\models\\account_move.py",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_move.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-account_payment_final",
+      "category": "MISSING_IMPORT",
+      "file_path": "account_payment_final\\models\\account_payment.py",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_payment.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-account_payment_final",
+      "category": "MISSING_IMPORT",
+      "file_path": "account_payment_final\\models\\account_payment_register.py",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\account_payment_register.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_company.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-account_payment_final",
+      "category": "MISSING_IMPORT",
+      "file_path": "account_payment_final\\models\\res_config_settings.py",
+      "description": "ValidationError used but not imported in account_payment_final\\models\\res_config_settings.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_partner.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_compatibility_patch.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_compatibility_patch.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_critical_interceptor.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_critical_interceptor.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_enhanced_handler.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_enhanced_handler.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_js_error_handler.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_js_error_handler.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\cloudpepper_nuclear_fix.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\cloudpepper_nuclear_fix.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\emergency_error_fix.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\emergency_error_fix.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\immediate_emergency_fix.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\immediate_emergency_fix.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "JS-001-account_payment_final",
+      "category": "JAVASCRIPT_COMPLIANCE",
+      "file_path": "account_payment_final\\static\\src\\js\\frontend\\qr_verification.js",
+      "description": "Missing @odoo-module declaration in account_payment_final\\static\\src\\js\\frontend\\qr_verification.js",
+      "fix_actions": [
+        "Add @odoo-module declaration at top of file",
+        "/** @odoo-module **/"
+      ],
+      "test_actions": [
+        "Verify JavaScript loads without errors",
+        "Test in browser console"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-order_status_override",
+      "category": "MISSING_IMPORT",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "description": "ValidationError used but not imported in order_status_override\\models\\sale_order.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-order_status_override",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "description": "Model missing _name attribute in order_status_override\\models\\sale_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-commission_ax",
+      "category": "MISSING_IMPORT",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "description": "ValidationError used but not imported in commission_ax\\models\\purchase_order.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-commission_ax",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "description": "Model missing _name attribute in commission_ax\\models\\purchase_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-commission_ax",
+      "category": "MISSING_IMPORT",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "description": "ValidationError used but not imported in commission_ax\\models\\sale_order.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-commission_ax",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "description": "Model missing _name attribute in commission_ax\\models\\sale_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-enhanced_rest_api",
+      "category": "MISSING_IMPORT",
+      "file_path": "enhanced_rest_api\\controllers\\crm_api_controller.py",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\crm_api_controller.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-enhanced_rest_api",
+      "category": "MISSING_IMPORT",
+      "file_path": "enhanced_rest_api\\controllers\\main_controller.py",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\main_controller.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-enhanced_rest_api",
+      "category": "MISSING_IMPORT",
+      "file_path": "enhanced_rest_api\\controllers\\payment_api_controller.py",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\payment_api_controller.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-enhanced_rest_api",
+      "category": "MISSING_IMPORT",
+      "file_path": "enhanced_rest_api\\controllers\\sales_api_controller.py",
+      "description": "ValidationError used but not imported in enhanced_rest_api\\controllers\\sales_api_controller.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-enhanced_rest_api",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-enhanced_rest_api",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-crm_executive_dashboard",
+      "category": "MISSING_IMPORT",
+      "file_path": "crm_executive_dashboard\\controllers\\main.py",
+      "description": "ValidationError used but not imported in crm_executive_dashboard\\controllers\\main.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-002-crm_executive_dashboard",
+      "category": "MISSING_IMPORT",
+      "file_path": "crm_executive_dashboard\\controllers\\strategic_controller.py",
+      "description": "ValidationError used but not imported in crm_executive_dashboard\\controllers\\strategic_controller.py",
+      "fix_actions": [
+        "Add missing import statement",
+        "from odoo.exceptions import ValidationError"
+      ],
+      "test_actions": [
+        "Verify Python syntax",
+        "Test module loading"
+      ],
+      "rollback_plan": []
+    }
+  ],
+  "validation_results": {
+    "cloudpepper": {
+      "exit_code": 1,
+      "output": "",
+      "errors": "Traceback (most recent call last):\n  File \"D:\\RUNNING APPS\\ready production\\latest\\odoo17_final\\cloudpepper_deployment_final_validation.py\", line 351, in <module>\n    success = main()\n  File \"D:\\RUNNING APPS\\ready production\\latest\\odoo17_final\\cloudpepper_deployment_final_validation.py\", line 293, in main\n    print(\"\\U0001f680 CLOUDPEPPER DEPLOYMENT FINAL VALIDATION\")\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\Python313\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f680' in position 0: character maps to <undefined>\n"
+    }
+  }
+}

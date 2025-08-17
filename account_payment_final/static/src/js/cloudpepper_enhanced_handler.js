@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * Enhanced Error Handler for CloudPepper JavaScript Issues
  * Specifically addresses MutationObserver and web.assets_web.min.js errors

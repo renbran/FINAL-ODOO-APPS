@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * CloudPepper JavaScript Error Handler
  * Fixes MutationObserver errors and provides robust DOM observation

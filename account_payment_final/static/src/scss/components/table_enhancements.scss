@@ -60,7 +60,8 @@
                 &.o_payment_status_cell {
                     text-align: center;
 
-                    .badge {
+/* Consider using BEM methodology: .o_module_name__badge */
+                    .o_module_badge {
                         padding: 0.375rem 0.75rem;
                         border-radius: 20px;
                         font-size: 0.75rem;

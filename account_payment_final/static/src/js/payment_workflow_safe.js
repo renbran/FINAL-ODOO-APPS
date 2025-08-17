@@ -1,3 +1,27 @@
+/** @odoo-module **/
+        // OSUS Properties Brand Colors
+        const brandColors = {
+            primary: '#800020',
+            gold: '#FFD700',
+            lightGold: '#FFF8DC',
+            darkGold: '#B8860B',
+            white: '#FFFFFF',
+            accent: '#A0522D',
+            
+            chartColors: [
+                '#800020',
+                '#FFD700',
+                '#A0522D',
+            ],
+            
+            chartBackgrounds: [
+                '#80002020',
+                '#FFD70020',
+                '#A0522D20',
+            ]
+        };
+        
+
 /**
  * Payment Workflow Helper - CloudPepper Compatible
  * NON-MODULE VERSION to prevent import statement errors

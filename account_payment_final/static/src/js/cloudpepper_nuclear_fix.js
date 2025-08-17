@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * CloudPepper Nuclear JavaScript Fix
  * Ultimate solution for all JavaScript errors in CloudPepper environment

@@ -146,7 +146,8 @@
     box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
 }
 
-.risk-metric {
+/* Consider using BEM methodology: .o_module_name__risk-metric */
+.o_module_risk-metric {
     text-align: center;
     padding: 15px;
     background: rgba(255, 255, 255, 0.8);
@@ -172,7 +173,8 @@
     color: #6c757d;
 }
 
-.risk-value {
+/* Consider using BEM methodology: .o_module_name__risk-value */
+.o_module_risk-value {
     font-size: 0.85rem;
     color: #dc3545;
     font-weight: 600;
@@ -209,7 +211,8 @@
 }
 
 /* Forecast Metrics */
-.forecast-metric {
+/* Consider using BEM methodology: .o_module_name__forecast-metric */
+.o_module_forecast-metric {
     padding: 10px;
     background: #f8f9fa;
     border-radius: 8px;
@@ -265,19 +268,22 @@
 }
 
 /* Progress bars */
-.progress {
+/* Consider using BEM methodology: .o_module_name__progress */
+.o_module_progress {
     background-color: #e9ecef;
     border-radius: 10px;
 }
 
-.progress-bar {
+/* Consider using BEM methodology: .o_module_name__progress-bar */
+.o_module_progress-bar {
     border-radius: 10px;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
 /* Badges */
-.badge {
+/* Consider using BEM methodology: .o_module_name__badge */
+.o_module_badge {
     font-size: 0.75rem;
     font-weight: 600;
     padding: 6px 10px;
@@ -297,7 +303,8 @@
 }
 
 /* Operational Metrics */
-.operational-metrics {
+/* Consider using BEM methodology: .o_module_name__operational-metrics */
+.o_module_operational-metrics {
     margin-top: 20px;
 }
 
@@ -309,7 +316,8 @@
     border-bottom: 2px solid #e9ecef;
 }
 
-.metric-item {
+/* Consider using BEM methodology: .o_module_name__metric-item */
+.o_module_metric-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -427,7 +435,8 @@
         font-size: 20px;
     }
     
-    .risk-metric {
+/* Consider using BEM methodology: .o_module_name__risk-metric */
+    .o_module_risk-metric {
         margin-bottom: 10px;
     }
     
@@ -435,7 +444,8 @@
         padding: 15px;
     }
     
-    .metric-item {
+/* Consider using BEM methodology: .o_module_name__metric-item */
+    .o_module_metric-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;

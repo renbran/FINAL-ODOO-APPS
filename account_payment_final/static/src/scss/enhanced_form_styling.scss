@@ -34,10 +34,12 @@
 
     // Enhanced notebooks/tabs
     .o_notebook {
-        .nav-tabs {
+/* Consider using BEM methodology: .o_module_name__nav-tabs */
+        .o_module_nav-tabs {
             border-bottom: 2px solid #e9ecef;
 
-            .nav-link {
+/* Consider using BEM methodology: .o_module_name__nav-link */
+            .o_module_nav-link {
                 border: none;
                 border-bottom: 2px solid transparent;
                 background: none;
@@ -58,13 +60,15 @@
             }
         }
 
-        .tab-content {
+/* Consider using BEM methodology: .o_module_name__tab-content */
+        .o_module_tab-content {
             padding: 1.5rem 0;
         }
     }
 
     // Enhanced buttons
-    .oe_button_box {
+/* Consider using BEM methodology: .o_module_name__oe_button_box */
+    .o_module_oe_button_box {
         .btn {
             border-radius: 8px;
             font-weight: 500;

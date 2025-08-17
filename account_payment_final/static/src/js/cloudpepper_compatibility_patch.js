@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * CloudPepper Compatibility Patch
  * Apply this patch to prevent RPC and OWL lifecycle errors

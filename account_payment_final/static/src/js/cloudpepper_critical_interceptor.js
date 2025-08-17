@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 /**
  * CloudPepper Critical Error Interceptor
  * MUST LOAD FIRST - Prevents web.assets_web_dark.min.js crashes

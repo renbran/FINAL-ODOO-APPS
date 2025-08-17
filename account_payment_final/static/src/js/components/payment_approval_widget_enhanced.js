@@ -1,4 +1,26 @@
 ﻿/** @odoo-module **/
+        // OSUS Properties Brand Colors
+        const brandColors = {
+            primary: '#800020',
+            gold: '#FFD700',
+            lightGold: '#FFF8DC',
+            darkGold: '#B8860B',
+            white: '#FFFFFF',
+            accent: '#A0522D',
+            
+            chartColors: [
+                '#800020',
+                '#FFD700',
+                '#A0522D',
+            ],
+            
+            chartBackgrounds: [
+                '#80002020',
+                '#FFD70020',
+                '#A0522D20',
+            ]
+        };
+        
 
 import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
@@ -81,7 +103,8 @@ export class PaymentApprovalWidget extends Component {
         this.state.hasError = false;
         
         try {
-            const result = await this.orm.call(;
+            const result = await this.orm.call(
+;
                 "account.payment",
                 "get_approval_workflow_data",
                 [this.props.record.resId],
@@ -129,7 +152,8 @@ export class PaymentApprovalWidget extends Component {
      * Enhanced fallback stages with better state detection
      */
     getFallbackStages() {
-        const currentState = this.props.record.data.approval_state || ;
+        const currentState = this.props.record.data.approval_state || 
+;
                            this.props.record.data.state || 'draft';
         const paymentType = this.props.record.data.payment_type || 'outbound';
         
@@ -159,7 +183,8 @@ export class PaymentApprovalWidget extends Component {
             status: this._getStageStatus(index, currentIndex),
             is_current: index === currentIndex,
             is_completed: index < currentIndex,
-            is_pending: index > currentIndex;
+            is_pending: index > currentIndex
+;
         }));
     }
 
@@ -180,18 +205,23 @@ export class PaymentApprovalWidget extends Component {
         const userGroups = this.user.context.user_groups || [];
         
         // Check if user has manager permissions
-        const isManager = userGroups.includes('account_payment_final.group_payment_voucher_manager') ||;
+        const isManager = userGroups.includes('account_payment_final.group_payment_voucher_manager') ||
+;
                          userGroups.includes('account.group_account_manager');
         
         // Basic permission logic
         switch (action) {
-            case 'submit':;
+            case 'submit':
+;
                 return currentState === 'draft';
-            case 'approve':;
+            case 'approve':
+;
                 return isManager && ['under_review', 'for_approval', 'for_authorization'].includes(currentState);
-            case 'reject':;
+            case 'reject':
+;
                 return isManager && ['under_review', 'for_approval', 'for_authorization'].includes(currentState);
-            default:;
+            default:
+;
                 return false;
         }
     }
@@ -227,22 +257,28 @@ export class PaymentApprovalWidget extends Component {
         const currentIndex = Array.from(buttons).findIndex(btn => btn === document.activeElement);
         
         switch (event.key) {
-            case 'ArrowLeft':;
-            case 'ArrowUp':;
+            case 'ArrowLeft':
+;
+            case 'ArrowUp':
+;
                 event.preventDefault();
                 const prevIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
                 buttons[prevIndex]?.focus();
                 break;
                 
-            case 'ArrowRight':;
-            case 'ArrowDown':;
+            case 'ArrowRight':
+;
+            case 'ArrowDown':
+;
                 event.preventDefault();
                 const nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
                 buttons[nextIndex]?.focus();
                 break;
                 
-            case 'Enter':;
-            case ' ':;
+            case 'Enter':
+;
+            case ' ':
+;
                 event.preventDefault();
                 document.activeElement?.click();
                 break;
@@ -272,7 +308,8 @@ export class PaymentApprovalWidget extends Component {
                 'review': 'action_review_payment', 
                 'approve': 'action_approve_payment',
                 'authorize': 'action_authorize_payment',
-                'post': 'action_post_payment';
+                'post': 'action_post_payment'
+;
             };
             
             const method = methodMap[actionType];
@@ -280,7 +317,8 @@ export class PaymentApprovalWidget extends Component {
                 throw new Error(_t("Unknown action type: %s", actionType));
             }
 
-            const result = await this.orm.call(;
+            const result = await this.orm.call(
+;
                 "account.payment",
                 method,
                 [this.props.record.resId],
@@ -355,15 +393,20 @@ export class PaymentApprovalWidget extends Component {
      */
     _validateActionPermission(actionType) {
         switch (actionType) {
-            case 'submit':;
+            case 'submit':
+;
                 return this.state.canSubmit;
-            case 'approve':;
+            case 'approve':
+;
                 return this.state.canApprove;
-            case 'authorize':;
+            case 'authorize':
+;
                 return this.state.canAuthorize;
-            case 'reject':;
+            case 'reject':
+;
                 return this.state.canReject;
-            default:;
+            default:
+;
                 return false;
         }
     }
@@ -389,7 +432,8 @@ export class PaymentApprovalWidget extends Component {
         const config = {
             name: stage.name || stage.id,
             icon: stage.icon || 'fa-circle',
-            color: stage.color || 'secondary';
+            color: stage.color || 'secondary'
+;
         };
         
         return config;
@@ -406,7 +450,8 @@ export class PaymentApprovalWidget extends Component {
                 type: 'submit',
                 label: _t('Submit for Review'),
                 class: 'btn-info o_btn_submit',
-                icon: 'fa-paper-plane';
+                icon: 'fa-paper-plane'
+;
             });
         }
         
@@ -415,7 +460,8 @@ export class PaymentApprovalWidget extends Component {
                 type: 'approve',
                 label: _t('Approve'),
                 class: 'btn-success o_btn_approve',
-                icon: 'fa-check';
+                icon: 'fa-check'
+;
             });
         }
         
@@ -424,7 +470,8 @@ export class PaymentApprovalWidget extends Component {
                 type: 'authorize',
                 label: _t('Authorize'),
                 class: 'btn-warning o_btn_authorize',
-                icon: 'fa-key';
+                icon: 'fa-key'
+;
             });
         }
         
@@ -433,7 +480,8 @@ export class PaymentApprovalWidget extends Component {
                 type: 'reject',
                 label: _t('Reject'),
                 class: 'btn-danger o_btn_reject',
-                icon: 'fa-times';
+                icon: 'fa-times'
+;
             });
         }
         

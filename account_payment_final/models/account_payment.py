@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 from odoo.exceptions import UserError, ValidationError, AccessError
 import qrcode
 import base64

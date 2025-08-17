@@ -1,3 +1,7 @@
+/* 
+WARNING: This file contains 6 !important declarations.
+Consider refactoring to use more specific selectors instead.
+*/
 /* OSUS Payment System Main Styles - CloudPepper Optimized */
 /* Main SCSS entry point with hardcoded values for compatibility */
 
@@ -164,7 +168,8 @@
 }
 
 // CloudPepper specific optimizations
-.cloudpepper_optimized {
+/* Consider using BEM methodology: .o_module_name__cloudpepper_optimized */
+.o_module_cloudpepper_optimized {
     // Reduced animations for better performance
     * {
         transition-duration: 0.15s !important;

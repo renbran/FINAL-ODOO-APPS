@@ -151,8 +151,10 @@
         }
 
         // Button enhancements
-        .oe_button_box {
-            .btn-primary {
+/* Consider using BEM methodology: .o_module_name__oe_button_box */
+        .o_module_oe_button_box {
+/* Consider using BEM methodology: .o_module_name__btn-primary */
+            .o_module_btn-primary {
                 background-color: #722f37;
                 border-color: #722f37;
 

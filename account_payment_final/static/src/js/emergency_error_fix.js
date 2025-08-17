@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 ﻿/**
  * Emergency CloudPepper Error Fix
  * Addresses critical console errors and rendering issues

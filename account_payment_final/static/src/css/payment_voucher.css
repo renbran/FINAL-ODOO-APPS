@@ -1,8 +1,8 @@
 /* OSUS Payment Voucher Custom Styles */
 
 :root {
-    --osus-primary: #800020;
-    --osus-secondary: #FFD700;
+    --osus-primary: var(--osus-primary);
+    --osus-secondary: var(--osus-gold);
     --osus-light: #f8f9fa;
     --osus-dark: #212529;
 }
@@ -177,7 +177,8 @@
 }
 
 /* Custom Alert Styling */
-.alert-osus {
+/* Consider using BEM methodology: .o_module_name__alert-osus */
+.o_module_alert-osus {
     background: linear-gradient(135deg, var(--osus-light) 0%, #ffffff 100%);
     border-left: 4px solid var(--osus-primary);
     border-radius: 8px;
@@ -189,24 +190,29 @@
 }
 
 /* Status Badge Styling */
-.badge-draft {
+/* Consider using BEM methodology: .o_module_name__badge-draft */
+.o_module_badge-draft {
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
 }
 
-.badge-submitted {
+/* Consider using BEM methodology: .o_module_name__badge-submitted */
+.o_module_badge-submitted {
     background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
     color: #212529;
 }
 
-.badge-approved {
+/* Consider using BEM methodology: .o_module_name__badge-approved */
+.o_module_badge-approved {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
 }
 
-.badge-posted {
+/* Consider using BEM methodology: .o_module_name__badge-posted */
+.o_module_badge-posted {
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
 }
 
 .badge-rejected,
-.badge-cancelled {
+/* Consider using BEM methodology: .o_module_name__badge-cancelled */
+.o_module_badge-cancelled {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
 }

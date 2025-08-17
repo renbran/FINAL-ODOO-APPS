@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 ﻿/**
  * QR Code Verification Portal Frontend JavaScript
  *
