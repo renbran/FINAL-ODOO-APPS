@@ -86,6 +86,10 @@
             ('prepend', 'account_payment_final/static/src/js/emergency_error_fix.js'),
             ('prepend', 'account_payment_final/static/src/js/cloudpepper_compatibility_patch.js'),
             
+            # NEW COMPREHENSIVE CLOUDPEPPER FIXES
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_owl_fix.js'),
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_payment_fix.js'),
+            
             # Real-time workflow enhancements (NEW)
             'account_payment_final/static/src/js/payment_workflow_realtime.js',
             

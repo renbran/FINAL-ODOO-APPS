@@ -41,6 +41,10 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # CloudPepper Error Fixes (load first)
+            ('prepend', 'order_status_override/static/src/js/cloudpepper_sales_fix.js'),
+            
+            # Styles
             'order_status_override/static/src/css/commission_report.css',
             'order_status_override/static/src/css/enhanced_sales_order_form.css',
             'order_status_override/static/src/css/responsive_mobile_fix.css',

@@ -87,6 +87,9 @@ All enhancements are contained within the dashboard interface only.
     'assets': {
         'web.assets_backend': [
             ('include', 'web._assets_helpers'),
+            # CloudPepper Error Fixes (load first)
+            ('prepend', 'oe_sale_dashboard_17/static/src/js/cloudpepper_dashboard_fix.js'),
+            
             'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/xml/sales_dashboard_main.xml',
