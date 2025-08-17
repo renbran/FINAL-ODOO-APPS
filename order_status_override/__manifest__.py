@@ -1,6 +1,6 @@
 {
     'name': 'Custom Sales Order Status Workflow',
-    'version': '17.0',
+    'version': '17.0.1.0.0',
     'summary': 'Custom status bar workflow for Sales Orders',
     'description': '''
         This module adds a custom status bar workflow to Sales Orders with the following stages:
