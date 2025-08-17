@@ -45,6 +45,12 @@ class SaleOrder(models.Model):
         tracking=True,
         help="User responsible for commission calculation"
     )
+    allocation_user_id = fields.Many2one(
+        'res.users',
+        string='Allocation User',
+        tracking=True,
+        help="User responsible for allocation stage"
+    )
     final_review_user_id = fields.Many2one(
         'res.users',
         string='Final Review User',
@@ -162,13 +168,13 @@ class SaleOrder(models.Model):
             elif current_status in ['approved', 'sale']:
                 record.show_post_button = True
     
-    @api.depends('document_review_user_id', 'commission_calculation_user_id', 'allocation_user_id', 'final_review_user_id')
+    @api.depends('documentation_user_id', 'commission_user_id', 'allocation_user_id', 'final_review_user_id')
     def _compute_auto_assigned_users(self):
         """Compute if users have been automatically assigned"""
         for record in self:
             record.auto_assigned_users = bool(
-                record.document_review_user_id or 
-                record.commission_calculation_user_id or 
+                record.documentation_user_id or 
+                record.commission_user_id or 
                 record.allocation_user_id or 
                 record.final_review_user_id
             )
