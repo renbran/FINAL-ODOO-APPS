@@ -289,18 +289,123 @@ class SaleDashboardSimple(models.TransientModel):
             }
 
     @api.model
-    def get_sale_type_options(self):
-        """Get available sale type options from le_sale_type module"""
+    def get_predefined_date_ranges(self):
+        """Get predefined date ranges for quick filtering"""
+        today = datetime.now().date()
+        
+        # Last 30 days
+        last_30_start = today - timedelta(days=30)
+        last_30_end = today
+        
+        # Last 90 days
+        last_90_start = today - timedelta(days=90)
+        last_90_end = today
+        
+        # Last year (current year)
+        last_year_start = today.replace(month=1, day=1)
+        last_year_end = today
+        
+        # Current quarter
+        current_quarter = (today.month - 1) // 3 + 1
+        quarter_start_month = (current_quarter - 1) * 3 + 1
+        current_quarter_start = today.replace(month=quarter_start_month, day=1)
+        current_quarter_end = today
+        
+        # Previous quarter
+        if current_quarter == 1:
+            prev_quarter_start = today.replace(year=today.year-1, month=10, day=1)
+            prev_quarter_end = today.replace(year=today.year-1, month=12, day=31)
+        else:
+            prev_quarter_month = (current_quarter - 2) * 3 + 1
+            prev_quarter_start = today.replace(month=prev_quarter_month, day=1)
+            if current_quarter == 2:
+                prev_quarter_end = today.replace(month=3, day=31)
+            elif current_quarter == 3:
+                prev_quarter_end = today.replace(month=6, day=30)
+            else:
+                prev_quarter_end = today.replace(month=9, day=30)
+        
+        return {
+            'last_30_days': {
+                'name': 'Last 30 Days',
+                'start_date': last_30_start.strftime('%Y-%m-%d'),
+                'end_date': last_30_end.strftime('%Y-%m-%d')
+            },
+            'last_90_days': {
+                'name': 'Last 90 Days', 
+                'start_date': last_90_start.strftime('%Y-%m-%d'),
+                'end_date': last_90_end.strftime('%Y-%m-%d')
+            },
+            'last_year': {
+                'name': 'This Year',
+                'start_date': last_year_start.strftime('%Y-%m-%d'),
+                'end_date': last_year_end.strftime('%Y-%m-%d')
+            },
+            'current_quarter': {
+                'name': f'Q{current_quarter} {today.year}',
+                'start_date': current_quarter_start.strftime('%Y-%m-%d'),
+                'end_date': current_quarter_end.strftime('%Y-%m-%d')
+            },
+            'previous_quarter': {
+                'name': f'Q{current_quarter-1 if current_quarter > 1 else 4} {today.year if current_quarter > 1 else today.year-1}',
+                'start_date': prev_quarter_start.strftime('%Y-%m-%d'),
+                'end_date': prev_quarter_end.strftime('%Y-%m-%d')
+            }
+        }
+
+    @api.model
+    def get_comprehensive_dashboard_data(self, start_date, end_date, sale_type_ids=None):
+        """Get comprehensive dashboard data with all charts and metrics"""
         try:
-            if hasattr(self.env['sale.order'], 'sale_order_type_id'):
-                sale_type_model = self.env.get('sale.order.type')
-                if sale_type_model:
-                    types = sale_type_model.search([])
-                    return [{'id': t.id, 'name': t.name} for t in types]
-            return []
+            _logger.info(f"Getting comprehensive dashboard data from {start_date} to {end_date}")
+            
+            # Get all individual data components
+            performance_data = self.get_sales_performance_data(start_date, end_date, sale_type_ids)
+            monthly_data = self.get_monthly_fluctuation_data(start_date, end_date, sale_type_ids)
+            state_data = self.get_sales_by_state_data(start_date, end_date, sale_type_ids)
+            customers_data = self.get_top_customers_data(start_date, end_date, sale_type_ids)
+            team_data = self.get_sales_team_performance(start_date, end_date, sale_type_ids)
+            agent_data = self.get_agent_ranking_data(start_date, end_date, sale_type_ids)
+            broker_data = self.get_broker_ranking_data(start_date, end_date, sale_type_ids)
+            recent_orders = self.get_recent_orders_data(start_date, end_date, sale_type_ids)
+            sale_type_options = self.get_sale_type_options()
+            predefined_ranges = self.get_predefined_date_ranges()
+            
+            result = {
+                'performance': performance_data,
+                'monthly_trend': monthly_data,
+                'sales_by_state': state_data,
+                'top_customers': customers_data,
+                'team_performance': team_data,
+                'agent_ranking': agent_data,
+                'broker_ranking': broker_data,
+                'recent_orders': recent_orders,
+                'sale_type_options': sale_type_options,
+                'predefined_ranges': predefined_ranges,
+                'date_range': {
+                    'start_date': start_date,
+                    'end_date': end_date
+                }
+            }
+            
+            _logger.info(f"Comprehensive dashboard data compiled successfully")
+            return result
+            
         except Exception as e:
-            _logger.error(f"Error getting sale type options: {e}")
-            return []
+            _logger.error(f"Error getting comprehensive dashboard data: {e}")
+            return {
+                'performance': {},
+                'monthly_trend': [],
+                'sales_by_state': {},
+                'top_customers': {},
+                'team_performance': {},
+                'agent_ranking': {},
+                'broker_ranking': {},
+                'recent_orders': [],
+                'sale_type_options': [],
+                'predefined_ranges': {},
+                'date_range': {'start_date': start_date, 'end_date': end_date}
+            }
 
     @api.model
     def get_agent_ranking_data(self, start_date, end_date, sale_type_ids=None, limit=10):

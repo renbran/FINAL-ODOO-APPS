@@ -3,7 +3,7 @@
     'name': 'Sales Dashboard - Odoo 17',
     'version': '17.0.1.6.2',
     'category': 'Sales',
-    'summary': 'Enhanced Sales Dashboard - Agent & Broker Rankings with Booking Date Support (#800020 Maroon Theme)',
+    'summary': 'Enhanced Sales Dashboard - Responsive Charts, Predefined Date Filters & Booking Date Support (#800020 Maroon Theme)',
     'description': """
 Enhanced Sales Dashboard for Odoo 17 - COMPLETELY ISOLATED EDITION  
 ==================================================================
@@ -92,8 +92,11 @@ All enhancements are contained within the dashboard interface only.
             
             'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
+            'oe_sale_dashboard_17/static/src/css/enhanced_dashboard.css',
             'oe_sale_dashboard_17/static/src/xml/sales_dashboard_main.xml',
+            'oe_sale_dashboard_17/static/src/xml/enhanced_sales_dashboard.xml',
             'oe_sale_dashboard_17/static/src/js/sales_dashboard.js',
+            'oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard.js',
         ],
     },
     'demo': [],
