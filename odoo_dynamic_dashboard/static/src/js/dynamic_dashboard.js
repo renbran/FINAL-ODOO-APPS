@@ -4,7 +4,7 @@ import { loadJS } from '@web/core/assets';
 import { DynamicDashboardTile} from './dynamic_dashboard_tile';
 import { DynamicDashboardChart} from './dynamic_dashboard_chart';
 import { useService } from "@web/core/utils/hooks";
-const { Component, useRef, mount, onWillStart, onMounted} = owl;
+import { Component, useRef, mount, onWillStart, onMounted } from "@odoo/owl";
 
 export class OdooDynamicDashboard extends Component {
     // Setup function to run when the template of the class OdooDynamicDashboard renders

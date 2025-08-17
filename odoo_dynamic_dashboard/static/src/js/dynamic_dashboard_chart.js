@@ -3,7 +3,7 @@ import { loadJS } from '@web/core/assets';
 import { getColor } from "@web/core/colors/colors";
 import { _t } from "@web/core/l10n/translation";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-const { Component, xml, onWillStart, useRef, onMounted } = owl
+import { Component, xml, onWillStart, useRef, onMounted } from "@odoo/owl";
 
 export class DynamicDashboardChart extends Component {
     // Setup function of the class DynamicDashboardChart

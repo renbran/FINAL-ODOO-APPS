@@ -2,7 +2,7 @@
 import { registry } from "@web/core/registry"
 import { loadJS } from '@web/core/assets';
 import { useService } from "@web/core/utils/hooks"
-const { Component, useRef, onMounted, useState , onWillStart } = owl
+import { Component, useRef, onMounted, useState, onWillStart } from "@odoo/owl";
 
 export class AccountDashboard extends Component {
     setup(){

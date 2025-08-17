@@ -6,7 +6,7 @@ import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
-export class QRCodeWidget extends Component {
+export class QRCodeWidgetEnhanced extends Component {
     static template = "account_payment_approval.QRCodeWidget";
     static props = { ...standardFieldProps };
 
@@ -58,5 +58,5 @@ export class QRCodeWidget extends Component {
     }
 }
 
-registry.category("fields").add("qr_code_widget", QRCodeWidget);
+registry.category("fields").add("qr_code_widget_enhanced", QRCodeWidgetEnhanced);
 

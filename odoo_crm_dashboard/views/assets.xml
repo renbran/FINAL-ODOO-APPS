@@ -2,8 +2,8 @@
 <odoo>
     <!-- Modern Odoo 17 Asset Bundle for odoo_crm_dashboard -->
     <template id="assets_backend" inherit_id="web.assets_backend">
-        <!-- JavaScript Files -->
-        <script type="text/javascript" src="/odoo_crm_dashboard/static/src/js/*.js"/>
+        <!-- JavaScript Files - Specific files to avoid conflicts -->
+        <script type="text/javascript" src="/odoo_crm_dashboard/static/src/js/crm_dashboard_legacy_fixed.js"/>
         
         <!-- CSS Files -->
         <link rel="stylesheet" type="text/scss" src="/odoo_crm_dashboard/static/src/scss/*.scss"/>

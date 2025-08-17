@@ -1,7 +1,7 @@
 /** @odoo-module **/
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
-const { Component, xml } = owl;
+import { Component, xml } from "@odoo/owl";
 
 export class DynamicDashboardTile extends Component {
     // Setup function of the class DynamicDashboardTile

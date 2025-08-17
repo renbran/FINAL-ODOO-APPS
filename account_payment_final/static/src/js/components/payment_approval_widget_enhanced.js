@@ -34,7 +34,7 @@ import { _t } from "@web/core/l10n/translation";
  * Enhanced with modern patterns, error handling, and accessibility
  * Compatible with Odoo 17 OWL framework and CloudPepper deployment
  */
-export class PaymentApprovalWidget extends Component {
+export class PaymentApprovalWidgetEnhanced extends Component {
     static template = "account_payment_final.PaymentApprovalWidget";
     static props = {
         readonly: { type: Boolean, optional: true },
@@ -490,5 +490,5 @@ export class PaymentApprovalWidget extends Component {
 }
 
 // Register the enhanced component
-registry.category("fields").add("payment_approval_widget", PaymentApprovalWidget);
+registry.category("fields").add("payment_approval_widget_enhanced", PaymentApprovalWidgetEnhanced);
 
