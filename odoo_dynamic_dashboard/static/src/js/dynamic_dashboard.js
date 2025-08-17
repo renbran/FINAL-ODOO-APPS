@@ -27,12 +27,16 @@ export class OdooDynamicDashboard extends Component {
 
     onChangeTheme(){
         /* Function for changing color of the theme of the dashboard */
-        $(".container").attr('style', this.ThemeSelector.el.value + 'min-height:-webkit-fill-available;')
+        const container = document.querySelector(".container");
+        if (container) {
+            container.setAttribute('style', this.ThemeSelector.el.value + 'min-height:-webkit-fill-available;');
+        }
     }
 
     ResizeDrag() {
     /* Function for resizing and dragging the div resize-drag */
-        $('.items .resize-drag').each(function(index, element) {
+        const resizeDragElements = document.querySelectorAll('.items .resize-drag');
+        resizeDragElements.forEach((element, index) => {
             interact(element).resizable({
                 edges: { left: true, right: true, bottom: true, top: true },
                 listeners: {
@@ -89,7 +93,8 @@ export class OdooDynamicDashboard extends Component {
     async renderDashboard(){
     /* Function for rendering the dashboard */
         var self = this;
-        $("#save_layout").hide();
+        const saveLayoutBtn = document.getElementById("save_layout");
+        if (saveLayoutBtn) saveLayoutBtn.style.display = "none";
         await this.orm.call('dashboard.theme', 'get_records', [[]]).then(function (response) {
             response.forEach((ev) => {
                 const options = document.createElement("option");
@@ -100,13 +105,16 @@ export class OdooDynamicDashboard extends Component {
         })
         await this.orm.call("dashboard.block", "get_dashboard_vals", [[], this.actionId]).then( function (response){
             for (let i = 0; i < response.length; i++) {
+                const itemsContainer = document.querySelector('.items');
+                if (!itemsContainer) continue;
+                
                 if (response[i].type === 'tile'){
-                    mount(DynamicDashboardTile, $('.items')[0], { props: {
+                    mount(DynamicDashboardTile, itemsContainer, { props: {
                         widget: response[i], doAction: self.action, dialog:self.dialog, orm: self.orm
                     }});
                 }
                 else{
-                    mount(DynamicDashboardChart, $('.items')[0], { props: {
+                    mount(DynamicDashboardChart, itemsContainer, { props: {
                         widget: response[i], doAction: self.action, rpc: self.rpc, dialog:self.dialog, orm: self.orm
                     }});
                 }
@@ -116,14 +124,19 @@ export class OdooDynamicDashboard extends Component {
 
     editLayout(ev) {
     /* Function for editing the layout , it enables resizing and dragging functionality */
-        $('.items .resize-drag').each(function(index, element) {
-            interact(element).draggable(true)
-            interact(element).resizable(true)
+        const resizeDragElements = document.querySelectorAll('.items .resize-drag');
+        resizeDragElements.forEach((element, index) => {
+            interact(element).draggable(true);
+            interact(element).resizable(true);
         });
         ev.stopPropagation();
         ev.preventDefault();
-        $("#edit_layout").hide();
-        $("#save_layout").show();
+        
+        const editLayoutBtn = document.getElementById("edit_layout");
+        const saveLayoutBtn = document.getElementById("save_layout");
+        if (editLayoutBtn) editLayoutBtn.style.display = "none";
+        if (saveLayoutBtn) saveLayoutBtn.style.display = "block";
+        
         this.ResizeDrag()
     }
 
@@ -132,8 +145,11 @@ export class OdooDynamicDashboard extends Component {
         var self = this;
         ev.stopPropagation();
         ev.preventDefault();
-        $("#edit_layout").show();
-        $("#save_layout").hide();
+        
+        const editLayoutBtn = document.getElementById("edit_layout");
+        const saveLayoutBtn = document.getElementById("save_layout");
+        if (editLayoutBtn) editLayoutBtn.style.display = "block";
+        if (saveLayoutBtn) saveLayoutBtn.style.display = "none";
         var data_list = []
         $('.items .resize-drag').each(function(index, element) {
             interact(element).draggable(false)

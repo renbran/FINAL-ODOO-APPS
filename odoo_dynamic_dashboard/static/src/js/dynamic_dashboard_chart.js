@@ -22,9 +22,18 @@ export class DynamicDashboardChart extends Component {
     exportItem(ev){
         ev.stopPropagation();
         ev.preventDefault();
-        var type = $(ev.currentTarget).attr('data-type');
-        var canvas = $($($(ev.currentTarget)[0].offsetParent)[0].children[0].lastChild).find("#canvas")[0]
-        var dataTitle = $(canvas).attr('data-title')
+        const type = ev.currentTarget.getAttribute('data-type');
+        
+        // Modern DOM navigation to find canvas
+        const parentContainer = ev.currentTarget.offsetParent;
+        const canvas = parentContainer.querySelector("#canvas");
+        
+        if (!canvas) {
+            console.error('Canvas not found for export');
+            return;
+        }
+        
+        const dataTitle = canvas.getAttribute('data-title') || 'chart';
         var bgCanvas = document.createElement("canvas");
         bgCanvas.width = canvas.width;
         bgCanvas.height = canvas.height;
@@ -48,9 +57,11 @@ export class DynamicDashboardChart extends Component {
         }
         if (type === 'xlsx'){
             var rows = [];
-            var items = $('.resize-drag');
+            const items = document.querySelectorAll('.resize-drag');
+            const currentTargetId = ev.currentTarget.getAttribute('data-id');
+            
             for (let i = 0; i < items.length; i++) {
-                if ($(items[i]).attr('data-id') === $(ev.currentTarget).attr('data-id')) {
+                if (items[i].getAttribute('data-id') === currentTargetId) {
                     rows.push(this.props.widget.x_axis);
                     rows.push(this.props.widget.y_axis);
                 }
@@ -84,9 +95,11 @@ export class DynamicDashboardChart extends Component {
         }
         if (type === 'csv') {
             var rows = [];
-            var items = $('.resize-drag')
+            const items = document.querySelectorAll('.resize-drag');
+            const currentTargetId = ev.currentTarget.getAttribute('data-id');
+            
             for (let i = 0; i < items.length; i++) {
-                if ($(items[i]).attr('data-id') === $(ev.currentTarget).attr('data-id')) {
+                if (items[i].getAttribute('data-id') === currentTargetId) {
                     rows.push(this.props.widget.x_axis);
                     rows.push(this.props.widget.y_axis);
                 }
