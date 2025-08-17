@@ -70,8 +70,7 @@ order_status_override/
 │   ├── commission_integration_views.xml  # Commission management UI
 │   ├── dashboard_views.xml              # Analytics dashboard
 │   ├── report_wizard_views.xml          # Report generation wizard
-│   ├── email_template_views.xml         # Email notifications
-│   └── assets.xml                       # CSS/JS assets
+│   └── email_template_views.xml         # Email notifications
 ├── security/                            # Access control
 │   ├── ir.model.access.csv             # Model access rights
 │   └── security.xml                     # Security groups
