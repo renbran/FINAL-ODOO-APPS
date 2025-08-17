@@ -222,10 +222,8 @@ def main():
     print(f"Date: August 17, 2025")
     print()
     
-    # Change to module directory
-    if os.path.exists("order_status_override"):
-        os.chdir("order_status_override")
-        print(f"📁 Working directory: {os.getcwd()}")
+    # Check current directory
+    print(f"📁 Working directory: {os.getcwd()}")
     
     results = []
     
