@@ -902,15 +902,3 @@ class SaleOrder(models.Model):
         )
         
         return result
-        elif status.responsible_type == 'commission':
-            user_id = self.commission_user_id.id
-        elif status.responsible_type == 'final_review':
-            user_id = self.final_review_user_id.id
-        
-        if user_id:
-            self.activity_schedule(
-                'mail.mail_activity_data_todo',
-                summary=summary,
-                note=note,
-                user_id=user_id
-            )
