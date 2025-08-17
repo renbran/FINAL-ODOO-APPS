@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 // QR Verification Frontend Script - Placeholder
 document.addEventListener('DOMContentLoaded', function() {
     console.log('QR Verification frontend loaded');

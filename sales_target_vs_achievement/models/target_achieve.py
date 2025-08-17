@@ -104,6 +104,15 @@ class TargetAchieve(models.Model):
                           f"{record.manager_id.name if record.manager_id else ''}" \
                           f" : {record.team_id.name if record.team_id else ''}"
 
+    def action_confirm(self):
+        """Confirm the target setting and activate it."""
+        for record in self:
+            # Add any confirmation logic here
+            # For now, we'll just ensure it's properly set up
+            if record.user_target <= 0:
+                raise models.ValidationError(_("Target amount must be greater than zero."))
+        return True
+
     @api.ondelete(at_uninstall=False)
     def delete_record(self):
         """When a record is deleted, reset the team target."""

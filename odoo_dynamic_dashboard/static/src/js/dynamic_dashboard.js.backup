@@ -41,9 +41,9 @@ export class OdooDynamicDashboard extends Component {
                 edges: { left: true, right: true, bottom: true, top: true },
                 listeners: {
                     move (event) {
-                        const target = event.target;
-                        const x = (parseFloat(target.getAttribute('data-x')) || 0);
-                        const y = (parseFloat(target.getAttribute('data-y')) || 0);
+                        var target = event.target
+                        var x = (parseFloat(target.getAttribute('data-x')) || 0)
+                        var y = (parseFloat(target.getAttribute('data-y')) || 0)
                         // update the element's style
                         target.style.width = event.rect.width + 'px'
                         target.style.height = event.rect.height + 'px'
@@ -74,11 +74,11 @@ export class OdooDynamicDashboard extends Component {
                 ]
             })
 
-            const dragMoveListener = (event) => {
-                const target = event.target;
+            function dragMoveListener (event) {
+                var target = event.target
                 // keep the dragged position in the data-x/data-y attributes
-                const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                 // translate the element
                 target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
                 // update the posiion attributes
@@ -91,38 +91,35 @@ export class OdooDynamicDashboard extends Component {
     }
 
     async renderDashboard(){
-        /* Function for rendering the dashboard */
+    /* Function for rendering the dashboard */
+        var self = this;
         const saveLayoutBtn = document.getElementById("save_layout");
         if (saveLayoutBtn) saveLayoutBtn.style.display = "none";
-        
-        try {
-            const themeResponse = await this.orm.call('dashboard.theme', 'get_records', [[]]);
-            themeResponse.forEach((ev) => {
+        await this.orm.call('dashboard.theme', 'get_records', [[]]).then(function (response) {
+            response.forEach((ev) => {
                 const options = document.createElement("option");
                 options.value = ev.style;
                 options.text = ev.name;
-                this.ThemeSelector.el.append(options);
+                self.ThemeSelector.el.append(options)
             });
-            
-            const dashboardResponse = await this.orm.call("dashboard.block", "get_dashboard_vals", [[], this.actionId]);
-            for (let i = 0; i < dashboardResponse.length; i++) {
+        })
+        await this.orm.call("dashboard.block", "get_dashboard_vals", [[], this.actionId]).then( function (response){
+            for (let i = 0; i < response.length; i++) {
                 const itemsContainer = document.querySelector('.items');
                 if (!itemsContainer) continue;
                 
-                if (dashboardResponse[i].type === 'tile'){
+                if (response[i].type === 'tile'){
                     mount(DynamicDashboardTile, itemsContainer, { props: {
-                        widget: dashboardResponse[i], doAction: this.action, dialog: this.dialog, orm: this.orm
+                        widget: response[i], doAction: self.action, dialog:self.dialog, orm: self.orm
                     }});
                 }
                 else{
                     mount(DynamicDashboardChart, itemsContainer, { props: {
-                        widget: dashboardResponse[i], doAction: this.action, rpc: this.rpc, dialog: this.dialog, orm: this.orm
+                        widget: response[i], doAction: self.action, rpc: self.rpc, dialog:self.dialog, orm: self.orm
                     }});
                 }
             }
-        } catch (error) {
-            console.error("Error rendering dashboard:", error);
-        }
+        })
     }
 
     editLayout(ev) {
@@ -143,8 +140,9 @@ export class OdooDynamicDashboard extends Component {
         this.ResizeDrag()
     }
 
-    async saveLayout(ev){
-        /* Function for saving the layout */
+    saveLayout(ev){
+    /* Function for saving the layout */
+        var self = this;
         ev.stopPropagation();
         ev.preventDefault();
         
@@ -152,27 +150,21 @@ export class OdooDynamicDashboard extends Component {
         const saveLayoutBtn = document.getElementById("save_layout");
         if (editLayoutBtn) editLayoutBtn.style.display = "block";
         if (saveLayoutBtn) saveLayoutBtn.style.display = "none";
-        
-        const data_list = [];
-        const resizeDragElements = document.querySelectorAll('.items .resize-drag');
-        resizeDragElements.forEach((element, index) => {
-            interact(element).draggable(false);
-            interact(element).resizable(false);
+        var data_list = []
+        $('.items .resize-drag').each(function(index, element) {
+            interact(element).draggable(false)
+            interact(element).resizable(false)
             data_list.push({
-                'id': element.dataset['id'],
+                'id' : element.dataset['id'],
                 'data-x': element.dataset['x'],
                 'data-y': element.dataset['y'],
                 'height': element.clientHeight,
                 'width': element.clientWidth,
-            });
+            })
         });
-        
-        try {
-            const response = await this.orm.call('dashboard.block','get_save_layout', [[], data_list]);
+        self.orm.call('dashboard.block','get_save_layout', [[], data_list]).then( function (response){
             window.location.reload();
-        } catch (error) {
-            console.error("Error saving layout:", error);
-        }
+        });
     }
 
     changeViewMode(ev){
@@ -227,17 +219,16 @@ export class OdooDynamicDashboard extends Component {
         $(".dropdown-addblock").toggle()
     }
     onClickAddItem(event){
-        /* Function for adding tiles and charts */
+    /* Function for adding tiles and charts */
         event.stopPropagation();
         event.preventDefault();
-        
-        const type = event.target.getAttribute('data-type');
-        let chart_type;
+        self = this;
+        var type = event.target.getAttribute('data-type');
         if (type == 'graph'){
-            chart_type = event.target.getAttribute('data-chart_type');
+            var chart_type = event.target.getAttribute('data-chart_type');
         }
         if (type == 'tile'){
-            const randomColor = '#' + ('000000' + Math.floor(Math.random() * 16777216).toString(16)).slice(-6);
+            var randomColor = '#' + ('000000' + Math.floor(Math.random() * 16777216).toString(16)).slice(-6);
             this.action.doAction({
                 type: 'ir.actions.act_window',
                 res_model: 'dashboard.block',
@@ -277,59 +268,49 @@ export class OdooDynamicDashboard extends Component {
         }
     }
 
-    async dateFilter(){
-        /* Function for filtering the data based on the creation date */
-        const itemsContainer = document.querySelector(".items");
-        if (itemsContainer) itemsContainer.innerHTML = "";
-        
-        let start_date = document.querySelector("#start-date")?.value;
-        let end_date = document.querySelector("#end-date")?.value;
-        
+    dateFilter(){
+    /* Function for filtering the data based on the creation date */
+        $(".items").empty();
+        var start_date = $("#start-date").val();
+        var end_date = $("#end-date").val();
+        var self = this;
         if (!start_date){
-            start_date = "null";
+            start_date = "null"
         }
         if (!end_date){
-            end_date = "null";
+            end_date = "null"
         }
-        
-        try {
-            const response = await this.orm.call("dashboard.block", "get_dashboard_vals", [[], this.actionId, start_date, end_date]);
+        this.orm.call("dashboard.block", "get_dashboard_vals", [[], this.actionId, start_date, end_date]).then( function (response){
             for (let i = 0; i < response.length; i++) {
                 if (response[i].type === 'tile'){
-                    mount(DynamicDashboardTile, itemsContainer, { props: {
-                        widget: response[i], doAction: this.action, dialog: this.dialog, orm: this.orm
+                    mount(DynamicDashboardTile, $('.items')[0], { props: {
+                        widget: response[i], doAction: self.action, dialog:self.dialog, orm: self.orm
                     }});
                 }
                 else{
-                    mount(DynamicDashboardChart, itemsContainer, { props: {
-                        widget: response[i], doAction: this.action, rpc: this.rpc, dialog: this.dialog, orm: this.orm
+                    mount(DynamicDashboardChart, $('.items')[0], { props: {
+                        widget: response[i], doAction: self.action, rpc: self.rpc, dialog:self.dialog, orm: self.orm
                     }});
                 }
             }
-        } catch (error) {
-            console.error("Error filtering dashboard data:", error);
-        }
+        })
     }
 
     async clickSearch(){
-        /* Function for searching the blocks with their names */
-        const input = document.querySelector("#search-input-chart")?.value;
-        
-        try {
-            const response = await this.rpc('/custom_dashboard/search_input_chart', {'search_input': input});
-            const blocks = document.querySelectorAll(".items .resize-drag");
-            blocks.forEach((element) => {
-                const dataId = element.dataset.id;
-                if (response.includes(parseInt(dataId))){
-                    element.style.visibility = "visible";
+    /* Function for searching the blocks with their names */
+        var input = $("#search-input-chart").val();
+        await this.rpc('/custom_dashboard/search_input_chart', {'search_input': input}).then(function (response) {
+            var blocks = $(".items .resize-drag");
+            blocks.each(function(index, element){
+                var dataId = $(element).data('id');
+                if (response.includes(dataId)){
+                    $(element).css("visibility", "visible");
                 }
                 else{
-                    element.style.visibility = "hidden";
+                    $(element).css("visibility", "hidden");
                 }
-            });
-        } catch (error) {
-            console.error("Error searching blocks:", error);
-        }
+            })
+        })
     }
 
     showViewMode(ev){
@@ -349,44 +330,35 @@ export class OdooDynamicDashboard extends Component {
         $(".mode").fadeOut(2000);
     }
     clearSearch(){
-        /* Function for clearing the search input */
-        const searchInput = document.querySelector("#search-input-chart");
-        if (searchInput) searchInput.value = '';
-        
-        const blocks = document.querySelectorAll(".items .resize-drag");
-        blocks.forEach((element) => {
-            element.style.visibility = "visible";
-        });
+    /* Function for clearing the search input */
+        $("#search-input-chart").val('');
+        var blocks = $(".items .resize-drag");
+        blocks.each(function(index, element){
+            $(element).css("visibility", "visible");
+        })
     }
 
     async printPdf() {
-        /* Function for printing whole dashboard in pdf format */
-        const elements = document.querySelectorAll('.items .resize-drag');
-        const newElement = document.createElement('div');
+    /* Function for printing whole dashboard in pdf format */
+        var elements = $('.items .resize-drag')
+        var newElement = document.createElement('div');
         newElement.className = 'pdf';
-        
-        elements.forEach((elem) => {
-            newElement.appendChild(elem.cloneNode(true));
+        elements.each(function(index, elem){
+            newElement.appendChild(elem);
         });
-        
-        for (let x = 0; x < newElement.children.length; x++){
-            newElement.children[x].style.transform = "";
+        for (var x=0; x< $(newElement)[0].children.length; x++){
+            $($(newElement)[0].children[x])[0].style.transform = ""
         }
-        
-        const opt = {
+        var opt = {
             margin:       0.3,
             filename:     'Dashboard.pdf',
             image:        { type: 'jpeg', quality: 1 },
             html2canvas:  { scale: 1 },
             jsPDF:        { unit: 'mm', format: 'a3', orientation: 'portrait' }
         };
-        
-        try {
-            await html2pdf().set(opt).from(newElement).save();
-            window.location.reload();
-        } catch (error) {
-            console.error("Error generating PDF:", error);
-        }
+        html2pdf().set(opt).from(newElement).save().then(()=>{
+            window.location.reload()
+        })
     }
 
     async createPDF(){

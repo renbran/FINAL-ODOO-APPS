@@ -8,9 +8,20 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     
     # Add custom status fields if they don't exist
+    order_status = fields.Selection([
+        ('draft', 'Draft'),
+        ('documentation', 'Documentation'),
+        ('commission', 'Commission'),
+        ('final_review', 'Final Review'),
+        ('approved', 'Approved'),
+        ('implementation', 'Implementation'),
+        ('completed', 'Completed'),
+    ], string='Order Status', default='draft', tracking=True,
+       help="Current status of the order in the workflow")
+    
     order_status_id = fields.Many2one(
         'order.status', 
-        string='Order Status',
+        string='Order Status Record',
         tracking=True,
         help="Custom order status for workflow management"
     )

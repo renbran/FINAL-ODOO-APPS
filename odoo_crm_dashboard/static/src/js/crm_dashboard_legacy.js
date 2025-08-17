@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, useRef, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, useRef, onMounted, onWillUnmount, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -13,6 +13,12 @@ export class CRMDashboardView extends Component {
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.notification = useService("notification");
+        
+        this.state = useState({
+            isLoading: true,
+            currentPeriod: 'today',
+            crmData: null
+        });
         
         // Chart references
         this.chartRefs = {
@@ -43,6 +49,7 @@ export class CRMDashboardView extends Component {
 
     async willStart() {
         try {
+            this.state.isLoading = true;
             await this.get_details();
             await this.render_dashboards();
             await this.render_graphs();
@@ -52,219 +59,295 @@ export class CRMDashboardView extends Component {
                 _t("Failed to load dashboard data"),
                 { type: "danger" }
             );
+        } finally {
+            this.state.isLoading = false;
         }
     }
 
-    // Events - Convert to modern event handling
-    async action_overdue_opportunities() {
-        'click .my_pipeline': 'action_my_pipeline',
-        'click .open_opportunities': 'action_open_opportunities',
-        'click .won_count': 'action_won_count',
-        'click .loss_count': 'action_loss_count',
-        'click .tot_exp_revenue': 'action_tot_exp_revenue',
-	},
-	init: function(parent, context) {
-        this._super(parent, context);
-        var crm_data = [];
-        var self = this;
-        if (context.tag == 'crm_dashboard.dashboard') {
-            self._rpc({
-                model: 'crm.dashboard',
-                method: 'get_crm_info',
-            }, []).then(function(result){
-                self.crm_data = result[0]
-            }).done(function(){
-                self.render();
-                self.href = window.location.href;
-            });
-        }
-    },
-    async willStart() {
+    // Convert get_data to modern async/await pattern
+    async get_data() {
         try {
-            await this.loadLibraries();
-            await super.willStart();
+            const result = await this.orm.call('crm.dashboard', 'get_crm_info', []);
+            this.state.crmData = result[0];
+            this.crm_data = result[0]; // Keep for backward compatibility
+            return result;
         } catch (error) {
-            console.error("Error in willStart:", error);
+            console.error("Error fetching CRM data:", error);
+            this.notification.add(_t("Failed to load CRM data"), { type: "danger" });
+            throw error;
         }
-    },
+    }
     
-    async loadLibraries() {
-        // Modern library loading would happen here
-        // In OWL components, libraries are typically loaded via imports
-        console.log("Libraries loaded");
-    },
-    start() {
+    // Modernize reload function
+    async reload() {
         try {
-            return super.start();
+            await this.get_data();
+            await this.render_dashboards();
+            await this.render_graphs();
         } catch (error) {
-            console.error("Error in start:", error);
+            console.error("Error reloading dashboard:", error);
         }
-    },
-    render() {
-        const superRender = super.render;
-        
+    }
+
+    // Modernize period filter functions
+    async onDayClicked() {
         try {
-            // Modern template rendering in OWL is handled automatically
-            // The template is already defined in static template
-            
-            // Hide control panel using modern DOM methods
-            const controlPanel = document.querySelector(".o_control_panel");
-            if (controlPanel) {
-                controlPanel.classList.add("o_hidden");
-            }
-            
-            // Trigger graph rendering
-            this.graph();
-            
-            return true;
+            this.state.currentPeriod = 'today';
+            await this.reload();
         } catch (error) {
-            console.error("Error in render:", error);
-            return false;
+            console.error("Error setting day filter:", error);
         }
-    },
-    reload: function () {
-            window.location.href = this.href;
-    },
-    action_overdue_opportunities: function(event) {
-        var self = this;
+    }
+
+    async onWeekClicked() {
+        try {
+            this.state.currentPeriod = 'week';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting week filter:", error);
+        }
+    }
+
+    async onMonthClicked() {
+        try {
+            this.state.currentPeriod = 'month';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting month filter:", error);
+        }
+    }
+
+    async onYearClicked() {
+        try {
+            this.state.currentPeriod = 'year';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting year filter:", error);
+        }
+    }
+
+    async onLastYearClicked() {
+        try {
+            this.state.currentPeriod = 'last_year';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting last year filter:", error);
+        }
+    }
+
+    async onQuarterClicked() {
+        try {
+            this.state.currentPeriod = 'quarter';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting quarter filter:", error);
+        }
+    }
+
+    async onLastQuarterClicked() {
+        try {
+            this.state.currentPeriod = 'last_quarter';
+            await this.reload();
+        } catch (error) {
+            console.error("Error setting last quarter filter:", error);
+        }
+    }
+
+    // Modernize render functions
+    async render_dashboards() {
+        console.log("Rendering dashboards...");
+        // Add dashboard rendering logic here
+    }
+
+    async render_graphs() {
+        this.graph();
+    }
+
+    async get_details() {
+        await this.get_data();
+    }
+
+    // Modernized action methods
+    async action_overdue_opportunities(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("Overdue Opportunities"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'tree,form',
-            view_type: 'form',
-            views: [[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_overdue_opportunities':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_my_pipeline: function(event) {
-        var self = this;
+        try {
+            await this.actionService.doAction({
+                name: _t("Overdue Opportunities"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
+                context: {                        
+                    'search_default_ep_overdue': true,                   
+                },
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening overdue opportunities"), { type: "danger" });
+        }
+    }
+
+    async action_my_pipeline(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("My Pipeline"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_assigned_to_me':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_open_opportunities: function(event) {
-        var self = this;
+        try {
+            await this.actionService.doAction({
+                name: _t("My Pipeline"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
+                context: {                        
+                    'search_default_ep_my_pipeline': true,                   
+                },
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening my pipeline"), { type: "danger" });
+        }
+    }
+
+    async action_open_opportunities(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("Open Opportunities"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_open_opportunities':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_won_count: function(event) {
-        var self = this;
+        try {
+            await this.actionService.doAction({
+                name: _t("Open Opportunities"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
+                context: {                        
+                    'search_default_ep_open_opportunities': true,                   
+                },
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening opportunities"), { type: "danger" });
+        }
+    }
+
+    async action_won_count(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("Won"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_won':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_loss_count: function(event) {
-        var self = this;
+        try {
+            await this.actionService.doAction({
+                name: _t("Won"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
+                context: {                        
+                    'search_default_ep_won': true,                   
+                },
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening won opportunities"), { type: "danger" });
+        }
+    }
+
+    async action_loss_count(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("Loss"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_lost':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_tot_exp_revenue: function(event) {
-        var self = this;
+        try {
+            await this.actionService.doAction({
+                name: _t("Loss"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'list'],[false, 'form']],
+                context: {                        
+                    'search_default_ep_lost': true,                   
+                },
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening lost opportunities"), { type: "danger" });
+        }
+    }
+
+    async action_tot_exp_revenue(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.do_action({
-            name: _t("Loss"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],                
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
+        try {
+            await this.actionService.doAction({
+                name: _t("Expected Revenue"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'kanban,tree,form',
+                view_type: 'form',
+                views: [[false, 'kanban'],[false, 'list'],[false, 'form']],                
+                search_view_id: this.crm_data?.crm_search_view_id,
+                target: 'current'
+            }, {
+                onClose: () => this.willStart()
+            });
+        } catch (error) {
+            this.notification.add(_t("Error opening expected revenue"), { type: "danger" });
+        }
+    }
+
     // Function which gives random color for charts.
-    getRandomColor: function () {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++ ) {
+    getRandomColor() {
+        const letters = '0123456789ABCDEF'.split('');
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
-    },
+    }
 
     // Here we are plotting bar,pie chart
-    graph: function() {
-        var self = this
-        var ctx = this.$el.find('#Chart')
+    graph() {
+        const ctx = this.env.root.el.querySelector('#Chart');
+        if (!ctx) {
+            console.warn("Chart canvas not found");
+            return;
+        }
+        
         // Fills the canvas with white background
         Chart.plugins.register({
-          beforeDraw: function(chartInstance) {
-            var ctx = chartInstance.chart.ctx;
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
-          }
+            beforeDraw: function(chartInstance) {
+                const ctx = chartInstance.chart.ctx;
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+            }
         });
-        var bg_color_list = []
-        for (var i=0;i<=12;i++){
-            bg_color_list.push(self.getRandomColor())
+        
+        const bg_color_list = [];
+        for (let i = 0; i <= 12; i++) {
+            bg_color_list.push(this.getRandomColor());
         }
-        var myChart = new Chart(ctx, {
+        
+        const myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                //labels: ["January","February", "March", "April", "May", "June", "July", "August", "September",
-                // "October", "November", "December"],
-                labels: self.crm_data.graph_exp_revenue_label,
+                labels: this.crm_data?.graph_exp_revenue_label || [],
                 datasets: [{
                     label: 'Expected Revenue',
-                    data: self.crm_data.graph_exp_revenue_dataset,
+                    data: this.crm_data?.graph_exp_revenue_dataset || [],
                     backgroundColor: bg_color_list,
                     borderColor: bg_color_list,
                     borderWidth: 1,
@@ -282,13 +365,11 @@ export class CRMDashboardView extends Component {
                     yAxes: [{
                         ticks: {
                             min: 0,
-                            max: Math.max.apply(null,self.crm_data.graph_exp_revenue_dataset),
-                            //min: 1000,
-                            //max: 100000,
-                            stepSize: self.crm_data.
-                            graph_exp_revenue_dataset.reduce((pv,cv)=>{return pv + (parseFloat(cv)||0)},0)
-                            /self.crm_data.graph_exp_revenue_dataset.length
-                          }
+                            max: Math.max.apply(null, this.crm_data?.graph_exp_revenue_dataset || [0]),
+                            stepSize: (this.crm_data?.graph_exp_revenue_dataset || [])
+                                .reduce((pv, cv) => pv + (parseFloat(cv) || 0), 0) / 
+                                (this.crm_data?.graph_exp_revenue_dataset?.length || 1)
+                        }
                     }]
                 },
                 responsive: true,
@@ -308,12 +389,11 @@ export class CRMDashboardView extends Component {
                 },
             },
         });
-       
+        
+        // Store chart instance for cleanup
+        this.chartInstances = this.chartInstances || {};
+        this.chartInstances.mainChart = myChart;
+    }
+}
 
-    },
-    
-});
-core.action_registry.add('crm_dashboard.dashboard', CRMDashboardView);
-return CRMDashboardView
-    
-});
+registry.category("actions").add("crm_dashboard.dashboard", CRMDashboardView);
