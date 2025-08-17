@@ -9,7 +9,7 @@ class OrderStatusChangeWizard(models.TransientModel):
     order_id = fields.Many2one('sale.order', string='Sale Order', required=True)
     current_status_id = fields.Many2one('order.status', string='Current Status', readonly=True)
     new_status_id = fields.Many2one('order.status', string='New Status', required=True)
-    notes = fields.Text(string='Notes', placeholder="Add notes about this status change...")
+    notes = fields.Text(string='Notes')
     
     # Helper fields for UI logic
     requires_documentation_user = fields.Boolean(

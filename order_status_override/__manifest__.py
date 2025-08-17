@@ -35,6 +35,7 @@
         'reports/enhanced_order_status_report_actions.xml',
         'views/order_status_views.xml',
         'views/order_views_assignment.xml',
+        'views/status_change_wizard_views.xml',
         'views/email_template_views.xml',
         'views/report_wizard_views.xml',
     ],
@@ -42,6 +43,7 @@
         'web.assets_backend': [
             'order_status_override/static/src/css/commission_report.css',
             'order_status_override/static/src/css/enhanced_sales_order_form.css',
+            'order_status_override/static/src/css/responsive_mobile_fix.css',
         ],
     },
     'installable': True,

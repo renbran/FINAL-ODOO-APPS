@@ -91,30 +91,18 @@
         },
 
         /**
-         * Setup field watchers for real-time validation (CloudPepper Safe)
+         * Setup field watchers for real-time validation
          */
         setupFieldWatchers: function() {
-            try {
-                // Amount validation
-                $(document).on('change', 'input[name="amount"]', function() {
-                    try {
-                        PaymentWorkflowRealtime.validateAmount($(this));
-                    } catch (error) {
-                        console.log('Amount validation error:', error);
-                    }
-                });
+            // Amount validation
+            $(document).on('change', 'input[name="amount"]', function() {
+                PaymentWorkflowRealtime.validateAmount($(this));
+            });
 
-                // Partner validation
-                $(document).on('change', 'select[name="partner_id"]', function() {
-                    try {
-                        PaymentWorkflowRealtime.onPartnerChange($(this));
-                    } catch (error) {
-                        console.log('Partner change error:', error);
-                    }
-                });
-            } catch (error) {
-                console.log('Setup field watchers error:', error);
-            }
+            // Partner validation
+            $(document).on('change', 'select[name="partner_id"]', function() {
+                PaymentWorkflowRealtime.onPartnerChange($(this));
+            });
         },
 
         /**

@@ -12,15 +12,11 @@
                 <xpath expr="//header" position="replace">
                     <header class="invoice-header">
                         <!-- UNIFIED STATUS BAR - Only show our approval workflow statusbar -->
-                        <field name="approval_state" widget="statusbar" 
-                               statusbar_visible="draft,under_review,for_approval,approved,posted"
-                               statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","approved":"success","posted":"success"}'
-                               readonly="0"
-                               invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
-                        
+                        <field name="approval_state" widget="statusbar" statusbar_visible="draft,under_review,for_approval,approved,posted" statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","approved":"success","posted":"success"}' readonly="0" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']"/>
+
                         <!-- Hide original state field but keep it for backend compatibility -->
                         <field name="state" invisible="1"/>
-                        
+
                         <!-- Hidden computed fields for button logic -->
                         <field name="can_submit_for_review" invisible="1"/>
                         <field name="can_review" invisible="1"/>
@@ -31,53 +27,26 @@
                         <!-- UNIFIED WORKFLOW BUTTONS for Invoices/Bills -->
                         <div class="workflow-buttons osus-workflow" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']">
                             <!-- Draft Stage: Submit for Review -->
-                            <button name="action_submit_for_review" 
-                                    string="Submit for Review" 
-                                    type="object" 
-                                    class="btn osus_primary_btn"
-                                    invisible="approval_state != 'draft'"
-                                    confirm="Submit this invoice/bill for review?"/>
-                            
+                            <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn osus_primary_btn" invisible="approval_state != 'draft'" confirm="Submit this invoice/bill for review?"/>
+
                             <!-- Review Stage: Approve or Reject -->
-                            <button name="action_review_approve" 
-                                    string="Review &amp; Approve" 
-                                    type="object" 
-                                    class="btn osus_success_btn"
-                                    groups="account_payment_final.group_payment_voucher_reviewer"
-                                    invisible="approval_state != 'under_review'"/>
-                            
+                            <button name="action_review_approve" string="Review &amp; Approve" type="object" class="btn osus_success_btn" groups="account_payment_final.group_payment_voucher_reviewer" invisible="approval_state != 'under_review'"/>
+
                             <!-- Approval Stage: Final Approval -->
-                            <button name="action_final_approve" 
-                                    string="Approve &amp; Post" 
-                                    type="object" 
-                                    class="btn osus_success_btn"
-                                    groups="account_payment_final.group_payment_voucher_approver"
-                                    invisible="approval_state != 'for_approval'"/>
-                            
+                            <button name="action_final_approve" string="Approve &amp; Post" type="object" class="btn osus_success_btn" groups="account_payment_final.group_payment_voucher_approver" invisible="approval_state != 'for_approval'"/>
+
                             <!-- Manual Post (Only if auto-post failed) -->
-                            <button name="action_post_invoice_bill" 
-                                    string="Post to Ledger" 
-                                    type="object" 
-                                    class="btn osus_primary_btn"
-                                    groups="account_payment_final.group_payment_poster"
-                                    invisible="approval_state != 'approved'"
-                                    confirm="Manually post this approved invoice/bill?"/>
-                            
+                            <button name="action_post_invoice_bill" string="Post to Ledger" type="object" class="btn osus_primary_btn" groups="account_payment_final.group_payment_poster" invisible="approval_state != 'approved'" confirm="Manually post this approved invoice/bill?"/>
+
                             <!-- Reject Button -->
-                            <button name="action_reject_invoice_bill" 
-                                    string="Reject" 
-                                    type="object" 
-                                    class="btn osus_danger_btn"
-                                    groups="account_payment_final.group_payment_voucher_approver"
-                                    invisible="approval_state not in ['under_review', 'for_approval']"
-                                    confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
+                            <button name="action_reject_invoice_bill" string="Reject" type="object" class="btn osus_danger_btn" groups="account_payment_final.group_payment_voucher_approver" invisible="approval_state not in ['under_review', 'for_approval']" confirm="Are you sure you want to reject this invoice/bill? It will return to draft state."/>
                         </div>
 
                         <!-- Keep original buttons for other move types (journal entries, etc.) -->
                         <div invisible="move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']">
                             <!-- Standard Odoo statusbar for non-invoice/bill moves -->
                             <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
-                            
+
                             <!-- Standard Odoo buttons for journal entries -->
                             <button name="action_post" string="Post" type="object" class="btn-primary" invisible="state != 'draft'" data-hotkey="v"/>
                             <button name="button_draft" string="Reset to Draft" type="object" class="btn-secondary" invisible="state != 'posted'" groups="account.group_account_manager" data-hotkey="w"/>
