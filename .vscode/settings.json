@@ -44,7 +44,7 @@
     
     // XML Configuration for Odoo Views
     "xml.format.enabled": true,
-    "xml.format.splitAttributes": true,
+    "xml.format.splitAttributes": "splitNewLine",
     "xml.format.joinCDATALines": false,
     "xml.format.joinCommentLines": false,
     "xml.format.joinContentLines": false,
@@ -221,6 +221,16 @@
         "editor.formatOnSave": false
     },
     
+    // Debug and crash reporting settings (prevent Crashpad errors)
+    "debug.allowBreakpointsEverywhere": false,
+    "debug.openDebug": "neverOpen",
+    "debug.console.closeOnEnd": true,
+    "debug.openExplorerOnEnd": false,
+    "extensions.autoUpdate": false,
+    "extensions.ignoreRecommendations": true,
+    "telemetry.telemetryLevel": "off",
+    "typescript.disableAutomaticTypeAcquisition": true,
+    
     // File exclusions to improve performance
     "files.exclude": {
         "**/__pycache__": true,
@@ -229,7 +239,11 @@
         "**/.git": true,
         "**/node_modules": true,
         "**/.DS_Store": true,
-        "**/Thumbs.db": true
+        "**/Thumbs.db": true,
+        "**/debug.log": true,
+        "**/*.log.backup.*": true,
+        "**/crashpad_reports": true,
+        "**/crash_dumps": true
     },
     
     // Search exclusions
@@ -238,7 +252,11 @@
         "**/*.pyc": true,
         "**/*.pyo": true,
         "**/node_modules": true,
-        "**/.git": true
+        "**/.git": true,
+        "**/debug.log": true,
+        "**/*.log.backup.*": true,
+        "**/crashpad_reports": true,
+        "**/crash_dumps": true
     },
     
     // Disable problematic extensions for Odoo
