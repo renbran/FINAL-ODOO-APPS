@@ -1,0 +1,15 @@
+
+# Debug and crash files (added by Crashpad resolver)
+debug.log
+*.dmp
+crashpad_reports/
+crash_dumps/
+*.log.backup.*
+
+# VS Code debug files
+.vscode/launch.json.backup
+.vscode/settings.json.backup
+
+# Windows crash dumps
+*.mdmp
+*.hdmp
