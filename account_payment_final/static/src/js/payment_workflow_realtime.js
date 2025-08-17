@@ -1,5 +1,20 @@
 /**
- * Payment Workflow Real-time Updates
+ (function() {
+    'use strict';
+
+    // CloudPepper compatibility check
+    if (typeof $ === 'undefined') {
+        console.log('PaymentWorkflowRealtime: jQuery not available, skipping initialization');
+        return;
+    }
+
+    // Global Payment Workflow Real-time Handler (CloudPepper Safe Version)
+    window.PaymentWorkflowRealtime = {
+        
+        // Version and compatibility info
+        version: '1.1.0',
+        cloudPepperSafe: true,
+        lastUserActivity: 0,ment Workflow Real-time Updates
  * CloudPepper Compatible - NON-MODULE VERSION
  * Provides real-time status updates and UI enhancements for payment approval workflow
  */
@@ -11,48 +26,95 @@
     window.PaymentWorkflowRealtime = {
         
         /**
-         * Initialize real-time workflow monitoring
+         * Initialize real-time workflow monitoring (CloudPepper Safe)
          */
         init: function() {
             this.setupWorkflowObservers();
             this.setupFieldWatchers();
             this.enhanceButtons();
             this.setupAutoRefresh();
+            this.setupUserActivityTracking();
+            this.lastUserActivity = Date.now();
         },
 
         /**
-         * Setup observers for workflow state changes
+         * Setup user activity tracking for safe refreshes
+         */
+        setupUserActivityTracking: function() {
+            var self = this;
+            
+            // Track various user interactions
+            $(document).on('click change keypress', function() {
+                self.trackUserActivity();
+            });
+            
+            // Track form interactions specifically
+            $(document).on('change', 'input, select, textarea', function() {
+                self.trackUserActivity();
+            });
+        },
+
+        /**
+         * Setup observers for workflow state changes (CloudPepper Safe)
          */
         setupWorkflowObservers: function() {
-            // Watch for approval_state field changes
-            $(document).on('change', 'select[name="approval_state"]', function() {
-                PaymentWorkflowRealtime.onApprovalStateChange($(this));
-            });
+            try {
+                // Watch for approval_state field changes
+                $(document).on('change', 'select[name="approval_state"]', function() {
+                    try {
+                        PaymentWorkflowRealtime.onApprovalStateChange($(this));
+                    } catch (error) {
+                        console.log('Approval state change error:', error);
+                    }
+                });
 
-            // Watch for reviewer/approver/authorizer changes
-            $(document).on('change', 'select[name="reviewer_id"], select[name="approver_id"], select[name="authorizer_id"]', function() {
-                PaymentWorkflowRealtime.onWorkflowUserChange($(this));
-            });
+                // Watch for reviewer/approver/authorizer changes
+                $(document).on('change', 'select[name="reviewer_id"], select[name="approver_id"], select[name="authorizer_id"]', function() {
+                    try {
+                        PaymentWorkflowRealtime.onWorkflowUserChange($(this));
+                    } catch (error) {
+                        console.log('Workflow user change error:', error);
+                    }
+                });
 
-            // Watch for state synchronization
-            $(document).on('change', 'select[name="state"]', function() {
-                PaymentWorkflowRealtime.onStateChange($(this));
-            });
+                // Watch for state synchronization
+                $(document).on('change', 'select[name="state"]', function() {
+                    try {
+                        PaymentWorkflowRealtime.onStateChange($(this));
+                    } catch (error) {
+                        console.log('State change error:', error);
+                    }
+                });
+            } catch (error) {
+                console.log('Setup workflow observers error:', error);
+            }
         },
 
         /**
-         * Setup field watchers for real-time validation
+         * Setup field watchers for real-time validation (CloudPepper Safe)
          */
         setupFieldWatchers: function() {
-            // Amount validation
-            $(document).on('change', 'input[name="amount"]', function() {
-                PaymentWorkflowRealtime.validateAmount($(this));
-            });
+            try {
+                // Amount validation
+                $(document).on('change', 'input[name="amount"]', function() {
+                    try {
+                        PaymentWorkflowRealtime.validateAmount($(this));
+                    } catch (error) {
+                        console.log('Amount validation error:', error);
+                    }
+                });
 
-            // Partner validation
-            $(document).on('change', 'select[name="partner_id"]', function() {
-                PaymentWorkflowRealtime.onPartnerChange($(this));
-            });
+                // Partner validation
+                $(document).on('change', 'select[name="partner_id"]', function() {
+                    try {
+                        PaymentWorkflowRealtime.onPartnerChange($(this));
+                    } catch (error) {
+                        console.log('Partner change error:', error);
+                    }
+                });
+            } catch (error) {
+                console.log('Setup field watchers error:', error);
+            }
         },
 
         /**
@@ -254,61 +316,65 @@
         },
 
         /**
-         * Setup auto-refresh for real-time updates
+         * Setup auto-refresh for real-time updates (CloudPepper Safe)
          */
         setupAutoRefresh: function() {
-            // Refresh workflow status every 30 seconds
+            // Use safer page-based refresh instead of RPC calls
             setInterval(function() {
-                PaymentWorkflowRealtime.refreshWorkflowStatus();
-            }, 30000);
+                PaymentWorkflowRealtime.refreshWorkflowStatusSafe();
+            }, 60000); // Increased to 60 seconds for stability
         },
 
         /**
-         * Refresh workflow status from server
+         * Safe refresh method that doesn't use RPC calls
          */
-        refreshWorkflowStatus: function() {
-            var recordId = this.getCurrentRecordId();
-            if (!recordId) return;
-            
-            // Only refresh if we're on a payment form
+        refreshWorkflowStatusSafe: function() {
+            // Only refresh if we're on a payment form and user hasn't interacted recently
             if (!$('select[name="approval_state"]').length) return;
             
-            // Simple AJAX call to get current status
-            $.ajax({
-                url: '/web/dataset/call_kw',
-                type: 'POST',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    jsonrpc: '2.0',
-                    method: 'call',
-                    params: {
-                        model: 'account.payment',
-                        method: 'read',
-                        args: [[recordId], ['approval_state', 'state', 'reviewer_id', 'approver_id', 'authorizer_id']],
-                        kwargs: {}
-                    },
-                    id: Math.floor(Math.random() * 1000)
-                }),
-                success: function(response) {
-                    if (response.result && response.result.length > 0) {
-                        PaymentWorkflowRealtime.updateFieldsFromServer(response.result[0]);
-                    }
+            var lastActivity = PaymentWorkflowRealtime.lastUserActivity || 0;
+            var now = Date.now();
+            
+            // Don't refresh if user was active in last 30 seconds
+            if (now - lastActivity < 30000) return;
+            
+            try {
+                // Safe notification about potential updates
+                var currentState = $('select[name="approval_state"]').val();
+                if (currentState && currentState !== 'posted') {
+                    PaymentWorkflowRealtime.showNotification(
+                        'Workflow may have updates. Refresh page to see latest status.', 
+                        'info', 
+                        5000
+                    );
                 }
-            });
+            } catch (error) {
+                console.log('Safe refresh notification skipped:', error);
+            }
         },
 
         /**
-         * Update fields from server response
+         * Deprecated: Direct RPC refresh - removed for CloudPepper compatibility
+         */
+        refreshWorkflowStatus: function() {
+            // This method is deprecated and replaced with refreshWorkflowStatusSafe
+            console.log('Direct RPC refresh disabled for CloudPepper compatibility');
+            this.refreshWorkflowStatusSafe();
+        },
+
+        /**
+         * Deprecated: Update fields from server response - removed for CloudPepper compatibility
          */
         updateFieldsFromServer: function(data) {
-            var currentApprovalState = $('select[name="approval_state"]').val();
-            
-            // Only update if state has changed
-            if (data.approval_state !== currentApprovalState) {
-                $('select[name="approval_state"]').val(data.approval_state).trigger('change');
-                this.showNotification('Status updated automatically', 'info');
-            }
+            // This method is deprecated to prevent RPC errors
+            console.log('Direct field updates from server disabled for CloudPepper compatibility');
+        },
+
+        /**
+         * Track user activity to prevent unnecessary refreshes
+         */
+        trackUserActivity: function() {
+            this.lastUserActivity = Date.now();
         },
 
         /**
@@ -345,27 +411,51 @@
         },
 
         /**
-         * Show notification messages
+         * Show notification messages (CloudPepper Safe)
          */
-        showNotification: function(message, type) {
-            type = type || 'info';
-            
-            // Create notification element
-            var $notification = $(
-                '<div class="alert alert-' + type + ' payment-notification" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">' +
-                '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
-                message +
-                '</div>'
-            );
-            
-            $('body').append($notification);
-            
-            // Auto-remove after 4 seconds
-            setTimeout(function() {
-                $notification.fadeOut(function() {
-                    $(this).remove();
+        showNotification: function(message, type, duration) {
+            try {
+                type = type || 'info';
+                duration = duration || 4000;
+                
+                // Remove any existing notifications first
+                $('.payment-notification').remove();
+                
+                // Create notification element with error handling
+                var $notification = $(
+                    '<div class="alert alert-' + type + ' payment-notification" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>' +
+                    '<span>' + message + '</span>' +
+                    '</div>'
+                );
+                
+                // Safely append to body
+                if ($('body').length) {
+                    $('body').append($notification);
+                } else {
+                    return; // Can't show notification if no body
+                }
+                
+                // Setup close button
+                $notification.find('.close').on('click', function() {
+                    $notification.fadeOut(300, function() {
+                        $(this).remove();
+                    });
                 });
-            }, 4000);
+                
+                // Auto-remove after specified duration
+                setTimeout(function() {
+                    if ($notification.length) {
+                        $notification.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }
+                }, duration);
+                
+            } catch (error) {
+                // Fallback to console if notification fails
+                console.log('Notification:', type, '-', message);
+            }
         },
 
         /**
@@ -387,17 +477,29 @@
         }
     };
 
-    // Initialize when document is ready
+    // Initialize when document is ready (CloudPepper Safe)
     $(document).ready(function() {
-        PaymentWorkflowRealtime.init();
+        try {
+            PaymentWorkflowRealtime.init();
+        } catch (error) {
+            console.log('PaymentWorkflowRealtime initialization error:', error);
+        }
     });
 
-    // Re-initialize when form is reloaded (for single-page app behavior)
+    // Re-initialize when form is reloaded (with error handling)
     $(document).on('DOMNodeInserted', function(e) {
-        if ($(e.target).find('select[name="approval_state"]').length > 0) {
-            setTimeout(function() {
-                PaymentWorkflowRealtime.init();
-            }, 100);
+        try {
+            if ($(e.target).find('select[name="approval_state"]').length > 0) {
+                setTimeout(function() {
+                    try {
+                        PaymentWorkflowRealtime.init();
+                    } catch (error) {
+                        console.log('PaymentWorkflowRealtime re-initialization error:', error);
+                    }
+                }, 100);
+            }
+        } catch (error) {
+            console.log('DOM insertion handler error:', error);
         }
     });
 
