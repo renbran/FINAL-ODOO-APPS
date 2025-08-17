@@ -150,10 +150,10 @@
                                                 <span t-field="line.product_uom_qty"/>
                                             </td>
                                             <td>
-                                                <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                <span t-field="line.price_unit"/>
                                             </td>
                                             <td>
-                                                <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                <span t-field="line.price_subtotal"/>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -601,28 +601,28 @@
                             <div class="commission-item">
                                 <span class="commission-label">Broker Amount:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.broker_amount if o.broker_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.broker_amount if o.broker_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-item">
                                 <span class="commission-label">Referrer Commission:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.referrer_amount if o.referrer_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.referrer_amount if o.referrer_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-item">
                                 <span class="commission-label">Cashback:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.cashback_amount if o.cashback_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.cashback_amount if o.cashback_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-total">
                                 <span>Total External:</span>
                                 <span>
-                                    <t t-esc="'{:,.2f} AED '.format(o.total_external_commission_amount or 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_external_commission_amount or 0)"/>
                                 </span>
                             </div>
                         </div>
@@ -642,35 +642,35 @@
                             <div class="commission-item">
                                 <span class="commission-label">Agent 1 Amount:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.agent1_amount if o.agent1_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.agent1_amount if o.agent1_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-item">
                                 <span class="commission-label">Agent 2 Amount:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.agent2_amount if o.agent2_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.agent2_amount if o.agent2_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-item">
                                 <span class="commission-label">Manager Commission:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.manager_amount if o.manager_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.manager_amount if o.manager_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-item">
                                 <span class="commission-label">Director Commission:</span>
                                 <span class="commission-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.director_amount if o.director_amount else 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.director_amount if o.director_amount else 0)"/>
                                 </span>
                             </div>
 
                             <div class="commission-total">
                                 <span>Total Internal:</span>
                                 <span>
-                                    <t t-esc="'{:,.2f} AED '.format(o.total_internal_commission_amount or 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_internal_commission_amount or 0)"/>
                                 </span>
                             </div>
                         </div>
@@ -689,13 +689,13 @@
                             <div class="total-item">
                                 <div class="total-label">Total Commissions</div>
                                 <div class="total-amount">
-                                    <t t-esc="'{:,.2f} AED '.format(o.total_commission_amount or 0)"/>
+                                    <t t-esc="'{:,.0f} AED'.format(o.total_commission_amount or 0)"/>
                                 </div>
                             </div>
                             <div class="total-item">
                                 <div class="total-label">Net Amount</div>
                                 <div class="total-amount">
-                                    <t t-esc="'{:,.2f} AED '.format((o.amount_total or 0) - (o.total_commission_amount or 0))"/>
+                                    <t t-esc="'{:,.0f} AED'.format((o.amount_total or 0) - (o.total_commission_amount or 0))"/>
                                 </div>
                             </div>
                         </div>
