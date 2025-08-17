@@ -1,8 +1,108 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+    
+    # Add custom status fields if they don't exist
+    order_status_id = fields.Many2one(
+        'order.status', 
+        string='Order Status',
+        tracking=True,
+        help="Custom order status for workflow management"
+    )
+    documentation_user_id = fields.Many2one(
+        'res.users',
+        string='Documentation User',
+        tracking=True,
+        help="User responsible for documentation stage"
+    )
+    commission_user_id = fields.Many2one(
+        'res.users',
+        string='Commission User',
+        tracking=True,
+        help="User responsible for commission calculation"
+    )
+    final_review_user_id = fields.Many2one(
+        'res.users',
+        string='Final Review User',
+        tracking=True,
+        help="User responsible for final review"
+    )
+    
+    @api.model
+    def create(self, vals):
+        """Set initial status when creating order"""
+        order = super().create(vals)
+        
+        # Set initial status if not provided
+        if not order.order_status_id:
+            initial_status = self.env['order.status'].search([('is_initial', '=', True)], limit=1)
+            if initial_status:
+                order.order_status_id = initial_status.id
+        
+        return order
+    
+    def _change_status(self, new_status_id, notes=None):
+        """Change order status with proper validation and logging"""
+        self.ensure_one()
+        
+        try:
+            new_status = self.env['order.status'].browse(new_status_id)
+            if not new_status.exists():
+                raise ValidationError(_("Invalid status specified."))
+            
+            old_status = self.order_status_id
+            
+            # Update the status
+            self.order_status_id = new_status.id
+            
+            # Handle Odoo state mapping
+            self._update_state_from_status(new_status)
+            
+            # Log the change
+            message = _("Status changed from '%s' to '%s'") % (
+                old_status.name if old_status else _('None'),
+                new_status.name
+            )
+            if notes:
+                message += _("\nNotes: %s") % notes
+            
+            self.message_post(body=message)
+            
+            _logger.info("Order %s status changed from %s to %s by user %s", 
+                        self.name, 
+                        old_status.name if old_status else 'None',
+                        new_status.name,
+                        self.env.user.name)
+            
+            return True
+            
+        except Exception as e:
+            _logger.error("Failed to change status for order %s: %s", self.name, str(e))
+            raise
+    
+    def _update_state_from_status(self, status):
+        """Update Odoo standard state based on custom status"""
+        state_mapping = {
+            'draft': 'draft',
+            'documentation_progress': 'sent',
+            'commission_progress': 'sale',
+            'final_review': 'sale',
+            'approved': 'sale',
+        }
+        
+        new_state = state_mapping.get(status.code)
+        if new_state and new_state != self.state:
+            if new_state == 'sale' and self.state in ['draft', 'sent']:
+                self.action_confirm()
+            elif new_state == 'sent' and self.state == 'draft':
+                self.state = 'sent'
+            else:
+                self.state = new_state
     
     @api.model
     def get_order_status(self, order_id):
