@@ -1,0 +1,381 @@
+{
+  "timestamp": "2025-08-17T14:29:37.323355",
+  "summary": {
+    "errors_detected": 14,
+    "warnings_detected": 21,
+    "fixes_applied": 8,
+    "files_cleaned": 2
+  },
+  "errors": [
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\account_journal.py",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.156578",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_company.py",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.170154",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-account_payment_final",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_partner.py",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.171779",
+      "status": "detected"
+    },
+    {
+      "id": "JS-002-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "ERROR_HANDLING",
+      "description": "Missing try-catch blocks in account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_safe.js",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.180089",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (7) in account_payment_final\\static\\src\\scss\\main.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\main.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.182121",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (6) in account_payment_final\\static\\src\\scss\\payment_voucher.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\payment_voucher.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.182633",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-account_payment_final",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (8) in account_payment_final\\static\\src\\scss\\responsive_report_styles.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\responsive_report_styles.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.183223",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-order_status_override",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in order_status_override\\models\\sale_order.py",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.203343",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-order_status_override",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (13) in order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "file_path": "order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.207318",
+      "status": "detected"
+    },
+    {
+      "id": "CSS-001-oe_sale_dashboard_17",
+      "severity": "MEDIUM",
+      "category": "CSS_SPECIFICITY",
+      "description": "Excessive !important usage (19) in oe_sale_dashboard_17\\static\\src\\css\\dashboard.css",
+      "file_path": "oe_sale_dashboard_17\\static\\src\\css\\dashboard.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.219002",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-commission_ax",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in commission_ax\\models\\purchase_order.py",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.221933",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-commission_ax",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in commission_ax\\models\\sale_order.py",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.225471",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.234276",
+      "status": "detected"
+    },
+    {
+      "id": "PY-003-enhanced_rest_api",
+      "severity": "HIGH",
+      "category": "MODEL_STRUCTURE",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.235620",
+      "status": "detected"
+    }
+  ],
+  "warnings": [
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_journal.py",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.156604"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_move.py",
+      "file_path": "account_payment_final\\models\\account_move.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.158280"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\account_payment.py",
+      "file_path": "account_payment_final\\models\\account_payment.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.166672"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\res_company.py",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.170165"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in account_payment_final\\models\\res_partner.py",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.171791"
+    },
+    {
+      "category": "JAVASCRIPT_LEGACY",
+      "description": "jQuery usage detected in account_payment_final\\static\\src\\js\\payment_workflow_realtime.js - consider modern alternatives",
+      "file_path": "account_payment_final\\static\\src\\js\\payment_workflow_realtime.js",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.180000"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.183730"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "file_path": "account_payment_final\\static\\src\\scss\\frontend\\verification_portal.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.183734"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in order_status_override\\models\\sale_order.py",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.203377"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\commission_report.css",
+      "file_path": "order_status_override\\static\\src\\css\\commission_report.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.206877"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\enhanced_sales_order_form.css",
+      "file_path": "order_status_override\\static\\src\\css\\enhanced_sales_order_form.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.207110"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "file_path": "order_status_override\\static\\src\\css\\responsive_mobile_fix.css",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.207325"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in commission_ax\\models\\purchase_order.py",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.221944"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in commission_ax\\models\\sale_order.py",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.225497"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.234287"
+    },
+    {
+      "category": "MODEL_DOCUMENTATION",
+      "description": "Model missing _description attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.235627"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.255619"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.255625"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\strategic_dashboard.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\strategic_dashboard.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.255882"
+    },
+    {
+      "category": "CSS_NAMING",
+      "description": "Consider using BEM methodology with .o_ prefix in crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.255984"
+    },
+    {
+      "category": "CSS_MODERNIZATION",
+      "description": "Consider using CSS custom properties in crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "file_path": "crm_executive_dashboard\\static\\src\\scss\\_variables.scss",
+      "line_number": null,
+      "timestamp": "2025-08-17T14:29:37.255987"
+    }
+  ],
+  "fixes_applied": [
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\account_journal.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\account_journal.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\res_company.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_company.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-account_payment_final",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "account_payment_final\\models\\res_partner.py",
+      "description": "Model missing _name attribute in account_payment_final\\models\\res_partner.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-order_status_override",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "order_status_override\\models\\sale_order.py",
+      "description": "Model missing _name attribute in order_status_override\\models\\sale_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-commission_ax",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "commission_ax\\models\\purchase_order.py",
+      "description": "Model missing _name attribute in commission_ax\\models\\purchase_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-commission_ax",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "commission_ax\\models\\sale_order.py",
+      "description": "Model missing _name attribute in commission_ax\\models\\sale_order.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-enhanced_rest_api",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "enhanced_rest_api\\models\\account_payment_extended.py",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\account_payment_extended.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    },
+    {
+      "error_id": "PY-003-enhanced_rest_api",
+      "category": "MODEL_STRUCTURE",
+      "file_path": "enhanced_rest_api\\models\\res_users_extended.py",
+      "description": "Model missing _name attribute in enhanced_rest_api\\models\\res_users_extended.py",
+      "fix_actions": [],
+      "test_actions": [],
+      "rollback_plan": []
+    }
+  ],
+  "validation_results": {
+    "cloudpepper": {
+      "exit_code": 1,
+      "output": "",
+      "errors": "Traceback (most recent call last):\n  File \"D:\\RUNNING APPS\\ready production\\latest\\odoo17_final\\cloudpepper_deployment_final_validation.py\", line 351, in <module>\n    success = main()\n  File \"D:\\RUNNING APPS\\ready production\\latest\\odoo17_final\\cloudpepper_deployment_final_validation.py\", line 293, in main\n    print(\"\\U0001f680 CLOUDPEPPER DEPLOYMENT FINAL VALIDATION\")\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\Python313\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f680' in position 0: character maps to <undefined>\n"
+    }
+  }
+}

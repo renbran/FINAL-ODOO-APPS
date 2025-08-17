@@ -1,256 +1,330 @@
-odoo.define('crm_dashboard.dashboard', function (require) {
-    "use strict";
+/** @odoo-module **/
+
+import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
+import { loadJS } from "@web/core/assets";
+
+export class CRMDashboardView extends Component {
+    static template = "crm_dashboard.Dashboard";
+    static props = {
+        resModel: { type: String, optional: true },
+        action: { type: Object, optional: true }
+    };
     
-var core = require('web.core');
-var framework = require('web.framework');
-var session = require('web.session');
-var ajax = require('web.ajax');
-var ActionManager = require('web.ActionManager');
-var view_registry = require('web.view_registry');
-var Widget = require('web.Widget');
-var AbstractAction = require('web.AbstractAction');
-var ControlPanelMixin = require('web.ControlPanelMixin');
-var QWeb = core.qweb;
-
-var _t = core._t;
-var _lt = core._lt;
-
-var CRMDashboardView = AbstractAction.extend(ControlPanelMixin, {
-	events: {
-        'click .opportunities': 'action_overdue_opportunities',
-        'click .my_pipeline': 'action_my_pipeline',
-        'click .open_opportunities': 'action_open_opportunities',
-        'click .won_count': 'action_won_count',
-        'click .loss_count': 'action_loss_count',
-        'click .tot_exp_revenue': 'action_tot_exp_revenue',
-	},
-	init: function(parent, context) {
-        this._super(parent, context);
-        var crm_data = [];
-        var self = this;
-        if (context.tag == 'crm_dashboard.dashboard') {
-            self._rpc({
-                model: 'crm.dashboard',
-                method: 'get_crm_info',
-            }, []).then(function(result){
-                self.crm_data = result[0]
-            }).done(function(){
-                self.render();
-                self.href = window.location.href;
-            });
-        }
-    },
-    willStart: function() {
-         return $.when(ajax.loadLibs(this), this._super());
-    },
-    start: function() {
-        var self = this;
-        return this._super();
-    },
-    render: function() {
-        var super_render = this._super;
-        var self = this;
-        var crm_dashboard = QWeb.render( 'crm_dashboard.dashboard', {
-            widget: self,
+    setup() {
+        this.orm = useService("orm");
+        this.actionService = useService("action");
+        this.notification = useService("notification");
+        
+        this.state = useState({
+            isLoading: true,
+            crmData: {},
+            error: null
         });
-        $( ".o_control_panel" ).addClass( "o_hidden" );
-        $(crm_dashboard).prependTo(self.$el);
-        self.graph();
-        // self.previewTable();
-        return crm_dashboard
-    },
-    reload: function () {
-            window.location.href = this.href;
-    },
-    action_overdue_opportunities: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("Overdue Opportunities"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'tree,form',
-            view_type: 'form',
-            views: [[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_overdue_opportunities':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_my_pipeline: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("My Pipeline"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_assigned_to_me':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_open_opportunities: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("Open Opportunities"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_open_opportunities':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_won_count: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("Won"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_won':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_loss_count: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("Loss"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'list'],[false, 'form']],
-            context: {                        
-                        'search_default_ep_lost':true,                   
-                    },
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    action_tot_exp_revenue: function(event) {
-        var self = this;
-        event.stopPropagation();
-        event.preventDefault();
-        this.do_action({
-            name: _t("Loss"),
-            type: 'ir.actions.act_window',
-            res_model: 'crm.lead',
-            view_mode: 'kanban,tree,form',
-            view_type: 'form',
-            views: [[false, 'kanban'],[false, 'list'],[false, 'form']],                
-            search_view_id: self.crm_data.crm_search_view_id,
-            target: 'current'
-        },{on_reverse_breadcrumb: function(){ return self.reload();}})
-    },
-    // Function which gives random color for charts.
-    getRandomColor: function () {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++ ) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    },
-
-    // Here we are plotting bar,pie chart
-    graph: function() {
-        var self = this
-        var ctx = this.$el.find('#Chart')
-        // Fills the canvas with white background
-        Chart.plugins.register({
-          beforeDraw: function(chartInstance) {
-            var ctx = chartInstance.chart.ctx;
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
-          }
+        
+        // Chart references
+        this.chartRefs = {
+            overdue_chart: useRef("overdue_chart"),
+            pipeline_chart: useRef("pipeline_chart"),
+            lead_chart: useRef("lead_chart"),
+            won_chart: useRef("won_chart"),
+            yearly_chart: useRef("yearly_chart"),
+            won_chart_year: useRef("won_chart_year"),
+            expected_chart: useRef("expected_chart")
+        };
+        
+        this.chartInstances = {};
+        
+        onMounted(async () => {
+            try {
+                await this.loadChartLibraries();
+                await this.loadDashboardData();
+                await this.renderGraphs();
+                this.state.isLoading = false;
+            } catch (error) {
+                console.error("Error initializing CRM Dashboard:", error);
+                this.state.error = error.message;
+                this.state.isLoading = false;
+                this.notification.add(
+                    _t("Failed to load dashboard data: %s", error.message),
+                    { type: "danger" }
+                );
+            }
         });
-        var bg_color_list = []
-        for (var i=0;i<=12;i++){
-            bg_color_list.push(self.getRandomColor())
+        
+        onWillUnmount(() => {
+            this.cleanupCharts();
+        });
+    }
+
+    async loadChartLibraries() {
+        try {
+            await loadJS("/odoo_crm_dashboard/static/lib/charts/Chart.min.js");
+            await loadJS("/odoo_crm_dashboard/static/lib/dataTables/jquery.dataTables.min.js");
+        } catch (error) {
+            console.warn("Error loading chart libraries:", error);
         }
-        var myChart = new Chart(ctx, {
-            type: 'bar',
+    }
+
+    async loadDashboardData() {
+        try {
+            const result = await this.orm.call("crm.dashboard", "get_crm_info", []);
+            this.state.crmData = result[0] || {};
+        } catch (error) {
+            console.error("Error loading CRM data:", error);
+            throw error;
+        }
+    }
+
+    cleanupCharts() {
+        Object.values(this.chartInstances).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+        this.chartInstances = {};
+    }
+
+    async renderGraphs() {
+        if (!window.Chart) {
+            console.warn("Chart.js not loaded, skipping graph rendering");
+            return;
+        }
+
+        try {
+            await this.renderOverdueChart();
+            await this.renderPipelineChart();
+            await this.renderLeadChart();
+            await this.renderWonChart();
+            await this.renderYearlyChart();
+            await this.renderExpectedChart();
+        } catch (error) {
+            console.error("Error rendering charts:", error);
+        }
+    }
+
+    async renderOverdueChart() {
+        const chartRef = this.chartRefs.overdue_chart;
+        if (!chartRef.el || !this.state.crmData.overdue_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.overdue_chart = new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                //labels: ["January","February", "March", "April", "May", "June", "July", "August", "September",
-                // "October", "November", "December"],
-                labels: self.crm_data.graph_exp_revenue_label,
+                labels: this.state.crmData.overdue_data.labels || [],
                 datasets: [{
-                    label: 'Expected Revenue',
-                    data: self.crm_data.graph_exp_revenue_dataset,
-                    backgroundColor: bg_color_list,
-                    borderColor: bg_color_list,
-                    borderWidth: 1,
-                    pointBorderColor: 'white',
-                    pointBackgroundColor: 'red',
-                    pointRadius: 5,
-                    pointHoverRadius: 10,
-                    pointHitRadius: 30,
-                    pointBorderWidth: 2,
-                    pointStyle: 'rectRounded'
+                    data: this.state.crmData.overdue_data.data || [],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
                 }]
             },
             options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                            max: Math.max.apply(null,self.crm_data.graph_exp_revenue_dataset),
-                            //min: 1000,
-                            //max: 100000,
-                            stepSize: self.crm_data.
-                            graph_exp_revenue_dataset.reduce((pv,cv)=>{return pv + (parseFloat(cv)||0)},0)
-                            /self.crm_data.graph_exp_revenue_dataset.length
-                          }
-                    }]
-                },
                 responsive: true,
-                maintainAspectRatio: true,
-                animation: {
-                    duration: 100, // general animation time
-                },
-                hover: {
-                    animationDuration: 500, // duration of animations when hovering an item
-                },
-                responsiveAnimationDuration: 500, // animation duration after a resize
+                maintainAspectRatio: false,
                 legend: {
-                    display: true,
-                    labels: {
-                        fontColor: 'black'
-                    }
-                },
-            },
+                    position: 'bottom'
+                }
+            }
         });
-       
+    }
 
-    },
-    
-});
-core.action_registry.add('crm_dashboard.dashboard', CRMDashboardView);
-return CRMDashboardView
-    
-});
+    async renderPipelineChart() {
+        const chartRef = this.chartRefs.pipeline_chart;
+        if (!chartRef.el || !this.state.crmData.pipeline_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.pipeline_chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: this.state.crmData.pipeline_data.labels || [],
+                datasets: [{
+                    label: _t('Pipeline'),
+                    data: this.state.crmData.pipeline_data.data || [],
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#36A2EB',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    async renderLeadChart() {
+        const chartRef = this.chartRefs.lead_chart;
+        if (!chartRef.el || !this.state.crmData.lead_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.lead_chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: this.state.crmData.lead_data.labels || [],
+                datasets: [{
+                    label: _t('Leads'),
+                    data: this.state.crmData.lead_data.data || [],
+                    borderColor: '#FFCE56',
+                    backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    async renderWonChart() {
+        const chartRef = this.chartRefs.won_chart;
+        if (!chartRef.el || !this.state.crmData.won_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.won_chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: this.state.crmData.won_data.labels || [],
+                datasets: [{
+                    data: this.state.crmData.won_data.data || [],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    }
+
+    async renderYearlyChart() {
+        const chartRef = this.chartRefs.yearly_chart;
+        if (!chartRef.el || !this.state.crmData.yearly_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.yearly_chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: this.state.crmData.yearly_data.labels || [],
+                datasets: [{
+                    label: _t('Yearly Revenue'),
+                    data: this.state.crmData.yearly_data.data || [],
+                    backgroundColor: '#4BC0C0',
+                    borderColor: '#4BC0C0',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    async renderExpectedChart() {
+        const chartRef = this.chartRefs.expected_chart;
+        if (!chartRef.el || !this.state.crmData.expected_data) return;
+
+        const ctx = chartRef.el.getContext('2d');
+        this.chartInstances.expected_chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: this.state.crmData.expected_data.labels || [],
+                datasets: [{
+                    data: this.state.crmData.expected_data.data || [],
+                    backgroundColor: ['#FF9F40', '#FF6384', '#36A2EB'],
+                    hoverBackgroundColor: ['#FF9F40', '#FF6384', '#36A2EB']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    }
+
+    // Action methods converted to modern async/await
+    async onOverdueOpportunitiesClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_overdue_opportunities", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading opportunities"), { type: "danger" });
+        }
+    }
+
+    async onMyPipelineClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_my_pipeline", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading pipeline"), { type: "danger" });
+        }
+    }
+
+    async onOpenOpportunitiesClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_open_opportunities", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading opportunities"), { type: "danger" });
+        }
+    }
+
+    async onWonCountClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_won_count", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading won opportunities"), { type: "danger" });
+        }
+    }
+
+    async onLossCountClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_loss_count", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading lost opportunities"), { type: "danger" });
+        }
+    }
+
+    async onTotalExpectedRevenueClick() {
+        try {
+            const action = await this.orm.call("crm.dashboard", "action_tot_exp_revenue", []);
+            this.actionService.doAction(action);
+        } catch (error) {
+            this.notification.add(_t("Error loading revenue data"), { type: "danger" });
+        }
+    }
+}
+
+// Register the component in the action registry
+registry.category("actions").add("crm_dashboard.dashboard", CRMDashboardView);
+
+// Export for compatibility
+export default CRMDashboardView;
