@@ -70,14 +70,14 @@ class AccountPayment(models.Model):
         help="Additional remarks or memo for this payment voucher"
     )
 
-    # Voucher number with automatic generation
+    # Voucher number with automatic generation - visible even in draft
     voucher_number = fields.Char(
         string='Voucher Number',
         copy=False,
         readonly=True,
         index=True,
-        default='/',
-        help="Unique voucher number generated automatically"
+        default=lambda self: self._generate_sequence_on_create(),
+        help="Unique voucher number generated automatically and visible in all stages"
     )
     
     # Smart Button Fields for UI Navigation
@@ -857,9 +857,15 @@ Verify at: {base_url}/payment/qr-guide"""
     # HELPER METHODS
     # ============================================================================
 
+    def _generate_sequence_on_create(self):
+        """Generate sequence immediately on field default (even before create)"""
+        # This is called as default value, so we can't access self yet
+        # Return a placeholder that will be replaced in create method
+        return 'NEW'
+
     def _generate_voucher_number(self):
         """Generate unique voucher number using sequence"""
-        if not self.voucher_number:
+        if not self.voucher_number or self.voucher_number in ['/', 'NEW']:
             sequence_code = 'payment.voucher' if self.payment_type == 'outbound' else 'receipt.voucher'
             
             # Try to get sequence, create if not exists
@@ -1345,12 +1351,12 @@ Verify at: {base_url}/payment/qr-guide"""
 
     @api.model
     def create(self, vals):
-        """Enhanced create method with voucher number generation and approval workflow enforcement"""
-        # Generate voucher number if not provided or is default '/'
-        if not vals.get('voucher_number') or vals.get('voucher_number') == '/':
+        """Enhanced create method with immediate voucher number generation and approval workflow enforcement"""
+        # ALWAYS generate voucher number immediately - visible even in draft stage
+        if not vals.get('voucher_number') or vals.get('voucher_number') in ['/', 'NEW']:
             payment_type = vals.get('payment_type', 'outbound')
             
-            # Try to get existing sequence or create one
+            # Use unified sequence code for both payments and receipts
             if payment_type == 'inbound':
                 sequence_code = 'payment.voucher.receipt'
                 prefix = 'RV'
@@ -1372,8 +1378,9 @@ Verify at: {base_url}/payment/qr-guide"""
                 })
             
             try:
+                # Generate sequence immediately - visible in all stages
                 vals['voucher_number'] = sequence.next_by_id()
-                _logger.info(f"Generated voucher number: {vals['voucher_number']}")
+                _logger.info(f"Generated voucher number immediately: {vals['voucher_number']}")
             except Exception as e:
                 # Fallback if sequence fails
                 import datetime
