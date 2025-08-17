@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'OSUS Payment Approval System',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.1.0',
     'category': 'Accounting/Payments',
     'summary': 'OSUS Properties - Professional Payment Voucher System with Multi-Stage Approval Workflow',
     'description': """
