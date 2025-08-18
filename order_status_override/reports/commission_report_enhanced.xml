@@ -639,6 +639,8 @@
                                         <div style="margin-top: 8px; font-size: 9px; font-style: italic;">
                                             Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/> by <span t-field="o.create_uid.name"/>
                                         </div>
+                                    </div>
+                                </div>
                             </div>
                         </t>
                     </t>
