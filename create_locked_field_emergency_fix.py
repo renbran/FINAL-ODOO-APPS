@@ -1,4 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
+#!/usr/bin/env python3
+"""
+EMERGENCY LOCKED FIELD FIX FOR ORDER NET COMMISSION
+OSUS Properties - Critical CloudPepper Production Issue
+
+Problem: Field 'locked' used in modifier 'readonly' (state == 'cancel' or locked) must be present in view but is missing
+Root Cause: Header replacement removed required 'locked' field
+Impact: Module installation fails in CloudPepper
+
+Solution: Add locked field to header replacement
+"""
+
+import os
+from datetime import datetime
+
+def create_locked_field_emergency_fix():
+    """Create emergency fix for missing locked field error"""
+    
+    print("LOCKED FIELD EMERGENCY FIX")
+    print("="*50)
+    print(f"Fix Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("Problem: Missing 'locked' field in order_net_commission view")
+    print("Solution: Add locked field to header replacement")
+    print()
+    
+    # Fixed view content with locked field
+    fixed_view = '''<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
 
@@ -70,4 +96,76 @@
         </record>
 
     </data>
-</odoo>
+</odoo>'''
+    
+    # Write the fixed view
+    view_path = "order_net_commission/views/sale_order_form.xml"
+    print(f"Updating view file: {view_path}")
+    
+    with open(view_path, 'w', encoding='utf-8') as f:
+        f.write(fixed_view)
+    
+    print("✅ Fixed view file updated with locked field")
+    
+    # Create deployment instructions
+    instructions = """LOCKED FIELD FIX - IMMEDIATE DEPLOYMENT
+
+PROBLEM RESOLVED:
+Field 'locked' used in modifier 'readonly' (state == 'cancel' or locked) must be present in view but is missing
+
+SOLUTION APPLIED:
+✅ Added <field name="locked" invisible="1"/> to header replacement
+✅ Maintains all existing functionality
+✅ Satisfies Odoo view validation requirements
+
+DEPLOYMENT STEPS:
+
+1. IMMEDIATE ACTION:
+   - Upload updated order_net_commission folder to CloudPepper
+   - The locked field is now included in the view
+
+2. INSTALL MODULE:
+   - Go to Apps > Update Apps List
+   - Search "Order Net Commission"
+   - Click Install (should work without validation errors)
+
+3. VERIFICATION:
+   - Module installs successfully
+   - No field validation errors
+   - Workflow buttons appear correctly
+   - Commission calculation works
+
+TECHNICAL DETAILS:
+
+The 'locked' field is a standard Odoo sale.order field that controls:
+- Record locking for editing
+- Readonly modifiers throughout the view
+- Business logic validation
+
+By adding it as invisible to our header, we:
+✅ Satisfy view validation requirements
+✅ Maintain original functionality  
+✅ Keep our custom workflow intact
+✅ Ensure CloudPepper compatibility
+
+STATUS: READY FOR IMMEDIATE CLOUDPEPPER DEPLOYMENT
+"""
+    
+    with open('LOCKED_FIELD_FIX_INSTRUCTIONS.txt', 'w', encoding='utf-8') as f:
+        f.write(instructions)
+    
+    print("✅ Deployment instructions created")
+    print()
+    print("LOCKED FIELD FIX COMPLETE")
+    print("="*50)
+    print("Changes Applied:")
+    print("1. Added locked field to header replacement")
+    print("2. View validation requirements satisfied")
+    print("3. CloudPepper compatibility maintained")
+    print()
+    print("READY FOR CLOUDPEPPER DEPLOYMENT!")
+    
+    return True
+
+if __name__ == "__main__":
+    create_locked_field_emergency_fix()

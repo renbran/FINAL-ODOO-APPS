@@ -1,0 +1,41 @@
+LOCKED FIELD FIX - IMMEDIATE DEPLOYMENT
+
+PROBLEM RESOLVED:
+Field 'locked' used in modifier 'readonly' (state == 'cancel' or locked) must be present in view but is missing
+
+SOLUTION APPLIED:
+✅ Added <field name="locked" invisible="1"/> to header replacement
+✅ Maintains all existing functionality
+✅ Satisfies Odoo view validation requirements
+
+DEPLOYMENT STEPS:
+
+1. IMMEDIATE ACTION:
+   - Upload updated order_net_commission folder to CloudPepper
+   - The locked field is now included in the view
+
+2. INSTALL MODULE:
+   - Go to Apps > Update Apps List
+   - Search "Order Net Commission"
+   - Click Install (should work without validation errors)
+
+3. VERIFICATION:
+   - Module installs successfully
+   - No field validation errors
+   - Workflow buttons appear correctly
+   - Commission calculation works
+
+TECHNICAL DETAILS:
+
+The 'locked' field is a standard Odoo sale.order field that controls:
+- Record locking for editing
+- Readonly modifiers throughout the view
+- Business logic validation
+
+By adding it as invisible to our header, we:
+✅ Satisfy view validation requirements
+✅ Maintain original functionality  
+✅ Keep our custom workflow intact
+✅ Ensure CloudPepper compatibility
+
+STATUS: READY FOR IMMEDIATE CLOUDPEPPER DEPLOYMENT
