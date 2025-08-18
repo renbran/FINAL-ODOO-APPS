@@ -1,0 +1,13 @@
+{
+  "module": "order_net_commission",
+  "validation_date": "2025-08-18T14:12:19.497742",
+  "deployment_ready": true,
+  "results": {
+    "passed": 31,
+    "failed": 0,
+    "warnings": 0,
+    "errors": []
+  },
+  "osus_branding": true,
+  "cloudpepper_compatible": true
+}
