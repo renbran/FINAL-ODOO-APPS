@@ -100,6 +100,225 @@ class SaleOrder(models.Model):
         help="Indicates if users have been automatically assigned"
     )
     
+    # Commission Configuration Fields
+    # External Commission Fields
+    broker_partner_id = fields.Many2one(
+        'res.partner',
+        string='Broker Partner',
+        tracking=True,
+        help="Partner receiving broker commission"
+    )
+    broker_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Broker Commission Type', default='percentage')
+    broker_rate = fields.Float(
+        string='Broker Rate (%)',
+        help="Broker commission percentage or fixed amount"
+    )
+    broker_amount = fields.Monetary(
+        string='Broker Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated broker commission amount"
+    )
+    
+    referrer_partner_id = fields.Many2one(
+        'res.partner',
+        string='Referrer Partner',
+        tracking=True,
+        help="Partner receiving referrer commission"
+    )
+    referrer_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Referrer Commission Type', default='percentage')
+    referrer_rate = fields.Float(
+        string='Referrer Rate (%)',
+        help="Referrer commission percentage or fixed amount"
+    )
+    referrer_amount = fields.Monetary(
+        string='Referrer Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated referrer commission amount"
+    )
+    
+    cashback_partner_id = fields.Many2one(
+        'res.partner',
+        string='Cashback Partner',
+        tracking=True,
+        help="Partner receiving cashback commission"
+    )
+    cashback_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Cashback Commission Type', default='percentage')
+    cashback_rate = fields.Float(
+        string='Cashback Rate (%)',
+        help="Cashback commission percentage or fixed amount"
+    )
+    cashback_amount = fields.Monetary(
+        string='Cashback Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated cashback commission amount"
+    )
+    
+    # Internal Commission Fields
+    agent1_partner_id = fields.Many2one(
+        'res.partner',
+        string='Agent 1 Partner',
+        tracking=True,
+        help="First agent receiving commission"
+    )
+    agent1_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Agent 1 Commission Type', default='percentage')
+    agent1_rate = fields.Float(
+        string='Agent 1 Rate (%)',
+        help="Agent 1 commission percentage or fixed amount"
+    )
+    agent1_amount = fields.Monetary(
+        string='Agent 1 Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated agent 1 commission amount"
+    )
+    
+    agent2_partner_id = fields.Many2one(
+        'res.partner',
+        string='Agent 2 Partner',
+        tracking=True,
+        help="Second agent receiving commission"
+    )
+    agent2_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Agent 2 Commission Type', default='percentage')
+    agent2_rate = fields.Float(
+        string='Agent 2 Rate (%)',
+        help="Agent 2 commission percentage or fixed amount"
+    )
+    agent2_amount = fields.Monetary(
+        string='Agent 2 Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated agent 2 commission amount"
+    )
+    
+    manager_partner_id = fields.Many2one(
+        'res.partner',
+        string='Manager Partner',
+        tracking=True,
+        help="Manager receiving commission"
+    )
+    manager_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Manager Commission Type', default='percentage')
+    manager_rate = fields.Float(
+        string='Manager Rate (%)',
+        help="Manager commission percentage or fixed amount"
+    )
+    manager_amount = fields.Monetary(
+        string='Manager Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated manager commission amount"
+    )
+    
+    director_partner_id = fields.Many2one(
+        'res.partner',
+        string='Director Partner',
+        tracking=True,
+        help="Director receiving commission"
+    )
+    director_commission_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage')
+    ], string='Director Commission Type', default='percentage')
+    director_rate = fields.Float(
+        string='Director Rate (%)',
+        help="Director commission percentage or fixed amount"
+    )
+    director_amount = fields.Monetary(
+        string='Director Amount',
+        compute='_compute_commission_amounts',
+        store=True,
+        help="Calculated director commission amount"
+    )
+    
+    # Commission Summary Fields
+    total_external_commission_amount = fields.Monetary(
+        string='Total External Commission',
+        compute='_compute_commission_totals',
+        store=True,
+        help="Total of all external commissions (broker + referrer + cashback)"
+    )
+    total_internal_commission_amount = fields.Monetary(
+        string='Total Internal Commission',
+        compute='_compute_commission_totals',
+        store=True,
+        help="Total of all internal commissions (agents + manager + director)"
+    )
+    total_commission_amount = fields.Monetary(
+        string='Total Commission Amount',
+        compute='_compute_commission_totals',
+        store=True,
+        help="Total of all commissions (internal + external)"
+    )
+    
+    # New Net Commission Field based on the specified formula
+    net_commission_amount = fields.Monetary(
+        string='Net Commission',
+        compute='_compute_net_commission',
+        store=True,
+        help="Net commission calculated as: amount_total - (total_internal - total_external)"
+    )
+    
+    # Real Estate specific fields referenced in views
+    booking_date = fields.Date(
+        string='Booking Date',
+        tracking=True,
+        help="Date when the booking was made"
+    )
+    project_id = fields.Many2one(
+        'project.project',
+        string='Project',
+        tracking=True,
+        help="Related project for real estate"
+    )
+    unit_id = fields.Many2one(
+        'product.product',
+        string='Unit',
+        tracking=True,
+        help="Specific unit/product being sold"
+    )
+    
+    # Additional workflow user assignments
+    approval_user_id = fields.Many2one(
+        'res.users',
+        string='Approval User',
+        tracking=True,
+        help="User responsible for final approval"
+    )
+    posting_user_id = fields.Many2one(
+        'res.users',
+        string='Posting User',
+        tracking=True,
+        help="User responsible for posting approved orders"
+    )
+    
+    # Status history for tracking
+    custom_status_history_ids = fields.One2many(
+        'order.status.history',
+        'order_id',
+        string='Status History',
+        help="History of status changes for this order"
+    )
+    
     @api.model
     def create(self, vals):
         """Set initial status when creating order"""
@@ -178,6 +397,90 @@ class SaleOrder(models.Model):
                 record.allocation_user_id or 
                 record.final_review_user_id
             )
+    
+    @api.depends('amount_total', 'broker_rate', 'broker_commission_type', 'referrer_rate', 'referrer_commission_type',
+                 'cashback_rate', 'cashback_commission_type', 'agent1_rate', 'agent1_commission_type',
+                 'agent2_rate', 'agent2_commission_type', 'manager_rate', 'manager_commission_type',
+                 'director_rate', 'director_commission_type')
+    def _compute_commission_amounts(self):
+        """Compute individual commission amounts based on type and rate"""
+        for record in self:
+            base_amount = record.amount_total
+            
+            # External Commissions
+            record.broker_amount = record._calculate_commission_amount(
+                base_amount, record.broker_rate, record.broker_commission_type
+            )
+            record.referrer_amount = record._calculate_commission_amount(
+                base_amount, record.referrer_rate, record.referrer_commission_type
+            )
+            record.cashback_amount = record._calculate_commission_amount(
+                base_amount, record.cashback_rate, record.cashback_commission_type
+            )
+            
+            # Internal Commissions
+            record.agent1_amount = record._calculate_commission_amount(
+                base_amount, record.agent1_rate, record.agent1_commission_type
+            )
+            record.agent2_amount = record._calculate_commission_amount(
+                base_amount, record.agent2_rate, record.agent2_commission_type
+            )
+            record.manager_amount = record._calculate_commission_amount(
+                base_amount, record.manager_rate, record.manager_commission_type
+            )
+            record.director_amount = record._calculate_commission_amount(
+                base_amount, record.director_rate, record.director_commission_type
+            )
+    
+    @api.depends('broker_amount', 'referrer_amount', 'cashback_amount',
+                 'agent1_amount', 'agent2_amount', 'manager_amount', 'director_amount')
+    def _compute_commission_totals(self):
+        """Compute total commission amounts"""
+        for record in self:
+            # Total External Commission (broker + referrer + cashback)
+            record.total_external_commission_amount = (
+                record.broker_amount + 
+                record.referrer_amount + 
+                record.cashback_amount
+            )
+            
+            # Total Internal Commission (agents + manager + director)
+            record.total_internal_commission_amount = (
+                record.agent1_amount + 
+                record.agent2_amount + 
+                record.manager_amount + 
+                record.director_amount
+            )
+            
+            # Total Commission Amount
+            record.total_commission_amount = (
+                record.total_external_commission_amount + 
+                record.total_internal_commission_amount
+            )
+    
+    @api.depends('amount_total', 'total_internal_commission_amount', 'total_external_commission_amount')
+    def _compute_net_commission(self):
+        """Compute net commission using the specified formula:
+        net commission = amount_total - (total internal - total external)
+        """
+        for record in self:
+            # Apply the new formula: amount_total - (total internal - total external)
+            total_internal = record.total_internal_commission_amount
+            total_external = record.total_external_commission_amount
+            
+            record.net_commission_amount = record.amount_total - (total_internal - total_external)
+    
+    def _calculate_commission_amount(self, base_amount, rate, commission_type):
+        """Helper method to calculate commission amount based on type"""
+        if not rate or not commission_type:
+            return 0.0
+        
+        if commission_type == 'percentage':
+            return base_amount * (rate / 100.0)
+        elif commission_type == 'fixed':
+            return rate
+        else:
+            return 0.0
     
     def _change_status(self, new_status_id, notes=None):
         """Change order status with proper validation and logging"""
@@ -347,7 +650,28 @@ class SaleOrder(models.Model):
     def action_move_to_commission_calculation(self):
         """Move to commission calculation stage"""
         self.ensure_one()
-        # Custom commission logic
+        
+        # Find commission calculation status
+        commission_status = self.env['order.status'].search([
+            ('code', '=', 'commission_calculation')
+        ], limit=1)
+        
+        if commission_status:
+            self._change_status(commission_status.id, "Moved to commission calculation")
+        
+        # Auto-calculate commissions if rates are already set
+        if any([
+            self.broker_rate, self.referrer_rate, self.cashback_rate,
+            self.agent1_rate, self.agent2_rate, self.manager_rate, self.director_rate
+        ]):
+            # Trigger commission recalculation
+            self._compute_commission_amounts()
+            self._compute_commission_totals()
+            self._compute_net_commission()
+            
+            _logger.info("Commission calculation completed for order %s. Net commission: %s", 
+                        self.name, self.net_commission_amount)
+        
         return True
     
     def action_view_order_reports(self):
