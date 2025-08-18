@@ -35,28 +35,28 @@ class PurchaseOrder(models.Model):
         'res.partner',
         string="Agent 1",
         compute="_compute_commission_fields",
-        store=False,
+        store=True,  # CRITICAL FIX: Changed to True for email template access
         help="Agent 1 from the origin sale order"
     )
     agent2_partner_id = fields.Many2one(
         'res.partner',
         string="Agent 2", 
         compute="_compute_commission_fields",
-        store=False,
+        store=True,  # CRITICAL FIX: Changed to True for email template access
         help="Agent 2 from the origin sale order"
     )
     project_id = fields.Many2one(
         'project.project',
         string="Project",
         compute="_compute_commission_fields",
-        store=False,
+        store=True,  # CRITICAL FIX: Changed to True for email template access
         help="Project from the origin sale order"
     )
     unit_id = fields.Many2one(
         'product.product',
         string="Unit",
         compute="_compute_commission_fields", 
-        store=False,
+        store=True,  # CRITICAL FIX: Changed to True for email template access
         help="Unit from the origin sale order"
     )
 
@@ -66,18 +66,22 @@ class PurchaseOrder(models.Model):
         for po in self:
             po.is_commission_po = bool(po.origin_so_id)
     
-    @api.depends('origin_so_id.agent1_partner_id', 'origin_so_id.agent2_partner_id')
+    @api.depends('origin_so_id', 'origin_so_id.agent1_partner_id', 'origin_so_id.agent2_partner_id')
     def _compute_commission_fields(self):
         """Compute commission-related fields from origin sale order."""
         for po in self:
             if po.origin_so_id:
-                po.agent1_partner_id = po.origin_so_id.agent1_partner_id
-                po.agent2_partner_id = po.origin_so_id.agent2_partner_id
-                # project_id and unit_id don't exist in sale.order model, so always False
-                po.project_id = False
-                po.unit_id = False
+                # Safe field access with hasattr checks
+                po.agent1_partner_id = po.origin_so_id.agent1_partner_id if hasattr(po.origin_so_id, 'agent1_partner_id') else False
+                po.agent2_partner_id = po.origin_so_id.agent2_partner_id if hasattr(po.origin_so_id, 'agent2_partner_id') else False
+                # project_id and unit_id might not exist in all sale.order implementations
+                po.project_id = po.origin_so_id.project_id if hasattr(po.origin_so_id, 'project_id') else False
+                po.unit_id = po.origin_so_id.unit_id if hasattr(po.origin_so_id, 'unit_id') else False
             else:
                 po.agent1_partner_id = False
+                po.agent2_partner_id = False
+                po.project_id = False
+                po.unit_id = False
                 po.agent2_partner_id = False
                 po.project_id = False
                 po.unit_id = False

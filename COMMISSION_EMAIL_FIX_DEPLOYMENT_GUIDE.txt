@@ -1,0 +1,42 @@
+EMERGENCY COMMISSION EMAIL FIX - DEPLOYMENT GUIDE
+
+PROBLEM:
+AttributeError: 'purchase.order' object has no attribute 'agent1_partner_id'
+
+ROOT CAUSE:
+- Commission fields in purchase.order are computed but not stored
+- Email templates cannot access non-stored computed fields
+- QWeb template rendering fails when field doesn't exist in memory
+
+SOLUTION:
+1. Make commission fields stored in database
+2. Update email templates with safe field access
+3. Trigger field recomputation
+
+DEPLOYMENT STEPS:
+
+STEP 1: Apply SQL Fix (IMMEDIATE)
+- Run cloudpepper_commission_email_emergency_fix.sql in CloudPepper database
+- This will make fields stored and fix templates immediately
+
+STEP 2: Update Python Code (FOLLOW-UP)
+- Edit commission_ax/models/purchase_order.py
+- Change store=False to store=True for commission fields
+- Follow commission_ax_emergency_fix_instructions.txt
+
+STEP 3: Module Update (PRODUCTION)
+- Update commission_ax module in CloudPepper
+- Restart Odoo service
+- Test commission email sending
+
+VERIFICATION:
+1. Check browser console - no more AttributeError
+2. Test commission email sending
+3. Verify commission fields visible in purchase orders
+4. Monitor CloudPepper logs for 24 hours
+
+EMERGENCY CONTACT:
+If issues persist, disable commission emails temporarily:
+UPDATE mail_template SET active = FALSE WHERE body_html LIKE '%COMMISSION PAYOUT%';
+
+STATUS: READY FOR IMMEDIATE DEPLOYMENT
