@@ -50,6 +50,7 @@
     'assets': {
         'web.assets_backend': [
             'order_net_commission/static/src/scss/order_commission_style.scss',
+            'order_net_commission/static/src/js/cloudpepper_rpc_protection.js',
         ],
     },
     'demo': [],

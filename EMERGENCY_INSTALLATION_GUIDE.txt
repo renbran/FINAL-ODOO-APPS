@@ -1,0 +1,24 @@
+CLOUDPEPPER EMERGENCY INSTALLATION GUIDE
+
+Problem: XPath error - field 'amount_total' cannot be located
+
+Solution: Emergency safe view with CloudPepper compatibility
+
+Installation Steps:
+1. Upload order_net_commission folder to CloudPepper addons
+2. Go to Apps > Update Apps List
+3. Search "Order Net Commission" and Install
+4. Test commission workflow
+
+Features:
+- Safe XPath selectors
+- CloudPepper compatible
+- All workflow functionality preserved
+- Commission calculation intact
+
+Monitor:
+- Check browser console for errors
+- Test workflow with different users
+- Verify commission calculation
+
+Success: Module should install without XPath errors

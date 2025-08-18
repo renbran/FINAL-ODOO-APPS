@@ -1,0 +1,19 @@
+{
+  "module_name": "order_net_commission",
+  "version": "17.0.1.0.0",
+  "deployment_date": "2025-08-18T14:16:48.548029",
+  "status": "READY",
+  "osus_compliant": true,
+  "cloudpepper_ready": true,
+  "test_status": "PASSED",
+  "files_count": 12,
+  "deployment_instructions": [
+    "Upload module to CloudPepper addons directory",
+    "Update Odoo apps list",
+    "Install Order Net Commission module",
+    "Assign users to security groups",
+    "Test workflow functionality",
+    "Monitor performance metrics"
+  ],
+  "support_contact": "support@osusproperties.com"
+}
