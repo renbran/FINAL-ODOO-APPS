@@ -4,18 +4,18 @@
     <template id="assets_backend" inherit_id="web.assets_backend">
         <!-- JavaScript Files - Specific files to avoid conflicts -->
         <script type="text/javascript" src="/odoo_crm_dashboard/static/src/js/crm_dashboard_legacy_fixed.js"/>
-        
+
         <!-- CSS Files -->
         <link rel="stylesheet" type="text/scss" src="/odoo_crm_dashboard/static/src/scss/*.scss"/>
         <link rel="stylesheet" type="text/css" src="/odoo_crm_dashboard/static/src/css/*.css"/>
     </template>
-    
+
     <!-- Frontend Assets (if needed) -->
     <template id="assets_frontend" inherit_id="web.assets_frontend">
         <script type="text/javascript" src="/odoo_crm_dashboard/static/src/js/frontend.js"/>
         <link rel="stylesheet" type="text/css" src="/odoo_crm_dashboard/static/src/css/frontend.css"/>
     </template>
-    
+
     <!-- QWeb Templates -->
     <template id="dashboard_template" name="odoo_crm_dashboard.Dashboard">
         <div class="o_odoo-crm-dashboard_dashboard">
@@ -23,7 +23,8 @@
                 <h2>OSUS Properties Dashboard</h2>
                 <div class="o_dashboard_controls">
                     <button class="btn btn-primary" t-on-click="onRefreshData">
-                        <i class="fa fa-refresh"/> Refresh
+                        <i class="fa fa-refresh"/>
+ Refresh
                     </button>
                 </div>
             </div>
@@ -36,7 +37,8 @@
                 </t>
                 <t t-elif="state.error">
                     <div class="alert alert-danger">
-                        <strong>Error:</strong> <t t-esc="state.error"/>
+                        <strong>Error:</strong>
+                        <t t-esc="state.error"/>
                     </div>
                 </t>
                 <t t-else="">

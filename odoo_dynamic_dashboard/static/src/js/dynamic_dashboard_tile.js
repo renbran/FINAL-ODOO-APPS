@@ -4,59 +4,61 @@ import { _t } from "@web/core/l10n/translation";
 import { Component, xml } from "@odoo/owl";
 
 export class DynamicDashboardTile extends Component {
-    // Setup function of the class DynamicDashboardTile
-    setup() {
-        this.doAction = this.props.doAction.doAction;
-        this.dialog = this.props.dialog;
-        this.orm = this.props.orm;
-
+  // Setup function of the class DynamicDashboardTile
+  setup() {
+    this.doAction = this.props.doAction.doAction;
+    this.dialog = this.props.dialog;
+    this.orm = this.props.orm;
+  }
+  // Function to get the configuration of the tile
+  async getConfiguration(ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    var id = this.props.widget.id;
+    await this.doAction({
+      type: "ir.actions.act_window",
+      res_model: "dashboard.block",
+      res_id: id,
+      view_mode: "form",
+      views: [[false, "form"]],
+    });
+  }
+  // Function to remove the tile
+  async removeTile(ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    this.dialog.add(ConfirmationDialog, {
+      title: _t("Delete Confirmation"),
+      body: _t("Are you sure you want to delete this item?"),
+      confirmLabel: _t("YES, I'M SURE"),
+      cancelLabel: _t("NO, GO BACK"),
+      confirm: async () => {
+        await this.orm.unlink("dashboard.block", [this.props.widget.id]);
+        location.reload();
+      },
+      cancel: () => {},
+    });
+  }
+  // Function for getting records by double click
+  async getRecords() {
+    var model_name = this.props.widget.model_name;
+    this.saveLayout = document.getElementById("save_layout");
+    this.displayValue = window.getComputedStyle(this.saveLayout).display;
+    if (model_name && this.displayValue == "none") {
+      await this.doAction({
+        type: "ir.actions.act_window",
+        res_model: model_name,
+        view_mode: "tree,form",
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
+        domain: this.props.widget.domain,
+      });
     }
-    // Function to get the configuration of the tile
-    async getConfiguration(ev){
-        ev.stopPropagation();
-        ev.preventDefault();
-        var id = this.props.widget.id
-        await this.doAction({
-              type: 'ir.actions.act_window',
-              res_model: 'dashboard.block',
-              res_id: id,
-              view_mode: 'form',
-              views: [[false, "form"]]
-          });
-    }
-    // Function to remove the tile
-    async removeTile(ev){
-        ev.stopPropagation();
-        ev.preventDefault();
-        this.dialog.add(ConfirmationDialog, {
-            title: _t("Delete Confirmation"),
-            body: _t("Are you sure you want to delete this item?"),
-            confirmLabel: _t("YES, I'M SURE"),
-            cancelLabel: _t("NO, GO BACK"),
-            confirm: async () => {
-                await this.orm.unlink("dashboard.block", [this.props.widget.id]);
-                location.reload();
-            },
-            cancel: () => {},
-        });
-    }
-    // Function for getting records by double click
-    async getRecords(){
-        var model_name = this.props.widget.model_name;
-        this.saveLayout = document.getElementById("save_layout");
-        this.displayValue = window.getComputedStyle(this.saveLayout).display;
-        if (model_name && this.displayValue=='none'){
-            await this.doAction({
-              type: 'ir.actions.act_window',
-              res_model: model_name,
-              view_mode: 'tree,form',
-              views: [[false, "tree"], [false, "form"]],
-              domain: this.props.widget.domain,
-          });
-        }
-    }
+  }
 }
-DynamicDashboardTile.template = xml `
+DynamicDashboardTile.template = xml`
     <div class="resize-drag tile"
         t-on-click="getRecords"
         t-att-data-id="this.props.widget.id"
@@ -89,4 +91,4 @@ DynamicDashboardTile.template = xml `
                 </div>
             </div>
         </div>
-    </div>`
+    </div>`;
