@@ -9,12 +9,17 @@ _logger = logging.getLogger(__name__)
 
 class SaleDashboard(models.TransientModel):
     _name = 'sale.dashboard'
-    _description = 'Sales Dashboard - Professional Analytics'
+    _description = 'Sales Dashboard - Professional Analytics with Enhanced Real Estate Features'
 
     # Dashboard configuration fields
     start_date = fields.Date(string='Start Date', default=lambda self: fields.Date.today().replace(day=1))
     end_date = fields.Date(string='End Date', default=fields.Date.today)
-    sale_type_ids = fields.Many2many('le.sale.type', string='Sale Types', help="Filter by sale types (if module available)")
+    sale_type_ids = fields.Many2many('sale.order.type', string='Sale Types', help="Filter by sale types from le_sale_type module")
+    booking_date_filter = fields.Date(string='Booking Date Filter', help="Filter by specific booking date from real estate module")
+    
+    # Enhanced filtering for real estate integration
+    project_filter_ids = fields.Many2many('product.template', string='Project Filter', help="Filter by projects")
+    buyer_filter_ids = fields.Many2many('res.partner', string='Buyer Filter', help="Filter by buyers")
 
     @api.model
     def format_dashboard_value(self, value):
@@ -419,3 +424,457 @@ class SaleDashboard(models.TransientModel):
                 'broker_rankings': {'rankings': []},
                 'sale_types': {'sale_types': []}
             }
+
+    @api.model
+    def get_filtered_data(self, booking_date=None, sale_order_type_id=None, project_ids=None, buyer_ids=None, start_date=None, end_date=None):
+        """
+        Enhanced filtering method for real estate and sale type integration.
+        Incorporates filtering based on booking_date, sale_order_type_id, projects, and buyers.
+        """
+        try:
+            sale_order = self.env['sale.order']
+            
+            # Base domain with date range
+            domain = []
+            
+            # Date filtering - prioritize booking_date if available
+            date_field = self._get_date_field()
+            if start_date:
+                domain.append((date_field, '>=', start_date))
+            if end_date:
+                domain.append((date_field, '<=', end_date))
+                
+            # Specific booking date filter
+            if booking_date and self._check_optional_field('sale.order', 'booking_date'):
+                domain.append(('booking_date', '=', booking_date))
+            
+            # Sale order type filtering (from le_sale_type module)
+            if sale_order_type_id and self._check_optional_field('sale.order', 'sale_order_type_id'):
+                domain.append(('sale_order_type_id', '=', sale_order_type_id))
+            
+            # Project filtering (from invoice_report_for_realestate module)
+            if project_ids and self._check_optional_field('sale.order', 'project_id'):
+                domain.append(('project_id', 'in', project_ids))
+                
+            # Buyer filtering (from invoice_report_for_realestate module)
+            if buyer_ids and self._check_optional_field('sale.order', 'buyer_id'):
+                domain.append(('buyer_id', 'in', buyer_ids))
+            
+            # Exclude cancelled orders
+            domain.append(('state', '!=', 'cancel'))
+            
+            # Search for orders matching criteria
+            sales_data = sale_order.search(domain)
+            
+            _logger.info(f"Filtered data found: {len(sales_data)} orders with domain: {domain}")
+            
+            return sales_data
+            
+        except Exception as e:
+            _logger.error(f"Error in get_filtered_data: {e}")
+            return self.env['sale.order']
+
+    @api.model
+    def compute_scorecard_metrics(self, orders=None, booking_date=None, sale_order_type_id=None):
+        """
+        Enhanced scorecard computation including real estate specific metrics.
+        Computes total sales value, total invoiced amount, and total paid amount.
+        """
+        try:
+            if orders is None:
+                # Get filtered data if no orders provided
+                orders = self.get_filtered_data(
+                    booking_date=booking_date,
+                    sale_order_type_id=sale_order_type_id
+                )
+            
+            # Basic sales metrics
+            total_sales_value = sum(orders.mapped('amount_total'))
+            total_orders_count = len(orders)
+            average_order_value = total_sales_value / total_orders_count if total_orders_count > 0 else 0
+            
+            # Real estate specific metrics (if available)
+            total_sale_value_realestate = 0
+            total_developer_commission = 0
+            
+            if self._check_optional_field('sale.order', 'sale_value'):
+                # Use real estate sale_value field if available
+                total_sale_value_realestate = sum(orders.filtered('sale_value').mapped('sale_value'))
+                
+            if self._check_optional_field('sale.order', 'developer_commission'):
+                # Calculate total commission
+                for order in orders.filtered('developer_commission'):
+                    commission_amount = (order.sale_value or order.amount_total) * (order.developer_commission / 100)
+                    total_developer_commission += commission_amount
+            
+            # Invoice related metrics
+            total_invoiced_amount = 0
+            total_paid_amount = 0
+            
+            # Get invoices related to these orders
+            invoices = self.env['account.move'].search([
+                ('invoice_origin', 'in', orders.mapped('name')),
+                ('move_type', 'in', ['out_invoice', 'out_refund']),
+                ('state', '!=', 'cancel')
+            ])
+            
+            total_invoiced_amount = sum(invoices.mapped('amount_total'))
+            
+            # Calculate paid amount from invoice payments
+            paid_invoices = invoices.filtered(lambda inv: inv.payment_state in ['paid', 'in_payment'])
+            total_paid_amount = sum(paid_invoices.mapped('amount_total'))
+            
+            # Payment completion rate
+            payment_completion_rate = (total_paid_amount / total_invoiced_amount * 100) if total_invoiced_amount > 0 else 0
+            
+            # Sale type breakdown
+            sale_type_breakdown = {}
+            if self._check_optional_field('sale.order', 'sale_order_type_id'):
+                for order in orders.filtered('sale_order_type_id'):
+                    type_name = order.sale_order_type_id.name
+                    if type_name not in sale_type_breakdown:
+                        sale_type_breakdown[type_name] = {
+                            'count': 0, 
+                            'amount': 0,
+                            'avg_value': 0
+                        }
+                    sale_type_breakdown[type_name]['count'] += 1
+                    sale_type_breakdown[type_name]['amount'] += order.amount_total
+                
+                # Calculate averages
+                for type_data in sale_type_breakdown.values():
+                    type_data['avg_value'] = type_data['amount'] / type_data['count'] if type_data['count'] > 0 else 0
+            
+            # Project performance (if available)
+            project_breakdown = {}
+            if self._check_optional_field('sale.order', 'project_id'):
+                for order in orders.filtered('project_id'):
+                    project_name = order.project_id.name
+                    if project_name not in project_breakdown:
+                        project_breakdown[project_name] = {
+                            'count': 0,
+                            'amount': 0,
+                            'units_sold': 0
+                        }
+                    project_breakdown[project_name]['count'] += 1
+                    project_breakdown[project_name]['amount'] += order.amount_total
+                    if hasattr(order, 'unit_id') and order.unit_id:
+                        project_breakdown[project_name]['units_sold'] += 1
+            
+            currency_symbol = self.env.company.currency_id.symbol or '$'
+            
+            return {
+                'total_sales_value': total_sales_value,
+                'total_sales_value_formatted': f"{currency_symbol}{self.format_dashboard_value(total_sales_value)}",
+                'total_orders_count': total_orders_count,
+                'average_order_value': average_order_value,
+                'average_order_value_formatted': f"{currency_symbol}{self.format_dashboard_value(average_order_value)}",
+                'total_invoiced_amount': total_invoiced_amount,
+                'total_invoiced_amount_formatted': f"{currency_symbol}{self.format_dashboard_value(total_invoiced_amount)}",
+                'total_paid_amount': total_paid_amount,
+                'total_paid_amount_formatted': f"{currency_symbol}{self.format_dashboard_value(total_paid_amount)}",
+                'payment_completion_rate': round(payment_completion_rate, 2),
+                'total_sale_value_realestate': total_sale_value_realestate,
+                'total_sale_value_realestate_formatted': f"{currency_symbol}{self.format_dashboard_value(total_sale_value_realestate)}",
+                'total_developer_commission': total_developer_commission,
+                'total_developer_commission_formatted': f"{currency_symbol}{self.format_dashboard_value(total_developer_commission)}",
+                'sale_type_breakdown': sale_type_breakdown,
+                'project_breakdown': project_breakdown,
+                'currency_symbol': currency_symbol,
+                'orders_analyzed': len(orders),
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error computing scorecard metrics: {e}")
+            return {
+                'total_sales_value': 0,
+                'total_invoiced_amount': 0,
+                'total_paid_amount': 0,
+                'error': str(e)
+            }
+
+    @api.model  
+    def generate_enhanced_charts(self, orders=None, chart_types=None):
+        """
+        Generate enhanced charts for visualization including trends and comparisons.
+        Utilizes booking_date for date-related visuals and sale_order_type_id for categorization.
+        """
+        try:
+            if orders is None:
+                orders = self.get_filtered_data()
+                
+            if chart_types is None:
+                chart_types = ['trends', 'comparison', 'real_estate_specific']
+            
+            charts_data = {}
+            
+            # 1. Trends Chart - Sales over time using booking_date
+            if 'trends' in chart_types:
+                trends_data = self._generate_trends_chart(orders)
+                charts_data['trends_chart'] = trends_data
+            
+            # 2. Comparison Chart - Sale types comparison
+            if 'comparison' in chart_types:
+                comparison_data = self._generate_comparison_chart(orders)
+                charts_data['comparison_chart'] = comparison_data
+                
+            # 3. Real Estate Specific Charts
+            if 'real_estate_specific' in chart_types:
+                real_estate_data = self._generate_real_estate_charts(orders)
+                charts_data.update(real_estate_data)
+            
+            return charts_data
+            
+        except Exception as e:
+            _logger.error(f"Error generating enhanced charts: {e}")
+            return {'error': str(e)}
+
+    def _generate_trends_chart(self, orders):
+        """Generate trends chart using booking_date if available"""
+        try:
+            date_field = 'booking_date' if self._check_optional_field('sale.order', 'booking_date') else 'date_order'
+            
+            # Group orders by month
+            monthly_trends = defaultdict(lambda: {'count': 0, 'amount': 0})
+            
+            for order in orders:
+                order_date = getattr(order, date_field)
+                if order_date:
+                    month_key = order_date.strftime('%Y-%m')
+                    monthly_trends[month_key]['count'] += 1
+                    monthly_trends[month_key]['amount'] += order.amount_total
+            
+            # Prepare Chart.js data
+            sorted_months = sorted(monthly_trends.keys())
+            
+            return {
+                'type': 'line',
+                'data': {
+                    'labels': [datetime.strptime(month, '%Y-%m').strftime('%b %Y') for month in sorted_months],
+                    'datasets': [
+                        {
+                            'label': 'Sales Count',
+                            'data': [monthly_trends[month]['count'] for month in sorted_months],
+                            'borderColor': '#800020',  # OSUS Burgundy
+                            'backgroundColor': 'rgba(128, 0, 32, 0.1)',
+                            'yAxisID': 'y'
+                        },
+                        {
+                            'label': 'Sales Amount',
+                            'data': [monthly_trends[month]['amount'] for month in sorted_months],
+                            'borderColor': '#FFD700',  # OSUS Gold
+                            'backgroundColor': 'rgba(255, 215, 0, 0.1)',
+                            'yAxisID': 'y1'
+                        }
+                    ]
+                },
+                'options': {
+                    'responsive': True,
+                    'scales': {
+                        'y': {
+                            'type': 'linear',
+                            'display': True,
+                            'position': 'left',
+                            'title': {'display': True, 'text': 'Sales Count'}
+                        },
+                        'y1': {
+                            'type': 'linear',
+                            'display': True,
+                            'position': 'right',
+                            'title': {'display': True, 'text': 'Sales Amount'},
+                            'grid': {'drawOnChartArea': False}
+                        }
+                    }
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error generating trends chart: {e}")
+            return {'error': str(e)}
+
+    def _generate_comparison_chart(self, orders):
+        """Generate comparison chart by sale order type"""
+        try:
+            if not self._check_optional_field('sale.order', 'sale_order_type_id'):
+                return {'error': 'Sale order type field not available'}
+                
+            type_data = defaultdict(lambda: {'count': 0, 'amount': 0})
+            
+            for order in orders.filtered('sale_order_type_id'):
+                type_name = order.sale_order_type_id.name
+                type_data[type_name]['count'] += 1
+                type_data[type_name]['amount'] += order.amount_total
+            
+            if not type_data:
+                return {'error': 'No data with sale order types found'}
+            
+            labels = list(type_data.keys())
+            counts = [type_data[label]['count'] for label in labels]
+            amounts = [type_data[label]['amount'] for label in labels]
+            
+            # OSUS color palette
+            colors = ['#800020', '#FFD700', '#8B0000', '#DAA520', '#A0522D', '#CD853F']
+            
+            return {
+                'type': 'doughnut',
+                'data': {
+                    'labels': labels,
+                    'datasets': [
+                        {
+                            'label': 'Sales by Type',
+                            'data': amounts,
+                            'backgroundColor': colors[:len(labels)],
+                            'borderColor': '#FFFFFF',
+                            'borderWidth': 2
+                        }
+                    ]
+                },
+                'options': {
+                    'responsive': True,
+                    'plugins': {
+                        'legend': {'position': 'bottom'},
+                        'title': {'display': True, 'text': 'Sales Distribution by Type'}
+                    }
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error generating comparison chart: {e}")
+            return {'error': str(e)}
+
+    def _generate_real_estate_charts(self, orders):
+        """Generate real estate specific charts"""
+        try:
+            charts = {}
+            
+            # Project performance chart
+            if self._check_optional_field('sale.order', 'project_id'):
+                project_data = defaultdict(lambda: {'count': 0, 'amount': 0, 'units': 0})
+                
+                for order in orders.filtered('project_id'):
+                    project_name = order.project_id.name
+                    project_data[project_name]['count'] += 1
+                    project_data[project_name]['amount'] += order.amount_total
+                    if hasattr(order, 'unit_id') and order.unit_id:
+                        project_data[project_name]['units'] += 1
+                
+                if project_data:
+                    charts['project_performance'] = {
+                        'type': 'bar',
+                        'data': {
+                            'labels': list(project_data.keys()),
+                            'datasets': [
+                                {
+                                    'label': 'Sales Amount',
+                                    'data': [project_data[proj]['amount'] for proj in project_data.keys()],
+                                    'backgroundColor': '#800020',
+                                    'borderColor': '#5a001a',
+                                    'borderWidth': 1
+                                }
+                            ]
+                        },
+                        'options': {
+                            'responsive': True,
+                            'plugins': {
+                                'title': {'display': True, 'text': 'Project Performance'}
+                            }
+                        }
+                    }
+            
+            # Commission analysis chart (if available)
+            if self._check_optional_field('sale.order', 'developer_commission'):
+                commission_ranges = {'0-5%': 0, '5-10%': 0, '10-15%': 0, '15%+': 0}
+                
+                for order in orders.filtered('developer_commission'):
+                    commission = order.developer_commission
+                    if commission <= 5:
+                        commission_ranges['0-5%'] += 1
+                    elif commission <= 10:
+                        commission_ranges['5-10%'] += 1
+                    elif commission <= 15:
+                        commission_ranges['10-15%'] += 1
+                    else:
+                        commission_ranges['15%+'] += 1
+                
+                charts['commission_analysis'] = {
+                    'type': 'pie',
+                    'data': {
+                        'labels': list(commission_ranges.keys()),
+                        'datasets': [
+                            {
+                                'data': list(commission_ranges.values()),
+                                'backgroundColor': ['#800020', '#FFD700', '#8B0000', '#DAA520'],
+                                'borderWidth': 2
+                            }
+                        ]
+                    },
+                    'options': {
+                        'responsive': True,
+                        'plugins': {
+                            'title': {'display': True, 'text': 'Commission Distribution'}
+                        }
+                    }
+                }
+            
+            return charts
+            
+        except Exception as e:
+            _logger.error(f"Error generating real estate charts: {e}")
+            return {'error': str(e)}
+
+    @api.model
+    def get_enhanced_dashboard_data(self, start_date, end_date, filters=None):
+        """
+        Get comprehensive enhanced dashboard data with real estate integration.
+        Combines all enhanced features including filtering, scorecard, and charts.
+        """
+        try:
+            filters = filters or {}
+            
+            # Get filtered orders based on enhanced criteria
+            filtered_orders = self.get_filtered_data(
+                booking_date=filters.get('booking_date'),
+                sale_order_type_id=filters.get('sale_order_type_id'),
+                project_ids=filters.get('project_ids'),
+                buyer_ids=filters.get('buyer_ids'),
+                start_date=start_date,
+                end_date=end_date
+            )
+            
+            # Compute enhanced scorecard metrics
+            scorecard_metrics = self.compute_scorecard_metrics(
+                orders=filtered_orders,
+                booking_date=filters.get('booking_date'),
+                sale_order_type_id=filters.get('sale_order_type_id')
+            )
+            
+            # Generate enhanced charts
+            charts_data = self.generate_enhanced_charts(
+                orders=filtered_orders,
+                chart_types=['trends', 'comparison', 'real_estate_specific']
+            )
+            
+            # Get existing dashboard data for compatibility
+            base_dashboard_data = self.get_dashboard_data(start_date, end_date, filters.get('sale_type_ids'))
+            
+            # Combine all data
+            enhanced_data = {
+                'enhanced_scorecard': scorecard_metrics,
+                'enhanced_charts': charts_data,
+                'filtered_orders_count': len(filtered_orders),
+                'applied_filters': filters,
+                'base_dashboard': base_dashboard_data,
+                'integration_status': {
+                    'le_sale_type_available': self._check_optional_field('sale.order', 'sale_order_type_id'),
+                    'real_estate_available': self._check_optional_field('sale.order', 'booking_date'),
+                    'project_field_available': self._check_optional_field('sale.order', 'project_id'),
+                    'buyer_field_available': self._check_optional_field('sale.order', 'buyer_id'),
+                    'commission_field_available': self._check_optional_field('sale.order', 'developer_commission'),
+                }
+            }
+            
+            return enhanced_data
+            
+        except Exception as e:
+            _logger.error(f"Error getting enhanced dashboard data: {e}")
+            return {'error': str(e), 'enhanced_scorecard': {}, 'enhanced_charts': {}}

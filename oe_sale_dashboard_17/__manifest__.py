@@ -76,6 +76,8 @@ Works with or without optional modules - graceful degradation included.
         'sale',
         'sale_management',
         'web',
+        'le_sale_type',
+        'invoice_report_for_realestate',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -85,7 +87,8 @@ Works with or without optional modules - graceful degradation included.
     'assets': {
         'web.assets_backend': [
             ('include', 'web._assets_helpers'),
-            # Emergency fixes (load first)
+            # CRITICAL: Emergency fixes (load first to prevent crashes)
+            ('prepend', 'oe_sale_dashboard_17/static/src/js/emergency_chartjs_fix.js'),
             ('prepend', 'oe_sale_dashboard_17/static/src/js/cloudpepper_dashboard_fix.js'),
             
             # Local Chart.js (no CDN dependency)
