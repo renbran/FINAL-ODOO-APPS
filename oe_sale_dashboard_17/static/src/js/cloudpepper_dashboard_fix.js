@@ -1,256 +1,139 @@
-/** @odoo-module **/
-        // OSUS Properties Brand Colors
-        const brandColors = {
-            primary: '#800020',
-            gold: '#FFD700',
-            lightGold: '#FFF8DC',
-            darkGold: '#B8860B',
-            white: '#FFFFFF',
-            accent: '#A0522D',
-            
-            chartColors: [
-                '#800020',
-                '#FFD700',
-                '#A0522D',
-            ],
-            
-            chartBackgrounds: [
-                '#80002020',
-                '#FFD70020',
-                '#A0522D20',
-            ]
-        };
-        
 /**
- * CloudPepper Dashboard Module Error Fix - Compatible Version
- * Specific fixes for dashboard modules and Chart.js errors
- * Uses CloudPepper-safe patterns to avoid import conflicts
+ * CloudPepper Dashboard Emergency Fix
+ * Safe error handling for dashboard modules
  */
 
-// CloudPepper-compatible dashboard error handling
-(function () {
-  "use strict";
-
-  console.log("[CloudPepper] Loading dashboard error protection...");
-
-  // Global dashboard error handling
-  const DashboardErrorHandler = {
-    handleChartError(error, chartType = "Unknown") {
-      console.warn(`[CloudPepper] Chart.js error in ${chartType}:`, error);
-      return {
-        labels: ["No Data"],
-        datasets: [
-          {
-            label: "Error Loading Data",
-            data: [0],
-            backgroundColor: ["#ff6b6b"],
-          },
+(function() {
+    'use strict';
+    
+    console.log('🔧 CloudPepper Dashboard Fix Loading...');
+    
+    // OSUS Properties Brand Colors
+    window.OSUSBrandColors = {
+        primary: '#4d1a1a',        // OSUS burgundy
+        gold: '#b8a366',           // OSUS gold
+        lightGold: '#f5f5e6',      // Light gold
+        darkGold: '#9d7f47',       // Dark gold
+        white: '#ffffff',
+        accent: '#7d1e2d',         // Dark burgundy
+        
+        chartColors: [
+            '#4d1a1a',  // burgundy
+            '#b8a366',  // gold
+            '#7d1e2d',  // dark burgundy
+            '#d4c299',  // light gold
+            '#cc4d66',  // burgundy light
         ],
-      };
-    },
-
-    async safeDataLoad(loader, fallback = {}) {
-      try {
-        return await loader();
-      } catch (error) {
-        console.warn("[CloudPepper] Dashboard data load error:", error);
-        return fallback;
-      }
-    },
-
-    handleDashboardError(error, dashboardName = "Unknown") {
-      console.warn(`[CloudPepper] Dashboard error in ${dashboardName}:`, error);
-
-      if (
-        error.message &&
-        (error.message.includes("Chart") ||
-          error.message.includes("RPC_ERROR") ||
-          error.message.includes("XMLHttpRequest"))
-      ) {
-        return {
-          handled: true,
-          fallbackData: {
-            message: "Dashboard data temporarily unavailable",
-            charts: [],
-          },
-        };
-      }
-
-      return { handled: false };
-    },
-  };
-
-  // Enhanced Chart.js error protection
-  setTimeout(function () {
-    try {
-      // Override Chart.js constructor if available
-      if (window.Chart) {
-        const OriginalChart = window.Chart;
-
-        window.Chart = function (ctx, config) {
-          try {
-            return new OriginalChart(ctx, config);
-          } catch (error) {
-            console.warn("[CloudPepper] Chart.js error handled:", error);
-
-            // Create fallback chart
-            const fallbackConfig = {
-              type: "bar",
-              data: DashboardErrorHandler.handleChartError(error, config.type),
-              options: {
-                responsive: true,
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Chart temporarily unavailable",
-                  },
-                },
-              },
-            };
-
-            try {
-              return new OriginalChart(ctx, fallbackConfig);
-            } catch (fallbackError) {
-              console.warn(
-                "[CloudPepper] Fallback chart failed:",
-                fallbackError
-              );
-              return null;
-            }
-          }
-        };
-
-        // Copy static properties
-        Object.setPrototypeOf(window.Chart, OriginalChart);
-        Object.assign(window.Chart, OriginalChart);
-
-        console.log("[CloudPepper] Chart.js error protection enabled");
-      }
-    } catch (chartError) {
-      console.warn("[CloudPepper] Could not protect Chart.js:", chartError);
-    }
-  }, 100);
-
-  // Dashboard component protection
-  const dashboardComponents = [
-    "SalesDashboard",
-    "CRMDashboard",
-    "PaymentDashboard",
-    "ExecutiveDashboard",
-  ];
-
-  setTimeout(function () {
-    dashboardComponents.forEach((componentName) => {
-      try {
-        // Look for dashboard elements in DOM
-        const dashboardElements = document.querySelectorAll(
-          `[class*="${componentName}"], [data-dashboard="${componentName}"]`
-        );
-
-        dashboardElements.forEach((element) => {
-          // Add error event listener
-          element.addEventListener("error", function (event) {
-            console.warn(
-              `[CloudPepper] Dashboard error prevented in ${componentName}:`,
-              event.error
-            );
-            event.preventDefault();
-
-            // Show fallback content
-            if (element.innerHTML) {
-              element.innerHTML = `
-                                <div style="padding: 20px; text-align: center; color: #666;">
-                                    <i class="fa fa-chart-bar" style="font-size: 48px; color: #ccc;"></i>
-                                    <p>Dashboard temporarily unavailable</p>
-                                    <button onclick="location.reload()" class="btn btn-sm btn-primary">Refresh</button>
-                                </div>
-                            `;
-            }
-          });
-        });
-
-        console.log(
-          `[CloudPepper] Protected dashboard component: ${componentName}`
-        );
-      } catch (error) {
-        console.warn(
-          `[CloudPepper] Could not protect ${componentName}:`,
-          error
-        );
-      }
-    });
-  }, 200);
-
-  // Global error handler for dashboard operations
-  window.addEventListener("error", function (event) {
-    if (event.error && event.error.message) {
-      const error = event.error;
-
-      // Check if it's a dashboard related error
-      if (
-        error.message.includes("Chart") ||
-        error.message.includes("dashboard") ||
-        (error.stack &&
-          (error.stack.includes("oe_sale_dashboard") ||
-            error.stack.includes("Chart.js") ||
-            error.stack.includes("dashboard")))
-      ) {
-        console.warn("[CloudPepper] Dashboard error intercepted:", error);
-
-        const result = DashboardErrorHandler.handleDashboardError(error);
-        if (result.handled) {
-          event.preventDefault();
-
-          // Show user-friendly message
-          if (window.Notification && Notification.permission === "granted") {
-            new Notification("Dashboard Notice", {
-              body: "Dashboard data temporarily unavailable",
-              icon: "/web/static/img/favicon.ico",
-            });
-          }
+        
+        chartBackgrounds: [
+            'rgba(77, 26, 26, 0.1)',   // burgundy with transparency
+            'rgba(184, 163, 102, 0.1)', // gold with transparency
+            'rgba(125, 30, 45, 0.1)',   // dark burgundy with transparency
+            'rgba(212, 194, 153, 0.1)', // light gold with transparency
+            'rgba(204, 77, 102, 0.1)',  // burgundy light with transparency
+        ]
+    };
+    
+    // Global dashboard error handler
+    window.dashboardErrorHandler = function(error, context) {
+        console.warn('Dashboard Error Handled:', error, context);
+        
+        // Show user-friendly message
+        if (window.location.pathname.includes('dashboard')) {
+            const notification = document.createElement('div');
+            notification.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4d1a1a;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 99999;
+                    font-family: system-ui;
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(77, 26, 26, 0.3);
+                ">
+                    ⚠️ Dashboard loading... Please wait.
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
-      }
-    }
-  });
-
-  // Enhanced RPC error handling for dashboards
-  window.addEventListener("unhandledrejection", function (event) {
-    if (event.reason && event.reason.message) {
-      const error = event.reason;
-
-      if (
-        (error.message.includes("RPC_ERROR") ||
-          error.message.includes("XMLHttpRequest")) &&
-        error.stack &&
-        (error.stack.includes("dashboard") ||
-          error.stack.includes("Chart") ||
-          error.stack.includes("oe_sale_dashboard"))
-      ) {
-        console.warn("[CloudPepper] Dashboard RPC error prevented:", error);
-        event.preventDefault();
-
-        // Attempt graceful recovery
-        setTimeout(function () {
-          const dashboards = document.querySelectorAll('[class*="dashboard"]');
-          dashboards.forEach((dashboard) => {
-            if (dashboard.style) {
-              dashboard.style.opacity = "0.7";
-              dashboard.title =
-                "Dashboard data temporarily unavailable - click to refresh";
+        
+        return true;
+    };
+    
+    // Chart.js error prevention
+    window.addEventListener('error', function(event) {
+        if (event.message && event.message.includes('Chart')) {
+            console.log('Chart.js error intercepted and handled');
+            window.dashboardErrorHandler(event.error, 'Chart.js');
+            event.preventDefault();
+            return true;
+        }
+    });
+    
+    // RPC error handling for dashboard
+    window.addEventListener('unhandledrejection', function(event) {
+        if (event.reason && event.reason.toString().includes('dashboard')) {
+            console.log('Dashboard RPC error intercepted and handled');
+            window.dashboardErrorHandler(event.reason, 'RPC');
+            event.preventDefault();
+            return true;
+        }
+    });
+    
+    // Dashboard initialization helper
+    window.initializeDashboard = function(callback) {
+        try {
+            // Wait for Chart.js if needed
+            if (typeof Chart === 'undefined') {
+                console.log('Waiting for Chart.js to load...');
+                setTimeout(() => window.initializeDashboard(callback), 100);
+                return;
             }
-          });
-        }, 500);
-      }
-    }
-  });
-
-  // Safe dashboard data loader for global use
-  window.cloudpepperSafeDashboardLoad = async function (
-    loader,
-    fallbackData = {}
-  ) {
-    return await DashboardErrorHandler.safeDataLoad(loader, fallbackData);
-  };
-
-  console.log("[CloudPepper] Dashboard Error Protection Loaded Successfully");
+            
+            // Execute callback with error handling
+            if (typeof callback === 'function') {
+                try {
+                    callback();
+                } catch (error) {
+                    window.dashboardErrorHandler(error, 'Dashboard Init');
+                }
+            }
+        } catch (error) {
+            window.dashboardErrorHandler(error, 'Dashboard Helper');
+        }
+    };
+    
+    // Safe fetch wrapper for dashboard data
+    window.safeDashboardFetch = async function(url, options = {}) {
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            window.dashboardErrorHandler(error, 'Dashboard Fetch');
+            return { error: error.message };
+        }
+    };
+    
+    console.log('✅ CloudPepper Dashboard Fix Ready');
+    
 })();

@@ -1,441 +1,258 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
-    <t t-name="oe_sale_dashboard_17.EnhancedDashboard">
-        <div class="o_enhanced_sales_dashboard enhanced_dashboard_container">
-            <!-- Loading Indicator -->
-            <div class="loading_indicator text-center p-5" t-if="state.loading">
-                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="sr-only">Loading...</span>
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    
+    <!-- Enhanced Sales Dashboard Template -->
+    <t t-name="oe_sale_dashboard_17.enhanced_sales_dashboard" owl="1">
+        <div class="o_sales_dashboard" role="main" aria-labelledby="dashboard-title">
+            <!-- Header Section -->
+            <div class="dashboard_header bg-white border-bottom p-3 mb-4" role="banner">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 id="dashboard-title" class="text-osus-burgundy mb-1">Enhanced Sales Dashboard</h2>
+                        <p class="text-muted mb-0">Professional sales analytics with OSUS branding</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row g-2" role="form" aria-label="Dashboard filters">
+                            <div class="col-md-4">
+                                <label for="dashboard_start_date" class="form-label">Start Date</label>
+                                <input type="date" 
+                                       id="dashboard_start_date"
+                                       name="start_date"
+                                       class="form-control" 
+                                       t-model="state.filters.start_date"
+                                       t-on-change="(ev) => this.onFilterChange('start_date', ev.target.value)"
+                                       aria-label="Start date for dashboard filter"/>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="dashboard_end_date" class="form-label">End Date</label>
+                                <input type="date" 
+                                       id="dashboard_end_date"
+                                       name="end_date"
+                                       class="form-control" 
+                                       t-model="state.filters.end_date"
+                                       t-on-change="(ev) => this.onFilterChange('end_date', ev.target.value)"
+                                       aria-label="End date for dashboard filter"/>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" 
+                                        class="btn btn-osus-primary me-2" 
+                                        t-on-click="onApplyFilters"
+                                        aria-label="Apply date filters to dashboard data">
+                                    <i class="fa fa-refresh" aria-hidden="true"/> Apply Filters
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-secondary" 
+                                        t-on-click="onRefreshDashboard"
+                                        aria-label="Refresh dashboard data">
+                                    <i class="fa fa-sync" aria-hidden="true"/>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h4 class="text-muted">Loading Enhanced Dashboard...</h4>
-                <p class="text-muted">Fetching real-time sales analytics with booking date analysis</p>
             </div>
 
-            <!-- Enhanced Dashboard Content -->
-            <div class="enhanced_dashboard_content" t-if="!state.loading">
-                <!-- Enhanced Header Section -->
-                <div class="dashboard_header bg-white shadow-sm rounded p-4 mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 col-md-12">
-                            <h1 class="h3 mb-2 text-maroon">
-                                <i class="fa fa-dashboard me-2"></i>Enhanced Sales Dashboard
-                            </h1>
-                            <p class="text-muted mb-0">Real-time analytics with agent rankings, booking date filters, and responsive visualizations</p>
-                        </div>
-                        <div class="col-lg-6 col-md-12">
-                            <div class="dashboard_controls">
-                                <!-- Predefined Date Range Selector -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Quick Filters:</label>
-                                        <select id="predefined_range_select" class="form-select form-select-sm">
-                                            <option value="last_30_days" t-att-selected="state.selectedPredefinedRange === 'last_30_days'">Last 30 Days</option>
-                                            <option value="last_90_days" t-att-selected="state.selectedPredefinedRange === 'last_90_days'">Last 90 Days</option>
-                                            <option value="last_year" t-att-selected="state.selectedPredefinedRange === 'last_year'">This Year</option>
-                                            <option value="current_quarter" t-att-selected="state.selectedPredefinedRange === 'current_quarter'">Current Quarter</option>
-                                            <option value="previous_quarter" t-att-selected="state.selectedPredefinedRange === 'previous_quarter'">Previous Quarter</option>
-                                            <option value="custom" t-att-selected="state.selectedPredefinedRange === 'custom'">Custom Range</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Sale Type Filter:</label>
-                                        <select id="sale_type_enhanced_filter" class="form-select form-select-sm" multiple="multiple">
-                                            <t t-foreach="state.data.sale_type_options" t-as="type" t-key="type.id">
-                                                <option t-att-value="type.id">
-                                                    <t t-esc="type.name"/>
-                                                </option>
-                                            </t>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <!-- Custom Date Range -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Start Date:</label>
-                                        <input type="date" id="start_date_enhanced" class="form-control form-control-sm" 
-                                               t-att-value="state.dateRange.start"/>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">End Date:</label>
-                                        <input type="date" id="end_date_enhanced" class="form-control form-control-sm" 
-                                               t-att-value="state.dateRange.end"/>
-                                    </div>
-                                    <div class="col-md-4 d-flex align-items-end">
-                                        <div class="btn-group w-100">
-                                            <button class="btn btn-primary btn-sm" t-on-click="refreshData">
-                                                <i class="fa fa-refresh me-1"></i> Refresh
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" t-on-click="testBackendConnectivity">
-                                                <i class="fa fa-cog me-1"></i> Test
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Loading State -->
+            <div t-if="state.isLoading" class="text-center p-5">
+                <div class="spinner-border text-osus-burgundy" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
+                <p class="mt-3 text-muted">Loading dashboard data...</p>
+            </div>
 
-                <!-- Enhanced KPI Cards Section -->
-                <div class="enhanced_kpi_section mb-4">
-                    <div class="row g-3">
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm h-100 kpi_card_enhanced">
-                                <div class="card-body d-flex align-items-center">
-                                    <div class="kpi_icon_enhanced me-3">
-                                        <i class="fa fa-file-text-o fa-2x text-primary"></i>
-                                    </div>
-                                    <div class="kpi_content_enhanced">
-                                        <h4 class="mb-1 fw-bold text-dark">
-                                            <t t-esc="formatNumber(state.data.performance.total_quotations || 0)"/>
-                                        </h4>
-                                        <p class="mb-0 small text-muted">Total Quotations</p>
-                                        <small class="text-primary">Booking Date Based</small>
-                                    </div>
+            <!-- Dashboard Content -->
+            <div t-else="" class="dashboard_content">
+                
+                <!-- KPI Cards Section -->
+                <section class="row mb-4" role="region" aria-labelledby="kpi-section-title">
+                    <h3 id="kpi-section-title" class="visually-hidden">Key Performance Indicators</h3>
+                    <div class="col-md-3 mb-3">
+                        <div class="card osus-kpi-card border-0 shadow-sm" role="article" aria-labelledby="total-quotations-label">
+                            <div class="card-body text-center">
+                                <div class="kpi-icon mb-2">
+                                    <i class="fa fa-file-text-o fa-2x text-osus-burgundy" aria-hidden="true"/>
                                 </div>
+                                <h3 class="fw-bold text-osus-burgundy mb-1" 
+                                    t-esc="formatNumber(state.data.performance.total_quotations)"/>
+                                <p id="total-quotations-label" class="text-muted mb-0">Total Quotations</p>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm h-100 kpi_card_enhanced">
-                                <div class="card-body d-flex align-items-center">
-                                    <div class="kpi_icon_enhanced me-3">
-                                        <i class="fa fa-shopping-cart fa-2x text-success"></i>
-                                    </div>
-                                    <div class="kpi_content_enhanced">
-                                        <h4 class="mb-1 fw-bold text-dark">
-                                            <t t-esc="formatNumber(state.data.performance.total_orders || 0)"/>
-                                        </h4>
-                                        <p class="mb-0 small text-muted">Sales Orders</p>
-                                        <small class="text-success">Active Pipeline</small>
-                                    </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card osus-kpi-card border-0 shadow-sm" role="article" aria-labelledby="sales-orders-label">
+                            <div class="card-body text-center">
+                                <div class="kpi-icon mb-2">
+                                    <i class="fa fa-shopping-cart fa-2x text-osus-gold" aria-hidden="true"/>
                                 </div>
+                                <h3 class="fw-bold text-osus-gold mb-1" 
+                                    t-esc="formatNumber(state.data.performance.total_sales)"/>
+                                <p id="sales-orders-label" class="text-muted mb-0">Sales Orders</p>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm h-100 kpi_card_enhanced">
-                                <div class="card-body d-flex align-items-center">
-                                    <div class="kpi_icon_enhanced me-3">
-                                        <i class="fa fa-check-circle fa-2x text-warning"></i>
-                                    </div>
-                                    <div class="kpi_content_enhanced">
-                                        <h4 class="mb-1 fw-bold text-dark">
-                                            <t t-esc="formatNumber(state.data.performance.total_invoiced || 0)"/>
-                                        </h4>
-                                        <p class="mb-0 small text-muted">Invoiced Sales</p>
-                                        <small class="text-warning">Revenue Ready</small>
-                                    </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card osus-kpi-card border-0 shadow-sm" role="article" aria-labelledby="invoiced-sales-label">
+                            <div class="card-body text-center">
+                                <div class="kpi-icon mb-2">
+                                    <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"/>
                                 </div>
+                                <h3 class="fw-bold text-success mb-1" 
+                                    t-esc="formatNumber(state.data.performance.total_invoiced)"/>
+                                <p id="invoiced-sales-label" class="text-muted mb-0">Invoiced Sales</p>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm h-100 kpi_card_enhanced">
-                                <div class="card-body d-flex align-items-center">
-                                    <div class="kpi_icon_enhanced me-3">
-                                        <i class="fa fa-money fa-2x text-maroon"></i>
-                                    </div>
-                                    <div class="kpi_content_enhanced">
-                                        <h4 class="mb-1 fw-bold text-maroon">
-                                            <t t-esc="formatCurrency(state.data.performance.total_amount || 0)"/>
-                                        </h4>
-                                        <p class="mb-0 small text-muted">Total Revenue</p>
-                                        <small class="text-maroon">Period Total</small>
-                                    </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card osus-kpi-card border-0 shadow-sm" role="article" aria-labelledby="total-revenue-label">
+                            <div class="card-body text-center">
+                                <div class="kpi-icon mb-2">
+                                    <i class="fa fa-money fa-2x text-osus-burgundy" aria-hidden="true"/>
+                                </div>
+                                <h3 class="fw-bold text-osus-burgundy mb-1" 
+                                    t-esc="formatCurrency(state.data.performance.total_amount)"/>
+                                <p id="total-revenue-label" class="text-muted mb-0">Total Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="row mb-4" role="region" aria-labelledby="charts-section-title">
+                    <h3 id="charts-section-title" class="visually-hidden">Sales Analytics Charts</h3>
+                    <!-- Monthly Trend Chart -->
+                    <div class="col-md-8 mb-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-osus-light">
+                                <h5 class="card-title text-osus-burgundy mb-0">
+                                    <i class="fa fa-line-chart me-2" aria-hidden="true"/>
+                                    Monthly Sales Trend
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 300px;">
+                                    <canvas id="monthly_trend_chart" 
+                                            aria-label="Monthly sales trend chart showing sales performance over time"
+                                            role="img"/>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Enhanced Responsive Charts Section -->
-                <div class="enhanced_charts_section">
-                    <div class="row g-4 mb-4">
-                        <!-- Monthly Trend Chart -->
-                        <div class="col-lg-8 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-line-chart me-2"></i>Monthly Sales Trend
-                                    </h5>
-                                    <small class="text-muted">Revenue trends based on booking dates</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 300px;">
-                                        <canvas t-ref="monthlyTrendChart" class="responsive-chart"></canvas>
-                                    </div>
-                                </div>
+                    
+                    <!-- Pipeline Chart -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-osus-light">
+                                <h5 class="card-title text-osus-burgundy mb-0">
+                                    <i class="fa fa-pie-chart me-2" aria-hidden="true"/>
+                                    Sales Pipeline
+                                </h5>
                             </div>
-                        </div>
-
-                        <!-- Sales by State Chart -->
-                        <div class="col-lg-4 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-pie-chart me-2"></i>Sales by State
-                                    </h5>
-                                    <small class="text-muted">Order status distribution</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 300px;">
-                                        <canvas t-ref="salesStateChart" class="responsive-chart"></canvas>
-                                    </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 300px;">
+                                    <canvas id="pipeline_chart" 
+                                            aria-label="Sales pipeline chart showing distribution of sales by stage"
+                                            role="img"/>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <div class="row g-4 mb-4">
-                        <!-- Top Customers Chart -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-users me-2"></i>Top Customers
-                                    </h5>
-                                    <small class="text-muted">Highest revenue customers</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 300px;">
-                                        <canvas t-ref="topCustomersChart" class="responsive-chart"></canvas>
-                                    </div>
-                                </div>
+                <!-- Rankings Section -->
+                <section class="row" role="region" aria-labelledby="rankings-section-title" 
+                         t-if="state.data.agent_rankings.rankings and state.data.agent_rankings.rankings.length > 0">
+                    <h3 id="rankings-section-title" class="visually-hidden">Performance Rankings</h3>
+                    <!-- Agent Rankings -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-osus-light">
+                                <h5 class="card-title text-osus-burgundy mb-0">
+                                    <i class="fa fa-user me-2" aria-hidden="true"/>
+                                    Top Agents
+                                </h5>
                             </div>
-                        </div>
-
-                        <!-- Sales Team Performance -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-group me-2"></i>Team Performance
-                                    </h5>
-                                    <small class="text-muted">Sales team revenue comparison</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 300px;">
-                                        <canvas t-ref="teamPerformanceChart" class="responsive-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Agent and Broker Rankings -->
-                    <div class="row g-4 mb-4">
-                        <!-- Agent Rankings -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-star me-2"></i>Top Agents Performance
-                                    </h5>
-                                    <small class="text-muted">Agent revenue and deal count comparison</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 350px;">
-                                        <canvas t-ref="agentRankingChart" class="responsive-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Broker Rankings -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-briefcase me-2"></i>Top Brokers Performance
-                                    </h5>
-                                    <small class="text-muted">Broker revenue and deal count comparison</small>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart_wrapper" style="position: relative; height: 350px;">
-                                        <canvas t-ref="brokerRankingChart" class="responsive-chart"></canvas>
-                                    </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm" 
+                                           role="table" 
+                                           aria-label="Top performing sales agents ranking table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Deals</th>
+                                                <th scope="col">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="state.data.agent_rankings.rankings.slice(0, 5)" t-as="agent" t-key="agent.agent_id">
+                                                <td class="fw-bold text-osus-burgundy" t-esc="agent.rank"/>
+                                                <td t-esc="agent.name"/>
+                                                <td t-esc="agent.deal_count"/>
+                                                <td class="fw-bold" t-esc="agent.formatted_amount"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Enhanced Performance Tables -->
-                <div class="enhanced_tables_section">
-                    <div class="row g-4 mb-4">
-                        <!-- Agent Performance Table -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-table me-2"></i>Agent Performance Details
-                                    </h5>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="fw-bold">Agent</th>
-                                                    <th class="fw-bold text-center">Deals</th>
-                                                    <th class="fw-bold text-end">Revenue</th>
-                                                    <th class="fw-bold text-end">Avg Price</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="state.data.agent_ranking.agents || []" t-as="agent" t-key="agent_index">
-                                                    <tr>
-                                                        <td class="fw-medium">
-                                                            <i class="fa fa-user-circle me-2 text-muted"></i>
-                                                            <t t-esc="agent"/>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="badge bg-primary">
-                                                                <t t-esc="state.data.agent_ranking.deal_counts[agent_index] || 0"/>
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-end fw-medium text-success">
-                                                            <t t-esc="formatCurrency(state.data.agent_ranking.total_amounts[agent_index] || 0)"/>
-                                                        </td>
-                                                        <td class="text-end text-muted">
-                                                            <t t-esc="formatCurrency(state.data.agent_ranking.avg_price_units[agent_index] || 0)"/>
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                                <tr t-if="!state.data.agent_ranking.agents || state.data.agent_ranking.agents.length === 0">
-                                                    <td colspan="4" class="text-center text-muted py-4">
-                                                        <i class="fa fa-info-circle me-2"></i>No agent data available for selected period
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                    
+                    <!-- Broker Rankings -->
+                    <div class="col-md-6 mb-3" t-if="state.data.broker_rankings.rankings and state.data.broker_rankings.rankings.length > 0">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-osus-light">
+                                <h5 class="card-title text-osus-burgundy mb-0">
+                                    <i class="fa fa-users me-2" aria-hidden="true"/>
+                                    Top Brokers
+                                </h5>
                             </div>
-                        </div>
-
-                        <!-- Broker Performance Table -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-table me-2"></i>Broker Performance Details
-                                    </h5>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="fw-bold">Broker</th>
-                                                    <th class="fw-bold text-center">Deals</th>
-                                                    <th class="fw-bold text-end">Revenue</th>
-                                                    <th class="fw-bold text-end">Avg Price</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="state.data.broker_ranking.brokers || []" t-as="broker" t-key="broker_index">
-                                                    <tr>
-                                                        <td class="fw-medium">
-                                                            <i class="fa fa-briefcase me-2 text-muted"></i>
-                                                            <t t-esc="broker"/>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="badge bg-warning">
-                                                                <t t-esc="state.data.broker_ranking.deal_counts[broker_index] || 0"/>
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-end fw-medium text-success">
-                                                            <t t-esc="formatCurrency(state.data.broker_ranking.total_amounts[broker_index] || 0)"/>
-                                                        </td>
-                                                        <td class="text-end text-muted">
-                                                            <t t-esc="formatCurrency(state.data.broker_ranking.avg_price_units[broker_index] || 0)"/>
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                                <tr t-if="!state.data.broker_ranking.brokers || state.data.broker_ranking.brokers.length === 0">
-                                                    <td colspan="4" class="text-center text-muted py-4">
-                                                        <i class="fa fa-info-circle me-2"></i>No broker data available for selected period
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm" 
+                                           role="table" 
+                                           aria-label="Top performing brokers ranking table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Deals</th>
+                                                <th scope="col">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="state.data.broker_rankings.rankings.slice(0, 5)" t-as="broker" t-key="broker.broker_id">
+                                                <td class="fw-bold text-osus-gold" t-esc="broker.rank"/>
+                                                <td t-esc="broker.name"/>
+                                                <td t-esc="broker.deal_count"/>
+                                                <td class="fw-bold" t-esc="broker.formatted_amount"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Recent Orders Table -->
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-header bg-light border-0">
-                                    <h5 class="card-title mb-0 text-maroon">
-                                        <i class="fa fa-list me-2"></i>Recent Sales Orders
-                                    </h5>
-                                    <small class="text-muted">Latest orders based on booking dates</small>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="fw-bold">Order #</th>
-                                                    <th class="fw-bold">Customer</th>
-                                                    <th class="fw-bold">Booking Date</th>
-                                                    <th class="fw-bold text-end">Amount</th>
-                                                    <th class="fw-bold text-center">State</th>
-                                                    <th class="fw-bold">Agent</th>
-                                                    <th class="fw-bold">Broker</th>
-                                                    <th class="fw-bold">Sale Type</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="state.data.recent_orders || []" t-as="order" t-key="order_index">
-                                                    <tr>
-                                                        <td class="fw-medium text-primary">
-                                                            <t t-esc="order.name"/>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fa fa-user me-2 text-muted"></i>
-                                                            <t t-esc="order.partner_name"/>
-                                                        </td>
-                                                        <td class="text-muted">
-                                                            <t t-esc="order.booking_date"/>
-                                                        </td>
-                                                        <td class="text-end fw-medium text-success">
-                                                            <t t-esc="formatCurrency(order.amount_total)"/>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span t-attf-class="badge bg-{{order.state === 'sale' ? 'success' : order.state === 'draft' ? 'secondary' : 'primary'}}">
-                                                                <t t-esc="order.state"/>
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-muted">
-                                                            <t t-esc="order.agent_name"/>
-                                                        </td>
-                                                        <td class="text-muted">
-                                                            <t t-esc="order.broker_name"/>
-                                                        </td>
-                                                        <td class="text-muted">
-                                                            <t t-esc="order.sale_type"/>
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                                <tr t-if="!state.data.recent_orders || state.data.recent_orders.length === 0">
-                                                    <td colspan="8" class="text-center text-muted py-4">
-                                                        <i class="fa fa-info-circle me-2"></i>No recent orders found for selected criteria
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Info Messages -->
+                <section class="row" role="region" aria-labelledby="info-section-title" 
+                         t-if="!state.data.agent_rankings.rankings or state.data.agent_rankings.rankings.length === 0">
+                    <h3 id="info-section-title" class="visually-hidden">Information Messages</h3>
+                    <div class="col-12">
+                        <div class="alert alert-info" role="note">
+                            <i class="fa fa-info-circle me-2" aria-hidden="true"/>
+                            <strong>Optional Features:</strong> Agent and broker rankings are available when commission_ax module is installed.
+                            Sale type filtering is available when le_sale_type module is installed.
+                            All features work independently and gracefully degrade when modules are not available.
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
     </t>
+    
 </templates>

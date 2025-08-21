@@ -1,200 +1,140 @@
 /** @odoo-module **/
 
-import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
-import { registry } from "@web/core/registry";
+import { Component, onWillStart, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { _t } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
 
-export class EnhancedSalesDashboardView extends Component {
-    static template = "oe_sale_dashboard_17.EnhancedDashboard";
-    static props = ["*"];
+/**
+ * Enhanced Sales Dashboard Component
+ * Professional analytics with OSUS branding
+ */
+class EnhancedSalesDashboard extends Component {
+    static template = "oe_sale_dashboard_17.enhanced_sales_dashboard";
     
     setup() {
-        this.orm = useService("orm");
+        this.rpc = useService("rpc");
         this.notification = useService("notification");
         
         this.state = useState({
-            loading: true,
+            isLoading: true,
             data: {
-                performance: {},
-                monthly_trend: [],
-                sales_by_state: {},
-                top_customers: {},
-                team_performance: {},
-                agent_ranking: {},
-                broker_ranking: {},
-                recent_orders: [],
-                sale_type_options: [],
-                predefined_ranges: {}
+                performance: {
+                    total_orders: 0,
+                    total_quotations: 0,
+                    total_sales: 0,
+                    total_invoiced: 0,
+                    total_amount: 0,
+                    currency_symbol: '$'
+                },
+                monthly_trend: { labels: [], datasets: [] },
+                pipeline: { labels: [], datasets: [] },
+                agent_rankings: { rankings: [] },
+                broker_rankings: { rankings: [] },
+                sale_types: { sale_types: [] }
             },
-            dateRange: {
-                start: this.getDefaultStartDate(),
-                end: this.getDefaultEndDate()
+            filters: {
+                start_date: this._getDefaultStartDate(),
+                end_date: this._getDefaultEndDate(),
+                sale_type_ids: []
             },
-            selectedSaleTypes: [],
-            selectedPredefinedRange: 'last_30_days'
+            charts: {}
         });
         
-        // Chart references
-        this.monthlyTrendChart = useRef("monthlyTrendChart");
-        this.salesStateChart = useRef("salesStateChart");
-        this.topCustomersChart = useRef("topCustomersChart");
-        this.teamPerformanceChart = useRef("teamPerformanceChart");
-        this.agentRankingChart = useRef("agentRankingChart");
-        this.brokerRankingChart = useRef("brokerRankingChart");
-        
-        // Chart instances
-        this.chartInstances = {};
-        
-        onMounted(async () => {
+        onWillStart(async () => {
             await this.loadDashboardData();
-            this.setupEventListeners();
-        });
-        
-        onWillUnmount(() => {
-            this.destroyAllCharts();
         });
     }
     
-    getDefaultStartDate() {
+    _getDefaultStartDate() {
         const today = new Date();
-        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-        return thirtyDaysAgo.toISOString().split('T')[0];
+        return new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
     }
     
-    getDefaultEndDate() {
+    _getDefaultEndDate() {
         return new Date().toISOString().split('T')[0];
     }
     
     async loadDashboardData() {
         try {
-            this.state.loading = true;
+            this.state.isLoading = true;
             
-            const data = await this.orm.call(
-                "sale.dashboard", 
-                "get_comprehensive_dashboard_data", 
-                [this.state.dateRange.start, this.state.dateRange.end, this.state.selectedSaleTypes]
-            );
+            const result = await this.rpc("/web/dataset/call_kw", {
+                model: "sale.dashboard",
+                method: "get_dashboard_data",
+                args: [],
+                kwargs: {
+                    start_date: this.state.filters.start_date,
+                    end_date: this.state.filters.end_date,
+                    sale_type_ids: this.state.filters.sale_type_ids
+                }
+            });
             
-            this.state.data = data;
+            if (result.error) {
+                this.notification.add(`Dashboard Error: ${result.error}`, { type: "danger" });
+                return;
+            }
             
-            // Render all charts after data load
-            await this.renderAllCharts();
+            this.state.data = result;
+            this.state.isLoading = false;
             
-            this.state.loading = false;
+            // Initialize charts after data is loaded
+            setTimeout(() => this.initializeCharts(), 100);
             
         } catch (error) {
-            console.error("Enhanced dashboard error:", error);
-            this.notification.add(_t("Failed to load enhanced dashboard data"), { type: "danger" });
-            this.state.loading = false;
+            console.error("Dashboard loading error:", error);
+            this.notification.add("Failed to load dashboard data", { type: "danger" });
+            this.state.isLoading = false;
         }
     }
     
-    setupEventListeners() {
-        // Date range change listeners
-        const startDateInput = document.getElementById('start_date_enhanced');
-        const endDateInput = document.getElementById('end_date_enhanced');
-        
-        if (startDateInput) {
-            startDateInput.addEventListener('change', (e) => {
-                this.state.dateRange.start = e.target.value;
-                this.state.selectedPredefinedRange = 'custom';
-                this.loadDashboardData();
-            });
-        }
-        
-        if (endDateInput) {
-            endDateInput.addEventListener('change', (e) => {
-                this.state.dateRange.end = e.target.value;
-                this.state.selectedPredefinedRange = 'custom';
-                this.loadDashboardData();
-            });
-        }
-        
-        // Predefined range selector
-        const predefinedSelect = document.getElementById('predefined_range_select');
-        if (predefinedSelect) {
-            predefinedSelect.addEventListener('change', (e) => {
-                this.onPredefinedRangeChange(e.target.value);
-            });
-        }
-        
-        // Sale type filter
-        const saleTypeSelect = document.getElementById('sale_type_enhanced_filter');
-        if (saleTypeSelect) {
-            saleTypeSelect.addEventListener('change', (e) => {
-                const selectedOptions = Array.from(e.target.selectedOptions);
-                this.state.selectedSaleTypes = selectedOptions.map(option => parseInt(option.value)).filter(v => !isNaN(v));
-                this.loadDashboardData();
-            });
-        }
-    }
-    
-    onPredefinedRangeChange(rangeKey) {
-        if (rangeKey === 'custom') {
-            this.state.selectedPredefinedRange = 'custom';
-            return;
-        }
-        
-        const range = this.state.data.predefined_ranges[rangeKey];
-        if (range) {
-            this.state.dateRange.start = range.start_date;
-            this.state.dateRange.end = range.end_date;
-            this.state.selectedPredefinedRange = rangeKey;
+    initializeCharts() {
+        try {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js not loaded, retrying...');
+                setTimeout(() => this.initializeCharts(), 500);
+                return;
+            }
             
-            // Update input fields
-            const startInput = document.getElementById('start_date_enhanced');
-            const endInput = document.getElementById('end_date_enhanced');
-            if (startInput) startInput.value = range.start_date;
-            if (endInput) endInput.value = range.end_date;
+            this.renderMonthlyTrendChart();
+            this.renderPipelineChart();
             
-            this.loadDashboardData();
+        } catch (error) {
+            console.error("Chart initialization error:", error);
+            if (window.dashboardErrorHandler) {
+                window.dashboardErrorHandler(error, 'Chart Init');
+            }
         }
-    }
-    
-    async renderAllCharts() {
-        // Wait for DOM to be ready
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        this.destroyAllCharts();
-        
-        // Render each chart
-        this.renderMonthlyTrendChart();
-        this.renderSalesStateChart();
-        this.renderTopCustomersChart();
-        this.renderTeamPerformanceChart();
-        this.renderAgentRankingChart();
-        this.renderBrokerRankingChart();
     }
     
     renderMonthlyTrendChart() {
-        const canvas = this.monthlyTrendChart.el;
-        if (!canvas || !this.state.data.monthly_trend) return;
+        const canvas = document.getElementById('monthly_trend_chart');
+        if (!canvas) return;
+        
+        // Destroy existing chart if exists
+        if (this.state.charts.monthlyTrend) {
+            this.state.charts.monthlyTrend.destroy();
+        }
         
         const ctx = canvas.getContext('2d');
         const data = this.state.data.monthly_trend;
         
-        this.chartInstances.monthlyTrend = new Chart(ctx, {
+        // OSUS brand colors
+        const brandColors = window.OSUSBrandColors || {
+            primary: '#4d1a1a',
+            gold: '#b8a366'
+        };
+        
+        this.state.charts.monthlyTrend = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.map(item => item.month),
-                datasets: [{
-                    label: _t("Monthly Sales Revenue"),
-                    data: data.map(item => item.amount),
-                    backgroundColor: 'rgba(128, 0, 32, 0.1)',
-                    borderColor: '#800020',
-                    borderWidth: 4,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#800020',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 3,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    pointHoverBackgroundColor: '#FFD700',
-                    pointHoverBorderColor: '#800020',
-                    pointHoverBorderWidth: 4
-                }]
+                labels: data.labels || [],
+                datasets: (data.datasets || []).map((dataset, index) => ({
+                    ...dataset,
+                    borderColor: index === 0 ? brandColors.primary : brandColors.gold,
+                    backgroundColor: index === 0 ? 
+                        'rgba(77, 26, 26, 0.1)' : 'rgba(184, 163, 102, 0.1)',
+                    tension: 0.4
+                }))
             },
             options: {
                 responsive: true,
@@ -202,81 +142,60 @@ export class EnhancedSalesDashboardView extends Component {
                 plugins: {
                     title: {
                         display: true,
-                        text: _t("Monthly Sales Trend (Booking Date)"),
-                        font: { size: 18, weight: 'bold' },
-                        color: '#800020',
-                        padding: 20
+                        text: 'Monthly Sales Trend',
+                        color: brandColors.primary,
+                        font: { size: 16, weight: 'bold' }
                     },
                     legend: {
                         display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#800020',
-                            font: { weight: 'bold', size: 12 },
-                            padding: 20
-                        }
+                        position: 'top'
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return this.formatCurrency(value);
-                            }.bind(this),
-                            color: '#495057',
-                            font: { weight: 'bold' }
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)',
-                            lineWidth: 1
-                        }
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Order Count' }
                     },
-                    x: {
-                        ticks: {
-                            color: '#495057',
-                            font: { weight: 'bold' }
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.05)',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                elements: {
-                    point: {
-                        hoverRadius: 12
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Amount' },
+                        grid: { drawOnChartArea: false }
                     }
                 }
             }
         });
     }
     
-    renderSalesStateChart() {
-        const canvas = this.salesStateChart.el;
-        if (!canvas || !this.state.data.sales_by_state) return;
+    renderPipelineChart() {
+        const canvas = document.getElementById('pipeline_chart');
+        if (!canvas) return;
+        
+        // Destroy existing chart if exists
+        if (this.state.charts.pipeline) {
+            this.state.charts.pipeline.destroy();
+        }
         
         const ctx = canvas.getContext('2d');
-        const data = this.state.data.sales_by_state;
+        const data = this.state.data.pipeline;
         
-        this.chartInstances.salesState = new Chart(ctx, {
+        // OSUS brand colors
+        const brandColors = window.OSUSBrandColors || {
+            chartColors: ['#4d1a1a', '#b8a366', '#7d1e2d', '#d4c299', '#cc4d66']
+        };
+        
+        this.state.charts.pipeline = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: data.labels || [],
                 datasets: [{
-                    data: data.counts || [],
-                    backgroundColor: [
-                        '#800020',     // Primary Burgundy
-                        '#A0002A',     // Darker Burgundy 
-                        '#FFD700',     // Gold Accent
-                        '#B8860B',     // Dark Gold
-                        '#600018',     // Deep Burgundy
-                        '#C41E3A'      // Crimson Red
-                    ],
-                    borderWidth: 3,
+                    data: data.datasets?.[0]?.data || [],
+                    backgroundColor: brandColors.chartColors,
                     borderColor: '#ffffff',
-                    hoverBorderWidth: 4,
-                    hoverBorderColor: '#800020'
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -285,11 +204,12 @@ export class EnhancedSalesDashboardView extends Component {
                 plugins: {
                     title: {
                         display: true,
-                        text: _t("Sales by State"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
+                        text: 'Sales Pipeline',
+                        color: brandColors.chartColors[0],
+                        font: { size: 16, weight: 'bold' }
                     },
                     legend: {
+                        display: true,
                         position: 'bottom'
                     }
                 }
@@ -297,386 +217,37 @@ export class EnhancedSalesDashboardView extends Component {
         });
     }
     
-    renderTopCustomersChart() {
-        const canvas = this.topCustomersChart.el;
-        if (!canvas || !this.state.data.top_customers) return;
-        
-        const ctx = canvas.getContext('2d');
-        const data = this.state.data.top_customers;
-        
-        this.chartInstances.topCustomers = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels || [],
-                datasets: [{
-                    label: _t("Revenue"),
-                    data: data.amounts || [],
-                    backgroundColor: 'rgba(128, 0, 32, 0.8)',
-                    borderColor: '#800020',
-                    borderWidth: 2,
-                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
-                    hoverBorderColor: '#FFD700',
-                    hoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    title: {
-                        display: true,
-                        text: _t("Top Customers by Revenue"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
-                    },
-                    legend: {
-                        labels: {
-                            color: '#800020',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return this.formatCurrency(value);
-                            }.bind(this),
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-    
-    renderTeamPerformanceChart() {
-        const canvas = this.teamPerformanceChart.el;
-        if (!canvas || !this.state.data.team_performance) return;
-        
-        const ctx = canvas.getContext('2d');
-        const data = this.state.data.team_performance;
-        
-        this.chartInstances.teamPerformance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels || [],
-                datasets: [{
-                    label: _t("Team Revenue"),
-                    data: data.amounts || [],
-                    backgroundColor: 'rgba(255, 215, 0, 0.8)',  // Gold theme for teams
-                    borderColor: '#FFD700',
-                    borderWidth: 2,
-                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
-                    hoverBorderColor: '#800020',
-                    hoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: _t("Sales Team Performance"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
-                    },
-                    legend: {
-                        labels: {
-                            color: '#800020',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return this.formatCurrency(value);
-                            }.bind(this),
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-    
-    renderAgentRankingChart() {
-        const canvas = this.agentRankingChart.el;
-        if (!canvas || !this.state.data.agent_ranking) return;
-        
-        const ctx = canvas.getContext('2d');
-        const data = this.state.data.agent_ranking;
-        
-        this.chartInstances.agentRanking = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.agents || [],
-                datasets: [{
-                    label: _t("Total Revenue"),
-                    data: data.total_amounts || [],
-                    backgroundColor: 'rgba(128, 0, 32, 0.8)',
-                    borderColor: '#800020',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
-                    hoverBorderColor: '#FFD700',
-                    hoverBorderWidth: 3
-                }, {
-                    label: _t("Deal Count"),
-                    data: data.deal_counts || [],
-                    backgroundColor: 'rgba(255, 215, 0, 0.8)',
-                    borderColor: '#FFD700',
-                    borderWidth: 2,
-                    yAxisID: 'y1',
-                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
-                    hoverBorderColor: '#800020',
-                    hoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: _t("Top Agents Performance"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
-                    },
-                    legend: {
-                        labels: {
-                            color: '#800020',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return this.formatCurrency(value);
-                            }.bind(this),
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                            color: 'rgba(255, 215, 0, 0.1)'
-                        },
-                    },
-                    x: {
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-    
-    renderBrokerRankingChart() {
-        const canvas = this.brokerRankingChart.el;
-        if (!canvas || !this.state.data.broker_ranking) return;
-        
-        const ctx = canvas.getContext('2d');
-        const data = this.state.data.broker_ranking;
-        
-        this.chartInstances.brokerRanking = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.brokers || [],
-                datasets: [{
-                    label: _t("Total Revenue"),
-                    data: data.total_amounts || [],
-                    backgroundColor: 'rgba(255, 215, 0, 0.8)',
-                    borderColor: '#FFD700',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                    hoverBackgroundColor: 'rgba(255, 215, 0, 1)',
-                    hoverBorderColor: '#800020',
-                    hoverBorderWidth: 3
-                }, {
-                    label: _t("Deal Count"),
-                    data: data.deal_counts || [],
-                    backgroundColor: 'rgba(128, 0, 32, 0.8)',
-                    borderColor: '#800020',
-                    borderWidth: 2,
-                    yAxisID: 'y1',
-                    hoverBackgroundColor: 'rgba(128, 0, 32, 1)',
-                    hoverBorderColor: '#FFD700',
-                    hoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: _t("Top Brokers Performance"),
-                        font: { size: 16, weight: 'bold' },
-                        color: '#800020'
-                    },
-                    legend: {
-                        labels: {
-                            color: '#800020',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return this.formatCurrency(value);
-                            }.bind(this),
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                            color: 'rgba(255, 215, 0, 0.1)'
-                        },
-                    },
-                    x: {
-                        ticks: {
-                            color: '#495057'
-                        },
-                        grid: {
-                            color: 'rgba(128, 0, 32, 0.1)'
-                        }
-                    }
-                }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                    }
-                }
-            }
-        });
-    }
-    
-    destroyAllCharts() {
-        Object.values(this.chartInstances).forEach(chart => {
-            if (chart) {
-                chart.destroy();
-            }
-        });
-        this.chartInstances = {};
+    formatCurrency(amount) {
+        const symbol = this.state.data.performance?.currency_symbol || '$';
+        return `${symbol}${this.formatNumber(amount)}`;
     }
     
     formatNumber(value) {
         if (!value || value === 0) return "0";
         
-        const absValue = Math.abs(value);
-        
-        if (absValue >= 1_000_000_000) {
-            return (value / 1_000_000_000).toFixed(2) + "B";
-        } else if (absValue >= 1_000_000) {
-            return (value / 1_000_000).toFixed(2) + "M";
-        } else if (absValue >= 1_000) {
-            return (value / 1_000).toFixed(0) + "K";
-        } else {
-            return Math.round(value).toString();
+        const abs = Math.abs(value);
+        if (abs >= 1_000_000_000) {
+            return (value / 1_000_000_000).toFixed(2) + 'B';
+        } else if (abs >= 1_000_000) {
+            return (value / 1_000_000).toFixed(2) + 'M';
+        } else if (abs >= 1_000) {
+            return (value / 1_000).toFixed(0) + 'K';
         }
+        return value.toFixed(0);
     }
     
-    formatCurrency(value) {
-        if (!value || value === 0) return "$0";
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(value);
-    }
-    
-    async refreshData() {
+    async onRefreshDashboard() {
         await this.loadDashboardData();
-        this.notification.add(_t("Dashboard data refreshed"), { type: "success" });
     }
     
-    async testBackendConnectivity() {
-        try {
-            const result = await this.orm.call("sale.dashboard", "get_predefined_date_ranges", []);
-            if (result) {
-                this.notification.add(_t("Backend connectivity test successful"), { type: "success" });
-            } else {
-                this.notification.add(_t("Backend connectivity test failed"), { type: "warning" });
-            }
-        } catch (error) {
-            console.error("Backend test error:", error);
-            this.notification.add(_t("Backend connectivity test failed"), { type: "danger" });
-        }
+    onFilterChange(field, value) {
+        this.state.filters[field] = value;
+    }
+    
+    async onApplyFilters() {
+        await this.loadDashboardData();
     }
 }
 
-registry.category("views").add("enhanced_sales_dashboard", EnhancedSalesDashboardView);
+// Register the component
+registry.category("actions").add("enhanced_sales_dashboard", EnhancedSalesDashboard);

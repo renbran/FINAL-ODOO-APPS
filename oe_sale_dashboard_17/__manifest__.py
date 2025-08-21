@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Sales Dashboard - Odoo 17',
-    'version': '17.0.1.6.2',
+    'version': '17.0.2.0.0',
     'category': 'Sales',
-    'summary': 'Enhanced Sales Dashboard - Responsive Charts, Predefined Date Filters & Booking Date Support (#800020 Maroon Theme)',
+    'summary': 'Enhanced Sales Dashboard - Professional Charts, Analytics & OSUS Brand Theme',
     'description': """
-Enhanced Sales Dashboard for Odoo 17 - COMPLETELY ISOLATED EDITION  
-==================================================================
+Enhanced Sales Dashboard for Odoo 17 - Professional Edition
+===========================================================
 
-‚ö†Ô∏è  IMPORTANT: This module DOES NOT modify sale.order model or views ‚ö†Ô∏è
+IMPORTANT: This module provides a completely independent sales dashboard.
 
-This module provides a completely independent enhanced sales dashboard with:
+This module provides a comprehensive enhanced sales dashboard with:
 
-üîπ ZERO INHERITANCE of sale.order model - completely separate
-üîπ NO MODIFICATIONS to quotation/order forms or views
-üîπ Independent TransientModel 'sale.dashboard' for data only
-üîπ Visual analytics with #800020 maroon primary color theme
-üîπ Interactive Chart.js visualizations with brand color palette  
-üîπ Mobile-responsive design optimized for brand presentation
-üîπ Real-time data updates through isolated data queries
+* ZERO INHERITANCE of sale.order model - completely separate
+* NO MODIFICATIONS to quotation/order forms or views
+* Independent TransientModel 'sale.dashboard' for data only
+* Visual analytics with OSUS burgundy/gold brand theme
+* Interactive Chart.js visualizations with professional color palette
+* Mobile-responsive design optimized for business presentation
+* Real-time data updates through optimized data queries
 
-NEW ENHANCED FEATURES:
----------------------
-‚úÖ Agent Rankings (agent1_partner_id) by deal count, price_unit and amount_total
-‚úÖ Broker Rankings (broker_partner_id) by deal count, price_unit and amount_total
-‚úÖ Booking Date Integration (booking_date field support from invoice_report_for_realestate)
-‚úÖ Sale Type Filtering (sale_order_type_id from le_sale_type module)
-‚úÖ Enhanced performance tables with detailed agent/broker analytics
-‚úÖ Multi-select sale type filters for targeted analysis
-‚úÖ Comprehensive agent and broker performance metrics
+ENHANCED FEATURES:
+-----------------
+* Agent Rankings by deal count, price_unit and amount_total
+* Broker Rankings by deal count, price_unit and amount_total
+* Flexible Date Integration (booking_date with fallback to date_order)
+* Sale Type Filtering with multi-select support
+* Enhanced performance tables with detailed analytics
+* Comprehensive metrics and KPIs
+* Professional OSUS branding integration
 
 Complete Independence:
 ---------------------
@@ -38,46 +38,44 @@ Complete Independence:
 * Pure read-only dashboard functionality
 * Zero impact on sales module operations
 
-Enhanced Architecture:
----------------------
+Professional Architecture:
+--------------------------
 * TransientModel 'sale.dashboard' - completely separate from sale.order
-* Client-side only dashboard rendering with enhanced agent analytics
-* Read-only queries to existing sale.order data with commission_ax integration
+* Client-side dashboard rendering with modern JavaScript
+* Optimized read-only queries to existing sale.order data
 * No model extensions or inheritance
 * No view modifications to sales module
-* Intelligent field detection (booking_date fallback to date_order)
+* Intelligent field detection with graceful fallbacks
 
-Enhanced Features:
------------------
-* Interactive charts with custom brand colors (#800020)
+Professional Features:
+---------------------
+* Interactive charts with OSUS brand colors (#4d1a1a burgundy)
 * Agent and broker ranking visualizations
-* Sales pipeline visualization in maroon/gold theme
-* Performance KPIs with white text contrast and agent metrics
-* Monthly/quarterly reports with professional styling and booking date support
-* Export capabilities with brand consistency
+* Sales pipeline visualization in burgundy/gold theme
+* Performance KPIs with professional styling
+* Monthly/quarterly reports with brand consistency
+* Export capabilities with professional formatting
 * Multi-currency support with enhanced formatting
 * Sale type filtering for targeted analysis
 * Responsive design for mobile and desktop
 
-Module Dependencies:
--------------------
-* le_sale_type (for sale_order_type_id filtering)
-* commission_ax (for agent1_partner_id and broker_partner_id)
-* invoice_report_for_realestate (for booking_date field)
+Optional Module Integration:
+---------------------------
+* le_sale_type (for sale_order_type_id filtering) - optional
+* commission_ax (for agent1_partner_id and broker_partner_id) - optional
+* invoice_report_for_realestate (for booking_date field) - optional
 
 This module is SAFE to install and will NOT affect your sales quotation workflow.
 All enhancements are contained within the dashboard interface only.
+Works with or without optional modules - graceful degradation included.
     """,
-    'author': 'Your Company',
-    'website': 'https://www.yourcompany.com',
+    'author': 'OSUS Properties',
+    'website': 'https://www.osusproperties.com',
     'depends': [
         'base',
         'sale',
         'sale_management',
         'web',
-        'le_sale_type',
-        'commission_ax',
-        'invoice_report_for_realestate',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -87,14 +85,21 @@ All enhancements are contained within the dashboard interface only.
     'assets': {
         'web.assets_backend': [
             ('include', 'web._assets_helpers'),
-            # CloudPepper Error Fixes (load first)
+            # Emergency fixes (load first)
             ('prepend', 'oe_sale_dashboard_17/static/src/js/cloudpepper_dashboard_fix.js'),
             
-            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
+            # Local Chart.js (no CDN dependency)
+            'oe_sale_dashboard_17/static/src/js/chart.min.js',
+            
+            # CSS Files
             'oe_sale_dashboard_17/static/src/css/dashboard.css',
             'oe_sale_dashboard_17/static/src/css/enhanced_dashboard.css',
+            
+            # XML Templates
             'oe_sale_dashboard_17/static/src/xml/sales_dashboard_main.xml',
             'oe_sale_dashboard_17/static/src/xml/enhanced_sales_dashboard.xml',
+            
+            # JavaScript Files
             'oe_sale_dashboard_17/static/src/js/sales_dashboard.js',
             'oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard.js',
         ],
@@ -104,6 +109,5 @@ All enhancements are contained within the dashboard interface only.
     'installable': True,
     'auto_install': False,
     'application': False,
-    'license': 'LGPL-3',
     'license': 'LGPL-3',
 }
