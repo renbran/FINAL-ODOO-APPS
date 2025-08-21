@@ -87,34 +87,11 @@ def migrate(cr, version):
         
         return admin_authorizers[0] if admin_authorizers else None
     
-    # Check if state column exists before running state-dependent queries
-    try:
-        cr.execute("""
-            SELECT EXISTS (
-                SELECT FROM information_schema.columns 
-                WHERE table_name = 'account_payment' 
-                AND column_name = 'state'
-            )
-        """)
-        state_column_exists = cr.fetchone()[0]
-    except Exception as e:
-        _logger.warning("Could not check for state column existence: %s", e)
-        state_column_exists = False
-    
-    if not state_column_exists:
-        _logger.info("State column does not exist, skipping state-based migration")
-        _logger.info("Only approval_state will be managed by this module")
-        return
-    
     # 1. Fix posted payments - SAFELY
-    try:
-        posted_payments = env['account.payment'].search([
-            ('state', '=', 'posted'),
-            ('approval_state', '!=', 'posted')
-        ])
-    except Exception as e:
-        _logger.warning("Could not search for posted payments: %s", e)
-        posted_payments = env['account.payment']
+    posted_payments = env['account.payment'].search([
+        ('state', '=', 'posted'),
+        ('approval_state', '!=', 'posted')
+    ])
     
     if posted_payments:
         _logger.info("Updating %d posted payments to approval_state=posted", len(posted_payments))
@@ -166,14 +143,10 @@ def migrate(cr, version):
         updated_count += len(posted_payments)
     
     # 2. Fix cancelled payments - SAFELY
-    try:
-        cancelled_payments = env['account.payment'].search([
-            ('state', '=', 'cancel'),
-            ('approval_state', '!=', 'cancelled')
-        ])
-    except Exception as e:
-        _logger.warning("Could not search for cancelled payments: %s", e)
-        cancelled_payments = env['account.payment']
+    cancelled_payments = env['account.payment'].search([
+        ('state', '=', 'cancel'),
+        ('approval_state', '!=', 'cancelled')
+    ])
     
     if cancelled_payments:
         _logger.info("Updating %d cancelled payments to approval_state=cancelled", len(cancelled_payments))
@@ -188,14 +161,10 @@ def migrate(cr, version):
         updated_count += len(cancelled_payments)
     
     # 3. Fix draft payments - SAFELY
-    try:
-        draft_payments = env['account.payment'].search([
-            ('state', '=', 'draft'),
-            ('approval_state', 'not in', ['draft', 'under_review'])
-        ])
-    except Exception as e:
-        _logger.warning("Could not search for draft payments: %s", e)
-        draft_payments = env['account.payment']
+    draft_payments = env['account.payment'].search([
+        ('state', '=', 'draft'),
+        ('approval_state', 'not in', ['draft', 'under_review'])
+    ])
     
     if draft_payments:
         _logger.info("Updating %d draft payments to approval_state=draft", len(draft_payments))
