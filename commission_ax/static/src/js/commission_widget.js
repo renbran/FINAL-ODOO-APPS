@@ -6,6 +6,18 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 export class CommissionWidget extends Component {
+    constructor() {
+        super(...arguments);
+        // Global error boundary for CloudPepper
+        window.addEventListener("error", (event) => {
+            if (event.error) {
+                this.notification.add(_t(`Global JS error: ${event.error.message}`), { type: "danger" });
+            }
+        });
+        window.addEventListener("unhandledrejection", (event) => {
+            this.notification.add(_t(`Unhandled promise rejection: ${event.reason}`), { type: "danger" });
+        });
+    }
     static template = "commission_ax.CommissionWidget";
     static props = ["*"];
     

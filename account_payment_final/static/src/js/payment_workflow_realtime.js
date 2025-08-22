@@ -8,6 +8,28 @@ import { Component, useState, onWillDestroy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class PaymentWorkflowRealtime extends Component {
+  constructor() {
+    super(...arguments);
+    // Global error boundary for CloudPepper
+    window.addEventListener("error", (event) => {
+      if (event.error) {
+        this.state.errorCount++;
+        this.notification.add(
+          `Global JS error: ${event.error.message}`,
+          { type: "danger" }
+        );
+        this.handleError(event.error);
+      }
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      this.state.errorCount++;
+      this.notification.add(
+        `Unhandled promise rejection: ${event.reason}`,
+        { type: "danger" }
+      );
+      this.handleError(event.reason);
+    });
+  }
   static template = "account_payment_final.PaymentWorkflowRealtime";
   static props = ["*"];
 

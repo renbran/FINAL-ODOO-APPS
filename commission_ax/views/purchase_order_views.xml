@@ -30,6 +30,9 @@
                         <span class="o_stat_text">Sale Order</span>
                     </div>
                 </button>
+        <!-- Valid Post Button -->
+        <button name="action_force_post" string="Force Post" type="object" class="oe_highlight" 
+            invisible="state not in ('draft', 'sent')"/>
             </xpath>
         </field>
     </record>
