@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.warn(
       "[CloudPepper Emergency] Chart.js not available, creating emergency service"
     );
-    
+
     // Register emergency service in modern way
     if (window.odoo && window.odoo.serviceRegistry) {
       window.odoo.serviceRegistry.add("emergency_graph_renderer", {
