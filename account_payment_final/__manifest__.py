@@ -58,6 +58,10 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # CloudPepper Compatibility (Load First)
+            ('prepend', 'account_payment_final/static/src/js/cloudpepper_compatibility_patch.js'),
+            'account_payment_final/static/src/js/payment_workflow_realtime.js',
+            
             # Core JavaScript functionality
             'account_payment_final/static/src/js/payment_workflow.js',
             'account_payment_final/static/src/js/components/payment_approval_widget.js',
