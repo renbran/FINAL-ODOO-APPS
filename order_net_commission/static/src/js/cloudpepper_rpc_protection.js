@@ -102,31 +102,35 @@ patch(Component.prototype, "order_net_commission_error_boundary", {
     }
 });
 
-// CloudPepper specific fixes
-if (typeof odoo !== 'undefined' && odoo.define) {
-    // Ensure backward compatibility with CloudPepper's module system
-    odoo.define('order_net_commission.cloudpepper_protection', function (require) {
-        'use strict';
+// CloudPepper specific fixes - Modern Odoo 17 syntax
+(function() {
+    'use strict';
+    
+    console.log('Order Net Commission - CloudPepper protection loaded');
+    
+    // Modern service registration approach
+    const CloudPepperProtection = {
+        protectRPC: function(originalRPC) {
+            return function(route, params, settings) {
+                try {
+                    return originalRPC.call(this, route, params, settings);
+                } catch (error) {
+                    console.warn('Protected RPC call failed:', error);
+                    return Promise.resolve({ error: 'RPC call protected' });
+                }
+            };
+        },
         
-        console.log('Order Net Commission - CloudPepper protection loaded');
-        
-        return {
-            protectRPC: function(originalRPC) {
-                return function(route, params, settings) {
-                    try {
-                        return originalRPC.call(this, route, params, settings);
-                    } catch (error) {
-                        console.warn('Protected RPC call failed:', error);
-                        return Promise.resolve({ error: 'RPC call protected' });
-                    }
-                };
-            },
-            
-            init: function() {
-                console.log('Order Net Commission protection initialized for CloudPepper');
-            }
-        };
-    });
-}
+        init: function() {
+            console.log('Order Net Commission protection initialized for CloudPepper');
+        }
+    };
+    
+    // Register protection globally for CloudPepper
+    if (typeof window !== 'undefined') {
+        window.OrderNetCommissionProtection = CloudPepperProtection;
+        CloudPepperProtection.init();
+    }
+})();
 
 console.log('Order Net Commission - CloudPepper RPC protection loaded successfully');
