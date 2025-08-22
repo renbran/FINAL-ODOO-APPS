@@ -76,6 +76,8 @@ Works with or without optional modules - graceful degradation included.
         'sale',
         'sale_management',
         'web',
+        'le_sale_type',
+        'invoice_report_for_realestate',
     ],
     'data': [
         'security/ir.model.access.csv',
