@@ -48,8 +48,9 @@
                             <button type="object"
                                     name="action_view_sale_order"
                                     class="oe_stat_button"
-                                    icon="fa-shopping-cart">
-                                <field name="sale_order_id" string="Sale Order"/>
+                                    icon="fa-shopping-cart"
+                                    invisible="not sale_order_id">
+                                <field name="sale_order_id" string="Sale Order" widget="statinfo"/>
                             </button>
                             
                             <button type="object"
@@ -57,7 +58,7 @@
                                     class="oe_stat_button"
                                     icon="fa-file-invoice"
                                     invisible="not invoice_id">
-                                <field name="invoice_id" string="Invoice"/>
+                                <field name="invoice_id" string="Invoice" widget="statinfo"/>
                             </button>
                             
                             <button type="object"
@@ -86,8 +87,8 @@
                         <group>
                             <group name="main_info" string="Commission Information">
                                 <field name="commission_type"/>
-                                <field name="sale_order_id" readonly="state != 'draft'"/>
-                                <field name="invoice_id" readonly="state != 'draft'"/>
+                                <field name="sale_order_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                                <field name="invoice_id" readonly="state != 'draft'" options="{'no_create': True}"/>
                                 <field name="currency_id" invisible="1"/>
                             </group>
                             
@@ -115,71 +116,17 @@
                         </group>
                         
                         <notebook>
-                            <page name="commission_details" string="Commission Details">
-                                <group string="External Commissions">
-                                    <field name="sale_order_id" invisible="1"/>
-                                    <!-- External commission fields from sale order -->
-                                    <label for="sale_order_id.broker_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.broker_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.broker_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.referrer_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.referrer_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.referrer_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.cashback_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.cashback_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.cashback_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.other_external_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.other_external_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.other_external_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <field name="sale_order_id.total_external_commission_amount" readonly="1" string="Total External"/>
+                            <page name="commission_summary" string="Commission Summary">
+                                <group string="Commission Details">
+                                    <field name="sale_order_id" readonly="1" string="Source Sale Order"/>
+                                    <field name="total_commission_amount" readonly="1" string="Total Commission Amount"/>
+                                    <button name="action_view_sale_order" type="object" string="View Sale Order Commission Details" class="btn-link" icon="fa-external-link"/>
                                 </group>
                                 
-                                <group string="Internal Commissions">
-                                    <label for="sale_order_id.agent1_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.agent1_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.agent1_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.agent2_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.agent2_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.agent2_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.manager_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.manager_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.manager_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <label for="sale_order_id.director_partner_id"/>
-                                    <div class="o_row">
-                                        <field name="sale_order_id.director_partner_id" readonly="1"/>
-                                        <span>-</span>
-                                        <field name="sale_order_id.director_amount" readonly="1"/>
-                                    </div>
-                                    
-                                    <field name="sale_order_id.total_internal_commission_amount" readonly="1" string="Total Internal"/>
+                                <group string="Processing Information">
+                                    <field name="commission_type" readonly="state != 'draft'"/>
+                                    <field name="auto_process_eligible" readonly="1"/>
+                                    <field name="processed_by" readonly="1"/>
                                 </group>
                             </page>
                             
@@ -207,7 +154,7 @@
                             </page>
                             
                             <page name="notes" string="Notes">
-                                <field name="notes" nolabel="1" placeholder="Add your notes here..."/>
+                                <field name="notes" nolabel="1" placeholder="Add your notes about this commission..."/>
                             </page>
                         </notebook>
                     </sheet>
