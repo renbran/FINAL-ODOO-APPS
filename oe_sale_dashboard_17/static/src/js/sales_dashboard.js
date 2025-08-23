@@ -36,7 +36,7 @@ export class SalesDashboardView extends Component {
     
     async loadSalesData() {
         try {
-            const data = await this.orm.call("sale.order", "get_dashboard_data", []);
+            const data = await this.orm.call("sale.dashboard", "get_dashboard_data", []);
             this.state.salesData = data;
             this.prepareChartData(data);
         } catch (error) {
