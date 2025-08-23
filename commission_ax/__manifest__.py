@@ -36,6 +36,11 @@
         'views/sale_order.xml',
         'views/purchase_order_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            ('prepend', 'commission_ax/static/src/js/cloudpepper_compatibility_patch.js'),
+        ],
+    },
     'demo': [],
     'installable': True,
     'application': True,

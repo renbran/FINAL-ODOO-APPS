@@ -16,7 +16,8 @@ def check_javascript_error_handlers():
     
     js_files = [
         "account_payment_final/static/src/js/payment_workflow_realtime.js",
-        "account_payment_final/static/src/js/cloudpepper_compatibility_patch.js"
+        "account_payment_final/static/src/js/cloudpepper_compatibility_patch.js",
+        "commission_ax/static/src/js/cloudpepper_compatibility_patch.js"
     ]
     
     all_safe = True
