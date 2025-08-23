@@ -87,8 +87,7 @@ Works with or without optional modules - graceful degradation included.
     'assets': {
         'web.assets_backend': [
             ('include', 'web._assets_helpers'),
-            # CRITICAL: Emergency fixes (load first to prevent crashes)
-            ('prepend', 'oe_sale_dashboard_17/static/src/js/emergency_chartjs_fix.js'),
+            # Emergency fixes (load first)
             ('prepend', 'oe_sale_dashboard_17/static/src/js/cloudpepper_dashboard_fix.js'),
             
             # Local Chart.js (no CDN dependency)

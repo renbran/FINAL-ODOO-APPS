@@ -162,28 +162,28 @@ if (typeof window.owl !== "undefined" && window.owl.Component) {
   };
 }
 
-// Emergency GraphRenderer component override
+// Emergency GraphRenderer component override - Modern Odoo 17 syntax
 document.addEventListener("DOMContentLoaded", function () {
-  // Override any failing GraphRenderer components
-  if (window.odoo && window.odoo.define) {
-    window.odoo.define("web.GraphRenderer.Emergency", function (require) {
-      console.log(
-        "[CloudPepper Emergency] Installing GraphRenderer emergency override"
-      );
+  // Modern approach without odoo.define
+  console.log(
+    "[CloudPepper Emergency] Installing GraphRenderer emergency override"
+  );
 
-      // This prevents the GraphRenderer from crashing on Chart.js load failure
-      return {
-        start: function () {
-          if (typeof window.Chart === "undefined") {
-            console.warn(
-              "[CloudPepper Emergency] Chart.js not available, using placeholder"
-            );
-            return Promise.resolve();
-          }
+  // Create emergency GraphRenderer service for modern Odoo 17
+  if (typeof window.Chart === "undefined") {
+    console.warn(
+      "[CloudPepper Emergency] Chart.js not available, creating emergency service"
+    );
+
+    // Register emergency service in modern way
+    if (window.odoo && window.odoo.serviceRegistry) {
+      window.odoo.serviceRegistry.add("emergency_graph_renderer", {
+        start() {
           return Promise.resolve();
         },
-      };
-    });
+        dependencies: [],
+      });
+    }
   }
 });
 

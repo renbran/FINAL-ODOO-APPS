@@ -304,5 +304,10 @@
         "reportIncompleteStub": "none",
         "reportUnsupportedDunderAll": "none",
         "reportUnusedCoroutine": "none"
-    }
+    },
+    
+    // Odoo Language Server settings
+    "odoo-lsp.serverPath": "${workspaceFolder}/odoo-lsp/dist/odoo-lsp.js",
+    "odoo-lsp.pythonPath": "python",
+    "odoo-lsp.odooPath": "${workspaceFolder}/odoo"
 }

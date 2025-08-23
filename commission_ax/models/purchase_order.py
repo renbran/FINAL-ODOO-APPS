@@ -6,6 +6,13 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class PurchaseOrder(models.Model):
+    def action_force_post(self):
+        """Post the purchase order (set state to 'purchase' if possible)."""
+        self.ensure_one()
+        if self.state not in ['draft', 'sent']:
+            raise UserError("Only draft or sent purchase orders can be posted.")
+        self.button_confirm()
+        return True
     _inherit = 'purchase.order'
 
     # Commission-related fields for purchase orders

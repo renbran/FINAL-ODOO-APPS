@@ -151,6 +151,11 @@ class CommissionAX(models.Model):
         compute='_compute_invoice_posted',
         store=True
     )
+
+    @api.depends('invoice_id.state')
+    def _compute_invoice_posted(self):
+        for record in self:
+            record.invoice_posted = record.invoice_id and record.invoice_id.state == 'posted'
     
     sale_confirmed = fields.Boolean(
         string='Sale Confirmed',
