@@ -14,19 +14,17 @@ export class PaymentWorkflowRealtime extends Component {
     window.addEventListener("error", (event) => {
       if (event.error) {
         this.state.errorCount++;
-        this.notification.add(
-          `Global JS error: ${event.error.message}`,
-          { type: "danger" }
-        );
+        this.notification.add(`Global JS error: ${event.error.message}`, {
+          type: "danger",
+        });
         this.handleError(event.error);
       }
     });
     window.addEventListener("unhandledrejection", (event) => {
       this.state.errorCount++;
-      this.notification.add(
-        `Unhandled promise rejection: ${event.reason}`,
-        { type: "danger" }
-      );
+      this.notification.add(`Unhandled promise rejection: ${event.reason}`, {
+        type: "danger",
+      });
       this.handleError(event.reason);
     });
   }
