@@ -25,7 +25,7 @@
     'category': 'Sales/Commission',
     'author': 'Enhanced Commission Team',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'purchase', 'account', 'mail'],
+    'depends': ['sale', 'purchase', 'account', 'mail', 'crm', 'project'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -36,6 +36,11 @@
         'views/sale_order.xml',
         'views/purchase_order_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            ('prepend', 'commission_ax/static/src/js/cloudpepper_compatibility_patch.js'),
+        ],
+    },
     'demo': [],
     'installable': True,
     'application': True,
