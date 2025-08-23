@@ -148,7 +148,7 @@ class CommissionAX(models.Model):
     # Constraints and Validation Fields
     invoice_posted = fields.Boolean(
         string='Invoice Posted',
-        related='invoice_id.posted',
+        compute='_compute_invoice_posted',
         store=True
     )
     
@@ -166,6 +166,12 @@ class CommissionAX(models.Model):
         """Compute if sale order is confirmed"""
         for record in self:
             record.sale_confirmed = record.sale_order_id.state == 'sale'
+    
+    @api.depends('invoice_id.state')
+    def _compute_invoice_posted(self):
+        """Compute if invoice is posted"""
+        for record in self:
+            record.invoice_posted = record.invoice_id.state == 'posted'
     
     @api.depends('sale_confirmed', 'invoice_posted', 'state')
     def _compute_auto_process_eligible(self):
