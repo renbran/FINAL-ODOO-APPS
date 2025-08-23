@@ -307,5 +307,6 @@
     // Odoo Language Server settings
     "odoo-lsp.serverPath": "${workspaceFolder}/odoo-lsp/dist/odoo-lsp.js",
     "odoo-lsp.pythonPath": "python",
-    "odoo-lsp.odooPath": "${workspaceFolder}/odoo"
+    "odoo-lsp.odooPath": "${workspaceFolder}/odoo",
+    "python.languageServer": "None"
 }
