@@ -25,7 +25,7 @@
     'category': 'Sales/Commission',
     'author': 'Enhanced Commission Team',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'purchase', 'account', 'mail'],
+    'depends': ['sale', 'purchase', 'account', 'mail', 'crm', 'project'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
