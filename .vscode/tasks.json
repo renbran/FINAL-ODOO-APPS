@@ -6,6 +6,12 @@
 			"label": "Odoo 17 Test: account_payment_final",
 			"command": "docker-compose exec odoo odoo --test-enable --log-level=test --stop-after-init -d odoo -i account_payment_final",
 			"group": "test"
+		},
+		{
+			"label": "Odoo 17 Build: account_payment_final",
+			"type": "shell",
+			"command": "docker-compose build odoo",
+			"group": "build"
 		}
 	]
 }

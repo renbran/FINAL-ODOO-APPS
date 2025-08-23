@@ -1,0 +1,6 @@
+[submodule "odoo-lsp"]
+	path = odoo-lsp
+	url = https://github.com/Desdaemon/odoo-lsp.git
+[submodule "partner_statement_followup/odoo-lsp"]
+	path = partner_statement_followup/odoo-lsp
+	url = https://github.com/Desdaemon/odoo-lsp.git
