@@ -12,9 +12,11 @@ errors in modules that do not adhere to the modern Odoo JS module system.
     'website': 'https://www.odoo.com',
     'depends': ['web'],
     'assets': {
-        'web.assets_backend': [
-            ('prepend', 'odoo_define_compatibility_fix/static/src/js/emergency_odoo_define_global_fix.js'),
-        ],
+            'web.assets_backend': [
+                ('prepend', 'odoo_define_compatibility_fix/static/src/js/cloudpepper_compatibility_patch.js'),
+                ('prepend', 'odoo_define_compatibility_fix/static/src/js/emergency_odoo_define_global_fix.js'),
+                'odoo_define_compatibility_fix/static/src/js/main_component.js',
+            ],
     },
     'installable': True,
     'application': False,

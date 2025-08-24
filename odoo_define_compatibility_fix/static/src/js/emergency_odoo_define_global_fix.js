@@ -10,55 +10,51 @@
 console.log("🚑 Emergency Odoo.define Global Fix Loading...");
 
 // Ensure window.odoo exists
-if (typeof window !== 'undefined') {
-    window.odoo = window.odoo || {};
-    
-    // Create a robust odoo.define compatibility shim
-    if (typeof window.odoo.define !== 'function') {
-        window.odoo.define = function(name, dependencies, callback) {
-            console.warn(`🚨 Emergency Fix: Legacy odoo.define() call for "${name}"`);
-            
-            // Handle different call signatures
-            if (typeof dependencies === 'function') {
-                // odoo.define(name, function() {})
-                callback = dependencies;
-                dependencies = [];
-            }
-            
-            // Create a safe execution context
-            const requireShim = function(moduleName) {
-                console.warn(`🚨 Emergency Fix: require('${moduleName}') called - returning empty object`);
+/** @odoo-module **/
+// Emergency Odoo.define Global Fix for CloudPepper/Odoo 17
+// Loads FIRST to patch asset loading issues and legacy JS errors
+
+console.log("🚑 Emergency Odoo.define Global Fix Loading...");
+
+(() => {
+    'use strict';
+    if (typeof window !== 'undefined') {
+        window.odoo = window.odoo || {};
+        // Patch odoo.define if missing or not a function
+        if (typeof window.odoo.define !== 'function') {
+            window.odoo.define = (name, dependencies, callback) => {
+                console.warn(`🚨 Emergency Fix: Legacy odoo.define() call for "${name}"`);
+                // Provide a dummy require function
+                const requireShim = moduleName => {
+                    console.warn(`🚨 Emergency Fix: require('${moduleName}') called - returning empty object`);
+                    return {};
+                };
+                if (typeof callback === 'function') {
+                    return callback(requireShim);
+                }
                 return {};
             };
-            
-            // Execute callback safely with error handling
-            try {
-                if (typeof callback === 'function') {
-                    const result = callback(requireShim);
-                    console.log(`✅ Emergency Fix: Successfully executed legacy module "${name}"`);
-                    return result;
-                }
-            } catch (error) {
-                console.error(`❌ Emergency Fix: Error in legacy module "${name}":`, error);
-                // Don't throw - just log and continue
-            }
-            
-            return {};
-        };
-        
-        console.log("✅ Emergency odoo.define() shim activated");
-    }
-    
-    // Also create a basic loader shim if needed
-    window.odoo.loader = window.odoo.loader || {
-        bus: {
-            addEventListener: function(event, callback) {
-                console.log(`🚨 Emergency Fix: loader.bus.addEventListener('${event}') shimmed`);
-            }
+            console.log("✅ Emergency odoo.define() shim activated");
         }
-    };
-}
-
+        // Patch loader
+        window.odoo.loader = window.odoo.loader || {
+            bus: {
+                addEventListener: (event, callback) => {
+                    console.log(`🚨 Emergency Fix: loader.bus.addEventListener('${event}') shimmed`);
+                }
+            }
+        };
+        // Global error handler for odoo.define errors
+        window.addEventListener('error', event => {
+            if (event.message && event.message.includes('odoo.define is not a function')) {
+                console.error('🚨 Emergency Fix: Caught odoo.define error:', event.message);
+                event.preventDefault();
+                return true;
+            }
+        });
+    }
+    console.log("🚑 Emergency Odoo.define Global Fix Ready!");
+})();
 // Global error handler specifically for odoo.define errors
 window.addEventListener('error', function(event) {
     if (event.message && event.message.includes('odoo.define is not a function')) {
