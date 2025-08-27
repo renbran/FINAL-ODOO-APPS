@@ -38,10 +38,8 @@
         "*.scss": "scss",
         "*.css": "css",
         "*.py": "python",
-        "*.yaml": "yaml",
-        "*.yml": "yaml"
-    },
-    
+        },
+
     // XML Configuration for Odoo Views
     "xml.format.enabled": true,
     "xml.format.splitAttributes": "splitNewLine",

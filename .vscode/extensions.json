@@ -16,6 +16,7 @@
         "ms-vscode.vscode-sass",
         "mrmlnc.vscode-scss",
         "sibiraj-s.vscode-scss-formatter"
+    ,"rinormaloku.vscode-lsp-client"
     ],
     "unwantedRecommendations": [
         "ms-python.flake8",
@@ -24,3 +25,4 @@
         "ms-vscode.vscode-typescript-next"
     ]
 }
+
