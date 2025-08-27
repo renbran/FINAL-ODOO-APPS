@@ -308,5 +308,6 @@
     "odoo-lsp.serverPath": "${workspaceFolder}/odoo-lsp/dist/odoo-lsp.js",
     "odoo-lsp.pythonPath": "python",
     "odoo-lsp.odooPath": "${workspaceFolder}/odoo",
-    "python.languageServer": "None"
+    "python.languageServer": "None",
+    "xml.symbols.enabled": false
 }
