@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-# Payment Approval Pro Models
-
-import logging
-from odoo import api, fields, models
-
-from . import payment_voucher
-from . import payment_workflow
-from . import account_payment_extension
-from . import payment_report_wizard
-
-_logger = logging.getLogger(__name__)
+from . import account_move
+from . import account_payment
+from . import account_payment_register
+from . import payment_approval_history
+from . import payment_qr_verification
+from . import payment_workflow_stage
+from . import res_company
+from . import res_config_settings
+from . import res_partner

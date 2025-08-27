@@ -1,158 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Extend Account Payment Form with Enhanced Reports -->
+
+        <!-- Enhanced Payment Form View with 4-Stage Workflow -->
         <record id="view_account_payment_form_enhanced" model="ir.ui.view">
             <field name="name">account.payment.form.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <!-- Enhanced Print Menu for Account Payments -->
-                    <div class="btn-group" invisible="state == 'draft'">
-                        <button name="osus_reports_dropdown" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa fa-print"/>
- OSUS Reports
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button name="action_print_enhanced_voucher" type="object" class="dropdown-item">
-                                    <i class="fa fa-file-pdf-o"/>
- Enhanced Payment Voucher
-                                </button>
-                            </li>
-                            <li>
-                                <button name="action_print_compact_voucher" type="object" class="dropdown-item">
-                                    <i class="fa fa-file-text-o"/>
- Compact Payment Voucher
-                                </button>
-                            </li>
-                            <li>
-                                <button name="action_print_professional_summary" type="object" class="dropdown-item">
-                                    <i class="fa fa-bar-chart"/>
- Professional Summary
-                                </button>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider"/>
-                            </li>
-                            <li>
-                                <button name="action_print_multiple_reports" type="object" class="dropdown-item">
-                                    <i class="fa fa-files-o"/>
- Multiple Payment Reports
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+
+                <!-- Replace header with workflow statusbar -->
+                <xpath expr="//header" position="replace">
+                    <header>
+                        <!-- 4-Stage Approval Workflow Statusbar -->
+                        <field name="approval_state" widget="statusbar" statusbar_visible="draft,under_review,for_approval,for_authorization,approved,posted" statusbar_colors='{"draft":"secondary","under_review":"info","for_approval":"warning","for_authorization":"warning","approved":"success","posted":"success"}' invisible="not approval_state"/>
+
+                        <!-- Legacy verification status for backward compatibility -->
+                        <field name="verification_status" widget="statusbar" statusbar_visible="pending,verified,rejected" statusbar_colors='{"pending":"info","verified":"success","rejected":"danger"}' invisible="approval_state"/>
+
+                        <!-- Hidden fields for button conditions -->
+                        <field name="state" invisible="1"/>
+                        <field name="payment_type" invisible="1"/>
+                        <field name="can_verify" invisible="1"/>
+                        <field name="can_submit_for_review" invisible="1"/>
+                        <field name="can_review" invisible="1"/>
+                        <field name="can_approve" invisible="1"/>
+                        <field name="can_authorize" invisible="1"/>
+
+                        <!-- 4-Stage Workflow Buttons -->
+                        <div class="workflow-buttons" invisible="not approval_state">
+                            <button name="action_submit_for_review" string="Submit for Review" type="object" class="btn-primary" invisible="approval_state != 'draft'"/>
+
+                            <button name="action_review_payment" string="Review" type="object" class="btn-success" groups="account_payment_final.group_payment_reviewer" invisible="approval_state != 'under_review'"/>
+
+                            <button name="action_approve_payment" string="Approve" type="object" class="btn-success" groups="account_payment_final.group_payment_approver" invisible="approval_state != 'for_approval'"/>
+
+                            <button name="action_authorize_payment" string="Authorize" type="object" class="btn-success" groups="account_payment_final.group_payment_authorizer" invisible="approval_state != 'for_authorization' or payment_type != 'outbound'"/>
+
+                            <button name="action_post" string="Post Payment" type="object" class="btn-primary" groups="account_payment_final.group_payment_poster" invisible="approval_state != 'approved'"/>
+
+                            <button name="action_reject_payment" string="Reject" type="object" class="btn-danger" groups="account_payment_final.group_payment_approver" invisible="approval_state in ['draft', 'posted', 'cancelled']" confirm="Are you sure you want to reject this payment?"/>
+                        </div>
+
+                        <!-- Legacy Verification Buttons -->
+                        <div class="verification-buttons" invisible="approval_state">
+                            <button name="action_verify_payment" string="Verify Payment" type="object" class="btn-success" invisible="not can_verify"/>
+
+                            <button name="action_reject_payment_verification" string="Reject Verification" type="object" class="btn-danger" groups="account_payment_final.group_payment_verifier" invisible="verification_status == 'rejected'"/>
+                        </div>
+                    </header>
                 </xpath>
 
-                <!-- Add QR Code field to the form -->
-                <xpath expr="//field[@name='ref']" position="after">
-                    <field name="qr_verification_token" invisible="1"/>
-                    <field name="qr_code" widget="image" class="oe_avatar" invisible="not qr_code" options="{'size': [100, 100]}"/>
+                <!-- Add voucher number and QR code fields -->
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="voucher_number" readonly="1" class="oe_inline"/>
+                </xpath>
+
+                <xpath expr="//field[@name='amount']" position="after">
+                    <field name="remarks" placeholder="Enter additional remarks..."/>
+                </xpath>
+
+                <!-- Add workflow and QR tabs -->
+                <xpath expr="//notebook" position="inside">
+
+                    <!-- Approval Workflow Tab -->
+                    <page string="Approval Workflow" name="approval_workflow" invisible="not approval_state">
+                        <group>
+                            <group string="Workflow Status">
+                                <field name="approval_state" readonly="1"/>
+                                <field name="reviewer_id" readonly="1"/>
+                                <field name="approver_id" readonly="1"/>
+                                <field name="authorizer_id" readonly="1" invisible="payment_type != 'outbound'"/>
+                                <field name="actual_approver_id" readonly="1"/>
+                            </group>
+                            <group string="Workflow Dates">
+                                <field name="reviewer_date" readonly="1"/>
+                                <field name="approver_date" readonly="1"/>
+                                <field name="authorizer_date" readonly="1" invisible="payment_type != 'outbound'"/>
+                            </group>
+                        </group>
+
+                        <!-- Approval History -->
+                        <field name="approval_history_ids" readonly="1">
+                            <tree>
+                                <field name="approval_date"/>
+                                <field name="action_type"/>
+                                <field name="stage_from"/>
+                                <field name="stage_to"/>
+                                <field name="user_id"/>
+                                <field name="duration_in_stage" widget="float_time"/>
+                                <field name="comments"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <!-- QR Code and Verification Tab -->
+                    <page string="QR Verification" name="qr_verification">
+                        <group>
+                            <group string="QR Code Settings">
+                                <field name="qr_in_report"/>
+                                <field name="qr_code" widget="image" options="{'size': [200, 200]}" readonly="1" invisible="not qr_code"/>
+                            </group>
+                            <group string="Verification Status">
+                                <field name="verification_status" readonly="1"/>
+                                <button name="action_verify_payment" string="Verify Payment" type="object" class="btn-success" invisible="not can_verify"/>
+                            </group>
+                        </group>
+
+                        <!-- QR Verification History -->
+                        <field name="qr_verification_ids" readonly="1">
+                            <tree>
+                                <field name="verification_date"/>
+                                <field name="verification_code"/>
+                                <field name="verification_method"/>
+                                <field name="verification_status"/>
+                                <field name="verifier_ip"/>
+                            </tree>
+                        </field>
+                    </page>
+
                 </xpath>
             </field>
         </record>
 
-        <!-- Extend Account Payment List to add Enhanced Print Actions -->
+        <!-- Enhanced Payment Tree View -->
         <record id="view_account_payment_tree_enhanced" model="ir.ui.view">
             <field name="name">account.payment.tree.enhanced</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <attribute name="multi_edit">1</attribute>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="voucher_number" optional="show"/>
                 </xpath>
 
-                <!-- Add QR verification token column -->
-                <xpath expr="//field[@name='date']" position="after">
-                    <field name="qr_verification_token" optional="hide"/>
-                </xpath>
-            </field>
-        </record>
-
-        <!-- Enhanced Payment Reports Menu -->
-        <menuitem id="menu_enhanced_payment_reports" name="Enhanced Payment Reports" parent="account.menu_finance_reports" sequence="45" groups="account.group_account_user"/>
-
-        <!-- Enhanced Payment Reports Action -->
-        <record id="action_enhanced_payment_reports" model="ir.actions.act_window">
-            <field name="name">Enhanced Payment Reports</field>
-            <field name="res_model">account.payment</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('state', '!=', 'draft')]</field>
-            <field name="context">{
-                'search_default_posted': 1,
-                'search_default_group_by_journal': 1,
-            }</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No payments found for enhanced reporting!
-                </p>
-                <p>
-                    Enhanced payment reports provide comprehensive documentation with:
-                    <br/>
-• Professional layouts with OSUS branding
-                    <br/>
-• QR code verification
-                    <br/>
-• Digital signature sections
-                    <br/>
-• Receipt acknowledgments
-                    <br/>
-• Multiple format options
-                </p>
-            </field>
-        </record>
-
-        <!-- Link menu to action -->
-        <menuitem id="menu_enhanced_payment_reports_action" name="Payment Reports" parent="menu_enhanced_payment_reports" action="action_enhanced_payment_reports" sequence="10"/>
-
-        <!-- Multiple Payment Reports Wizard Action -->
-        <record id="action_multiple_payment_reports_wizard" model="ir.actions.act_window">
-            <field name="name">Generate Multiple Payment Reports</field>
-            <field name="res_model">payment.report.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="binding_model_id" ref="account.model_account_payment"/>
-            <field name="binding_view_types">list</field>
-        </record>
-
-        <!-- Server Action for Bulk Enhanced Reports -->
-        <record id="server_action_bulk_enhanced_reports" model="ir.actions.server">
-            <field name="name">Print Enhanced Reports (Bulk)</field>
-            <field name="model_id" ref="account.model_account_payment"/>
-            <field name="binding_model_id" ref="account.model_account_payment"/>
-            <field name="binding_view_types">list</field>
-            <field name="state">code</field>
-            <field name="code">
-if records:
-    return records.action_print_multiple_reports()
-            </field>
-        </record>
-
-        <!-- Server Action for Bulk Compact Reports -->
-        <record id="server_action_bulk_compact_reports" model="ir.actions.server">
-            <field name="name">Print Compact Reports (Bulk)</field>
-            <field name="model_id" ref="account.model_account_payment"/>
-            <field name="binding_model_id" ref="account.model_account_payment"/>
-            <field name="binding_view_types">list</field>
-            <field name="state">code</field>
-            <field name="code">
-if records:
-    # Generate individual compact reports for each payment
-    reports = []
-    for payment in records:
-        report = payment.action_print_compact_voucher()
-        reports.append(report)
-    
-    # Return the last report or multiple reports action
-    if len(records) == 1:
-        action = records.action_print_compact_voucher()
-    else:
-        action = records.action_print_multiple_reports()
-    
-    return action
-            </field>
-        </record>
-    </data>
-</odoo>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="approval_state" widget="badge" optional="show" decoration-info="approval_state == 'draft'" decoration-warning="approval_state in ['under_review', 'for_approval', 'for_authorization']" decoration-success="approval_state in
