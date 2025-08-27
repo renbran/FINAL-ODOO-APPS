@@ -8,42 +8,23 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                
+
                 <!-- Safe Header Override with Locked Field - Odoo 17.0 Compatible -->
                 <xpath expr="//header" position="replace">
                     <header>
                         <!-- CRITICAL: Include locked field to satisfy view modifiers -->
                         <field name="locked" invisible="1"/>
-                        
-                        <field name="state" widget="statusbar"
-                               statusbar_visible="draft,documentation,commission,sale,done"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,documentation,commission,sale,done"/>
 
                         <!-- Safe Workflow Buttons - Odoo 17.0 Compatible -->
-                        <button name="action_set_documentation"
-                                type="object"
-                                string="Documentation"
-                                class="btn-info"
-                                invisible="state != 'draft'"
-                                groups="order_net_commission.group_documentation_officer"/>
+                        <button name="action_set_documentation" type="object" string="Documentation" class="btn-info" invisible="state != 'draft'" groups="order_net_commission.group_documentation_officer"/>
 
-                        <button name="action_set_commission"
-                                type="object"
-                                string="Commission"
-                                class="btn-warning"
-                                invisible="state != 'documentation'"
-                                groups="order_net_commission.group_commission_analyst"/>
+                        <button name="action_set_commission" type="object" string="Commission" class="btn-warning" invisible="state != 'documentation'" groups="order_net_commission.group_commission_analyst"/>
 
-                        <button name="action_approve_commission"
-                                type="object"
-                                string="Approve"
-                                class="btn-success"
-                                invisible="state != 'commission'"
-                                groups="order_net_commission.group_sales_approver"/>
+                        <button name="action_approve_commission" type="object" string="Approve" class="btn-success" invisible="state != 'commission'" groups="order_net_commission.group_sales_approver"/>
 
-                        <button name="action_cancel"
-                                type="object"
-                                string="Cancel"
-                                invisible="state in ('sale','done','cancel')"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state in ('sale','done','cancel')"/>
 
                     </header>
                 </xpath>

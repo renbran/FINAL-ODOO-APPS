@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        
+
         <!-- Security Groups for Order Net Commission Workflow -->
-        
+
         <!-- 1. Documentation Officer Group -->
         <record id="group_documentation_officer" model="res.groups">
             <field name="name">Sales / Documentation Officer</field>
@@ -29,7 +29,7 @@
         </record>
 
         <!-- Record Rules for Enhanced Security -->
-        
+
         <!-- Documentation Officer can only access draft and documentation stages -->
         <record id="sale_order_documentation_officer_rule" model="ir.rule">
             <field name="name">Sales Order: Documentation Officer Access</field>

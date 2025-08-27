@@ -3,7 +3,7 @@
     <data noupdate="1">
 
         <!-- Mail Activity Types for Commission Workflow -->
-        
+
         <!-- Documentation Review Activity -->
         <record id="mail_activity_documentation_review" model="mail.activity.type">
             <field name="name">Documentation Review</field>
