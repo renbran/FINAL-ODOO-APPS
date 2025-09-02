@@ -1,85 +1,65 @@
 #!/bin/bash
 
-# Script to deploy OSUS Executive Sales Dashboard
-# This script prepares the module for deployment, ensuring all robustness improvements are applied
+# Production deployment script for oe_sale_dashboard_17
+# This script ensures proper module deployment with cache clearing
 
-echo "OSUS Executive Sales Dashboard Deployment"
-echo "=========================================="
-echo "This script will prepare your module for deployment"
+MODULE_NAME="oe_sale_dashboard_17"
+ODOO_PATH="/var/odoo/coatest"
+DB_NAME="coatest"
 
-# Check if we're in the correct directory
-if [ ! -d "./oe_sale_dashboard_17" ]; then
-    echo "Error: oe_sale_dashboard_17 directory not found. Please run this script from your Odoo addons directory."
-    exit 1
-fi
+echo "🚀 Starting deployment of $MODULE_NAME..."
 
-# Create backup
-echo "Creating backup..."
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-BACKUP_DIR="./oe_sale_dashboard_17_backup_${TIMESTAMP}"
-cp -r ./oe_sale_dashboard_17 $BACKUP_DIR
-echo "Backup created at: $BACKUP_DIR"
+# Function to execute Odoo commands
+execute_odoo_cmd() {
+    local cmd="$1"
+    echo "📋 Executing: $cmd"
+    cd "$ODOO_PATH"
+    sudo -u odoo python3 src/odoo/odoo-bin "$cmd" || {
+        echo "❌ Command failed: $cmd"
+        return 1
+    }
+}
 
-# Clear assets cache if available
-if [ -d "../var/assets" ]; then
-    echo "Clearing assets cache..."
-    rm -rf ../var/assets/*
-fi
+# Step 1: Stop Odoo service
+echo "🛑 Stopping Odoo service..."
+sudo systemctl stop odoo || echo "⚠️ Odoo service not running"
 
-# Create missing directories if needed
-directories=(
-    "./oe_sale_dashboard_17/static/src/js"
-    "./oe_sale_dashboard_17/static/src/css"
-    "./oe_sale_dashboard_17/static/src/xml"
-    "./oe_sale_dashboard_17/views"
-    "./oe_sale_dashboard_17/data"
-)
+# Step 2: Clear Python cache
+echo "🧹 Clearing Python cache..."
+find "$ODOO_PATH" -name "*.pyc" -delete
+find "$ODOO_PATH" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
-for dir in "${directories[@]}"; do
-    mkdir -p "$dir"
-done
+# Step 3: Update module list
+echo "📦 Updating module list..."
+execute_odoo_cmd "-d $DB_NAME --update-list --stop-after-init"
 
-# JavaScript syntax validation for production readiness
-echo "Validating JavaScript syntax..."
-# Check if node is available
-if command -v node &> /dev/null; then
-    # Simple JavaScript syntax validation
-    for jsfile in $(find ./oe_sale_dashboard_17 -name "*.js"); do
-        echo "Checking $jsfile..."
-        node --check "$jsfile"
-        if [ $? -ne 0 ]; then
-            echo "Syntax error in $jsfile. Please fix before deployment."
-            echo "Deployment preparation aborted."
-            exit 1
-        fi
-    done
-    echo "All JavaScript files passed syntax validation."
-else
-    echo "Node.js not found. Skipping JavaScript syntax validation."
-    echo "Recommend installing Node.js for syntax validation before production deployment."
-fi
+# Step 4: Upgrade module if already installed
+echo "🔄 Upgrading module..."
+execute_odoo_cmd "-d $DB_NAME -u $MODULE_NAME --stop-after-init"
 
-# Ensure correct permissions
-echo "Setting correct permissions..."
-find ./oe_sale_dashboard_17 -type f -exec chmod 644 {} \;
-find ./oe_sale_dashboard_17 -type d -exec chmod 755 {} \;
+# Step 5: Install module if not installed
+echo "📥 Installing module (if needed)..."
+execute_odoo_cmd "-d $DB_NAME -i $MODULE_NAME --stop-after-init"
 
-echo "Deployment preparation complete!"
+# Step 6: Clear browser cache (optional)
+echo "🌐 Clearing web assets cache..."
+execute_odoo_cmd "-d $DB_NAME --dev=all --stop-after-init"
+
+# Step 7: Start Odoo service
+echo "▶️ Starting Odoo service..."
+sudo systemctl start odoo
+
+# Step 8: Wait for service to be ready
+echo "⏳ Waiting for Odoo to start..."
+sleep 10
+
+# Step 9: Check service status
+echo "🔍 Checking service status..."
+sudo systemctl status odoo --no-pager
+
+echo "✅ Deployment completed!"
 echo ""
-echo "To install/update the module:"
-echo "1. Restart your Odoo server"
-echo "2. Update the module via the Apps menu or run:"
-echo "   python3 odoo-bin -d YOUR_DATABASE -u oe_sale_dashboard_17"
-echo ""
-echo "If you encounter any issues:"
-echo "1. Check browser console for JavaScript errors"
-echo "2. Review Odoo server logs for Python errors"
-echo "3. Consult the documentation in oe_sale_dashboard_17/docs/"
-echo ""
-echo "Rollback procedure:"
-echo "If issues occur after deployment, restore from the backup:"
-echo "1. Stop Odoo server"
-echo "2. Run: rm -rf ./oe_sale_dashboard_17"
-echo "3. Run: cp -r $BACKUP_DIR ./oe_sale_dashboard_17"
-echo "4. Restart Odoo server"
-echo "3. Consult the documentation in oe_sale_dashboard_17/docs/"
+echo "📋 Next steps:"
+echo "1. Check Odoo logs: sudo journalctl -u odoo -f"
+echo "2. Access dashboard: [Your Odoo URL]/web#action=oe_sale_dashboard_17.action_sale_dashboard"
+echo "3. If issues persist, check module dependencies and database integrity"

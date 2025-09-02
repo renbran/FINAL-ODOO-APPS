@@ -2,67 +2,60 @@
 # 🧠 Copilot Instructions for odoo17_final
 
 ## Project Architecture & Big Picture
-- **Odoo 17, Dockerized**: All dev/test/deploy is via Docker Compose. Odoo runs in a container, with custom modules mounted at `/mnt/extra-addons`.
-- **Custom modules**: Each top-level folder (e.g. `account_payment_approval/`, `custom_sales/`, `oe_sale_dashboard_17/`) is a standard Odoo module with its own models, views, security, and tests.
-- **Database**: Managed by a Postgres container. Use `docker-compose exec db ...` for DB ops.
-- **Setup scripts**: Use `setup.bat` (Windows) or `setup.sh` (Linux/Mac) for common tasks (start, stop, logs, backup).
-- **Access**: Odoo UI at http://localhost:8069 (default admin: `admin`/`admin`).
+- **Odoo 17 Multi-Module Repository**: Production-ready Odoo addons with Dockerfile for containerized deployment
+- **Module Portfolio**: ~50+ custom modules spanning accounting, sales, HR, reporting, theming, and workflow automation
+- **No Docker Compose**: Uses standalone Dockerfile with custom Python dependencies (xlsxwriter, qrcode, pandas, etc.)
+- **Setup Scripts**: Use `setup.bat` (Windows) or `setup.sh` (Linux/Mac) for docker operations (start, stop, logs, build, shell)
+- **Module Deployment**: Individual modules have `deploy.sh/deploy.ps1` scripts for production deployment (see `oe_sale_dashboard_17/`)
 
 ## Developer Workflows
-- **Start/Stop**: Use setup scripts or `docker-compose up -d` / `docker-compose down`.
-- **Logs**: `docker-compose logs -f odoo`
-- **DB backup/restore**: See project root scripts and `docker-compose` commands.
-- **Update all modules**: `docker-compose exec odoo odoo --update=all --stop-after-init`
-- **Update single module**: `docker-compose exec odoo odoo --update=module_name --stop-after-init`
-- **Run tests**: `docker-compose exec odoo odoo --test-enable --log-level=test --stop-after-init -d odoo -i module_name`
-- **Enter Odoo shell**: `docker-compose exec odoo bash`
-- **Module install**: Copy to repo, update app list in Odoo UI, then install from Apps menu.
+- **Container Operations**: Use `setup.bat start|stop|restart|logs|build|shell|update|status` or `setup.sh` equivalent
+- **Module Updates**: `./setup.sh update_mod MODULE_NAME` for single module or `./setup.sh update` for all
+- **Shell Access**: `./setup.sh shell` to enter container bash
+- **Module Deployment**: Use module-specific `deploy.sh` scripts (see `oe_sale_dashboard_17/deploy.sh`)
+- **Testing**: Standard Odoo `TransactionCase` in `tests/` directories (see `tk_sale_split_invoice/tests/`)
+- **Documentation**: Check module `docs/` folders for deployment guides and troubleshooting
 
 ## Project Conventions & Patterns
-- **Module structure**: Each module has `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `demo/`, `static/`, `tests/`.
-- **Naming**: Use snake_case for modules/models. Prefix custom models with module name (e.g. `custom_sales.kpi_config`).
-- **Security**: Always define `ir.model.access.csv` and `security.xml` for each module. See `account_payment_approval/security/` for reference.
-- **Testing**: Use `TransactionCase` in `tests/` (see `tk_sale_split_invoice/tests/test_sale_split_invoice.py`).
-- **External dependencies**: Declare all Python packages in both `__manifest__.py` and Dockerfile.
-- **Model extension**: Use `_inherit` for extension, `_inherits` for delegation. Example: `account_payment_approval/models/account_payment.py`.
-- **State machines**: Use Selection fields and statusbar in form views (see `account_payment_approval`).
-- **API endpoints**: Use `@http.route` with proper auth/CSRF (see `om_dynamic_report/controllers/`).
-- **Reports**: Use QWeb XML for PDF, controllers for Excel/CSV. See `payment_account_enhanced/reports/` for QWeb patterns.
-- **Config/settings**: Use `res.config.settings` and `ir.config_parameter` for settings (see `account_payment_approval/models/res_config_settings.py`).
-- **Error handling**: Use `ValidationError` for constraints, `UserError` for user-facing errors.
-- **Frontend**: Use Chart.js for dashboards (see `custom_sales/`, `oe_sale_dashboard_17/`).
-- **Report theming**: For report styling, see `report_font_enhancement/` (uses CSS variables, high-contrast, print optimizations).
+- **Module Structure**: Standard Odoo with `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `static/`, `tests/`, optional `docs/`
+- **Odoo 17 Syntax**: **CRITICAL** - Use modern XML syntax: `invisible="condition"` NOT `states=` or `attrs={}` (see `ODOO17_SYNTAX_GUIDELINES.md`)
+- **Dependencies**: Dockerfile pre-installs: `xlsxwriter`, `qrcode`, `pandas`, `python-dateutil`, `PyPDF2`, `reportlab`, `num2words`
+- **Module Categories**: Sales dashboards, accounting enhancements, report theming, HR automation, website customization, workflow approval
+- **Naming**: snake_case modules, descriptive manifests with version `17.0.x.y.z`, proper category classification
+- **Security**: Always include `security/ir.model.access.csv` and security groups for new models
+- **Testing**: Use `@tagged('module_name')` and `TransactionCase` for comprehensive test coverage
 
 ## Integration & Cross-Component Patterns
-- **Excel export**: Use `report_xlsx` if available, but degrade gracefully if not (see `account_statement/`).
-- **Multi-app integration**: Some modules (e.g. `account_statement/`) add features to both Contacts and Accounting apps.
-- **Security**: Multi-level permissions and record rules (see `account_statement/security/`).
-- **REST API**: Some modules expose REST endpoints (see `custom_sales/api/`).
-- **Mobile/responsive**: Dashboards and reports are designed for mobile (see `custom_sales/`).
+- **Dashboard Architecture**: Chart.js with CDN fallback, responsive design, mobile-optimized (see `oe_sale_dashboard_17/`)
+- **Report Theming**: Universal CSS variables system with high-contrast, adaptive transparency (see `report_font_enhancement/`)
+- **Commission Systems**: Dual-group structure (external/internal) with flexible calculation methods (see `commission_ax/`)
+- **Multi-App Integration**: Modules span Contacts, Accounting, Sales, HR apps with cross-app data flows
+- **Deployment Patterns**: Module-specific deployment scripts with backup, cache clearing, and robustness checks
+- **Theme Integration**: Multiple web theme modules (`muk_web_*`, `web_login_styles`) with cohesive styling approach
 
 ## Examples & References
-- **Module structure**: `account_payment_approval/`, `custom_sales/`, `account_statement/`
-- **API endpoint**: `om_dynamic_report/controllers/om_dynamic_report_controller.py`, `custom_sales/api/`
-- **Form view**: `account_payment_approval/views/account_payment_views.xml`
-- **Testing**: `tk_sale_split_invoice/tests/test_sale_split_invoice.py`
-- **Report theming**: `report_font_enhancement/README.md`
+- **Complete Module**: `commission_ax/` (manifest, models, views, data, security)
+- **Testing Pattern**: `tk_sale_split_invoice/tests/test_sale_split_invoice.py` (TransactionCase with @tagged)
+- **Dashboard Module**: `oe_sale_dashboard_17/` (Chart.js, deployment scripts, documentation)
+- **Report Theming**: `report_font_enhancement/README.md` (CSS variables, accessibility)
+- **Deployment Script**: `oe_sale_dashboard_17/deploy.sh` (backup, cache clearing, robustness)
+- **Odoo 17 Syntax**: `ODOO17_SYNTAX_GUIDELINES.md` (modern XML attributes)
 
 ## Common Issues & Troubleshooting
-- **DB errors**: If cron jobs fail, check `fix_cron_in_odoo.py`.
-- **Duplicate records**: See `fix_duplicate_partners.py` for deduplication logic.
-- **JS errors**: Run `fix_dashboard_js.py` for dashboard JS issues.
-- **Permission errors**: Check `ir.model.access.csv` and security groups.
-- **Module dependencies**: Ensure all dependencies are in `__manifest__.py` before install.
-- **Excel export**: If not available, check `xlsxwriter` and `report_xlsx` install.
+- **Odoo 17 Compatibility**: Replace deprecated `states=` and `attrs={}` with modern `invisible=`, `readonly=` syntax
+- **Chart.js Issues**: Modules use CDN with fallback mechanism for offline deployment
+- **Module Dependencies**: Check `__manifest__.py` dependencies and ensure all required modules are available
+- **Security Errors**: Always include `ir.model.access.csv` and proper security groups for new models
+- **Deployment Issues**: Use module-specific deploy scripts which handle cache clearing and backups
 
 ## Tips for AI Agents
-- Always use Docker Compose for all dev/test/debug.
-- When adding modules, follow structure and manifest patterns of existing modules.
-- Prefer Odoo ORM, API, and security mechanisms over custom code.
-- Always include security definitions for new models.
-- Use Odoo's built-in test infra, not ad-hoc scripts.
-- For reports, prefer QWeb XML and follow theming patterns in `report_font_enhancement/`.
+- **Always use modern Odoo 17 XML syntax**: Replace deprecated `states=` and `attrs={}` with `invisible=`, `readonly=` conditions
+- **Follow existing patterns**: Study `commission_ax/` for complete module structure, `oe_sale_dashboard_17/` for dashboards
+- **Use deployment scripts**: Leverage module-specific `deploy.sh` scripts instead of manual deployment
+- **Check documentation**: Many modules have `docs/` folders with deployment guides and troubleshooting
+- **Test thoroughly**: Use `@tagged` decorators and `TransactionCase` for comprehensive testing
+- **Container-first development**: All operations should work within Docker container using setup scripts
 
 ---
 
-For more details, see the root `README.md` and module-level `README.md` files. If in doubt, mimic the structure and patterns of the most recently updated modules.
+**Key Documentation**: `ODOO17_SYNTAX_GUIDELINES.md` for syntax migration, module `docs/` folders for deployment guides
