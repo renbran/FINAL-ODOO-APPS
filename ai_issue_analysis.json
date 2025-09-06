@@ -1,0 +1,23 @@
+{
+  "category": "cloudpepper_deployment",
+  "priority": "high",
+  "suggested_actions": [
+    "1. Run deployment validation: `python cloudpepper_deployment_final_validation.py`",
+    "2. Check CloudPepper logs for specific error messages",
+    "3. Test locally with CloudPepper compatibility patches",
+    "4. Use emergency fix scripts if critical issues found",
+    "5. Validate with test deployment before production"
+  ],
+  "relevant_scripts": [
+    "cloudpepper_deployment_final_validation.py",
+    "create_emergency_cloudpepper_fix.py",
+    "create_commission_ax_emergency_deployment.py"
+  ],
+  "estimated_difficulty": "medium",
+  "cloudpepper_impact": true,
+  "related_modules": [
+    "commission_ax",
+    "order_net_commission"
+  ],
+  "analyzed_at": "2025-09-06T13:50:10.669298"
+}

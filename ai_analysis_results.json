@@ -1,0 +1,1071 @@
+{
+  "analysis_results": {
+    "critical_issues": [
+      {
+        "file": "payment_approval_pro/views/account_payment_enhanced_views.xml",
+        "message": "XML parsing error: unclosed token: line 137, column 20"
+      },
+      {
+        "file": "comprehensive_greetings/views/menu_items.xml",
+        "message": "XML parsing error: no element found: line 1, column 0"
+      },
+      {
+        "file": "comprehensive_greetings/views/greeting_views.xml",
+        "message": "XML parsing error: no element found: line 1, column 0"
+      },
+      {
+        "file": "order_status_override/views/order_views_enhanced.xml",
+        "message": "XML parsing error: no element found: line 1, column 0"
+      },
+      {
+        "file": "order_status_override/views/dashboard_views.xml",
+        "message": "XML parsing error: no element found: line 1, column 0"
+      },
+      {
+        "file": "order_status_override/views/commission_integration_views.xml",
+        "message": "XML parsing error: no element found: line 1, column 0"
+      }
+    ],
+    "warnings": [
+      {
+        "file": "osus_premium/static/src/js/osus_enhancements.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "odoo_accounting_dashboard/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "odoo_accounting_dashboard/static/src/js/accounting_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "enhanced_rest_api/static/src/js/api_widget.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "crm_executive_dashboard/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "crm_executive_dashboard/static/src/js/crm_executive_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "crm_executive_dashboard/static/src/js/crm_strategic_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "tk_portal_partner_leads/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "tk_portal_partner_leads/static/src/js/script.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "order_net_commission/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "order_net_commission/static/src/js/cloudpepper_rpc_protection.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "commission/models/purchase_order.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "ingenuity_invoice_qr_code/models/account_payment.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "payment_approval_pro/models/res_config_settings.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "payment_approval_pro/models/payment_workflow_stage.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "payment_approval_pro/models/res_partner.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "payment_approval_pro/models/account_journal.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "payment_approval_pro/static/src/js/payment_widget.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "statement_report/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "statement_report/models/res_partner.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "whatsapp_mail_messaging/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "whatsapp_mail_messaging/static/src/js/mail_icon.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "whatsapp_mail_messaging/static/src/js/whatsapp_web_icon.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "whatsapp_mail_messaging/static/src/js/whatsapp_modal.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "whatsapp_mail_messaging/static/src/js/whatsapp_icon.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "account_payment_final/models/res_config_settings.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_final/models/payment_workflow_stage.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_final/models/account_move.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_final/models/res_partner.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_final/models/account_journal.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_final/static/src/js/modern_odoo17_compatibility.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "account_payment_final/static/src/js/payment_workflow_realtime.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "account_payment_final/static/src/js/cloudpepper_compatibility_patch.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "account_payment_final/static/src/js/cloudpepper_compatibility_patch.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "invoice_report_for_realestate/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "invoice_report_for_realestate/models/account_payment.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/chart.min.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/chart.min.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard_old.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard_new.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/emergency_chartjs_fix.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/enhanced_sales_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/cloudpepper_dashboard_fix_old.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "oe_sale_dashboard_17/static/src/js/sales_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "report_font_enhancement/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "report_font_enhancement/static/src/js/report_font_enhancement.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "rental_management/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "rental_management/models/res_partner.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "rental_management/models/maintenance.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "commission_ax/static/src/js/commission_widget.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "commission_ax/static/src/js/cloudpepper_compatibility_patch.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "commission_ax/static/src/js/cloudpepper_compatibility_patch.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/static/src/js/dynamic_dashboard_tile.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/static/src/js/dynamic_dashboard_chart.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/static/src/js/dynamic_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/static/src/js/dynamic_dashboard.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "odoo_crm_dashboard/static/src/js/crm_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "odoo_crm_dashboard/static/src/js/crm_dashboard_modern.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "ks_dynamic_financial_report/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "ks_dynamic_financial_report/static/src/js/ks_dynamic_financial_report.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "ks_dynamic_financial_report/static/src/js/ks_dynamic_financial_report.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "mx_elearning_plus/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "mx_elearning_plus/static/src/js/slides_course_extend.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "mx_elearning_plus/static/src/js/slides_course_rating_fullscreen.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "mx_elearning_plus/static/src/js/slide_comment_composer_fullscreen.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "mx_elearning_plus/static/src/js/slides_course.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "order_status_override/models/status_change_wizard.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "order_status_override/static/src/js/order_status_widget.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "order_net_commission_enhanced/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "frontend_enhancement/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "frontend_enhancement/static/src/js/file_upload_widget.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "website_subscription_package/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "osus_premium_enhanced/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "hrms_dashboard/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "hrms_dashboard/static/src/js/hrms_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "hrms_dashboard/static/src/js/hrms_dashboard.js",
+        "message": "Avoid jQuery in Odoo 17 - use native JS or OWL patterns",
+        "type": "modernization"
+      },
+      {
+        "file": "report_xlsx/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "account_payment_approval/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "account_payment_approval/models/payment_report_wizard.py",
+        "message": "Computed fields in commission/payment modules should consider store=True",
+        "suggestion": "Add store=True for fields used in email templates or external references"
+      },
+      {
+        "file": "account_payment_approval/static/src/js/qr_widget_enhanced.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "account_payment_approval/static/src/js/payment_approval_dashboard.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "report_pdf_options/__manifest__.py",
+        "message": "Consider using prepend loading for emergency fixes",
+        "suggestion": "Add (\"prepend\", \"path/to/emergency_fix.js\") for CloudPepper compatibility"
+      },
+      {
+        "file": "report_pdf_options/static/src/js/qwebactionmanager.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      },
+      {
+        "file": "report_pdf_options/static/src/js/PdfOptionsModal.js",
+        "message": "OWL components should include error handlers for CloudPepper",
+        "suggestion": "Add global error and unhandledrejection listeners"
+      }
+    ],
+    "suggestions": [
+      {
+        "file": "om_account_accountant_v17/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "om_account_followup/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "om_account_followup/models/partner.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "event_so_trigger/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "osus_premium/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "sales_target_vs_achievement/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "reconcilation_fields/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "pretty_buttons/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "odoo_accounting_dashboard/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "odoo_accounting_dashboard/models/account_move.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "work_anniversary_reminder/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "import_bank_statement_odoo/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "muk_web_appsbar/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "tk_portal_partner_leads/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "order_net_commission/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "order_net_commission/models/sale_order.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "website_custom_contact_us/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "zehntech_main_menu/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "commission/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "commission/models/sale_commission.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "commission/models/commission_ax.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "wt_birthday_reminder/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "ingenuity_invoice_qr_code/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "payment_approval_pro/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "payment_approval_pro/models/payment_qr_verification.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "payment_approval_pro/models/account_payment_register.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "payment_approval_pro/models/res_partner.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "payment_approval_pro/models/payment_approval_history.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "statement_report/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "odoo_define_compatibility_fix/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "whatsapp_mail_messaging/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "website_menu_fix/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "comprehensive_greetings/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "muk_web_dialog/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "rest_api_odoo/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "account_payment_final/models/res_config_settings.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "account_payment_final/models/account_payment_register.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "account_payment_final/models/res_partner.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "account_payment_final/models/payment_approval_history.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "account_payment_final/models/account_journal.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "sale_invoice_due_date_reminder/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "tk_sale_split_invoice/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "invoice_bill_select_orderlines/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "invoice_report_for_realestate/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "eg_mo_today_yesterday_filter/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "oe_sale_dashboard_17/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "partner_statement_followup/models/followup_history.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "partner_statement_followup/models/statement_config.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "partner_statement_followup/models/account_move_line.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "order_invoice_manual_link/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "report_font_enhancement/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "report_font_enhancement/models/report_font_settings.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "muk_web_colors/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "muk_web_colors/models/res_config_settings.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "muk_web_colors/models/web_editor_assets.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/property_sub_project.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/rent_contract.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/maintenance.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/property_project.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/property_details.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "rental_management/models/sale_contract.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "subscription_package/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "subscription_package/models/sale_order.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "subscription_package/models/subscription_package_plan.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "subscription_package/models/subscription_package.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "sale_order_invoicing_qty_percentage/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "commission_ax/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "commission_ax/models/purchase_order.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "whatsapp_redirect/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "muk_web_theme/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "muk_web_theme/models/res_config_settings.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "odoo_dynamic_dashboard/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "sale_invoice_detail/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "hr_uae/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "hr_uae/models/uae_leave_allocation.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "hr_uae/models/hr_air_ticket.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "odoo_crm_dashboard/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "ks_dynamic_financial_report/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "ks_dynamic_financial_report/models/ks_dynamic_financial_reports.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "om_data_remove/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "mx_elearning_plus/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "mx_elearning_plus/models/slide_slide.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "print_contact/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "tk_partner_ledger/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "webhook_crm/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "automatic_invoice_and_post/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "form_edit_button_restore/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "web_login_styles/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "order_status_override/__manifest__.py",
+        "message": "Consider adding common dependencies: base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "contact_kyc/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "order_net_commission_enhanced/__manifest__.py",
+        "message": "Consider adding common dependencies: web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "frontend_enhancement/models/res_users.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "frontend_enhancement/models/sale_order.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "frontend_enhancement/models/account_move.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "website_subscription_package/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "osus_premium_enhanced/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "hrms_dashboard/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "hrms_dashboard/models/hr_employee.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "report_xlsx/__manifest__.py",
+        "message": "Consider adding common dependencies: mail",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "account_payment_approval/models/mail_template.py",
+        "message": "Consider adding try-catch blocks for better error handling",
+        "type": "error_handling"
+      },
+      {
+        "file": "muk_web_chatter/__manifest__.py",
+        "message": "Consider adding common dependencies: base, web",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "report_pdf_options/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base",
+        "type": "dependency_optimization"
+      },
+      {
+        "file": "le_sale_type/__manifest__.py",
+        "message": "Consider adding common dependencies: mail, base, web",
+        "type": "dependency_optimization"
+      }
+    ],
+    "cloudpepper_compatibility": true,
+    "modules_analyzed": [
+      "om_account_accountant_v17",
+      "om_account_followup",
+      "event_so_trigger",
+      "osus_premium",
+      "sales_target_vs_achievement",
+      "reconcilation_fields",
+      "pretty_buttons",
+      "odoo_accounting_dashboard",
+      "enhanced_rest_api",
+      "work_anniversary_reminder",
+      "import_bank_statement_odoo",
+      "crm_executive_dashboard",
+      "muk_web_appsbar",
+      "tk_portal_partner_leads",
+      "order_net_commission",
+      "website_custom_contact_us",
+      "zehntech_main_menu",
+      "commission",
+      "wt_birthday_reminder",
+      "ingenuity_invoice_qr_code",
+      "payment_approval_pro",
+      "statement_report",
+      "odoo_define_compatibility_fix",
+      "whatsapp_mail_messaging",
+      "website_menu_fix",
+      "comprehensive_greetings",
+      "muk_web_dialog",
+      "rest_api_odoo",
+      "account_payment_final",
+      "sale_invoice_due_date_reminder",
+      "tk_sale_split_invoice",
+      "invoice_bill_select_orderlines",
+      "invoice_report_for_realestate",
+      "eg_mo_today_yesterday_filter",
+      "oe_sale_dashboard_17",
+      "partner_statement_followup",
+      "order_invoice_manual_link",
+      "report_font_enhancement",
+      "muk_web_colors",
+      "rental_management",
+      "subscription_package",
+      "sale_order_invoicing_qty_percentage",
+      "commission_ax",
+      "whatsapp_redirect",
+      "muk_web_theme",
+      "odoo_dynamic_dashboard",
+      "sale_invoice_detail",
+      "hr_uae",
+      "odoo_crm_dashboard",
+      "ks_dynamic_financial_report",
+      "om_data_remove",
+      "mx_elearning_plus",
+      "print_contact",
+      "tk_partner_ledger",
+      "webhook_crm",
+      "automatic_invoice_and_post",
+      "form_edit_button_restore",
+      "web_login_styles",
+      "order_status_override",
+      "contact_kyc",
+      "order_net_commission_enhanced",
+      "frontend_enhancement",
+      "website_subscription_package",
+      "osus_premium_enhanced",
+      "hrms_dashboard",
+      "report_xlsx",
+      "account_payment_approval",
+      "muk_web_chatter",
+      "report_pdf_options",
+      "le_sale_type"
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "title": "Critical Issues Detected",
+      "description": "These issues will prevent CloudPepper deployment",
+      "action": "Fix immediately before deployment"
+    },
+    {
+      "priority": "MEDIUM",
+      "title": "OSUS Branding Consistency",
+      "description": "Ensure color scheme consistency: #800020 (maroon), #FFD700 (gold)",
+      "action": "Review CSS files for brand color usage"
+    },
+    {
+      "priority": "INFO",
+      "title": "Emergency Scripts Available",
+      "description": "Use emergency scripts for quick fixes",
+      "scripts": [
+        "cloudpepper_deployment_final_validation.py",
+        "create_emergency_cloudpepper_fix.py",
+        "create_commission_ax_emergency_deployment.py"
+      ]
+    }
+  ]
+}
