@@ -1,2 +1,4 @@
 2025-08-30T07:41:50+04:00 [INFO] (codacy-cli-v2/cli-v2.go:27) Starting Codacy CLI version=1.0.0-main.354.sha.642d8bf (642d8bf) built at 2025-08-20T09:30:46Z
 2025-08-30T07:41:50+04:00 [INFO] (codacy-cli-v2/cmd/root.go:34) Executing CLI command command=init full_command=[/home/modprobe/.cache/codacy/codacy-cli-v2/1.0.0-main.354.sha.642d8bf/codacy-cli-v2 init] args=[]
+2025-08-30T07:42:13+04:00 [INFO] (codacy-cli-v2/cli-v2.go:27) Starting Codacy CLI version=1.0.0-main.354.sha.642d8bf (642d8bf) built at 2025-08-20T09:30:46Z
+2025-08-30T07:42:13+04:00 [INFO] (codacy-cli-v2/cmd/root.go:34) Executing CLI command command=install full_command=[/home/modprobe/.cache/codacy/codacy-cli-v2/1.0.0-main.354.sha.642d8bf/codacy-cli-v2 install] args=[]
