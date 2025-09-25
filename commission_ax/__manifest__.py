@@ -24,9 +24,8 @@
     'depends': ['sale', 'purchase', 'account'],
     'data': [
         'security/ir.model.access.csv',
-        'data/commission_demo_data.xml',
+        'data/purchase_order_cron.xml',
         'views/sale_order.xml',
-        'views/purchase_order.xml',
     ],
     'demo': [],
     'installable': True,

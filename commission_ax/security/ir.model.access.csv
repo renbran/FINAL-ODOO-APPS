@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_commission_report_generator_user,commission.report.generator user,model_commission_report_generator,base.group_user,1,1,1,1
+access_commission_report_generator_manager,commission.report.generator manager,model_commission_report_generator,base.group_system,1,1,1,1
