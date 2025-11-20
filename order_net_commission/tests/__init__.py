@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import test_workflow
+from . import test_qr_verification

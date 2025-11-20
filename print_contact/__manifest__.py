@@ -11,10 +11,8 @@
         'website':'https://github.com/YvanDotet/print_contact',
         
         'data':[
-            'security/ir.model.access.csv',
-            'data/contact_data.xml',
             'views/print_buttons.xml',
-            'report/contact_kyc.xml',
+            
             'report/print_page.xml',
             'report/print_listing.xml',
             'report/print_checkin.xml',

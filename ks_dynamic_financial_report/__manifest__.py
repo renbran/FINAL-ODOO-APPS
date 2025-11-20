@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'Dynamic Financial Report',
 
@@ -49,9 +50,7 @@
 
     'depends': ['base', 'mail', 'account', 'sale_management'],
 
-    'auto_install': False,
-
-    'installable': True,
+    'auto_install': True,
 
     'data': ['security/ir.model.access.csv', 'data/ks_dfr_account_data.xml', 'data/ks_dynamic_financial_report.xml',
              'security/ks_access_file.xml',

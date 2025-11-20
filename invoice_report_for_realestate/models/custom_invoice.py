@@ -270,7 +270,7 @@ class AccountMove(models.Model):
         
         return '\n'.join(content_lines)
 
-    def _generate_qr_code(self, content):
+    def _generate_qr_code(self, content=None, silent_errors=False):
         """Generate QR code image from content"""
         try:
             qr = qrcode.QRCode(
