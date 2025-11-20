@@ -1,4 +1,4 @@
-/** @odoo-module */
+﻿/** @odoo-module */
 
 import { patch } from '@web/core/utils/patch';
 
@@ -8,6 +8,7 @@ import { AppsBar } from '@muk_web_appsbar/webclient/appsbar/appsbar';
 patch(WebClient, {
     components: {
         ...WebClient.components,
-        AppsBar,
-    },
+        AppsBar;
+}
 });
+

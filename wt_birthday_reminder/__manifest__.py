@@ -1,25 +1,36 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Birthday Wish to Customer and Employee",
-    "version": "17.0",
+    "name": "OSUS Properties Birthday Greetings",
+    "version": "17.0.1.0.0",
     "category": "HR",
-    "summary": "This Module send an email to customer and employee",
+    "summary": "Automated Birthday Wishes for OSUS Properties Employees",
     "description": """
-    This module send an email to customer and employee. also this one 
-    will send reminder to all other employee and manager.
+    Professional birthday greeting system for OSUS Properties that sends:
+    - Personalized birthday wishes to employees on their special day
+    - Birthday reminders to all team members to celebrate together
+    - Elegant, branded email templates matching OSUS Properties corporate identity
+    - Automated daily scheduling through cron jobs
+    
+    Features:
+    - Burgundy and gold branded email templates
+    - Professional typography and layout
+    - Responsive design for all devices
+    - Integration with Telegram for team celebrations
+    - Complete company contact information
     """,
-    "author": "Warlock Technologies Pvt Ltd.",
-    "website": "http://warlocktechnologies.com",
-    "support": "support@warlocktechnologies.com",
-    "depends": ['contacts', 'hr'],
+    "author": "OSUS Properties",
+    "website": "https://osusproperties.com",
+    "support": "info@osusproperties.com",
+    "depends": ['contacts', 'hr', 'mail'],
     "data": [
         "data/ir_cron.xml",
-        "data/mail_template_demo.xml"
+        "data/mail_template_osus.xml"
     ],
-    "images": ["images/screen_image.png"],
-    "license": "OPL-1",
+    "images": ["static/description/banner.png"],
+    "license": "LGPL-3",
     "installable": True,
-    'license': 'LGPL-3',
-    "price": 00,
+    "auto_install": False,
+    "application": False,
+    "price": 0,
     "currency": "USD",
 }

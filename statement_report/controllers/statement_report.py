@@ -32,22 +32,62 @@ class XLSXReportController(http.Controller):
     @http.route('/xlsx_report', type='http', auth='user', methods=['POST'],
                 csrf=False)
     def get_report_xlsx(self, model, options, output_format, report_name):
-        """ get xlsx report data """
-
-        report_obj = request.env[model].sudo()
-        options = json.loads(options)
+        """ Get xlsx report data with enhanced error handling """
         try:
+            # Validate inputs to prevent 'undefined' errors
+            if not report_name or report_name == 'undefined':
+                report_name = f'Statement_Report_{http.request.env.user.id}'
+            
+            if not model:
+                raise ValueError("Model parameter is required")
+                
+            if not options:
+                raise ValueError("Options parameter is required")
+
+            report_obj = request.env[model].sudo()
+            options = json.loads(options)
+            
+            # Add validation for options
+            if not isinstance(options, dict):
+                raise ValueError("Invalid options format")
+            
             if output_format == 'xlsx':
+                # Create response with proper headers
                 response = request.make_response(
                     None, headers=[
-                        ('Content-Type', 'application/vnd.ms-excel'),
-                        ('Content-Disposition', content_disposition(
-                            report_name + '.xlsx'))])
+                        ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                        ('Content-Disposition', content_disposition(f'{report_name}.xlsx')),
+                        ('Cache-Control', 'no-cache, no-store, must-revalidate'),
+                        ('Pragma', 'no-cache'),
+                        ('Expires', '0')
+                    ])
+                
+                # Generate the report
                 report_obj.get_xlsx_report(options, response)
                 response.set_cookie('fileToken', 'dummy token')
                 return response
-        except Exception as event:
-            serialize = http.serialize_exception(event)
+            else:
+                raise ValueError(f"Unsupported output format: {output_format}")
+                
+        except json.JSONDecodeError as e:
+            return request.make_response(
+                f"Invalid JSON in options: {str(e)}", 
+                status=400, 
+                headers=[('Content-Type', 'text/plain')]
+            )
+        except ValueError as e:
+            return request.make_response(
+                f"Validation error: {str(e)}", 
+                status=400, 
+                headers=[('Content-Type', 'text/plain')]
+            )
+        except Exception as e:
+            serialize = http.serialize_exception(e)
+            return request.make_response(
+                f"Error generating report: {str(e)}", 
+                status=500, 
+                headers=[('Content-Type', 'text/plain')]
+            )
             error = {
                 'code': 200,
                 'message': 'Odoo Server Error',

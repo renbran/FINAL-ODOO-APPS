@@ -27,7 +27,7 @@ def validate_module_structure():
         "README.md"
     ]
     
-    print("🔍 VALIDATING MODULE STRUCTURE")
+    print("üîç VALIDATING MODULE STRUCTURE")
     print("=" * 40)
     
     missing_files = []
@@ -37,30 +37,30 @@ def validate_module_structure():
         full_path = os.path.join(base_path, file_path)
         if os.path.exists(full_path):
             existing_files.append(file_path)
-            print(f"✅ {file_path}")
+            print(f"‚úÖ {file_path}")
         else:
             missing_files.append(file_path)
-            print(f"❌ {file_path}")
+            print(f"‚ùå {file_path}")
     
-    print("\n📊 SUMMARY")
+    print("\nüìä SUMMARY")
     print("=" * 40)
     print(f"Total files checked: {len(required_files)}")
     print(f"Existing files: {len(existing_files)}")
     print(f"Missing files: {len(missing_files)}")
     
     if missing_files:
-        print(f"\n❌ Missing files:")
+        print(f"\n‚ùå Missing files:")
         for file_path in missing_files:
             print(f"  - {file_path}")
         return False
     else:
-        print(f"\n✅ All required files are present!")
+        print(f"\n‚úÖ All required files are present!")
         return True
 
 def validate_manifest():
     """Validate the manifest file"""
     
-    print("\n🔍 VALIDATING MANIFEST FILE")
+    print("\nüîç VALIDATING MANIFEST FILE")
     print("=" * 40)
     
     manifest_path = "d:\\RUNNING APPS\\ready production\\latest\\odoo17_final\\report_font_enhancement\\__manifest__.py"
@@ -74,21 +74,21 @@ def validate_manifest():
         
         for key in required_keys:
             if f"'{key}'" in content:
-                print(f"✅ {key}")
+                print(f"‚úÖ {key}")
             else:
-                print(f"❌ {key}")
+                print(f"‚ùå {key}")
                 
-        print("\n✅ Manifest file structure looks good!")
+        print("\n‚úÖ Manifest file structure looks good!")
         return True
         
     except Exception as e:
-        print(f"❌ Error reading manifest: {e}")
+        print(f"‚ùå Error reading manifest: {e}")
         return False
 
 def check_css_file_sizes():
     """Check CSS file sizes to ensure they're not empty"""
     
-    print("\n🔍 CHECKING CSS FILES")
+    print("\nüîç CHECKING CSS FILES")
     print("=" * 40)
     
     css_files = [
@@ -104,16 +104,16 @@ def check_css_file_sizes():
         try:
             size = os.path.getsize(file_path)
             if size > 1000:  # At least 1KB
-                print(f"✅ {css_file} ({size:,} bytes)")
+                print(f"‚úÖ {css_file} ({size:,} bytes)")
             else:
-                print(f"⚠️  {css_file} ({size} bytes - might be too small)")
+                print(f"‚ö†Ô∏è  {css_file} ({size} bytes - might be too small)")
         except Exception as e:
-            print(f"❌ {css_file} - Error: {e}")
+            print(f"‚ùå {css_file} - Error: {e}")
 
 def main():
     """Main validation function"""
     
-    print("🚀 REPORT FONT ENHANCEMENT MODULE VALIDATOR")
+    print("üöÄ REPORT FONT ENHANCEMENT MODULE VALIDATOR")
     print("=" * 50)
     
     # Run validations
@@ -121,21 +121,21 @@ def main():
     manifest_ok = validate_manifest() 
     check_css_file_sizes()
     
-    print("\n🎯 FINAL VALIDATION RESULT")
+    print("\nüéØ FINAL VALIDATION RESULT")
     print("=" * 50)
     
     if structure_ok and manifest_ok:
-        print("✅ MODULE IS READY FOR INSTALLATION!")
-        print("\n📝 Next steps:")
+        print("‚úÖ MODULE IS READY FOR INSTALLATION!")
+        print("\nüìù Next steps:")
         print("1. Copy the module to your Odoo addons directory")
         print("2. Restart Odoo server") 
         print("3. Update apps list")
         print("4. Install 'Report Font Enhancement' module")
-        print("5. Configure settings at Settings → Report Enhancement")
+        print("5. Configure settings at Settings ‚Üí Report Enhancement")
         
         return True
     else:
-        print("❌ MODULE HAS ISSUES - Please fix before installation")
+        print("‚ùå MODULE HAS ISSUES - Please fix before installation")
         return False
 
 if __name__ == "__main__":

@@ -33,6 +33,9 @@
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
     'depends': ['base', 'account', 'contacts'],
+    'external_dependencies': {
+        'python': ['xlsxwriter'],
+    },
     'data': [
         'data/ir_cron_data.xml',
         'views/res_partner_views.xml',

@@ -48,11 +48,26 @@ export class ksDynamicReportsWidget extends Component {
                 this.props.action.xml_id == 'ks_dynamic_financial_report.ks_df_pay_action')
                 {
                 if (this.state.offset_dict.next_offset >= this.state.offset_dict.limit){
-                    $('.ks_pager').find('.ks_load_next').addClass('ks_event_offer_list');
+                    const ksPager = document.querySelector('.ks_pager');
+                    if (ksPager) {
+                        const ksLoadNext = ksPager.querySelector('.ks_load_next');
+                        if (ksLoadNext) {
+                            ksLoadNext.classList.add('ks_event_offer_list');
+                        }
+                    }
                 }
             }
         });
 
+    }
+
+    /**
+     * Helper method to create DOM elements from HTML string
+     */
+    createElementFromHTML(htmlString) {
+        const template = document.createElement('template');
+        template.innerHTML = htmlString.trim();
+        return template.content.firstChild;
     }
     async ksSetReportInfo(values) {
         this.ks_df_reports_ids = values.ks_df_reports_ids;
@@ -60,8 +75,8 @@ export class ksDynamicReportsWidget extends Component {
         this.ks_df_context = values.context;
         this.ks_report_manager_id = values.ks_report_manager_id;
         this.ks_remarks = values.ks_remarks;
-        this.$ks_buttons = $(values.ks_buttons);
-        this.$ks_searchview_buttons = $(values.ks_searchview_html);
+        this.ksButtonsElement = this.createElementFromHTML(values.ks_buttons);
+        this.ksSearchviewButtonsElement = this.createElementFromHTML(values.ks_searchview_html);
         this.ks_currency = values.ks_currency;
         this.ks_report_lines = values.ks_report_lines;
         this.ks_enable_ledger_in_bal = values.ks_enable_ledger_in_bal;
@@ -82,7 +97,13 @@ export class ksDynamicReportsWidget extends Component {
                 this.props.action.xml_id == 'ks_dynamic_financial_report.ks_df_pay_action')
                 {
                 if (this.state.offset_dict.next_offset >= this.state.offset_dict.limit){
-                    $('.ks_pager').find('.ks_load_next').addClass('ks_event_offer_list');
+                    const ksPager = document.querySelector('.ks_pager');
+                    if (ksPager) {
+                        const ksLoadNext = ksPager.querySelector('.ks_load_next');
+                        if (ksLoadNext) {
+                            ksLoadNext.classList.add('ks_event_offer_list');
+                        }
+                    }
                 }
             }
         //            this.ksSaveReportInfo();
@@ -125,7 +146,13 @@ export class ksDynamicReportsWidget extends Component {
                 this.props.action.xml_id == 'ks_dynamic_financial_report.ks_df_pay_action')
                 {
                 if (this.state.offset_dict.next_offset >= this.state.offset_dict.limit){
-                    $('.ks_pager').find('.ks_load_next').addClass('ks_event_offer_list');
+                    const ksPager = document.querySelector('.ks_pager');
+                    if (ksPager) {
+                        const ksLoadNext = ksPager.querySelector('.ks_load_next');
+                        if (ksLoadNext) {
+                            ksLoadNext.classList.add('ks_event_offer_list');
+                        }
+                    }
                 }
             }
 
@@ -249,7 +276,7 @@ export class ksDynamicReportsWidget extends Component {
         self.props.retained = this.ks_retained
         self.props.subtotal = this.ks_subtotal
         self.props.ks_df_new_end_report_opt = DateTime.fromISO(self.ks_df_report_opt['date']['ks_end_date']).toISODate(new_date_format)
-        //            self.$('.o_content').html(QWeb.render('ks_df_trial_balance', {
+        //            self.this.safeQuerySelector('.o_content')?.html(QWeb.render('ks_df_trial_balance', {
         //
         //                    account_data: self.ks_report_lines,
         //                    retained: self.ks_retained,
@@ -702,42 +729,43 @@ export class ksDynamicReportsWidget extends Component {
 
     async ksGetAgedLinesInfo(event) {
             var ev = event.currentTarget
-             $('.o_filter_menu').removeClass('ks_d_block')
+             const filterMenu = document.querySelector('.o_filter_menu');
+             if (filterMenu) filterMenu.classList.remove('ks_d_block')
             event.preventDefault();
 
 
             var self = this;
-            var partner_id = $(ev).data('bsPartnerId');
+            const partnerId = ev.currentTarget.dataset.bsPartnerId;
             var offset = 0;
 
-            if ($(event.currentTarget).hasClass('ks_load_previous_new')){
-                var offset = parseInt($(event.currentTarget).parent().attr('offset'));
+            if (event.currentTarget.classList.contains(\'ks_load_previous_new\')){
+                const offset = parseInt(event.currentTarget.parentElement.getAttribute('offset'));
                 offset = offset-1;
 
                 if(offset >= 0){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
                     offset = total_pages-1;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
             }
-            if ($(event.currentTarget).hasClass('ks_load_next_new')){
+            if (event.currentTarget.classList.contains(\'ks_load_next_new\')){
                 var offset = parseInt($(ev).parent().attr('offset'));
                 offset = offset+1;
                 var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
 
                 if(offset < total_pages){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     offset = 0;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
             }
             var td = $(ev).next('tr').find('td');
-            if (td.length == 1 || $(event.currentTarget).hasClass('ks_pr-py-mline')) {
+            if (td.length == 1 || event.currentTarget.classList.contains(\'ks_pr-py-mline\')) {
                 self.ksGetAgedReportDetailedInfo(offset, partner_id).then(function (datas) {
                     var count = datas[0];
                     var offset = datas[1];
@@ -822,7 +850,13 @@ export class ksDynamicReportsWidget extends Component {
                 this.props.action.xml_id == 'ks_dynamic_financial_report.ks_df_pay_action')
                 {
                 if (this.state.offset_dict.next_offset >= this.state.offset_dict.limit){
-                    $('.ks_pager').find('.ks_load_next').addClass('ks_event_offer_list');
+                    const ksPager = document.querySelector('.ks_pager');
+                    if (ksPager) {
+                        const ksLoadNext = ksPager.querySelector('.ks_load_next');
+                        if (ksLoadNext) {
+                            ksLoadNext.classList.add('ks_event_offer_list');
+                        }
+                    }
                 }
             }
 
@@ -887,10 +921,10 @@ export class ksDynamicReportsWidget extends Component {
 
         return await this.orm.call('ks.dynamic.financial.reports', 'ks_get_dynamic_fin_info', [this.props.action.context.id,
             this.ks_df_report_opt,{ks_intial_count: ks_intial_count,offset: ks_offset}],{context:this.props.action.context}).then(function (result) {
-                $('.ks_pager').find('.ks_value').text(result.offset_dict.offset + "-" + result.offset_dict.next_offset);
+                this.safeQuerySelector('.ks_pager')?.find('.ks_value').text(result.offset_dict.offset + "-" + result.offset_dict.next_offset);
                 e.target.parentElement.dataset.next_offset = result.offset_dict.next_offset;
                 e.target.parentElement.dataset.prevOffset = result.offset_dict.offset;
-                $('.ks_pager').find('.ks_load_next').removeClass('ks_event_offer_list');
+                this.safeQuerySelector('.ks_pager')?.find('.ks_load_next').removeClass('ks_event_offer_list');
 
                 if (result.offset_dict.offset === 1) {
                    $(e.target).addClass('ks_event_offer_list');
@@ -914,10 +948,10 @@ export class ksDynamicReportsWidget extends Component {
 
             return await this.orm.call('ks.dynamic.financial.reports', 'ks_get_dynamic_fin_info', [this.props.action.context.id,
             this.ks_df_report_opt,{ks_intial_count: ks_intial_count,offset: ks_offset}],{context:this.props.action.context}).then(function (result) {
-                      $('.ks_pager').find('.ks_value').text(result.offset_dict.offset + "-" + result.offset_dict.next_offset);
+                      this.safeQuerySelector('.ks_pager')?.find('.ks_value').text(result.offset_dict.offset + "-" + result.offset_dict.next_offset);
                       ev.parentElement.dataset.next_offset = result.offset_dict.next_offset;
                       ev.parentElement.dataset.prevOffset = result.offset_dict.offset;
-                      $('.ks_pager').find('.ks_load_previous').removeClass('ks_event_offer_list');
+                      this.safeQuerySelector('.ks_pager')?.find('.ks_load_previous').removeClass('ks_event_offer_list');
                      if (result.offset_dict.next_offset >= result.offset_dict.limit){
                         $(e.target).addClass('ks_event_offer_list')
                     }
@@ -939,7 +973,8 @@ export class ksDynamicReportsWidget extends Component {
     async ksGetConsolidateInfo(event) {
 
             var ev = event.currentTarget
-             $('.o_filter_menu').removeClass('ks_d_block')
+             const filterMenu = document.querySelector('.o_filter_menu');
+             if (filterMenu) filterMenu.classList.remove('ks_d_block')
             event.preventDefault();
             var self = this;
             var ks_journal_id = $(ev).data('bsJournalId');
@@ -992,35 +1027,36 @@ export class ksDynamicReportsWidget extends Component {
 
             var offset = 0;
 
-            if ($(event.currentTarget).hasClass('ks_load_previous_new')){
-                var offset = parseInt($(event.currentTarget).parent().attr('offset'));
+            if (event.currentTarget.classList.contains(\'ks_load_previous_new\')){
+                const offset = parseInt(event.currentTarget.parentElement.getAttribute('offset'));
                 offset = offset-1;
 
                 if(offset >= 0){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
                     offset = total_pages-1;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
             }
-            else if ($(event.currentTarget).hasClass('ks_load_next_new')){
-                var offset = parseInt($(event.currentTarget).parent().attr('offset'));
+            else if (event.currentTarget.classList.contains(\'ks_load_next_new\')){
+                const offset = parseInt(event.currentTarget.parentElement.getAttribute('offset'));
                 offset = offset+1;
                 var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
 
                 if(offset < total_pages){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     offset = 0;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
 
             }
 
-            $('.o_filter_menu').removeClass('ks_d_block')
+            const filterMenu = document.querySelector('.o_filter_menu');
+             if (filterMenu) filterMenu.classList.remove('ks_d_block')
             var self = this;
             var account_id = $(ev).data('bsAccountId');
 
@@ -1049,7 +1085,7 @@ if (td.length == 1 || $(event.target).hasClass('ks_py-mline-page')) {
                                 account_data: datas[2],
                                 ks_enable_ledger_in_bal: self.ks_enable_ledger_in_bal,
                             })
-                        $('.ks_py-mline-page').removeClass('ks_high_light_page')
+                        this.safeQuerySelector('.ks_py-mline-page')?.removeClass('ks_high_light_page')
                         $(event.target).parent().parent().next('div').replaceWith(content)
                         $(event.target).addClass('ks_high_light_page')
                     }else {
@@ -1088,30 +1124,31 @@ if (td.length == 1 || $(event.target).hasClass('ks_py-mline-page')) {
 
 
             var ev = event.currentTarget
-             $('.o_filter_menu').removeClass('ks_d_block')
+             const filterMenu = document.querySelector('.o_filter_menu');
+             if (filterMenu) filterMenu.classList.remove('ks_d_block')
 
              var offset = 0;
             if ($(event.target).hasClass('ks_load_previous_new')){
-                var offset = parseInt($(event.currentTarget).parent().attr('offset'));
+                const offset = parseInt(event.currentTarget.parentElement.getAttribute('offset'));
                 offset = offset-1;
                 if(offset >= 0){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
                     offset = total_pages-1;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
             }
             else if ($(event.target).hasClass('ks_load_next_new')){
-                var offset = parseInt($(event.currentTarget).parent().attr('offset'));
+                const offset = parseInt(event.currentTarget.parentElement.getAttribute('offset'));
                 offset = offset+1;
                 var total_pages = parseInt($(event.currentTarget).parent().attr('total_pages'));
                 if(offset < total_pages){
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }else{
                     offset = 0;
-                    $(event.currentTarget).parent().attr('offset', offset)
+                    event.currentTarget.parentElement.setAttribute('offset', offset)
                 }
                 $(event.currentTarget).parent().parent().find(".ks_new_text")[0].innerText = offset+1;
             }
@@ -1180,7 +1217,7 @@ if (td.length == 1 || $(event.target).hasClass('ks_py-mline-page')) {
                 self.ks_df_context.ks_account_enable = false
                 self.ks_df_context.ks_account_both_enable = false
                 var ks_options_enable = false
-                if (!$(event.currentTarget).hasClass('selected')){
+                if (!event.currentTarget.classList.contains(\'selected\')){
                     var ks_options_enable = true
                     if(option_value == 'ks_report_with_lines' && !self.ks_df_context.print_detailed_view){
                     self.ks_df_report_opt.print_detailed_view = true;
@@ -1219,8 +1256,8 @@ if (td.length == 1 || $(event.target).hasClass('ks_py-mline-page')) {
                 }
 
                 const result = await this._ksRenderBody();
-                $('.collapse').removeClass("show");
-                $('.ks_py-mline-table-div').remove();
+                this.safeQuerySelector('.collapse')?.removeClass("show");
+                this.safeQuerySelector('.ks_py-mline-table-div')?.remove();
                 this.setReportValues(result)
             }
 
@@ -1324,7 +1361,7 @@ if (td.length == 1 || $(event.target).hasClass('ks_py-mline-page')) {
                 var option_value = bsFilter;
                 var option_id = bsId;
 
-                if (!$(event.currentTarget).hasClass('selected')){
+                if (!event.currentTarget.classList.contains(\'selected\')){
                     var ks_options_enable = true
                 }
                 var ks_temp_arr = []
@@ -1457,7 +1494,8 @@ actionRegistry.add('ks_dynamic_report', ksDynamicReportsWidget);
 
 $(document).ready(function() {
     $(document).on('click', 'header .o_main_navbar', function(evt) {
-        $('.o_filter_menu').removeClass('ks_d_block')
+        const filterMenu = document.querySelector('.o_filter_menu');
+             if (filterMenu) filterMenu.classList.remove('ks_d_block')
     });
 });
 

@@ -38,7 +38,7 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'commission_ax/static/src/js/cloudpepper_compatibility_patch.js',
+            ('prepend', 'commission_ax/static/src/js/cloudpepper_compatibility_patch.js'),
         ],
     },
     'demo': [],

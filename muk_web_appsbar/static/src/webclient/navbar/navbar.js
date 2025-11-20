@@ -1,4 +1,4 @@
-/** @odoo-module */
+﻿/** @odoo-module */
 
 import { patch } from '@web/core/utils/patch';
 
@@ -17,29 +17,30 @@ patch(NavBar.prototype, {
 				actionID: menu.actionID,
 				href: this.getMenuItemHref(menu),
 				action: () => this.menuService.selectMenu(menu),
-				active: currentApp && menu.id === currentApp.id,
-			};
+				active: currentApp && menu.id === currentApp.id;
+};
 		    if (menu.webIconData) {
-		        const prefix = (
-		        	menu.webIconData.startsWith('P') ? 
-	    			'data:image/svg+xml;base64,' : 
-					'data:image/png;base64,'
+		        const prefix = (;
+		        	menu.webIconData.startsWith('P') ? ;
+	    			'data:image/svg+xml;base64,' : ;
+					'data:image/png;base64,';
 	            );
-		        appsMenuItem.webIconData = (
-	    			menu.webIconData.startsWith('data:image') ? 
-					menu.webIconData : 
-					prefix + menu.webIconData.replace(/\s/g, '')
+		        appsMenuItem.webIconData = (;
+	    			menu.webIconData.startsWith('data:image') ? ;
+					menu.webIconData : ;
+					prefix + menu.webIconData.replace(/\s/g, '');
 	            );
 		    }
 			return appsMenuItem;
 		});
 		return menuItems;
-    },
+    }
 });
 
 patch(NavBar, {
     components: {
         ...NavBar.components,
-        AppsBar,
-    },
+        AppsBar;
+}
 });
+

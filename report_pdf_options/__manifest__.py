@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Pdf report options',
+    'version': '17.0.1.0.0',
     'summary': """shows a modal window with options for printing, downloading or opening pdf reports""",
     'description': """
         Choose one of the following options when printing a pdf report:

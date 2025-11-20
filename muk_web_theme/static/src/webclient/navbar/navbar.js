@@ -1,4 +1,4 @@
-/** @odoo-module */
+﻿/** @odoo-module */
 
 import { patch } from '@web/core/utils/patch';
 import { useService } from '@web/core/utils/hooks';
@@ -10,12 +10,13 @@ patch(NavBar.prototype, {
 	setup() {
         super.setup();
         this.appMenuService = useService('app_menu');
-    },
+    }
 });
 
 patch(NavBar, {
     components: {
         ...NavBar.components,
-        AppsMenu,
-    },
+        AppsMenu;
+}
 });
+

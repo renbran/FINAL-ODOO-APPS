@@ -9,3 +9,4 @@
 #
 #############################################################################
 from . import invoice
+from . import account_payment

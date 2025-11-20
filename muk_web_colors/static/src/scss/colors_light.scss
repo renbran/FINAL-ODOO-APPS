@@ -1,4 +1,4 @@
-// Colors
+﻿// Colors
 
 $mk_color_brand: #243742;
 $mk_color_primary: #5D8DA8;
@@ -10,22 +10,23 @@ $mk_color_danger: #DC3545;
 
 // Override
 
-$o-community-color: $mk-color-brand;
-$o-enterprise-color: $mk-color-brand;
-$o-enterprise-action-color: $mk-color-primary;
+$o-community-color: $mk_color_brand;
+$o-enterprise-color: $mk_color_brand;
+$o-enterprise-action-color: $mk_color_primary;
 
-$o-brand-odoo: $mk-color-brand;
-$o-brand-primary: $mk-color-primary;
+$o-brand-odoo: $mk_color_brand;
+$o-brand-primary: $mk_color_primary;
 
-$o-success: $mk-color-success;
-$o-info: $mk-color-info;
-$o-warning: $mk-color-warning;
-$o-danger: $mk-color-danger;
+$o-success: $mk_color_success;
+$o-info: $mk_color_info;
+$o-warning: $mk_color_warning;
+$o-danger: $mk_color_danger;
 
 $o-theme-text-colors: (
-    "primary": $mk-color-brand,
+    "primary": $mk_color_brand,
     "success": $o-success,
     "info": $o-info,
     "warning": $o-warning,
     "danger": $o-danger,
 );
+
