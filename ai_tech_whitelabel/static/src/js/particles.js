@@ -25,32 +25,46 @@ class ParticleSystem {
     }
     
     init() {
-        // Create canvas
-        this.canvas = document.createElement("canvas");
-        this.canvas.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        `;
-        
-        this.container.appendChild(this.canvas);
-        this.ctx = this.canvas.getContext("2d");
-        
-        // Set canvas size
-        this.resize();
-        
-        // Create particles
-        this.createParticles();
-        
-        // Start animation
-        this.animate();
-        
-        // Handle resize
-        window.addEventListener("resize", () => this.resize());
+        try {
+            if (!this.container) {
+                console.warn("AI Theme: Particle container not found");
+                return;
+            }
+            
+            // Create canvas
+            this.canvas = document.createElement("canvas");
+            this.canvas.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+            `;
+            
+            this.container.appendChild(this.canvas);
+            this.ctx = this.canvas.getContext("2d");
+            
+            if (!this.ctx) {
+                console.error("AI Theme: Failed to get canvas context");
+                return;
+            }
+            
+            // Set canvas size
+            this.resize();
+            
+            // Create particles
+            this.createParticles();
+            
+            // Start animation
+            this.animate();
+            
+            // Handle resize
+            window.addEventListener("resize", () => this.resize());
+        } catch (error) {
+            console.error("AI Theme: Particle system initialization failed", error);
+        }
     }
     
     resize() {
@@ -158,22 +172,26 @@ class ParticleSystem {
  * Initialize particles on login page
  */
 function initLoginParticles() {
-    const loginContainer = document.querySelector(".o_login_container");
-    
-    if (loginContainer) {
-        // Check if particles are enabled
-        const particlesEnabled = document.body.classList.contains("ai-particles-enabled");
+    try {
+        const loginContainer = document.querySelector(".o_login_container");
         
-        if (particlesEnabled) {
-            new ParticleSystem(loginContainer, {
-                particleCount: 80,
-                particleColor: "#0ea5e9",
-                particleSize: 2,
-                particleSpeed: 0.5,
-                connectionDistance: 120,
-                enableConnections: true,
-            });
+        if (loginContainer && document.body) {
+            // Check if particles are enabled
+            const particlesEnabled = document.body.classList.contains("ai-particles-enabled");
+            
+            if (particlesEnabled) {
+                new ParticleSystem(loginContainer, {
+                    particleCount: 80,
+                    particleColor: "#0ea5e9",
+                    particleSize: 2,
+                    particleSpeed: 0.5,
+                    connectionDistance: 120,
+                    enableConnections: true,
+                });
+            }
         }
+    } catch (error) {
+        console.error("AI Theme: Failed to initialize login particles", error);
     }
 }
 
@@ -181,33 +199,43 @@ function initLoginParticles() {
  * Initialize particles on dashboard
  */
 function initDashboardParticles() {
-    const dashboards = document.querySelectorAll(".o_dashboard, .o_kanban_view");
-    
-    dashboards.forEach(dashboard => {
-        const particlesEnabled = dashboard.dataset.aiParticles === "true";
+    try {
+        const dashboards = document.querySelectorAll(".o_dashboard, .o_kanban_view");
         
-        if (particlesEnabled) {
-            new ParticleSystem(dashboard, {
-                particleCount: 30,
-                particleColor: "#8b5cf6",
-                particleSize: 2,
-                particleSpeed: 0.3,
-                connectionDistance: 100,
-                enableConnections: false,
-            });
-        }
-    });
+        dashboards.forEach(dashboard => {
+            if (!dashboard) return;
+            
+            const particlesEnabled = dashboard.dataset.aiParticles === "true";
+            
+            if (particlesEnabled) {
+                new ParticleSystem(dashboard, {
+                    particleCount: 30,
+                    particleColor: "#8b5cf6",
+                    particleSize: 2,
+                    particleSpeed: 0.3,
+                    connectionDistance: 100,
+                    enableConnections: false,
+                });
+            }
+        });
+    } catch (error) {
+        console.error("AI Theme: Failed to initialize dashboard particles", error);
+    }
 }
 
 // Auto-initialize based on page
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
+function initParticles() {
+    if (document.body && document.documentElement) {
         initLoginParticles();
         initDashboardParticles();
-    });
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initParticles);
 } else {
-    initLoginParticles();
-    initDashboardParticles();
+    // Delay initialization to ensure DOM is fully ready
+    setTimeout(initParticles, 100);
 }
 
 // Export for manual initialization

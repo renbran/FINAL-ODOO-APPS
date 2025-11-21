@@ -165,30 +165,36 @@ class DynamicColorManager {
         const colorInputs = document.querySelectorAll('input[type="color"]');
         
         colorInputs.forEach(input => {
+            if (!input) return;
+            
             input.addEventListener("change", (e) => {
                 const fieldName = e.target.name || e.target.id;
                 this.handleColorChange(fieldName, e.target.value);
             });
             
             // Add preview box next to input
-            const preview = document.createElement("div");
-            preview.className = "ai-color-preview";
-            preview.style.cssText = `
-                display: inline-block;
-                width: 40px;
-                height: 40px;
-                border-radius: 8px;
-                margin-left: 8px;
-                border: 2px solid var(--ai-dark-border);
-                background: ${input.value};
-                transition: all 0.3s ease;
-            `;
-            
-            input.parentNode.insertBefore(preview, input.nextSibling);
-            
-            input.addEventListener("input", (e) => {
-                preview.style.background = e.target.value;
-            });
+            if (input.parentNode) {
+                const preview = document.createElement("div");
+                preview.className = "ai-color-preview";
+                preview.style.cssText = `
+                    display: inline-block;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    margin-left: 8px;
+                    border: 2px solid var(--ai-dark-border);
+                    background: ${input.value};
+                    transition: all 0.3s ease;
+                `;
+                
+                input.parentNode.insertBefore(preview, input.nextSibling);
+                
+                input.addEventListener("input", (e) => {
+                    if (preview && preview.style) {
+                        preview.style.background = e.target.value;
+                    }
+                });
+            }
         });
     }
     
@@ -215,10 +221,13 @@ class DynamicColorManager {
      * Force browser repaint for glassmorphism effects
      */
     triggerRepaint() {
-        document.body.style.display = "none";
-        // Trigger reflow
-        void document.body.offsetHeight;
-        document.body.style.display = "";
+        if (document.body) {
+            const currentDisplay = document.body.style.display;
+            document.body.style.display = "none";
+            // Trigger reflow
+            void document.body.offsetHeight;
+            document.body.style.display = currentDisplay || "";
+        }
     }
     
     /**
@@ -245,12 +254,23 @@ class DynamicColorManager {
 }
 
 // Initialize when DOM is ready
-const colorManager = new DynamicColorManager();
+let colorManager;
+
+function initColorManager() {
+    try {
+        if (document.body && document.documentElement) {
+            colorManager = new DynamicColorManager();
+            colorManager.init();
+        }
+    } catch (error) {
+        console.error("AI Theme: Failed to initialize color manager", error);
+    }
+}
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => colorManager.init());
+    document.addEventListener("DOMContentLoaded", initColorManager);
 } else {
-    colorManager.init();
+    initColorManager();
 }
 
 // Export for use in other modules
