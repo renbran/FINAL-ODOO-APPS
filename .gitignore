@@ -13,3 +13,4 @@ crash_dumps/
 # Windows crash dumps
 *.mdmp
 *.hdmp
+__pycache__/
