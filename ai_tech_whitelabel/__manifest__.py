@@ -48,10 +48,20 @@ Backend Configuration:
     ],
     'assets': {
         'web.assets_backend': [
-            'ai_tech_whitelabel/static/src/scss/ai_theme.scss',
-            'ai_tech_whitelabel/static/src/scss/variables.scss',
+            # Core Theme Variables & Styles
+            ('prepend', 'ai_tech_whitelabel/static/src/scss/variables.scss'),
             'ai_tech_whitelabel/static/src/scss/animations.scss',
+            'ai_tech_whitelabel/static/src/scss/ai_theme.scss',
+            'ai_tech_whitelabel/static/src/scss/components.scss',
+            'ai_tech_whitelabel/static/src/scss/navbar.scss',
+            'ai_tech_whitelabel/static/src/scss/sidebar.scss',
+            'ai_tech_whitelabel/static/src/scss/forms.scss',
+            'ai_tech_whitelabel/static/src/scss/glassmorphism.scss',
+            
+            # JavaScript Components
             'ai_tech_whitelabel/static/src/js/theme_config.js',
+            'ai_tech_whitelabel/static/src/js/dynamic_colors.js',
+            'ai_tech_whitelabel/static/src/js/particles.js',
         ],
         'web.assets_frontend': [
             'ai_tech_whitelabel/static/src/scss/login.scss',
