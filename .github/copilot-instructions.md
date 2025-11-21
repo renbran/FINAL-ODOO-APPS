@@ -2,91 +2,40 @@
 # 🧠 Copilot Instructions for odoo17_final
 
 ## Project Architecture & Big Picture
-<<<<<<< HEAD
-- **Odoo 17 Multi-Module Repository**: Production-ready Odoo addons with Dockerfile for containerized deployment
-- **Module Portfolio**: ~50+ custom modules spanning accounting, sales, HR, reporting, theming, and workflow automation
-- **No Docker Compose**: Uses standalone Dockerfile with custom Python dependencies (xlsxwriter, qrcode, pandas, etc.)
-- **Setup Scripts**: Use `setup.bat` (Windows) or `setup.sh` (Linux/Mac) for docker operations (start, stop, logs, build, shell)
-- **Module Deployment**: Individual modules have `deploy.sh/deploy.ps1` scripts for production deployment (see `oe_sale_dashboard_17/`)
-
-## Developer Workflows
-- **Container Operations**: Use `setup.bat start|stop|restart|logs|build|shell|update|status` or `setup.sh` equivalent
-- **Module Updates**: `./setup.sh update_mod MODULE_NAME` for single module or `./setup.sh update` for all
-- **Shell Access**: `./setup.sh shell` to enter container bash
-- **Module Deployment**: Use module-specific `deploy.sh` scripts (see `oe_sale_dashboard_17/deploy.sh`)
-- **Testing**: Standard Odoo `TransactionCase` in `tests/` directories (see `tk_sale_split_invoice/tests/`)
-- **Documentation**: Check module `docs/` folders for deployment guides and troubleshooting
-
-## Project Conventions & Patterns
-- **Module Structure**: Standard Odoo with `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `static/`, `tests/`, optional `docs/`
-- **Odoo 17 Syntax**: **CRITICAL** - Use modern XML syntax: `invisible="condition"` NOT `states=` or `attrs={}` (see `ODOO17_SYNTAX_GUIDELINES.md`)
-- **Dependencies**: Dockerfile pre-installs: `xlsxwriter`, `qrcode`, `pandas`, `python-dateutil`, `PyPDF2`, `reportlab`, `num2words`
-- **Module Categories**: Sales dashboards, accounting enhancements, report theming, HR automation, website customization, workflow approval
-- **Naming**: snake_case modules, descriptive manifests with version `17.0.x.y.z`, proper category classification
-- **Security**: Always include `security/ir.model.access.csv` and security groups for new models
-- **Testing**: Use `@tagged('module_name')` and `TransactionCase` for comprehensive test coverage
-
-## Integration & Cross-Component Patterns
-- **Dashboard Architecture**: Chart.js with CDN fallback, responsive design, mobile-optimized (see `oe_sale_dashboard_17/`)
-- **Report Theming**: Universal CSS variables system with high-contrast, adaptive transparency (see `report_font_enhancement/`)
-- **Commission Systems**: Dual-group structure (external/internal) with flexible calculation methods (see `commission_ax/`)
-- **Multi-App Integration**: Modules span Contacts, Accounting, Sales, HR apps with cross-app data flows
-- **Deployment Patterns**: Module-specific deployment scripts with backup, cache clearing, and robustness checks
-- **Theme Integration**: Multiple web theme modules (`muk_web_*`, `web_login_styles`) with cohesive styling approach
-
-## Examples & References
-- **Complete Module**: `commission_ax/` (manifest, models, views, data, security)
-- **Testing Pattern**: `tk_sale_split_invoice/tests/test_sale_split_invoice.py` (TransactionCase with @tagged)
-- **Dashboard Module**: `oe_sale_dashboard_17/` (Chart.js, deployment scripts, documentation)
-- **Report Theming**: `report_font_enhancement/README.md` (CSS variables, accessibility)
-- **Deployment Script**: `oe_sale_dashboard_17/deploy.sh` (backup, cache clearing, robustness)
-- **Odoo 17 Syntax**: `ODOO17_SYNTAX_GUIDELINES.md` (modern XML attributes)
-
-## Common Issues & Troubleshooting
-- **Odoo 17 Compatibility**: Replace deprecated `states=` and `attrs={}` with modern `invisible=`, `readonly=` syntax
-- **Chart.js Issues**: Modules use CDN with fallback mechanism for offline deployment
-- **Module Dependencies**: Check `__manifest__.py` dependencies and ensure all required modules are available
-- **Security Errors**: Always include `ir.model.access.csv` and proper security groups for new models
-- **Deployment Issues**: Use module-specific deploy scripts which handle cache clearing and backups
-
-## Tips for AI Agents
-- **Always use modern Odoo 17 XML syntax**: Replace deprecated `states=` and `attrs={}` with `invisible=`, `readonly=` conditions
-- **Follow existing patterns**: Study `commission_ax/` for complete module structure, `oe_sale_dashboard_17/` for dashboards
-- **Use deployment scripts**: Leverage module-specific `deploy.sh` scripts instead of manual deployment
-- **Check documentation**: Many modules have `docs/` folders with deployment guides and troubleshooting
-- **Test thoroughly**: Use `@tagged` decorators and `TransactionCase` for comprehensive testing
-- **Container-first development**: All operations should work within Docker container using setup scripts
-
----
-
-**Key Documentation**: `ODOO17_SYNTAX_GUIDELINES.md` for syntax migration, module `docs/` folders for deployment guides
-=======
 - **Odoo 17 Production Collection**: 50+ custom modules for CloudPepper deployment at `https://stagingtry.cloudpepper.site/` (login: `salescompliance@osusproperties.com`)
-- **Module Categories**: Payment workflows (`account_payment_*`), dashboards (`*_dashboard*`, `oe_sale_dashboard_17`), API services (`enhanced_rest_api`), reports, and UI enhancements
+- **Module Portfolio**: Payment workflows (`account_payment_approval/`, `account_payment_final/`), dashboards (`oe_sale_dashboard_17/`, `crm_executive_dashboard/`), API services (`enhanced_rest_api/`), commission systems (`commission_ax/`), and workflow automation
 - **Emergency Response Architecture**: 200+ validation/fix scripts (`cloudpepper_*.py`, `validate_*.py`, `emergency_*.py`) with comprehensive error detection and automated recovery
 - **CloudPepper-First Design**: All modules include CloudPepper compatibility patches, global error handlers, and OWL lifecycle protection
 - **OSUS Properties Branding**: Consistent color scheme `#800020` (maroon), `#FFD700` (gold), unified UX patterns across all modules
 
 ## Developer Workflows
 
-### Pre-Deployment Validation (CRITICAL)
+### Pre-Deployment Validation (CRITICAL - ALWAYS RUN FIRST)
 ```bash
-# CloudPepper deployment readiness - ALWAYS run before deployment
+# CloudPepper deployment readiness - MANDATORY before any deployment
 python cloudpepper_deployment_final_validation.py
 
-# Module-specific deep analysis for compatibility issues  
-python comprehensive_module_analyzer.py <module_name>
+# Module-specific validation scripts (200+ available)
+python validate_commission_enhancement.py
+python validate_order_net_commission.py
+python commission_ax_deployment_validator.py
+```
 
-# Emergency fixes for critical CloudPepper issues
+### Emergency Fix System (Production Hotfixes)
+```bash
+# For critical CloudPepper production issues (infinite recursion/RPC errors)
 python create_emergency_cloudpepper_fix.py
+python create_simple_emergency_fix.py
+python emergency_odoo_define_global_fix.js  # JavaScript compatibility
 ```
 
 ### Development & Testing Patterns
-- **JavaScript Safety Protocol**: All JS includes CloudPepper compatibility patches (`cloudpepper_global_protection.js`) and OWL lifecycle error handlers
-- **Validation Pipeline**: Every module change requires validation script execution - check 200+ `validate_*.py` scripts for comprehensive testing
-- **Emergency Fix System**: For infinite recursion/RPC errors, use emergency scripts (`emergency_*.py`) that create targeted fixes with rollback capabilities
-- **Cache Management**: Clean `__pycache__` after major changes; use `final_cleanup_status.py` for comprehensive cleanup
-- **Asset Loading Strategy**: Use `('prepend', 'path/to/emergency_fix.js')` pattern for critical fixes that must load first
+- **Validation First**: Run validation scripts before ANY code changes or deployment
+- **JavaScript Safety**: All JS must include CloudPepper compatibility patches and OWL lifecycle error handlers
+- **Emergency Deployment**: Use emergency scripts for critical hotfixes with automatic rollback capabilities
+- **Cache Management**: Clean `__pycache__` after major changes; run `final_manual_cleanup.py` for comprehensive cleanup
+- **Asset Loading**: Use `('prepend', 'path/to/fix.js')` in manifest for critical fixes that must load first
+- **Testing**: Standard Odoo `TransactionCase` with `@tagged('module_name')` decorators
 
 ## Critical Architecture Patterns
 
@@ -198,19 +147,28 @@ export class MyComponent extends Component {
 - **Security Model**: `account_payment_approval/security/` - 6-tier groups with access rules
 - **Report Templates**: `account_payment_approval/reports/` - OSUS-branded QWeb with digital signatures
 
-## AI Agent Guidelines
-- **Always validate**: Use Python validation scripts before any deployment
-- **Follow patterns**: Match existing module structures, especially manifest dependencies and security
-- **CloudPepper first**: Test all changes against CloudPepper compatibility patterns
-- **Complete implementations**: If adding view elements, ensure all referenced methods/fields exist
-- **OSUS branding**: Maintain consistent styling and color schemes across modules
-- **Emergency ready**: Document any breaking changes for potential nuclear fix procedures
+## Module Structure & Conventions
+- **Standard Layout**: `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `static/`, `tests/`, optional `doc/`, `wizards/`, `reports/`
+- **Odoo 17 Modern Syntax**: **CRITICAL** - Use `invisible="condition"` NOT deprecated `states=` or `attrs={}` (see `order_status_override/MODERN_SYNTAX_UPGRADE_SUMMARY.md`)
+- **Naming**: snake_case modules, version `17.0.x.y.z`, descriptive categories
+- **Security**: Always include `security/ir.model.access.csv` and group definitions in `security/` for new models
+- **Dependencies**: Common libs pre-installed: `qrcode`, `num2words`, `pillow`, `xlsxwriter`, `pandas`, `PyJWT`
 
-## Emergency Response & Validation System
-- **Real-time Error Detection**: Use `comprehensive_module_analyzer.py` for immediate issue identification
-- **CloudPepper Emergencies**: Deploy fixes via `create_emergency_cloudpepper_fix.py` for critical production issues
-- **JavaScript Safety**: All modules include `cloudpepper_compatibility_patch.js` and `cloudpepper_global_protection.js`
-- **Nuclear Options**: Emergency deployment scripts for system-wide issues requiring immediate resolution
-- **Validation Pipeline**: `cloudpepper_deployment_final_validation.py` → Emergency fixes → Production deployment
-- **Monitoring**: Post-deployment validation with 24-hour monitoring for CloudPepper stability
->>>>>>> main
+### XML Modern Syntax Examples
+```xml
+<!-- ✅ CORRECT - Odoo 17 Modern Syntax -->
+<field name="custom_status" readonly="state in ['sale', 'done', 'cancel']"/>
+<button name="action_approve" invisible="state != 'draft' or not approver_id"/>
+
+<!-- ❌ WRONG - Deprecated Syntax (DO NOT USE) -->
+<field name="custom_status" attrs="{'readonly': [('state', 'in', ['sale', 'done'])]}"/>
+<button name="action_approve" states="draft"/>
+```
+
+## AI Agent Guidelines
+- **Always validate first**: Run `cloudpepper_deployment_final_validation.py` before any deployment
+- **Modern syntax only**: Replace ALL `attrs={}` and `states=` with modern `invisible=`, `readonly=` patterns
+- **Complete implementations**: If adding view elements, ensure ALL referenced methods/fields exist in models
+- **CloudPepper compatibility**: Include error handlers and compatibility patches for all JavaScript
+- **OSUS branding**: Maintain color scheme `#800020` (maroon), `#FFD700` (gold) across all UI
+- **Emergency procedures**: For production issues, use emergency fix scripts with validation and rollback
