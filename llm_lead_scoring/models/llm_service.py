@@ -43,7 +43,7 @@ class LLMService(models.AbstractModel):
             headers = provider.get_api_headers()
             payload = provider.format_request_payload(messages, system_prompt)
 
-            _logger.info(f"Calling LLM API: {provider.name} ({provider.provider_type})")
+            _logger.info("Calling LLM API: %s (%s)", provider.name, provider.provider_type)
 
             response = requests.post(
                 url,
@@ -63,7 +63,7 @@ class LLMService(models.AbstractModel):
                     'error': ''
                 }
             else:
-                error_msg = f"API Error {response.status_code}: {response.text}"
+                error_msg = "API Error %s: %s" % (response.status_code, response.text)
                 _logger.error(error_msg)
                 provider.increment_usage(success=False)
 
@@ -74,13 +74,13 @@ class LLMService(models.AbstractModel):
                 }
 
         except requests.exceptions.Timeout:
-            error_msg = f"Request timeout after {provider.timeout} seconds"
+            error_msg = "Request timeout after %s seconds" % provider.timeout
             _logger.error(error_msg)
             provider.increment_usage(success=False)
             return {'success': False, 'content': '', 'error': error_msg}
 
         except Exception as e:
-            error_msg = f"LLM API Error: {str(e)}"
+            error_msg = "LLM API Error: %s" % str(e)
             _logger.error(error_msg)
             provider.increment_usage(success=False)
             return {'success': False, 'content': '', 'error': error_msg}
@@ -309,7 +309,8 @@ Provide your response in the following JSON format:
         recent_score = 0
         if messages:
             latest_message = messages[0]
-            days_since = (datetime.now() - latest_message.date).days
+            from odoo import fields
+            days_since = (fields.Datetime.now() - latest_message.date).days
             if days_since <= 1:
                 recent_score = 20
             elif days_since <= 7:
@@ -327,7 +328,8 @@ Provide your response in the following JSON format:
         else:
             engagement_level = "low engagement"
 
-        analysis = f"Lead shows {engagement_level} with {activity_count} activities and {message_count} interactions."
+        analysis = "Lead shows %s with %d activities and %d interactions." % (
+            engagement_level, activity_count, message_count)
 
         return {
             'score': min(total_score, 100),
@@ -349,12 +351,17 @@ Provide your response in the following JSON format:
         clarity = self.analyze_requirement_clarity(lead)
         engagement = self.analyze_activity_engagement(lead)
 
-        # Weight the scores
-        # Completeness: 30%, Clarity: 40%, Engagement: 30%
+        # Get configured weights
+        config = self.env['ir.config_parameter'].sudo()
+        weight_completeness = float(config.get_param('llm_lead_scoring.weight_completeness', '30.0')) / 100.0
+        weight_clarity = float(config.get_param('llm_lead_scoring.weight_clarity', '40.0')) / 100.0
+        weight_engagement = float(config.get_param('llm_lead_scoring.weight_engagement', '30.0')) / 100.0
+
+        # Weight the scores using configured values
         weighted_score = (
-            completeness['score'] * 0.30 +
-            clarity['score'] * 0.40 +
-            engagement['score'] * 0.30
+            completeness['score'] * weight_completeness +
+            clarity['score'] * weight_clarity +
+            engagement['score'] * weight_engagement
         )
 
         # Use LLM for final analysis and adjustment

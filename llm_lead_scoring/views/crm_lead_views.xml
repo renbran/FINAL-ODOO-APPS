@@ -13,7 +13,7 @@
                         type="object"
                         class="oe_highlight"
                         icon="fa-magic"
-                        invisible="active == False"
+                        invisible="not active"
                         help="Enrich this lead with AI-powered analysis"/>
             </xpath>
 

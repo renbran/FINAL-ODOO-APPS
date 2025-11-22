@@ -46,6 +46,7 @@ class CrmLead(models.Model):
     ai_last_enrichment_date = fields.Datetime(
         string='Last AI Enrichment',
         readonly=True,
+        index=True,
     )
 
     ai_enrichment_status = fields.Selection([
@@ -53,7 +54,7 @@ class CrmLead(models.Model):
         ('processing', 'Processing'),
         ('completed', 'Completed'),
         ('failed', 'Failed'),
-    ], string='Enrichment Status', default='pending', readonly=True)
+    ], string='Enrichment Status', default='pending', readonly=True, index=True)
 
     ai_analysis_summary = fields.Text(
         string='AI Analysis Summary',
@@ -66,6 +67,7 @@ class CrmLead(models.Model):
         string='Auto Enrich',
         default=True,
         help='Automatically enrich this lead with AI when key fields change',
+        index=True,
     )
 
     # Computed field for visual indicator
@@ -101,12 +103,12 @@ class CrmLead(models.Model):
 
         try:
             self.write({'ai_enrichment_status': 'processing'})
-            self.env.cr.commit()  # Commit status update
+            # Let Odoo handle transaction management
 
             llm_service = self.env['llm.service']
 
             # 1. Calculate AI Probability Score
-            _logger.info(f"Calculating AI score for lead: {self.name}")
+            _logger.info("Calculating AI score for lead: %s", self.name)
             scoring_result = llm_service.calculate_ai_probability_score(self)
 
             # 2. Research Customer (if enabled in settings)
@@ -115,7 +117,7 @@ class CrmLead(models.Model):
             enable_research = config.get_param('llm_lead_scoring.enable_customer_research', 'True') == 'True'
 
             if enable_research:
-                _logger.info(f"Researching customer for lead: {self.name}")
+                _logger.info("Researching customer for lead: %s", self.name)
                 research_result = llm_service.research_customer(self)
 
             # 3. Prepare enrichment data
@@ -157,7 +159,8 @@ class CrmLead(models.Model):
                 'ai_analysis_summary': scoring_result['llm_analysis'],
             })
 
-            _logger.info(f"Successfully enriched lead {self.name} with AI score: {scoring_result['calculated_score']}")
+            _logger.info("Successfully enriched lead %s with AI score: %.2f",
+                        self.name, scoring_result['calculated_score'])
 
             return {
                 'type': 'ir.actions.client',
@@ -171,10 +174,10 @@ class CrmLead(models.Model):
             }
 
         except Exception as e:
-            _logger.error(f"Error enriching lead {self.id}: {str(e)}", exc_info=True)
+            _logger.error("Error enriching lead %s: %s", self.id, str(e), exc_info=True)
             self.write({
                 'ai_enrichment_status': 'failed',
-                'ai_analysis_summary': f'Enrichment failed: {str(e)}',
+                'ai_analysis_summary': 'Enrichment failed: %s' % str(e),
             })
 
             return {
@@ -251,15 +254,14 @@ class CrmLead(models.Model):
             ('active', '=', True),
         ], limit=50)  # Limit to avoid overload
 
-        _logger.info(f"Found {len(leads_to_enrich)} leads to enrich")
+        _logger.info("Found %d leads to enrich", len(leads_to_enrich))
 
         for lead in leads_to_enrich:
             try:
                 lead._enrich_lead()
-                # Add delay between requests to avoid rate limiting
-                self.env.cr.commit()
+                # Let Odoo handle transaction management
             except Exception as e:
-                _logger.error(f"Failed to enrich lead {lead.id}: {str(e)}")
+                _logger.error("Failed to enrich lead %s: %s", lead.id, str(e))
                 continue
 
     @api.model_create_multi
@@ -273,8 +275,9 @@ class CrmLead(models.Model):
         if auto_enrich_new:
             for lead in leads:
                 if lead.auto_enrich and lead.type == 'opportunity':
-                    # Enrich in background
-                    lead.with_delay()._enrich_lead()
+                    # Mark as pending for cron to process
+                    # This avoids blocking lead creation and doesn't require queue_job
+                    lead.write({'ai_enrichment_status': 'pending'})
 
         return leads
 

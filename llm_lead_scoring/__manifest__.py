@@ -38,6 +38,7 @@ The module leverages LLM reasoning capabilities to help sales teams:
         'mail',
     ],
     'data': [
+        'security/llm_provider_security.xml',
         'security/ir.model.access.csv',
         'data/llm_provider_data.xml',
         'data/ir_cron_data.xml',
