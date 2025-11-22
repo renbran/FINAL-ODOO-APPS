@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_llm_provider_user,llm.provider.user,model_llm_provider,crm.group_crm_user,1,0,0,0
+access_llm_provider_manager,llm.provider.manager,model_llm_provider,crm.group_crm_manager,1,1,1,1
+access_llm_service_user,llm.service.user,model_llm_service,crm.group_crm_user,1,0,0,0
+access_lead_enrichment_wizard_user,lead.enrichment.wizard.user,model_lead_enrichment_wizard,crm.group_crm_user,1,1,1,1
