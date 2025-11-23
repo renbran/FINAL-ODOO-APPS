@@ -29,7 +29,11 @@ import { _t } from "@web/core/l10n/translation";
 
 export class CRMStrategicDashboard extends Component {
     static template = "crm_strategic_dashboard.Dashboard";
-    static props = {};
+    static props = {
+        action: { type: Object, optional: true },
+        actionId: { type: Number, optional: true },
+        className: { type: String, optional: true },
+    };
 
     setup() {
         this.orm = useService("orm");

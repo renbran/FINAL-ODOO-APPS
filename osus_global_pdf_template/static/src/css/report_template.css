@@ -1,0 +1,43 @@
+/* OSUS Global PDF Template - Minimal CSS for proper rendering */
+
+@media print {
+    body {
+        background: transparent !important;
+    }
+}
+
+/* Ensure content is positioned correctly over template */
+.page {
+    position: relative;
+    background: transparent !important;
+}
+
+/* Clean, minimal spacing for content to sit on template */
+.header {
+    margin-bottom: 5pt !important;
+    padding: 5pt 0 !important;
+}
+
+.article {
+    margin-top: 5pt !important;
+    padding: 10pt !important;
+}
+
+.footer {
+    margin-top: 5pt !important;
+    padding-top: 5pt !important;
+}
+
+/* Ensure tables and content don't have excessive spacing */
+table {
+    margin: 5pt 0 !important;
+}
+
+th, td {
+    padding: 4pt !important;
+}
+
+h1, h2, h3, h4 {
+    margin-top: 5pt !important;
+    margin-bottom: 3pt !important;
+}

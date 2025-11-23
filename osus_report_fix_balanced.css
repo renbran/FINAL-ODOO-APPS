@@ -1,0 +1,130 @@
+/* OSUS Properties - MINIMAL PDF Report Styling - NO OVERLAP */
+
+/* CRITICAL: Disable ALL excessive padding that causes overlap */
+.header, 
+.o_report_layout_standard .header,
+.o_report_layout_boxed .header,
+.o_report_layout_clean .header,
+.o_report_layout_background .header,
+div[class*="header"] {
+    margin-bottom: 0pt !important;
+    padding: 0pt !important;
+    padding-bottom: 10pt !important;
+    min-height: auto !important;
+    background-color: transparent !important;
+}
+
+/* Remove all extra spacing */
+.header .company_details,
+.header .address,
+.header div {
+    padding: 0pt !important;
+    margin: 0pt !important;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    color: #333333 !important;
+}
+
+.page {
+    page-break-after: always;
+    overflow: hidden !important;
+}
+
+/* Typography - minimal */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600 !important;
+    margin: 5pt 0 !important;
+    page-break-after: avoid !important;
+}
+
+h1 { font-size: 16pt !important; }
+h2 { font-size: 14pt !important; }
+h3 { font-size: 12pt !important; }
+
+/* Logo - no extra margin */
+.header img, .company-logo {
+    margin: 0pt !important;
+    max-height: 50pt !important;
+}
+
+/* Content - NO TOP MARGIN */
+.article,
+.o_report_layout_standard .article,
+.o_report_layout_boxed .article,
+.o_report_layout_clean .article,
+.o_report_layout_background .article {
+    padding: 0pt !important;
+    margin: 0pt !important;
+}
+
+/* Footer - minimal */
+.footer, 
+.o_report_layout_standard .footer,
+.o_report_layout_boxed .footer,
+.o_report_layout_clean .footer,
+.o_report_layout_background .footer {
+    margin-top: 10pt !important;
+    padding: 5pt 0 !important;
+    font-size: 8.5pt !important;
+}
+
+/* CRITICAL: Remove spacing after header */
+.header + *,
+div[class*="header"] + * {
+    margin-top: 0pt !important;
+    padding-top: 0pt !important;
+}
+
+/* TABLE - compact */
+table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 5pt 0 !important;
+    font-size: 9.5pt !important;
+}
+
+th {
+    padding: 4pt !important;
+    font-weight: 600 !important;
+}
+
+td {
+    padding: 3pt !important;
+}
+
+/* Document sections - NO extra margin */
+.invoice-header, .document-header {
+    margin: 5pt 0 !important;
+    padding: 5pt !important;
+}
+
+div[name="invoice_line_table"],
+div[name="stock_move_table"],
+div[name="order_line_table"],
+.invoice_table_wrapper {
+    margin-top: 5pt !important;
+}
+
+/* Totals - compact */
+.total-section {
+    margin-top: 8pt !important;
+    padding: 5pt !important;
+}
+
+/* Images - constrained */
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Print optimization */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

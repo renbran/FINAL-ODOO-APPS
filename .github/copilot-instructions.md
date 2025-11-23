@@ -38,7 +38,7 @@ python create_emergency_cloudpepper_fix.py
 
 ### Unified State Workflow Pattern
 ```python
-# Example: account_payment_approval/models/account_payment.py lines 25-42
+# Example: account_payment_final/models/account_payment.py
 state = fields.Selection([
     ('draft', 'Draft'),
     ('submitted', 'Submitted'),
@@ -66,8 +66,9 @@ def _compute_is_approve_person(self):
 
 ### Module Dependency & Integration Strategy
 - **Cross-Module Communication**: Use `enhanced_rest_api/` for JWT-authenticated endpoints across CRM, Sales, Payments
-- **Report Generation**: QWeb XML for PDFs, controllers for Excel/CSV with `report_xlsx` fallbacks
-- **Email Integration**: `mail.thread` inheritance with activity tracking across all workflow modules
+- **Report Generation**: QWeb XML for PDF (`payment_voucher_report.xml`), controllers for Excel/CSV with `report_xlsx` fallbacks
+- **Multi-App Integration**: Modules extend Account, CRM, Sales, Website with unified UX
+- **Email Integration**: Template-based with `mail.thread` inheritance and activity tracking
 
 ## Frontend Architecture (Odoo 17 Modern Stack)
 

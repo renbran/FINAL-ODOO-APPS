@@ -1,0 +1,182 @@
+/* OSUS Properties - OPTIMIZED PDF Report Styling (v2.0 - Fixed Overlap) */
+
+/* BASE DOCUMENT STYLES */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    color: #333333 !important;
+}
+
+.page {
+    page-break-after: always;
+    overflow: hidden !important;
+    padding-top: 10pt !important;  /* REDUCED from 60pt */
+}
+
+/* TYPOGRAPHY - Minimal spacing */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600 !important;
+    margin-top: 8pt !important;  /* REDUCED from 12pt */
+    margin-bottom: 4pt !important;  /* REDUCED from 8pt */
+    color: #2c3e50 !important;
+    page-break-after: avoid !important;
+}
+
+h1 { font-size: 18pt !important; }
+h2 { font-size: 15pt !important; }
+h3 { font-size: 13pt !important; }
+
+/* TABLE STYLING */
+table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 8pt 0 !important;  /* REDUCED from 10pt */
+    page-break-inside: auto !important;
+    font-size: 9.5pt !important;
+}
+
+thead {
+    display: table-header-group !important;
+    background-color: #f8f9fa !important;
+}
+
+tr {
+    page-break-inside: avoid !important;
+}
+
+th {
+    background-color: #f8f9fa !important;
+    color: #2c3e50 !important;
+    font-weight: 600 !important;
+    padding: 6pt 4pt !important;  /* REDUCED from 8pt 6pt */
+    border-bottom: 1.5pt solid #dee2e6 !important;  /* REDUCED from 2pt */
+}
+
+td {
+    padding: 4pt !important;  /* REDUCED from 6pt */
+    border-bottom: 0.5pt solid #e9ecef !important;
+    word-wrap: break-word !important;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8f9fa !important;
+}
+
+tfoot td {
+    font-weight: 600 !important;
+    background-color: #e9ecef !important;
+    border-top: 1.5pt solid #dee2e6 !important;  /* REDUCED from 2pt */
+}
+
+/* MINIMAL HEADER SPACING - NO OVERLAP */
+.header,
+.o_report_layout_standard .header,
+.o_report_layout_boxed .header,
+.o_report_layout_clean .header,
+.o_report_layout_background .header {
+    border-bottom: 1pt solid #dee2e6 !important;
+    margin-bottom: 10pt !important;  /* REDUCED from 50pt */
+    padding: 8pt 0 !important;  /* REDUCED from 30pt */
+    min-height: auto !important;  /* REMOVED fixed 150pt */
+}
+
+/* Remove extra header spacing */
+.header .company_details,
+.header .address,
+.header div {
+    padding-top: 2pt !important;  /* REDUCED from 15pt */
+    padding-bottom: 2pt !important;  /* REDUCED from 15pt */
+    margin-top: 2pt !important;  /* REDUCED from 10pt */
+    margin-bottom: 2pt !important;  /* REDUCED from 10pt */
+}
+
+.header > * {
+    margin-top: 2pt !important;  /* REDUCED from 10pt */
+    margin-bottom: 2pt !important;  /* REDUCED from 10pt */
+}
+
+.footer {
+    border-top: 1pt solid #dee2e6 !important;
+    margin-top: 10pt !important;  /* REDUCED from 15pt */
+    padding-top: 8pt !important;  /* REDUCED from 15pt */
+    font-size: 8.5pt !important;
+}
+
+/* MINIMAL content margin - prevent overlap */
+.article {
+    margin-top: 5pt !important;  /* REDUCED from 40pt */
+}
+
+/* MONETARY VALUES */
+.monetary, .text-right, .amount {
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+/* TOTALS */
+.total-section {
+    margin-top: 10pt !important;  /* REDUCED from 15pt */
+    padding-top: 8pt !important;  /* REDUCED from 10pt */
+    border-top: 1.5pt solid #dee2e6 !important;  /* REDUCED from 2pt */
+}
+
+/* IMAGES */
+img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid !important;
+}
+
+.company-logo {
+    max-height: 50pt !important;  /* REDUCED from 60pt */
+    max-width: 180pt !important;  /* REDUCED from 200pt */
+}
+
+/* FIX CONTENT OVERFLOW */
+table.o_main_table, table.table {
+    table-layout: fixed !important;
+}
+
+td.text-wrap, th.text-wrap {
+    word-break: break-word !important;
+}
+
+/* PREVENT ORPHANS */
+p, td, th, li {
+    orphans: 3 !important;
+    widows: 3 !important;
+}
+
+/* BOOTSTRAP GRID FIXES */
+.row {
+    display: table !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+}
+
+.col, [class*="col-"] {
+    display: table-cell !important;
+    float: none !important;
+    padding: 0 6pt !important;  /* REDUCED from 8pt */
+}
+
+/* PRINT OPTIMIZATION */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* Minimal spacing for report layouts */
+.o_report_layout_standard .article,
+.o_report_layout_boxed .article,
+.o_report_layout_clean .article,
+.o_report_layout_background .article {
+    padding: 12pt !important;  /* REDUCED from 20pt */
+}
