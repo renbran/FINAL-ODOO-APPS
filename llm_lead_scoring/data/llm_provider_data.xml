@@ -17,12 +17,12 @@
             <field name="is_default" eval="False"/>
         </record>
 
-        <!-- Groq Llama 3.1 -->
+        <!-- Groq Llama 3.3 (Latest - Recommended FREE option) -->
         <record id="llm_provider_groq_llama" model="llm.provider">
-            <field name="name">Groq Llama 3.1 70B</field>
+            <field name="name">Groq Llama 3.3 70B (Free)</field>
             <field name="sequence">20</field>
             <field name="provider_type">groq</field>
-            <field name="model_name">llama-3.1-70b-versatile</field>
+            <field name="model_name">llama-3.3-70b-versatile</field>
             <field name="api_key">your-groq-api-key-here</field>
             <field name="temperature">0.7</field>
             <field name="max_tokens">2000</field>
