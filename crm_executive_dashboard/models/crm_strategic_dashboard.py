@@ -584,3 +584,13 @@ class CRMStrategicDashboard(models.Model):
             })
         
         return team_overview
+
+    def create_default_dashboard(self):
+        """Reset dashboard to default settings"""
+        self.ensure_one()
+        self.write({
+            'date_from': fields.Date.today().replace(day=1),
+            'date_to': fields.Date.today(),
+            'team_ids': [(5, 0, 0)],  # Clear teams to show all
+        })
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
