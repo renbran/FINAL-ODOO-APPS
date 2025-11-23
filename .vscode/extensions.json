@@ -16,7 +16,9 @@
         "ms-vscode.vscode-sass",
         "mrmlnc.vscode-scss",
         "sibiraj-s.vscode-scss-formatter"
-    ,"rinormaloku.vscode-lsp-client"
+    ,
+    "rinormaloku.vscode-lsp-client",
+    "automatalabs.copilot-mcp"
     ],
     "unwantedRecommendations": [
         "ms-python.flake8",

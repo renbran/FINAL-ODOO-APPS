@@ -3,39 +3,36 @@
 
 ## Project Architecture & Big Picture
 - **Odoo 17 Production Collection**: 50+ custom modules for CloudPepper deployment at `https://stagingtry.cloudpepper.site/` (login: `salescompliance@osusproperties.com`)
-- **Module Portfolio**: Payment workflows (`account_payment_approval/`, `account_payment_final/`), dashboards (`oe_sale_dashboard_17/`, `crm_executive_dashboard/`), API services (`enhanced_rest_api/`), commission systems (`commission_ax/`), and workflow automation
-- **Emergency Response Architecture**: 200+ validation/fix scripts (`cloudpepper_*.py`, `validate_*.py`, `emergency_*.py`) with comprehensive error detection and automated recovery
-- **CloudPepper-First Design**: All modules include CloudPepper compatibility patches, global error handlers, and OWL lifecycle protection
+- **Module Categories**: Payment workflows (`account_payment_approval/`, `account_payment_final/`), dashboards (`oe_sale_dashboard_17/`, `crm_executive_dashboard/`, `odoo_dynamic_dashboard/`), API services (`enhanced_rest_api/`, `rest_api_odoo/`), commission systems (`commission_ax/`, `order_net_commission/`), workflow automation, HR (`scholarix_recruitment/`, `scholarix_assessment/`), and CRM/Sales enhancements
+- **Emergency Response Architecture**: Validation/fix scripts for critical issues - run `validate_*.py` for pre-deployment checks, emergency scripts for production hotfixes
+- **CloudPepper-First Design**: All modules include CloudPepper compatibility patches, global error handlers (`cloudpepper_global_protection.js`), and OWL lifecycle protection
 - **OSUS Properties Branding**: Consistent color scheme `#800020` (maroon), `#FFD700` (gold), unified UX patterns across all modules
+- **No Docker**: This is a direct Odoo installation (not containerized) - deployment is to CloudPepper server, not via docker-compose
 
 ## Developer Workflows
 
 ### Pre-Deployment Validation (CRITICAL - ALWAYS RUN FIRST)
-```bash
-# CloudPepper deployment readiness - MANDATORY before any deployment
-python cloudpepper_deployment_final_validation.py
-
-# Module-specific validation scripts (200+ available)
-python validate_commission_enhancement.py
-python validate_order_net_commission.py
-python commission_ax_deployment_validator.py
+```powershell
+# Module-specific validation scripts - run before any deployment
+python validate_module.py  # In specific module directories
+python validate_production_ready.py  # For production modules
+python validate_modern_syntax.py  # Check Odoo 17 syntax compliance
 ```
 
 ### Emergency Fix System (Production Hotfixes)
-```bash
+```powershell
 # For critical CloudPepper production issues (infinite recursion/RPC errors)
 python create_emergency_cloudpepper_fix.py
-python create_simple_emergency_fix.py
-python emergency_odoo_define_global_fix.js  # JavaScript compatibility
+# Global JavaScript protection already in: report_font_enhancement/static/src/js/cloudpepper_global_protection.js
 ```
 
 ### Development & Testing Patterns
-- **Validation First**: Run validation scripts before ANY code changes or deployment
-- **JavaScript Safety**: All JS must include CloudPepper compatibility patches and OWL lifecycle error handlers
-- **Emergency Deployment**: Use emergency scripts for critical hotfixes with automatic rollback capabilities
-- **Cache Management**: Clean `__pycache__` after major changes; run `final_manual_cleanup.py` for comprehensive cleanup
-- **Asset Loading**: Use `('prepend', 'path/to/fix.js')` in manifest for critical fixes that must load first
-- **Testing**: Standard Odoo `TransactionCase` with `@tagged('module_name')` decorators
+- **Validation First**: Run validation scripts in module directory before ANY code changes or deployment
+- **Testing**: Standard Odoo `TransactionCase` with `@tagged('module_name')` decorators (see `account_payment_final/tests/`)
+- **JavaScript Safety**: All JS must include CloudPepper compatibility patches and OWL lifecycle error handlers (extend from `cloudpepper_global_protection.js`)
+- **Asset Loading**: Use `('prepend', 'path/to/fix.js')` in `__manifest__.py` assets for critical fixes that must load first
+- **Cache Management**: Clean `__pycache__` after model/Python changes
+- **Security Groups**: Always define 4-6 tier permission hierarchy (User→Reviewer→Approver→Authorizer→Manager→Admin) in `security/` folder
 
 ## Critical Architecture Patterns
 
