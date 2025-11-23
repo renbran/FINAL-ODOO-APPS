@@ -38,8 +38,10 @@
         - Comprehensive security model
         - RESTful API endpoints
     """,
-    'author': 'Your Company',
-    'website': 'https://www.yourcompany.com',
+    'author': 'Odoo Professional Services',
+    'website': 'https://www.odoo.com',
+    'maintainer': 'Odoo Professional Services Team',
+    'support': 'support@odoo.com',
     'depends': [
         'base',
         'crm',
