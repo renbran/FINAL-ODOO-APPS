@@ -1,0 +1,184 @@
+name: Genspark AI Developer Integration
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.10'
+  ODOO_VERSION: '17.0'
+
+jobs:
+  ai-code-review:
+    name: AI Code Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      checks: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install xmlschema lxml pyyaml requests
+
+      - name: Run CloudPepper Deployment Validation
+        run: |
+          if [ -f "cloudpepper_deployment_final_validation.py" ]; then
+            python cloudpepper_deployment_final_validation.py
+          fi
+
+      - name: AI-Powered Odoo Module Analysis
+        run: |
+          python .github/scripts/ai_module_analyzer.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate AI Development Suggestions
+        run: |
+          python .github/scripts/ai_development_assistant.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update PR with AI Analysis
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## 🤖 Genspark AI Developer Analysis\n\n';
+            
+            // Read AI analysis results if they exist
+            if (fs.existsSync('ai_analysis_results.md')) {
+              const analysis = fs.readFileSync('ai_analysis_results.md', 'utf8');
+              comment += analysis;
+            } else {
+              comment += 'AI analysis completed. No specific recommendations at this time.';
+            }
+            
+            // Add CloudPepper specific guidance
+            comment += '\n\n### CloudPepper Deployment Guidance\n';
+            comment += '- ✅ Ensure all modules follow CloudPepper compatibility patterns\n';
+            comment += '- ✅ Validate emergency fix scripts are updated\n';
+            comment += '- ✅ Check OSUS branding consistency (#800020 maroon, #FFD700 gold)\n';
+            comment += '- ✅ Verify JavaScript includes CloudPepper compatibility patches\n';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  ai-issue-assistant:
+    name: AI Issue Assistant
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: AI Issue Analysis
+        run: |
+          python .github/scripts/ai_issue_analyzer.py "${{ github.event.issue.title }}" "${{ github.event.issue.body }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add AI Analysis to Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## 🤖 Genspark AI Assistant Analysis\n\n';
+            
+            if (fs.existsSync('ai_issue_analysis.md')) {
+              const analysis = fs.readFileSync('ai_issue_analysis.md', 'utf8');
+              comment += analysis;
+            }
+            
+            // Add relevant emergency scripts based on issue content
+            const issueBody = `${{ github.event.issue.title }} ${{ github.event.issue.body }}`.toLowerCase();
+            
+            if (issueBody.includes('cloudpepper') || issueBody.includes('deployment')) {
+              comment += '\n### 🚨 CloudPepper Emergency Scripts Available:\n';
+              comment += '- `python cloudpepper_deployment_final_validation.py`\n';
+              comment += '- `python create_emergency_cloudpepper_fix.py`\n';
+              comment += '- `python create_commission_ax_emergency_deployment.py`\n';
+            }
+            
+            if (issueBody.includes('commission') || issueBody.includes('email')) {
+              comment += '\n### 📧 Commission System Scripts:\n';
+              comment += '- `python create_commission_email_emergency_fix.py`\n';
+              comment += '- `python validate_commission_enhancement.py`\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  ai-module-validation:
+    name: AI Module Validation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Odoo dependencies
+        run: |
+          pip install --upgrade pip
+          pip install xmlschema lxml pyyaml requests qrcode pillow num2words
+
+      - name: AI-Enhanced Module Validation
+        run: |
+          python .github/scripts/ai_module_validator.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload validation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-validation-results
+          path: |
+            ai_validation_report.json
+            ai_module_analysis.md
+          retention-days: 7

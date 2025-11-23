@@ -13,4 +13,18 @@ crash_dumps/
 # Windows crash dumps
 *.mdmp
 *.hdmp
+
+# Genspark AI generated temporary files
+ai_analysis_results.md
+ai_analysis_results.json
+ai_development_suggestions.md
+ai_development_data.json
+ai_issue_analysis.md
+ai_issue_analysis.json
+ai_module_analysis.md
+ai_validation_report.json
+
+# Python cache
 __pycache__/
+*.pyc
+*.pyo
