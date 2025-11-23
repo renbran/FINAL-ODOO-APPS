@@ -1,0 +1,61 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.xml": "xml",
+			"*.js": "javascript",
+			"*.scss": "scss",
+			"*.css": "css",
+			"*.py": "python"
+		},
+		"xml.format.enabled": true,
+		"xml.format.splitAttributes": "splitNewLine",
+		"xml.format.joinCDATALines": false,
+		"xml.format.joinCommentLines": false,
+		"xml.format.joinContentLines": false,
+		"xml.format.splitAttributesIndentSize": 4,
+		"xml.format.preservedNewlines": 2,
+		"xml.validation.enabled": true,
+		"xml.validation.namespaces.enabled": "never",
+		"xml.validation.schema.enabled": "never",
+		"xml.validation.disallowDocTypeDecl": false,
+		"xml.validation.resolveExternalEntities": false,
+		"xml.server.workDir": "~/.cache/xml",
+		"xml.trace.server": "off",
+		"xml.logs.client": false,
+		"xml.format.enforceQuoteStyle": "preferred",
+		"xml.format.preserveEmptyContent": true,
+		"xml.format.preserveAttributeLineBreaks": false,
+		"xml.catalogs": [
+			".vscode/xml-catalog.xml"
+		],
+		"xml.fileAssociations": [
+			{
+				"pattern": "**/*.xml",
+				"systemId": "odoo-views.xsd"
+			}
+		],
+		"xml.preferences.showSchemaDocumentationType": "none",
+		"emmet.includeLanguages": {
+			"xml": "html"
+		},
+		"emmet.showExpandedAbbreviation": "always",
+		"emmet.showSuggestionsAsSnippets": true,
+		"javascript.validate.enable": false,
+		"javascript.format.enable": true,
+		"typescript.validate.enable": false,
+		"debug.allowBreakpointsEverywhere": false,
+		"debug.openDebug": "neverOpen",
+		"debug.console.closeOnEnd": true,
+		"debug.openExplorerOnEnd": false,
+		"extensions.ignoreRecommendations": true,
+		"typescript.disableAutomaticTypeAcquisition": true,
+		"python.analysis.logLevel": "Warning",
+		"python.languageServer": "None",
+		"xml.symbols.enabled": false
+	}
+}
