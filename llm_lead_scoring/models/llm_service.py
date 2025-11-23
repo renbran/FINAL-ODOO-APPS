@@ -3,9 +3,10 @@
 import json
 import logging
 import requests
+import time
 from datetime import datetime
 
-from odoo import models, api, _
+from odoo import models, api, tools, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -16,17 +17,50 @@ class LLMService(models.AbstractModel):
     _description = 'LLM Integration Service'
 
     @api.model
-    def call_llm(self, messages, provider=None, system_prompt=None):
+    @tools.ormcache()
+    def _get_scoring_weights(self):
         """
-        Call LLM API with given messages
+        Get scoring weights from configuration with caching for performance
+
+        Returns:
+            dict: {'completeness': float, 'clarity': float, 'engagement': float}
+        """
+        config = self.env['ir.config_parameter'].sudo()
+        return {
+            'completeness': float(config.get_param('llm_lead_scoring.weight_completeness', '30.0')) / 100.0,
+            'clarity': float(config.get_param('llm_lead_scoring.weight_clarity', '40.0')) / 100.0,
+            'engagement': float(config.get_param('llm_lead_scoring.weight_engagement', '30.0')) / 100.0,
+        }
+
+    @api.model
+    @tools.ormcache()
+    def _get_config_bool(self, param_name, default='False'):
+        """
+        Get boolean configuration parameter with caching
+
+        Args:
+            param_name: Configuration parameter name
+            default: Default value if not set
+
+        Returns:
+            bool: Configuration value
+        """
+        config = self.env['ir.config_parameter'].sudo()
+        return config.get_param(param_name, default) == 'True'
+
+    @api.model
+    def call_llm(self, messages, provider=None, system_prompt=None, max_retries=3):
+        """
+        Call LLM API with given messages, including retry logic with exponential backoff
 
         Args:
             messages: List of message dicts with 'role' and 'content'
             provider: llm.provider record (uses default if not provided)
             system_prompt: Optional system prompt
+            max_retries: Maximum number of retry attempts (default: 3)
 
         Returns:
-            dict: {'success': bool, 'content': str, 'error': str}
+            dict: {'success': bool, 'content': str, 'error': str, 'retries': int}
         """
         if not provider:
             provider = self.env['llm.provider'].get_default_provider()
@@ -35,55 +69,148 @@ class LLMService(models.AbstractModel):
             return {
                 'success': False,
                 'content': '',
-                'error': 'No LLM provider configured. Please configure an LLM provider in Settings.'
+                'error': 'No LLM provider configured. Please configure an LLM provider in Settings.',
+                'retries': 0
             }
 
-        try:
-            url = provider.get_api_url()
-            headers = provider.get_api_headers()
-            payload = provider.format_request_payload(messages, system_prompt)
+        # Retry configuration
+        retry_count = 0
+        base_delay = 1.0  # Start with 1 second
 
-            _logger.info("Calling LLM API: %s (%s)", provider.name, provider.provider_type)
+        while retry_count <= max_retries:
+            try:
+                url = provider.get_api_url()
+                headers = provider.get_api_headers()
+                payload = provider.format_request_payload(messages, system_prompt)
 
-            response = requests.post(
-                url,
-                headers=headers,
-                json=payload,
-                timeout=provider.timeout
-            )
+                if retry_count > 0:
+                    _logger.info("Retry attempt %d/%d for LLM API: %s",
+                                retry_count, max_retries, provider.name)
+                else:
+                    _logger.info("Calling LLM API: %s (%s)", provider.name, provider.provider_type)
 
-            if response.status_code == 200:
-                response_json = response.json()
-                content = provider.parse_response(response_json)
-                provider.increment_usage(success=True)
+                response = requests.post(
+                    url,
+                    headers=headers,
+                    json=payload,
+                    timeout=provider.timeout
+                )
 
-                return {
-                    'success': True,
-                    'content': content,
-                    'error': ''
-                }
-            else:
-                error_msg = "API Error %s: %s" % (response.status_code, response.text)
-                _logger.error(error_msg)
+                # Success case
+                if response.status_code == 200:
+                    response_json = response.json()
+                    content = provider.parse_response(response_json)
+                    provider.increment_usage(success=True)
+
+                    if retry_count > 0:
+                        _logger.info("LLM API call succeeded after %d retries", retry_count)
+
+                    return {
+                        'success': True,
+                        'content': content,
+                        'error': '',
+                        'retries': retry_count
+                    }
+
+                # Rate limit or temporary error - retry
+                elif response.status_code in [429, 500, 502, 503, 504]:
+                    if retry_count < max_retries:
+                        # Exponential backoff: 1s, 2s, 4s, 8s...
+                        delay = base_delay * (2 ** retry_count)
+                        _logger.warning(
+                            "LLM API returned status %d, retrying in %.1f seconds (attempt %d/%d)",
+                            response.status_code, delay, retry_count + 1, max_retries
+                        )
+                        time.sleep(delay)
+                        retry_count += 1
+                        continue
+                    else:
+                        # Max retries exceeded
+                        error_msg = "API Error %s after %d retries: %s" % (
+                            response.status_code, retry_count, response.text[:200]
+                        )
+                        _logger.error(error_msg)
+                        provider.increment_usage(success=False)
+                        return {
+                            'success': False,
+                            'content': '',
+                            'error': error_msg,
+                            'retries': retry_count
+                        }
+
+                # Client error (4xx) - don't retry
+                else:
+                    error_msg = "API Error %s: %s" % (response.status_code, response.text[:200])
+                    _logger.error(error_msg)
+                    provider.increment_usage(success=False)
+                    return {
+                        'success': False,
+                        'content': '',
+                        'error': error_msg,
+                        'retries': retry_count
+                    }
+
+            except requests.exceptions.Timeout:
+                if retry_count < max_retries:
+                    delay = base_delay * (2 ** retry_count)
+                    _logger.warning(
+                        "Request timeout, retrying in %.1f seconds (attempt %d/%d)",
+                        delay, retry_count + 1, max_retries
+                    )
+                    time.sleep(delay)
+                    retry_count += 1
+                    continue
+                else:
+                    error_msg = "Request timeout after %d retries" % retry_count
+                    _logger.error(error_msg)
+                    provider.increment_usage(success=False)
+                    return {
+                        'success': False,
+                        'content': '',
+                        'error': error_msg,
+                        'retries': retry_count
+                    }
+
+            except requests.exceptions.ConnectionError as e:
+                if retry_count < max_retries:
+                    delay = base_delay * (2 ** retry_count)
+                    _logger.warning(
+                        "Connection error: %s, retrying in %.1f seconds (attempt %d/%d)",
+                        str(e)[:100], delay, retry_count + 1, max_retries
+                    )
+                    time.sleep(delay)
+                    retry_count += 1
+                    continue
+                else:
+                    error_msg = "Connection error after %d retries: %s" % (retry_count, str(e)[:100])
+                    _logger.error(error_msg)
+                    provider.increment_usage(success=False)
+                    return {
+                        'success': False,
+                        'content': '',
+                        'error': error_msg,
+                        'retries': retry_count
+                    }
+
+            except Exception as e:
+                # Unexpected errors - don't retry
+                error_msg = "LLM API Error: %s" % str(e)
+                _logger.error(error_msg, exc_info=True)
                 provider.increment_usage(success=False)
-
                 return {
                     'success': False,
                     'content': '',
-                    'error': error_msg
+                    'error': error_msg,
+                    'retries': retry_count
                 }
 
-        except requests.exceptions.Timeout:
-            error_msg = "Request timeout after %s seconds" % provider.timeout
-            _logger.error(error_msg)
-            provider.increment_usage(success=False)
-            return {'success': False, 'content': '', 'error': error_msg}
-
-        except Exception as e:
-            error_msg = "LLM API Error: %s" % str(e)
-            _logger.error(error_msg)
-            provider.increment_usage(success=False)
-            return {'success': False, 'content': '', 'error': error_msg}
+        # Should not reach here, but safety fallback
+        return {
+            'success': False,
+            'content': '',
+            'error': 'Maximum retries exceeded',
+            'retries': retry_count
+        }
 
     @api.model
     def research_customer(self, lead):
@@ -351,17 +478,14 @@ Provide your response in the following JSON format:
         clarity = self.analyze_requirement_clarity(lead)
         engagement = self.analyze_activity_engagement(lead)
 
-        # Get configured weights
-        config = self.env['ir.config_parameter'].sudo()
-        weight_completeness = float(config.get_param('llm_lead_scoring.weight_completeness', '30.0')) / 100.0
-        weight_clarity = float(config.get_param('llm_lead_scoring.weight_clarity', '40.0')) / 100.0
-        weight_engagement = float(config.get_param('llm_lead_scoring.weight_engagement', '30.0')) / 100.0
+        # Get configured weights (cached for performance)
+        weights = self._get_scoring_weights()
 
         # Weight the scores using configured values
         weighted_score = (
-            completeness['score'] * weight_completeness +
-            clarity['score'] * weight_clarity +
-            engagement['score'] * weight_engagement
+            completeness['score'] * weights['completeness'] +
+            clarity['score'] * weights['clarity'] +
+            engagement['score'] * weights['engagement']
         )
 
         # Use LLM for final analysis and adjustment

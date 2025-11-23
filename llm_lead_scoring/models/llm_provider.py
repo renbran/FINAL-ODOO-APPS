@@ -59,6 +59,31 @@ class LLMProvider(models.Model):
                 if other_defaults:
                     raise ValidationError(_('Only one default LLM provider is allowed per company.'))
 
+    @api.constrains('temperature')
+    def _check_temperature(self):
+        """Validate temperature is within valid range"""
+        for record in self:
+            if not (0.0 <= record.temperature <= 2.0):
+                raise ValidationError(_('Temperature must be between 0.0 and 2.0. Current value: %.2f') % record.temperature)
+
+    @api.constrains('max_tokens')
+    def _check_max_tokens(self):
+        """Validate max_tokens is reasonable"""
+        for record in self:
+            if record.max_tokens < 1:
+                raise ValidationError(_('Max tokens must be at least 1'))
+            if record.max_tokens > 100000:
+                raise ValidationError(_('Max tokens cannot exceed 100,000 for performance reasons'))
+
+    @api.constrains('timeout')
+    def _check_timeout(self):
+        """Validate timeout is reasonable"""
+        for record in self:
+            if record.timeout < 5:
+                raise ValidationError(_('Timeout must be at least 5 seconds'))
+            if record.timeout > 300:
+                raise ValidationError(_('Timeout cannot exceed 300 seconds (5 minutes)'))
+
     @api.model
     def get_default_provider(self):
         """Get the default LLM provider"""

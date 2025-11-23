@@ -113,8 +113,7 @@ class CrmLead(models.Model):
 
             # 2. Research Customer (if enabled in settings)
             research_result = ""
-            config = self.env['ir.config_parameter'].sudo()
-            enable_research = config.get_param('llm_lead_scoring.enable_customer_research', 'True') == 'True'
+            enable_research = llm_service._get_config_bool('llm_lead_scoring.enable_customer_research', 'True')
 
             if enable_research:
                 _logger.info("Researching customer for lead: %s", self.name)
@@ -239,8 +238,8 @@ class CrmLead(models.Model):
     @api.model
     def _cron_enrich_leads(self):
         """Scheduled action to enrich leads automatically"""
-        config = self.env['ir.config_parameter'].sudo()
-        auto_enrich_enabled = config.get_param('llm_lead_scoring.auto_enrich_enabled', 'False') == 'True'
+        llm_service = self.env['llm.service']
+        auto_enrich_enabled = llm_service._get_config_bool('llm_lead_scoring.auto_enrich_enabled', 'False')
 
         if not auto_enrich_enabled:
             _logger.info("Auto-enrichment is disabled in settings")
@@ -269,8 +268,8 @@ class CrmLead(models.Model):
         """Override create to trigger auto-enrichment"""
         leads = super(CrmLead, self).create(vals_list)
 
-        config = self.env['ir.config_parameter'].sudo()
-        auto_enrich_new = config.get_param('llm_lead_scoring.auto_enrich_new_leads', 'False') == 'True'
+        llm_service = self.env['llm.service']
+        auto_enrich_new = llm_service._get_config_bool('llm_lead_scoring.auto_enrich_new_leads', 'False')
 
         if auto_enrich_new:
             for lead in leads:
@@ -292,8 +291,8 @@ class CrmLead(models.Model):
         ]
 
         if any(field in vals for field in trigger_fields):
-            config = self.env['ir.config_parameter'].sudo()
-            auto_enrich_update = config.get_param('llm_lead_scoring.auto_enrich_on_update', 'False') == 'True'
+            llm_service = self.env['llm.service']
+            auto_enrich_update = llm_service._get_config_bool('llm_lead_scoring.auto_enrich_on_update', 'False')
 
             if auto_enrich_update:
                 for lead in self:
