@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Candidate Tree View -->
+        <record id="view_assessment_candidate_tree" model="ir.ui.view">
+            <field name="name">assessment.candidate.tree</field>
+            <field name="model">assessment.candidate</field>
+            <field name="arch" type="xml">
+                <tree string="Candidates" decoration-success="status=='shortlisted'" decoration-info="status=='ai_scored'" decoration-warning="status=='under_review'" decoration-danger="has_red_flags">
+                    <field name="full_name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="location"/>
+                    <field name="odoo_experience"/>
+                    <field name="sales_experience"/>
+                    <field name="submission_date"/>
+                    <field name="status" widget="badge" decoration-success="status in ['reviewed', 'shortlisted']" decoration-info="status=='ai_scored'" decoration-warning="status=='under_review'"/>
+                    <field name="overall_score" widget="progressbar"/>
+                    <field name="overall_rank"/>
+                    <field name="percentile" optional="show"/>
+                    <field name="has_red_flags" invisible="1"/>
+                    <field name="is_duplicate" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Candidate Form View -->
+        <record id="view_assessment_candidate_form" model="ir.ui.view">
+            <field name="name">assessment.candidate.form</field>
+            <field name="model">assessment.candidate</field>
+            <field name="arch" type="xml">
+                <form string="Candidate Assessment">
+                    <header>
+                        <button name="action_start_ai_scoring" string="Run AI Scoring" type="object" class="oe_highlight" invisible="status != 'submitted'" groups="scholarix_assessment.group_assessment_manager"/>
+                        <button name="action_create_human_review" string="Create Human Review" type="object" class="oe_highlight" invisible="human_review_id or status not in ['ai_scored', 'under_review']" groups="scholarix_assessment.group_assessment_reviewer"/>
+                        <button name="action_create_human_review" string="View Human Review" type="object" invisible="not human_review_id" groups="scholarix_assessment.group_assessment_reviewer"/>
+                        <button name="action_print_assessment_pdf" string="Print PDF" type="object" invisible="status not in ['ai_scored', 'under_review', 'reviewed', 'shortlisted']" groups="scholarix_assessment.group_assessment_reviewer"/>
+                        <button name="action_send_submission_confirmation" string="Send Confirmation Email" type="object" groups="scholarix_assessment.group_assessment_manager"/>
+                        <button name="action_export_to_recruitment" string="Export to Recruitment" type="object" invisible="status != 'shortlisted'" groups="scholarix_assessment.group_assessment_manager"/>
+                        <button name="action_view_portal_assessment" string="View Portal" type="object" icon="fa-external-link"/>
+                        <field name="status" widget="statusbar" statusbar_visible="draft,submitted,ai_scored,under_review,reviewed,shortlisted"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_audit_logs" type="object" class="oe_stat_button" icon="fa-history">
+                                <field name="audit_log_count" widget="statinfo" string="Audit Logs"/>
+                            </button>
+                        </div>
+                        <field name="has_red_flags" invisible="1"/>
+                        <field name="is_duplicate" invisible="1"/>
+                        <widget name="web_ribbon" title="Red Flags" bg_color="bg-danger" invisible="not has_red_flags"/>
+                        <widget name="web_ribbon" title="Duplicate" bg_color="bg-warning" invisible="not is_duplicate"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="full_name" placeholder="Candidate Name"/>
+                            </h1>
+                            <h3>
+                                <field name="email" widget="email" placeholder="email@example.com"/>
+                            </h3>
+                        </div>
+                        <group>
+                            <group string="Personal Information">
+                                <field name="phone" widget="phone"/>
+                                <field name="location"/>
+                                <field name="submission_date" readonly="1"/>
+                                <field name="access_token" readonly="1" groups="base.group_no_one"/>
+                            </group>
+                            <group string="Experience">
+                                <field name="odoo_experience"/>
+                                <field name="sales_experience"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Scores">
+                                <field name="overall_score" widget="progressbar"/>
+                                <field name="technical_score" widget="progressbar"/>
+                                <field name="sales_score" widget="progressbar"/>
+                                <field name="communication_score" widget="progressbar"/>
+                                <field name="learning_score" widget="progressbar"/>
+                                <field name="cultural_fit_score" widget="progressbar"/>
+                            </group>
+                            <group string="Ranking">
+                                <field name="overall_rank"/>
+                                <field name="percentile" widget="percentage"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Assessment Responses" name="responses">
+                                <group>
+                                    <field name="response_id" invisible="1"/>
+                                </group>
+                                <field name="response_id" mode="form" context="{'default_candidate_id': id}" invisible="not response_id">
+                                    <form string="Responses">
+                                        <group>
+                                            <group>
+                                                <field name="submission_date" readonly="1"/>
+                                                <field name="total_time_spent" widget="integer" readonly="1"/>
+                                                <field name="total_characters" readonly="1"/>
+                                                <field name="average_answer_length" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="has_short_answers" readonly="1"/>
+                                                <field name="has_copy_paste_patterns" readonly="1"/>
+                                            </group>
+                                        </group>
+                                        <notebook>
+                                            <page string="Question 1" name="q1">
+                                                <field name="q1_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q1_char_count" readonly="1"/>
+                                                    <field name="q1_time_spent" readonly="1"/>
+                                                    <field name="q1_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 2" name="q2">
+                                                <field name="q2_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q2_char_count" readonly="1"/>
+                                                    <field name="q2_time_spent" readonly="1"/>
+                                                    <field name="q2_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 3" name="q3">
+                                                <field name="q3_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q3_char_count" readonly="1"/>
+                                                    <field name="q3_time_spent" readonly="1"/>
+                                                    <field name="q3_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 4" name="q4">
+                                                <field name="q4_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q4_char_count" readonly="1"/>
+                                                    <field name="q4_time_spent" readonly="1"/>
+                                                    <field name="q4_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 5" name="q5">
+                                                <field name="q5_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q5_char_count" readonly="1"/>
+                                                    <field name="q5_time_spent" readonly="1"/>
+                                                    <field name="q5_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 6" name="q6">
+                                                <field name="q6_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q6_char_count" readonly="1"/>
+                                                    <field name="q6_time_spent" readonly="1"/>
+                                                    <field name="q6_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 7" name="q7">
+                                                <field name="q7_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q7_char_count" readonly="1"/>
+                                                    <field name="q7_time_spent" readonly="1"/>
+                                                    <field name="q7_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 8" name="q8">
+                                                <field name="q8_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q8_char_count" readonly="1"/>
+                                                    <field name="q8_time_spent" readonly="1"/>
+                                                    <field name="q8_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 9" name="q9">
+                                                <field name="q9_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q9_char_count" readonly="1"/>
+                                                    <field name="q9_time_spent" readonly="1"/>
+                                                    <field name="q9_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                            <page string="Question 10" name="q10">
+                                                <field name="q10_answer" widget="text"/>
+                                                <group col="4">
+                                                    <field name="q10_char_count" readonly="1"/>
+                                                    <field name="q10_time_spent" readonly="1"/>
+                                                    <field name="q10_score" widget="progressbar" readonly="1"/>
+                                                </group>
+                                            </page>
+                                        </notebook>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="AI Analysis" name="ai_analysis">
+                                <group>
+                                    <field name="ai_score_id" invisible="1"/>
+                                </group>
+                                <field name="ai_score_id" mode="form" invisible="not ai_score_id">
+                                    <form string="AI Analysis">
+                                        <group>
+                                            <group string="Scores">
+                                                <field name="overall_score" widget="progressbar"/>
+                                                <field name="technical_score" widget="progressbar"/>
+                                                <field name="sales_score" widget="progressbar"/>
+                                                <field name="communication_score" widget="progressbar"/>
+                                                <field name="learning_score" widget="progressbar"/>
+                                                <field name="cultural_fit_score" widget="progressbar"/>
+                                            </group>
+                                            <group string="AI Details">
+                                                <field name="ai_confidence_score" widget="progressbar"/>
+                                                <field name="ai_recommendation" widget="badge"/>
+                                                <field name="ai_model_version"/>
+                                                <field name="processing_time_ms"/>
+                                                <field name="scoring_date" readonly="1"/>
+                                            </group>
+                                        </group>
+                                        <group string="Analysis">
+                                            <field name="identified_strengths" widget="text" colspan="2"/>
+                                            <field name="skill_gaps" widget="text" colspan="2"/>
+                                            <field name="red_flags_detail" widget="text" colspan="2"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Human Review" name="human_review">
+                                <group>
+                                    <field name="human_review_id" invisible="1"/>
+                                </group>
+                                <field name="human_review_id" mode="form" context="{'default_candidate_id': id}" invisible="not human_review_id">
+                                    <form string="Human Review">
+                                        <group>
+                                            <group string="Reviewer Scores">
+                                                <field name="technical_score"/>
+                                                <field name="sales_score"/>
+                                                <field name="communication_score"/>
+                                                <field name="learning_score"/>
+                                                <field name="cultural_fit_score"/>
+                                                <field name="overall_score" widget="progressbar" readonly="1"/>
+                                            </group>
+                                            <group string="Review Details">
+                                                <field name="reviewer_id" readonly="1"/>
+                                                <field name="review_date" readonly="1"/>
+                                                <field name="recommendation" required="1"/>
+                                                <field name="ai_score_before" readonly="1"/>
+                                                <field name="score_difference" readonly="1"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="reviewer_notes" widget="text" colspan="2" placeholder="General notes about the candidate..."/>
+                                            <field name="strengths" widget="text" colspan="2" placeholder="Key strengths observed..."/>
+                                            <field name="concerns" widget="text" colspan="2" placeholder="Areas of concern or red flags..."/>
+                                            <field name="score_change_reason" widget="text" colspan="2" placeholder="Explain why you adjusted the AI score..."/>
+                                        </group>
+                                    </form>
+                                </field>
+                                <div invisible="human_review_id">
+                                    <p class="text-muted">No human review yet. Click "Request Human Review" button in the header to create one.</p>
+                                </div>
+                            </page>
+                            <page string="Notes" name="notes">
+                                <field name="internal_notes" widget="text" placeholder="Internal notes (not visible to candidate)..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Candidate Search View -->
+        <record id="view_assessment_candidate_search" model="ir.ui.view">
+            <field name="name">assessment.candidate.search</field>
+            <field name="model">assessment.candidate</field>
+            <field name="arch" type="xml">
+                <search string="Search Candidates">
+                    <field name="full_name" filter_domain="[('full_name', 'ilike', self)]"/>
+                    <field name="email" filter_domain="[('email', 'ilike', self)]"/>
+                    <field name="phone" filter_domain="[('phone', 'ilike', self)]"/>
+                    <field name="location"/>
+                    <separator/>
+                    <filter name="pending" string="Pending" domain="[('status', '=', 'submitted')]"/>
+                    <filter name="ai_scored" string="AI Scored" domain="[('status', '=', 'ai_scored')]"/>
+                    <filter name="under_review" string="Under Review" domain="[('status', '=', 'under_review')]"/>
+                    <filter name="reviewed" string="Reviewed" domain="[('status', '=', 'reviewed')]"/>
+                    <filter name="shortlisted" string="Shortlisted" domain="[('status', '=', 'shortlisted')]"/>
+                    <separator/>
+                    <filter name="red_flags" string="Has Red Flags" domain="[('has_red_flags', '=', True)]"/>
+                    <filter name="duplicates" string="Possible Duplicates" domain="[('is_duplicate', '=', True)]"/>
+                    <filter name="high_score" string="High Score (80+)" domain="[('overall_score', '&gt;=', 80)]"/>
+                    <separator/>
+                    <filter name="this_week" string="This Week" domain="[('submission_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                    <filter name="this_month" string="This Month" domain="[('submission_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                        <filter name="group_experience" string="Odoo Experience" context="{'group_by': 'odoo_experience'}"/>
+                        <filter name="group_submission_date" string="Submission Date" context="{'group_by': 'submission_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Candidate Kanban View -->
+        <record id="view_assessment_candidate_kanban" model="ir.ui.view">
+            <field name="name">assessment.candidate.kanban</field>
+            <field name="model">assessment.candidate</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="status" quick_create="false">
+                    <field name="id"/>
+                    <field name="full_name"/>
+                    <field name="email"/>
+                    <field name="overall_score"/>
+                    <field name="overall_rank"/>
+                    <field name="status"/>
+                    <field name="has_red_flags"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title"><field name="full_name"/></strong>
+                                        <small class="o_kanban_record_subtitle"><field name="email"/></small>
+                                    </div>
+                                    <span class="float-end badge badge-pill" t-if="record.has_red_flags.raw_value" t-attf-class="badge-danger">⚠ Red Flag</span>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <strong>Score:</strong> <field name="overall_score"/> / 100
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>Rank:</strong> #<field name="overall_rank"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="submission_date" widget="date"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Candidate Action -->
+        <record id="action_assessment_candidate" model="ir.actions.act_window">
+            <field name="name">Candidates</field>
+            <field name="res_model">assessment.candidate</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_pending': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No assessment submissions yet
+                </p>
+                <p>
+                    Candidates will appear here after they submit their assessments via the portal.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

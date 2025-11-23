@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Email Template: Assessment Invitation -->
+        <record id="mail_template_assessment_invitation" model="mail.template">
+            <field name="name">Assessment: Invitation to Candidate</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="subject">You're Invited: Scholarix Global AI Consultant Assessment</field>
+            <field name="email_from">noreply@scholarixglobal.com</field>
+            <field name="email_to">${object.email}</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f4f4f4;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f4f4;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="650" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+                    <!-- Header with Gradient -->
+                    <tr>
+                        <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:50px 40px;text-align:center;">
+                            <h1 style="color:#ffffff;margin:0;font-size:36px;font-weight:bold;letter-spacing:1px;">SCHOLARIX GLOBAL</h1>
+                            <p style="color:#ffffff;margin:15px 0 0;font-size:18px;opacity:0.95;">AI Consultant Assessment</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding:50px 40px;">
+                            <h2 style="color:#333;margin:0 0 20px;font-size:28px;font-weight:600;">Dear ${object.full_name or 'Candidate'},</h2>
+                            
+                            <p style="color:#555;line-height:1.8;margin:0 0 20px;font-size:16px;">
+                                We are excited to invite you to complete the <strong>Scholarix Global AI Consultant Assessment</strong>. 
+                                This comprehensive evaluation will help us understand your expertise in Odoo, sales capabilities, 
+                                and communication skills.
+                            </p>
+                            
+                            <!-- Info Box -->
+                            <div style="background:#f8f9ff;border-left:5px solid #667eea;padding:25px;margin:30px 0;border-radius:5px;">
+                                <h3 style="margin:0 0 15px;color:#333;font-size:20px;font-weight:600;">Assessment Details:</h3>
+                                <ul style="color:#555;line-height:1.8;margin:0;padding-left:20px;">
+                                    <li><strong>Duration:</strong> Approximately 30-45 minutes</li>
+                                    <li><strong>Format:</strong> Multiple detailed questions</li>
+                                    <li><strong>Evaluation:</strong> AI-powered analysis + Human review</li>
+                                    <li><strong>Minimum:</strong> 50 characters per answer (thoughtful responses)</li>
+                                </ul>
+                            </div>
+                            
+                            <p style="color:#555;line-height:1.8;margin:20px 0;font-size:16px;">
+                                <strong>What We're Looking For:</strong><br/>
+                                ✓ Deep understanding of Odoo ERP systems<br/>
+                                ✓ Proven sales and client engagement experience<br/>
+                                ✓ Excellent written and verbal communication<br/>
+                                ✓ Problem-solving and analytical thinking
+                            </p>
+                            
+                            <!-- CTA Button -->
+                            <div style="text-align:center;margin:40px 0;">
+                                <a href="https://scholarixglobal.com/assessment" 
+                                   style="display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#ffffff;padding:18px 50px;text-decoration:none;border-radius:50px;font-weight:bold;font-size:18px;box-shadow:0 4px 15px rgba(102,126,234,0.4);transition:all 0.3s;">
+                                    Start Your Assessment →
+                                </a>
+                            </div>
+                            
+                            <!-- Important Notes -->
+                            <div style="background:#fff9e6;border:2px solid #ffc107;padding:20px;margin:30px 0;border-radius:8px;">
+                                <p style="margin:0;color:#856404;font-weight:600;font-size:15px;">
+                                    ⚠️ <strong>Important:</strong> Please complete the assessment within 7 days. 
+                                    Take your time to provide thoughtful, detailed answers. Your responses will be 
+                                    evaluated by our advanced AI system and reviewed by our HR team.
+                                </p>
+                            </div>
+                            
+                            <p style="color:#555;line-height:1.8;margin:20px 0 0;font-size:16px;">
+                                We look forward to learning more about your qualifications and expertise. 
+                                If you have any questions, feel free to reach out to us.
+                            </p>
+                            
+                            <p style="color:#555;line-height:1.8;margin:30px 0 0;font-size:16px;">
+                                Best regards,<br/>
+                                <strong style="color:#333;">Scholarix Global Recruitment Team</strong><br/>
+                                <a href="https://scholarixglobal.com" style="color:#667eea;text-decoration:none;">scholarixglobal.com</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background:#f8f9fa;padding:30px 40px;border-top:1px solid #e9ecef;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="color:#6c757d;font-size:14px;line-height:1.6;">
+                                        <p style="margin:0 0 10px;"><strong style="color:#333;">Scholarix Global AI Consultant</strong></p>
+                                        <p style="margin:0 0 5px;">📧 contact@scholarixglobal.com</p>
+                                        <p style="margin:0 0 5px;">🌐 <a href="https://scholarixglobal.com" style="color:#667eea;text-decoration:none;">scholarixglobal.com</a></p>
+                                        <p style="margin:15px 0 0;font-size:12px;color:#999;">
+                                            This is an automated invitation. Please do not reply to this email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+            </field>
+        </record>
+        
+        <!-- Email Template: Assessment Submission Confirmation -->
+        <record id="mail_template_assessment_confirmation" model="mail.template">
+            <field name="name">Assessment: Submission Confirmation</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="subject">Thank You for Completing the SCHOLARIX Assessment</field>
+            <field name="email_from">noreply@scholarixglobal.com</field>
+            <field name="email_to">${object.email}</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;font-family:Arial,sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f4f4;padding:20px;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background:#ffffff;border-radius:8px;overflow:hidden;">
+                    <tr>
+                        <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px;text-align:center;">
+                            <h1 style="color:#ffffff;margin:0;font-size:32px;font-weight:bold;letter-spacing:1px;">SCHOLARIX GLOBAL</h1>
+                            <p style="color:#ffffff;margin:10px 0 0;font-size:16px;">AI Consultant Assessment</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:40px;">
+                            <h2 style="color:#333;margin:0 0 20px;font-size:24px;">Thank You, ${object.full_name}!</h2>
+                            <p style="color:#666;line-height:1.6;margin:0 0 15px;">
+                                We've successfully received your assessment submission. Our AI system has completed an initial evaluation of your responses.
+                            </p>
+                            
+                            <div style="background:#f8f9fa;border-left:4px solid #667eea;padding:15px;margin:20px 0;">
+                                <h3 style="margin:0 0 10px;color:#333;font-size:18px;">Your AI Scores:</h3>
+                                <p style="margin:5px 0;color:#666;"><strong>Overall Score:</strong> ${object.overall_score:.1f}/100</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Technical:</strong> ${object.technical_score:.1f}/100</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Sales:</strong> ${object.sales_score:.1f}/100</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Communication:</strong> ${object.communication_score:.1f}/100</p>
+                            </div>
+                            
+                            <p style="color:#666;line-height:1.6;margin:15px 0;">
+                                <strong>Next Steps:</strong><br/>
+                                • Your responses will be reviewed by our HR team<br/>
+                                • We'll contact you within 3-5 business days<br/>
+                                • Top candidates will be invited for interviews
+                            </p>
+                            
+                            <div style="text-align:center;margin:30px 0;">
+                                <a href="https://scholarixglobal.com/assessment/view/${object.access_token}" 
+                                   style="display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#ffffff;padding:15px 40px;text-decoration:none;border-radius:50px;font-weight:bold;box-shadow:0 4px 15px rgba(102,126,234,0.4);">
+                                    View Your Assessment →
+                                </a>
+                            </div>
+                            
+                            <p style="color:#555;line-height:1.6;margin:25px 0 0;">
+                                Best regards,<br/>
+                                <strong>Scholarix Global Recruitment Team</strong><br/>
+                                <a href="https://scholarixglobal.com" style="color:#667eea;text-decoration:none;">scholarixglobal.com</a>
+                            </p>
+                            
+                            <p style="color:#999;font-size:12px;margin:20px 0 0;border-top:1px solid #eee;padding-top:20px;">
+                                Questions? Contact us at contact@scholarixglobal.com
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+            </field>
+        </record>
+
+        <!-- Email Template: Score Change Notification to Admin -->
+        <record id="mail_template_score_change_notification" model="mail.template">
+            <field name="name">Assessment: Score Change Notification</field>
+            <field name="model_id" ref="model_assessment_human_review"/>
+            <field name="subject">Significant Score Adjustment Alert - ${object.candidate_id.full_name}</field>
+            <field name="email_from">${object.company_id.email or user.email_formatted}</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;font-family:Arial,sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f4f4;padding:20px;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background:#ffffff;border-radius:8px;overflow:hidden;">
+                    <tr>
+                        <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px;text-align:center;">
+                            <h1 style="color:#ffffff;margin:0;font-size:28px;">⚠️ Score Adjustment Alert</h1>
+                            <p style="color:#ffffff;margin:10px 0 0;font-size:16px;">SCHOLARIX Assessment System</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:40px;">
+                            <h2 style="color:#333;margin:0 0 20px;font-size:24px;">Significant Score Change Detected</h2>
+                            <p style="color:#666;line-height:1.6;margin:0 0 15px;">
+                                A human review has resulted in a significant score adjustment (>10 points) for the following candidate:
+                            </p>
+
+                            <div style="background:#f8f9fa;border-left:4px solid #dc3545;padding:15px;margin:20px 0;">
+                                <h3 style="margin:0 0 10px;color:#333;font-size:18px;">Candidate Information:</h3>
+                                <p style="margin:5px 0;color:#666;"><strong>Name:</strong> ${object.candidate_id.full_name}</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Email:</strong> ${object.candidate_id.email}</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Phone:</strong> ${object.candidate_id.phone or 'N/A'}</p>
+                            </div>
+
+                            <div style="background:#fff3cd;border-left:4px solid #ffc107;padding:15px;margin:20px 0;">
+                                <h3 style="margin:0 0 10px;color:#333;font-size:18px;">Score Comparison:</h3>
+                                <p style="margin:5px 0;color:#666;"><strong>AI Score:</strong> ${object.ai_score_before:.1f}/100</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Human Review Score:</strong> ${object.overall_score:.1f}/100</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Score Difference:</strong>
+                                    <span style="color:${'#28a745' if object.score_difference > 0 else '#dc3545'};font-weight:bold;">
+                                        ${'+' if object.score_difference > 0 else ''}${object.score_difference:.1f}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div style="background:#d1ecf1;border-left:4px solid #0c5460;padding:15px;margin:20px 0;">
+                                <h3 style="margin:0 0 10px;color:#333;font-size:18px;">Review Details:</h3>
+                                <p style="margin:5px 0;color:#666;"><strong>Reviewer:</strong> ${object.reviewer_id.name}</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Review Date:</strong> ${format_datetime(object.review_date, dt_format='medium', tz=user.tz or 'UTC')}</p>
+                                <p style="margin:5px 0;color:#666;"><strong>Recommendation:</strong> ${dict(object._fields['recommendation'].selection).get(object.recommendation, object.recommendation)}</p>
+                                % if object.score_change_reason:
+                                <p style="margin:10px 0 0;color:#666;"><strong>Reason for Adjustment:</strong><br/>
+                                    <span style="font-style:italic;">${object.score_change_reason}</span>
+                                </p>
+                                % endif
+                            </div>
+
+                            <div style="text-align:center;margin:30px 0;">
+                                <a href="${ctx['base_url']}/web#id=${object.candidate_id.id}&amp;model=assessment.candidate&amp;view_type=form"
+                                   style="display:inline-block;background:#667eea;color:#ffffff;padding:15px 30px;text-decoration:none;border-radius:5px;font-weight:bold;">
+                                    View Candidate Details
+                                </a>
+                            </div>
+
+                            <p style="color:#999;font-size:12px;margin:20px 0 0;border-top:1px solid #eee;padding-top:20px;">
+                                This is an automated notification from the SCHOLARIX Assessment System.<br/>
+                                You are receiving this because you are an Assessment Manager.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

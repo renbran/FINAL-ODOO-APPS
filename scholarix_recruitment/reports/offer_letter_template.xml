@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Definition -->
+    <record id="action_report_offer_letter" model="ir.actions.report">
+        <field name="name">Offer Letter</field>
+        <field name="model">hr.applicant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">scholarix_recruitment.report_offer_letter_document</field>
+        <field name="report_file">scholarix_recruitment.report_offer_letter_document</field>
+        <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- Offer Letter Template -->
+    <template id="report_offer_letter_document">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="padding: 45px 35px 25px 35px; font-family: 'Helvetica', 'Arial', sans-serif;">
+
+                    <!-- SCHOLARIX LETTERHEAD -->
+                    <div style="text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 3px solid #0c1e34;">
+                        <div style="margin-bottom: 12px;">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" alt="Scholarix Global" style="height: 65px; max-width: 220px;"/>
+                        </div>
+                        <h1 style="color: #0c1e34; font-weight: 700; margin: 0 0 8px 0; font-size: 28px; letter-spacing: 1.5px;">
+                            SCHOLARIX GLOBAL
+                        </h1>
+                        <p style="color: #1e3a8a; margin: 0 0 12px 0; font-size: 13px; font-style: italic;">
+                            Where Ancient Wisdom Meets Artificial Intelligence
+                        </p>
+                        <p style="color: #6b7280; margin: 0; font-size: 11px;">
+                            Dubai, United Arab Emirates | 
+                            <span t-if="o.company_id.email" t-out="o.company_id.email"/>
+                            <span t-else="">careers@scholarixglobal.com</span> | 
+                            <span t-if="o.company_id.website" t-out="o.company_id.website"/>
+                            <span t-else="">www.scholarixglobal.com</span>
+                        </p>
+                    </div>
+
+                    <!-- DOCUMENT METADATA -->
+                    <div style="margin: 20px 0 25px 0;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top;">
+                                    <p style="margin: 0; font-size: 11px; color: #6b7280;">
+                                        <strong>Reference:</strong>
+                                        <span t-out="o.offer_letter_reference"/>
+                                    </p>
+                                </td>
+                                <td style="width: 50%; text-align: right; vertical-align: top;">
+                                    <p style="margin: 0; font-size: 11px; color: #6b7280;">
+                                        <strong>Date:</strong>
+                                        <span t-out="o.offer_letter_date" t-options='{"widget": "date"}'/>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- LETTER BODY -->
+                    <div style="font-size: 13px; line-height: 1.8; color: #374151;">
+
+                        <p style="margin: 8px 0 20px 0; font-size: 13px;">Dear <strong t-out="o.partner_name"/>
+,</p>
+
+                        <p style="margin: 0 0 22px 0; font-size: 13px;">
+                            We are pleased to offer you the position of <strong t-out="o.position_title"/>
+ 
+                            with <strong>Scholarix Global</strong> (hereinafter referred to as "the Company"), 
+                            subject to the terms and conditions outlined in this offer letter.
+                    </p>
+
+                    <!-- EMPLOYMENT DETAILS -->
+                    <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            1. EMPLOYMENT DETAILS
+                    </h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; page-break-inside: avoid;">
+                        <tr>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; width: 38%; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Position Title:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <strong t-out="o.position_title"/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.department_id">
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Department:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <span t-out="o.department_id.name"/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.reporting_manager">
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Reports To:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <span t-out="o.reporting_manager.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Work Location:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <span t-out="o.work_location"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Employment Type:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <span t-if="o.employment_type == 'unlimited'">Unlimited Contract</span>
+                                <span t-if="o.employment_type == 'limited'">Limited Contract (<span t-out="o.contract_duration_months"/>
+ months)</span>
+                                <span t-if="o.employment_type == 'part_time'">Part-Time</span>
+                                <span t-if="o.employment_type == 'consultant'">Consultant/Freelance</span>
+                            </td>
+                        </tr>
+                        <tr t-if="o.proposed_start_date">
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Start Date:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <strong>
+                                    <span t-out="o.proposed_start_date" t-options='{"widget": "date"}'/>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 13px; font-weight: 600; color: #0c1e34; vertical-align: top;">
+                                    Probation Period:
+                            </td>
+                            <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151; vertical-align: top;">
+                                <span t-out="o.probation_period_days"/>
+ days (as per UAE Labour Law)
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- COMPENSATION -->
+                    <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            2. COMPENSATION &amp; REMUNERATION
+                    </h3>
+                    <p style="margin: 0 0 15px 0; font-size: 13px;">Your monthly compensation package will be as follows:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; page-break-inside: avoid;">
+                        <thead>
+                            <tr style="background: #0c1e34; color: white;">
+                                <th style="padding: 14px 15px; text-align: left; font-size: 14px; font-weight: 600; border: 1px solid #0c1e34;">Component</th>
+                                <th style="padding: 14px 15px; text-align: right; font-size: 14px; font-weight: 600; border: 1px solid #0c1e34;">Monthly (AED)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151;">Basic Salary</td>
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; text-align: right; font-size: 13px; color: #374151;">
+                                    <span t-out="o.basic_salary" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr t-if="o.housing_allowance &gt; 0">
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151;">Housing Allowance</td>
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; text-align: right; font-size: 13px; color: #374151;">
+                                    <span t-out="o.housing_allowance" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr t-if="o.transport_allowance &gt; 0">
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151;">Transport Allowance</td>
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; text-align: right; font-size: 13px; color: #374151;">
+                                    <span t-out="o.transport_allowance" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr t-if="o.other_allowances &gt; 0">
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; font-size: 13px; color: #374151;">Other Allowances</td>
+                                <td style="padding: 12px 15px; border: 1px solid #d1d5db; text-align: right; font-size: 13px; color: #374151;">
+                                    <span t-out="o.other_allowances" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr style="background: #e8f4fd;">
+                                <td style="padding: 14px 15px; border: 1px solid #4fc3f7; font-size: 14px; font-weight: 700; color: #0c1e34;">
+                                        Total Monthly Salary
+                                </td>
+                                <td style="padding: 14px 15px; border: 1px solid #4fc3f7; text-align: right; font-size: 14px; font-weight: 700; color: #0c1e34;">
+                                    <span t-out="o.total_monthly_salary" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr style="background: #1e3a8a; color: white;">
+                                <td style="padding: 14px 15px; border: 1px solid #1e3a8a; font-size: 15px; font-weight: 700;">
+                                        Total Annual Salary
+                                </td>
+                                <td style="padding: 14px 15px; border: 1px solid #1e3a8a; text-align: right; font-size: 15px; font-weight: 700;">
+                                    <span t-out="o.annual_salary" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin: 0 0 25px 0; font-size: 11px; color: #6b7280; font-style: italic;">
+                            Salary will be paid monthly via bank transfer by the last working day of each month.
+                    </p>
+
+                    <!-- BENEFITS -->
+                    <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            3. BENEFITS &amp; ENTITLEMENTS
+                    </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 25px 0;">
+                        <li style="margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                            <span style="position: absolute; left: 0; color: #4fc3f7; font-weight: 700; font-size: 18px;">●</span>
+                            <strong>Annual Leave:</strong>
+                            <span t-out="o.annual_leave_days"/>
+ days per year (in accordance with UAE Labour Law)
+                        </li>
+                        <li t-if="o.visa_provided" style="margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                            <span style="position: absolute; left: 0; color: #4fc3f7; font-weight: 700; font-size: 18px;">●</span>
+                            <strong>Employment Visa:</strong> Fully sponsored by the Company, including Emirates ID processing
+                        </li>
+                        <li style="margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                            <span style="position: absolute; left: 0; color: #4fc3f7; font-weight: 700; font-size: 18px;">●</span>
+                            <strong>Health Insurance:</strong>
+                            <span t-if="o.health_insurance == 'basic'">Basic medical coverage as per UAE regulations</span>
+                            <span t-if="o.health_insurance == 'enhanced'">Enhanced medical coverage including dental and optical</span>
+                            <span t-if="o.health_insurance == 'premium'">Premium medical coverage with family extension</span>
+                        </li>
+                        <li t-if="o.flight_tickets != 'none'" style="margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                            <span style="position: absolute; left: 0; color: #4fc3f7; font-weight: 700; font-size: 18px;">●</span>
+                            <strong>Flight Tickets:</strong>
+                            <span t-if="o.flight_tickets == 'annual'">Annual return economy class ticket to home country</span>
+                            <span t-if="o.flight_tickets == 'biannual'">Bi-annual return economy class tickets to home country</span>
+                        </li>
+                        <li t-if="o.additional_benefits" style="margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                            <span style="position: absolute; left: 0; color: #4fc3f7; font-weight: 700; font-size: 18px;">●</span>
+                            <strong>Additional Benefits:</strong>
+                            <span t-out="o.additional_benefits"/>
+                        </li>
+                    </ul>
+
+                    <!-- WORKING HOURS -->
+                    <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            4. WORKING HOURS
+                    </h3>
+                    <p style="margin: 0 0 25px 0; font-size: 13px;">
+                            Your standard working hours will be <strong>9:00 AM to 6:00 PM</strong>, Sunday to Thursday, 
+                            with one hour for lunch break. The Company operates a 5-day working week with Friday and 
+                            Saturday as weekly rest days, in accordance with UAE regulations.
+                    </p>
+
+                    <!-- NOTICE PERIOD -->
+                    <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            5. NOTICE PERIOD &amp; TERMINATION
+                    </h3>
+                    <p style="margin: 0 0 25px 0; font-size: 13px;">
+                            Either party may terminate this employment by providing <strong>
+                        <span t-out="o.notice_period_days"/>
+ days</strong> 
+                            written notice. During the probation period, either party may terminate employment with 
+                    <strong>14 days</strong> notice or as per UAE Labour Law provisions.
+                </p>
+
+                <!-- CONFIDENTIALITY -->
+                <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 32px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            6. CONFIDENTIALITY &amp; NON-DISCLOSURE
+                </h3>
+                <p style="margin: 0 0 25px 0; font-size: 13px;">
+                            You will be required to sign a separate Confidentiality and Non-Disclosure Agreement (NDA) 
+                            protecting the Company's proprietary information, trade secrets, client data, and intellectual 
+                            property throughout and beyond your employment term.
+                </p>
+
+                <!-- ACCEPTANCE -->
+                <h3 style="color: #0c1e34; font-size: 16px; font-weight: 700; margin: 38px 0 15px 0; border-bottom: 2px solid #4fc3f7; padding-bottom: 6px; page-break-after: avoid;">
+                            7. OFFER ACCEPTANCE
+                </h3>
+                <p t-if="o.offer_valid_until" style="margin: 0 0 15px 0; font-size: 13px;">
+                            This offer is valid until <strong>
+                    <span t-out="o.offer_valid_until" t-options='{"widget": "date"}'/>
+                </strong>. 
+                            To accept this offer, please sign and return this letter along with the following documents:
+            </p>
+            <ul style="list-style: none; padding: 0; margin: 0 0 25px 0;">
+                <li style="margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                    <span style="position: absolute; left: 0; color: #1e3a8a; font-weight: 700;">✓</span>
+                                Copy of valid passport (all pages)
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                    <span style="position: absolute; left: 0; color: #1e3a8a; font-weight: 700;">✓</span>
+                                Copy of Emirates ID (if applicable)
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                    <span style="position: absolute; left: 0; color: #1e3a8a; font-weight: 700;">✓</span>
+                                Educational certificates and transcripts
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                    <span style="position: absolute; left: 0; color: #1e3a8a; font-weight: 700;">✓</span>
+                                Previous employment certificates and experience letters
+                </li>
+                <li style="margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 12.5px; line-height: 1.7;">
+                    <span style="position: absolute; left: 0; color: #1e3a8a; font-weight: 700;">✓</span>
+                                Recent passport-size photographs (2 copies)
+                </li>
+            </ul>
+
+            <!-- CLOSING -->
+            <p style="margin: 25px 0 18px 0; font-size: 13px;">
+                            We are excited about the prospect of you joining the Scholarix Global team and look forward 
+                            to your valuable contributions to our mission of delivering intelligent, transformative 
+                            AI-powered solutions.
+            </p>
+
+            <p style="margin: 0 0 22px 0; font-size: 13px;">
+                            Should you have any questions regarding this offer, please do not hesitate to contact us.
+            </p>
+
+            <p style="margin: 0 0 30px 0; color: #0c1e34; font-weight: 700; font-size: 14px;">
+                            Navigate. Innovate. Transform.
+            </p>
+
+        </div>
+
+        <!-- SIGNATURE SECTION -->
+        <div style="margin-top: 40px; page-break-inside: avoid;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 48%; vertical-align: top; padding: 0;">
+                        <div style="padding: 18px; border: 1px solid #d1d5db; background: #f9fafb;">
+                            <p style="margin: 0 0 45px 0; font-size: 12px; color: #0c1e34; font-weight: 700;">
+                                            For Scholarix Global:
+                            </p>
+                            <div style="border-top: 1.5px solid #0c1e34; padding-top: 10px; margin-top: 20px;">
+                                <p style="margin: 0; font-size: 12px; color: #0c1e34; line-height: 1.7;">
+                                    <strong>[Authorized Signatory]</strong>
+                                    <br/>
+                                                Managing Director<br/>
+                                                Date: <span t-out="o.offer_letter_date" t-options='{"widget": "date"}'/>
+                            </p>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 4%;"/>
+                <td style="width: 48%; vertical-align: top; padding: 0;">
+                    <div style="padding: 18px; border: 1px solid #d1d5db; background: #f9fafb;">
+                        <p style="margin: 0 0 45px 0; font-size: 12px; color: #0c1e34; font-weight: 700;">
+                                            Candidate Acceptance:
+                        </p>
+                        <div style="border-top: 1.5px solid #0c1e34; padding-top: 10px; margin-top: 20px;">
+                            <p style="margin: 0; font-size: 12px; color: #0c1e34; line-height: 1.7;">
+                                <strong t-out="o.partner_name"/>
+                                <br/>
+                                                Signature: ______________________<br/>
+                                                Date: ______________________
+                            </p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <div style="margin-top: 35px; padding: 18px 0 0 0; border-top: 2px solid #e8f4fd; text-align: center; page-break-inside: avoid;">
+        <p style="margin: 0 0 6px 0; font-size: 10px; color: #6b7280; line-height: 1.5;">
+                            This offer letter constitutes the entire agreement between you and Scholarix Global regarding your employment.<br/>
+                            It supersedes all prior discussions, agreements, or understandings of any kind.
+        </p>
+        <p style="margin: 6px 0 0 0; font-size: 10px; color: #1e3a8a; font-weight: 600;">
+                            Scholarix Global • Dubai, UAE • careers@scholarixglobal.com • www.scholarixglobal.com
+        </p>
+    </div>
+
+</div>
+</t>
+</t>
+</template>
+
+</odoo>

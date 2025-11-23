@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcement Banner - OSUSAPPS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #001f3f 0%, #17a2b8 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 31, 63, 0.3);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 22px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .branding {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #FFD700;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section h2 {
+            color: #001f3f;
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            border-bottom: 3px solid #17a2b8;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #17a2b8;
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f0f8f9 0%, #e0f2f1 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.2);
+        }
+
+        .feature-card h4 {
+            color: #001f3f;
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .screenshot {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            margin: 25px 0;
+            border: 3px solid #e0f2f1;
+        }
+
+        .tech-specs {
+            background: #001f3f;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .tech-specs h4 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .tech-specs ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tech-specs li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .tech-specs li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #17a2b8;
+            font-weight: bold;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #17a2b8 0%, #0e7490 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #FFD700;
+            color: #001f3f;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .footer a {
+            color: #17a2b8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .badge.new {
+            background: #FFD700;
+            color: #001f3f;
+        }
+
+        .badge.pro {
+            background: #001f3f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📢 Announcement Banner</h1>
+            <p class="subtitle">Professional Popup Announcement System for Odoo 17</p>
+            <div class="branding">by OSUSAPPS</div>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="section">
+            <h2>Overview</h2>
+            <p style="font-size: 18px; line-height: 1.8; color: #4a5568;">
+                The <strong>Announcement Banner</strong> module is a professional, production-ready solution for displaying
+                important announcements to your Odoo users. With elegant popup banners, rich HTML content support, and
+                advanced scheduling features, you can ensure your team never misses critical updates.
+            </p>
+
+            <div style="margin-top: 20px;">
+                <span class="badge new">NEW</span>
+                <span class="badge">Production Ready</span>
+                <span class="badge pro">Odoo 17</span>
+                <span class="badge">Mobile Responsive</span>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2>✨ Key Features</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <span class="feature-icon">📢</span>
+                    <h4>Elegant Popup Banners</h4>
+                    <p>Beautiful, attention-grabbing popup announcements that appear when users log in to Odoo</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🎨</span>
+                    <h4>Rich HTML Content</h4>
+                    <p>Full support for formatted text, images, links, lists, and custom styling with WYSIWYG editor</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📅</span>
+                    <h4>Smart Scheduling</h4>
+                    <p>Set start and end dates for time-sensitive announcements with automatic activation</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">👥</span>
+                    <h4>User Targeting</h4>
+                    <p>Show announcements to all users or target specific individuals or groups</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🔔</span>
+                    <h4>Show Once Option</h4>
+                    <p>Choose whether users see announcements once or every time they log in</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h4>Priority System</h4>
+                    <p>Control display order with priority levels for multiple announcements</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h4>View Tracking</h4>
+                    <p>Track how many times announcements have been shown and to whom</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h4>Mobile Responsive</h4>
+                    <p>Perfectly optimized for all devices with elegant animations and transitions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="section">
+            <h2>🎯 Perfect For</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>System Maintenance</strong><br>
+                    <span style="color: #6c757d;">Notify users of scheduled downtime</span>
+                </div>
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>Feature Launches</strong><br>
+                    <span style="color: #6c757d;">Announce new features and updates</span>
+                </div>
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>Policy Updates</strong><br>
+                    <span style="color: #6c757d;">Communicate policy changes</span>
+                </div>
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>Emergency Alerts</strong><br>
+                    <span style="color: #6c757d;">Send urgent notifications</span>
+                </div>
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>Holiday Schedules</strong><br>
+                    <span style="color: #6c757d;">Share company calendar updates</span>
+                </div>
+                <div style="background: #f0f8f9; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <strong>Training Reminders</strong><br>
+                    <span style="color: #6c757d;">Remind staff of training sessions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Specifications -->
+        <div class="section">
+            <h2>🔧 Technical Specifications</h2>
+            <div class="tech-specs">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                    <div>
+                        <h4>Requirements</h4>
+                        <ul>
+                            <li>Odoo 17.0 (Community or Enterprise)</li>
+                            <li>Python 3.10+</li>
+                            <li>OWL Framework (included in Odoo 17)</li>
+                            <li>Modern web browser</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Dependencies</h4>
+                        <ul>
+                            <li>base (Odoo core)</li>
+                            <li>web (Odoo web client)</li>
+                            <li>No external dependencies</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Features</h4>
+                        <ul>
+                            <li>Production-ready code</li>
+                            <li>Optimized performance</li>
+                            <li>Security hardened</li>
+                            <li>Full test coverage</li>
+                            <li>Professional branding</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What's New -->
+        <div class="section">
+            <h2>🚀 What's New in Version 1.1.0</h2>
+            <div style="background: linear-gradient(135deg, #e0f2f1 0%, #f0f8f9 100%); padding: 30px; border-radius: 10px; margin-top: 20px;">
+                <h3 style="color: #001f3f; margin-top: 0;">Production Ready Release</h3>
+                <ul style="color: #4a5568; font-size: 16px; line-height: 2;">
+                    <li><strong>FIXED:</strong> Text rendering with proper word-break behavior - no more awkward text breaks</li>
+                    <li><strong>ENHANCED:</strong> Image display with responsive styling and proper borders</li>
+                    <li><strong>IMPROVED:</strong> Footer branding with OSUSAPPS attribution</li>
+                    <li><strong>OPTIMIZED:</strong> CSS for better readability and professional appearance</li>
+                    <li><strong>ADDED:</strong> Professional module icon and branding</li>
+                    <li><strong>SECURITY:</strong> Enhanced access controls and data validation</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Installation -->
+        <div class="section">
+            <h2>📦 Installation</h2>
+            <h3>Quick Install</h3>
+            <ol style="font-size: 16px; line-height: 2; color: #4a5568;">
+                <li>Download and extract the module to your Odoo addons directory</li>
+                <li>Restart your Odoo server</li>
+                <li>Go to <strong>Apps</strong> menu and click <strong>Update Apps List</strong></li>
+                <li>Search for "Announcement Banner"</li>
+                <li>Click <strong>Install</strong></li>
+            </ol>
+
+            <h3>Configuration</h3>
+            <p style="font-size: 16px; line-height: 1.8; color: #4a5568; margin-top: 15px;">
+                After installation, navigate to <strong>Announcements</strong> menu (visible to System Administrators only).
+                Create your first announcement with a title and message, set scheduling options, and activate it!
+            </p>
+        </div>
+
+        <!-- Support -->
+        <div class="section">
+            <h2>💬 Support & Documentation</h2>
+            <p style="font-size: 16px; line-height: 1.8; color: #4a5568;">
+                Need help? We're here for you! Our team at OSUSAPPS provides comprehensive support for all our modules.
+            </p>
+            <div style="margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="text-align: center; padding: 25px; background: #f0f8f9; border-radius: 10px;">
+                    <h4 style="color: #001f3f; margin-bottom: 10px;">📧 Email Support</h4>
+                    <a href="mailto:support@osusapps.com" style="color: #17a2b8; text-decoration: none; font-weight: 600;">support@osusapps.com</a>
+                </div>
+                <div style="text-align: center; padding: 25px; background: #f0f8f9; border-radius: 10px;">
+                    <h4 style="color: #001f3f; margin-bottom: 10px;">🌐 Website</h4>
+                    <a href="https://www.osusapps.com" style="color: #17a2b8; text-decoration: none; font-weight: 600;">www.osusapps.com</a>
+                </div>
+                <div style="text-align: center; padding: 25px; background: #f0f8f9; border-radius: 10px;">
+                    <h4 style="color: #001f3f; margin-bottom: 10px;">📚 Documentation</h4>
+                    <span style="color: #6c757d;">Comprehensive README included</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="cta-section">
+            <h2>Ready to Enhance Your Communication?</h2>
+            <p style="font-size: 18px; margin: 20px 0;">
+                Install Announcement Banner today and start communicating effectively with your team!
+            </p>
+            <a href="#" class="cta-button">Install Now</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="font-size: 16px; margin-bottom: 10px;">
+                <strong>Announcement Banner - OSUSAPPS</strong>
+            </p>
+            <p>
+                Version 1.1.0 | Odoo 17.0 |
+                <a href="https://www.osusapps.com">www.osusapps.com</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 14px;">
+                © 2025 OSUSAPPS - Enterprise Odoo Solutions. All rights reserved.
+            </p>
+            <p style="margin-top: 10px; font-size: 13px; color: #9ca3af;">
+                Licensed under LGPL-3
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <report 
+            id="action_report_assessment_candidate"
+            model="assessment.candidate"
+            string="Assessment Report"
+            report_type="qweb-pdf"
+            name="scholarix_assessment.report_assessment_candidate_document"
+            file="scholarix_assessment.report_assessment_candidate_document"
+            print_report_name="'Assessment - %s' % object.full_name"
+        />
+
+    </data>
+</odoo>

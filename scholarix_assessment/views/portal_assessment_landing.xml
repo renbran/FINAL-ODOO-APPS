@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Landing Page: Assessment Portal Homepage -->
+    <template id="portal_assessment_landing" name="Assessment Landing Page">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">SCHOLARIX Global AI Consultant Assessment</t>
+            <div class="assessment_landing_wrapper">
+                <!-- Hero Section -->
+                <section class="hero_section">
+                    <div class="container py-5">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <h1 class="display-4 fw-bold mb-4">AI-Powered Consultant Assessment</h1>
+                                <p class="lead mb-4">
+                                    Take our comprehensive assessment to showcase your Odoo expertise, 
+                                    sales capabilities, and communication skills. Get instant AI-powered 
+                                    feedback and join our elite consultant network.
+                                </p>
+                                <div class="d-flex gap-3 mb-4">
+                                    <div class="stat_box">
+                                        <h3 class="text-primary mb-0">45</h3>
+                                        <small class="text-muted">Minutes</small>
+                                    </div>
+                                    <div class="stat_box">
+                                        <h3 class="text-primary mb-0">10</h3>
+                                        <small class="text-muted">Questions</small>
+                                    </div>
+                                    <div class="stat_box">
+                                        <h3 class="text-primary mb-0">AI</h3>
+                                        <small class="text-muted">Powered</small>
+                                    </div>
+                                </div>
+                                <a href="/assessment/start" class="btn btn-primary btn-lg px-5 py-3 mb-3">
+                                    <i class="fa fa-rocket me-2"></i>Start Assessment
+                                </a>
+                                <p class="text-muted small">
+                                    <i class="fa fa-clock-o me-2"></i>Time limit: 45 minutes • Minimum 50 characters per answer
+                                </p>
+                            </div>
+                            <div class="col-lg-6 text-center">
+                                <div class="feature_graphic p-4">
+                                    <i class="fa fa-graduation-cap" style="font-size: 150px; color: #667eea;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- What to Expect Section -->
+                <section class="what_to_expect bg-light py-5">
+                    <div class="container">
+                        <h2 class="text-center mb-5">What to Expect</h2>
+                        <div class="row g-4">
+                            <div class="col-md-3">
+                                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                                    <i class="fa fa-user-circle fa-3x text-primary mb-3"></i>
+                                    <h5>Personal Info</h5>
+                                    <p class="text-muted small mb-0">Basic details and experience levels</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                                    <i class="fa fa-question-circle fa-3x text-primary mb-3"></i>
+                                    <h5>10 Questions</h5>
+                                    <p class="text-muted small mb-0">Technical, sales, and communication scenarios</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                                    <i class="fa fa-robot fa-3x text-primary mb-3"></i>
+                                    <h5>AI Analysis</h5>
+                                    <p class="text-muted small mb-0">Instant scoring across 5 categories</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                                    <i class="fa fa-envelope fa-3x text-primary mb-3"></i>
+                                    <h5>Results Email</h5>
+                                    <p class="text-muted small mb-0">Detailed feedback and next steps</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Assessment Criteria -->
+                <section class="assessment_criteria py-5">
+                    <div class="container">
+                        <h2 class="text-center mb-5">We Evaluate</h2>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-cogs"></i>
+                                    </div>
+                                    <h5>Technical Skills</h5>
+                                    <p class="text-muted">Odoo/ERP knowledge and technical understanding</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-handshake-o"></i>
+                                    </div>
+                                    <h5>Sales Ability</h5>
+                                    <p class="text-muted">Client management and sales techniques</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-comments"></i>
+                                    </div>
+                                    <h5>Communication</h5>
+                                    <p class="text-muted">Clarity, articulation, and professional writing</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-lightbulb-o"></i>
+                                    </div>
+                                    <h5>Learning Agility</h5>
+                                    <p class="text-muted">Ability to adapt and learn new technologies</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-users"></i>
+                                    </div>
+                                    <h5>Cultural Fit</h5>
+                                    <p class="text-muted">Alignment with company values and work style</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="criteria_card">
+                                    <div class="criteria_icon">
+                                        <i class="fa fa-trophy"></i>
+                                    </div>
+                                    <h5>Problem Solving</h5>
+                                    <p class="text-muted">Analytical thinking and solution design</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Leaderboard Section -->
+                <section class="leaderboard_section py-5" style="background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 100%);">
+                    <div class="container">
+                        <div class="text-center mb-5">
+                            <h2 class="text-white mb-3">
+                                <i class="fa fa-trophy" style="color: #FFD700;"></i>
+                                Top Performers Leaderboard
+                            </h2>
+                            <p class="lead text-white-50">Join <t t-esc="total_candidates"/>
+ candidates competing for excellence</p>
+                        </div>
+
+                        <t t-if="top_candidates">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <div class="leaderboard-container">
+                                        <t t-foreach="top_candidates" t-as="candidate">
+                                            <t t-set="rank" t-value="candidate_index + 1"/>
+                                            <t t-set="rank_badge" t-value="'🥇' if rank == 1 else ('🥈' if rank == 2 else ('🥉' if rank == 3 else ''))"/>
+
+                                            <div class="leaderboard-item" t-att-class="'top-performer' if rank &lt;= 3 else ''">
+                                                <div class="rank-badge">
+                                                    <t t-if="rank &lt;= 3">
+                                                        <span class="trophy-emoji" t-esc="rank_badge"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="rank-number" t-esc="rank"/>
+                                                    </t>
+                                                </div>
+
+                                                <div class="candidate-info">
+                                                    <div class="candidate-name">
+                                                        <t t-esc="candidate.name[:15] + '...' if len(candidate.name) &gt; 15 else candidate.name"/>
+                                                    </div>
+                                                    <div class="candidate-role" t-if="candidate.position_applied">
+                                                        <i class="fa fa-briefcase me-1"></i>
+                                                        <t t-esc="candidate.position_applied.name"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="score-display">
+                                                    <div class="score-value">
+                                                        <t t-esc="'%.1f' % candidate.overall_score"/>
+                                                    </div>
+                                                    <div class="score-label">SCORE</div>
+                                                </div>
+
+                                                <div class="score-badge" t-att-class="'badge-gold' if rank == 1 else ('badge-silver' if rank == 2 else ('badge-bronze' if rank == 3 else 'badge-blue'))">
+                                                    <t t-if="candidate.overall_score &gt;= 90">Exceptional</t>
+                                                    <t t-elif="candidate.overall_score &gt;= 80">Outstanding</t>
+                                                    <t t-elif="candidate.overall_score &gt;= 70">Strong</t>
+                                                    <t t-elif="candidate.overall_score &gt;= 60">Good</t>
+                                                    <t t-else="">Promising</t>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <t t-else="">
+                            <div class="text-center py-5">
+                                <i class="fa fa-users fa-3x text-white-50 mb-3"></i>
+                                <p class="text-white-50 lead">Be the first to join the leaderboard!</p>
+                                <p class="text-white-50">Complete the assessment to showcase your skills</p>
+                            </div>
+                        </t>
+
+                        <div class="text-center mt-5">
+                            <a href="/assessment/start" class="btn btn-light btn-lg px-5 py-3 shadow-lg">
+                                <i class="fa fa-rocket me-2"></i>
+                                Join the Competition
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Share Section -->
+                <section class="share_section bg-light py-5">
+                    <div class="container text-center">
+                        <h2 class="mb-4">Share This Assessment</h2>
+                        <p class="lead mb-4">Know someone who'd be perfect for this role?</p>
+                        <div class="share_buttons d-flex justify-content-center gap-3 mb-4">
+                            <button class="btn btn-outline-primary" onclick="copyAssessmentLink()">
+                                <i class="fa fa-copy me-2"></i>Copy Link
+                            </button>
+                            <a href="mailto:?subject=SCHOLARIX Assessment Opportunity&amp;body=I thought you might be interested in this AI Consultant Assessment: https://scholarixglobal.com/assessment" class="btn btn-outline-primary">
+                                <i class="fa fa-envelope me-2"></i>Email
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://scholarixglobal.com/assessment" target="_blank" class="btn btn-outline-primary">
+                                <i class="fa fa-linkedin me-2"></i>LinkedIn
+                            </a>
+                        </div>
+                        <input type="text" id="assessmentLinkInput" value="https://scholarixglobal.com/assessment" class="form-control text-center mx-auto" style="max-width: 500px;" readonly="readonly"/>
+                    </div>
+                </section>
+
+                <!-- CTA Section -->
+                <section class="cta_section py-5 text-center">
+                    <div class="container">
+                        <h2 class="mb-4">Ready to Showcase Your Skills?</h2>
+                        <p class="lead mb-4">Join our network of elite Odoo consultants</p>
+                        <a href="/assessment/start" class="btn btn-primary btn-lg px-5 py-3">
+                            Start Your Assessment Now
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Custom CSS -->
+            <style>
+                /* Deep Ocean Brand Palette */
+                :root {
+                    --deep-navy: #0c1e3d;
+                    --ocean-blue: #1e3a8a;
+                    --sky-blue: #4fc3f7;
+                    --ice-white: #e8f4fd;
+                }
+                
+                body {
+                    background: var(--deep-navy) !important;
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                .assessment_landing_wrapper {
+                    font-family: 'Inter', 'Segoe UI', sans-serif;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    background: linear-gradient(180deg, var(--deep-navy) 0%, var(--ocean-blue) 100%);
+                }
+                
+                .hero_section {
+                    background: linear-gradient(135deg, var(--deep-navy) 0%, var(--ocean-blue) 50%, var(--sky-blue) 100%);
+                    color: white;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0;
+                }
+                
+                .hero_section .container {
+                    max-width: 1400px;
+                }
+                
+                .hero_section h1 {
+                    color: white;
+                    font-size: 3.5rem;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+                }
+                
+                .hero_section .lead {
+                    color: rgba(255,255,255,0.95);
+                    font-size: 1.3rem;
+                }
+                
+                .stat_box {
+                    background: rgba(79, 195, 247, 0.2);
+                    backdrop-filter: blur(10px);
+                    padding: 25px;
+                    border-radius: 15px;
+                    text-align: center;
+                    min-width: 120px;
+                    border: 2px solid rgba(79, 195, 247, 0.3);
+                }
+                
+                .stat_box h3 {
+                    color: var(--sky-blue);
+                    font-weight: bold;
+                    font-size: 2.5rem;
+                }
+                
+                .stat_box small {
+                    color: var(--ice-white);
+                    font-size: 0.9rem;
+                }
+                
+                .what_to_expect {
+                    background: var(--ocean-blue) !important;
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0 !important;
+                }
+                
+                .what_to_expect h2 {
+                    color: white;
+                }
+                
+                .what_to_expect .card {
+                    background: rgba(255, 255, 255, 0.1) !important;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(79, 195, 247, 0.2) !important;
+                    transition: transform 0.3s ease;
+                }
+                
+                .what_to_expect .card:hover {
+                    transform: translateY(-10px);
+                    border-color: var(--sky-blue) !important;
+                }
+                
+                .what_to_expect .card h5 {
+                    color: white;
+                }
+                
+                .what_to_expect .card p {
+                    color: var(--ice-white);
+                }
+                
+                .what_to_expect .fa {
+                    color: var(--sky-blue) !important;
+                }
+                
+                .assessment_criteria {
+                    background: var(--deep-navy);
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0;
+                }
+                
+                .assessment_criteria h2 {
+                    color: white;
+                }
+                
+                .criteria_card {
+                    text-align: center;
+                    padding: 30px;
+                    background: rgba(30, 58, 138, 0.3);
+                    border-radius: 15px;
+                    height: 100%;
+                    transition: all 0.3s ease;
+                }
+                
+                .criteria_card:hover {
+                    background: rgba(30, 58, 138, 0.5);
+                    transform: scale(1.05);
+                }
+                
+                .criteria_card h5 {
+                    color: white;
+                }
+                
+                .criteria_card p {
+                    color: var(--ice-white);
+                }
+                
+                .criteria_icon {
+                    width: 90px;
+                    height: 90px;
+                    background: linear-gradient(135deg, var(--ocean-blue) 0%, var(--sky-blue) 100%);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 20px;
+                    box-shadow: 0 5px 15px rgba(79, 195, 247, 0.3);
+                }
+                
+                .criteria_icon i {
+                    font-size: 36px;
+                    color: white;
+                }
+                
+                .share_section {
+                    background: var(--ocean-blue) !important;
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0 !important;
+                }
+                
+                .share_section h2, .share_section .lead {
+                    color: white;
+                }
+                
+                .share_section .btn {
+                    background: transparent !important;
+                    border: 2px solid var(--sky-blue) !important;
+                    color: white !important;
+                }
+                
+                .share_section .btn:hover {
+                    background: var(--sky-blue) !important;
+                    border-color: var(--sky-blue) !important;
+                }
+                
+                .share_buttons .btn {
+                    min-width: 150px;
+                }
+                
+                #assessmentLinkInput {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 2px dashed var(--sky-blue);
+                    color: white;
+                }
+                
+                .cta_section {
+                    background: linear-gradient(135deg, var(--deep-navy) 0%, var(--ocean-blue) 100%);
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 100px 0;
+                }
+                
+                .cta_section h2, .cta_section .lead {
+                    color: white;
+                }
+                
+                .btn-primary {
+                    background: linear-gradient(135deg, var(--sky-blue) 0%, var(--ocean-blue) 100%) !important;
+                    border: none !important;
+                    font-weight: 600;
+                    box-shadow: 0 5px 15px rgba(79, 195, 247, 0.4);
+                    transition: all 0.3s ease;
+                }
+                
+                .btn-primary:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 20px rgba(79, 195, 247, 0.6);
+                }
+                
+                .feature_graphic {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 50%;
+                    backdrop-filter: blur(10px);
+                }
+                
+                /* Leaderboard Section */
+                .leaderboard_section {
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0 !important;
+                }
+                
+                .leaderboard-container {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 20px;
+                    padding: 20px;
+                    backdrop-filter: blur(10px);
+                }
+                
+                .leaderboard-item {
+                    display: flex;
+                    align-items: center;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 15px;
+                    padding: 20px;
+                    margin-bottom: 15px;
+                    transition: all 0.3s ease;
+                    border: 2px solid transparent;
+                }
+                
+                .leaderboard-item:hover {
+                    background: rgba(255, 255, 255, 0.15);
+                    transform: translateX(10px);
+                    border-color: var(--sky-blue);
+                }
+                
+                .leaderboard-item.top-performer {
+                    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(30, 58, 138, 0.3) 100%);
+                    border: 2px solid rgba(255, 215, 0, 0.5);
+                    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+                }
+                
+                .rank-badge {
+                    min-width: 60px;
+                    height: 60px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 20px;
+                }
+                
+                .trophy-emoji {
+                    font-size: 36px;
+                }
+                
+                .rank-number {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: var(--sky-blue);
+                    background: rgba(79, 195, 247, 0.2);
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .candidate-info {
+                    flex: 1;
+                    margin-right: 20px;
+                }
+                
+                .candidate-name {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: white;
+                    margin-bottom: 5px;
+                }
+                
+                .candidate-role {
+                    font-size: 14px;
+                    color: var(--sky-blue);
+                    opacity: 0.9;
+                }
+                
+                .score-display {
+                    text-align: center;
+                    margin-right: 20px;
+                }
+                
+                .score-value {
+                    font-size: 32px;
+                    font-weight: bold;
+                    color: white;
+                    line-height: 1;
+                }
+                
+                .score-label {
+                    font-size: 11px;
+                    color: var(--sky-blue);
+                    letter-spacing: 2px;
+                    margin-top: 5px;
+                }
+                
+                .score-badge {
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                
+                .badge-gold {
+                    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                    color: #0c1e3d;
+                    box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
+                }
+                
+                .badge-silver {
+                    background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+                    color: #0c1e3d;
+                    box-shadow: 0 3px 10px rgba(192, 192, 192, 0.4);
+                }
+                
+                .badge-bronze {
+                    background: linear-gradient(135deg, #CD7F32 0%, #B8732E 100%);
+                    color: white;
+                    box-shadow: 0 3px 10px rgba(205, 127, 50, 0.4);
+                }
+                
+                .badge-blue {
+                    background: linear-gradient(135deg, var(--sky-blue) 0%, var(--ocean-blue) 100%);
+                    color: white;
+                    box-shadow: 0 3px 10px rgba(79, 195, 247, 0.3);
+                }
+                
+                /* Mobile Responsive */
+                @media (max-width: 768px) {
+                    .leaderboard-item {
+                        flex-direction: column;
+                        text-align: center;
+                        padding: 15px;
+                    }
+                    
+                    .rank-badge {
+                        margin-right: 0;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .candidate-info {
+                        margin-right: 0;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .score-display {
+                        margin-right: 0;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .candidate-name {
+                        font-size: 16px;
+                    }
+                    
+                    .score-value {
+                        font-size: 28px;
+                    }
+                }
+            </style>
+
+            <!-- JavaScript -->
+            <script>
+                function copyAssessmentLink() {
+                    var copyText = document.getElementById("assessmentLinkInput");
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999);
+                    document.execCommand("copy");
+                    
+                    // Show feedback
+                    alert("Link copied to clipboard!");
+                }
+            </script>
+        </t>
+    </template>
+
+</odoo>

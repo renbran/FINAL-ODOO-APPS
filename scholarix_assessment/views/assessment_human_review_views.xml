@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Human Review Tree View -->
+        <record id="view_assessment_human_review_tree" model="ir.ui.view">
+            <field name="name">assessment.human.review.tree</field>
+            <field name="model">assessment.human.review</field>
+            <field name="arch" type="xml">
+                <tree string="Human Reviews" decoration-success="recommendation == 'strong_hire'" decoration-info="recommendation == 'interview'" decoration-warning="recommendation == 'reconsider'" decoration-danger="recommendation == 'reject'">
+                    <field name="candidate_id"/>
+                    <field name="reviewer_id"/>
+                    <field name="review_date"/>
+                    <field name="overall_score" widget="progressbar"/>
+                    <field name="ai_score_before" widget="progressbar" optional="show"/>
+                    <field name="score_difference" widget="integer" optional="show" decoration-success="score_difference &gt; 5" decoration-danger="score_difference &lt; -5"/>
+                    <field name="recommendation" widget="badge" decoration-success="recommendation == 'strong_hire'" decoration-info="recommendation == 'interview'" decoration-warning="recommendation == 'reconsider'" decoration-danger="recommendation == 'reject'"/>
+                    <field name="technical_score" widget="progressbar" optional="hide"/>
+                    <field name="sales_score" widget="progressbar" optional="hide"/>
+                    <field name="communication_score" widget="progressbar" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Human Review Form View -->
+        <record id="view_assessment_human_review_form" model="ir.ui.view">
+            <field name="name">assessment.human.review.form</field>
+            <field name="model">assessment.human.review</field>
+            <field name="arch" type="xml">
+                <form string="Human Review">
+                    <header>
+                        <button name="action_submit_review" string="Submit Review" type="object" class="oe_highlight" invisible="recommendation != False"/>
+                        <button name="action_view_candidate" string="View Candidate" type="object"/>
+                        <field name="recommendation" widget="statusbar" statusbar_visible="reject,reconsider,interview,strong_hire"/>
+                    </header>
+                    <sheet>
+                        <field name="score_difference" invisible="1"/>
+                        <widget name="web_ribbon" title="Score Adjusted" bg_color="bg-info" invisible="score_difference == 0"/>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="candidate_id" readonly="1"/>
+                            </h1>
+                            <h3 class="text-muted">
+                                Human Review by <field name="reviewer_id" readonly="1" class="oe_inline"/>
+                            </h3>
+                        </div>
+
+                        <group>
+                            <group string="Review Details">
+                                <field name="review_date" readonly="1"/>
+                                <field name="ai_score_before" widget="progressbar" readonly="1"/>
+                                <field name="overall_score" widget="progressbar"/>
+                                <field name="score_change_reason" invisible="score_difference == 0" required="score_difference != 0"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Adjusted Scores">
+                                <field name="technical_score" widget="progressbar"/>
+                                <field name="sales_score" widget="progressbar"/>
+                                <field name="communication_score" widget="progressbar"/>
+                                <field name="learning_score" widget="progressbar"/>
+                                <field name="cultural_fit_score" widget="progressbar"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Question-by-Question Review" name="questions">
+                                <group string="Instructions">
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>Review each answer below.</strong> The AI score is shown on the right. Provide your own score (0-100) based on the quality of the answer. The average of AI and Human scores will be calculated automatically.
+                                    </div>
+                                </group>
+
+                                <!-- Question 1 -->
+                                <group string="Q1: Describe a time you automated a repetitive process">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q1_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q1_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q1_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q1_avg_score" string="Average Score"/>
+                                        <field name="q1_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 2 -->
+                                <group string="Q2: How have you used AI tools in your work?">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q2_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q2_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q2_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q2_avg_score" string="Average Score"/>
+                                        <field name="q2_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 3 -->
+                                <group string="Q3: Client asks for a feature but doesn't understand what they need">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q3_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q3_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q3_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q3_avg_score" string="Average Score"/>
+                                        <field name="q3_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 4 -->
+                                <group string="Q4: Client asks 'How long will this project take?'">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q4_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q4_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q4_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q4_avg_score" string="Average Score"/>
+                                        <field name="q4_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 5 -->
+                                <group string="Q5: Describe how you'd learn a new technology">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q5_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q5_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q5_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q5_avg_score" string="Average Score"/>
+                                        <field name="q5_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 6 -->
+                                <group string="Q6: Client says 'Your price is too high'">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q6_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q6_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q6_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q6_avg_score" string="Average Score"/>
+                                        <field name="q6_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 7 -->
+                                <group string="Q7: Tell me about a difficult client situation">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q7_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q7_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q7_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q7_avg_score" string="Average Score"/>
+                                        <field name="q7_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 8 -->
+                                <group string="Q8: Explain what Odoo does to someone non-technical">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q8_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q8_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q8_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q8_avg_score" string="Average Score"/>
+                                        <field name="q8_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 9 -->
+                                <group string="Q9: Client asks for something out of scope - how to say no?">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q9_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q9_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q9_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q9_avg_score" string="Average Score"/>
+                                        <field name="q9_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+
+                                <!-- Question 10 -->
+                                <group string="Q10: Why do you want this role? Any concerns?">
+                                    <group string="Answer" colspan="4">
+                                        <div class="o_row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                            <field name="q10_answer" readonly="1" nolabel="1" widget="text" placeholder="No answer provided"/>
+                                        </div>
+                                    </group>
+                                    <group string="Scoring">
+                                        <field name="q10_ai_score" string="AI Score (0-100)" readonly="1"/>
+                                        <field name="q10_human_score" widget="percentage" placeholder="Enter your score (0-100)"/>
+                                        <label for="q10_avg_score" string="Average Score"/>
+                                        <field name="q10_avg_score" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Category Scores" name="category_scores">
+                                <group>
+                                    <group string="Category-Level Scores (Optional)">
+                                        <div class="alert alert-warning" role="alert">
+                                            You can either score by question above, or by category here. Category scores will override question-level scores.
+                                        </div>
+                                        <field name="technical_score" widget="progressbar"/>
+                                        <field name="sales_score" widget="progressbar"/>
+                                        <field name="communication_score" widget="progressbar"/>
+                                        <field name="learning_score" widget="progressbar"/>
+                                        <field name="cultural_fit_score" widget="progressbar"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Overall Assessment" name="assessment">
+                                <group>
+                                    <group string="Strengths">
+                                        <field name="strengths" widget="text" nolabel="1" placeholder="What are this candidate's key strengths?"/>
+                                    </group>
+                                    <group string="Concerns">
+                                        <field name="concerns" widget="text" nolabel="1" placeholder="What concerns do you have about this candidate?"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <field name="reviewer_notes" widget="text" nolabel="1" placeholder="Additional notes and observations..."/>
+                                </group>
+                            </page>
+
+                            <page string="Score Comparison" name="ai_comparison">
+                                <group>
+                                    <group string="Score Comparison">
+                                        <label for="ai_score_before" string="AI Score"/>
+                                        <field name="ai_score_before" widget="progressbar" readonly="1"/>
+                                        <label for="overall_score" string="Human Score"/>
+                                        <field name="overall_score" widget="progressbar" readonly="1"/>
+                                        <label for="score_difference" string="Difference"/>
+                                        <div>
+                                            <field name="score_difference" widget="integer" readonly="1" class="oe_inline"/>
+                                            <span class="text-muted"> points</span>
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <field name="score_change_reason" widget="text" nolabel="1" placeholder="Explain why you adjusted the AI score..." invisible="score_difference == 0"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Human Review Kanban View -->
+        <record id="view_assessment_human_review_kanban" model="ir.ui.view">
+            <field name="name">assessment.human.review.kanban</field>
+            <field name="model">assessment.human.review</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="candidate_id"/>
+                    <field name="reviewer_id"/>
+                    <field name="review_date"/>
+                    <field name="overall_score"/>
+                    <field name="recommendation"/>
+                    <field name="score_difference"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_card oe_kanban_global_click" t-attf-style="border-left: 4px solid {{record.recommendation.raw_value == 'strong_hire' ? '#28a745' : record.recommendation.raw_value == 'interview' ? '#17a2b8' : record.recommendation.raw_value == 'reconsider' ? '#ffc107' : '#dc3545'}};">
+                                <div class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="candidate_id"/>
+                                        </strong>
+                                        <div class="text-muted">by <field name="reviewer_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                        <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                        <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_content mt8">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <button class="btn btn-sm" t-attf-class="btn-outline-{{record.recommendation.raw_value == 'strong_hire' ? 'success' : record.recommendation.raw_value == 'interview' ? 'info' : record.recommendation.raw_value == 'reconsider' ? 'warning' : 'danger'}}">
+                                                <field name="recommendation"/>
+                                            </button>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <span class="badge" t-attf-class="badge-{{record.overall_score.raw_value &gt;= 85 ? 'success' : record.overall_score.raw_value &gt;= 70 ? 'info' : record.overall_score.raw_value &gt;= 50 ? 'warning' : 'danger'}}">
+                                                <field name="overall_score"/>
+%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt8" t-if="record.score_difference.raw_value != 0">
+                                        <div class="col-12">
+                                            <span class="text-muted">Score Adjusted: </span>
+                                            <span t-attf-class="{{record.score_difference.raw_value &gt; 0 ? 'text-success' : 'text-danger'}}">
+                                                <t t-if="record.score_difference.raw_value &gt; 0">+</t>
+                                                <field name="score_difference"/>
+ pts
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt8">
+                                        <div class="col-12 text-muted">
+                                            <i class="fa fa-calendar"/>
+                                            <field name="review_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Human Review Search View -->
+        <record id="view_assessment_human_review_search" model="ir.ui.view">
+            <field name="name">assessment.human.review.search</field>
+            <field name="model">assessment.human.review</field>
+            <field name="arch" type="xml">
+                <search string="Human Reviews">
+                    <field name="candidate_id"/>
+                    <field name="reviewer_id"/>
+                    <field name="recommendation"/>
+                    <filter string="Strong Hire" name="strong_hire" domain="[('recommendation', '=', 'strong_hire')]"/>
+                    <filter string="Interview" name="interview" domain="[('recommendation', '=', 'interview')]"/>
+                    <filter string="Reconsider" name="reconsider" domain="[('recommendation', '=', 'reconsider')]"/>
+                    <filter string="Reject" name="reject" domain="[('recommendation', '=', 'reject')]"/>
+                    <separator/>
+                    <filter string="Score Increased" name="score_increased" domain="[('score_difference', '&gt;', 0)]"/>
+                    <filter string="Score Decreased" name="score_decreased" domain="[('score_difference', '&lt;', 0)]"/>
+                    <filter string="Major Adjustment (±10+)" name="major_adjustment" domain="['|', ('score_difference', '&gt;', 10), ('score_difference', '&lt;', -10)]"/>
+                    <separator/>
+                    <filter string="My Reviews" name="my_reviews" domain="[('reviewer_id', '=', uid)]"/>
+                    <filter string="This Week" name="this_week" domain="[('review_date', '&gt;=', (context_today() - relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Month" name="this_month" domain="[('review_date', '&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Reviewer" name="group_reviewer" context="{'group_by': 'reviewer_id'}"/>
+                        <filter string="Recommendation" name="group_recommendation" context="{'group_by': 'recommendation'}"/>
+                        <filter string="Review Date" name="group_review_date" context="{'group_by': 'review_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Human Review Action -->
+        <record id="action_assessment_human_review" model="ir.actions.act_window">
+            <field name="name">Human Reviews</field>
+            <field name="res_model">assessment.human.review</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="context">{'search_default_interview': 1, 'search_default_strong_hire': 1, 'search_default_my_reviews': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No human reviews yet!
+                </p>
+                <p>
+                    Human reviews allow experienced recruiters to validate and adjust AI assessments.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
