@@ -59,6 +59,15 @@ export class CRMExecutiveDashboard extends Component {
           fast_updaters: [],
           slow_updaters: [],
         },
+        ai_insights: {
+          total_ai_scored: 0,
+          avg_ai_score: 0,
+          high_quality_leads: 0,
+          ai_score_distribution: { high: 0, medium: 0, low: 0 },
+          top_ai_scored_leads: [],
+          ai_vs_manual_accuracy: 0,
+          enrichment_stats: { completed: 0, pending: 0, failed: 0 },
+        },
       },
       overdueOpportunities: [],
       topPerformers: [],
@@ -231,6 +240,8 @@ export class CRMExecutiveDashboard extends Component {
         this.renderTrendsChart();
         this.renderTeamPerformanceChart();
         this.renderSourcesChart();
+        this.renderAIScoreDistributionChart();
+        this.renderAIEnrichmentChart();
       } catch (error) {
         console.error("Error in renderAllCharts:", error);
         this.showChartError();
@@ -536,6 +547,165 @@ export class CRMExecutiveDashboard extends Component {
         },
       },
     });
+  }
+
+  renderAIScoreDistributionChart() {
+    if (typeof Chart === "undefined") {
+      console.warn("Chart.js not available for AI score distribution chart");
+      return;
+    }
+
+    const canvas = document.getElementById("aiScoreDistributionChart");
+    if (!canvas) return;
+
+    const ai = this.state.dashboardData.ai_insights;
+    if (!ai || ai.total_ai_scored === 0) {
+      console.info("No AI scored leads data available");
+      return;
+    }
+
+    try {
+      if (this.charts.aiDistribution) {
+        this.charts.aiDistribution.destroy();
+      }
+
+      const ctx = canvas.getContext("2d");
+      this.charts.aiDistribution = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: [
+            `High Quality (≥70): ${ai.ai_score_distribution.high}`,
+            `Medium Quality (40-69): ${ai.ai_score_distribution.medium}`,
+            `Low Quality (<40): ${ai.ai_score_distribution.low}`
+          ],
+          datasets: [
+            {
+              data: [
+                ai.ai_score_distribution.high,
+                ai.ai_score_distribution.medium,
+                ai.ai_score_distribution.low
+              ],
+              backgroundColor: [
+                "#28a745",  // Green for high
+                "#ffc107",  // Yellow for medium
+                "#dc3545"   // Red for low
+              ],
+              borderWidth: 2,
+              borderColor: "#fff",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                padding: 15,
+                usePointStyle: true,
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const total = ai.ai_score_distribution.high +
+                                ai.ai_score_distribution.medium +
+                                ai.ai_score_distribution.low;
+                  const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                  return `${context.label}: ${percentage}% of AI-scored leads`;
+                },
+              },
+            },
+            title: {
+              display: true,
+              text: `AI Lead Quality Distribution (${ai.total_ai_scored} leads scored)`,
+              font: { size: 14, weight: 'bold' }
+            }
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error rendering AI score distribution chart:", error);
+    }
+  }
+
+  renderAIEnrichmentChart() {
+    if (typeof Chart === "undefined") {
+      console.warn("Chart.js not available for AI enrichment chart");
+      return;
+    }
+
+    const canvas = document.getElementById("aiEnrichmentChart");
+    if (!canvas) return;
+
+    const ai = this.state.dashboardData.ai_insights;
+    if (!ai) {
+      console.info("No AI enrichment data available");
+      return;
+    }
+
+    try {
+      if (this.charts.aiEnrichment) {
+        this.charts.aiEnrichment.destroy();
+      }
+
+      const ctx = canvas.getContext("2d");
+      const stats = ai.enrichment_stats;
+      const total = stats.completed + stats.pending + stats.failed;
+
+      this.charts.aiEnrichment = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Completed", "Pending", "Failed"],
+          datasets: [
+            {
+              label: "AI Enrichment Status",
+              data: [stats.completed, stats.pending, stats.failed],
+              backgroundColor: [
+                "#28a745",  // Green for completed
+                "#17a2b8",  // Blue for pending
+                "#dc3545"   // Red for failed
+              ],
+              borderWidth: 1,
+              borderColor: "#fff",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+                  return `${context.parsed.y} leads (${percentage}%)`;
+                },
+              },
+            },
+            title: {
+              display: true,
+              text: `AI Enrichment Progress (${total} total leads)`,
+              font: { size: 14, weight: 'bold' }
+            }
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error rendering AI enrichment chart:", error);
+    }
   }
 
   // Event handlers
