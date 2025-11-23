@@ -140,8 +140,22 @@ class LLMService(models.AbstractModel):
 
                 # Client error (4xx) - don't retry
                 else:
-                    error_msg = "API Error %s: %s" % (response.status_code, response.text[:200])
-                    _logger.error(error_msg)
+                    error_detail = response.text[:200]
+                    
+                    # Provide helpful error messages for common issues
+                    if response.status_code == 401:
+                        if 'invalid_api_key' in error_detail.lower() or 'invalid api key' in error_detail.lower():
+                            error_msg = "Invalid API Key: Please update the API key in CRM → Configuration → LLM Providers. Get a valid API key from %s" % provider.get_provider_signup_url()
+                        else:
+                            error_msg = "Authentication Error (401): The API key may be expired or invalid. Please check your LLM Provider configuration."
+                    elif response.status_code == 403:
+                        error_msg = "Access Forbidden (403): Your API key doesn't have permission to use this model (%s). Please check your plan or upgrade." % provider.model_name
+                    elif response.status_code == 404:
+                        error_msg = "Model Not Found (404): The model '%s' doesn't exist or isn't available. Please check the model name in LLM Provider settings." % provider.model_name
+                    else:
+                        error_msg = "API Error %s: %s" % (response.status_code, error_detail)
+                    
+                    _logger.error("%s - Provider: %s, Model: %s", error_msg, provider.name, provider.model_name)
                     provider.increment_usage(success=False)
                     return {
                         'success': False,

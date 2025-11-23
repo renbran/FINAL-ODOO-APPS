@@ -273,3 +273,20 @@ class LLMProvider(models.Model):
             'failed_requests': self.failed_requests + (0 if success else 1),
             'last_used': fields.Datetime.now(),
         })
+
+    def get_provider_signup_url(self):
+        """Get the signup/API key URL for the provider"""
+        self.ensure_one()
+        
+        urls = {
+            'openai': 'https://platform.openai.com/api-keys',
+            'groq': 'https://console.groq.com/keys',
+            'anthropic': 'https://console.anthropic.com/settings/keys',
+            'google': 'https://makersuite.google.com/app/apikey',
+            'huggingface': 'https://huggingface.co/settings/tokens',
+            'cohere': 'https://dashboard.cohere.com/api-keys',
+            'mistral': 'https://console.mistral.ai/api-keys/',
+            'custom': 'your provider dashboard',
+        }
+        
+        return urls.get(self.provider_type, 'your LLM provider website')
