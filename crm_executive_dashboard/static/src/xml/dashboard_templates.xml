@@ -695,6 +695,170 @@
                     </div>
                 </div>
             </div>
+
+            <!-- AI Insights Section (LLM Lead Scoring Integration) -->
+            <div class="o_ai_insights_section mt-4">
+                <div class="section-header mb-3">
+                    <h3 class="section-title">
+                        <i class="fa fa-robot text-info me-2"/>
+                        🤖 AI-Powered Lead Insights
+                    </h3>
+                    <p class="text-muted">Machine learning insights powered by LLM Lead Scoring</p>
+                </div>
+
+                <!-- AI KPI Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="o_kpi_card o_kpi_ai">
+                            <div class="o_kpi_icon bg-gradient-info">
+                                <i class="fa fa-brain"/>
+                            </div>
+                            <div class="o_kpi_content">
+                                <h5 class="o_kpi_title">AI-Scored Leads</h5>
+                                <div class="o_kpi_value text-info">
+                                    <t t-esc="state.dashboardData.ai_insights.total_ai_scored || 0"/>
+                                </div>
+                                <p class="o_kpi_subtitle">Total leads analyzed by AI</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="o_kpi_card o_kpi_ai">
+                            <div class="o_kpi_icon bg-gradient-success">
+                                <i class="fa fa-chart-line"/>
+                            </div>
+                            <div class="o_kpi_content">
+                                <h5 class="o_kpi_title">Avg AI Score</h5>
+                                <div class="o_kpi_value text-success">
+                                    <t t-esc="state.dashboardData.ai_insights.avg_ai_score || 0"/>/100
+                                </div>
+                                <p class="o_kpi_subtitle">Average quality score</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="o_kpi_card o_kpi_ai">
+                            <div class="o_kpi_icon bg-gradient-warning">
+                                <i class="fa fa-star"/>
+                            </div>
+                            <div class="o_kpi_content">
+                                <h5 class="o_kpi_title">High Quality Leads</h5>
+                                <div class="o_kpi_value text-warning">
+                                    <t t-esc="state.dashboardData.ai_insights.high_quality_leads || 0"/>
+                                </div>
+                                <p class="o_kpi_subtitle">Score ≥ 70 (Hot leads)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="o_kpi_card o_kpi_ai">
+                            <div class="o_kpi_icon bg-gradient-primary">
+                                <i class="fa fa-crosshairs"/>
+                            </div>
+                            <div class="o_kpi_content">
+                                <h5 class="o_kpi_title">AI Accuracy</h5>
+                                <div class="o_kpi_value text-primary">
+                                    <t t-esc="state.dashboardData.ai_insights.ai_vs_manual_accuracy || 0"/>%
+                                </div>
+                                <p class="o_kpi_subtitle">vs Manual probability</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Charts Row -->
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="o_dashboard_card">
+                            <div class="o_card_header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fa fa-chart-pie text-success me-2"/>
+                                    AI Lead Quality Distribution
+                                </h5>
+                            </div>
+                            <div class="o_card_body">
+                                <t t-if="state.dashboardData.ai_insights.total_ai_scored > 0">
+                                    <div class="chart-container" style="position: relative; height: 300px;">
+                                        <canvas id="aiScoreDistributionChart"/>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fa fa-robot fa-3x mb-3"/>
+                                        <p>No AI-Scored Leads Yet</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="o_dashboard_card">
+                            <div class="o_card_header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fa fa-tasks text-info me-2"/>
+                                    AI Enrichment Progress
+                                </h5>
+                            </div>
+                            <div class="o_card_body">
+                                <div class="chart-container" style="position: relative; height: 300px;">
+                                    <canvas id="aiEnrichmentChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top AI-Scored Leads Table -->
+                <t t-if="state.dashboardData.ai_insights.top_ai_scored_leads and state.dashboardData.ai_insights.top_ai_scored_leads.length > 0">
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="o_dashboard_card">
+                                <div class="o_card_header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-trophy text-warning me-2"/>
+                                        Top AI-Scored Leads
+                                    </h5>
+                                </div>
+                                <div class="o_card_body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>AI Score</th>
+                                                    <th>Lead</th>
+                                                    <th>Partner</th>
+                                                    <th>Revenue</th>
+                                                    <th>Stage</th>
+                                                    <th>User</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="state.dashboardData.ai_insights.top_ai_scored_leads.slice(0, 10)" t-as="lead" t-key="lead.id">
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge bg-success" t-esc="lead.ai_score.toFixed(1)"/>
+                                                        </td>
+                                                        <td t-esc="lead.name"/>
+                                                        <td t-esc="lead.partner_name"/>
+                                                        <td t-esc="formatCurrency(lead.expected_revenue)"/>
+                                                        <td><span class="badge bg-primary" t-esc="lead.stage"/></td>
+                                                        <td t-esc="lead.user"/>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
         </div>
     </t>
 

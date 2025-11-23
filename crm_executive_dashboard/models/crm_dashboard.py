@@ -123,12 +123,15 @@ class CRMExecutiveDashboard(models.Model):
             
             # Get agent performance metrics
             agent_metrics = self._get_agent_performance_metrics(date_from, date_to, team_ids)
-            
+
             # Get lead quality metrics
             lead_quality_metrics = self._get_lead_quality_metrics(date_from, date_to, team_ids)
-            
+
             # Get response time metrics
             response_metrics = self._get_response_time_metrics(date_from, date_to, team_ids)
+
+            # Get AI-powered insights (LLM Integration)
+            ai_insights = self._get_ai_insights(date_from, date_to, team_ids)
 
             return {
                 'kpis': {
@@ -149,6 +152,7 @@ class CRMExecutiveDashboard(models.Model):
                 'agent_metrics': agent_metrics,
                 'lead_quality': lead_quality_metrics,
                 'response_metrics': response_metrics,
+                'ai_insights': ai_insights,  # NEW: AI-powered insights
                 'currency_symbol': self.env.company.currency_id.symbol,
             }
             
@@ -675,6 +679,125 @@ class CRMExecutiveDashboard(models.Model):
         for record in self:
             if record.date_from and record.date_to and record.date_from > record.date_to:
                 raise ValidationError(_("Start date must be before end date"))
+
+    def _get_ai_insights(self, date_from, date_to, team_ids=None):
+        """Get AI-powered insights from LLM Lead Scoring integration"""
+        try:
+            domain = [
+                ('create_date', '>=', date_from),
+                ('create_date', '<=', date_to),
+                ('type', '=', 'opportunity'),
+            ]
+
+            if team_ids:
+                domain.append(('team_id', 'in', team_ids))
+
+            # Get leads with AI scoring
+            ai_scored_leads = self.env['crm.lead'].search(
+                domain + [('ai_probability_score', '>', 0)]
+            )
+
+            total_ai_scored = len(ai_scored_leads)
+
+            if total_ai_scored == 0:
+                return {
+                    'total_ai_scored': 0,
+                    'avg_ai_score': 0,
+                    'high_quality_leads': [],
+                    'ai_score_distribution': {
+                        'high': 0,
+                        'medium': 0,
+                        'low': 0
+                    },
+                    'top_ai_scored_leads': [],
+                    'ai_vs_manual_accuracy': 0,
+                    'enrichment_stats': {
+                        'completed': 0,
+                        'pending': 0,
+                        'failed': 0
+                    }
+                }
+
+            # Calculate average AI score
+            avg_ai_score = sum(ai_scored_leads.mapped('ai_probability_score')) / total_ai_scored if total_ai_scored else 0
+
+            # High quality leads (AI score >= 70)
+            high_quality_leads = ai_scored_leads.filtered(lambda l: l.ai_probability_score >= 70)
+
+            # AI Score distribution
+            high_score_leads = ai_scored_leads.filtered(lambda l: l.ai_probability_score >= 70)
+            medium_score_leads = ai_scored_leads.filtered(lambda l: 40 <= l.ai_probability_score < 70)
+            low_score_leads = ai_scored_leads.filtered(lambda l: l.ai_probability_score < 40)
+
+            # Top AI scored leads
+            top_leads = ai_scored_leads.sorted(key=lambda l: l.ai_probability_score, reverse=True)[:10]
+            top_ai_scored_leads = [{
+                'id': lead.id,
+                'name': lead.name,
+                'partner_name': lead.partner_id.name if lead.partner_id else lead.partner_name or 'Unknown',
+                'ai_score': round(lead.ai_probability_score, 2),
+                'expected_revenue': lead.expected_revenue or 0,
+                'stage': lead.stage_id.name if lead.stage_id else 'No Stage',
+                'user': lead.user_id.name if lead.user_id else 'Unassigned',
+            } for lead in top_leads]
+
+            # AI vs Manual probability comparison (accuracy metric)
+            accurate_predictions = 0
+            total_with_manual = 0
+            for lead in ai_scored_leads:
+                if lead.probability and lead.ai_probability_score:
+                    total_with_manual += 1
+                    # Consider accurate if within 20 points
+                    if abs(lead.probability - lead.ai_probability_score) <= 20:
+                        accurate_predictions += 1
+
+            ai_accuracy = (accurate_predictions / total_with_manual * 100) if total_with_manual > 0 else 0
+
+            # Enrichment stats
+            all_leads = self.env['crm.lead'].search(domain)
+            enrichment_stats = {
+                'completed': all_leads.search_count([
+                    ('id', 'in', all_leads.ids),
+                    ('ai_enrichment_status', '=', 'completed')
+                ]),
+                'pending': all_leads.search_count([
+                    ('id', 'in', all_leads.ids),
+                    ('ai_enrichment_status', '=', 'pending')
+                ]),
+                'failed': all_leads.search_count([
+                    ('id', 'in', all_leads.ids),
+                    ('ai_enrichment_status', '=', 'failed')
+                ])
+            }
+
+            return {
+                'total_ai_scored': total_ai_scored,
+                'avg_ai_score': round(avg_ai_score, 2),
+                'high_quality_leads': len(high_quality_leads),
+                'ai_score_distribution': {
+                    'high': len(high_score_leads),
+                    'medium': len(medium_score_leads),
+                    'low': len(low_score_leads)
+                },
+                'top_ai_scored_leads': top_ai_scored_leads,
+                'ai_vs_manual_accuracy': round(ai_accuracy, 2),
+                'enrichment_stats': enrichment_stats,
+                'ai_completeness_avg': round(sum(ai_scored_leads.mapped('ai_completeness_score')) / total_ai_scored, 2) if total_ai_scored else 0,
+                'ai_clarity_avg': round(sum(ai_scored_leads.mapped('ai_clarity_score')) / total_ai_scored, 2) if total_ai_scored else 0,
+                'ai_engagement_avg': round(sum(ai_scored_leads.mapped('ai_engagement_score')) / total_ai_scored, 2) if total_ai_scored else 0,
+            }
+
+        except Exception as e:
+            _logger.error(f"Error in _get_ai_insights: {str(e)}")
+            return {
+                'total_ai_scored': 0,
+                'avg_ai_score': 0,
+                'high_quality_leads': [],
+                'ai_score_distribution': {'high': 0, 'medium': 0, 'low': 0},
+                'top_ai_scored_leads': [],
+                'ai_vs_manual_accuracy': 0,
+                'enrichment_stats': {'completed': 0, 'pending': 0, 'failed': 0}
+            }
 
     @api.model
     def create_default_dashboard(self):
