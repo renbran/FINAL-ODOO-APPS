@@ -3,7 +3,7 @@
     'name': 'CRM Executive Dashboard',
     'version': '17.0.1.0.0',
     'category': 'Sales/CRM',
-    'summary': 'Advanced CRM analytics and executive dashboard for Odoo 17',
+    'summary': 'AI-Powered CRM Executive Dashboard with LLM Lead Scoring Integration - World-Class Solution',
     'description': """
         CRM Executive Dashboard - Odoo 17
         =================================
@@ -48,6 +48,7 @@
         'sales_team',
         'mail',
         'web',
+        'llm_lead_scoring',  # Integration with AI Lead Scoring
     ],
     'data': [
         'security/security_groups.xml',
