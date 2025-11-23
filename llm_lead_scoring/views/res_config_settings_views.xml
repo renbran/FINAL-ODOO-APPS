@@ -4,10 +4,10 @@
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.llm.lead.scoring</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data_key="llm_lead_scoring" string="LLM Lead Scoring">
+            <xpath expr="//div[@id='crm_sale']" position="after">
+                <div class="app_settings_block" data-key="llm_lead_scoring" string="LLM Lead Scoring" data-string="LLM Lead Scoring" id="llm_lead_scoring_settings">
                     <h2>AI-Powered Lead Scoring</h2>
 
                     <div class="row mt16 o_settings_container">

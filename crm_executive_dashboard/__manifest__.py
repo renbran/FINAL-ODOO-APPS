@@ -58,12 +58,16 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'crm_executive_dashboard/static/src/scss/**/*.scss',
-            'crm_executive_dashboard/static/src/js/**/*.js',
-            'crm_executive_dashboard/static/src/xml/**/*.xml',
-        ],
-        'web.qunit_suite_tests': [
-            'crm_executive_dashboard/static/tests/**/*.js',
+            # SCSS files
+            'crm_executive_dashboard/static/src/scss/_variables.scss',
+            'crm_executive_dashboard/static/src/scss/dashboard.scss',
+            'crm_executive_dashboard/static/src/scss/strategic_dashboard.scss',
+            # JavaScript files
+            'crm_executive_dashboard/static/src/js/crm_executive_dashboard.js',
+            'crm_executive_dashboard/static/src/js/crm_strategic_dashboard.js',
+            # XML templates
+            'crm_executive_dashboard/static/src/xml/dashboard_templates.xml',
+            'crm_executive_dashboard/static/src/xml/strategic_dashboard_templates.xml',
         ],
     },
     'demo': [
