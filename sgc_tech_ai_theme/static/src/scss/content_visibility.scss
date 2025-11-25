@@ -1,0 +1,98 @@
+// SGC TECH AI - Content Visibility & Layout
+@import 'sgc_colors';
+
+// Card Components
+.o_kanban_record, .o_kanban_card {
+    border-radius: \-radius-md;
+    box-shadow: \-shadow-sm;
+    transition: all \-transition-normal;
+    
+    &:hover {
+        box-shadow: \-shadow-md;
+        transform: translateY(-2px);
+    }
+}
+
+// Form Views
+.o_form_view {
+    .o_form_sheet {
+        box-shadow: \-shadow-sm;
+        border-radius: \-radius-md;
+    }
+    
+    .o_group {
+        margin-bottom: 1rem;
+    }
+}
+
+// List Views
+.o_list_view {
+    .o_list_table {
+        thead tr {
+            background: \-ice-white;
+            border-bottom: 2px solid \-sky-blue;
+        }
+        
+        tbody tr {
+            transition: background \-transition-fast;
+            
+            &:hover {
+                background: \-off-white;
+            }
+        }
+    }
+}
+
+// Buttons
+.btn-primary {
+    background: \-ocean-blue;
+    border-color: \-ocean-blue;
+    
+    &:hover {
+        background: \-deep-navy;
+        border-color: \-deep-navy;
+    }
+}
+
+.btn-secondary {
+    background: \-slate-gray;
+    border-color: \-slate-gray;
+    
+    &:hover {
+        background: \-dark-gray;
+        border-color: \-dark-gray;
+    }
+}
+
+// Chatter
+.o_Chatter {
+    border-left: 1px solid \-light-gray;
+    
+    .o_Message {
+        border-radius: \-radius-sm;
+        margin-bottom: 0.5rem;
+    }
+}
+
+// Notebook tabs
+.o_notebook {
+    .nav-tabs {
+        border-bottom: 2px solid \-light-gray;
+        
+        .nav-link {
+            color: \-dark-gray;
+            transition: all \-transition-fast;
+            
+            &:hover {
+                color: \-ocean-blue;
+                border-bottom-color: \-sky-blue;
+            }
+            
+            &.active {
+                color: \-ocean-blue;
+                border-bottom: 2px solid \-ocean-blue;
+                font-weight: \-font-semibold;
+            }
+        }
+    }
+}

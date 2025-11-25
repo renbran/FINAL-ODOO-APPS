@@ -3,11 +3,13 @@
 
 ## Project Architecture & Big Picture
 - **Odoo 17 Production Collection**: 50+ custom modules for CloudPepper deployment at `https://stagingtry.cloudpepper.site/` (login: `salescompliance@osusproperties.com`)
-- **Module Categories**: Payment workflows (`account_payment_approval/`, `account_payment_final/`), dashboards (`oe_sale_dashboard_17/`, `crm_executive_dashboard/`, `odoo_dynamic_dashboard/`), API services (`enhanced_rest_api/`, `rest_api_odoo/`), commission systems (`commission_ax/`, `order_net_commission/`), workflow automation, HR (`scholarix_recruitment/`, `scholarix_assessment/`), and CRM/Sales enhancements
-- **Emergency Response Architecture**: Validation/fix scripts for critical issues - run `validate_*.py` for pre-deployment checks, emergency scripts for production hotfixes
-- **CloudPepper-First Design**: All modules include CloudPepper compatibility patches, global error handlers (`cloudpepper_global_protection.js`), and OWL lifecycle protection
-- **OSUS Properties Branding**: Consistent color scheme `#800020` (maroon), `#FFD700` (gold), unified UX patterns across all modules
-- **No Docker**: This is a direct Odoo installation (not containerized) - deployment is to CloudPepper server, not via docker-compose
+- **Module Categories**: Payment workflows (`account_payment_approval/`, `account_payment_final/`), dashboards (`oe_sale_dashboard_17/`, `crm_executive_dashboard/`, `odoo_dynamic_dashboard/`), API services (`enhanced_rest_api/`, `rest_api_odoo/`), commission systems (`commission_ax/`, `order_net_commission/`), workflow automation, HR (`scholarix_recruitment/`, `scholarix_assessment/`), theming (`muk_web_theme/`, `sgc_tech_ai_theme/`), and CRM/Sales enhancements
+- **Emergency Response Architecture**: Validation/fix scripts for critical issues - run `validate_*.py` for pre-deployment checks, emergency scripts (`emergency_*.py`) for production hotfixes
+- **CloudPepper-First Design**: All modules include CloudPepper compatibility patches, global error handlers, and OWL lifecycle protection (see `commission_ax/models/cloudpepper_compatibility.py`)
+- **Dual Branding System**: 
+  - **OSUS Properties**: `#800020` (maroon), `#FFD700` (gold) - for property/real estate modules
+  - **SGC Tech AI**: `#0c1e34` (deep navy), `#00FFF0` (electric cyan), `#00FF88` (neon green) - for Scholarix/tech modules
+- **No Docker**: Direct Odoo installation (not containerized) - deployment via SSH to CloudPepper server, not via docker-compose
 
 ## Developer Workflows
 
@@ -107,10 +109,25 @@ export class MyComponent extends Component {
 }
 ```
 
-### OSUS Branding & Responsive Design
-- **Color Variables**: `#800020` (primary maroon), `#FFD700` (gold), `#FFF8DC` (light gold background)
-- **Chart.js Integration**: All dashboards (`crm_executive_dashboard/`, `oe_sale_dashboard_17/`) use Chart.js with mobile-first responsive design
-- **CSS Structure**: BEM methodology with module prefixing (`.o_module_name_component`)
+### Branding & Theme Architecture
+**OSUS Properties Theme** (Real Estate/Property modules):
+- Colors: `#800020` (maroon), `#FFD700` (gold), `#FFF8DC` (light gold)
+- Modules: `muk_web_theme/`, `muk_web_colors/`, `muk_web_chatter/`, `muk_web_dialog/`
+- Modern OWL components, CloudPepper error protection
+- Files: See `OSUS_WEB_MODULES_QA_REPORT.md` for implementation details
+
+**SGC Tech AI Theme** (Scholarix/AI modules):
+- Colors: `#0c1e34` (deep navy), `#00FFF0` (electric cyan), `#00FF88` (neon green)
+- Module: `sgc_tech_ai_theme/` with modular SCSS architecture
+- Variables: SCSS only (no CSS custom properties) for Odoo 17 compliance
+- Structure: `sgc_colors.scss` → `typography.scss` → component themes
+- Gradients: `\-gradient-ocean`, `\-gradient-electric` for modern AI aesthetic
+
+**Shared Patterns**:
+- Chart.js integration for dashboards with mobile-first responsive design
+- BEM methodology with module prefixing (`.o_module_name_component`)
+- Asset loading order: colors → typography → layout → components
+- CloudPepper compatibility: all JS wrapped in try-catch with fallbacks
 
 ## Integration & Cross-Component Patterns
 - **REST API**: JWT authentication via `enhanced_rest_api/` with endpoints for CRM, Sales, Payments
@@ -138,12 +155,59 @@ export class MyComponent extends Component {
 - **CloudPepper OWL Errors**: Use global error handlers and CloudPepper compatibility patches
 - **RPC Errors**: Always wrap RPC calls in try-catch with proper error handling and fallbacks
 
+## Quality Assurance & Validation
+
+### Pre-Deployment Validation Pattern
+```python
+# Example: validate_module.py structure
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+def validate_manifest():
+    # Check all assets paths exist
+    # Verify dependencies are declared
+    # Validate version format
+    
+def validate_views():
+    # Parse XML files with ET.parse()
+    # Check field references exist in models
+    # Verify actions have corresponding methods
+    
+def validate_python():
+    # Check syntax with compile()
+    # Verify proper decorators (@api.depends)
+    # Validate security groups defined
+```
+
+### Error Handling Pattern (CloudPepper Compatible)
+```javascript
+// Always wrap OWL setup methods
+setup() {
+    try {
+        super.setup();
+        // Component logic
+    } catch (error) {
+        console.error('Module: Error description', error);
+        // Fallback logic
+    }
+}
+```
+
+### Recent Quality Improvements (Nov 2025)
+- Fixed JavaScript syntax errors in `muk_web_theme/` components (semicolons, object properties)
+- Added comprehensive error handling to all OWL components
+- Updated localStorage keys to module-namespaced (`osus_*`, `sgc_*`)
+- Implemented CloudPepper compatibility in `muk_web_chatter/`, `muk_web_dialog/`
+- See `OSUS_WEB_MODULES_QA_REPORT.md` for complete audit results
+
 ## Examples & References
 - **Complete Module**: `account_payment_approval/` - enterprise payment workflow with signatures, QR, reports
 - **API Implementation**: `enhanced_rest_api/controllers/` - JWT auth, CRUD endpoints, error handling
 - **Dashboard Pattern**: `oe_sale_dashboard_17/static/src/js/` - Chart.js integration with OWL
 - **Security Model**: `account_payment_approval/security/` - 6-tier groups with access rules
 - **Report Templates**: `account_payment_approval/reports/` - OSUS-branded QWeb with digital signatures
+- **Theme Implementation**: `muk_web_theme/` - OSUS Properties branded backend (see QA report)
+- **SCSS Architecture**: `sgc_tech_ai_theme/` - Modular SCSS with proper variable structure
 
 ## Module Structure & Conventions
 - **Standard Layout**: `__manifest__.py`, `models/`, `views/`, `security/`, `data/`, `static/`, `tests/`, optional `doc/`, `wizards/`, `reports/`
@@ -164,9 +228,12 @@ export class MyComponent extends Component {
 ```
 
 ## AI Agent Guidelines
-- **Always validate first**: Run `cloudpepper_deployment_final_validation.py` before any deployment
+- **Always validate first**: Run validation scripts in module directory before ANY changes or deployment
 - **Modern syntax only**: Replace ALL `attrs={}` and `states=` with modern `invisible=`, `readonly=` patterns
 - **Complete implementations**: If adding view elements, ensure ALL referenced methods/fields exist in models
 - **CloudPepper compatibility**: Include error handlers and compatibility patches for all JavaScript
-- **OSUS branding**: Maintain color scheme `#800020` (maroon), `#FFD700` (gold) across all UI
-- **Emergency procedures**: For production issues, use emergency fix scripts with validation and rollback
+- **Dual branding**: Use OSUS colors for property modules, SGC Tech AI colors for Scholarix modules
+- **Emergency procedures**: For production issues, use `emergency_*.py` scripts with validation and rollback
+- **Theme selection**: OSUS theme for business workflows, SGC Tech AI theme for innovative/AI features
+- **SCSS compliance**: Use SCSS variables (not CSS custom properties) for Odoo 17 compatibility
+- **Asset order**: Always load colors first, then typography, then components in manifest assets

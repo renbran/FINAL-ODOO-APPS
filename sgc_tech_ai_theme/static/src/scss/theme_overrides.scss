@@ -1,0 +1,156 @@
+// SGC TECH AI - Global Theme Overrides
+@import 'sgc_colors';
+
+// Control Panel
+.o_control_panel {
+    background: \-white;
+    border-bottom: 1px solid \-light-gray;
+    box-shadow: \-shadow-sm;
+    
+    .o_cp_buttons {
+        .btn {
+            border-radius: \-radius-sm;
+            transition: all \-transition-fast;
+        }
+    }
+    
+    .breadcrumb {
+        .breadcrumb-item {
+            color: \-dark-gray;
+            
+            &.active {
+                color: \-ocean-blue;
+                font-weight: \-font-medium;
+            }
+        }
+    }
+}
+
+// Status Bar
+.o_form_statusbar {
+    border-bottom: 2px solid \-light-gray;
+    
+    .o_arrow_button {
+        border-radius: \-radius-sm;
+        transition: all \-transition-fast;
+        
+        &.btn-primary {
+            background: \-ocean-blue;
+            
+            &:hover {
+                background: \-deep-navy;
+            }
+        }
+        
+        &.btn-secondary {
+            background: \-light-gray;
+            color: \-dark-gray;
+        }
+    }
+}
+
+// Modals
+.modal {
+    .modal-content {
+        border-radius: \-radius-lg;
+        box-shadow: \-shadow-lg;
+        border: none;
+    }
+    
+    .modal-header {
+        background: \-gradient-ocean;
+        color: \-white;
+        border-bottom: 3px solid \-electric-cyan;
+        border-radius: \-radius-lg \-radius-lg 0 0;
+        
+        .modal-title {
+            font-weight: \-font-semibold;
+        }
+        
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+    }
+    
+    .modal-footer {
+        border-top: 1px solid \-light-gray;
+        background: \-off-white;
+    }
+}
+
+// Alerts & Notifications
+.alert {
+    border-radius: \-radius-md;
+    border-left-width: 4px;
+    
+    &.alert-success {
+        border-left-color: \-success;
+        background: lighten(\-success, 45%);
+    }
+    
+    &.alert-warning {
+        border-left-color: \-warning;
+        background: lighten(\-warning, 35%);
+    }
+    
+    &.alert-danger {
+        border-left-color: \-error;
+        background: lighten(\-error, 35%);
+    }
+    
+    &.alert-info {
+        border-left-color: \-info;
+        background: \-ice-white;
+    }
+}
+
+// Tooltips
+.tooltip {
+    .tooltip-inner {
+        background: \-charcoal;
+        border-radius: \-radius-sm;
+        box-shadow: \-shadow-md;
+    }
+}
+
+// Badges
+.badge {
+    border-radius: \-radius-sm;
+    font-weight: \-font-medium;
+    padding: 0.25rem 0.5rem;
+    
+    &.badge-primary {
+        background: \-ocean-blue;
+    }
+    
+    &.badge-success {
+        background: \-success;
+    }
+    
+    &.badge-warning {
+        background: \-warning;
+    }
+    
+    &.badge-danger {
+        background: \-error;
+    }
+}
+
+// Scrollbars (Webkit)
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: \-off-white;
+}
+
+::-webkit-scrollbar-thumb {
+    background: \-slate-gray;
+    border-radius: \-radius-sm;
+    
+    &:hover {
+        background: \-ocean-blue;
+    }
+}

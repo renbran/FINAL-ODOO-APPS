@@ -1,17 +1,20 @@
 {
-    'name': 'MuK Colors', 
-    'summary': 'Customize your Odoo colors',
+    'name': 'OSUS Properties Colors', 
+    'summary': 'OSUS Properties Brand Color System',
     'description': '''
-        This module gives you options to customize the theme colors.
+        OSUS Properties color customization module featuring:
+        - Brand maroon (#800020) and gold (#FFD700) colors
+        - Light and dark mode support
+        - Consistent brand identity across all interfaces
     ''',
     'version': '17.0.1.0.5',
     'category': 'Tools/UI',
     'license': 'LGPL-3', 
-    'author': 'MuK IT',
-    'website': 'http://www.mukit.at',
-    'live_test_url': 'https://mukit.at/demo',
+    'author': 'OSUS Properties',
+    'website': 'https://osusproperties.com',
+    'live_test_url': '',
     'contributors': [
-        'Mathias Markl <mathias.markl@mukit.at>',
+        'OSUS Properties Development Team',
     ],
     'depends': [
         'base_setup',

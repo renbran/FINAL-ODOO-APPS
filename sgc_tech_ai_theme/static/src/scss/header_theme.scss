@@ -1,0 +1,108 @@
+// SGC TECH AI - Header & Navigation Theme
+@import 'sgc_colors';
+
+// Main Navigation Bar
+.o_main_navbar {
+    background: \-gradient-ocean;
+    border-bottom: 3px solid \-electric-cyan;
+    box-shadow: \-shadow-md;
+    
+    .o_menu_brand {
+        color: \-white;
+        font-weight: \-font-bold;
+        
+        &:hover {
+            color: \-electric-cyan;
+        }
+    }
+    
+    .o_menu_sections {
+        .dropdown {
+            > a {
+                color: \-white;
+                transition: all \-transition-fast;
+                
+                &:hover, &:focus {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: \-electric-cyan;
+                }
+            }
+        }
+    }
+    
+    .o_menu_systray {
+        > .dropdown {
+            > a {
+                color: \-white;
+                
+                &:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: \-electric-cyan;
+                }
+            }
+        }
+    }
+}
+
+// Dropdown Menus
+.dropdown-menu {
+    border-radius: \-radius-md;
+    box-shadow: \-shadow-lg;
+    border: 1px solid \-light-gray;
+    
+    .dropdown-item {
+        transition: all \-transition-fast;
+        
+        &:hover, &:focus {
+            background: \-ice-white;
+            color: \-ocean-blue;
+        }
+        
+        &.active {
+            background: \-ocean-blue;
+            color: \-white;
+        }
+    }
+}
+
+// App Drawer
+.o_action_manager {
+    .o_home_menu {
+        background: \-off-white;
+        
+        .o_app {
+            border-radius: \-radius-lg;
+            box-shadow: \-shadow-sm;
+            transition: all \-transition-normal;
+            
+            &:hover {
+                box-shadow: \-shadow-md;
+                transform: translateY(-4px);
+                
+                .o_caption {
+                    color: \-ocean-blue;
+                }
+            }
+        }
+    }
+}
+
+// Search Bar
+.o_searchview {
+    .o_searchview_input {
+        border-radius: \-radius-md;
+        border: 1px solid \-light-gray;
+        transition: all \-transition-fast;
+        
+        &:focus {
+            border-color: \-ocean-blue;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+    }
+    
+    .o_searchview_facet {
+        background: \-ice-white;
+        border-radius: \-radius-sm;
+        color: \-ocean-blue;
+    }
+}
