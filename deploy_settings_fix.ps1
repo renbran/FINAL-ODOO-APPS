@@ -40,13 +40,8 @@ if ($response -eq 'y' -or $response -eq 'Y') {
     Write-Host ""
     Write-Host "🔄 Connecting to server..." -ForegroundColor Yellow
     
-    $commands = @"
-cd /opt/odoo17/odoo17_final && 
-git pull origin main && 
-/opt/odoo17/venv/bin/python3 /opt/odoo17/odoo/odoo-bin -c /etc/odoo17.conf -d $ODOO_DB -u $MODULE_NAME --stop-after-init
-"@
-    
-    ssh "odoo@$ODOO_SERVER" $commands
+    # Execute commands via SSH
+    ssh "odoo@$ODOO_SERVER" "cd /opt/odoo17/odoo17_final; git pull origin main; /opt/odoo17/venv/bin/python3 /opt/odoo17/odoo/odoo-bin -c /etc/odoo17.conf -d $ODOO_DB -u $MODULE_NAME --stop-after-init"
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host ""
