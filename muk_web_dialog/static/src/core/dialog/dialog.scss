@@ -1,47 +1,47 @@
 // OSUS Properties Dialog Styles
 .mk_btn_dialog_size {
-	color: $btn-close-color;
-	opacity: $btn-close-opacity;
-	transition: opacity 0.2s ease, color 0.2s ease;
-	&:hover {
-	    opacity: $btn-close-hover-opacity;
-	    color: #FFD700; // OSUS Gold on hover
-	}
+  color: $btn-close-color;
+  opacity: $btn-close-opacity;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  &:hover {
+    opacity: $btn-close-hover-opacity;
+    color: #ffd700; // OSUS Gold on hover
+  }
 }
 
 // OSUS branded modal headers
 .modal-header {
-    background: linear-gradient(135deg, #800020 0%, #600018 100%);
-    color: #FFD700;
-    border-bottom: 3px solid #FFD700;
-    
-    .modal-title {
-        color: #FFD700;
-        font-weight: 600;
+  background: linear-gradient(135deg, #800020 0%, #600018 100%);
+  color: #ffd700;
+  border-bottom: 3px solid #ffd700;
+
+  .modal-title {
+    color: #ffd700;
+    font-weight: 600;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    &:hover {
+      opacity: 1;
     }
-    
-    .btn-close {
-        filter: brightness(0) invert(1);
-        opacity: 0.8;
-        &:hover {
-            opacity: 1;
-        }
-    }
+  }
 }
 
 // OSUS branded dialog buttons
 .modal-footer {
-    border-top: 2px solid #FFD700;
-    
-    .btn-primary {
-        background-color: #800020;
-        border-color: #800020;
-        color: #FFD700;
-        font-weight: 500;
-        &:hover {
-            background-color: #600018;
-            border-color: #600018;
-            box-shadow: 0 2px 8px rgba(128, 0, 32, 0.3);
-        }
+  border-top: 2px solid #ffd700;
+
+  .btn-primary {
+    background-color: #800020;
+    border-color: #800020;
+    color: #ffd700;
+    font-weight: 500;
+    &:hover {
+      background-color: #600018;
+      border-color: #600018;
+      box-shadow: 0 2px 8px rgba(128, 0, 32, 0.3);
     }
+  }
 }
