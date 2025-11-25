@@ -1,0 +1,205 @@
+// OSUS Properties - Settings Page Fixes
+// ======================================
+// Fixes for the res.config.settings form view
+
+@import "osus_variables";
+
+// Fix settings page layout
+.o_form_view.o_xxl_form_view {
+    // Hide the rogue "Toggle Dropdown" button
+    button:contains("Toggle Dropdown"),
+    .btn:contains("Toggle Dropdown"),
+    button[data-toggle="dropdown"]:empty {
+        display: none !important;
+    }
+
+    // Settings container styling
+    .o_settings_container {
+        background: $osus-white;
+        border-radius: $osus-border-radius-lg;
+        padding: $osus-spacing-lg;
+        margin-bottom: $osus-spacing-md;
+        box-shadow: $osus-shadow-sm;
+        border-left: 4px solid $osus-gold-medium;
+
+        .o_setting_box {
+            margin-bottom: $osus-spacing-md;
+            padding: $osus-spacing-md;
+            background: lighten($osus-gold-primary, 5%);
+            border-radius: $osus-border-radius-md;
+            transition: all $osus-transition-standard;
+
+            &:hover {
+                box-shadow: $osus-shadow-md;
+                transform: translateX(2px);
+            }
+
+            .o_setting_left_pane {
+                margin-right: $osus-spacing-md;
+            }
+
+            .o_setting_right_pane {
+                label {
+                    color: $osus-burgundy-primary;
+                    font-weight: $osus-font-weight-semibold;
+                    font-size: 1.05rem;
+                }
+
+                .text-muted {
+                    color: $osus-dark-gray !important;
+                }
+            }
+        }
+    }
+
+    // App settings blocks
+    .app_settings_block {
+        margin-bottom: $osus-spacing-xl;
+        
+        h2 {
+            color: $osus-burgundy-primary;
+            font-weight: $osus-font-weight-bold;
+            border-bottom: 3px solid $osus-gold-medium;
+            padding-bottom: $osus-spacing-sm;
+            margin-bottom: $osus-spacing-lg;
+        }
+    }
+
+    // Settings header area
+    .o_form_sheet_bg {
+        background: linear-gradient(
+            135deg,
+            $osus-white 0%,
+            lighten($osus-gold-primary, 4%) 100%
+        );
+
+        .o_form_sheet {
+            border-radius: $osus-border-radius-lg;
+            box-shadow: $osus-shadow-lg;
+            padding: $osus-spacing-xl;
+        }
+    }
+
+    // Settings navigation tabs
+    .settings_tab {
+        background: $osus-white;
+        border-radius: $osus-border-radius-md;
+        padding: $osus-spacing-sm;
+        margin-bottom: $osus-spacing-md;
+
+        .nav-link {
+            color: $osus-dark-gray;
+            font-weight: $osus-font-weight-medium;
+            transition: all $osus-transition-standard;
+            border-radius: $osus-border-radius-sm;
+
+            &:hover {
+                background: $osus-offwhite-burgundy-gradient;
+                color: $osus-burgundy-primary;
+            }
+
+            &.active {
+                background: $osus-burgundy-gradient;
+                color: $osus-white !important;
+                box-shadow: $osus-shadow-sm;
+            }
+        }
+    }
+}
+
+// Hide empty or broken dropdown toggles globally in settings
+.o_web_settings_dashboard,
+.o_form_view[data-view-type="form"].o_xxl_form_view {
+    // Target any dropdown toggle that's empty or just says "Toggle Dropdown"
+    .dropdown-toggle:empty,
+    button[data-bs-toggle="dropdown"]:empty,
+    button[data-toggle="dropdown"]:empty,
+    .btn-secondary.dropdown-toggle:not(.o_dropdown_kanban):not(.o_field_dropdown) {
+        &:not([name]):not([title]):not([aria-label]) {
+            display: none !important;
+        }
+    }
+
+    // Also hide if it contains only the text "Toggle Dropdown"
+    button {
+        &:not([name]):not([class*="o_"]) {
+            &:empty,
+            &:contains("Toggle Dropdown") {
+                display: none !important;
+            }
+        }
+    }
+}
+
+// Settings page specific fixes
+.o_res_config_settings {
+    // Ensure proper container structure
+    .settings {
+        max-width: 100%;
+        padding: $osus-spacing-lg;
+    }
+
+    // Fix for the company info settings
+    .company_logo {
+        border-radius: $osus-border-radius-md;
+        border: 2px solid $osus-gold-medium;
+        padding: $osus-spacing-sm;
+        background: $osus-white;
+    }
+
+    // User settings list styling
+    .o_users_list {
+        .o_user_item {
+            background: $osus-white;
+            border-radius: $osus-border-radius-md;
+            padding: $osus-spacing-md;
+            margin-bottom: $osus-spacing-sm;
+            border-left: 3px solid $osus-gold-medium;
+            transition: all $osus-transition-fast;
+
+            &:hover {
+                box-shadow: $osus-shadow-md;
+                transform: translateX(4px);
+                border-left-color: $osus-burgundy-primary;
+            }
+        }
+    }
+}
+
+// Settings save/discard buttons
+.o_form_view .o_form_statusbar {
+    background: $osus-white;
+    border-radius: $osus-border-radius-md $osus-border-radius-md 0 0;
+    padding: $osus-spacing-md;
+    border-bottom: 2px solid $osus-gold-medium;
+
+    button.btn-primary {
+        background: $osus-burgundy-gradient !important;
+        border: none;
+        color: $osus-white;
+        font-weight: $osus-font-weight-semibold;
+        padding: $osus-spacing-sm $osus-spacing-lg;
+        border-radius: $osus-border-radius-md;
+        transition: all $osus-transition-standard;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $osus-shadow-md;
+        }
+    }
+
+    button.btn-secondary {
+        background: $osus-white;
+        border: 2px solid $osus-gold-medium;
+        color: $osus-burgundy-primary;
+        font-weight: $osus-font-weight-medium;
+        padding: $osus-spacing-sm $osus-spacing-lg;
+        border-radius: $osus-border-radius-md;
+        transition: all $osus-transition-standard;
+
+        &:hover {
+            background: lighten($osus-gold-primary, 5%);
+            border-color: $osus-burgundy-primary;
+        }
+    }
+}
