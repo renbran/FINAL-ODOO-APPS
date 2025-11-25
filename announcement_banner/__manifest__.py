@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Announcement Banner - OSUSAPPS',
-    'version': '17.0.1.2.1',
+    'version': '17.0.1.2.2',
     'category': 'Productivity/Communications',
     'summary': 'Professional Announcement Banners with Rich Content Support',
     'description': """

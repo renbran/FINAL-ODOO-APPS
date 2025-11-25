@@ -31,9 +31,10 @@ export class AnnouncementBanner extends Component {
 
       if (announcements && announcements.length > 0) {
         // Process announcements to wrap message in markup for HTML rendering
+        // Using markup() + t-out (not t-raw) for proper Odoo 17 HTML rendering
         this.state.announcements = announcements.map((announcement) => ({
           ...announcement,
-          message: markup(announcement.message), // KEY FIX: Wrap message in markup()
+          message: markup(announcement.message), // Wrap in markup() for safe HTML rendering
         }));
         this.state.showBanner = true;
       }

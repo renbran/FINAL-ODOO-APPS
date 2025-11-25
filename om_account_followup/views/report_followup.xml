@@ -24,7 +24,7 @@
                                 <span t-field="o.partner_id.ref"/>
                             </p>
 
-                            <p t-raw="get_text(o,data['followup_id']).replace('\n', '&lt;br&gt;')"/>
+                            <p t-out="get_text(o,data['followup_id']).replace('\n', '&lt;br&gt;')"/>
 
                             <t t-foreach="getLines(o)" t-as="cur_lines">
                                 <table class="table table-condensed"

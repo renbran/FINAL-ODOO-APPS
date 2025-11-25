@@ -768,7 +768,7 @@
                                                     </h6>
                                                 </div>
                                                 <t t-if="img_count % 4 == 0">
-                                                    <t t-raw="ap_tag" />
+                                                    <t t-out="ap_tag" />
                                                 </t>
                                             </t>
                                         </td>
@@ -865,7 +865,7 @@
                                                     </h5>
                                                 </div>
                                                 <t t-if="img_count % 4 == 0">
-                                                    <t t-raw="ap_tag" />
+                                                    <t t-out="ap_tag" />
                                                 </t>
                                             </t>
                                         </td>
