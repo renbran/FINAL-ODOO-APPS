@@ -1,0 +1,208 @@
+// OSUS Properties - Calendar View Fixes
+// ======================================
+// Fixes for calendar view layout issues
+
+@import "osus_variables";
+
+// Calendar View Container
+.o_calendar_view {
+    // Reset any conflicting styles
+    font-size: inherit;
+    line-height: normal;
+    
+    // Ensure proper layout
+    .fc {
+        // FullCalendar base fixes
+        font-size: 0.875rem;
+        
+        .fc-toolbar {
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            
+            .fc-toolbar-title {
+                font-size: 1.25rem;
+                font-weight: $osus-font-weight-semibold;
+                color: $osus-burgundy-primary;
+                margin: 0.5rem 0;
+            }
+            
+            .fc-button {
+                background: $osus-burgundy-gradient !important;
+                border: none;
+                color: $osus-white;
+                padding: 0.375rem 0.75rem;
+                border-radius: $osus-border-radius-sm;
+                transition: all $osus-transition-fast;
+                
+                &:hover {
+                    transform: translateY(-1px);
+                    box-shadow: $osus-shadow-sm;
+                }
+                
+                &.fc-button-active {
+                    background: $osus-gold-medium !important;
+                    color: $osus-burgundy-primary;
+                }
+            }
+        }
+        
+        // Calendar grid
+        .fc-view {
+            background: $osus-white;
+            border-radius: $osus-border-radius-md;
+            overflow: hidden;
+        }
+        
+        // Day headers
+        .fc-col-header-cell {
+            background: lighten($osus-burgundy-light, 45%);
+            font-weight: $osus-font-weight-semibold;
+            padding: 0.75rem 0.5rem;
+            border-color: rgba($osus-burgundy-primary, 0.1);
+        }
+        
+        // Day cells
+        .fc-daygrid-day {
+            border-color: rgba($osus-burgundy-primary, 0.1);
+            
+            &.fc-day-today {
+                background: rgba($osus-gold-primary, 0.1) !important;
+                
+                .fc-daygrid-day-number {
+                    background: $osus-burgundy-gradient;
+                    color: $osus-white;
+                    border-radius: 50%;
+                    width: 28px;
+                    height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: $osus-font-weight-bold;
+                }
+            }
+            
+            &.fc-day-other {
+                opacity: 0.5;
+            }
+        }
+        
+        // Events
+        .fc-event {
+            border-radius: $osus-border-radius-sm;
+            padding: 2px 4px;
+            margin: 1px 0;
+            font-size: 0.813rem;
+            border-left-width: 3px;
+            
+            &:hover {
+                box-shadow: $osus-shadow-sm;
+            }
+        }
+        
+        .fc-daygrid-event {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        // Time grid (week/day view)
+        .fc-timegrid {
+            .fc-timegrid-slot {
+                height: 2rem;
+                border-color: rgba($osus-burgundy-primary, 0.05);
+            }
+            
+            .fc-timegrid-axis {
+                background: lighten($osus-burgundy-light, 47%);
+            }
+        }
+        
+        // Popover
+        .fc-popover {
+            background: $osus-white;
+            border: 2px solid $osus-gold-medium;
+            border-radius: $osus-border-radius-md;
+            box-shadow: $osus-shadow-lg;
+            
+            .fc-popover-header {
+                background: $osus-burgundy-gradient;
+                color: $osus-white;
+                font-weight: $osus-font-weight-semibold;
+                padding: 0.5rem 0.75rem;
+                border-radius: $osus-border-radius-md $osus-border-radius-md 0 0;
+            }
+        }
+    }
+    
+    // Odoo-specific calendar classes
+    .o_calendar_container {
+        padding: $osus-spacing-md;
+        background: $osus-white;
+        border-radius: $osus-border-radius-lg;
+        box-shadow: $osus-shadow-sm;
+    }
+    
+    .o_calendar_sidebar {
+        background: lighten($osus-gold-primary, 5%);
+        padding: $osus-spacing-md;
+        border-radius: $osus-border-radius-md;
+        border-left: 3px solid $osus-gold-medium;
+        
+        .o_calendar_filter {
+            padding: $osus-spacing-sm;
+            margin-bottom: $osus-spacing-xs;
+            border-radius: $osus-border-radius-sm;
+            transition: all $osus-transition-fast;
+            
+            &:hover {
+                background: rgba($osus-burgundy-primary, 0.05);
+            }
+            
+            input[type="checkbox"] {
+                accent-color: $osus-burgundy-primary;
+            }
+        }
+    }
+}
+
+// Fix for calendar in form view sidepanel
+.o_form_view .o_calendar_view {
+    padding: 0;
+    
+    .fc {
+        font-size: 0.813rem;
+        
+        .fc-toolbar {
+            margin-bottom: 0.5rem;
+            
+            .fc-toolbar-title {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// Gantt view similar fixes (if gantt is used)
+.o_gantt_view {
+    .o_gantt_header {
+        background: lighten($osus-burgundy-light, 45%);
+        font-weight: $osus-font-weight-semibold;
+        border-bottom: 2px solid $osus-gold-medium;
+    }
+    
+    .o_gantt_row {
+        &:hover {
+            background: rgba($osus-gold-primary, 0.05);
+        }
+    }
+}
+
+// Ensure calendar doesn't inherit problematic styles
+.o_calendar_view, .o_gantt_view, .fc {
+    * {
+        box-sizing: border-box;
+    }
+    
+    // Reset transforms that might break positioning
+    transform: none !important;
+}

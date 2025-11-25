@@ -1,6 +1,6 @@
 {
     'name': 'OSUS Premium Branding',
-    'version': '17.0.1.0.1',
+    'version': '17.0.1.0.2',
     'category': 'Theme/Branding',
     'summary': 'Premium luxury branding for OSUS Properties - Global Odoo transformation',
     'description': '''
@@ -37,6 +37,7 @@
             'osus_premium/static/src/scss/osus_components.scss',
             'osus_premium/static/src/scss/osus_forms.scss',
             'osus_premium/static/src/scss/osus_settings.scss',
+            'osus_premium/static/src/scss/osus_calendar.scss',
             'osus_premium/static/src/scss/osus_buttons.scss',
             'osus_premium/static/src/scss/osus_animations.scss',
             'osus_premium/static/src/js/settings_fixes.js',
