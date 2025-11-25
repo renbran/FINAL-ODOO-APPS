@@ -17,8 +17,18 @@ body {
 }
 
 // Override Odoo's default font (scoped to avoid breaking calendar/complex views)
-body, .o_web_client, .o_action_manager, .o_form_view, .o_list_view, 
-.o_kanban_view, .o_menu_systray, .o_navbar, button, input, select, textarea {
+body,
+.o_web_client,
+.o_action_manager,
+.o_form_view,
+.o_list_view,
+.o_kanban_view,
+.o_menu_systray,
+.o_navbar,
+button,
+input,
+select,
+textarea {
   font-family: $osus-font-family-primary !important;
 }
 
