@@ -1,70 +1,15 @@
-// SGC TECH AI - Global Theme Overrides
+// SGC TECH AI - Core Theme Overrides
 @import 'sgc_colors';
 
-// Control Panel
-.o_control_panel {
-    background: \-white;
-    border-bottom: 1px solid \-light-gray;
-    box-shadow: \-shadow-sm;
-    
-    .o_cp_buttons {
-        .btn {
-            border-radius: \-radius-sm;
-            transition: all \-transition-fast;
-        }
-    }
-    
-    .breadcrumb {
-        .breadcrumb-item {
-            color: \-dark-gray;
-            
-            &.active {
-                color: \-ocean-blue;
-                font-weight: \-font-medium;
-            }
-        }
-    }
-}
-
-// Status Bar
-.o_form_statusbar {
-    border-bottom: 2px solid \-light-gray;
-    
-    .o_arrow_button {
-        border-radius: \-radius-sm;
-        transition: all \-transition-fast;
-        
-        &.btn-primary {
-            background: \-ocean-blue;
-            
-            &:hover {
-                background: \-deep-navy;
-            }
-        }
-        
-        &.btn-secondary {
-            background: \-light-gray;
-            color: \-dark-gray;
-        }
-    }
-}
-
-// Modals
+// Modal Dialogs
 .modal {
-    .modal-content {
-        border-radius: \-radius-lg;
-        box-shadow: \-shadow-lg;
-        border: none;
-    }
-    
     .modal-header {
-        background: \-gradient-ocean;
-        color: \-white;
-        border-bottom: 3px solid \-electric-cyan;
-        border-radius: \-radius-lg \-radius-lg 0 0;
+        background: $sgc-gradient-ocean;
+        color: $sgc-white;
+        border-bottom: 2px solid $sgc-ocean-blue;
         
         .modal-title {
-            font-weight: \-font-semibold;
+            font-weight: $sgc-font-bold;
         }
         
         .btn-close {
@@ -72,85 +17,272 @@
         }
     }
     
+    .modal-body {
+        background: $sgc-off-white;
+    }
+    
     .modal-footer {
-        border-top: 1px solid \-light-gray;
-        background: \-off-white;
+        background: $sgc-ice-white;
+        border-top: 1px solid $sgc-light-gray;
     }
 }
 
-// Alerts & Notifications
+// Alerts and Notifications
 .alert {
-    border-radius: \-radius-md;
+    border-radius: $sgc-radius-md;
     border-left-width: 4px;
     
     &.alert-success {
-        border-left-color: \-success;
-        background: lighten(\-success, 45%);
-    }
-    
-    &.alert-warning {
-        border-left-color: \-warning;
-        background: lighten(\-warning, 35%);
-    }
-    
-    &.alert-danger {
-        border-left-color: \-error;
-        background: lighten(\-error, 35%);
+        background: lighten($sgc-success, 45%);
+        border-left-color: $sgc-success;
+        color: darken($sgc-success, 30%);
     }
     
     &.alert-info {
-        border-left-color: \-info;
-        background: \-ice-white;
+        background: lighten($sgc-ocean-blue, 40%);
+        border-left-color: $sgc-ocean-blue;
+        color: darken($sgc-ocean-blue, 25%);
+    }
+    
+    &.alert-warning {
+        background: lighten($sgc-warning, 35%);
+        border-left-color: $sgc-warning;
+        color: darken($sgc-warning, 30%);
+    }
+    
+    &.alert-danger {
+        background: lighten($sgc-error, 35%);
+        border-left-color: $sgc-error;
+        color: darken($sgc-error, 25%);
+    }
+}
+
+// Control Panel
+.o_control_panel {
+    background: $sgc-gradient-ocean;
+    box-shadow: $sgc-shadow-md;
+    
+    .o_cp_top {
+        .breadcrumb {
+            .breadcrumb-item {
+                color: $sgc-white;
+                
+                a {
+                    color: $sgc-electric-cyan;
+                    
+                    &:hover {
+                        color: $sgc-neon-green;
+                    }
+                }
+                
+                &.active {
+                    color: $sgc-off-white;
+                }
+            }
+        }
+        
+        .o_cp_searchview {
+            .o_searchview_input_container {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: $sgc-radius-md;
+                
+                input {
+                    color: $sgc-white;
+                    
+                    &::placeholder {
+                        color: rgba(255, 255, 255, 0.6);
+                    }
+                }
+            }
+        }
+    }
+    
+    .o_cp_buttons {
+        .btn-primary {
+            background: $sgc-gradient-electric;
+            border: none;
+            
+            &:hover {
+                background: $sgc-gradient-success;
+            }
+        }
+    }
+}
+
+// Tabs
+.nav-tabs {
+    border-bottom: 2px solid $sgc-light-gray;
+    
+    .nav-link {
+        color: $sgc-slate-gray;
+        border-bottom: 3px solid transparent;
+        transition: all $sgc-transition-fast;
+        
+        &:hover {
+            color: $sgc-ocean-blue;
+            border-bottom-color: $sgc-sky-blue;
+        }
+        
+        &.active {
+            color: $sgc-ocean-blue;
+            border-bottom-color: $sgc-ocean-blue;
+            font-weight: $sgc-font-semibold;
+        }
+    }
+}
+
+// Badges
+.badge {
+    font-weight: $sgc-font-medium;
+    padding: 0.35em 0.65em;
+    border-radius: $sgc-radius-sm;
+    
+    &.badge-primary {
+        background: $sgc-ocean-blue;
+        color: $sgc-white;
+    }
+    
+    &.badge-success {
+        background: $sgc-success;
+        color: $sgc-white;
+    }
+    
+    &.badge-warning {
+        background: $sgc-warning;
+        color: $sgc-deep-navy;
+    }
+    
+    &.badge-danger {
+        background: $sgc-error;
+        color: $sgc-white;
+    }
+    
+    &.badge-info {
+        background: $sgc-sky-blue;
+        color: $sgc-white;
+    }
+}
+
+// Pagination
+.pagination {
+    .page-link {
+        color: $sgc-ocean-blue;
+        border: 1px solid $sgc-light-gray;
+        transition: all $sgc-transition-fast;
+        
+        &:hover {
+            background: $sgc-ice-white;
+            border-color: $sgc-ocean-blue;
+        }
+    }
+    
+    .page-item.active .page-link {
+        background: $sgc-gradient-ocean;
+        border-color: $sgc-ocean-blue;
+    }
+}
+
+// Dropdown Menus
+.dropdown-menu {
+    border-radius: $sgc-radius-md;
+    box-shadow: $sgc-shadow-lg;
+    border: 1px solid $sgc-light-gray;
+    
+    .dropdown-item {
+        transition: all $sgc-transition-fast;
+        
+        &:hover,
+        &:focus {
+            background: $sgc-ice-white;
+            color: $sgc-ocean-blue;
+        }
+        
+        &.active {
+            background: $sgc-gradient-ocean;
+            color: $sgc-white;
+        }
+    }
+    
+    .dropdown-divider {
+        border-color: $sgc-light-gray;
+    }
+}
+
+// Progress Bars
+.progress {
+    background: $sgc-off-white;
+    border-radius: $sgc-radius-md;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    
+    .progress-bar {
+        background: $sgc-gradient-electric;
+        transition: width $sgc-transition-base;
+        
+        &.bg-success {
+            background: $sgc-gradient-success;
+        }
     }
 }
 
 // Tooltips
 .tooltip {
     .tooltip-inner {
-        background: \-charcoal;
-        border-radius: \-radius-sm;
-        box-shadow: \-shadow-md;
+        background: $sgc-deep-navy;
+        color: $sgc-white;
+        border-radius: $sgc-radius-sm;
+        box-shadow: $sgc-shadow-md;
+    }
+    
+    &.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: $sgc-deep-navy;
+    }
+    
+    &.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: $sgc-deep-navy;
     }
 }
 
-// Badges
-.badge {
-    border-radius: \-radius-sm;
-    font-weight: \-font-medium;
-    padding: 0.25rem 0.5rem;
+// Popovers
+.popover {
+    border-radius: $sgc-radius-md;
+    box-shadow: $sgc-shadow-lg;
+    border-color: $sgc-light-gray;
     
-    &.badge-primary {
-        background: \-ocean-blue;
+    .popover-header {
+        background: $sgc-gradient-ocean;
+        color: $sgc-white;
+        border-bottom-color: $sgc-ocean-blue;
+        font-weight: $sgc-font-semibold;
     }
     
-    &.badge-success {
-        background: \-success;
-    }
-    
-    &.badge-warning {
-        background: \-warning;
-    }
-    
-    &.badge-danger {
-        background: \-error;
+    .popover-body {
+        background: $sgc-off-white;
     }
 }
 
-// Scrollbars (Webkit)
+// Spinners/Loading
+.o_loading {
+    .o_spinner {
+        border-color: $sgc-light-gray;
+        border-top-color: $sgc-ocean-blue;
+    }
+}
+
+// Scrollbars (webkit only)
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: \-off-white;
+    background: $sgc-off-white;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: \-slate-gray;
-    border-radius: \-radius-sm;
+    background: $sgc-slate-gray;
+    border-radius: $sgc-radius-sm;
     
     &:hover {
-        background: \-ocean-blue;
+        background: $sgc-ocean-blue;
     }
 }

@@ -1,134 +1,134 @@
 // SGC TECH AI - Dashboard Styling
-@import 'sgc_colors';
+@import "sgc_colors";
 
 // Dashboard Container
 .o_dashboard {
-    padding: 1.5rem;
-    background: \-off-white;
-    
-    .o_dashboard_title {
-        color: \-deep-navy;
-        font-size: \-text-2xl;
-        font-weight: \-font-bold;
-        margin-bottom: 1.5rem;
-    }
+  padding: 1.5rem;
+  background: $sgc-off-white;
+
+  .o_dashboard_title {
+    color: $sgc-deep-navy;
+    font-size: $sgc-text-2xl;
+    font-weight: $sgc-font-bold;
+    margin-bottom: 1.5rem;
+  }
 }
 
 // KPI Cards
 .o_dashboard_kpi {
-    background: \-white;
-    border-radius: \-radius-lg;
-    box-shadow: \-shadow-sm;
-    padding: 1.5rem;
-    transition: all \-transition-normal;
-    
-    &:hover {
-        box-shadow: \-shadow-md;
-        transform: translateY(-2px);
+  background: $sgc-white;
+  border-radius: $sgc-radius-lg;
+  box-shadow: $sgc-shadow-sm;
+  padding: 1.5rem;
+  transition: all $sgc-transition-normal;
+
+  &:hover {
+    box-shadow: $sgc-shadow-md;
+    transform: translateY(-2px);
+  }
+
+  .o_kpi_value {
+    font-size: $sgc-text-3xl;
+    font-weight: $sgc-font-bold;
+    color: $sgc-ocean-blue;
+  }
+
+  .o_kpi_label {
+    color: $sgc-dark-gray;
+    font-size: $sgc-text-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .o_kpi_trend {
+    font-size: $sgc-text-sm;
+    font-weight: $sgc-font-medium;
+
+    &.positive {
+      color: $sgc-success;
     }
-    
-    .o_kpi_value {
-        font-size: \-text-3xl;
-        font-weight: \-font-bold;
-        color: \-ocean-blue;
+
+    &.negative {
+      color: $sgc-error;
     }
-    
-    .o_kpi_label {
-        color: \-dark-gray;
-        font-size: \-text-sm;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .o_kpi_trend {
-        font-size: \-text-sm;
-        font-weight: \-font-medium;
-        
-        &.positive {
-            color: \-success;
-        }
-        
-        &.negative {
-            color: \-error;
-        }
-    }
+  }
 }
 
 // Chart Containers
 .o_dashboard_chart {
-    background: \-white;
-    border-radius: \-radius-lg;
-    box-shadow: \-shadow-sm;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    
-    .o_chart_title {
-        font-size: \-text-lg;
-        font-weight: \-font-semibold;
-        color: \-deep-navy;
-        margin-bottom: 1rem;
-    }
-    
-    canvas {
-        max-height: 300px;
-    }
+  background: $sgc-white;
+  border-radius: $sgc-radius-lg;
+  box-shadow: $sgc-shadow-sm;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  .o_chart_title {
+    font-size: $sgc-text-lg;
+    font-weight: $sgc-font-semibold;
+    color: $sgc-deep-navy;
+    margin-bottom: 1rem;
+  }
+
+  canvas {
+    max-height: 300px;
+  }
 }
 
 // Grid Layout
 .o_dashboard_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 // Widget Styling
 .o_dashboard_widget {
-    background: \-white;
-    border-radius: \-radius-lg;
-    box-shadow: \-shadow-sm;
-    padding: 1rem;
-    
-    .o_widget_header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid \-ice-white;
-        
-        .o_widget_title {
-            font-weight: \-font-semibold;
-            color: \-ocean-blue;
-        }
-        
-        .o_widget_actions {
-            .btn {
-                padding: 0.25rem 0.5rem;
-                font-size: \-text-sm;
-            }
-        }
+  background: $sgc-white;
+  border-radius: $sgc-radius-lg;
+  box-shadow: $sgc-shadow-sm;
+  padding: 1rem;
+
+  .o_widget_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid $sgc-ice-white;
+
+    .o_widget_title {
+      font-weight: $sgc-font-semibold;
+      color: $sgc-ocean-blue;
     }
+
+    .o_widget_actions {
+      .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: $sgc-text-sm;
+      }
+    }
+  }
 }
 
 // Activity Widget
 .o_dashboard_activity {
-    .o_activity_item {
-        padding: 0.75rem;
-        border-left: 3px solid \-sky-blue;
-        background: \-ice-white;
-        border-radius: \-radius-sm;
-        margin-bottom: 0.5rem;
-        transition: all \-transition-fast;
-        
-        &:hover {
-            background: \-light-sky;
-            border-left-color: \-ocean-blue;
-        }
-        
-        .o_activity_date {
-            font-size: \-text-xs;
-            color: \-slate-gray;
-        }
+  .o_activity_item {
+    padding: 0.75rem;
+    border-left: 3px solid $sgc-sky-blue;
+    background: $sgc-ice-white;
+    border-radius: $sgc-radius-sm;
+    margin-bottom: 0.5rem;
+    transition: all $sgc-transition-fast;
+
+    &:hover {
+      background: $sgc-light-sky;
+      border-left-color: $sgc-ocean-blue;
     }
+
+    .o_activity_date {
+      font-size: $sgc-text-xs;
+      color: $sgc-slate-gray;
+    }
+  }
 }

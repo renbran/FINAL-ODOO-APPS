@@ -1,108 +1,110 @@
 // SGC TECH AI - Header & Navigation Theme
-@import 'sgc_colors';
+@import "sgc_colors";
 
 // Main Navigation Bar
 .o_main_navbar {
-    background: \-gradient-ocean;
-    border-bottom: 3px solid \-electric-cyan;
-    box-shadow: \-shadow-md;
-    
-    .o_menu_brand {
-        color: \-white;
-        font-weight: \-font-bold;
-        
+  background: $sgc-gradient-ocean;
+  border-bottom: 3px solid $sgc-electric-cyan;
+  box-shadow: $sgc-shadow-md;
+
+  .o_menu_brand {
+    color: $sgc-white;
+    font-weight: $sgc-font-bold;
+
+    &:hover {
+      color: $sgc-electric-cyan;
+    }
+  }
+
+  .o_menu_sections {
+    .dropdown {
+      > a {
+        color: $sgc-white;
+        transition: all $sgc-transition-fast;
+
+        &:hover,
+        &:focus {
+          background: rgba(255, 255, 255, 0.1);
+          color: $sgc-electric-cyan;
+        }
+      }
+    }
+  }
+
+  .o_menu_systray {
+    > .dropdown {
+      > a {
+        color: $sgc-white;
+
         &:hover {
-            color: \-electric-cyan;
+          background: rgba(255, 255, 255, 0.1);
+          color: $sgc-electric-cyan;
         }
+      }
     }
-    
-    .o_menu_sections {
-        .dropdown {
-            > a {
-                color: \-white;
-                transition: all \-transition-fast;
-                
-                &:hover, &:focus {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: \-electric-cyan;
-                }
-            }
-        }
-    }
-    
-    .o_menu_systray {
-        > .dropdown {
-            > a {
-                color: \-white;
-                
-                &:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: \-electric-cyan;
-                }
-            }
-        }
-    }
+  }
 }
 
 // Dropdown Menus
 .dropdown-menu {
-    border-radius: \-radius-md;
-    box-shadow: \-shadow-lg;
-    border: 1px solid \-light-gray;
-    
-    .dropdown-item {
-        transition: all \-transition-fast;
-        
-        &:hover, &:focus {
-            background: \-ice-white;
-            color: \-ocean-blue;
-        }
-        
-        &.active {
-            background: \-ocean-blue;
-            color: \-white;
-        }
+  border-radius: $sgc-radius-md;
+  box-shadow: $sgc-shadow-lg;
+  border: 1px solid $sgc-light-gray;
+
+  .dropdown-item {
+    transition: all $sgc-transition-fast;
+
+    &:hover,
+    &:focus {
+      background: $sgc-ice-white;
+      color: $sgc-ocean-blue;
     }
+
+    &.active {
+      background: $sgc-ocean-blue;
+      color: $sgc-white;
+    }
+  }
 }
 
 // App Drawer
 .o_action_manager {
-    .o_home_menu {
-        background: \-off-white;
-        
-        .o_app {
-            border-radius: \-radius-lg;
-            box-shadow: \-shadow-sm;
-            transition: all \-transition-normal;
-            
-            &:hover {
-                box-shadow: \-shadow-md;
-                transform: translateY(-4px);
-                
-                .o_caption {
-                    color: \-ocean-blue;
-                }
-            }
+  .o_home_menu {
+    background: $sgc-off-white;
+
+    .o_app {
+      border-radius: $sgc-radius-lg;
+      box-shadow: $sgc-shadow-sm;
+      transition: all $sgc-transition-normal;
+
+      &:hover {
+        box-shadow: $sgc-shadow-md;
+        transform: translateY(-4px);
+
+        .o_caption {
+          color: $sgc-ocean-blue;
         }
+      }
     }
+  }
 }
 
 // Search Bar
 .o_searchview {
-    .o_searchview_input {
-        border-radius: \-radius-md;
-        border: 1px solid \-light-gray;
-        transition: all \-transition-fast;
-        
-        &:focus {
-            border-color: \-ocean-blue;
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-        }
+  .o_searchview_input {
+    border-radius: $sgc-radius-md;
+    border: 1px solid $sgc-light-gray;
+    transition: all $sgc-transition-fast;
+
+    &:focus {
+      border-color: $sgc-ocean-blue;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
     }
-    
-    .o_searchview_facet {
-        background: \-ice-white;
-        border-radius: \-radius-sm;
-        color: \-ocean-blue;
-    }
+  }
+
+  .o_searchview_facet {
+    background: $sgc-ice-white;
+    border-radius: $sgc-radius-sm;
+    color: $sgc-ocean-blue;
+  }
 }

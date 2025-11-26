@@ -7,55 +7,67 @@
 // ============================================================================
 
 // Core Brand Colors - Deep Ocean Palette
-\-deep-navy: #0c1e34;
-\-ocean-blue: #1e3a8a;
-\-sky-blue: #4fc3f7;
+$sgc-deep-navy: #0c1e34;
+$sgc-ocean-blue: #1e3a8a;
+$sgc-sky-blue: #4fc3f7;
 
 // Accent Colors - Tech & Innovation
-\-electric-cyan: #00FFF0;
-\-neon-green: #00FF88;
-\-carbon-black: #0A0A0A;
-\-ice-white: #e8f4fd;
-\-slate-gray: #64748b;
+$sgc-electric-cyan: #00fff0;
+$sgc-neon-green: #00ff88;
+$sgc-carbon-black: #0a0a0a;
+$sgc-ice-white: #e8f4fd;
+$sgc-slate-gray: #64748b;
 
 // Extended Palette for UI Elements
-\-dark-navy: #051429;
-\-light-sky: #b3e5fc;
-\-soft-cyan: #80deea;
-\-pale-green: #80ff99;
+$sgc-dark-navy: #051429;
+$sgc-light-sky: #b3e5fc;
+$sgc-soft-cyan: #80deea;
+$sgc-pale-green: #80ff99;
 
 // Functional Colors
-\-success: #00FF88;
-\-warning: #FFB84D;
-\-error: #FF6B6B;
-\-info: #4fc3f7;
+$sgc-success: #00ff88;
+$sgc-warning: #ffb84d;
+$sgc-error: #ff6b6b;
+$sgc-info: #4fc3f7;
 
 // Neutral Colors
-\-white: #FFFFFF;
-\-off-white: #f8f9fa;
-\-light-gray: #e9ecef;
-\-medium-gray: #adb5bd;
-\-dark-gray: #495057;
-\-charcoal: #212529;
+$sgc-white: #ffffff;
+$sgc-off-white: #f8f9fa;
+$sgc-light-gray: #e9ecef;
+$sgc-medium-gray: #adb5bd;
+$sgc-dark-gray: #495057;
+$sgc-charcoal: #212529;
 
 // Shadow & Overlay
-\-shadow-sm: 0 2px 4px rgba(12, 30, 52, 0.1);
-\-shadow-md: 0 4px 8px rgba(12, 30, 52, 0.15);
-\-shadow-lg: 0 8px 16px rgba(12, 30, 52, 0.2);
-\-overlay: rgba(12, 30, 52, 0.8);
+$sgc-shadow-sm: 0 2px 4px rgba(12, 30, 52, 0.1);
+$sgc-shadow-md: 0 4px 8px rgba(12, 30, 52, 0.15);
+$sgc-shadow-lg: 0 8px 16px rgba(12, 30, 52, 0.2);
+$sgc-overlay: rgba(12, 30, 52, 0.8);
 
 // Gradients
-\-gradient-ocean: linear-gradient(135deg, \-deep-navy 0%, \-ocean-blue 100%);
-\-gradient-sky: linear-gradient(135deg, \-ocean-blue 0%, \-sky-blue 100%);
-\-gradient-electric: linear-gradient(90deg, \-electric-cyan 0%, \-neon-green 100%);
+$sgc-gradient-ocean: linear-gradient(
+  135deg,
+  $sgc-deep-navy 0%,
+  $sgc-ocean-blue 100%
+);
+$sgc-gradient-sky: linear-gradient(
+  135deg,
+  $sgc-ocean-blue 0%,
+  $sgc-sky-blue 100%
+);
+$sgc-gradient-electric: linear-gradient(
+  90deg,
+  $sgc-electric-cyan 0%,
+  $sgc-neon-green 100%
+);
 
 // Border Radius
-\-radius-sm: 4px;
-\-radius-md: 8px;
-\-radius-lg: 12px;
-\-radius-xl: 16px;
+$sgc-radius-sm: 4px;
+$sgc-radius-md: 8px;
+$sgc-radius-lg: 12px;
+$sgc-radius-xl: 16px;
 
 // Transitions
-\-transition-fast: 0.15s ease-in-out;
-\-transition-normal: 0.3s ease-in-out;
-\-transition-slow: 0.5s ease-in-out;
+$sgc-transition-fast: 0.15s ease-in-out;
+$sgc-transition-normal: 0.3s ease-in-out;
+$sgc-transition-slow: 0.5s ease-in-out;

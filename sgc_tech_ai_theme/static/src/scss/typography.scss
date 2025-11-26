@@ -1,66 +1,70 @@
 // SGC TECH AI - Typography System
-@import 'sgc_colors';
+@import "sgc_colors";
 
 // Font Families
-\-font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-\-font-mono: 'Courier New', Courier, monospace;
+$sgc-font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial, sans-serif;
+$sgc-font-mono: "Courier New", Courier, monospace;
 
 // Font Sizes
-\-text-xs: 0.75rem;    // 12px
-\-text-sm: 0.875rem;   // 14px
-\-text-base: 1rem;     // 16px
-\-text-lg: 1.125rem;   // 18px
-\-text-xl: 1.25rem;    // 20px
-\-text-2xl: 1.5rem;    // 24px
-\-text-3xl: 1.875rem;  // 30px
+$sgc-text-xs: 0.75rem; // 12px
+$sgc-text-sm: 0.875rem; // 14px
+$sgc-text-base: 1rem; // 16px
+$sgc-text-lg: 1.125rem; // 18px
+$sgc-text-xl: 1.25rem; // 20px
+$sgc-text-2xl: 1.5rem; // 24px
+$sgc-text-3xl: 1.875rem; // 30px
 
 // Font Weights
-\-font-light: 300;
-\-font-normal: 400;
-\-font-medium: 500;
-\-font-semibold: 600;
-\-font-bold: 700;
+$sgc-font-light: 300;
+$sgc-font-normal: 400;
+$sgc-font-medium: 500;
+$sgc-font-semibold: 600;
+$sgc-font-bold: 700;
 
 // Line Heights
-\-leading-tight: 1.25;
-\-leading-normal: 1.5;
-\-leading-relaxed: 1.75;
+$sgc-leading-tight: 1.25;
+$sgc-leading-normal: 1.5;
+$sgc-leading-relaxed: 1.75;
 
 // Apply typography
 body.o_web_client {
-    font-family: \-font-primary;
-    font-size: \-text-base;
-    line-height: \-leading-normal;
-    color: \-charcoal;
+  font-family: $sgc-font-primary;
+  font-size: $sgc-text-base;
+  line-height: $sgc-leading-normal;
+  color: $sgc-charcoal;
 }
 
-h1, .h1 {
-    font-size: \-text-3xl;
-    font-weight: \-font-bold;
-    line-height: \-leading-tight;
-    color: \-deep-navy;
+h1,
+.h1 {
+  font-size: $sgc-text-3xl;
+  font-weight: $sgc-font-bold;
+  line-height: $sgc-leading-tight;
+  color: $sgc-deep-navy;
 }
 
-h2, .h2 {
-    font-size: \-text-2xl;
-    font-weight: \-font-semibold;
-    line-height: \-leading-tight;
-    color: \-ocean-blue;
+h2,
+.h2 {
+  font-size: $sgc-text-2xl;
+  font-weight: $sgc-font-semibold;
+  line-height: $sgc-leading-tight;
+  color: $sgc-ocean-blue;
 }
 
-h3, .h3 {
-    font-size: \-text-xl;
-    font-weight: \-font-semibold;
-    line-height: \-leading-normal;
-    color: \-ocean-blue;
+h3,
+.h3 {
+  font-size: $sgc-text-xl;
+  font-weight: $sgc-font-semibold;
+  line-height: $sgc-leading-normal;
+  color: $sgc-ocean-blue;
 }
 
 .o_form_label {
-    font-weight: \-font-medium;
-    color: \-dark-gray;
+  font-weight: $sgc-font-medium;
+  color: $sgc-dark-gray;
 }
 
 .btn {
-    font-weight: \-font-medium;
-    transition: all \-transition-fast;
+  font-weight: $sgc-font-medium;
+  transition: all $sgc-transition-fast;
 }

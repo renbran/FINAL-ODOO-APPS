@@ -4,27 +4,27 @@
 // CRM Pipeline
 .o_kanban_view.o_kanban_grouped {
     .o_kanban_group {
-        background: \-off-white;
-        border-radius: \-radius-md;
-        box-shadow: \-shadow-sm;
+        background: $sgc-off-white;
+        border-radius: $sgc-radius-md;
+        box-shadow: $sgc-shadow-sm;
         margin-right: 1rem;
         
         .o_kanban_header {
-            background: \-gradient-ocean;
-            color: \-white;
-            border-radius: \-radius-md \-radius-md 0 0;
+            background: $sgc-gradient-ocean;
+            color: $sgc-white;
+            border-radius: $sgc-radius-md $sgc-radius-md 0 0;
             padding: 0.75rem;
             
             .o_kanban_header_title {
-                font-weight: \-font-semibold;
-                font-size: \-text-lg;
+                font-weight: $sgc-font-semibold;
+                font-size: $sgc-text-lg;
             }
             
             .o_column_quick_create {
-                color: \-white;
+                color: $sgc-white;
                 
                 &:hover {
-                    color: \-electric-cyan;
+                    color: $sgc-electric-cyan;
                 }
             }
         }
@@ -34,34 +34,34 @@
 // Lead/Opportunity Cards
 .o_kanban_record {
     &.o_kanban_record_has_image_fill {
-        border-left: 4px solid \-sky-blue;
+        border-left: 4px solid $sgc-sky-blue;
         
-        &.oe_kanban_color_0 { border-left-color: \-slate-gray; }
-        &.oe_kanban_color_1 { border-left-color: \-ocean-blue; }
-        &.oe_kanban_color_2 { border-left-color: \-sky-blue; }
-        &.oe_kanban_color_3 { border-left-color: \-success; }
-        &.oe_kanban_color_4 { border-left-color: \-warning; }
-        &.oe_kanban_color_5 { border-left-color: \-error; }
+        &.oe_kanban_color_0 { border-left-color: $sgc-slate-gray; }
+        &.oe_kanban_color_1 { border-left-color: $sgc-ocean-blue; }
+        &.oe_kanban_color_2 { border-left-color: $sgc-sky-blue; }
+        &.oe_kanban_color_3 { border-left-color: $sgc-success; }
+        &.oe_kanban_color_4 { border-left-color: $sgc-warning; }
+        &.oe_kanban_color_5 { border-left-color: $sgc-error; }
     }
 }
 
 // Activity Panel
 .o_activity_view {
     .o_activity_record {
-        border-left: 3px solid \-sky-blue;
-        transition: all \-transition-fast;
+        border-left: 3px solid $sgc-sky-blue;
+        transition: all $sgc-transition-fast;
         
         &:hover {
-            border-left-color: \-ocean-blue;
-            background: \-ice-white;
+            border-left-color: $sgc-ocean-blue;
+            background: $sgc-ice-white;
         }
         
         &.o_activity_overdue {
-            border-left-color: \-error;
+            border-left-color: $sgc-error;
         }
         
         &.o_activity_today {
-            border-left-color: \-warning;
+            border-left-color: $sgc-warning;
         }
     }
 }
@@ -71,9 +71,9 @@
     .o_form_sheet {
         .o_field_monetary {
             .o_field_widget {
-                font-size: \-text-2xl;
-                font-weight: \-font-bold;
-                color: \-ocean-blue;
+                font-size: $sgc-text-2xl;
+                font-weight: $sgc-font-bold;
+                color: $sgc-ocean-blue;
             }
         }
     }
@@ -81,17 +81,17 @@
     .o_opportunity_status {
         .o_status_value {
             padding: 0.5rem 1rem;
-            border-radius: \-radius-md;
-            font-weight: \-font-medium;
+            border-radius: $sgc-radius-md;
+            font-weight: $sgc-font-medium;
             
             &.won {
-                background: lighten(\-success, 40%);
-                color: darken(\-success, 20%);
+                background: lighten($sgc-success, 40%);
+                color: darken($sgc-success, 20%);
             }
             
             &.lost {
-                background: lighten(\-error, 35%);
-                color: darken(\-error, 15%);
+                background: lighten($sgc-error, 35%);
+                color: darken($sgc-error, 15%);
             }
         }
     }
@@ -100,37 +100,37 @@
 // CRM Executive Dashboard Integration
 .o_crm_dashboard {
     .o_dashboard_card {
-        border-left: 4px solid \-sky-blue;
+        border-left: 4px solid $sgc-sky-blue;
         
         &:hover {
-            border-left-color: \-ocean-blue;
+            border-left-color: $sgc-ocean-blue;
         }
     }
     
     .o_metric_positive {
-        color: \-success;
-        font-weight: \-font-semibold;
+        color: $sgc-success;
+        font-weight: $sgc-font-semibold;
     }
     
     .o_metric_negative {
-        color: \-error;
-        font-weight: \-font-semibold;
+        color: $sgc-error;
+        font-weight: $sgc-font-semibold;
     }
 }
 
 // Email Thread Integration
 .o_mail_thread {
     .o_mail_thread_message {
-        border-left: 3px solid \-ice-white;
-        transition: border-left-color \-transition-fast;
+        border-left: 3px solid $sgc-ice-white;
+        transition: border-left-color $sgc-transition-fast;
         
         &:hover {
-            border-left-color: \-sky-blue;
+            border-left-color: $sgc-sky-blue;
         }
         
         .o_mail_message_bubble {
-            background: \-off-white;
-            border-radius: \-radius-md;
+            background: $sgc-off-white;
+            border-radius: $sgc-radius-md;
         }
     }
 }
@@ -139,13 +139,13 @@
 .o_res_partner_kanban {
     .o_kanban_record {
         .o_kanban_image {
-            border: 2px solid \-light-gray;
+            border: 2px solid $sgc-light-gray;
             border-radius: 50%;
         }
         
         .oe_kanban_partner_name {
-            color: \-ocean-blue;
-            font-weight: \-font-semibold;
+            color: $sgc-ocean-blue;
+            font-weight: $sgc-font-semibold;
         }
     }
 }

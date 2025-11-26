@@ -1,98 +1,283 @@
 // SGC TECH AI - Content Visibility & Layout
 @import 'sgc_colors';
 
-// Card Components
-.o_kanban_record, .o_kanban_card {
-    border-radius: \-radius-md;
-    box-shadow: \-shadow-sm;
-    transition: all \-transition-normal;
+// Cards and Panels
+.card,
+.o_card {
+    background: $sgc-white;
+    border: 1px solid $sgc-light-gray;
+    border-radius: $sgc-radius-md;
+    box-shadow: $sgc-shadow-sm;
+    transition: all $sgc-transition-base;
     
     &:hover {
-        box-shadow: \-shadow-md;
+        box-shadow: $sgc-shadow-md;
         transform: translateY(-2px);
+    }
+    
+    .card-header,
+    .o_card_header {
+        background: $sgc-ice-white;
+        border-bottom: 2px solid $sgc-light-gray;
+        font-weight: $sgc-font-semibold;
+        color: $sgc-deep-navy;
+    }
+    
+    .card-body,
+    .o_card_body {
+        padding: 1.5rem;
+    }
+    
+    .card-footer,
+    .o_card_footer {
+        background: $sgc-off-white;
+        border-top: 1px solid $sgc-light-gray;
     }
 }
 
 // Form Views
 .o_form_view {
     .o_form_sheet {
-        box-shadow: \-shadow-sm;
-        border-radius: \-radius-md;
-    }
-    
-    .o_group {
-        margin-bottom: 1rem;
+        background: $sgc-white;
+        border-radius: $sgc-radius-lg;
+        box-shadow: $sgc-shadow-md;
+        
+        .o_form_statusbar {
+            border-bottom: 2px solid $sgc-light-gray;
+            
+            .o_statusbar_status {
+                .o_arrow_button {
+                    color: $sgc-slate-gray;
+                    
+                    &.btn-primary {
+                        color: $sgc-white;
+                        background: $sgc-gradient-ocean;
+                    }
+                    
+                    &:hover {
+                        background: $sgc-ice-white;
+                    }
+                }
+            }
+        }
+        
+        .o_group {
+            .o_td_label {
+                color: $sgc-slate-gray;
+                font-weight: $sgc-font-medium;
+            }
+            
+            .o_field_widget {
+                color: $sgc-deep-navy;
+            }
+        }
     }
 }
 
 // List Views
 .o_list_view {
     .o_list_table {
-        thead tr {
-            background: \-ice-white;
-            border-bottom: 2px solid \-sky-blue;
-        }
-        
-        tbody tr {
-            transition: background \-transition-fast;
+        thead {
+            background: $sgc-ice-white;
             
-            &:hover {
-                background: \-off-white;
+            th {
+                color: $sgc-deep-navy;
+                font-weight: $sgc-font-semibold;
+                border-bottom: 2px solid $sgc-light-gray;
             }
         }
+        
+        tbody {
+            tr {
+                transition: background $sgc-transition-fast;
+                
+                &:hover {
+                    background: $sgc-off-white;
+                }
+                
+                td {
+                    border-bottom: 1px solid $sgc-light-gray;
+                }
+            }
+            
+            tr.o_data_row.o_selected_row {
+                background: lighten($sgc-sky-blue, 40%);
+                
+                td {
+                    border-bottom-color: $sgc-sky-blue;
+                }
+            }
+        }
+    }
+}
+
+// Kanban Views
+.o_kanban_view {
+    background: $sgc-off-white;
+    
+    .o_kanban_record {
+        background: $sgc-white;
+        border-radius: $sgc-radius-md;
+        box-shadow: $sgc-shadow-sm;
+        transition: all $sgc-transition-base;
+        
+        &:hover {
+            box-shadow: $sgc-shadow-md;
+            transform: translateY(-3px);
+        }
+        
+        .o_kanban_card_content {
+            padding: 1rem;
+        }
+    }
+}
+
+// Calendar Views
+.o_calendar_view {
+    .fc-event {
+        background: $sgc-gradient-ocean;
+        border: none;
+        border-radius: $sgc-radius-sm;
+        
+        &:hover {
+            background: $sgc-gradient-electric;
+        }
+    }
+    
+    .fc-day-today {
+        background: lighten($sgc-electric-cyan, 45%);
+    }
+}
+
+// Graph/Chart Views
+.o_graph_view,
+.o_dashboard_graph {
+    .o_graph_canvas_container {
+        background: $sgc-white;
+        border-radius: $sgc-radius-md;
+        padding: 1rem;
+        box-shadow: $sgc-shadow-sm;
     }
 }
 
 // Buttons
-.btn-primary {
-    background: \-ocean-blue;
-    border-color: \-ocean-blue;
+.btn {
+    border-radius: $sgc-radius-md;
+    font-weight: $sgc-font-medium;
+    transition: all $sgc-transition-fast;
     
-    &:hover {
-        background: \-deep-navy;
-        border-color: \-deep-navy;
-    }
-}
-
-.btn-secondary {
-    background: \-slate-gray;
-    border-color: \-slate-gray;
-    
-    &:hover {
-        background: \-dark-gray;
-        border-color: \-dark-gray;
-    }
-}
-
-// Chatter
-.o_Chatter {
-    border-left: 1px solid \-light-gray;
-    
-    .o_Message {
-        border-radius: \-radius-sm;
-        margin-bottom: 0.5rem;
-    }
-}
-
-// Notebook tabs
-.o_notebook {
-    .nav-tabs {
-        border-bottom: 2px solid \-light-gray;
+    &.btn-primary {
+        background: $sgc-gradient-ocean;
+        border: none;
+        color: $sgc-white;
         
-        .nav-link {
-            color: \-dark-gray;
-            transition: all \-transition-fast;
-            
-            &:hover {
-                color: \-ocean-blue;
-                border-bottom-color: \-sky-blue;
-            }
-            
-            &.active {
-                color: \-ocean-blue;
-                border-bottom: 2px solid \-ocean-blue;
-                font-weight: \-font-semibold;
-            }
+        &:hover {
+            background: $sgc-gradient-electric;
+            box-shadow: $sgc-shadow-md;
         }
+    }
+    
+    &.btn-secondary {
+        background: $sgc-slate-gray;
+        border: none;
+        color: $sgc-white;
+        
+        &:hover {
+            background: lighten($sgc-slate-gray, 10%);
+        }
+    }
+    
+    &.btn-success {
+        background: $sgc-gradient-success;
+        border: none;
+        color: $sgc-white;
+        
+        &:hover {
+            box-shadow: $sgc-shadow-md;
+        }
+    }
+    
+    &.btn-danger {
+        background: $sgc-error;
+        border: none;
+        color: $sgc-white;
+        
+        &:hover {
+            background: darken($sgc-error, 10%);
+        }
+    }
+    
+    &.btn-warning {
+        background: $sgc-warning;
+        border: none;
+        color: $sgc-deep-navy;
+        
+        &:hover {
+            background: darken($sgc-warning, 10%);
+        }
+    }
+    
+    &.btn-link {
+        color: $sgc-ocean-blue;
+        
+        &:hover {
+            color: $sgc-electric-cyan;
+        }
+    }
+}
+
+// Input Fields
+.form-control,
+.o_input {
+    border: 1px solid $sgc-light-gray;
+    border-radius: $sgc-radius-md;
+    transition: all $sgc-transition-fast;
+    
+    &:focus {
+        border-color: $sgc-ocean-blue;
+        box-shadow: 0 0 0 0.2rem rgba(0, 150, 255, 0.15);
+    }
+    
+    &::placeholder {
+        color: lighten($sgc-slate-gray, 20%);
+    }
+}
+
+// Checkboxes and Radio Buttons
+.form-check-input {
+    border-color: $sgc-light-gray;
+    
+    &:checked {
+        background-color: $sgc-ocean-blue;
+        border-color: $sgc-ocean-blue;
+    }
+    
+    &:focus {
+        border-color: $sgc-ocean-blue;
+        box-shadow: 0 0 0 0.2rem rgba(0, 150, 255, 0.15);
+    }
+}
+
+// Select Dropdowns
+select.form-control,
+select.o_input {
+    background: $sgc-white url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%230c1e34' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+}
+
+// Focus State for Accessibility
+*:focus {
+    outline: 2px solid $sgc-electric-cyan;
+    outline-offset: 2px;
+}
+
+// Link Styles
+a {
+    color: $sgc-ocean-blue;
+    text-decoration: none;
+    transition: color $sgc-transition-fast;
+    
+    &:hover {
+        color: $sgc-electric-cyan;
+        text-decoration: underline;
     }
 }
