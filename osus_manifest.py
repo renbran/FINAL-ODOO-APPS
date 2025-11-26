@@ -37,7 +37,6 @@
     'data': [
         'data/report_paperformat.xml',
         'report/osus_external_layout.xml',
-        'report/osus_external_layout_primary.xml',
     ],
     'assets': {
         'web.report_assets_common': [

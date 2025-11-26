@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- COMPACT OSUS Report Header - ONE PAGE OPTIMIZED -->
+        <template id="osus_external_layout_header">
+            <div class="osus-header" style="padding: 8px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-bottom: 2px solid #800020;">
+                <div class="row">
+                    <div class="col-4">
+                        <!-- Compact OSUS Logo -->
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-height: 45px; max-width: 150px; display: block;"/>
+                    </div>
+                    <div class="col-8 text-end">
+                        <!-- Compact Company Information -->
+                        <div style="font-size: 7.5pt; line-height: 1.3; color: #2c3e50;">
+                            <div t-if="company.phone" style="display: inline-block; margin-right: 8px;">
+                                <i class="fa fa-phone" style="color: #800020; font-size: 7pt;"/>
+                                <span t-esc="company.phone" style="font-size: 7.5pt;"/>
+                            </div>
+                            <div t-if="company.email" style="display: inline-block; margin-right: 8px;">
+                                <i class="fa fa-envelope" style="color: #800020; font-size: 7pt;"/>
+                                <span t-esc="company.email" style="font-size: 7.5pt;"/>
+                            </div>
+                            <div t-if="company.website" style="display: inline-block;">
+                                <i class="fa fa-globe" style="color: #800020; font-size: 7pt;"/>
+                                <span t-esc="company.website" style="font-size: 7.5pt;"/>
+                            </div>
+                            <div t-if="company.street" style="margin-top: 2px; font-size: 7pt; color: #566573;">
+                                <span t-esc="company.street"/><t t-if="company.city">, <span t-esc="company.city"/></t><t t-if="company.country_id">, <span t-esc="company.country_id.name"/></t>
+                            </div>
+                            <div t-if="company.vat" style="margin-top: 2px; font-weight: 600; color: #800020; font-size: 7.5pt;">
+                                <strong>TRN:</strong> <span t-esc="company.vat"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- COMPACT OSUS Report Footer - ONE PAGE OPTIMIZED -->
+        <template id="osus_external_layout_footer">
+            <div style="padding: 6px 15px; background: #f8f9fa; border-top: 2px solid #800020;">
+                <div class="row">
+                    <div class="col-6">
+                        <div style="font-size: 7pt; line-height: 1.4; color: #2c3e50;">
+                            <span style="font-weight: 600; color: #800020;" t-esc="company.name"/>
+                            <span t-if="company.phone"> | <i class="fa fa-phone" style="font-size: 6pt;"/> <span t-esc="company.phone"/></span>
+                            <span t-if="company.email"> | <i class="fa fa-envelope" style="font-size: 6pt;"/> <span t-esc="company.email"/></span>
+                        </div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div style="font-size: 7pt; color: #2c3e50;">
+                            <span style="font-weight: 600; color: #800020;">Page <span class="page"/> of <span class="topage"/></span>
+                            <span style="font-size: 6.5pt; color: #566573;"> | <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></span>
+                            <span t-if="company.vat" style="font-size: 6.5pt;"> | TRN: <span t-esc="company.vat"/></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- OSUS External Layout (Inherits from web.external_layout_standard) -->
+        <template id="osus_external_layout" inherit_id="web.external_layout_standard" priority="99">
+            <!-- Replace entire header content -->
+            <xpath expr="//div[contains(@t-attf-class, 'header')]" position="replace">
+                <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                    <t t-call="osus_report_header_footer.osus_external_layout_header"/>
+                </div>
+            </xpath>
+
+            <!-- Replace entire footer content -->
+            <xpath expr="//div[contains(@t-attf-class, 'footer')]" position="replace">
+                <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+                    <t t-call="osus_report_header_footer.osus_external_layout_footer"/>
+                </div>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

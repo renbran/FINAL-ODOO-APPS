@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Override account invoice report to use OSUS layout and ensure single page -->
+        <template id="report_invoice_document_osus" inherit_id="account.report_invoice_document" priority="99">
+            <!-- Compact invoice layout for single page -->
+            <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                    <div class="page" style="font-size: 9pt; line-height: 1.3;">
+                        <t t-out="0"/>
+                    </div>
+                </t>
+            </xpath>
+            
+            <!-- Make table more compact -->
+            <xpath expr="//table[@name='invoice_line_table']" position="attributes">
+                <attribute name="style">font-size: 8.5pt; margin: 10px 0;</attribute>
+            </xpath>
+            
+            <!-- Compact address block -->
+            <xpath expr="//div[@id='informations']" position="attributes">
+                <attribute name="style">font-size: 8.5pt; margin: 8px 0;</attribute>
+            </xpath>
+        </template>
+
+        <!-- Compact payment terms section -->
+        <template id="report_invoice_payment_osus" inherit_id="account.report_invoice_document" priority="98">
+            <xpath expr="//p[@t-if='o.payment_reference']" position="attributes">
+                <attribute name="style">font-size: 8pt; margin: 4px 0;</attribute>
+            </xpath>
+        </template>
+        
+    </data>
+</odoo>

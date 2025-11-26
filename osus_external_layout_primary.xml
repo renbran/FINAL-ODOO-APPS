@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- OSUS Primary External Layout (No Inheritance) -->
+        <template id="osus_external_layout_primary" name="OSUS External Layout Primary">
+            <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                <!-- OSUS Enhanced Header -->
+                <div class="osus-header" style="position: relative; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 3px solid #800020; padding: 20px 15px; margin-bottom: 15px;">
+                    <!-- Decorative corner elements -->
+                    <div style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: linear-gradient(135deg, rgba(128, 0, 32, 0.05) 0%, transparent 100%); border-bottom-left-radius: 100%;"></div>
+                    <div style="position: absolute; bottom: 0; left: 0; width: 100px; height: 4px; background: linear-gradient(90deg, #FFD700 0%, transparent 100%);"></div>
+                    
+                    <div class="row" style="position: relative; z-index: 1;">
+                        <div class="col-5">
+                            <!-- OSUS Logo with enhanced styling -->
+                            <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: inline-block; border-left: 4px solid #800020;">
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" 
+                                     alt="OSUS Properties"
+                                     style="max-height: 70px; max-width: 200px; display: block;"/>
+                            </div>
+                        </div>
+                        <div class="col-7 text-end">
+                            <!-- Company Information with modern card design -->
+                            <div style="background: rgba(255, 255, 255, 0.95); padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-right: 4px solid #FFD700;">
+                                <div style="font-size: 9pt; line-height: 1.6; color: #2c3e50;">
+                                    <div t-if="company.phone" style="margin-bottom: 3px;">
+                                        <i class="fa fa-phone" style="color: #800020; width: 16px; margin-right: 5px;"/> 
+                                        <span t-field="company.phone" style="font-weight: 500;"/>
+                                    </div>
+                                    <div t-if="company.email" style="margin-bottom: 3px;">
+                                        <i class="fa fa-envelope" style="color: #800020; width: 16px; margin-right: 5px;"/> 
+                                        <span t-field="company.email" style="font-weight: 500;"/>
+                                    </div>
+                                    <div t-if="company.website" style="margin-bottom: 3px;">
+                                        <i class="fa fa-globe" style="color: #800020; width: 16px; margin-right: 5px;"/> 
+                                        <span t-field="company.website" style="font-weight: 500;"/>
+                                    </div>
+                                    <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #e0e0e0; font-size: 8pt; line-height: 1.4;">
+                                        <div t-if="company.street">
+                                            <span t-field="company.street"/>
+                                        </div>
+                                        <div>
+                                            <span t-if="company.city" t-field="company.city"/>
+                                            <span t-if="company.state_id">, <span t-field="company.state_id.name"/></span>
+                                            <span t-if="company.zip"> - <span t-field="company.zip"/></span>
+                                        </div>
+                                        <div t-if="company.country_id">
+                                            <span t-field="company.country_id.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Accent line separator -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div style="height: 3px; background: linear-gradient(90deg, #800020 0%, #FFD700 50%, #800020 100%); border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Set variable for o based on invoices -->
+            <t t-if="not o and doc">
+                <t t-set="o" t-value="doc"/>
+            </t>
+
+            <!-- Set company in rendering context -->
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-out="0"/>
+            </div>
+
+            <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+                <!-- OSUS Enhanced Footer -->
+                <div style="position: relative; background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); border-top: 3px solid #800020; padding: 15px 20px;">
+                    <!-- Decorative top accent -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #800020 0%, #FFD700 50%, #800020 100%);"></div>
+                    
+                    <div class="row" style="font-size: 9pt; color: #2c3e50;">
+                        <div class="col-7">
+                            <!-- Company Footer Details -->
+                            <div style="border-right: 2px solid #e0e0e0; padding-right: 15px;">
+                                <div style="font-weight: bold; color: #800020; margin-bottom: 8px; font-size: 10pt;">
+                                    <span t-field="company.name"/>
+                                </div>
+                                <div style="line-height: 1.5; font-size: 8pt;">
+                                    <div t-if="company.vat">
+                                        <strong style="color: #800020;">VAT:</strong> 
+                                        <span t-field="company.vat"/>
+                                    </div>
+                                    <div t-if="company.phone">
+                                        <strong style="color: #800020;">Phone:</strong> 
+                                        <span t-field="company.phone"/>
+                                    </div>
+                                    <div t-if="company.email">
+                                        <strong style="color: #800020;">Email:</strong> 
+                                        <span t-field="company.email"/>
+                                    </div>
+                                    <div t-if="company.website">
+                                        <strong style="color: #800020;">Website:</strong> 
+                                        <span t-field="company.website"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5 text-end">
+                            <!-- Page Numbers and Document Info -->
+                            <div style="padding-left: 15px;">
+                                <div style="font-size: 8pt; margin-bottom: 8px;">
+                                    <div style="color: #800020; font-weight: bold; margin-bottom: 4px;">
+                                        Page <span class="page"/> of <span class="topage"/>
+                                    </div>
+                                    <div style="color: #666; font-size: 7pt;">
+                                        Generated: <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                                    <div style="font-size: 7pt; color: #666; font-style: italic;">
+                                        This is a computer-generated document.<br/>
+                                        No signature is required.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom accent bar -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div style="height: 2px; background: linear-gradient(90deg, #800020 0%, #FFD700 50%, #800020 100%); border-radius: 1px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </data>
+</odoo>
