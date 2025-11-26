@@ -1,0 +1,301 @@
+/* OSUS Report Header Footer Styles - Enhanced Design */
+
+/* Color Variables */
+:root {
+    --osus-maroon: #800020;
+    --osus-gold: #FFD700;
+    --osus-dark-gray: #2c3e50;
+    --osus-light-gray: #f8f9fa;
+    --osus-border-gray: #e9ecef;
+    --osus-text-gray: #566573;
+}
+
+/* Header Styles - Modern Card Design */
+.osus-header {
+    position: relative;
+    background: linear-gradient(135deg, var(--osus-light-gray) 0%, var(--osus-border-gray) 100%);
+    border-bottom: 3px solid var(--osus-maroon);
+    padding: 20px 15px;
+    margin-bottom: 15px;
+}
+
+.osus-logo {
+    max-height: 70px;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+}
+
+.osus-company-info {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-right: 4px solid var(--osus-gold);
+}
+
+.osus-contact-details {
+    font-size: 9pt;
+    line-height: 1.6;
+    color: var(--osus-dark-gray);
+}
+
+.osus-contact-details div {
+    margin-bottom: 3px;
+}
+
+.osus-contact-details i {
+    color: var(--osus-maroon);
+    margin-right: 4px;
+    width: 16px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Footer Styles - Enhanced Card Design */
+.osus-footer {
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, var(--osus-light-gray) 100%);
+    border-top: 3px solid var(--osus-maroon);
+    padding: 15px 20px;
+    margin-top: 20px;
+}
+
+.osus-footer-info {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 3px solid var(--osus-maroon);
+    font-size: 8pt;
+    line-height: 1.8;
+    color: var(--osus-dark-gray);
+}
+
+.osus-footer-info div {
+    margin-bottom: 2px;
+}
+
+.osus-page-number {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-right: 3px solid var(--osus-gold);
+    font-size: 9pt;
+    color: var(--osus-dark-gray);
+}
+
+/* Decorative Elements */
+.osus-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(128, 0, 32, 0.05) 0%, transparent 100%);
+    border-bottom-left-radius: 100%;
+    pointer-events: none;
+}
+
+.osus-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--osus-gold) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.osus-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(128, 0, 32, 0.03) 0%, transparent 100%);
+    border-bottom-right-radius: 100%;
+    pointer-events: none;
+}
+
+.osus-footer::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(270deg, var(--osus-gold) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+/* Gradient Accent Lines */
+.osus-gradient-line {
+    height: 3px;
+    background: linear-gradient(90deg, var(--osus-maroon) 0%, var(--osus-gold) 50%, var(--osus-maroon) 100%);
+    border-radius: 2px;
+}
+
+/* General Report Styling */
+.page {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    background-color: #ffffff;
+}
+
+/* Full Page Background Coverage */
+body, html {
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+}
+
+.article {
+    background-color: #ffffff !important;
+    min-height: 100vh;
+}
+
+/* Table Styling for Invoices */
+table.o_main_table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 15px 0;
+}
+
+table.o_main_table thead {
+    background: linear-gradient(135deg, var(--osus-maroon) 0%, #a50028 100%);
+    color: white;
+}
+
+table.o_main_table thead th {
+    padding: 12px 10px;
+    font-weight: 600;
+    text-align: left;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+table.o_main_table tbody tr {
+    border-bottom: 1px solid var(--osus-border-gray);
+}
+
+table.o_main_table tbody tr:hover {
+    background-color: rgba(128, 0, 32, 0.02);
+}
+
+table.o_main_table tbody td {
+    padding: 10px;
+    vertical-align: top;
+}
+
+/* Total Amount Styling */
+.osus-total-section {
+    background: linear-gradient(135deg, var(--osus-light-gray) 0%, #ffffff 100%);
+    border: 2px solid var(--osus-border-gray);
+    border-left: 4px solid var(--osus-maroon);
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.osus-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--osus-border-gray);
+}
+
+.osus-total-row.grand-total {
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--osus-maroon);
+    border-bottom: none;
+    border-top: 2px solid var(--osus-maroon);
+    margin-top: 10px;
+    padding-top: 12px;
+}
+
+/* Badge Styling */
+.osus-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.osus-badge-paid {
+    background-color: #27ae60;
+    color: white;
+}
+
+.osus-badge-due {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.osus-badge-draft {
+    background-color: #95a5a6;
+    color: white;
+}
+
+/* Print Optimization */
+@media print {
+    .osus-header,
+    .osus-footer {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .page-break {
+        page-break-after: always;
+    }
+    
+    .no-page-break {
+        page-break-inside: avoid;
+    }
+}
+
+/* Responsive Adjustments */
+@page {
+    margin: 0;
+    padding: 0;
+}
+
+/* Shadow and Depth Effects */
+.osus-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+/* Icon Styling */
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar for Large Tables */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--osus-light-gray);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--osus-maroon);
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a50028;
+}
