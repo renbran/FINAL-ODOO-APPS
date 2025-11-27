@@ -1,0 +1,14 @@
+Source:
+/var/odoo/scholarixv2/src
+Log files:
+/var/odoo/scholarixv2/logs
+Config file:
+/var/odoo/scholarixv2/odoo.conf
+Python Interpreter:
+/var/odoo/scholarixv2/venv/bin/python3
+Odoo Shell Access:
+cd /var/odoo/scholarixv2 && sudo -u odoo venv/bin/python3 src/odoo-bin shell -c odoo.conf
+Update all modules:
+cd /var/odoo/scholarixv2 && sudo -u odoo venv/bin/python3 src/odoo-bin -c odoo.conf --no-http --stop-after-init --update all
+Install Python Packages:
+sudo -u odoo /var/odoo/scholarixv2/venv/bin/python3 -m pip install 
