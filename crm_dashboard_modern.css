@@ -1,0 +1,419 @@
+/* OSUS Properties Executive CRM Dashboard - Modern Styles */
+/* Based on C-Level Executive Report Design */
+
+:root {
+    --osus-primary: #800020;
+    --osus-secondary: #FFD700;
+    --osus-accent: #FFF8DC;
+    --gradient-burgundy: linear-gradient(135deg, #800020 0%, #5c0017 100%);
+    --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-info: linear-gradient(135deg, #800020 0%, #5c0017 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --text-burgundy: #800020;
+    --bg-light: #FFF8DC;
+    --bg-cream: #FFFEF0;
+}
+
+/* Main Dashboard Container */
+.o_crm_dashboard {
+    background: var(--bg-light);
+    padding: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: var(--gradient-burgundy);
+    color: var(--osus-secondary);
+    padding: 50px 40px;
+    text-align: center;
+    border-radius: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 20px 60px rgba(128, 0, 32, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.dashboard-header h1 {
+    font-size: 3.5em;
+    margin: 0 0 15px 0;
+    font-weight: 300;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    letter-spacing: -1px;
+}
+
+.dashboard-header p {
+    font-size: 1.3em;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.verified-badge {
+    display: inline-block;
+    background: rgba(255,215,0,0.25);
+    padding: 12px 30px;
+    border-radius: 30px;
+    margin-top: 20px;
+    font-size: 1em;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--osus-secondary);
+}
+
+/* Alert Banner */
+.alert-banner {
+    background: var(--gradient-gold);
+    color: var(--osus-primary);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: 700;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+    letter-spacing: 0.5px;
+    border: 3px solid var(--osus-primary);
+}
+
+/* Critical Metrics Grid */
+.critical-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+/* Metric Cards */
+.metric-card {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(128, 0, 32, 0.12);
+    border-left: 6px solid var(--osus-primary);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(128, 0, 32, 0.08) 0%, transparent 100%);
+    border-radius: 0 20px 0 100%;
+    transition: all 0.4s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.metric-card:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.metric-card.success {
+    border-left-color: var(--osus-secondary);
+}
+
+.metric-card.success::before {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, transparent 100%);
+}
+
+.metric-card.warning {
+    border-left-color: #d4af37;
+}
+
+.metric-card.warning::before {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, transparent 100%);
+}
+
+.metric-card.info {
+    border-left-color: #a0002a;
+}
+
+.metric-card.info::before {
+    background: linear-gradient(135deg, rgba(160, 0, 42, 0.12) 0%, transparent 100%);
+}
+
+.metric-card.danger {
+    border-left-color: #ef4444;
+}
+
+.metric-card.danger::before {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, transparent 100%);
+}
+
+/* Metric Card Content */
+.metric-icon {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    opacity: 0.85;
+    display: block;
+    line-height: 1;
+}
+
+.metric-label {
+    font-size: 0.95em;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.metric-value {
+    font-size: 3.2em;
+    font-weight: 800;
+    color: var(--osus-primary);
+    margin: 20px 0;
+    line-height: 1;
+    display: block;
+    letter-spacing: -1px;
+}
+
+.metric-subtitle {
+    font-size: 1em;
+    color: var(--text-muted);
+    margin-top: 15px;
+    font-weight: 500;
+}
+
+.metric-change {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9em;
+    font-weight: 700;
+    margin-top: 15px;
+    letter-spacing: 0.5px;
+}
+
+.metric-change.positive {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+}
+
+.metric-change.negative {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+}
+
+/* Section Cards */
+.section {
+    background: white;
+    padding: 45px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+    transition: all 0.3s ease;
+}
+
+.section:hover {
+    box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 4px solid var(--osus-primary);
+}
+
+.section-header h2 {
+    font-size: 2.5em;
+    color: var(--osus-primary);
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.section-header .badge {
+    background: var(--gradient-burgundy);
+    color: var(--osus-secondary);
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 0.9em;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(128, 0, 32, 0.4);
+}
+
+/* Department Grid */
+.department-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 30px;
+}
+
+.department-card {
+    background: linear-gradient(135deg, #ffffff 0%, var(--osus-accent) 100%);
+    padding: 35px;
+    border-radius: 20px;
+    border-top: 6px solid var(--osus-secondary);
+    box-shadow: 0 8px 30px rgba(128, 0, 32, 0.12);
+    transition: all 0.3s ease;
+}
+
+.department-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+}
+
+.department-card h3 {
+    font-size: 1.8em;
+    margin: 0 0 25px 0;
+    color: var(--osus-primary);
+    font-weight: 700;
+}
+
+.department-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.department-stat:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 1em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 1.3em;
+    font-weight: 800;
+    color: var(--osus-primary);
+    letter-spacing: -0.5px;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin: 30px 0;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .critical-metrics {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .department-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5em;
+    }
+    
+    .metric-value {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 768px) {
+    .o_crm_dashboard {
+        padding: 15px;
+    }
+    
+    .dashboard-header {
+        padding: 30px 20px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2em;
+    }
+    
+    .metric-card {
+        padding: 25px;
+    }
+    
+    .section {
+        padding: 25px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+/* Loading Animation */
+.loading-spinner {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--osus-accent);
+    border-radius: 50%;
+    border-top-color: var(--osus-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: var(--osus-primary);
+    color: var(--osus-secondary);
+    text-align: center;
+    border-radius: 8px;
+    padding: 10px 15px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
