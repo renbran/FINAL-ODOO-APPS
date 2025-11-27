@@ -60,6 +60,11 @@ $sgc-gradient-electric: linear-gradient(
   $sgc-electric-cyan 0%,
   $sgc-neon-green 100%
 );
+$sgc-gradient-success: linear-gradient(
+  135deg,
+  $sgc-success 0%,
+  lighten($sgc-success, 10%) 100%
+);
 
 // Border Radius
 $sgc-radius-sm: 4px;
@@ -69,5 +74,6 @@ $sgc-radius-xl: 16px;
 
 // Transitions
 $sgc-transition-fast: 0.15s ease-in-out;
+$sgc-transition-base: 0.2s ease-in-out;
 $sgc-transition-normal: 0.3s ease-in-out;
 $sgc-transition-slow: 0.5s ease-in-out;
