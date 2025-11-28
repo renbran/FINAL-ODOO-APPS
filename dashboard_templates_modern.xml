@@ -15,274 +15,283 @@
             <!-- Alert Banner (conditional) -->
             <t t-if="this.show_alert">
                 <div class="alert-banner">
-                    ⚡ CONFIRMED SALES: <span t-esc="this.confirmed_count"/> DEALS • <span t-esc="this.confirmed_value"/> TOTAL VALUE
-                </div>
-            </t>
+                    ⚡ CONFIRMED SALES: <span t-esc="this.confirmed_count"/>
+ DEALS • <span t-esc="this.confirmed_value"/>
+ TOTAL VALUE
+            </div>
+        </t>
 
-            <!-- Critical Metrics Grid -->
-            <div class="critical-metrics">
-                <!-- Total Deals Card -->
-                <div class="metric-card" t-on-click="(e) => this.view_all_deals(e)">
-                    <span class="metric-icon">📊</span>
-                    <span class="metric-label">Total Deals</span>
-                    <span class="metric-value" id="total_deals_metric">
-                        <div id="deals_this_year"/>
-                        <div id="deals_this_quarter"/>
-                        <div id="deals_this_month"/>
-                        <div id="deals_this_week"/>
-                    </span>
-                    <div class="metric-subtitle">All Opportunities</div>
-                </div>
-
-                <!-- Sales Value Card -->
-                <div class="metric-card success" t-on-click="(e) => this.view_revenue(e)">
-                    <span class="metric-icon">💰</span>
-                    <span class="metric-label">Sales Value</span>
-                    <span class="metric-value" id="sales_value_metric">
-                        <div id="rev_this_year"/>
-                        <div id="rev_this_quarter"/>
-                        <div id="rev_this_month"/>
-                        <div id="rev_this_week"/>
-                    </span>
-                    <div class="metric-subtitle">Confirmed Revenue</div>
-                    <span class="metric-change positive">+12.5% vs Last Period</span>
-                </div>
-
-                <!-- Commission Card -->
-                <div class="metric-card warning" t-on-click="(e) => this.view_commission(e)">
-                    <span class="metric-icon">💼</span>
-                    <span class="metric-label">Commission</span>
-                    <span class="metric-value" id="commission_metric">
-                        <div id="comm_this_year"/>
-                        <div id="comm_this_quarter"/>
-                        <div id="comm_this_month"/>
-                        <div id="comm_this_week"/>
-                    </span>
-                    <div class="metric-subtitle">Total Earned</div>
-                </div>
-
-                <!-- Win Ratio Card -->
-                <div class="metric-card info">
-                    <span class="metric-icon">🏆</span>
-                    <span class="metric-label">Win Ratio</span>
-                    <span class="metric-value" id="win_ratio_metric">
-                        <div id="ratio_this_year"/>
-                        <div id="ratio_this_quarter"/>
-                        <div id="ratio_this_month"/>
-                        <div id="ratio_this_week"/>
-                    </span>
-                    <div class="metric-subtitle">Success Rate</div>
-                </div>
+        <!-- Critical Metrics Grid -->
+        <div class="critical-metrics">
+            <!-- Total Deals Card -->
+            <div class="metric-card" t-on-click="(e) => this.view_all_deals(e)">
+                <span class="metric-icon">📊</span>
+                <span class="metric-label">Total Deals</span>
+                <span class="metric-value" id="total_deals_metric">
+                    <div id="deals_this_year"/>
+                    <div id="deals_this_quarter"/>
+                    <div id="deals_this_month"/>
+                    <div id="deals_this_week"/>
+                </span>
+                <div class="metric-subtitle">All Opportunities</div>
             </div>
 
-            <!-- Time Period Filter -->
-            <div class="section">
-                <div class="section-header">
-                    <h2>📅 Performance Analysis</h2>
-                    <select id="income_expense_values"
-                            t-on-change="(e) => this.on_change_income_expense_values(e)"
-                            class="form-control"
-                            style="width: 200px;">
-                        <option value="this_year">This Year</option>
-                        <option value="this_quarter">This Quarter</option>
-                        <option value="this_month" selected="">This Month</option>
-                        <option value="this_week">This Week</option>
-                    </select>
-                </div>
+            <!-- Sales Value Card -->
+            <div class="metric-card success" t-on-click="(e) => this.view_revenue(e)">
+                <span class="metric-icon">💰</span>
+                <span class="metric-label">Sales Value</span>
+                <span class="metric-value" id="sales_value_metric">
+                    <div id="rev_this_year"/>
+                    <div id="rev_this_quarter"/>
+                    <div id="rev_this_month"/>
+                    <div id="rev_this_week"/>
+                </span>
+                <div class="metric-subtitle">Confirmed Revenue</div>
+                <span class="metric-change positive">+12.5% vs Last Period</span>
             </div>
 
-            <!-- Department Performance Section -->
-            <div class="section">
-                <div class="section-header">
-                    <h2>🏢 Department Performance</h2>
-                    <span class="badge">3 Departments</span>
-                </div>
-
-                <div class="department-grid">
-                    <!-- Exclusive Sales Department -->
-                    <div class="department-card">
-                        <h3>🌟 Exclusive Sales</h3>
-                        <div class="department-stat">
-                            <span class="stat-label">Total Deals:</span>
-                            <span class="stat-value" id="exclusive_deals">0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Sales Value:</span>
-                            <span class="stat-value" id="exclusive_value">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Commission:</span>
-                            <span class="stat-value" id="exclusive_commission">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Avg Deal Size:</span>
-                            <span class="stat-value" id="exclusive_avg">AED 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Primary Sales Department -->
-                    <div class="department-card">
-                        <h3>🎯 Primary Sales</h3>
-                        <div class="department-stat">
-                            <span class="stat-label">Total Deals:</span>
-                            <span class="stat-value" id="primary_deals">0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Sales Value:</span>
-                            <span class="stat-value" id="primary_value">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Commission:</span>
-                            <span class="stat-value" id="primary_commission">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Avg Deal Size:</span>
-                            <span class="stat-value" id="primary_avg">AED 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Secondary Sales Department -->
-                    <div class="department-card">
-                        <h3>📈 Secondary Sales</h3>
-                        <div class="department-stat">
-                            <span class="stat-label">Total Deals:</span>
-                            <span class="stat-value" id="secondary_deals">0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Sales Value:</span>
-                            <span class="stat-value" id="secondary_value">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Commission:</span>
-                            <span class="stat-value" id="secondary_commission">AED 0</span>
-                        </div>
-                        <div class="department-stat">
-                            <span class="stat-label">Avg Deal Size:</span>
-                            <span class="stat-value" id="secondary_avg">AED 0</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Commission Card -->
+            <div class="metric-card warning" t-on-click="(e) => this.view_commission(e)">
+                <span class="metric-icon">💼</span>
+                <span class="metric-label">Commission</span>
+                <span class="metric-value" id="commission_metric">
+                    <div id="comm_this_year"/>
+                    <div id="comm_this_quarter"/>
+                    <div id="comm_this_month"/>
+                    <div id="comm_this_week"/>
+                </span>
+                <div class="metric-subtitle">Total Earned</div>
             </div>
 
-            <!-- Traditional Dashboard Sections (Preserved for compatibility) -->
-            <t t-call="Managercrm"/>
-            <t t-call="Admincrm"/>
+            <!-- Win Ratio Card -->
+            <div class="metric-card info">
+                <span class="metric-icon">🏆</span>
+                <span class="metric-label">Win Ratio</span>
+                <span class="metric-value" id="win_ratio_metric">
+                    <div id="ratio_this_year"/>
+                    <div id="ratio_this_quarter"/>
+                    <div id="ratio_this_month"/>
+                    <div id="ratio_this_week"/>
+                </span>
+                <div class="metric-subtitle">Success Rate</div>
+            </div>
         </div>
-    </t>
 
-    <!-- Manager CRM Section (Enhanced) -->
-    <t t-name="Managercrm">
-        <section class="section" id="main_section_manager">
+        <!-- Time Period Filter -->
+        <div class="section">
             <div class="section-header">
-                <h2>👤 My Performance</h2>
+                <h2>📅 Performance Analysis</h2>
+                <select id="income_expense_values" t-on-change="(e) => this.on_change_income_expense_values(e)" class="form-control" style="width: 200px;">
+                    <option value="this_year">This Year</option>
+                    <option value="this_quarter">This Quarter</option>
+                    <option value="this_month" selected="">This Month</option>
+                    <option value="this_week">This Week</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Department Performance Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🏢 Department Performance</h2>
+                <span class="badge">3 Departments</span>
             </div>
 
-            <div class="critical-metrics">
-                <div class="metric-card" t-on-click="(e) => this.my_lead(e)">
-                    <span class="metric-icon">📍</span>
-                    <span class="metric-label">My Leads</span>
-                    <span class="metric-value">
-                        <div id="leads_this_year"/>
-                        <div id="leads_this_quarter"/>
-                        <div id="leads_this_month"/>
-                        <div id="leads_this_week"/>
-                    </span>
-                </div>
-
-                <div class="metric-card success" t-on-click="(e) => this.opportunity(e)">
-                    <span class="metric-icon">🎯</span>
-                    <span class="metric-label">My Opportunities</span>
-                    <span class="metric-value">
-                        <div id="opp_this_year"/>
-                        <div id="opp_this_quarter"/>
-                        <div id="opp_this_month"/>
-                        <div id="opp_this_week"/>
-                    </span>
-                </div>
-
-                <div class="metric-card warning" t-on-click="(e) => this.exp_revenue(e)">
-                    <span class="metric-icon">💵</span>
-                    <span class="metric-label">Expected Revenue</span>
-                    <span class="metric-value">
-                        <div id="exp_rev_this_year"/>
-                        <div id="exp_rev_this_quarter"/>
-                        <div id="exp_rev_this_month"/>
-                        <div id="exp_rev_this_week"/>
-                    </span>
-                </div>
-
-                <div class="metric-card info" t-on-click="(e) => this.revenue_card(e)">
-                    <span class="metric-icon">💰</span>
-                    <span class="metric-label">My Revenue</span>
-                    <span class="metric-value">
-                        <div id="my_rev_this_year"/>
-                        <div id="my_rev_this_quarter"/>
-                        <div id="my_rev_this_month"/>
-                        <div id="my_rev_this_week"/>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="row" style="margin-top: 40px;">
-                <div class="col-lg-6">
-                    <div class="section">
-                        <h3>📊 Lead Pipeline</h3>
-                        <div class="chart-container">
-                            <canvas id="lead_pipeline_chart"/>
-                        </div>
+            <div class="department-grid">
+                <!-- Exclusive Sales Department -->
+                <div class="department-card">
+                    <h3>🌟 Exclusive Sales</h3>
+                    <div class="department-stat">
+                        <span class="stat-label">Total Deals:</span>
+                        <span class="stat-value" id="exclusive_deals">0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Sales Value:</span>
+                        <span class="stat-value" id="exclusive_value">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Commission:</span>
+                        <span class="stat-value" id="exclusive_commission">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Avg Deal Size:</span>
+                        <span class="stat-value" id="exclusive_avg">AED 0</span>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="section">
-                        <h3>📈 Revenue Trend</h3>
-                        <div class="chart-container">
-                            <canvas id="revenue_trend_chart"/>
-                        </div>
+
+                <!-- Primary Sales Department -->
+                <div class="department-card">
+                    <h3>🎯 Primary Sales</h3>
+                    <div class="department-stat">
+                        <span class="stat-label">Total Deals:</span>
+                        <span class="stat-value" id="primary_deals">0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Sales Value:</span>
+                        <span class="stat-value" id="primary_value">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Commission:</span>
+                        <span class="stat-value" id="primary_commission">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Avg Deal Size:</span>
+                        <span class="stat-value" id="primary_avg">AED 0</span>
+                    </div>
+                </div>
+
+                <!-- Secondary Sales Department -->
+                <div class="department-card">
+                    <h3>📈 Secondary Sales</h3>
+                    <div class="department-stat">
+                        <span class="stat-label">Total Deals:</span>
+                        <span class="stat-value" id="secondary_deals">0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Sales Value:</span>
+                        <span class="stat-value" id="secondary_value">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Commission:</span>
+                        <span class="stat-value" id="secondary_commission">AED 0</span>
+                    </div>
+                    <div class="department-stat">
+                        <span class="stat-label">Avg Deal Size:</span>
+                        <span class="stat-value" id="secondary_avg">AED 0</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Top Deals Section -->
-            <div class="section">
-                <div class="section-header">
-                    <h2>🏆 Top Deals</h2>
+        <!-- Traditional Dashboard Sections (Preserved for compatibility) -->
+        <t t-call="Managercrm"/>
+        <t t-call="Admincrm"/>
+    </div>
+</t>
+
+<!-- Manager CRM Section (Enhanced) -->
+<t t-name="Managercrm">
+    <section class="section" id="main_section_manager">
+        <div class="section-header">
+            <h2>👤 My Performance</h2>
+        </div>
+
+        <div class="critical-metrics">
+            <div class="metric-card" t-on-click="(e) => this.my_lead(e)">
+                <span class="metric-icon">📍</span>
+                <span class="metric-label">My Leads</span>
+                <span class="metric-value">
+                    <div id="leads_this_year"/>
+                    <div id="leads_this_quarter"/>
+                    <div id="leads_this_month"/>
+                    <div id="leads_this_week"/>
+                </span>
+            </div>
+
+            <div class="metric-card success" t-on-click="(e) => this.opportunity(e)">
+                <span class="metric-icon">🎯</span>
+                <span class="metric-label">My Opportunities</span>
+                <span class="metric-value">
+                    <div id="opp_this_year"/>
+                    <div id="opp_this_quarter"/>
+                    <div id="opp_this_month"/>
+                    <div id="opp_this_week"/>
+                </span>
+            </div>
+
+            <div class="metric-card warning" t-on-click="(e) => this.exp_revenue(e)">
+                <span class="metric-icon">💵</span>
+                <span class="metric-label">Expected Revenue</span>
+                <span class="metric-value">
+                    <div id="exp_rev_this_year"/>
+                    <div id="exp_rev_this_quarter"/>
+                    <div id="exp_rev_this_month"/>
+                    <div id="exp_rev_this_week"/>
+                </span>
+            </div>
+
+            <div class="metric-card info" t-on-click="(e) => this.revenue_card(e)">
+                <span class="metric-icon">💰</span>
+                <span class="metric-label">My Revenue</span>
+                <span class="metric-value">
+                    <div id="my_rev_this_year"/>
+                    <div id="my_rev_this_quarter"/>
+                    <div id="my_rev_this_month"/>
+                    <div id="my_rev_this_week"/>
+                </span>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row" style="margin-top: 40px;">
+            <div class="col-lg-6">
+                <div class="section">
+                    <h3>📊 Lead Pipeline</h3>
+                    <div class="chart-container">
+                        <canvas id="lead_pipeline_chart"/>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
+            </div>
+            <div class="col-lg-6">
+                <div class="section">
+                    <h3>📈 Revenue Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="revenue_trend_chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Deals Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🏆 Top Deals</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Deal Name</th>
+                            <th>Customer</th>
+                            <th>Value</th>
+                            <th>Stage</th>
+                            <th>Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top_deals_table">
+                        <t t-foreach="this.top_deals" t-as="deal" t-key="deal.id">
                             <tr>
-                                <th>Deal Name</th>
-                                <th>Customer</th>
-                                <th>Value</th>
-                                <th>Stage</th>
-                                <th>Probability</th>
+                                <td>
+                                    <t t-esc="deal.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="deal.partner_id"/>
+                                </td>
+                                <td>
+                                    <t t-esc="formatCurrency(deal.expected_revenue)"/>
+                                </td>
+                                <td>
+                                    <t t-esc="deal.stage_id"/>
+                                </td>
+                                <td>
+                                    <t t-esc="deal.probability"/>
+%</td>
                             </tr>
-                        </thead>
-                        <tbody id="top_deals_table">
-                            <t t-foreach="this.top_deals" t-as="deal" t-key="deal.id">
-                                <tr>
-                                    <td><t t-esc="deal.name"/></td>
-                                    <td><t t-esc="deal.partner_id"/></td>
-                                    <td><t t-esc="formatCurrency(deal.expected_revenue)"/></td>
-                                    <td><t t-esc="deal.stage_id"/></td>
-                                    <td><t t-esc="deal.probability"/>%</td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
+                        </t>
+                    </tbody>
+                </table>
             </div>
-        </section>
-    </t>
+        </div>
+    </section>
+</t>
 
-    <!-- Admin CRM Section (Preserved) -->
-    <t t-name="Admincrm">
-        <section class="section" id="main_section_admin">
-            <div class="section-header">
-                <h2>👑 Administrator Dashboard</h2>
-            </div>
-            <!-- Additional admin content preserved here -->
-        </section>
-    </t>
+<!-- Admin CRM Section (Preserved) -->
+<t t-name="Admincrm">
+    <section class="section" id="main_section_admin">
+        <div class="section-header">
+            <h2>👑 Administrator Dashboard</h2>
+        </div>
+        <!-- Additional admin content preserved here -->
+    </section>
+</t>
 </templates>
