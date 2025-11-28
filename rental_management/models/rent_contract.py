@@ -25,7 +25,9 @@ class TenancyDetails(models.Model):
                                       ('cancel_contract', 'Cancel'),
                                       ('close_contract', 'Close'),
                                       ('expire_contract', 'Expire')],
-                                     string='Contract Type')
+                                     string='Contract Type',
+                                     index=True,
+                                     tracking=True)
     days_left = fields.Integer(string="Days Left", compute="compute_days_left")
     responsible_id = fields.Many2one('res.users',
                                      default=lambda
@@ -89,6 +91,7 @@ class TenancyDetails(models.Model):
         ('daily', 'Daily'),
     ],
         string="Payment Term",
+        index=True,
     )
     
     # Payment Schedule Integration
@@ -116,9 +119,9 @@ class TenancyDetails(models.Model):
                                   ('Month', "Month"),
                                   ('Year', "Year")],
                                  compute="_compute_rent_unit")
-    start_date = fields.Date(string='Start Date', default=fields.date.today())
+    start_date = fields.Date(string='Start Date', default=fields.date.today(), index=True)
     end_date = fields.Date(string='End Date', compute='_compute_end_date',
-                           search='_search_end_date')
+                           search='_search_end_date', store=True, index=True)
     invoice_start_date = fields.Date(
         string="Invoice Start From", default=fields.date.today())
     last_invoice_payment_date = fields.Date(string='Last Invoice Payment Date')
@@ -302,10 +305,11 @@ class TenancyDetails(models.Model):
                     _("End date should be greater than start date"))
 
     def unlink(self):
+        """Reset property stage to draft when deleting new contracts."""
         for rec in self:
             if rec.contract_type == 'new_contract':
                 rec.property_id.stage = 'draft'
-            return super(TenancyDetails, self).unlink()
+        return super(TenancyDetails, self).unlink()
 
     # On delete
     @api.ondelete(at_uninstall=False)
@@ -1109,7 +1113,7 @@ class TenancyDetails(models.Model):
                             'description': 'Installment of ' + rec.property_id.name,
                             'rent_invoice_id': invoice_id.id,
                             'amount': invoice_id.amount_total,
-                            'rent_amount': self.total_rent
+                            'rent_amount': rec.total_rent
                         })
                         # Process Separate Invoice
                         if rec.is_maintenance_service and rec.maintenance_service_invoice == 'separate':

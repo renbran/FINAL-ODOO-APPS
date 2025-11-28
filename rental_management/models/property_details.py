@@ -21,12 +21,14 @@ class PropertyDetails(models.Model):
                              ('industrial', 'Industrial')
                              ], string='Property Type',
                             required=True,
-                            default="residential")
+                            default="residential",
+                            index=True)
     sale_lease = fields.Selection([('for_sale', 'Sale'),
                                    ('for_tenancy', 'Rent')],
                                   string='Property For',
                                   default='for_tenancy',
-                                  required=True)
+                                  required=True,
+                                  index=True)
     property_seq = fields.Char(string='Property Code',
                                required=True,
                                readonly=False,
@@ -42,7 +44,9 @@ class PropertyDetails(models.Model):
                              string='Status',
                              default='draft',
                              copy=False,
-                             required=True)
+                             required=True,
+                             index=True,
+                             tracking=True)
 
     # Multi Companies
     company_id = fields.Many2one('res.company',
@@ -58,18 +62,17 @@ class PropertyDetails(models.Model):
                                           domain="[('type','=',type)]")
 
     # Project & Sub Project & Region
-    region_id = fields.Many2one('property.region', string="Region")
+    region_id = fields.Many2one('property.region', string="Region", index=True)
     property_project_id = fields.Many2one('property.project',
                                           string="Project")
     subproject_id = fields.Many2one('property.sub.project',
                                     string="Sub Project")
 
     # Address
-    region_id = fields.Many2one('property.region', string="Region")
     zip = fields.Char(string='Zip')
     street = fields.Char(string='Street1', translate=True)
     street2 = fields.Char(string='Street2', translate=True)
-    city = fields.Char(string='City  ', translate=True)
+    city = fields.Char(string='City', translate=True)
     city_id = fields.Many2one('property.res.city', string='City')
     country_id = fields.Many2one('res.country', 'Country')
     state_id = fields.Many2one(
@@ -407,12 +410,12 @@ class PropertyDetails(models.Model):
 
     # Unlink
     def unlink(self):
+        """Prevent deletion of properties that are booked, leased, in sale, or sold."""
         for rec in self:
             if rec.stage in ['booked', 'on_lease', 'sale', 'sold']:
                 raise ValidationError(
                     _("You can't delete property until status is in 'Draft' or 'Available'"))
-            else:
-                return super(PropertyDetails, self).unlink()
+        return super(PropertyDetails, self).unlink()
 
     # Name-get
     def name_get(self):
