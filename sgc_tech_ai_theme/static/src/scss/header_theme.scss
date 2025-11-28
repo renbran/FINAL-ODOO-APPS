@@ -45,27 +45,8 @@
   }
 }
 
-// Dropdown Menus
-.dropdown-menu {
-  border-radius: $sgc-radius-md;
-  box-shadow: $sgc-shadow-lg;
-  border: 1px solid $sgc-light-gray;
-
-  .dropdown-item {
-    transition: all $sgc-transition-fast;
-
-    &:hover,
-    &:focus {
-      background: $sgc-ice-white;
-      color: $sgc-ocean-blue;
-    }
-
-    &.active {
-      background: $sgc-ocean-blue;
-      color: $sgc-white;
-    }
-  }
-}
+// Note: Dropdown menu styles are in theme_overrides.scss (scoped to .o_web_client)
+// to prevent conflicts with Website, POS, and other frontends
 
 // App Drawer
 .o_action_manager {
