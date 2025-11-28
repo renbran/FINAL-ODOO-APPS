@@ -43,6 +43,7 @@
         "data/sequence.xml",
         "data/property_product_data.xml",
         "data/update_ir_cron.xml",
+        "data/payment_schedule_data.xml",
         # wizard views
         "wizard/contract_wizard_view.xml",
         "wizard/property_payment_wizard_view.xml",
@@ -59,6 +60,7 @@
         "wizard/agreement_preview_view.xml",
         # Views
         "views/assets.xml",
+        "views/payment_schedule_views.xml",
         "views/property_details_view.xml",
         "views/property_document_view.xml",
         "views/user_type_view.xml",

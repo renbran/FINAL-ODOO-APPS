@@ -4,6 +4,7 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import fields, api, models, _
+from odoo.exceptions import UserError
 
 
 class PropertyVendor(models.Model):
@@ -82,6 +83,11 @@ class PropertyVendor(models.Model):
         related="landlord_id.email", string="Landlord Email")
 
     # Payment Details & Remaining Payment
+    payment_schedule_id = fields.Many2one('payment.schedule',
+                                         string='Payment Schedule',
+                                         domain=[('schedule_type', '=', 'sale'), ('active', '=', True)],
+                                         help='Select payment schedule to auto-generate invoices')
+    use_schedule = fields.Boolean(string='Use Payment Schedule', default=False)
     payment_term = fields.Selection([('monthly', 'Monthly'),
                                      ('full_payment', 'Full Payment'),
                                      ('quarterly', 'Quarterly')],
@@ -126,6 +132,16 @@ class PropertyVendor(models.Model):
     # Documents
     sold_document = fields.Binary(string='Sold Document')
     file_name = fields.Char('File Name', translate=True)
+
+    # Additional Fees (Not included in property price)
+    dld_fee = fields.Monetary(string='DLD Fee',
+                             help='Dubai Land Department registration fee (separate from property price)')
+    admin_fee = fields.Monetary(string='Admin Fee',
+                               help='Administrative processing fee (separate from property price)')
+    total_additional_fees = fields.Monetary(string='Total Additional Fees',
+                                           compute='_compute_total_additional_fees',
+                                           store=True,
+                                           help='DLD Fee + Admin Fee')
 
     # Terms & Conditions
     term_condition = fields.Html(string='Term and Condition')
@@ -187,6 +203,25 @@ class PropertyVendor(models.Model):
             data.append((rec.id, '%s - %s' %
                          (rec.sold_seq, rec.customer_id.name)))
         return data
+    
+    # Onchange Methods
+    @api.onchange('payment_schedule_id')
+    def _onchange_payment_schedule(self):
+        """Update use_schedule when payment schedule is selected"""
+        if self.payment_schedule_id:
+            self.use_schedule = True
+            total_invoices = sum(self.payment_schedule_id.schedule_line_ids.mapped('number_of_installments'))
+            return {
+                'warning': {
+                    'title': _('Payment Schedule Selected'),
+                    'message': _('Payment schedule "%s" will generate %d invoice(s). '
+                               'Click "Generate from Schedule" button after saving.') % (
+                        self.payment_schedule_id.name, total_invoices
+                    )
+                }
+            }
+        else:
+            self.use_schedule = False
 
     # Scheduler
     @api.model
@@ -277,13 +312,22 @@ class PropertyVendor(models.Model):
                 [('sell_contract_id', 'in', [rec.id])])
             rec.maintenance_request_count = request_count
 
+    # Additional Fees Calculation
+    @api.depends('dld_fee', 'admin_fee')
+    def _compute_total_additional_fees(self):
+        """Calculate total additional fees (DLD + Admin)"""
+        for rec in self:
+            rec.total_additional_fees = rec.dld_fee + rec.admin_fee
+
     # Sell Price Calculation
     @api.depends('sale_price',
                  'book_price',
                  'total_service',
                  'is_utility_service',
                  'total_maintenance',
-                 'is_any_maintenance')
+                 'is_any_maintenance',
+                 'dld_fee',
+                 'admin_fee')
     def compute_sell_price(self):
         for rec in self:
             tax_amount = 0.0
@@ -293,7 +337,8 @@ class PropertyVendor(models.Model):
             if rec.is_utility_service:
                 total_sell_amount = total_sell_amount + rec.total_service
             total_sell_amount = total_sell_amount + rec.sale_price
-            rec.payable_amount = total_sell_amount + rec.book_price
+            # Add additional fees to payable amount
+            rec.payable_amount = total_sell_amount + rec.book_price + rec.dld_fee + rec.admin_fee
             rec.tax_amount = tax_amount
             rec.total_sell_amount = total_sell_amount
 
@@ -384,6 +429,68 @@ class PropertyVendor(models.Model):
     def action_reset_installments(self):
         """Reset Installments"""
         self.sale_invoice_ids = [(6, 0, 0)]
+    
+    def action_generate_from_schedule(self):
+        """Generate sale invoices from payment schedule"""
+        self.ensure_one()
+        
+        if not self.use_schedule or not self.payment_schedule_id:
+            raise UserError(_('Please select a payment schedule first.'))
+        
+        if not self.date:
+            raise UserError(_('Contract date is required to generate invoice schedule.'))
+        
+        # Clear existing invoices
+        self.sale_invoice_ids.unlink()
+        
+        contract_start_date = self.date
+        total_amount = self.sale_price
+        
+        for line in self.payment_schedule_id.schedule_line_ids.sorted('days_after'):
+            # Calculate amount for this line
+            line_amount = (total_amount * line.percentage) / 100
+            
+            # Calculate frequency in days
+            frequency_days = {
+                'one_time': 0,
+                'monthly': 30,
+                'quarterly': 90,
+                'bi_annual': 180,
+                'annual': 365
+            }.get(line.installment_frequency, 0)
+            
+            # Generate invoices based on number of installments
+            amount_per_invoice = line_amount / line.number_of_installments
+            
+            for installment_num in range(line.number_of_installments):
+                # Calculate invoice date
+                days_offset = line.days_after + (installment_num * frequency_days)
+                invoice_date = contract_start_date + relativedelta(days=days_offset)
+                
+                # Create invoice line
+                invoice_name = line.name
+                if line.number_of_installments > 1:
+                    invoice_name = f"{line.name} ({installment_num + 1}/{line.number_of_installments})"
+                
+                self.env['sale.invoice'].create({
+                    'property_sold_id': self.id,
+                    'name': invoice_name,
+                    'amount': amount_per_invoice,
+                    'invoice_date': invoice_date,
+                    'invoice_created': False,
+                    'desc': line.note or '',
+                    'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes else False
+                })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'message': _('Invoices generated successfully from payment schedule!'),
+                'sticky': False,
+            }
+        }
 
     # Confirm Sale
     def action_confirm_sale(self):

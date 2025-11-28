@@ -122,7 +122,8 @@ class PropertyDetails(models.Model):
     cu_m = fields.Float(string="Total M³")
 
     # Pricing
-    price = fields.Monetary(string="Price")
+    price = fields.Monetary(string="Price",
+                           help="Base property price (DLD Fee and Admin Fee are separate)")
     rent_unit = fields.Selection([('Day', "Day"),
                                   ('Month', "Month"),
                                   ('Year', "Year")],
@@ -133,6 +134,12 @@ class PropertyDetails(models.Model):
                                     string="Pricing Type",
                                     default='fixed')
     price_per_area = fields.Monetary(string="Price / Area")
+
+    # Additional Fees for Sale Properties (Not included in price)
+    dld_fee = fields.Monetary(string='DLD Fee',
+                             help='Dubai Land Department registration fee (separate from property price, only for sale)')
+    admin_fee = fields.Monetary(string='Admin Fee',
+                               help='Administrative processing fee (separate from property price, only for sale)')
 
     # Utility Service
     is_extra_service = fields.Boolean(string="Utility Services")
