@@ -374,27 +374,36 @@ class PropertyVendor(models.Model):
     def _compute_dld_fee(self):
         """Calculate DLD fee based on type and percentage"""
         for rec in self:
-            if rec.dld_fee_type == 'percentage' and rec.sale_price:
-                rec.dld_fee = (rec.sale_price * rec.dld_fee_percentage) / 100
-            # If fixed type, the user sets the amount directly
+            if rec.dld_fee_type == 'percentage':
+                if rec.sale_price:
+                    rec.dld_fee = round((rec.sale_price * rec.dld_fee_percentage) / 100, 2)
+                else:
+                    rec.dld_fee = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
     
     # Admin Fee Calculation
     @api.depends('sale_price', 'admin_fee_percentage', 'admin_fee_type')
     def _compute_admin_fee(self):
         """Calculate Admin fee based on type and percentage"""
         for rec in self:
-            if rec.admin_fee_type == 'percentage' and rec.sale_price:
-                rec.admin_fee = (rec.sale_price * rec.admin_fee_percentage) / 100
-            # If fixed type, the user sets the amount directly
+            if rec.admin_fee_type == 'percentage':
+                if rec.sale_price:
+                    rec.admin_fee = round((rec.sale_price * rec.admin_fee_percentage) / 100, 2)
+                else:
+                    rec.admin_fee = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
     
     # Booking Amount Calculation
     @api.depends('sale_price', 'booking_percentage', 'booking_type')
     def _compute_booking_amount(self):
         """Calculate booking amount based on type and percentage"""
         for rec in self:
-            if rec.booking_type == 'percentage' and rec.sale_price:
-                rec.book_price = (rec.sale_price * rec.booking_percentage) / 100
-            # If fixed type, the user sets the amount directly
+            if rec.booking_type == 'percentage':
+                if rec.sale_price:
+                    rec.book_price = round((rec.sale_price * rec.booking_percentage) / 100, 2)
+                else:
+                    rec.book_price = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
 
     # Additional Fees Calculation
     @api.depends('dld_fee', 'admin_fee')
@@ -600,10 +609,11 @@ class PropertyVendor(models.Model):
                 'annual': 365
             }.get(line.installment_frequency, 0)
             
-            # Generate invoices based on number of installments
-            amount_per_invoice = line_amount / line.number_of_installments if line.number_of_installments > 0 else line_amount
+            # Generate invoices based on number of installments (safeguard against division by zero)
+            num_installments = max(line.number_of_installments, 1)
+            amount_per_invoice = round(line_amount / num_installments, 2)
             
-            for installment_num in range(line.number_of_installments):
+            for installment_num in range(num_installments):
                 # Calculate invoice date
                 days_offset = line.days_after + (installment_num * frequency_days)
                 invoice_date = contract_start_date + relativedelta(days=days_offset)

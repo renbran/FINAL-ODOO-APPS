@@ -2,8 +2,8 @@
 # Copyright 2020-Today TechKhedut.
 # Part of TechKhedut. See LICENSE file for full copyright and licensing details.
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
 
 
 class PropertySold(models.TransientModel):
@@ -118,6 +118,19 @@ class PropertySold(models.TransientModel):
                     'sticky': False,
                 }
             }
+        
+        # Validate start_date is required for installment-based payments
+        if self.payment_term != 'full_payment' and not self.start_date:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'warning',
+                    'title': _('Start Date Required'),
+                    'message': _("Please specify a start date for installment payments."),
+                    'sticky': False,
+                }
+            }
 
         self.customer_id.write({
             'installment_item_id': self.installment_item_id.id,
@@ -191,84 +204,97 @@ class PropertySold(models.TransientModel):
         
         for rec in self:
             if rec.payment_term == "monthly":
-                amount = rec.customer_id.payable_amount / rec.duration_id.month
+                if not rec.duration_id:
+                    raise ValidationError(_("Please select a duration for monthly payments."))
+                amount = round(rec.customer_id.payable_amount / rec.duration_id.month, 2)
                 invoice_date = rec.start_date
                 for r in range(rec.duration_id.month):
                     count = count + 1
                     sold_invoice_data = {
-                        'name': f"Installment : {str(count)}",
+                        'name': _("Installment : %s") % str(count),
                         'property_sold_id': rec.customer_id.id,
                         'invoice_date': invoice_date,
                         'amount': amount,
                         'invoice_type': 'installment',
                         'sequence': sequence,
-                        'tax_ids': self.taxes_ids.ids if self.is_taxes else False
+                        'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes and self.taxes_ids else False
                     }
                     self.env['sale.invoice'].create(sold_invoice_data)
                     invoice_date = invoice_date + relativedelta(months=1)
                     sequence += 1
             elif rec.payment_term == "quarterly":
                 if rec.quarter > 1:
-                    amount = rec.customer_id.payable_amount / rec.quarter
+                    amount = round(rec.customer_id.payable_amount / rec.quarter, 2)
                     invoice_date = rec.start_date
                     for r in range(rec.quarter):
                         count = count + 1
                         sold_invoice_data = {
-                            'name': f"Quarter Payment : {str(count)}",
+                            'name': _("Quarter Payment : %s") % str(count),
                             'property_sold_id': rec.customer_id.id,
                             'invoice_date': invoice_date,
                             'amount': amount,
                             'invoice_type': 'installment',
                             'sequence': sequence,
-                            'tax_ids': self.taxes_ids.ids if self.is_taxes else False
+                            'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes and self.taxes_ids else False
                         }
                         self.env['sale.invoice'].create(sold_invoice_data)
                         invoice_date = invoice_date + relativedelta(months=3)
                         sequence += 1
             elif rec.payment_term == "bi_annual":
                 if rec.bi_annual_count >= 1:
-                    amount = rec.customer_id.payable_amount / rec.bi_annual_count
+                    amount = round(rec.customer_id.payable_amount / rec.bi_annual_count, 2)
                     invoice_date = rec.start_date
                     for r in range(rec.bi_annual_count):
                         count = count + 1
                         sold_invoice_data = {
-                            'name': f"Bi-Annual Payment : {str(count)}",
+                            'name': _("Bi-Annual Payment : %s") % str(count),
                             'property_sold_id': rec.customer_id.id,
                             'invoice_date': invoice_date,
                             'amount': amount,
                             'invoice_type': 'installment',
                             'sequence': sequence,
-                            'tax_ids': self.taxes_ids.ids if self.is_taxes else False
+                            'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes and self.taxes_ids else False
                         }
                         self.env['sale.invoice'].create(sold_invoice_data)
                         invoice_date = invoice_date + relativedelta(months=6)
                         sequence += 1
             elif rec.payment_term == "annual":
                 if rec.annual_count >= 1:
-                    amount = rec.customer_id.payable_amount / rec.annual_count
+                    amount = round(rec.customer_id.payable_amount / rec.annual_count, 2)
                     invoice_date = rec.start_date
                     for r in range(rec.annual_count):
                         count = count + 1
                         sold_invoice_data = {
-                            'name': f"Annual Payment : {str(count)}",
+                            'name': _("Annual Payment : %s") % str(count),
                             'property_sold_id': rec.customer_id.id,
                             'invoice_date': invoice_date,
                             'amount': amount,
                             'invoice_type': 'installment',
                             'sequence': sequence,
-                            'tax_ids': self.taxes_ids.ids if self.is_taxes else False
+                            'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes and self.taxes_ids else False
                         }
                         self.env['sale.invoice'].create(sold_invoice_data)
                         invoice_date = invoice_date + relativedelta(years=1)
                         sequence += 1
             elif rec.payment_term == "full_payment":
                 self.env['sale.invoice'].create({
-                    'name': "Full Payment",
+                    'name': _("Full Payment"),
                     'property_sold_id': self.customer_id.id,
                     'invoice_date': fields.Date.today(),
-                    'amount': rec.customer_id.payable_amount,
+                    'amount': round(rec.customer_id.payable_amount, 2),
                     'invoice_type': 'installment',
                     'sequence': sequence,
-                    'tax_ids': self.taxes_ids.ids if self.is_taxes else False,
+                    'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes and self.taxes_ids else False,
                     'is_remain_invoice': True
                 })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'title': _('Success'),
+                'message': _('Payment installments created successfully!'),
+                'sticky': False,
+            }
+        }
