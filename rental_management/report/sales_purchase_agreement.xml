@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============================================================ -->
+        <!-- SALES PURCHASE AGREEMENT - PROFESSIONAL TEMPLATE             -->
+        <!-- World-Class Legal Document for Property Transactions         -->
+        <!-- Compatible with Odoo 17 and CloudPepper Deployment           -->
+        <!-- ============================================================ -->
+        
+        <template id="sales_purchase_agreement_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page" style="font-family: 'Times New Roman', Georgia, serif; font-size: 11pt; line-height: 1.6; color: #1a1a1a;">
+                            
+                            <!-- ===================== DOCUMENT HEADER ===================== -->
+                            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px double #800020; padding-bottom: 20px;">
+                                <h1 style="font-size: 24pt; font-weight: bold; color: #800020; margin: 0; letter-spacing: 2px; text-transform: uppercase;">
+                                    SALES &amp; PURCHASE AGREEMENT
+                                </h1>
+                                <p style="font-size: 12pt; color: #555; margin: 10px 0 0 0; font-style: italic;">
+                                    Property Transaction Contract
+                                </p>
+                            </div>
+                            
+                            <!-- ===================== AGREEMENT INFO BOX ===================== -->
+                            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 33.33%; padding: 8px 15px; border-right: 1px solid #dee2e6;">
+                                            <span style="display: block; font-size: 9pt; color: #6c757d; text-transform: uppercase; letter-spacing: 1px;">Agreement Reference</span>
+                                            <strong style="font-size: 14pt; color: #800020;"><span t-field="o.sold_seq"/></strong>
+                                        </td>
+                                        <td style="width: 33.33%; padding: 8px 15px; border-right: 1px solid #dee2e6;">
+                                            <span style="display: block; font-size: 9pt; color: #6c757d; text-transform: uppercase; letter-spacing: 1px;">Date of Agreement</span>
+                                            <strong style="font-size: 14pt; color: #333;"><span t-field="o.date" t-options='{"widget": "date", "format": "dd MMMM yyyy"}'/></strong>
+                                        </td>
+                                        <td style="width: 33.33%; padding: 8px 15px;">
+                                            <span style="display: block; font-size: 9pt; color: #6c757d; text-transform: uppercase; letter-spacing: 1px;">Status</span>
+                                            <strong style="font-size: 14pt; color: #28a745;"><span t-field="o.stage"/></strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- ===================== PREAMBLE ===================== -->
+                            <div style="margin-bottom: 25px; text-align: justify;">
+                                <p style="margin: 0; text-indent: 40px;">
+                                    This Sales and Purchase Agreement (hereinafter referred to as the <strong>"Agreement"</strong>) is entered into 
+                                    on <strong><span t-field="o.date" t-options='{"widget": "date", "format": "dd MMMM yyyy"}'/></strong>, 
+                                    by and between the parties identified below, concerning the sale and purchase of the property described herein.
+                                </p>
+                            </div>
+                            
+                            <!-- ===================== SECTION 1: PARTIES ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">1</span>
+                                    PARTIES TO THE AGREEMENT
+                                </h2>
+                                
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                                    <tr>
+                                        <!-- SELLER / LANDLORD -->
+                                        <td style="width: 48%; vertical-align: top; padding: 15px; background: #fff8f8; border: 1px solid #f0d0d0; border-radius: 8px;">
+                                            <h4 style="margin: 0 0 15px 0; color: #800020; font-size: 12pt; border-bottom: 1px solid #f0d0d0; padding-bottom: 8px;">
+                                                🏠 THE SELLER (First Party)
+                                            </h4>
+                                            <table style="width: 100%; font-size: 10pt;">
+                                                <tr>
+                                                    <td style="width: 35%; padding: 5px 0; color: #666;">Full Name:</td>
+                                                    <td style="padding: 5px 0;"><strong><span t-field="o.landlord_id.name"/></strong></td>
+                                                </tr>
+                                                <t t-if="o.landlord_phone">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666;">Phone:</td>
+                                                        <td style="padding: 5px 0;"><span t-field="o.landlord_phone"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.landlord_email">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666;">Email:</td>
+                                                        <td style="padding: 5px 0;"><span t-field="o.landlord_email"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.landlord_id.street">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666; vertical-align: top;">Address:</td>
+                                                        <td style="padding: 5px 0;">
+                                                            <span t-field="o.landlord_id.street"/>
+                                                            <t t-if="o.landlord_id.street2"><br/><span t-field="o.landlord_id.street2"/></t>
+                                                            <t t-if="o.landlord_id.city"><br/><span t-field="o.landlord_id.city"/></t>
+                                                            <t t-if="o.landlord_id.country_id"><br/><span t-field="o.landlord_id.country_id.name"/></t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </td>
+                                        
+                                        <td style="width: 4%;"></td>
+                                        
+                                        <!-- BUYER / CUSTOMER -->
+                                        <td style="width: 48%; vertical-align: top; padding: 15px; background: #f8fff8; border: 1px solid #d0f0d0; border-radius: 8px;">
+                                            <h4 style="margin: 0 0 15px 0; color: #28a745; font-size: 12pt; border-bottom: 1px solid #d0f0d0; padding-bottom: 8px;">
+                                                👤 THE BUYER (Second Party)
+                                            </h4>
+                                            <table style="width: 100%; font-size: 10pt;">
+                                                <tr>
+                                                    <td style="width: 35%; padding: 5px 0; color: #666;">Full Name:</td>
+                                                    <td style="padding: 5px 0;"><strong><span t-field="o.customer_id.name"/></strong></td>
+                                                </tr>
+                                                <t t-if="o.customer_phone">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666;">Phone:</td>
+                                                        <td style="padding: 5px 0;"><span t-field="o.customer_phone"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.customer_email">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666;">Email:</td>
+                                                        <td style="padding: 5px 0;"><span t-field="o.customer_email"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.customer_id.street">
+                                                    <tr>
+                                                        <td style="padding: 5px 0; color: #666; vertical-align: top;">Address:</td>
+                                                        <td style="padding: 5px 0;">
+                                                            <span t-field="o.customer_id.street"/>
+                                                            <t t-if="o.customer_id.street2"><br/><span t-field="o.customer_id.street2"/></t>
+                                                            <t t-if="o.customer_id.city"><br/><span t-field="o.customer_id.city"/></t>
+                                                            <t t-if="o.customer_id.country_id"><br/><span t-field="o.customer_id.country_id.name"/></t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- ===================== SECTION 2: PROPERTY DESCRIPTION ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">2</span>
+                                    PROPERTY DESCRIPTION
+                                </h2>
+                                
+                                <p style="text-align: justify; margin-bottom: 15px; text-indent: 40px;">
+                                    The Seller agrees to sell and transfer, and the Buyer agrees to purchase and acquire, the following property 
+                                    (hereinafter referred to as the <strong>"Property"</strong>) under the terms and conditions set forth in this Agreement:
+                                </p>
+                                
+                                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 50%; vertical-align: top; padding-right: 20px;">
+                                                <table style="width: 100%; font-size: 10pt;">
+                                                    <tr>
+                                                        <td style="width: 40%; padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Property Name:</td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><strong><span t-field="o.property_id.name"/></strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Property Type:</td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><span t-field="o.type"/></td>
+                                                    </tr>
+                                                    <t t-if="o.property_subtype_id">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Sub Type:</td>
+                                                            <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><span t-field="o.property_subtype_id.name"/></td>
+                                                        </tr>
+                                                    </t>
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Total Area:</td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <strong><span t-field="o.total_area"/></strong> <span t-field="o.measure_unit"/>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="o.usable_area">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Usable Area:</td>
+                                                            <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.usable_area"/> <span t-field="o.measure_unit"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </td>
+                                            <td style="width: 50%; vertical-align: top; padding-left: 20px; border-left: 1px solid #dee2e6;">
+                                                <table style="width: 100%; font-size: 10pt;">
+                                                    <t t-if="o.property_project_id">
+                                                        <tr>
+                                                            <td style="width: 35%; padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Project:</td>
+                                                            <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><span t-field="o.property_project_id.name"/></td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.subproject_id">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Sub Project:</td>
+                                                            <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><span t-field="o.subproject_id.name"/></td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.region_id">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">Region:</td>
+                                                            <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;"><span t-field="o.region_id.name"/></td>
+                                                        </tr>
+                                                    </t>
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; vertical-align: top;">Location:</td>
+                                                        <td style="padding: 8px 0;">
+                                                            <t t-if="o.street"><span t-field="o.street"/><br/></t>
+                                                            <t t-if="o.street2"><span t-field="o.street2"/><br/></t>
+                                                            <t t-if="o.city_id"><span t-field="o.city_id.name"/></t>
+                                                            <t t-if="o.zip">, <span t-field="o.zip"/></t><br/>
+                                                            <t t-if="o.state_id"><span t-field="o.state_id.name"/>, </t>
+                                                            <t t-if="o.country_id"><span t-field="o.country_id.name"/></t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- ===================== PAGE BREAK ===================== -->
+                            <p style="page-break-before: always;"/>
+                            
+                            <!-- ===================== SECTION 3: PURCHASE PRICE ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">3</span>
+                                    PURCHASE PRICE AND PAYMENT TERMS
+                                </h2>
+                                
+                                <p style="text-align: justify; margin-bottom: 15px; text-indent: 40px;">
+                                    The Buyer agrees to pay the Seller the total purchase price as detailed below. All amounts are in 
+                                    <strong><span t-field="o.currency_id.name"/></strong> unless otherwise specified.
+                                </p>
+                                
+                                <!-- Price Summary Table -->
+                                <div style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 60%; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                                <span style="font-size: 11pt;">Property Listed Price</span>
+                                            </td>
+                                            <td style="width: 40%; padding: 12px 0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                                <span t-field="o.price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <t t-if="o.ask_price">
+                                            <tr>
+                                                <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                                    <span style="font-size: 11pt;">Customer Offered Price</span>
+                                                </td>
+                                                <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                                    <span t-field="o.ask_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr>
+                                            <td style="padding: 15px 0;">
+                                                <strong style="font-size: 14pt;">AGREED SALE PRICE</strong>
+                                            </td>
+                                            <td style="padding: 15px 0; text-align: right;">
+                                                <strong style="font-size: 16pt;">
+                                                    <span t-field="o.sale_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Additional Fees -->
+                                <t t-if="o.dld_fee or o.admin_fee or o.book_price">
+                                    <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 15px 0; color: #495057; font-size: 12pt;">Additional Fees &amp; Charges</h4>
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
+                                            <t t-if="o.book_price">
+                                                <tr>
+                                                    <td style="width: 60%; padding: 10px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        Booking/Reservation Amount
+                                                    </td>
+                                                    <td style="width: 40%; padding: 10px 0; text-align: right; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.book_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.dld_fee">
+                                                <tr>
+                                                    <td style="padding: 10px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        DLD Fee (Dubai Land Department)
+                                                    </td>
+                                                    <td style="padding: 10px 0; text-align: right; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.dld_fee" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.admin_fee">
+                                                <tr>
+                                                    <td style="padding: 10px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        Administrative Fee
+                                                    </td>
+                                                    <td style="padding: 10px 0; text-align: right; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.admin_fee" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.is_any_maintenance and o.total_maintenance">
+                                                <tr>
+                                                    <td style="padding: 10px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        Maintenance Charges
+                                                    </td>
+                                                    <td style="padding: 10px 0; text-align: right; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.total_maintenance" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.is_utility_service and o.total_service">
+                                                <tr>
+                                                    <td style="padding: 10px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        Utility Service Cost
+                                                    </td>
+                                                    <td style="padding: 10px 0; text-align: right; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.total_service" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <tr style="background: #e9ecef;">
+                                                <td style="padding: 12px 0; font-weight: bold;">
+                                                    TOTAL PAYABLE AMOUNT
+                                                </td>
+                                                <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 12pt; color: #800020;">
+                                                    <span t-field="o.payable_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </t>
+                                
+                                <!-- Payment Terms -->
+                                <div style="margin-bottom: 15px;">
+                                    <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 11pt;">3.1 Payment Terms</h4>
+                                    <p style="text-align: justify; margin: 0; text-indent: 40px;">
+                                        <t t-if="o.payment_term == 'full_payment'">
+                                            The Buyer shall pay the full purchase price in a single payment upon execution of this Agreement 
+                                            or as mutually agreed upon by both parties.
+                                        </t>
+                                        <t t-elif="o.payment_term == 'monthly'">
+                                            The Buyer shall pay the purchase price in monthly installments as detailed in the Payment Schedule 
+                                            attached hereto and made a part of this Agreement.
+                                        </t>
+                                        <t t-elif="o.payment_term == 'quarterly'">
+                                            The Buyer shall pay the purchase price in quarterly installments as detailed in the Payment Schedule 
+                                            attached hereto and made a part of this Agreement.
+                                        </t>
+                                        <t t-else="">
+                                            The payment terms shall be as mutually agreed upon by both parties and documented in the Payment Schedule 
+                                            section of this Agreement.
+                                        </t>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- ===================== SECTION 4: PAYMENT SCHEDULE ===================== -->
+                            <t t-if="o.sale_invoice_ids">
+                                <div style="margin-bottom: 25px;">
+                                    <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                        <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">4</span>
+                                        PAYMENT SCHEDULE
+                                    </h2>
+                                    
+                                    <p style="text-align: justify; margin-bottom: 15px; text-indent: 40px;">
+                                        The Buyer agrees to make payments according to the following schedule. Each payment shall be made on or before 
+                                        the specified due date. Late payments may be subject to penalties as outlined in the terms and conditions.
+                                    </p>
+                                    
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 15px;">
+                                        <thead>
+                                            <tr style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white;">
+                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017;">No.</th>
+                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017;">Description</th>
+                                                <th style="padding: 12px; text-align: center; border: 1px solid #5c0017;">Due Date</th>
+                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Amount</th>
+                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Tax</th>
+                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="counter" t-value="0"/>
+                                            <t t-foreach="o.sale_invoice_ids" t-as="invoice">
+                                                <t t-set="counter" t-value="counter + 1"/>
+                                                <tr style="background-color: #f8f9fa;" t-attf-style="background-color: {{ 'white' if counter % 2 == 0 else '#f8f9fa' }};">
+                                                    <td style="padding: 10px 12px; border: 1px solid #dee2e6;">
+                                                        <span t-esc="counter"/>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; border: 1px solid #dee2e6;">
+                                                        <strong><span t-field="invoice.name"/></strong>
+                                                        <t t-if="invoice.desc">
+                                                            <br/><small style="color: #6c757d;"><span t-field="invoice.desc"/></small>
+                                                        </t>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: center; border: 1px solid #dee2e6;">
+                                                        <span t-field="invoice.invoice_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6;">
+                                                        <span t-field="invoice.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6;">
+                                                        <span t-field="invoice.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6; font-weight: bold;">
+                                                        <span t-esc="invoice.amount + invoice.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr style="background: #e9ecef; font-weight: bold;">
+                                                <td colspan="3" style="padding: 12px; border: 1px solid #dee2e6; text-align: right;">
+                                                    TOTALS:
+                                                </td>
+                                                <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">
+                                                    <span t-field="o.total_untaxed_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">
+                                                    <span t-field="o.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6; color: #800020; font-size: 11pt;">
+                                                    <span t-field="o.total_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    
+                                    <!-- Payment Summary -->
+                                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                                        <table style="width: 100%; font-size: 10pt;">
+                                            <tr>
+                                                <td style="width: 33.33%; text-align: center; padding: 10px; border-right: 1px solid #ffc107;">
+                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Amount Paid</span>
+                                                    <strong style="font-size: 14pt; color: #28a745;">
+                                                        <span t-field="o.paid_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </strong>
+                                                </td>
+                                                <td style="width: 33.33%; text-align: center; padding: 10px; border-right: 1px solid #ffc107;">
+                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Remaining Balance</span>
+                                                    <strong style="font-size: 14pt; color: #dc3545;">
+                                                        <span t-field="o.remaining_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </strong>
+                                                </td>
+                                                <td style="width: 33.33%; text-align: center; padding: 10px;">
+                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Total Contract Value</span>
+                                                    <strong style="font-size: 14pt; color: #800020;">
+                                                        <span t-field="o.total_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- ===================== PAGE BREAK ===================== -->
+                            <p style="page-break-before: always;"/>
+                            
+                            <!-- ===================== SECTION 5: BROKER DETAILS ===================== -->
+                            <t t-if="o.is_any_broker and o.broker_id">
+                                <div style="margin-bottom: 25px;">
+                                    <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                        <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">5</span>
+                                        REAL ESTATE BROKER
+                                    </h2>
+                                    
+                                    <p style="text-align: justify; margin-bottom: 15px; text-indent: 40px;">
+                                        The following registered real estate broker has facilitated this transaction and is entitled to 
+                                        commission as detailed below:
+                                    </p>
+                                    
+                                    <div style="background: #e7f3ff; border: 1px solid #b8daff; border-radius: 8px; padding: 20px;">
+                                        <table style="width: 100%; font-size: 10pt;">
+                                            <tr>
+                                                <td style="width: 50%; vertical-align: top;">
+                                                    <table style="width: 100%;">
+                                                        <tr>
+                                                            <td style="width: 40%; padding: 8px 0; color: #666;">Broker Name:</td>
+                                                            <td style="padding: 8px 0;"><strong><span t-field="o.broker_id.name"/></strong></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666;">Commission From:</td>
+                                                            <td style="padding: 8px 0;"><span t-field="o.commission_from"/></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666;">Commission Type:</td>
+                                                            <td style="padding: 8px 0;">
+                                                                <t t-if="o.commission_type == 'f'">Fixed Amount</t>
+                                                                <t t-elif="o.commission_type == 'p'">Percentage</t>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td style="width: 50%; vertical-align: top; border-left: 1px solid #b8daff; padding-left: 20px;">
+                                                    <table style="width: 100%;">
+                                                        <t t-if="o.commission_type == 'p'">
+                                                            <tr>
+                                                                <td style="width: 45%; padding: 8px 0; color: #666;">Commission Rate:</td>
+                                                                <td style="padding: 8px 0;"><span t-field="o.broker_commission_percentage"/>%</td>
+                                                            </tr>
+                                                        </t>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #666;">Commission Amount:</td>
+                                                            <td style="padding: 8px 0;">
+                                                                <strong style="color: #800020; font-size: 12pt;">
+                                                                    <span t-field="o.broker_final_commission" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                                </strong>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- ===================== SECTION 6: TERMS AND CONDITIONS ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
+                                        <t t-if="o.is_any_broker">6</t>
+                                        <t t-else="">5</t>
+                                    </span>
+                                    TERMS AND CONDITIONS
+                                </h2>
+                                
+                                <t t-if="o.term_condition">
+                                    <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: justify;">
+                                        <span t-raw="o.term_condition"/>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: justify;">
+                                        <p style="margin-bottom: 12px;"><strong>1. TRANSFER OF TITLE:</strong> The Seller agrees to transfer clear and marketable title to the Property to the Buyer upon receipt of the full purchase price.</p>
+                                        <p style="margin-bottom: 12px;"><strong>2. PROPERTY CONDITION:</strong> The Property is sold in its current "as-is" condition. The Buyer has inspected the Property and accepts it in its present state.</p>
+                                        <p style="margin-bottom: 12px;"><strong>3. PAYMENT DEFAULT:</strong> In the event of payment default, the Seller reserves the right to terminate this Agreement and retain any payments made as liquidated damages.</p>
+                                        <p style="margin-bottom: 12px;"><strong>4. GOVERNING LAW:</strong> This Agreement shall be governed by and construed in accordance with the laws of the United Arab Emirates.</p>
+                                        <p style="margin-bottom: 12px;"><strong>5. DISPUTE RESOLUTION:</strong> Any disputes arising from this Agreement shall be resolved through arbitration in accordance with applicable laws.</p>
+                                        <p style="margin: 0;"><strong>6. ENTIRE AGREEMENT:</strong> This Agreement constitutes the entire understanding between the parties and supersedes all prior negotiations, representations, or agreements.</p>
+                                    </div>
+                                </t>
+                            </div>
+                            
+                            <!-- ===================== SECTION 7: REPRESENTATIONS ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
+                                        <t t-if="o.is_any_broker">7</t>
+                                        <t t-else="">6</t>
+                                    </span>
+                                    REPRESENTATIONS AND WARRANTIES
+                                </h2>
+                                
+                                <div style="text-align: justify;">
+                                    <p style="margin-bottom: 12px; text-indent: 40px;">
+                                        <strong>The Seller represents and warrants that:</strong>
+                                    </p>
+                                    <ul style="margin-left: 60px; margin-bottom: 15px;">
+                                        <li style="margin-bottom: 8px;">The Seller has good and marketable title to the Property, free from all encumbrances except as disclosed herein.</li>
+                                        <li style="margin-bottom: 8px;">There are no pending or threatened legal actions affecting the Property.</li>
+                                        <li style="margin-bottom: 8px;">All property taxes and assessments have been paid to date.</li>
+                                        <li style="margin-bottom: 8px;">The Seller has the legal authority to enter into this Agreement and transfer the Property.</li>
+                                    </ul>
+                                    
+                                    <p style="margin-bottom: 12px; text-indent: 40px;">
+                                        <strong>The Buyer represents and warrants that:</strong>
+                                    </p>
+                                    <ul style="margin-left: 60px;">
+                                        <li style="margin-bottom: 8px;">The Buyer has the financial capacity to complete this transaction.</li>
+                                        <li style="margin-bottom: 8px;">The Buyer has inspected the Property and accepts it in its current condition.</li>
+                                        <li style="margin-bottom: 8px;">The Buyer has the legal authority to enter into this Agreement.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- ===================== PAGE BREAK FOR SIGNATURES ===================== -->
+                            <p style="page-break-before: always;"/>
+                            
+                            <!-- ===================== SECTION 8: SIGNATURES ===================== -->
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
+                                        <t t-if="o.is_any_broker">8</t>
+                                        <t t-else="">7</t>
+                                    </span>
+                                    EXECUTION OF AGREEMENT
+                                </h2>
+                                
+                                <p style="text-align: justify; margin-bottom: 25px; text-indent: 40px;">
+                                    IN WITNESS WHEREOF, the parties hereto have executed this Sales and Purchase Agreement as of the date 
+                                    first written above, acknowledging that they have read, understood, and agree to be bound by all terms 
+                                    and conditions contained herein.
+                                </p>
+                                
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
+                                    <tr>
+                                        <!-- SELLER SIGNATURE -->
+                                        <td style="width: 45%; vertical-align: top; padding: 20px; border: 2px solid #800020; border-radius: 8px;">
+                                            <div style="text-align: center; margin-bottom: 20px;">
+                                                <h4 style="color: #800020; margin: 0;">THE SELLER</h4>
+                                                <p style="color: #666; font-size: 10pt; margin: 5px 0 0 0;">(First Party)</p>
+                                            </div>
+                                            
+                                            <div style="margin-bottom: 40px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Full Name:</p>
+                                                <p style="margin: 5px 0; border-bottom: 1px solid #333; min-height: 20px;">
+                                                    <strong><span t-field="o.landlord_id.name"/></strong>
+                                                </p>
+                                            </div>
+                                            
+                                            <div style="margin-bottom: 40px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Signature:</p>
+                                                <div style="height: 60px; border-bottom: 1px solid #333; margin-top: 5px;">
+                                                    <!-- Signature Space -->
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Date:</p>
+                                                <p style="margin: 5px 0; border-bottom: 1px solid #333; min-height: 20px;">
+                                                    _______ / _______ / _____________
+                                                </p>
+                                            </div>
+                                        </td>
+                                        
+                                        <td style="width: 10%;"></td>
+                                        
+                                        <!-- BUYER SIGNATURE -->
+                                        <td style="width: 45%; vertical-align: top; padding: 20px; border: 2px solid #28a745; border-radius: 8px;">
+                                            <div style="text-align: center; margin-bottom: 20px;">
+                                                <h4 style="color: #28a745; margin: 0;">THE BUYER</h4>
+                                                <p style="color: #666; font-size: 10pt; margin: 5px 0 0 0;">(Second Party)</p>
+                                            </div>
+                                            
+                                            <div style="margin-bottom: 40px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Full Name:</p>
+                                                <p style="margin: 5px 0; border-bottom: 1px solid #333; min-height: 20px;">
+                                                    <strong><span t-field="o.customer_id.name"/></strong>
+                                                </p>
+                                            </div>
+                                            
+                                            <div style="margin-bottom: 40px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Signature:</p>
+                                                <div style="height: 60px; border-bottom: 1px solid #333; margin-top: 5px;">
+                                                    <!-- Signature Space -->
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <p style="color: #666; font-size: 9pt; margin: 0;">Date:</p>
+                                                <p style="margin: 5px 0; border-bottom: 1px solid #333; min-height: 20px;">
+                                                    _______ / _______ / _____________
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- WITNESS SECTION -->
+                                <div style="margin-top: 40px;">
+                                    <h4 style="color: #495057; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 20px;">
+                                        WITNESSES
+                                    </h4>
+                                    
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 45%; vertical-align: top; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0 0 5px 0;">Witness 1 - Name:</p>
+                                                <p style="border-bottom: 1px solid #adb5bd; min-height: 20px; margin: 0 0 15px 0;"></p>
+                                                
+                                                <p style="color: #666; font-size: 9pt; margin: 0 0 5px 0;">Signature:</p>
+                                                <div style="height: 40px; border-bottom: 1px solid #adb5bd;"></div>
+                                            </td>
+                                            
+                                            <td style="width: 10%;"></td>
+                                            
+                                            <td style="width: 45%; vertical-align: top; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                                <p style="color: #666; font-size: 9pt; margin: 0 0 5px 0;">Witness 2 - Name:</p>
+                                                <p style="border-bottom: 1px solid #adb5bd; min-height: 20px; margin: 0 0 15px 0;"></p>
+                                                
+                                                <p style="color: #666; font-size: 9pt; margin: 0 0 5px 0;">Signature:</p>
+                                                <div style="height: 40px; border-bottom: 1px solid #adb5bd;"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- ===================== FOOTER NOTE ===================== -->
+                            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center;">
+                                <p style="font-size: 9pt; color: #6c757d; margin: 0;">
+                                    This document was generated on <span t-esc="datetime.datetime.now().strftime('%d %B %Y at %H:%M')"/> 
+                                    and constitutes a legally binding agreement between the parties.
+                                </p>
+                                <p style="font-size: 9pt; color: #6c757d; margin: 5px 0 0 0;">
+                                    Agreement Reference: <strong><span t-field="o.sold_seq"/></strong> | 
+                                    Company: <strong><span t-field="o.company_id.name"/></strong>
+                                </p>
+                            </div>
+                            
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        
+        <!-- ============================================================ -->
+        <!-- REPORT ACTION DEFINITION                                      -->
+        <!-- ============================================================ -->
+        <record id="action_report_sales_purchase_agreement" model="ir.actions.report">
+            <field name="name">Sales Purchase Agreement</field>
+            <field name="model">property.vendor</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">rental_management.sales_purchase_agreement_template</field>
+            <field name="report_file">rental_management.sales_purchase_agreement_template</field>
+            <field name="binding_model_id" ref="model_property_vendor"/>
+            <field name="binding_type">report</field>
+            <field name="print_report_name">'Sales Purchase Agreement - %s' % (object.sold_seq)</field>
+            <field name="paperformat_id" ref="base.paperformat_us"/>
+        </record>
+        
+    </data>
+</odoo>

@@ -16,7 +16,7 @@
     "summary": """
         Property Sale & Rental Management
     """,
-    "version": "3.2.7",
+    "version": "3.2.8",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",
@@ -93,6 +93,7 @@
         "report/tenancy_details_report_template.xml",
         "report/property_details_report_v2.xml",
         "report/property_sold_report.xml",
+        "report/sales_purchase_agreement.xml",
         "report/invoice_report_inherit.xml",
         # Mail Template
         "data/active_contract_mail_template.xml",
