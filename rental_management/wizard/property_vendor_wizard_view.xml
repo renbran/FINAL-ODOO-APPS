@@ -6,7 +6,7 @@
             <field name="model">property.vendor.wizard</field>
             <field name="arch" type="xml">
                 <form>
-                    <group>
+                    <group string="Payment Term Configuration">
                         <group>
                             <label for="payment_term"/>
                             <div>
@@ -14,15 +14,23 @@
                                 <div class="font-italic text-muted" invisible="payment_term != 'quarterly'">
                                     * 3 Month Quarter
                                 </div>
+                                <div class="font-italic text-muted" invisible="payment_term != 'bi_annual'">
+                                    * 6 Month Interval
+                                </div>
+                                <div class="font-italic text-muted" invisible="payment_term != 'annual'">
+                                    * 12 Month Interval
+                                </div>
                             </div>
-                            <field name="start_date" invisible="payment_term == 'full_payment'" required="payment_term in ['quarterly','monthly']"/>
+                            <field name="start_date" invisible="payment_term == 'full_payment'" required="payment_term in ['quarterly','monthly','bi_annual','annual']"/>
                         </group>
                         <group>
                             <field name="quarter" invisible="payment_term != 'quarterly'" required="payment_term == 'quarterly'"/>
+                            <field name="bi_annual_count" invisible="payment_term != 'bi_annual'" required="payment_term == 'bi_annual'"/>
+                            <field name="annual_count" invisible="payment_term != 'annual'" required="payment_term == 'annual'"/>
                             <field name="duration_id" options="{'no_quick_create':True,'no_create_edit':True}" invisible="payment_term != 'monthly'" required="payment_term == 'monthly'"/>
                         </group>
                     </group>
-                    <group>
+                    <group string="Sale Price">
                         <group>
                             <field name="company_id" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
@@ -36,7 +44,19 @@
                                    force_save="1"/>
                         </group>
                     </group>
-                    <group>
+                    <group string="DLD &amp; Admin Fees (Due 30 days after booking)">
+                        <group>
+                            <field name="include_dld_fee"/>
+                            <field name="dld_fee_amount" invisible="not include_dld_fee"/>
+                            <field name="dld_due_days" invisible="not include_dld_fee"/>
+                        </group>
+                        <group>
+                            <field name="include_admin_fee"/>
+                            <field name="admin_fee_amount" invisible="not include_admin_fee"/>
+                            <field name="admin_due_days" invisible="not include_admin_fee"/>
+                        </group>
+                    </group>
+                    <group string="Invoice Settings">
                         <group>
                             <field name="installment_item_id" required="1"/>
                         </group>

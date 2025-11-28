@@ -14,9 +14,9 @@
         - Property List
     """,
     "summary": """
-        Property Sale & Rental Management
+        Property Sale & Rental Management with Flexible Payment Plans
     """,
-    "version": "3.2.8",
+    "version": "3.3.0",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",

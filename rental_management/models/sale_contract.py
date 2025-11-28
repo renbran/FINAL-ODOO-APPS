@@ -88,13 +88,20 @@ class PropertyVendor(models.Model):
                                          domain=[('schedule_type', '=', 'sale'), ('active', '=', True)],
                                          help='Select payment schedule to auto-generate invoices')
     use_schedule = fields.Boolean(string='Use Payment Schedule', default=False)
-    payment_term = fields.Selection([('monthly', 'Monthly'),
-                                     ('full_payment', 'Full Payment'),
-                                     ('quarterly', 'Quarterly')],
-                                    string='Payment Term')
+    payment_term = fields.Selection([
+        ('monthly', 'Monthly'),
+        ('full_payment', 'Full Payment'),
+        ('quarterly', 'Quarterly'),
+        ('bi_annual', 'Bi-Annual (6 Months)'),
+        ('annual', 'Annual')
+    ], string='Payment Term', help='Frequency of installment payments')
     sale_invoice_ids = fields.One2many(
         'sale.invoice', 'property_sold_id', string="Invoices")
-    book_price = fields.Monetary(string='Book Price')
+    book_price = fields.Monetary(string='Booking Amount',
+                                 compute='_compute_booking_amount',
+                                 store=True,
+                                 readonly=False,
+                                 help='Booking/Reservation payment amount')
     sale_price = fields.Monetary(string='Confirmed Sale Price', store=True)
     ask_price = fields.Monetary(string='Customer Ask Price')
     book_invoice_id = fields.Many2one(
@@ -135,13 +142,63 @@ class PropertyVendor(models.Model):
 
     # Additional Fees (Not included in property price)
     dld_fee = fields.Monetary(string='DLD Fee',
-                             help='Dubai Land Department registration fee (separate from property price)')
+                              compute='_compute_dld_fee',
+                              store=True,
+                              readonly=False,
+                              help='Dubai Land Department registration fee (separate from property price)')
+    dld_fee_percentage = fields.Float(string='DLD Fee %', default=4.0,
+                                      help='DLD Fee as percentage of sale price (default 4%)')
+    dld_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='DLD Fee Type', default='percentage',
+       help='Calculate DLD fee as fixed amount or percentage')
+    dld_fee_due_days = fields.Integer(string='DLD Due Days', default=30,
+                                      help='Number of days after booking when DLD fee is due')
+    
     admin_fee = fields.Monetary(string='Admin Fee',
-                               help='Administrative processing fee (separate from property price)')
+                                compute='_compute_admin_fee',
+                                store=True,
+                                readonly=False,
+                                help='Administrative processing fee (separate from property price)')
+    admin_fee_percentage = fields.Float(string='Admin Fee %', default=2.0,
+                                        help='Admin Fee as percentage of sale price (default 2%)')
+    admin_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Admin Fee Type', default='fixed',
+       help='Calculate admin fee as fixed amount or percentage')
+    admin_fee_due_days = fields.Integer(string='Admin Due Days', default=30,
+                                        help='Number of days after booking when admin fee is due')
+    
     total_additional_fees = fields.Monetary(string='Total Additional Fees',
                                            compute='_compute_total_additional_fees',
                                            store=True,
                                            help='DLD Fee + Admin Fee')
+    
+    # Booking/Reservation Payment Settings
+    booking_percentage = fields.Float(string='Booking %', default=10.0,
+                                      help='Booking amount as percentage of sale price')
+    booking_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Booking Type', default='percentage')
+    
+    # DLD and Admin Fee Product Items
+    dld_fee_item_id = fields.Many2one('product.product',
+                                      string="DLD Fee Item",
+                                      default=lambda self: self.env.ref('rental_management.property_product_dld_fee',
+                                                                        raise_if_not_found=False))
+    admin_fee_item_id = fields.Many2one('product.product',
+                                        string="Admin Fee Item",
+                                        default=lambda self: self.env.ref('rental_management.property_product_admin_fee',
+                                                                          raise_if_not_found=False))
+    
+    # Include fees in payment plan
+    include_dld_in_plan = fields.Boolean(string='Include DLD in Payment Plan', default=True,
+                                         help='Automatically add DLD fee invoice to payment schedule')
+    include_admin_in_plan = fields.Boolean(string='Include Admin in Payment Plan', default=True,
+                                           help='Automatically add admin fee invoice to payment schedule')
 
     # Terms & Conditions
     term_condition = fields.Html(string='Term and Condition')
@@ -312,6 +369,33 @@ class PropertyVendor(models.Model):
                 [('sell_contract_id', 'in', [rec.id])])
             rec.maintenance_request_count = request_count
 
+    # DLD Fee Calculation
+    @api.depends('sale_price', 'dld_fee_percentage', 'dld_fee_type')
+    def _compute_dld_fee(self):
+        """Calculate DLD fee based on type and percentage"""
+        for rec in self:
+            if rec.dld_fee_type == 'percentage' and rec.sale_price:
+                rec.dld_fee = (rec.sale_price * rec.dld_fee_percentage) / 100
+            # If fixed type, the user sets the amount directly
+    
+    # Admin Fee Calculation
+    @api.depends('sale_price', 'admin_fee_percentage', 'admin_fee_type')
+    def _compute_admin_fee(self):
+        """Calculate Admin fee based on type and percentage"""
+        for rec in self:
+            if rec.admin_fee_type == 'percentage' and rec.sale_price:
+                rec.admin_fee = (rec.sale_price * rec.admin_fee_percentage) / 100
+            # If fixed type, the user sets the amount directly
+    
+    # Booking Amount Calculation
+    @api.depends('sale_price', 'booking_percentage', 'booking_type')
+    def _compute_booking_amount(self):
+        """Calculate booking amount based on type and percentage"""
+        for rec in self:
+            if rec.booking_type == 'percentage' and rec.sale_price:
+                rec.book_price = (rec.sale_price * rec.booking_percentage) / 100
+            # If fixed type, the user sets the amount directly
+
     # Additional Fees Calculation
     @api.depends('dld_fee', 'admin_fee')
     def _compute_total_additional_fees(self):
@@ -431,7 +515,7 @@ class PropertyVendor(models.Model):
         self.sale_invoice_ids = [(6, 0, 0)]
     
     def action_generate_from_schedule(self):
-        """Generate sale invoices from payment schedule"""
+        """Generate sale invoices from payment schedule including DLD and Admin fees"""
         self.ensure_one()
         
         if not self.use_schedule or not self.payment_schedule_id:
@@ -445,10 +529,67 @@ class PropertyVendor(models.Model):
         
         contract_start_date = self.date
         total_amount = self.sale_price
+        sequence = 1
+        booking_date = None
+        
+        # 1. Generate Booking/Reservation Payment (First invoice)
+        if self.book_price > 0:
+            booking_date = contract_start_date
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('Booking/Reservation Payment'),
+                'amount': self.book_price,
+                'invoice_date': booking_date,
+                'invoice_created': False,
+                'invoice_type': 'booking',
+                'sequence': sequence,
+                'desc': _('Booking deposit - %s%% of sale price') % self.booking_percentage if self.booking_type == 'percentage' else _('Booking deposit'),
+                'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes else False
+            })
+            sequence += 1
+        
+        # 2. Generate DLD Fee (Due X days after booking)
+        if self.include_dld_in_plan and self.dld_fee > 0:
+            dld_due_date = (booking_date or contract_start_date) + relativedelta(days=self.dld_fee_due_days)
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('DLD Fee - Dubai Land Department'),
+                'amount': self.dld_fee,
+                'invoice_date': dld_due_date,
+                'invoice_created': False,
+                'invoice_type': 'dld_fee',
+                'sequence': sequence,
+                'desc': _('DLD Fee - Due %s days after booking (%s%% of sale price)') % (
+                    self.dld_fee_due_days, 
+                    self.dld_fee_percentage
+                ) if self.dld_fee_type == 'percentage' else _('DLD Fee - Due %s days after booking') % self.dld_fee_due_days,
+                'tax_ids': False  # DLD fees typically not taxed
+            })
+            sequence += 1
+        
+        # 3. Generate Admin Fee (Due X days after booking)
+        if self.include_admin_in_plan and self.admin_fee > 0:
+            admin_due_date = (booking_date or contract_start_date) + relativedelta(days=self.admin_fee_due_days)
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('Admin Fee - Administrative Processing'),
+                'amount': self.admin_fee,
+                'invoice_date': admin_due_date,
+                'invoice_created': False,
+                'invoice_type': 'admin_fee',
+                'sequence': sequence,
+                'desc': _('Admin Fee - Due %s days after booking') % self.admin_fee_due_days,
+                'tax_ids': False  # Admin fees typically not taxed
+            })
+            sequence += 1
+        
+        # 4. Generate Payment Schedule Installments
+        # Calculate remaining amount (after booking)
+        remaining_amount = total_amount - self.book_price
         
         for line in self.payment_schedule_id.schedule_line_ids.sorted('days_after'):
-            # Calculate amount for this line
-            line_amount = (total_amount * line.percentage) / 100
+            # Calculate amount for this line based on remaining amount
+            line_amount = (remaining_amount * line.percentage) / 100
             
             # Calculate frequency in days
             frequency_days = {
@@ -460,7 +601,7 @@ class PropertyVendor(models.Model):
             }.get(line.installment_frequency, 0)
             
             # Generate invoices based on number of installments
-            amount_per_invoice = line_amount / line.number_of_installments
+            amount_per_invoice = line_amount / line.number_of_installments if line.number_of_installments > 0 else line_amount
             
             for installment_num in range(line.number_of_installments):
                 # Calculate invoice date
@@ -478,16 +619,19 @@ class PropertyVendor(models.Model):
                     'amount': amount_per_invoice,
                     'invoice_date': invoice_date,
                     'invoice_created': False,
+                    'invoice_type': 'installment',
+                    'sequence': sequence,
                     'desc': line.note or '',
                     'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes else False
                 })
+                sequence += 1
         
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'type': 'success',
-                'message': _('Invoices generated successfully from payment schedule!'),
+                'message': _('Payment schedule generated successfully with %s invoices!') % (sequence - 1),
                 'sticky': False,
             }
         }
@@ -533,8 +677,10 @@ class PropertyVendor(models.Model):
 class SaleInvoice(models.Model):
     _name = 'sale.invoice'
     _description = "Sale Invoice"
+    _order = 'invoice_date, sequence, id'
 
     name = fields.Char(string="Title", translate=True)
+    sequence = fields.Integer(string='Sequence', default=10)
     property_sold_id = fields.Many2one('property.vendor',
                                        string="Property Sold",
                                        ondelete='cascade')
@@ -554,6 +700,17 @@ class SaleInvoice(models.Model):
     tax_ids = fields.Many2many('account.tax', string="Taxes")
     tax_amount = fields.Monetary(string="Tax Amount",
                                  compute="compute_tax_amount")
+    
+    # Invoice Type for categorization
+    invoice_type = fields.Selection([
+        ('booking', 'Booking/Reservation'),
+        ('dld_fee', 'DLD Fee'),
+        ('admin_fee', 'Admin Fee'),
+        ('installment', 'Installment'),
+        ('handover', 'Handover Payment'),
+        ('other', 'Other')
+    ], string='Invoice Type', default='installment',
+       help='Type of payment for categorization and reporting')
 
     total_amount = fields.Monetary(
         string="Total Amount", compute="_compute_amount")

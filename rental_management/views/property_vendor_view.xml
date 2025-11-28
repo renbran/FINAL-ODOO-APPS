@@ -157,9 +157,6 @@
                             </group>
                             <group>
                                 <field name="total_sell_amount" />
-                                <field name="dld_fee" readonly="stage != 'booked'" force_save="1" help="Dubai Land Department registration fee (separate from property price)"/>
-                                <field name="admin_fee" readonly="stage != 'booked'" force_save="1" help="Administrative processing fee (separate from property price)"/>
-                                <field name="total_additional_fees" readonly="1" force_save="1" decoration-info="total_additional_fees > 0" help="Total of DLD Fee + Admin Fee"/>
                                 <label for="book_price" class="mt-1" invisible="book_price == 0" />
                                 <div name="book_invoice_id" invisible="book_price == 0">
                                     <field name="book_price" required="1" class="oe_inline" readonly="1" force_save="1" />
@@ -171,6 +168,29 @@
                                     <field name="book_invoice_payment_state" widget="badge" invisible="not book_invoice_id" style="margin-left: 10px;width:auto;" decoration-success="book_invoice_payment_state=='paid'" decoration-danger="book_invoice_payment_state=='not_paid'" decoration-info="book_invoice_payment_state=='in_payment'" decoration-primary="book_invoice_payment_state=='partial'" decoration-warning="book_invoice_payment_state=='reversed'" />
                                 </div>
                                 <field name="payable_amount" />
+                            </group>
+                        </group>
+                        <group string="DLD &amp; Admin Fees Configuration">
+                            <group string="Booking Payment">
+                                <field name="booking_type" readonly="stage != 'booked'" force_save="1"/>
+                                <field name="booking_percentage" readonly="stage != 'booked' or booking_type != 'percentage'" force_save="1" invisible="booking_type != 'percentage'"/>
+                            </group>
+                            <group string="DLD Fee (Due after Booking)">
+                                <field name="dld_fee_type" readonly="stage != 'booked'" force_save="1"/>
+                                <field name="dld_fee_percentage" readonly="stage != 'booked' or dld_fee_type != 'percentage'" force_save="1" invisible="dld_fee_type != 'percentage'"/>
+                                <field name="dld_fee" readonly="stage != 'booked' or dld_fee_type == 'percentage'" force_save="1" help="Dubai Land Department registration fee (separate from property price)"/>
+                                <field name="dld_fee_due_days" readonly="stage != 'booked'" force_save="1"/>
+                                <field name="include_dld_in_plan" readonly="stage != 'booked'" force_save="1"/>
+                            </group>
+                            <group string="Admin Fee (Due after Booking)">
+                                <field name="admin_fee_type" readonly="stage != 'booked'" force_save="1"/>
+                                <field name="admin_fee_percentage" readonly="stage != 'booked' or admin_fee_type != 'percentage'" force_save="1" invisible="admin_fee_type != 'percentage'"/>
+                                <field name="admin_fee" readonly="stage != 'booked' or admin_fee_type == 'percentage'" force_save="1" help="Administrative processing fee (separate from property price)"/>
+                                <field name="admin_fee_due_days" readonly="stage != 'booked'" force_save="1"/>
+                                <field name="include_admin_in_plan" readonly="stage != 'booked'" force_save="1"/>
+                            </group>
+                            <group string="Total Additional Fees">
+                                <field name="total_additional_fees" readonly="1" force_save="1" decoration-info="total_additional_fees > 0" help="Total of DLD Fee + Admin Fee"/>
                             </group>
                         </group>
                         <notebook>
@@ -200,7 +220,14 @@
                                         </group>
                                     </form>
                                     <tree editable="bottom" delete="false" create="false">
+                                        <field name="sequence" widget="handle"/>
                                         <field name="name" required="1" readonly="1" force_save="1" />
+                                        <field name="invoice_type" string="Type" widget="badge" 
+                                               decoration-info="invoice_type == 'booking'"
+                                               decoration-warning="invoice_type in ['dld_fee', 'admin_fee']"
+                                               decoration-success="invoice_type == 'installment'"
+                                               decoration-primary="invoice_type == 'handover'"
+                                               optional="show"/>
                                         <field name="desc" readonly="invoice_id" force_save="1" optional="hide" />
                                         <field name="invoice_date" required="1" readonly="invoice_id" force_save="1" />
                                         <field name="amount" required="1" readonly="1" force_save="1" />
