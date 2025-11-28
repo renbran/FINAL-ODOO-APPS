@@ -14,9 +14,9 @@
         - Property List
     """,
     "summary": """
-        Property Sale & Rental Management with Flexible Payment Plans
+        Property Sale & Rental Management with Flexible Payment Plans, Professional SPA Reports, and Bank Account Integration
     """,
-    "version": "3.3.0",
+    "version": "3.4.0",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",

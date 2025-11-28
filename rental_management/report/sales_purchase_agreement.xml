@@ -368,23 +368,23 @@
                                 <div style="margin-bottom: 25px;">
                                     <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
                                         <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">4</span>
-                                        PAYMENT SCHEDULE
+                                        SCHEDULE 1 – PAYMENT PLAN
                                     </h2>
                                     
                                     <p style="text-align: justify; margin-bottom: 15px; text-indent: 40px;">
                                         The Buyer agrees to make payments according to the following schedule. Each payment shall be made on or before 
-                                        the specified due date. Late payments may be subject to penalties as outlined in the terms and conditions.
+                                        the specified due date. Payments shall be made to the designated bank accounts specified in this Schedule.
                                     </p>
                                     
-                                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 15px;">
+                                    <!-- Payment Schedule Table -->
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 20px;">
                                         <thead>
                                             <tr style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white;">
-                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017;">No.</th>
-                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017;">Description</th>
-                                                <th style="padding: 12px; text-align: center; border: 1px solid #5c0017;">Due Date</th>
-                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Amount</th>
-                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Tax</th>
-                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017;">Total</th>
+                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017; width: 15%;">No.</th>
+                                                <th style="padding: 12px; text-align: left; border: 1px solid #5c0017; width: 35%;">Description</th>
+                                                <th style="padding: 12px; text-align: center; border: 1px solid #5c0017; width: 20%;">% of Price</th>
+                                                <th style="padding: 12px; text-align: right; border: 1px solid #5c0017; width: 15%;">Amount (AED)</th>
+                                                <th style="padding: 12px; text-align: center; border: 1px solid #5c0017; width: 15%;">Due Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -393,7 +393,7 @@
                                                 <t t-set="counter" t-value="counter + 1"/>
                                                 <tr style="background-color: #f8f9fa;" t-attf-style="background-color: {{ 'white' if counter % 2 == 0 else '#f8f9fa' }};">
                                                     <td style="padding: 10px 12px; border: 1px solid #dee2e6;">
-                                                        <span t-esc="counter"/>
+                                                        <strong><span t-esc="counter"/></strong>
                                                     </td>
                                                     <td style="padding: 10px 12px; border: 1px solid #dee2e6;">
                                                         <strong><span t-field="invoice.name"/></strong>
@@ -402,63 +402,239 @@
                                                         </t>
                                                     </td>
                                                     <td style="padding: 10px 12px; text-align: center; border: 1px solid #dee2e6;">
-                                                        <span t-field="invoice.invoice_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                                        <t t-set="percentage" t-value="(invoice.amount / o.sale_price * 100) if o.sale_price > 0 else 0"/>
+                                                        <span t-esc="'{:.1f}%'.format(percentage)"/>
                                                     </td>
                                                     <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6;">
                                                         <span t-field="invoice.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                                     </td>
-                                                    <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6;">
-                                                        <span t-field="invoice.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                    </td>
-                                                    <td style="padding: 10px 12px; text-align: right; border: 1px solid #dee2e6; font-weight: bold;">
-                                                        <span t-esc="invoice.amount + invoice.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    <td style="padding: 10px 12px; text-align: center; border: 1px solid #dee2e6;">
+                                                        <span t-field="invoice.invoice_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
                                                     </td>
                                                 </tr>
                                             </t>
                                         </tbody>
                                         <tfoot>
                                             <tr style="background: #e9ecef; font-weight: bold;">
-                                                <td colspan="3" style="padding: 12px; border: 1px solid #dee2e6; text-align: right;">
-                                                    TOTALS:
+                                                <td colspan="2" style="padding: 12px; border: 1px solid #dee2e6; text-align: right;">
+                                                    TOTAL:
                                                 </td>
-                                                <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">
-                                                    <span t-field="o.total_untaxed_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                </td>
-                                                <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">
-                                                    <span t-field="o.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
+                                                    100%
                                                 </td>
                                                 <td style="padding: 12px; text-align: right; border: 1px solid #dee2e6; color: #800020; font-size: 11pt;">
                                                     <span t-field="o.total_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                                 </td>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;"></td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                     
-                                    <!-- Payment Summary -->
-                                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 15px;">
-                                        <table style="width: 100%; font-size: 10pt;">
-                                            <tr>
-                                                <td style="width: 33.33%; text-align: center; padding: 10px; border-right: 1px solid #ffc107;">
-                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Amount Paid</span>
-                                                    <strong style="font-size: 14pt; color: #28a745;">
-                                                        <span t-field="o.paid_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                    </strong>
-                                                </td>
-                                                <td style="width: 33.33%; text-align: center; padding: 10px; border-right: 1px solid #ffc107;">
-                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Remaining Balance</span>
-                                                    <strong style="font-size: 14pt; color: #dc3545;">
-                                                        <span t-field="o.remaining_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                    </strong>
-                                                </td>
-                                                <td style="width: 33.33%; text-align: center; padding: 10px;">
-                                                    <span style="display: block; color: #856404; font-size: 9pt; text-transform: uppercase;">Total Contract Value</span>
-                                                    <strong style="font-size: 14pt; color: #800020;">
-                                                        <span t-field="o.total_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                    </strong>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <!-- Bank Account Details Section -->
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 12px 0; color: #495057; font-size: 11pt; border-bottom: 1px solid #dee2e6; padding-bottom: 8px;">Bank Account Details for Down Payment/Installments</h4>
+                                        
+                                        <t t-if="o.payment_bank_name">
+                                            <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
+                                                <tr>
+                                                    <td style="width: 30%; padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                        <strong>Bank Name</strong>
+                                                    </td>
+                                                    <td style="width: 70%; padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                        <span t-field="o.payment_bank_name"/>
+                                                    </td>
+                                                </tr>
+                                                <t t-if="o.payment_account_name">
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            <strong>Account Name</strong>
+                                                        </td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.payment_account_name"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.payment_currency">
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            <strong>Currency</strong>
+                                                        </td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.payment_currency"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.payment_account_number">
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            <strong>Account Number</strong>
+                                                        </td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.payment_account_number"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.payment_iban">
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            <strong>IBAN Number</strong>
+                                                        </td>
+                                                        <td style="padding: 8px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.payment_iban"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.payment_swift">
+                                                    <tr>
+                                                        <td style="padding: 8px 0; color: #666;">
+                                                            <strong>SWIFT Code</strong>
+                                                        </td>
+                                                        <td style="padding: 8px 0;">
+                                                            <span t-field="o.payment_swift"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </t>
+                                        <t t-else="">
+                                            <p style="color: #999; font-style: italic;">No payment bank account details configured.</p>
+                                        </t>
                                     </div>
+                                    
+                                    <!-- DLD and Admin Fees Bank Details -->
+                                    <t t-if="(o.dld_bank_name or o.admin_bank_name)">
+                                        <div style="margin-bottom: 20px;">
+                                            <h4 style="margin: 0 0 12px 0; color: #495057; font-size: 11pt; border-bottom: 1px solid #dee2e6; padding-bottom: 8px;">Bank Details for Dubai Land Department &amp; Admin Fees</h4>
+                                            
+                                            <t t-if="o.dld_bank_name">
+                                                <p style="margin: 0 0 8px 0; font-size: 10pt; color: #666;"><strong>For DLD Fees:</strong></p>
+                                                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 15px;">
+                                                    <tr>
+                                                        <td style="width: 30%; padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            Bank Name
+                                                        </td>
+                                                        <td style="width: 70%; padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.dld_bank_name"/>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="o.dld_account_name">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Account Name
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.dld_account_name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.dld_account_number">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Account Number
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.dld_account_number"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.dld_currency">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Currency
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.dld_currency"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.dld_iban">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                IBAN Number
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.dld_iban"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.dld_swift">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666;">
+                                                                SWIFT Code
+                                                            </td>
+                                                            <td style="padding: 6px 0;">
+                                                                <span t-field="o.dld_swift"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </t>
+                                            
+                                            <t t-if="o.admin_bank_name">
+                                                <p style="margin: 0 0 8px 0; font-size: 10pt; color: #666;"><strong>For Admin Fees:</strong></p>
+                                                <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
+                                                    <tr>
+                                                        <td style="width: 30%; padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                            Bank Name
+                                                        </td>
+                                                        <td style="width: 70%; padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                            <span t-field="o.admin_bank_name"/>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="o.admin_account_name">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Account Name
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.admin_account_name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.admin_account_number">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Account Number
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.admin_account_number"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.admin_currency">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                Currency
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.admin_currency"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.admin_iban">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666; border-bottom: 1px dashed #dee2e6;">
+                                                                IBAN Number
+                                                            </td>
+                                                            <td style="padding: 6px 0; border-bottom: 1px dashed #dee2e6;">
+                                                                <span t-field="o.admin_iban"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.admin_swift">
+                                                        <tr>
+                                                            <td style="padding: 6px 0; color: #666;">
+                                                                SWIFT Code
+                                                            </td>
+                                                            <td style="padding: 6px 0;">
+                                                                <span t-field="o.admin_swift"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                             </t>
                             
@@ -527,10 +703,7 @@
                             <!-- ===================== SECTION 6: TERMS AND CONDITIONS ===================== -->
                             <div style="margin-bottom: 25px;">
                                 <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
-                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
-                                        <t t-if="o.is_any_broker">6</t>
-                                        <t t-else="">5</t>
-                                    </span>
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">6</span>
                                     TERMS AND CONDITIONS
                                 </h2>
                                 
@@ -554,10 +727,7 @@
                             <!-- ===================== SECTION 7: REPRESENTATIONS ===================== -->
                             <div style="margin-bottom: 25px;">
                                 <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
-                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
-                                        <t t-if="o.is_any_broker">7</t>
-                                        <t t-else="">6</t>
-                                    </span>
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">7</span>
                                     REPRESENTATIONS AND WARRANTIES
                                 </h2>
                                 
@@ -589,10 +759,7 @@
                             <!-- ===================== SECTION 8: SIGNATURES ===================== -->
                             <div style="margin-bottom: 25px;">
                                 <h2 style="font-size: 14pt; color: #800020; border-bottom: 2px solid #800020; padding-bottom: 8px; margin-bottom: 15px;">
-                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">
-                                        <t t-if="o.is_any_broker">8</t>
-                                        <t t-else="">7</t>
-                                    </span>
+                                    <span style="background: #800020; color: white; padding: 2px 10px; border-radius: 3px; margin-right: 10px;">8</span>
                                     EXECUTION OF AGREEMENT
                                 </h2>
                                 

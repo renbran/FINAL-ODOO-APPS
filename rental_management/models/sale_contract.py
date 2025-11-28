@@ -200,6 +200,46 @@ class PropertyVendor(models.Model):
     include_admin_in_plan = fields.Boolean(string='Include Admin in Payment Plan', default=True,
                                            help='Automatically add admin fee invoice to payment schedule')
 
+    # Bank Account Details for Payment Instructions
+    payment_bank_name = fields.Char(string='Payment Bank Name',
+                                    help='Bank name for booking/installment payments')
+    payment_account_name = fields.Char(string='Payment Account Name',
+                                       help='Account holder name for payments')
+    payment_account_number = fields.Char(string='Payment Account Number',
+                                         help='Bank account number for payments')
+    payment_iban = fields.Char(string='Payment IBAN',
+                               help='International Bank Account Number for payments')
+    payment_swift = fields.Char(string='Payment SWIFT Code',
+                                help='SWIFT code for international transfers')
+    payment_currency = fields.Char(string='Payment Currency', default='AED',
+                                   help='Currency for payment account')
+    
+    dld_bank_name = fields.Char(string='DLD Bank Name',
+                                help='Bank name for DLD fee payments')
+    dld_account_name = fields.Char(string='DLD Account Name',
+                                   help='Account holder name for DLD fees')
+    dld_account_number = fields.Char(string='DLD Account Number',
+                                     help='Bank account number for DLD fees')
+    dld_iban = fields.Char(string='DLD IBAN',
+                           help='International Bank Account Number for DLD payments')
+    dld_swift = fields.Char(string='DLD SWIFT Code',
+                            help='SWIFT code for DLD transfers')
+    dld_currency = fields.Char(string='DLD Currency', default='AED',
+                               help='Currency for DLD account')
+    
+    admin_bank_name = fields.Char(string='Admin Bank Name',
+                                  help='Bank name for admin fee payments')
+    admin_account_name = fields.Char(string='Admin Account Name',
+                                     help='Account holder name for admin fees')
+    admin_account_number = fields.Char(string='Admin Account Number',
+                                       help='Bank account number for admin fees')
+    admin_iban = fields.Char(string='Admin IBAN',
+                             help='International Bank Account Number for admin payments')
+    admin_swift = fields.Char(string='Admin SWIFT Code',
+                              help='SWIFT code for admin transfers')
+    admin_currency = fields.Char(string='Admin Currency', default='AED',
+                                 help='Currency for admin account')
+
     # Terms & Conditions
     term_condition = fields.Html(string='Term and Condition')
 
