@@ -881,20 +881,8 @@
             </t>
         </template>
         
-        <!-- ============================================================ -->
-        <!-- REPORT ACTION DEFINITION                                      -->
-        <!-- ============================================================ -->
-        <record id="action_report_sales_purchase_agreement" model="ir.actions.report">
-            <field name="name">Sales Purchase Agreement</field>
-            <field name="model">property.vendor</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">rental_management.sales_purchase_agreement_template</field>
-            <field name="report_file">rental_management.sales_purchase_agreement_template</field>
-            <field name="binding_model_id" ref="model_property_vendor"/>
-            <field name="binding_type">report</field>
-            <field name="print_report_name">'Sales Purchase Agreement - %s' % (object.sold_seq)</field>
-            <field name="paperformat_id" ref="base.paperformat_us"/>
-        </record>
+        <!-- ACTION DEFINITION MOVED TO data/report_actions.xml -->
+        <!-- (Loaded earlier to avoid references before creation) -->
         
     </data>
 </odoo>

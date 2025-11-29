@@ -38,12 +38,20 @@
         "security/groups.xml",
         "security/ir.model.access.csv",
         "security/security.xml",
+        # Report ACTIONS must load first (before any views reference them)
+        "data/report_actions.xml",
         # Data
         "data/ir_cron.xml",
         "data/sequence.xml",
         "data/property_product_data.xml",
         "data/update_ir_cron.xml",
         "data/payment_schedule_data.xml",
+        # Report TEMPLATES load after actions are created
+        "report/tenancy_details_report_template.xml",
+        "report/property_details_report_v2.xml",
+        "report/property_sold_report.xml",
+        "report/sales_purchase_agreement.xml",
+        "report/invoice_report_inherit.xml",
         # wizard views
         "wizard/contract_wizard_view.xml",
         "wizard/property_payment_wizard_view.xml",
@@ -89,12 +97,6 @@
         "views/maintenance_product_inherit.xml",
         "views/property_maintenance_view.xml",
         "views/property_crm_lead_inherit_view.xml",
-        # Report views
-        "report/tenancy_details_report_template.xml",
-        "report/property_details_report_v2.xml",
-        "report/property_sold_report.xml",
-        "report/sales_purchase_agreement.xml",
-        "report/invoice_report_inherit.xml",
         # Mail Template
         "data/active_contract_mail_template.xml",
         "data/tenancy_reminder_mail_template.xml",
