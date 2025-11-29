@@ -42,10 +42,11 @@ The module leverages LLM reasoning capabilities to help sales teams:
         'security/ir.model.access.csv',
         'data/llm_provider_data.xml',
         'data/ir_cron_data.xml',
+        'wizards/lead_enrichment_wizard_views.xml',
+        'wizards/google_search_setup_wizard_views.xml',
         'views/llm_provider_views.xml',
         'views/res_config_settings_views.xml',
         'views/crm_lead_views.xml',
-        'wizards/lead_enrichment_wizard_views.xml',
     ],
     'external_dependencies': {
         'python': ['requests'],

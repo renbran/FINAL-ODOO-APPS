@@ -26,6 +26,35 @@
                             <field name="enable_customer_research"/>
                         </setting>
                     </block>
+                    <block title="Web Research Configuration (Google Custom Search)">
+                        <div class="alert alert-info">
+                            <strong>🌐 Live Web Research Integration (FREE)</strong><br/>
+                            Google Custom Search API provides <strong>100 free searches per day</strong>.<br/>
+                            This enables real-time company research instead of relying on LLM's outdated training data.
+                        </div>
+                        <setting string="Enable Live Web Research" help="Use Google Custom Search API for real-time web data (100 free queries/day)">
+                            <field name="enable_web_research" widget="boolean_toggle"/>
+                            <div class="mt16" invisible="not enable_web_research">
+                                <button name="%(llm_lead_scoring.action_google_search_setup_wizard)d" 
+                                        type="action" 
+                                        string="Setup Guide" 
+                                        class="btn-link" 
+                                        icon="fa-question-circle"/>
+                            </div>
+                        </setting>
+                        <setting string="Google API Key" invisible="not enable_web_research">
+                            <field name="google_search_api_key" password="True" placeholder="AIzaSy..."/>
+                            <div class="text-muted">
+                                Get free API key: <a href="https://developers.google.com/custom-search/v1/overview" target="_blank">Google Custom Search</a>
+                            </div>
+                        </setting>
+                        <setting string="Search Engine ID" invisible="not enable_web_research">
+                            <field name="google_search_engine_id" placeholder="017576662512468239146:omuauf_lfve"/>
+                            <div class="text-muted">
+                                Create free search engine: <a href="https://programmablesearchengine.google.com/" target="_blank">Programmable Search Engine</a>
+                            </div>
+                        </setting>
+                    </block>
                     <block title="LLM Configuration">
                         <setting string="Default LLM Provider" help="Select the default LLM provider for lead scoring">
                             <field name="llm_provider_id" placeholder="Select LLM Provider..." context="{'form_view_ref': 'llm_lead_scoring.view_llm_provider_form'}"/>

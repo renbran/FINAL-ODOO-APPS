@@ -229,15 +229,28 @@ class LLMService(models.AbstractModel):
     @api.model
     def research_customer(self, lead):
         """
-        Research customer using LLM to find publicly available information
+        Research customer using LLM and optionally live web search
+        
+        Tries web research first (if enabled), falls back to LLM knowledge
 
         Args:
             lead: crm.lead record
 
         Returns:
-            str: Research findings
+            str: Research findings (HTML formatted)
         """
-        # Build research context
+        # Check if web research is enabled and configured
+        web_research_enabled = self._get_config_bool('llm_lead_scoring.enable_web_research', 'False')
+        
+        if web_research_enabled:
+            # Use live Google Custom Search
+            _logger.info("Using live web research for lead: %s", lead.name)
+            web_research_service = self.env['web.research.service']
+            return web_research_service.research_company_web(lead)
+        
+        # Fallback: Use LLM's training knowledge (original method)
+        _logger.info("Using LLM knowledge base for lead: %s", lead.name)
+        
         company_name = lead.partner_name or lead.contact_name or 'Unknown'
         email = lead.email_from or ''
         phone = lead.phone or lead.mobile or ''

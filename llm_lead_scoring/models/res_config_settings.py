@@ -40,6 +40,26 @@ class ResConfigSettings(models.TransientModel):
         help='Use LLM to research customers from public sources',
     )
 
+    # Web Research Settings (Google Custom Search)
+    enable_web_research = fields.Boolean(
+        string='Enable Live Web Research',
+        config_parameter='llm_lead_scoring.enable_web_research',
+        default=False,
+        help='Use Google Custom Search API for real-time web research (Free: 100 queries/day)',
+    )
+
+    google_search_api_key = fields.Char(
+        string='Google Custom Search API Key',
+        config_parameter='llm_lead_scoring.google_search_api_key',
+        help='Get free API key from: https://developers.google.com/custom-search/v1/overview',
+    )
+
+    google_search_engine_id = fields.Char(
+        string='Search Engine ID',
+        config_parameter='llm_lead_scoring.google_search_engine_id',
+        help='Create free search engine at: https://programmablesearchengine.google.com/',
+    )
+
     # Scoring Weights
     weight_completeness = fields.Float(
         string='Completeness Weight (%)',
