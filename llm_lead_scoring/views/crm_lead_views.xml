@@ -50,14 +50,24 @@
                         </group>
                     </group>
 
-                    <group string="AI Analysis">
+                    <group string="AI Enrichment Report"
+                           invisible="not ai_enrichment_report">
+                        <field name="ai_enrichment_report"
+                               readonly="1"
+                               nolabel="1"
+                               widget="text"
+                               placeholder="Run AI enrichment to see detailed report..."
+                               style="font-family: 'Courier New', monospace; font-size: 12px; white-space: pre; background: #f5f5f5; padding: 15px; border-radius: 5px;"/>
+                    </group>
+
+                    <group string="AI Analysis Summary">
                         <field name="ai_analysis_summary"
                                readonly="1"
                                nolabel="1"
                                placeholder="Run AI enrichment to see analysis..."/>
                     </group>
 
-                    <group string="Enrichment Data"
+                    <group string="Raw Enrichment Data (JSON)"
                            invisible="not ai_enrichment_data">
                         <field name="ai_enrichment_data"
                                readonly="1"

@@ -61,6 +61,12 @@ class CrmLead(models.Model):
         readonly=True,
         help='Summary of AI analysis and recommendations',
     )
+    
+    ai_enrichment_report = fields.Text(
+        string='AI Enrichment Report',
+        readonly=True,
+        help='Complete plain text enrichment report with scores and analysis',
+    )
 
     # Configuration
     auto_enrich = fields.Boolean(
@@ -137,15 +143,8 @@ class CrmLead(models.Model):
                 'research': research_result,
             }
 
-            # 4. Create internal note with findings
-            note_body = self._format_enrichment_note(enrichment_data)
-            # Use with_context to prevent email notifications (plain text not suitable for email)
-            self.with_context(mail_post_autofollow=False, mail_notify_force_send=False).message_post(
-                body=note_body,
-                subject='AI Lead Enrichment',
-                message_type='comment',
-                subtype_xmlid='mail.mt_note',
-            )
+            # 4. Format plain text enrichment report
+            plain_text_report = self._format_plain_text_report(enrichment_data)
 
             # 5. Update lead fields
             self.write({
@@ -157,6 +156,7 @@ class CrmLead(models.Model):
                 'ai_last_enrichment_date': fields.Datetime.now(),
                 'ai_enrichment_status': 'completed',
                 'ai_analysis_summary': scoring_result['llm_analysis'],
+                'ai_enrichment_report': plain_text_report,
             })
 
             _logger.info("Successfully enriched lead %s with AI score: %.2f",
@@ -191,15 +191,15 @@ class CrmLead(models.Model):
                 }
             }
 
-    def _format_enrichment_note(self, data):
-        """Format enrichment data as HTML note"""
+    def _format_plain_text_report(self, data):
+        """Format enrichment data as pure plain text report"""
         scores = data.get('scores', {})
         analysis = data.get('analysis', {})
         research = data.get('research', '')
-        
-        # Helper function to format text with proper line breaks
+
+        # Helper function to format text
         def format_text(text):
-            """Format text for plain display - clean and simple"""
+            """Clean text for plain display"""
             if not text or text == 'N/A':
                 return 'No data available'
             # Remove markdown formatting
@@ -221,10 +221,8 @@ class CrmLead(models.Model):
         clarity_score = scores.get('clarity', 0)
         engagement_score = scores.get('engagement', 0)
 
-        # Simple text format - easy to read
-        html = f"""
-<pre style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; background: #f5f5f5; padding: 20px; border-radius: 8px; color: #333;">
-================================================================================
+        # Pure plain text format - no HTML
+        report = f"""================================================================================
 🤖 AI LEAD ENRICHMENT REPORT
 ================================================================================
 Generated: {data.get('timestamp', '')}
@@ -258,21 +256,18 @@ Engagement Level:         {engagement_score:.1f}/100  {get_score_indicator(engag
 """
 
         if research:
-            html += f"""
+            report += f"""
 ================================================================================
 🔍 CUSTOMER RESEARCH
 ================================================================================
 {format_text(research)}
 """
 
-        html += """
+        report += """
 ================================================================================
-</pre>
 """
 
-        return html
-
-    @api.model
+        return report    @api.model
     def _cron_enrich_leads(self):
         """Scheduled action to enrich leads automatically"""
         llm_service = self.env['llm.service']
