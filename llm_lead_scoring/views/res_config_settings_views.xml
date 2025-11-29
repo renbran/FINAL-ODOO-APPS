@@ -28,18 +28,15 @@
                     </block>
                     <block title="Web Research Configuration (Google Custom Search)">
                         <div class="alert alert-info">
-                            <strong>🌐 Live Web Research Integration (FREE)</strong><br/>
-                            Google Custom Search API provides <strong>100 free searches per day</strong>.<br/>
+                            <strong>🌐 Live Web Research Integration (FREE)</strong>
+                            <br/>
+                            Google Custom Search API provides <strong>100 free searches per day</strong>.                            <br/>
                             This enables real-time company research instead of relying on LLM's outdated training data.
                         </div>
                         <setting string="Enable Live Web Research" help="Use Google Custom Search API for real-time web data (100 free queries/day)">
                             <field name="enable_web_research" widget="boolean_toggle"/>
                             <div class="mt16" invisible="not enable_web_research">
-                                <button name="%(llm_lead_scoring.action_google_search_setup_wizard)d" 
-                                        type="action" 
-                                        string="Setup Guide" 
-                                        class="btn-link" 
-                                        icon="fa-question-circle"/>
+                                <button name="%(llm_lead_scoring.action_google_search_setup_wizard)d" type="action" string="Setup Guide" class="btn-link" icon="fa-question-circle"/>
                             </div>
                         </setting>
                         <setting string="Google API Key" invisible="not enable_web_research">

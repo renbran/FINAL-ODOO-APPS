@@ -8,34 +8,41 @@
             <form>
                 <field name="step" invisible="1"/>
                 <field name="test_success" invisible="1"/>
-                
+
                 <!-- Introduction Step -->
                 <group invisible="step != 'intro'">
                     <div class="alert alert-info">
                         <h3>🌐 Google Custom Search Setup</h3>
-                        <p><strong>What you'll get:</strong></p>
+                        <p>
+                            <strong>What you'll get:</strong>
+                        </p>
                         <ul>
-                            <li>✅ <strong>100 FREE searches per day</strong></li>
+                            <li>✅                                <strong>100 FREE searches per day</strong>
+                            </li>
                             <li>✅ Real-time company research</li>
                             <li>✅ Recent news and developments</li>
                             <li>✅ More accurate lead enrichment</li>
                         </ul>
-                        <p><strong>Setup time:</strong> 5-10 minutes</p>
-                        <p><strong>Requirements:</strong> Google account (free)</p>
+                        <p>
+                            <strong>Setup time:</strong> 5-10 minutes</p>
+                        <p>
+                            <strong>Requirements:</strong> Google account (free)</p>
                     </div>
                     <div class="alert alert-warning">
                         <strong>💰 Cost:</strong> FREE for up to 100 queries/day<br/>
                         After free tier: $5 per 1,000 queries (optional)
                     </div>
                 </group>
-                
+
                 <!-- API Key Step -->
                 <group invisible="step != 'api_key'">
                     <div class="alert alert-info">
                         <h4>📝 Step 1: Get Your API Key</h4>
                         <ol>
-                            <li>Go to: <a href="https://developers.google.com/custom-search/v1/overview" target="_blank">Google Custom Search API</a></li>
-                            <li>Click <strong>"Get a Key"</strong></li>
+                            <li>Go to: <a href="https://developers.google.com/custom-search/v1/overview" target="_blank">Google Custom Search API</a>
+                            </li>
+                            <li>Click <strong>"Get a Key"</strong>
+                            </li>
                             <li>Create or select a project</li>
                             <li>Copy your API key</li>
                             <li>Paste it below</li>
@@ -46,17 +53,21 @@
                         Your API key starts with "AIzaSy..." and is 39 characters long
                     </div>
                 </group>
-                
+
                 <!-- Search Engine Step -->
                 <group invisible="step != 'search_engine'">
                     <div class="alert alert-info">
                         <h4>🔧 Step 2: Create Search Engine</h4>
                         <ol>
-                            <li>Go to: <a href="https://programmablesearchengine.google.com/controlpanel/create" target="_blank">Create Search Engine</a></li>
+                            <li>Go to: <a href="https://programmablesearchengine.google.com/controlpanel/create" target="_blank">Create Search Engine</a>
+                            </li>
                             <li>Name it: "Lead Research Engine"</li>
-                            <li>Search the entire web: Select <strong>"Search the entire web"</strong></li>
-                            <li>Click <strong>"Create"</strong></li>
-                            <li>Copy the <strong>Search Engine ID</strong></li>
+                            <li>Search the entire web: Select <strong>"Search the entire web"</strong>
+                            </li>
+                            <li>Click <strong>"Create"</strong>
+                            </li>
+                            <li>Copy the <strong>Search Engine ID</strong>
+                            </li>
                             <li>Paste it below</li>
                         </ol>
                     </div>
@@ -65,7 +76,7 @@
                         Search Engine ID is a long string with numbers and colons
                     </div>
                 </group>
-                
+
                 <!-- Test Step -->
                 <group invisible="step != 'test'">
                     <div class="alert alert-info">
@@ -78,12 +89,14 @@
                     <button name="action_test_connection" string="Run Test" type="object" class="btn-primary"/>
                     <field name="test_result" readonly="1" widget="text" invisible="not test_result"/>
                 </group>
-                
+
                 <!-- Complete Step -->
                 <group invisible="step != 'complete'">
                     <div class="alert alert-success">
                         <h3>🎉 Setup Complete!</h3>
-                        <p><strong>Google Custom Search is now enabled.</strong></p>
+                        <p>
+                            <strong>Google Custom Search is now enabled.</strong>
+                        </p>
                         <p>Your leads will now benefit from:</p>
                         <ul>
                             <li>✅ Real-time web research</li>
@@ -102,7 +115,7 @@
                         </ul>
                     </div>
                 </group>
-                
+
                 <footer>
                     <button string="Previous" name="action_previous_step" type="object" invisible="step == 'intro' or step == 'complete'" class="btn-secondary"/>
                     <button string="Next" name="action_next_step" type="object" invisible="step == 'complete'" class="btn-primary"/>
