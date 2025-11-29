@@ -195,44 +195,112 @@ class CrmLead(models.Model):
         scores = data.get('scores', {})
         analysis = data.get('analysis', {})
         research = data.get('research', '')
+        
+        # Helper function to format text with proper line breaks
+        def format_text(text):
+            if not text or text == 'N/A':
+                return '<em style="color: #999;">No data available</em>'
+            return text.replace('\n', '<br/>').replace('**', '<strong>').replace('**', '</strong>')
+        
+        # Score color coding
+        def get_score_color(score):
+            if score >= 70:
+                return '#28a745'  # Green
+            elif score >= 40:
+                return '#ffc107'  # Yellow
+            else:
+                return '#dc3545'  # Red
+
+        overall_score = scores.get('overall', 0)
+        score_color = get_score_color(overall_score)
 
         html = f"""
-        <div style="font-family: Arial, sans-serif;">
-            <h3 style="color: #875A7B;">🤖 AI Lead Enrichment Report</h3>
-            <p><strong>Generated:</strong> {data.get('timestamp', '')}</p>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 10px 10px 0 0; color: white; text-align: center;">
+                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">🤖 AI Lead Enrichment Report</h2>
+                <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 14px;">Generated: {data.get('timestamp', '')}</p>
+            </div>
 
-            <h4 style="color: #875A7B;">📊 AI Probability Scores</h4>
-            <ul>
-                <li><strong>Overall Probability:</strong> {scores.get('overall', 0):.2f}/100</li>
-                <li><strong>Information Completeness:</strong> {scores.get('completeness', 0):.2f}/100</li>
-                <li><strong>Requirement Clarity:</strong> {scores.get('clarity', 0):.2f}/100</li>
-                <li><strong>Engagement Level:</strong> {scores.get('engagement', 0):.2f}/100</li>
-            </ul>
+            <!-- Overall Score Badge -->
+            <div style="background: white; padding: 20px; text-align: center; border-left: 4px solid {score_color}; border-right: 4px solid {score_color};">
+                <div style="display: inline-block; background: {score_color}; color: white; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: bold;">
+                    Overall Probability: {overall_score:.1f}/100
+                </div>
+            </div>
 
-            <h4 style="color: #875A7B;">📝 Analysis</h4>
+            <!-- Detailed Scores -->
+            <div style="background: #f8f9fa; padding: 25px; border-left: 4px solid #e9ecef; border-right: 4px solid #e9ecef;">
+                <h3 style="color: #495057; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center;">
+                    <span style="margin-right: 10px;">📊</span> Detailed Scores
+                </h3>
+                <div style="display: grid; gap: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid {get_score_color(scores.get('completeness', 0))};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: #495057;">Information Completeness</span>
+                            <span style="font-size: 18px; font-weight: bold; color: {get_score_color(scores.get('completeness', 0))};">{scores.get('completeness', 0):.1f}%</span>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid {get_score_color(scores.get('clarity', 0))};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: #495057;">Requirement Clarity</span>
+                            <span style="font-size: 18px; font-weight: bold; color: {get_score_color(scores.get('clarity', 0))};">{scores.get('clarity', 0):.1f}%</span>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid {get_score_color(scores.get('engagement', 0))};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: #495057;">Engagement Level</span>
+                            <span style="font-size: 18px; font-weight: bold; color: {get_score_color(scores.get('engagement', 0))};">{scores.get('engagement', 0):.1f}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <p><strong>Completeness Analysis:</strong><br/>
-            {analysis.get('completeness', 'N/A')}</p>
+            <!-- Analysis Section -->
+            <div style="background: white; padding: 25px; border-left: 4px solid #e9ecef; border-right: 4px solid #e9ecef;">
+                <h3 style="color: #495057; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center;">
+                    <span style="margin-right: 10px;">📝</span> Detailed Analysis
+                </h3>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin: 0 0 10px 0; font-size: 15px; font-weight: 600;">🔍 Completeness Analysis</h4>
+                    <p style="margin: 0; line-height: 1.6; color: #495057;">{format_text(analysis.get('completeness', 'N/A'))}</p>
+                </div>
 
-            <p><strong>Clarity Analysis:</strong><br/>
-            {analysis.get('clarity', 'N/A')}</p>
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin: 0 0 10px 0; font-size: 15px; font-weight: 600;">💡 Clarity Analysis</h4>
+                    <p style="margin: 0; line-height: 1.6; color: #495057;">{format_text(analysis.get('clarity', 'N/A'))}</p>
+                </div>
 
-            <p><strong>Engagement Analysis:</strong><br/>
-            {analysis.get('engagement', 'N/A')}</p>
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin: 0 0 10px 0; font-size: 15px; font-weight: 600;">📈 Engagement Analysis</h4>
+                    <p style="margin: 0; line-height: 1.6; color: #495057;">{format_text(analysis.get('engagement', 'N/A'))}</p>
+                </div>
 
-            <p><strong>AI Recommendation:</strong><br/>
-            {analysis.get('llm_final', 'N/A')}</p>
+                <div style="padding: 20px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; border: 2px solid #667eea;">
+                    <h4 style="color: #667eea; margin: 0 0 15px 0; font-size: 16px; font-weight: 600;">🎯 AI Recommendation</h4>
+                    <div style="line-height: 1.8; color: #495057;">{format_text(analysis.get('llm_final', 'N/A'))}</div>
+                </div>
+            </div>
         """
 
         if research:
             html += f"""
-            <h4 style="color: #875A7B;">🔍 Customer Research</h4>
-            <div style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">
-                {research.replace(chr(10), '<br/>')}
+            <!-- Customer Research Section -->
+            <div style="background: white; padding: 25px; border-radius: 0 0 10px 10px; border-left: 4px solid #e9ecef; border-right: 4px solid #e9ecef; border-bottom: 4px solid #e9ecef;">
+                <h3 style="color: #495057; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center;">
+                    <span style="margin-right: 10px;">🔍</span> Customer Research
+                </h3>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8; line-height: 1.8; color: #495057;">
+                    {format_text(research)}
+                </div>
+            </div>
+            """
+        else:
+            html += """
             </div>
             """
 
-        html += "</div>"
         return html
 
     @api.model
