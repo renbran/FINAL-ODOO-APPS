@@ -71,9 +71,7 @@
                            invisible="not ai_enrichment_data">
                         <field name="ai_enrichment_data"
                                readonly="1"
-                               nolabel="1"
-                               widget="ace"
-                               options="{'mode': 'json'}"/>
+                               nolabel="1"/>
                     </group>
                 </page>
             </xpath>
