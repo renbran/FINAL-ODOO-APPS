@@ -120,5 +120,5 @@
     </record>
 
     <!-- Menu Item -->
-    <menuitem id="menu_payment_schedule" name="Payment Schedules" parent="rental_management.main_menu_id" action="action_payment_schedule" sequence="3"/>
+    <menuitem id="menu_payment_schedule" name="Payment Schedules" parent="rental_management.main_menu_rental_management" action="action_payment_schedule" sequence="3"/>
 </odoo>
