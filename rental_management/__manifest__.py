@@ -120,6 +120,7 @@
             "rental_management/static/src/js/lib/Animated.js",
             "rental_management/static/src/js/lib/apexcharts.js",
             "rental_management/static/src/js/rental.js",
+            "rental_management/static/src/js/property_dashboard_action.js",
             'rental_management/static/src/components/**/*',
             'rental_management/static/src/views/**/*',
         ],
