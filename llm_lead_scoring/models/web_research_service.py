@@ -31,13 +31,29 @@ class WebResearchService(models.AbstractModel):
             dict: {'success': bool, 'results': list, 'error': str}
         """
         config = self.env['ir.config_parameter'].sudo()
-        api_key = config.get_param('llm_lead_scoring.google_search_api_key', '')
-        search_engine_id = config.get_param('llm_lead_scoring.google_search_engine_id', '')
+        api_key = config.get_param('llm_lead_scoring.google_search_api_key', '').strip()
+        search_engine_id = config.get_param('llm_lead_scoring.google_search_engine_id', '').strip()
         
         if not api_key or not search_engine_id:
             return {
                 'success': False,
-                'error': 'Google Custom Search not configured. Please add API key and Search Engine ID in Settings.',
+                'error': 'Google Custom Search not configured. Please add API key and Search Engine ID in Settings → CRM → LLM Lead Scoring.',
+                'results': []
+            }
+        
+        # Validate Search Engine ID format (should contain a colon, not start with AIza)
+        if search_engine_id.startswith('AIza') or ':' not in search_engine_id:
+            return {
+                'success': False,
+                'error': 'Invalid Search Engine ID format. Should be like "017576662512468239146:omuauf_lfve" from Programmable Search Engine, not an API key.',
+                'results': []
+            }
+        
+        # Validate query is not empty
+        if not query or len(query.strip()) < 3:
+            return {
+                'success': False,
+                'error': 'Search query is too short or empty.',
                 'results': []
             }
         
@@ -45,7 +61,7 @@ class WebResearchService(models.AbstractModel):
         params = {
             'key': api_key,
             'cx': search_engine_id,
-            'q': query,
+            'q': query.strip(),
             'num': min(num_results, 10)  # Max 10 per request
         }
         
@@ -151,7 +167,7 @@ class WebResearchService(models.AbstractModel):
             str: Research report (HTML formatted)
         """
         # Extract lead information
-        company_name = lead.partner_name or lead.contact_name or 'Unknown Company'
+        company_name = lead.partner_name or lead.contact_name or ''
         website = lead.website or ''
         email_domain = lead.email_from.split('@')[1] if lead.email_from and '@' in lead.email_from else ''
         
@@ -160,17 +176,35 @@ class WebResearchService(models.AbstractModel):
         web_research_enabled = config.get_param('llm_lead_scoring.enable_web_research', 'False') == 'True'
         
         if not web_research_enabled:
-            return "Web research is disabled. Enable in Settings > CRM > LLM Lead Scoring."
+            return """
+            <div style="color: #666; font-style: italic;">
+                ⚠️ Web research is disabled. Enable it in Settings → CRM → LLM Lead Scoring to get real-time company data.
+            </div>
+            """
+        
+        # Skip web research if no meaningful company identifier
+        if not company_name or len(company_name.strip()) < 3:
+            if not website and not email_domain:
+                return """
+                <div style="color: #999; font-style: italic;">
+                    ℹ️ Web research skipped - no company name, website, or email domain provided in lead.
+                    Add company information to enable live web research.
+                </div>
+                """
+            # If we have website/email but no name, use domain as company name
+            if email_domain and not company_name:
+                company_name = email_domain.replace('.com', '').replace('.', ' ').title()
         
         # Build search queries (limit to save quota)
         queries = []
         
-        # Query 1: Company profile
-        queries.append(f'"{company_name}" company profile about')
+        # Query 1: Company profile (only if we have a valid name)
+        if company_name and len(company_name.strip()) >= 3:
+            queries.append(f'"{company_name.strip()}" company profile about')
         
         # Query 2: Recent news (if we have good company name)
-        if company_name and company_name != 'Unknown Company' and len(company_name) > 3:
-            queries.append(f'"{company_name}" news recent 2024 2025')
+        if company_name and len(company_name.strip()) > 3:
+            queries.append(f'"{company_name.strip()}" news recent 2024 2025')
         
         # Query 3: Site-specific (if website provided)
         if website:
