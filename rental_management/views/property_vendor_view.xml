@@ -10,6 +10,7 @@
                         <field name="stage" widget="statusbar" statusbar_visible="booked" nolabel="1" />
                         <button name="action_refund_amount" type="object" string="Refund" icon="fa-undo" class="btn btn-outline-dark" invisible="stage not in ['booked'] or sale_invoice_ids" confirm="Are you sure you want to cancel your booking and receive a refund ?" />
                         <button name="%(property_vendor_wizard_action)d" type="action" icon="fa-plus" string="Create Installments" class="btn btn-primary" invisible="stage not in ['booked'] or sale_invoice_ids" />
+                        <button name="action_generate_from_schedule" type="object" string="⚡ Generate from Schedule" class="btn btn-success" icon="fa-bolt" invisible="stage != 'booked' or not payment_schedule_id or sale_invoice_ids" confirm="This will generate invoices based on the payment schedule. Continue?" />
                         <button name="action_reset_installments" type="object" icon="fa-refresh" string="Reset Installments" class="btn btn-outline-danger" invisible="stage not in ['booked'] or not sale_invoice_ids" />
                         <button name="action_confirm_sale" type="object" string="Confirm Sale" class="btn btn-info" icon="fa-chevron-circle-right" invisible="stage not in ['booked'] or not sale_invoice_ids" />
                         <button name="%(rental_management.action_report_sales_purchase_agreement)d" type="action" string="Print SPA" icon="fa-print" class="btn btn-success" invisible="stage not in ['booked', 'sold', 'locked']"/>
@@ -148,6 +149,8 @@
                         </group>
                         <group string="Payment Details">
                             <group>
+                                <field name="payment_schedule_id" readonly="stage != 'booked'" force_save="1" options="{'no_create': True, 'no_create_edit': True}" domain="[('schedule_type', '=', 'sale'), ('active', '=', True)]" help="Select a payment schedule template to auto-generate invoices"/>
+                                <field name="use_schedule" invisible="1"/>
                                 <field name="payment_term" readonly="1" force_save="1" />
                                 <field name="ask_price" required="1" readonly="stage != 'booked'" force_save="1" />
                                 <field name="sale_price" required="1" force_save="1" readonly="1" />
@@ -254,6 +257,48 @@
                             </page>
                             <page string="Terms &amp; Conditions">
                                 <field name="term_condition" placeholder="Terms &amp; Conditions" widget="html" />
+                            </page>
+                            <page string="Payment Instructions &amp; Bank Details" name="bank_details">
+                                <group string="💳 Booking &amp; Installment Payment Account">
+                                    <group>
+                                        <field name="payment_bank_name" readonly="stage != 'booked'" placeholder="e.g., Emirates NBD"/>
+                                        <field name="payment_account_name" readonly="stage != 'booked'" placeholder="e.g., Company Name"/>
+                                        <field name="payment_account_number" readonly="stage != 'booked'" placeholder="e.g., 1234567890"/>
+                                    </group>
+                                    <group>
+                                        <field name="payment_iban" readonly="stage != 'booked'" placeholder="e.g., AE070331234567890123456"/>
+                                        <field name="payment_swift" readonly="stage != 'booked'" placeholder="e.g., EBILAEAD"/>
+                                        <field name="payment_currency" readonly="stage != 'booked'" placeholder="e.g., AED"/>
+                                    </group>
+                                </group>
+                                <group string="🏛️ DLD Fee Payment Account" invisible="not include_dld_in_plan and dld_fee == 0">
+                                    <group>
+                                        <field name="dld_bank_name" readonly="stage != 'booked'" placeholder="e.g., Emirates NBD"/>
+                                        <field name="dld_account_name" readonly="stage != 'booked'" placeholder="e.g., DLD Trustee Account"/>
+                                        <field name="dld_account_number" readonly="stage != 'booked'" placeholder="e.g., 9876543210"/>
+                                    </group>
+                                    <group>
+                                        <field name="dld_iban" readonly="stage != 'booked'" placeholder="e.g., AE070331234567890123456"/>
+                                        <field name="dld_swift" readonly="stage != 'booked'" placeholder="e.g., EBILAEAD"/>
+                                        <field name="dld_currency" readonly="stage != 'booked'" placeholder="e.g., AED"/>
+                                    </group>
+                                </group>
+                                <group string="📋 Admin Fee Payment Account" invisible="not include_admin_in_plan and admin_fee == 0">
+                                    <group>
+                                        <field name="admin_bank_name" readonly="stage != 'booked'" placeholder="e.g., Emirates NBD"/>
+                                        <field name="admin_account_name" readonly="stage != 'booked'" placeholder="e.g., Company Administration"/>
+                                        <field name="admin_account_number" readonly="stage != 'booked'" placeholder="e.g., 5555555555"/>
+                                    </group>
+                                    <group>
+                                        <field name="admin_iban" readonly="stage != 'booked'" placeholder="e.g., AE070331234567890123456"/>
+                                        <field name="admin_swift" readonly="stage != 'booked'" placeholder="e.g., EBILAEAD"/>
+                                        <field name="admin_currency" readonly="stage != 'booked'" placeholder="e.g., AED"/>
+                                    </group>
+                                </group>
+                                <div class="alert alert-info" role="alert" style="margin-top: 20px;">
+                                    <strong>ℹ️ Note:</strong> These bank account details will be displayed on the Sales &amp; Purchase Agreement (SPA) report for customer reference.
+                                    Ensure all information is accurate before printing the SPA document.
+                                </div>
                             </page>
                         </notebook>
                     </sheet>
