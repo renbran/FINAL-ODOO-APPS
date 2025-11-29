@@ -176,21 +176,12 @@ class WebResearchService(models.AbstractModel):
         web_research_enabled = config.get_param('llm_lead_scoring.enable_web_research', 'False') == 'True'
         
         if not web_research_enabled:
-            return """
-            <div style="color: #666; font-style: italic;">
-                ⚠️ Web research is disabled. Enable it in Settings → CRM → LLM Lead Scoring to get real-time company data.
-            </div>
-            """
+            return "⚠️ Web research is disabled. Enable it in Settings → CRM → LLM Lead Scoring to get real-time company data."
         
         # Skip web research if no meaningful company identifier
         if not company_name or len(company_name.strip()) < 3:
             if not website and not email_domain:
-                return """
-                <div style="color: #999; font-style: italic;">
-                    ℹ️ Web research skipped - no company name, website, or email domain provided in lead.
-                    Add company information to enable live web research.
-                </div>
-                """
+                return "ℹ️ Web research skipped - no company name, website, or email domain provided in lead. Add company information to enable live web research."
             # If we have website/email but no name, use domain as company name
             if email_domain and not company_name:
                 company_name = email_domain.replace('.com', '').replace('.', ' ').title()
@@ -229,14 +220,10 @@ class WebResearchService(models.AbstractModel):
                 _logger.warning("Search %d/%d failed: %s", i, len(queries), error_msg)
         
         if not all_results:
-            return f"""
-            <div style="color: #666;">
-                <strong>Web Research Attempted:</strong><br/>
-                {'<br/>'.join(search_summary)}<br/><br/>
-                <em>No web results available. This may be due to API quota limits (100/day free tier) 
-                or the company may not have a strong online presence.</em>
-            </div>
-            """
+            return f"""WEB RESEARCH ATTEMPTED:
+{chr(10).join(['   ' + s for s in search_summary])}
+
+No web results available. This may be due to API quota limits (100/day free tier) or the company may not have a strong online presence."""
         
         # Format search results for LLM
         context_parts = []
@@ -284,26 +271,25 @@ IMPORTANT:
         else:
             llm_analysis = f"LLM synthesis failed: {result['error']}"
         
-        # Format final report (HTML)
+        # Format final report (Plain Text)
+        # Remove markdown formatting from LLM analysis
+        clean_analysis = llm_analysis.replace('**', '').replace('*', '')
+        
+        # Build source list
+        source_list = '\n'.join([f'   • {r["displayLink"]}: {r["link"][:60]}...' for r in all_results[:3]])
+        
         report = f"""
-<div style="font-family: Arial, sans-serif; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-    <h4 style="color: #875A7B; margin-top: 0;">🌐 Live Web Research Results</h4>
-    
-    <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-        <strong>Search Summary:</strong><br/>
-        {'<br/>'.join(search_summary)}<br/>
-        <em style="color: #666; font-size: 0.9em;">Total: {len(all_results)} web results analyzed</em>
-    </div>
-    
-    <div style="background: white; padding: 10px; border-radius: 5px;">
-        {llm_analysis.replace(chr(10), '<br/>')}
-    </div>
-    
-    <div style="margin-top: 10px; padding: 8px; background: #e8f4f8; border-radius: 5px; font-size: 0.85em;">
-        <strong>🔍 Top Sources:</strong><br/>
-        {'<br/>'.join([f'• <a href="{r["link"]}" target="_blank">{r["displayLink"]}</a>' for r in all_results[:3]])}
-    </div>
-</div>
+🌐 LIVE WEB RESEARCH RESULTS
+
+SEARCH SUMMARY:
+{chr(10).join(['   ' + s for s in search_summary])}
+   Total: {len(all_results)} web results analyzed
+
+ANALYSIS:
+{clean_analysis}
+
+TOP SOURCES:
+{source_list}
         """.strip()
         
         return report

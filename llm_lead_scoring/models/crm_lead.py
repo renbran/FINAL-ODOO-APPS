@@ -139,7 +139,8 @@ class CrmLead(models.Model):
 
             # 4. Create internal note with findings
             note_body = self._format_enrichment_note(enrichment_data)
-            self.message_post(
+            # Use with_context to prevent email notifications (plain text not suitable for email)
+            self.with_context(mail_post_autofollow=False, mail_notify_force_send=False).message_post(
                 body=note_body,
                 subject='AI Lead Enrichment',
                 message_type='comment',
