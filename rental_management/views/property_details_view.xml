@@ -9,6 +9,7 @@
                     <header>
                         <field name="sold_booking_id" invisible="1"/>
                         <field name="stage" widget="statusbar" statusbar_visible="draft,available" nolabel="1"/>
+                        <button name="%(action_report_sales_offer_property)d" type="action" string="Print Sales Offer" class="btn btn-primary" icon="fa-print" invisible="sale_lease != 'for_sale'"/>
                         <button name="%(contract_wizard_action)d" type='action' string="Create Contract" class="btn btn-success" icon="fa-money" invisible="stage not in ['available','on_lease'] or sale_lease != 'for_tenancy'"/>
                         <button name="%(booking_wizard_action)d" type='action' string="Create Booking" class="btn btn-success" invisible="stage not in ['sale'] or sold_booking_id"/>
                         <button name="action_in_available" type="object" string="Available" class="btn-info" invisible="stage not in ['draft']"/>

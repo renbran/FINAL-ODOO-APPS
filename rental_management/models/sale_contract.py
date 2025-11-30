@@ -421,6 +421,12 @@ class PropertyVendor(models.Model):
                     rec.dld_fee = 0.0
             # If fixed type, preserve the manually set amount (readonly=False allows user input)
     
+    @api.onchange('sale_price', 'dld_fee_percentage', 'dld_fee_type')
+    def _onchange_dld_fee(self):
+        """Trigger DLD fee recalculation on field changes"""
+        if self.dld_fee_type == 'percentage' and self.sale_price:
+            self.dld_fee = round((self.sale_price * self.dld_fee_percentage) / 100, 2)
+    
     # Admin Fee Calculation
     @api.depends('sale_price', 'admin_fee_percentage', 'admin_fee_type')
     def _compute_admin_fee(self):
@@ -432,6 +438,12 @@ class PropertyVendor(models.Model):
                 else:
                     rec.admin_fee = 0.0
             # If fixed type, preserve the manually set amount (readonly=False allows user input)
+    
+    @api.onchange('sale_price', 'admin_fee_percentage', 'admin_fee_type')
+    def _onchange_admin_fee(self):
+        """Trigger Admin fee recalculation on field changes"""
+        if self.admin_fee_type == 'percentage' and self.sale_price:
+            self.admin_fee = round((self.sale_price * self.admin_fee_percentage) / 100, 2)
     
     # Booking Amount Calculation
     @api.depends('sale_price', 'booking_percentage', 'booking_type')

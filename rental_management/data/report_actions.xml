@@ -5,7 +5,33 @@
         <!-- REPORT ACTIONS - MUST LOAD BEFORE VIEWS THAT REFERENCE THEM  -->
         <!-- ============================================================ -->
 
-        <!-- Sales Purchase Agreement Report Action -->
+        <!-- Sales Offer Report Action (Client Proposal/Quotation) -->
+        <record id="action_report_sales_offer" model="ir.actions.report">
+            <field name="name">Sales Offer</field>
+            <field name="model">property.vendor</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">rental_management.sales_offer_template</field>
+            <field name="report_file">rental_management.sales_offer_template</field>
+            <field name="binding_model_id" ref="model_property_vendor"/>
+            <field name="binding_type">report</field>
+            <field name="print_report_name">'Sales Offer - %s' % (object.name or object.sold_seq)</field>
+            <field name="paperformat_id" ref="base.paperformat_us"/>
+        </record>
+
+        <!-- Sales Offer Report Action for Property Details (Initial Client Proposal) -->
+        <record id="action_report_sales_offer_property" model="ir.actions.report">
+            <field name="name">Sales Offer</field>
+            <field name="model">property.details</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">rental_management.sales_offer_property_template</field>
+            <field name="report_file">rental_management.sales_offer_property_template</field>
+            <field name="binding_model_id" ref="model_property_details"/>
+            <field name="binding_type">report</field>
+            <field name="print_report_name">'Sales Offer - %s' % (object.name or object.property_seq)</field>
+            <field name="paperformat_id" ref="base.paperformat_us"/>
+        </record>
+
+        <!-- Sales Purchase Agreement Report Action (Formal Legal Contract) -->
         <record id="action_report_sales_purchase_agreement" model="ir.actions.report">
             <field name="name">Sales Purchase Agreement</field>
             <field name="model">property.vendor</field>

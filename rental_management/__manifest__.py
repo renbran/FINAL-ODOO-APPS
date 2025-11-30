@@ -29,6 +29,7 @@
         "hr",
         "maintenance",
         "crm",
+        "crm_ai_field_compatibility",  # Required for ai_enrichment_report field
         "website",
         "base",
         "web",
@@ -51,7 +52,9 @@
         "report/tenancy_details_report_template.xml",
         "report/property_details_report_v2.xml",
         "report/property_sold_report.xml",
-        "report/sales_purchase_agreement.xml",
+        "report/sales_offer_template.xml",  # Client proposal/quotation for property.vendor
+        "report/sales_offer_property_template.xml",  # Client proposal for property.details
+        "report/sales_purchase_agreement.xml",  # Formal legal contract
         "report/invoice_report_inherit.xml",
         # wizard views
         "wizard/contract_wizard_view.xml",

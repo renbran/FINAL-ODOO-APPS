@@ -65,10 +65,11 @@ class CrmLead(models.Model):
         help='Summary of AI analysis and recommendations',
     )
     
-    ai_enrichment_report = fields.Text(
+    ai_enrichment_report = fields.Html(
         string='AI Enrichment Report',
         readonly=True,
-        help='Complete plain text enrichment report with scores and analysis',
+        sanitize=False,
+        help='Complete HTML enrichment report with scores and analysis',
     )
 
     # Configuration
@@ -195,80 +196,107 @@ class CrmLead(models.Model):
             }
 
     def _format_plain_text_report(self, data):
-        """Format enrichment data as pure plain text report"""
+        """Format enrichment data as HTML report for Odoo chatter display"""
         scores = data.get('scores', {})
         analysis = data.get('analysis', {})
         research = data.get('research', '')
 
-        # Helper function to format text
         def format_text(text):
-            """Clean text for plain display"""
+            """Clean and format text for HTML display"""
             if not text or text == 'N/A':
-                return 'No data available'
-            # Remove markdown formatting
+                return '<em style="color: #888;">No data available</em>'
+            # Convert markdown-style formatting to HTML
             text = text.replace('**', '')
-            text = text.replace('*', '')
+            text = text.replace('\n\n', '</p><p>')
+            text = text.replace('\n', '<br/>')
+            text = text.replace('\t*', '<br/>•')
+            text = text.replace('* ', '• ')
             return text.strip()
         
-        # Get score indicator
-        def get_score_indicator(score):
+        def get_score_badge(score, label):
+            """Generate score badge with color"""
             if score >= 70:
-                return '🟢 HIGH'
+                color = '#28a745'  # Green
+                icon = '🟢'
             elif score >= 40:
-                return '🟡 MEDIUM'
+                color = '#ffc107'  # Yellow  
+                icon = '🟡'
             else:
-                return '🔴 LOW'
+                color = '#dc3545'  # Red
+                icon = '🔴'
+            return f'''<div style="display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: {color}20; border-left: 4px solid {color}; border-radius: 4px;">
+                <span style="color: #666; font-size: 11px; display: block;">{label}</span>
+                <strong style="color: {color}; font-size: 18px;">{score:.0f}</strong><span style="color: #888; font-size: 12px;">/100</span> {icon}
+            </div>'''
 
-        overall_score = scores.get('overall', 0)
-        completeness_score = scores.get('completeness', 0)
-        clarity_score = scores.get('clarity', 0)
-        engagement_score = scores.get('engagement', 0)
+        overall = scores.get('overall', 0)
+        completeness = scores.get('completeness', 0)
+        clarity = scores.get('clarity', 0)
+        engagement = scores.get('engagement', 0)
 
-        # Pure plain text format - no HTML
-        report = f"""================================================================================
-🤖 AI LEAD ENRICHMENT REPORT
-================================================================================
-Generated: {data.get('timestamp', '')}
+        # Build HTML report
+        report = f'''
+<div style="font-family: Arial, sans-serif; max-width: 100%; padding: 0;">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0 0 5px 0; font-size: 16px;">🤖 AI Lead Enrichment Report</h3>
+        <small style="opacity: 0.9;">Generated: {data.get('timestamp', '')[:19].replace('T', ' ')}</small>
+    </div>
+    
+    <!-- Scores Section -->
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 10px 0; color: #333; font-size: 14px; border-bottom: 1px solid #dee2e6; padding-bottom: 8px;">📊 Probability Scores</h4>
+        <div style="display: flex; flex-wrap: wrap;">
+            {get_score_badge(overall, 'Overall Score')}
+            {get_score_badge(completeness, 'Completeness')}
+            {get_score_badge(clarity, 'Clarity')}
+            {get_score_badge(engagement, 'Engagement')}
+        </div>
+    </div>
+    
+    <!-- Analysis Section -->
+    <div style="background: #fff; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 15px;">
+        <h4 style="margin: 0; padding: 12px 15px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; color: #333; font-size: 14px; border-radius: 8px 8px 0 0;">📝 Detailed Analysis</h4>
+        
+        <div style="padding: 15px;">
+            <!-- Completeness -->
+            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+                <strong style="color: #495057; font-size: 12px;">🔍 Completeness:</strong>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('completeness', 'N/A'))}</p>
+            </div>
+            
+            <!-- Clarity -->
+            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+                <strong style="color: #495057; font-size: 12px;">💡 Clarity:</strong>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('clarity', 'N/A'))}</p>
+            </div>
+            
+            <!-- Engagement -->
+            <div style="margin-bottom: 0;">
+                <strong style="color: #495057; font-size: 12px;">📈 Engagement:</strong>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('engagement', 'N/A'))}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Recommendation -->
+    <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%); border: 1px solid #f0ad4e; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 10px 0; color: #856404; font-size: 14px;">🎯 AI Recommendation</h4>
+        <div style="color: #856404; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('llm_final', 'N/A'))}</div>
+    </div>'''
 
-================================================================================
-📊 PROBABILITY SCORES
-================================================================================
+        # Add research section if available
+        if research and research.strip():
+            report += f'''
+    <!-- Customer Research -->
+    <div style="background: #e7f3ff; border: 1px solid #b8daff; border-radius: 8px; padding: 15px;">
+        <h4 style="margin: 0 0 10px 0; color: #004085; font-size: 14px;">🌐 Customer Research</h4>
+        <div style="color: #004085; font-size: 12px; line-height: 1.5; max-height: 300px; overflow-y: auto;">{format_text(research)}</div>
+    </div>'''
 
-Overall Probability:      {overall_score:.1f}/100  {get_score_indicator(overall_score)}
-Information Completeness: {completeness_score:.1f}/100  {get_score_indicator(completeness_score)}
-Requirement Clarity:      {clarity_score:.1f}/100  {get_score_indicator(clarity_score)}
-Engagement Level:         {engagement_score:.1f}/100  {get_score_indicator(engagement_score)}
-
-================================================================================
-📝 DETAILED ANALYSIS
-================================================================================
-
-🔍 COMPLETENESS ANALYSIS:
-{format_text(analysis.get('completeness', 'N/A'))}
-
-💡 CLARITY ANALYSIS:
-{format_text(analysis.get('clarity', 'N/A'))}
-
-📈 ENGAGEMENT ANALYSIS:
-{format_text(analysis.get('engagement', 'N/A'))}
-
-================================================================================
-🎯 AI RECOMMENDATION
-================================================================================
-{format_text(analysis.get('llm_final', 'N/A'))}
-"""
-
-        if research:
-            report += f"""
-================================================================================
-🔍 CUSTOMER RESEARCH
-================================================================================
-{format_text(research)}
-"""
-
-        report += """
-================================================================================
-"""
+        report += '''
+</div>'''
 
         return report
 

@@ -33,8 +33,8 @@
                         </group>
                     </group>
 
-                    <group string="AI Enrichment Report" invisible="not ai_enrichment_report">
-                        <field name="ai_enrichment_report" readonly="1" nolabel="1" widget="text" placeholder="Run AI enrichment to see detailed report..." style="font-family: 'Courier New', monospace; font-size: 12px; white-space: pre; background: #f5f5f5; padding: 15px; border-radius: 5px;"/>
+                    <group string="AI Enrichment Report" invisible="not ai_enrichment_report" colspan="2">
+                        <field name="ai_enrichment_report" readonly="1" nolabel="1" colspan="2"/>
                     </group>
 
                     <group string="AI Analysis Summary">

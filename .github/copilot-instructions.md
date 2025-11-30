@@ -6,6 +6,7 @@
 
 ### Module Categories & Examples
 - **Payment Workflows**: `account_payment_approval/`, `account_payment_final/` - Multi-stage approval with digital signatures, QR verification
+- **Property Management**: `rental_management/` (v3.4.0) - Complete real estate sales/rental with flexible payment plans, SPA reports, bank integration
 - **Dashboards**: `oe_sale_dashboard_17/`, `crm_executive_dashboard/`, `odoo_dynamic_dashboard/` - Chart.js + OWL components
 - **REST APIs**: `enhanced_rest_api/` (JWT auth, server-wide), `rest_api_odoo/` (base API)
 - **Commission Systems**: `commission_ax/`, `order_net_commission/` - Automated calculations with sales/payment integration
@@ -33,9 +34,12 @@
 ### Pre-Deployment Validation (ALWAYS RUN FIRST) 🚨
 ```powershell
 # In module directory, run validation before ANY changes
-python validate_module.py              # Module-specific checks
-python validate_production_ready.py    # Production readiness audit
-python validate_modern_syntax.py       # Odoo 17 compliance (no attrs={}, states=)
+python validate_module.py              # Module-specific checks (if exists)
+python validate_production_ready.py    # Production readiness audit (if exists)
+python validate_modern_syntax.py       # Odoo 17 compliance (if exists)
+
+# Note: Not all modules have all validators - use what's available
+# Check module directory for specific validation scripts
 ```
 
 **What These Scripts Check**:
@@ -52,6 +56,10 @@ python create_emergency_cloudpepper_fix.py
 
 # Emergency fix already deployed globally:
 # report_font_enhancement/static/src/js/cloudpepper_global_protection.js
+
+# For rental_management dependency error (Nov 30, 2025):
+.\deploy_rental_emergency_fix.ps1  # Installs crm_ai_field_compatibility + upgrades module
+# See: EMERGENCY_FIX_rental_management_dependency.md
 ```
 
 ### Testing & Development Cycle
@@ -528,7 +536,44 @@ $sgc-gradient-electric: linear-gradient(90deg, $sgc-cyan, $sgc-green);
 
 ## CloudPepper Deployment & Troubleshooting
 
-### Deployment Checklist
+### Automated Deployment Scripts (RECOMMENDED)
+**Location**: Repository root directory
+
+**quick_deploy.ps1** - Simplest one-command deployment:
+```powershell
+# Check status
+.\quick_deploy.ps1 status
+
+# Deploy module (with confirmations)
+.\quick_deploy.ps1 deploy
+
+# Verify deployment
+.\quick_deploy.ps1 verify
+
+# Fast deploy (skip confirmations)
+.\quick_deploy.ps1 deploy -SkipConfirm
+```
+
+**deploy_coordinator.ps1** - Advanced step-by-step deployment:
+```powershell
+# Full deployment with monitoring
+.\deploy_coordinator.ps1 -Action deploy
+
+# Individual phases
+.\deploy_coordinator.ps1 -Action backup
+.\deploy_coordinator.ps1 -Action upload
+.\deploy_coordinator.ps1 -Action restart
+```
+
+**Key Features**:
+- Automatic SSH connection testing
+- Database and file backups before deployment
+- Service status monitoring
+- Error detection and rollback capability
+- Color-coded status output
+- Deployment verification
+
+### Manual Deployment Checklist
 1. **Validate Module**: Run all `validate_*.py` scripts in module directory
 2. **Backup Database**: `pg_dump -U odoo_user odoo_db > backup.sql`
 3. **Upload Module**: `scp -r module_name/ user@cloudpepper.site:/opt/odoo/addons/`
@@ -684,6 +729,18 @@ class TestPaymentWorkflow(TransactionCase):
 - CloudPepper compatibility patches
 - Comprehensive test suite
 
+**Property Management System**: `rental_management/` (v3.4.0) ⭐ **PRODUCTION READY**
+- Complete real estate sales/rental workflow with world-class SPA reports
+- ✅ **Sales Offer Integration**: Fully present in property form (property.vendor)
+- ✅ **Printable Payment Plans**: Professional SPA report with automatic percentage calculations
+- ✅ **EMI/Installment Compliance**: Template-based system matching agreed payment terms
+- 15 bank account fields (IBAN, SWIFT, separate accounts for payment/DLD/admin)
+- DLD & Admin fee handling with configurable due dates
+- Template-driven payment schedules (monthly, quarterly, bi-annual, annual)
+- Automatic date calculation and invoice generation
+- See `RENTAL_MANAGEMENT_PRODUCTION_AUDIT.md` for comprehensive quality report
+- See `PAYMENT_PLAN_SOLUTION_PACKAGE.md` for 100+ pages of implementation docs
+
 **REST API Reference**: `enhanced_rest_api/`
 - JWT authentication, server-wide integration
 - CRUD endpoints for CRM, Sales, Payments
@@ -729,5 +786,7 @@ class TestPaymentWorkflow(TransactionCase):
 - **Validation Scripts**: `.github/scripts/ai_*.py`, module-level `validate_*.py`
 - **Emergency Procedures**: `create_emergency_cloudpepper_fix.py`
 - **Module READMEs**: Each module has detailed documentation in `README.md`
+- **Deployment Docs**: `00_START_HERE.txt`, `INDEX.md`, `DEPLOYMENT_README.md`
+- **Payment Plan System**: `PAYMENT_PLAN_SOLUTION_PACKAGE.md` (100+ pages), `PAYMENT_PLAN_IMPLEMENTATION_GUIDE.md`
 
-**Last Updated**: November 27, 2025
+**Last Updated**: November 30, 2025

@@ -13,6 +13,7 @@
                         <button name="action_generate_from_schedule" type="object" string="⚡ Generate from Schedule" class="btn btn-success" icon="fa-bolt" invisible="stage != 'booked' or not payment_schedule_id or sale_invoice_ids" confirm="This will generate invoices based on the payment schedule. Continue?" />
                         <button name="action_reset_installments" type="object" icon="fa-refresh" string="Reset Installments" class="btn btn-outline-danger" invisible="stage not in ['booked'] or not sale_invoice_ids" />
                         <button name="action_confirm_sale" type="object" string="Confirm Sale" class="btn btn-info" icon="fa-chevron-circle-right" invisible="stage not in ['booked'] or not sale_invoice_ids" />
+                        <button name="%(rental_management.action_report_sales_offer)d" type="action" string="Print Sales Offer" icon="fa-file-text-o" class="btn btn-primary" invisible="stage not in ['booked', 'sold', 'locked']"/>
                         <button name="%(rental_management.action_report_sales_purchase_agreement)d" type="action" string="Print SPA" icon="fa-print" class="btn btn-success" invisible="stage not in ['booked', 'sold', 'locked']"/>
                         <button name="%(maintenance_wizard_action)d" type='action' context="{'is_selling_contract_maintenance': True}" icon="fa-wrench" string="Maintenance Request" class="btn btn-warning" invisible="stage not in ['sold', 'locked']" />
                         <button name="action_cancel_contract" type="object" string="Cancel" class="btn btn-danger" icon="fa-times" invisible="stage in ['locked','cancel']" confirm="Are you sure you want to cancel your contract?" />
@@ -189,7 +190,7 @@
                             <group string="Admin Fee (Due after Booking)">
                                 <field name="admin_fee_type" readonly="stage != 'booked'" force_save="1"/>
                                 <field name="admin_fee_percentage" readonly="stage != 'booked' or admin_fee_type != 'percentage'" force_save="1" invisible="admin_fee_type != 'percentage'"/>
-                                <field name="admin_fee" readonly="stage != 'booked' or admin_fee_type == 'percentage'" force_save="1" help="Administrative processing fee (separate from property price)"/>
+                                <field name="admin_fee" readonly="stage != 'booked'" force_save="1" help="Administrative processing fee (separate from property price)"/>
                                 <field name="admin_fee_due_days" readonly="stage != 'booked'" force_save="1"/>
                                 <field name="include_admin_in_plan" readonly="stage != 'booked'" force_save="1"/>
                             </group>
