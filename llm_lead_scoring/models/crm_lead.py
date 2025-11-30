@@ -196,7 +196,11 @@ class CrmLead(models.Model):
             }
 
     def _format_plain_text_report(self, data):
-        """Format enrichment data as HTML report for Odoo chatter display"""
+        """Format enrichment data as professional HTML report for Odoo display.
+        
+        Uses table-based layouts for maximum email/widget compatibility.
+        Avoids flexbox and gradients which don't render properly in Odoo mail.
+        """
         scores = data.get('scores', {})
         analysis = data.get('analysis', {})
         research = data.get('research', '')
@@ -204,98 +208,176 @@ class CrmLead(models.Model):
         def format_text(text):
             """Clean and format text for HTML display"""
             if not text or text == 'N/A':
-                return '<em style="color: #888;">No data available</em>'
+                return '<em style="color: #888888;">No data available</em>'
             # Convert markdown-style formatting to HTML
+            text = str(text)
             text = text.replace('**', '')
-            text = text.replace('\n\n', '</p><p>')
+            text = text.replace('\n\n', '</p><p style="margin: 8px 0;">')
             text = text.replace('\n', '<br/>')
-            text = text.replace('\t*', '<br/>•')
+            text = text.replace('\t*', '<br/>• ')
             text = text.replace('* ', '• ')
             return text.strip()
         
-        def get_score_badge(score, label):
-            """Generate score badge with color"""
+        def get_score_color(score):
+            """Get color based on score value"""
             if score >= 70:
-                color = '#28a745'  # Green
-                icon = '🟢'
+                return '#28a745', '#d4edda', '🟢'  # Green
             elif score >= 40:
-                color = '#ffc107'  # Yellow  
-                icon = '🟡'
+                return '#ffc107', '#fff3cd', '🟡'  # Yellow  
             else:
-                color = '#dc3545'  # Red
-                icon = '🔴'
-            return f'''<div style="display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: {color}20; border-left: 4px solid {color}; border-radius: 4px;">
-                <span style="color: #666; font-size: 11px; display: block;">{label}</span>
-                <strong style="color: {color}; font-size: 18px;">{score:.0f}</strong><span style="color: #888; font-size: 12px;">/100</span> {icon}
-            </div>'''
+                return '#dc3545', '#f8d7da', '🔴'  # Red
+        
+        def format_score_cell(score, label):
+            """Generate a single score cell for table layout"""
+            color, bg_color, icon = get_score_color(score)
+            return f'''
+                <td style="padding: 10px; text-align: center; background-color: {bg_color}; border-left: 4px solid {color}; vertical-align: top;">
+                    <div style="color: #666666; font-size: 11px; margin-bottom: 4px;">{label}</div>
+                    <div style="color: {color}; font-size: 22px; font-weight: bold;">{score:.0f}</div>
+                    <div style="color: #888888; font-size: 11px;">/100 {icon}</div>
+                </td>'''
 
         overall = scores.get('overall', 0)
         completeness = scores.get('completeness', 0)
         clarity = scores.get('clarity', 0)
         engagement = scores.get('engagement', 0)
 
-        # Build HTML report
+        # Determine overall score status
+        overall_color, overall_bg, overall_icon = get_score_color(overall)
+        
+        timestamp = data.get('timestamp', '')
+        if timestamp:
+            timestamp = timestamp[:19].replace('T', ' ')
+
+        # Build HTML report using table-based layout for compatibility
         report = f'''
-<div style="font-family: Arial, sans-serif; max-width: 100%; padding: 0;">
+<div style="font-family: Arial, Helvetica, sans-serif; max-width: 100%; margin: 0; padding: 0;">
     
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
-        <h3 style="margin: 0 0 5px 0; font-size: 16px;">🤖 AI Lead Enrichment Report</h3>
-        <small style="opacity: 0.9;">Generated: {data.get('timestamp', '')[:19].replace('T', ' ')}</small>
-    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+        <tr>
+            <td style="background-color: #6366f1; padding: 16px 20px; border-radius: 8px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="color: #ffffff; font-size: 18px; font-weight: bold;">
+                            🤖 AI Lead Enrichment Report
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #e0e0ff; font-size: 12px; padding-top: 4px;">
+                            Generated: {timestamp}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
     
-    <!-- Scores Section -->
-    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; color: #333; font-size: 14px; border-bottom: 1px solid #dee2e6; padding-bottom: 8px;">📊 Probability Scores</h4>
-        <div style="display: flex; flex-wrap: wrap;">
-            {get_score_badge(overall, 'Overall Score')}
-            {get_score_badge(completeness, 'Completeness')}
-            {get_score_badge(clarity, 'Clarity')}
-            {get_score_badge(engagement, 'Engagement')}
-        </div>
-    </div>
+    <!-- Overall Score Highlight -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+        <tr>
+            <td style="background-color: {overall_bg}; border: 2px solid {overall_color}; border-radius: 8px; padding: 16px; text-align: center;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="text-align: center;">
+                            <div style="color: #333333; font-size: 14px; font-weight: bold; margin-bottom: 8px;">OVERALL PROBABILITY SCORE</div>
+                            <div style="color: {overall_color}; font-size: 42px; font-weight: bold; line-height: 1;">{overall:.0f}%</div>
+                            <div style="color: #666666; font-size: 12px; margin-top: 4px;">{overall_icon} {'High' if overall >= 70 else 'Medium' if overall >= 40 else 'Low'} Priority Lead</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
     
-    <!-- Analysis Section -->
-    <div style="background: #fff; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 15px;">
-        <h4 style="margin: 0; padding: 12px 15px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; color: #333; font-size: 14px; border-radius: 8px 8px 0 0;">📝 Detailed Analysis</h4>
-        
-        <div style="padding: 15px;">
-            <!-- Completeness -->
-            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
-                <strong style="color: #495057; font-size: 12px;">🔍 Completeness:</strong>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('completeness', 'N/A'))}</p>
-            </div>
-            
-            <!-- Clarity -->
-            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
-                <strong style="color: #495057; font-size: 12px;">💡 Clarity:</strong>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('clarity', 'N/A'))}</p>
-            </div>
-            
-            <!-- Engagement -->
-            <div style="margin-bottom: 0;">
-                <strong style="color: #495057; font-size: 12px;">📈 Engagement:</strong>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 13px; line-height: 1.5;">{format_text(analysis.get('engagement', 'N/A'))}</p>
-            </div>
-        </div>
-    </div>
+    <!-- Score Breakdown -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; background-color: #f8f9fa; border-radius: 8px;">
+        <tr>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #dee2e6;">
+                <strong style="color: #333333; font-size: 14px;">📊 Score Breakdown</strong>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 12px;">
+                <table width="100%" cellpadding="0" cellspacing="8">
+                    <tr>
+                        {format_score_cell(completeness, 'Completeness')}
+                        {format_score_cell(clarity, 'Clarity')}
+                        {format_score_cell(engagement, 'Engagement')}
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    
+    <!-- Detailed Analysis -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; border: 1px solid #e9ecef; border-radius: 8px;">
+        <tr>
+            <td style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e9ecef; border-radius: 8px 8px 0 0;">
+                <strong style="color: #333333; font-size: 14px;">📝 Detailed Analysis</strong>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px;">
+                <!-- Completeness Analysis -->
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                    <tr>
+                        <td style="padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;">
+                            <div style="color: #495057; font-size: 13px; font-weight: bold; margin-bottom: 6px;">🔍 Completeness Analysis</div>
+                            <div style="color: #666666; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('completeness', 'N/A'))}</div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Clarity Analysis -->
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                    <tr>
+                        <td style="padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;">
+                            <div style="color: #495057; font-size: 13px; font-weight: bold; margin-bottom: 6px;">💡 Clarity Analysis</div>
+                            <div style="color: #666666; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('clarity', 'N/A'))}</div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Engagement Analysis -->
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <div style="color: #495057; font-size: 13px; font-weight: bold; margin-bottom: 6px;">📈 Engagement Analysis</div>
+                            <div style="color: #666666; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('engagement', 'N/A'))}</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
     
     <!-- AI Recommendation -->
-    <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%); border: 1px solid #f0ad4e; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; color: #856404; font-size: 14px;">🎯 AI Recommendation</h4>
-        <div style="color: #856404; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('llm_final', 'N/A'))}</div>
-    </div>'''
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 8px;">
+        <tr>
+            <td style="padding: 16px;">
+                <div style="color: #856404; font-size: 14px; font-weight: bold; margin-bottom: 10px;">🎯 AI Recommendation</div>
+                <div style="color: #856404; font-size: 13px; line-height: 1.6;">{format_text(analysis.get('llm_final', 'N/A'))}</div>
+            </td>
+        </tr>
+    </table>'''
 
         # Add research section if available
         if research and research.strip():
             report += f'''
+    
     <!-- Customer Research -->
-    <div style="background: #e7f3ff; border: 1px solid #b8daff; border-radius: 8px; padding: 15px;">
-        <h4 style="margin: 0 0 10px 0; color: #004085; font-size: 14px;">🌐 Customer Research</h4>
-        <div style="color: #004085; font-size: 12px; line-height: 1.5; max-height: 300px; overflow-y: auto;">{format_text(research)}</div>
-    </div>'''
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #e7f3ff; border: 1px solid #b8daff; border-radius: 8px;">
+        <tr>
+            <td style="padding: 16px;">
+                <div style="color: #004085; font-size: 14px; font-weight: bold; margin-bottom: 10px;">🌐 Customer Research</div>
+                <div style="color: #004085; font-size: 12px; line-height: 1.5;">{format_text(research)}</div>
+            </td>
+        </tr>
+    </table>'''
 
         report += '''
+    
 </div>'''
 
         return report
