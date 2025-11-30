@@ -449,6 +449,34 @@ class CrmLead(models.Model):
 
         return result
 
+    def action_regenerate_report(self):
+        """Regenerate AI enrichment report from existing data without calling AI.
+        
+        This is useful after updating the report template to refresh the display.
+        """
+        self.ensure_one()
+
+        if not self.ai_enrichment_data:
+            raise UserError(_('No enrichment data available for this lead. Please run AI Enrich first.'))
+
+        try:
+            data = json.loads(self.ai_enrichment_data)
+            new_report = self._format_plain_text_report(data)
+            self.write({'ai_enrichment_report': new_report})
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('Report regenerated successfully.'),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        except json.JSONDecodeError as exc:
+            raise UserError(_('Invalid enrichment data format. Please run AI Enrich again.')) from exc
+
     def action_view_enrichment_data(self):
         """Action to view enrichment data in a formatted way"""
         self.ensure_one()
