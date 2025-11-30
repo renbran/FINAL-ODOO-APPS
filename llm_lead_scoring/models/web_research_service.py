@@ -41,11 +41,11 @@ class WebResearchService(models.AbstractModel):
                 'results': []
             }
         
-        # Validate Search Engine ID format (should contain a colon, not start with AIza)
-        if search_engine_id.startswith('AIza') or ':' not in search_engine_id:
+        # Validate Search Engine ID format (should not be an API key)
+        if search_engine_id.startswith('AIza'):
             return {
                 'success': False,
-                'error': 'Invalid Search Engine ID format. Should be like "017576662512468239146:omuauf_lfve" from Programmable Search Engine, not an API key.',
+                'error': 'Invalid Search Engine ID - you entered an API key. Please use the Search Engine ID from Programmable Search Engine.',
                 'results': []
             }
         

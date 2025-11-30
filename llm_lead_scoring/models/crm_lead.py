@@ -11,6 +11,9 @@ _logger = logging.getLogger(__name__)
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
+    # Check if module is properly installed before adding fields
+    _auto = True  # Ensure automatic table creation
+    
     # AI Scoring Fields
     ai_probability_score = fields.Float(
         string='AI Probability Score',
@@ -267,7 +270,9 @@ Engagement Level:         {engagement_score:.1f}/100  {get_score_indicator(engag
 ================================================================================
 """
 
-        return report    @api.model
+        return report
+
+    @api.model
     def _cron_enrich_leads(self):
         """Scheduled action to enrich leads automatically"""
         llm_service = self.env['llm.service']

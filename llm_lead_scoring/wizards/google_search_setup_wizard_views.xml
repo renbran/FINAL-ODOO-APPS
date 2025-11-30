@@ -11,7 +11,7 @@
 
                 <!-- Introduction Step -->
                 <group invisible="step != 'intro'">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" role="alert">
                         <h3>🌐 Google Custom Search Setup</h3>
                         <p>
                             <strong>What you'll get:</strong>
@@ -28,7 +28,7 @@
                         <p>
                             <strong>Requirements:</strong> Google account (free)</p>
                     </div>
-                    <div class="alert alert-warning">
+                    <div class="alert alert-warning" role="alert">
                         <strong>💰 Cost:</strong> FREE for up to 100 queries/day<br/>
                         After free tier: $5 per 1,000 queries (optional)
                     </div>
@@ -36,7 +36,7 @@
 
                 <!-- API Key Step -->
                 <group invisible="step != 'api_key'">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" role="alert">
                         <h4>📝 Step 1: Get Your API Key</h4>
                         <ol>
                             <li>Go to: <a href="https://developers.google.com/custom-search/v1/overview" target="_blank">Google Custom Search API</a>
@@ -56,7 +56,7 @@
 
                 <!-- Search Engine Step -->
                 <group invisible="step != 'search_engine'">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" role="alert">
                         <h4>🔧 Step 2: Create Search Engine</h4>
                         <ol>
                             <li>Go to: <a href="https://programmablesearchengine.google.com/controlpanel/create" target="_blank">Create Search Engine</a>
@@ -79,7 +79,7 @@
 
                 <!-- Test Step -->
                 <group invisible="step != 'test'">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" role="alert">
                         <h4>✅ Step 3: Test Your Configuration</h4>
                         <p>Let's verify everything is working correctly.</p>
                     </div>
@@ -92,7 +92,7 @@
 
                 <!-- Complete Step -->
                 <group invisible="step != 'complete'">
-                    <div class="alert alert-success">
+                    <div class="alert alert-success" role="alert">
                         <h3>🎉 Setup Complete!</h3>
                         <p>
                             <strong>Google Custom Search is now enabled.</strong>
@@ -105,7 +105,7 @@
                             <li>✅ Better lead scoring</li>
                         </ul>
                     </div>
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" role="alert">
                         <strong>💡 Usage Tips:</strong>
                         <ul>
                             <li>Free quota: 100 searches/day (resets daily)</li>

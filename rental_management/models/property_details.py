@@ -143,6 +143,12 @@ class PropertyDetails(models.Model):
                              help='Dubai Land Department registration fee (separate from property price, only for sale)')
     admin_fee = fields.Monetary(string='Admin Fee',
                                help='Administrative processing fee (separate from property price, only for sale)')
+    
+    # Payment Plan Support
+    is_payment_plan = fields.Boolean(
+        string='Payment Plan Available',
+        default=False,
+        help='Enable flexible payment plans for this property')
 
     # Utility Service
     is_extra_service = fields.Boolean(string="Utility Services")
@@ -1138,8 +1144,14 @@ class PropertyTag(models.Model):
     _description = 'Property Tags'
     _rec_name = 'title'
 
-    title = fields.Char(string='Title', translate=True)
+    name = fields.Char(string='Tag Name', translate=True, compute='_compute_name', store=True)
+    title = fields.Char(string='Title', translate=True, required=True)
     color = fields.Integer(string='Color')
+    
+    @api.depends('title')
+    def _compute_name(self):
+        for record in self:
+            record.name = record.title or ''
 
 
 # Utility Service

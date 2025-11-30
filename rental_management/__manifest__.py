@@ -46,6 +46,7 @@
         "data/property_product_data.xml",
         "data/update_ir_cron.xml",
         "data/payment_schedule_data.xml",
+        "data/cleanup_orphaned_fields.xml",
         # Report TEMPLATES load after actions are created
         "report/tenancy_details_report_template.xml",
         "report/property_details_report_v2.xml",

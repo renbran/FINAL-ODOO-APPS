@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Clean up orphaned field references that cause validation errors -->
+    <function model="ir.model.fields" name="search">
+        <value eval="[('name', '=', 'recurring_order_id'), ('model', '=', 'sale.order')]"/>
+    </function>
+    <function model="ir.model.fields" name="unlink">
+        <value eval="[('name', '=', 'recurring_order_id'), ('model', '=', 'sale.order')]"/>
+    </function>
+</odoo>
