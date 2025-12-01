@@ -60,6 +60,35 @@ class ResConfigSettings(models.TransientModel):
         help='Create free search engine at: https://programmablesearchengine.google.com/',
     )
 
+    # Google Maps API Settings
+    google_maps_api_key = fields.Char(
+        string='Google Maps API Key',
+        config_parameter='llm_lead_scoring.google_maps_api_key',
+        help='API key for Google Maps Place API. Get from: https://console.cloud.google.com/apis/library/places-backend.googleapis.com',
+    )
+
+    enable_maps_research = fields.Boolean(
+        string='Enable Google Maps Lookup',
+        config_parameter='llm_lead_scoring.enable_maps_research',
+        default=False,
+        help='Look up business details from Google Maps (ratings, reviews, address)',
+    )
+
+    # Enhanced Research Settings
+    enable_tech_analysis = fields.Boolean(
+        string='Enable Tech Stack Analysis',
+        config_parameter='llm_lead_scoring.enable_tech_analysis',
+        default=True,
+        help='Analyze company website for technology stack (CMS, analytics, marketing tools)',
+    )
+
+    enable_digital_presence = fields.Boolean(
+        string='Enable Digital Presence Check',
+        config_parameter='llm_lead_scoring.enable_digital_presence',
+        default=True,
+        help='Check company presence on LinkedIn, Facebook, and other platforms',
+    )
+
     # Scoring Weights
     weight_completeness = fields.Float(
         string='Completeness Weight (%)',

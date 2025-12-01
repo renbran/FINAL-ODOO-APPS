@@ -88,6 +88,10 @@ class PropertyVendor(models.Model):
                                          domain=[('schedule_type', '=', 'sale'), ('active', '=', True)],
                                          help='Select payment schedule to auto-generate invoices')
     use_schedule = fields.Boolean(string='Use Payment Schedule', default=False)
+    schedule_from_property = fields.Boolean(
+        string='Inherited from Property',
+        default=False,
+        help='True if payment schedule was automatically inherited from property')
     payment_term = fields.Selection([
         ('monthly', 'Monthly'),
         ('full_payment', 'Full Payment'),
@@ -445,6 +449,81 @@ class PropertyVendor(models.Model):
         if self.admin_fee_type == 'percentage' and self.sale_price:
             self.admin_fee = round((self.sale_price * self.admin_fee_percentage) / 100, 2)
     
+    # Payment Schedule Inheritance from Property
+    @api.onchange('property_id')
+    def _onchange_property_id_payment_schedule(self):
+        """Auto-inherit payment schedule from property when property is selected.
+        This enables UAE real estate sector payment plan integration where 
+        payment plans are defined at property level and inherited by contracts.
+        """
+        if self.property_id:
+            # Check if property has a sale payment plan configured
+            if self.property_id.is_payment_plan and self.property_id.payment_schedule_id:
+                self.payment_schedule_id = self.property_id.payment_schedule_id
+                self.use_schedule = True
+                self.schedule_from_property = True
+                
+                # Calculate total invoices from schedule
+                total_invoices = sum(
+                    line.number_of_installments 
+                    for line in self.payment_schedule_id.schedule_line_ids
+                )
+                
+                # Add booking invoice count if not in schedule
+                has_booking = any(line.payment_type == 'booking' 
+                                for line in self.payment_schedule_id.schedule_line_ids)
+                if not has_booking:
+                    total_invoices += 1  # Add booking invoice
+                
+                return {
+                    'warning': {
+                        'title': _('Payment Schedule Inherited'),
+                        'message': _(
+                            'Payment schedule "%s" has been automatically applied from property. '
+                            'This schedule will generate %d sale invoices based on the UAE payment plan structure. '
+                            'You can change this schedule if needed.'
+                        ) % (self.payment_schedule_id.name, total_invoices)
+                    }
+                }
+            else:
+                # No sale payment schedule on property, reset if previously inherited
+                if self.schedule_from_property:
+                    self.payment_schedule_id = False
+                    self.use_schedule = False
+                    self.schedule_from_property = False
+    
+    @api.onchange('payment_schedule_id')
+    def _onchange_payment_schedule(self):
+        """Preview invoice count when payment schedule is selected"""
+        if self.payment_schedule_id:
+            self.use_schedule = True
+            total_invoices = sum(line.number_of_installments 
+                               for line in self.payment_schedule_id.schedule_line_ids)
+            
+            # Add booking, DLD, admin invoices if they will be generated
+            has_booking = any(line.payment_type == 'booking' 
+                            for line in self.payment_schedule_id.schedule_line_ids)
+            if not has_booking:
+                total_invoices += 1  # Booking invoice
+            
+            if self.include_dld_in_plan and self.dld_fee > 0:
+                total_invoices += 1  # DLD fee invoice
+            
+            if self.include_admin_in_plan and self.admin_fee > 0:
+                total_invoices += 1  # Admin fee invoice
+            
+            return {
+                'warning': {
+                    'title': _('Payment Schedule Selected'),
+                    'message': _(
+                        'This schedule will generate approximately %d sale invoices '
+                        '(including booking, DLD, admin fees, and installments) based on the defined payment plan.'
+                    ) % total_invoices
+                }
+            }
+        else:
+            self.use_schedule = False
+    
     # Booking Amount Calculation
     @api.depends('sale_price', 'booking_percentage', 'booking_type')
     def _compute_booking_amount(self):
@@ -770,6 +849,7 @@ class SaleInvoice(models.Model):
         ('admin_fee', 'Admin Fee'),
         ('installment', 'Installment'),
         ('handover', 'Handover Payment'),
+        ('completion', 'Completion Payment'),
         ('other', 'Other')
     ], string='Invoice Type', default='installment',
        help='Type of payment for categorization and reporting')

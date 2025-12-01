@@ -139,16 +139,36 @@ class PropertyDetails(models.Model):
     price_per_area = fields.Monetary(string="Price / Area")
 
     # Additional Fees for Sale Properties (Not included in price)
-    dld_fee = fields.Monetary(string='DLD Fee',
-                             help='Dubai Land Department registration fee (separate from property price, only for sale)')
-    admin_fee = fields.Monetary(string='Admin Fee',
-                               help='Administrative processing fee (separate from property price, only for sale)')
+    dld_fee = fields.Monetary(
+        string='DLD Fee',
+        compute='_compute_dld_fee',
+        store=True,
+        readonly=False,
+        help='Dubai Land Department registration fee (4% of sale price)')
+    admin_fee = fields.Monetary(
+        string='Admin Fee',
+        help='Administrative processing fee (separate from property price, only for sale)')
+    total_customer_obligation = fields.Monetary(
+        string='Total Customer Obligation',
+        compute='_compute_total_customer_obligation',
+        store=True,
+        help='Total amount = Property Price + DLD Fee + Admin Fee')
     
     # Payment Plan Support
     is_payment_plan = fields.Boolean(
         string='Payment Plan Available',
         default=False,
         help='Enable flexible payment plans for this property')
+    payment_schedule_id = fields.Many2one(
+        'payment.schedule',
+        string='Sale Payment Schedule',
+        domain=[('schedule_type', '=', 'sale'), ('active', '=', True)],
+        help='Default payment schedule for Sales contracts. Client will see the full payment breakdown.')
+    rental_payment_schedule_id = fields.Many2one(
+        'payment.schedule',
+        string='Rental Payment Schedule',
+        domain=[('schedule_type', '=', 'rental'), ('active', '=', True)],
+        help='Default payment schedule for Rental contracts. Used to generate rent installments based on UAE payment plan structure.')
 
     # Utility Service
     is_extra_service = fields.Boolean(string="Utility Services")
@@ -548,6 +568,26 @@ class PropertyDetails(models.Model):
         for rec in self:
             if rec.pricing_type == 'area_wise':
                 rec.price = rec.total_area * rec.price_per_area
+
+    # DLD Fee Auto-Calculation (4% of sale price) - Computed Field
+    @api.depends('price', 'sale_lease')
+    def _compute_dld_fee(self):
+        """Auto-calculate DLD fee as 4% of property price for sale properties"""
+        for rec in self:
+            if rec.sale_lease == 'for_sale' and rec.price:
+                rec.dld_fee = rec.price * 0.04
+            else:
+                rec.dld_fee = 0.0
+    
+    # Total Customer Obligation (Price + DLD + Admin)
+    @api.depends('price', 'dld_fee', 'admin_fee', 'sale_lease')
+    def _compute_total_customer_obligation(self):
+        """Calculate total amount client must pay = Price + DLD Fee + Admin Fee"""
+        for rec in self:
+            if rec.sale_lease == 'for_sale':
+                rec.total_customer_obligation = (rec.price or 0.0) + (rec.dld_fee or 0.0) + (rec.admin_fee or 0.0)
+            else:
+                rec.total_customer_obligation = 0.0
 
     # Maintenance Area wise Price
     @api.onchange('is_maintenance_service', 'maintenance_type', 'per_area_maintenance')

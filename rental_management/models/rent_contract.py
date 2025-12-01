@@ -103,7 +103,15 @@ class TenancyDetails(models.Model):
     )
     use_schedule = fields.Boolean(
         string='Use Payment Schedule',
-        help="Enable to use payment schedule for automatic invoice generation"
+        default=True,
+        help="Enable to use payment schedule for automatic invoice generation. "
+             "When enabled, installments will be generated based on the payment schedule "
+             "instead of contract duration. This aligns with UAE real estate sector payment plans."
+    )
+    schedule_from_property = fields.Boolean(
+        string='Schedule Inherited from Property',
+        readonly=True,
+        help="Indicates if the payment schedule was automatically inherited from the property"
     )
     
     duration_ids = fields.Many2many('contract.duration', string="Durations",
@@ -264,6 +272,42 @@ class TenancyDetails(models.Model):
 
     # Total Days
     total_days = fields.Integer(compute="_compute_total_days")
+    
+    @api.onchange('property_id')
+    def _onchange_property_id_payment_schedule(self):
+        """Auto-inherit payment schedule from property when property is selected.
+        This enables UAE real estate sector payment plan integration where 
+        payment plans are defined at property level and inherited by contracts.
+        """
+        if self.property_id:
+            # Check if property has a rental payment plan configured
+            if self.property_id.is_payment_plan and self.property_id.rental_payment_schedule_id:
+                self.payment_schedule_id = self.property_id.rental_payment_schedule_id
+                self.use_schedule = True
+                self.schedule_from_property = True
+                
+                # Calculate total invoices from schedule
+                total_invoices = sum(
+                    line.number_of_installments 
+                    for line in self.payment_schedule_id.schedule_line_ids
+                )
+                
+                return {
+                    'warning': {
+                        'title': _('Payment Schedule Inherited'),
+                        'message': _(
+                            'Payment schedule "%s" has been automatically applied from property. '
+                            'This schedule will generate %d rent invoices based on the UAE payment plan structure. '
+                            'You can change this schedule if needed.'
+                        ) % (self.payment_schedule_id.name, total_invoices)
+                    }
+                }
+            else:
+                # No rental payment schedule on property, reset if previously inherited
+                if self.schedule_from_property:
+                    self.payment_schedule_id = False
+                    self.use_schedule = False
+                    self.schedule_from_property = False
     
     @api.onchange('payment_schedule_id')
     def _onchange_payment_schedule(self):
@@ -630,7 +674,18 @@ class TenancyDetails(models.Model):
 
     # Active Contract
     def action_active_contract(self):
-        """Process auto Installment for Rent Unit : Month and Year """
+        """Process auto Installment for Rent Unit : Month and Year
+        
+        ENHANCED (UAE Real Estate Payment Plan Integration):
+        If a payment schedule is configured and use_schedule is True,
+        installments will be generated from the payment schedule instead
+        of using the traditional contract duration method.
+        """
+        # CHECK: Use payment schedule if available (UAE payment plan integration)
+        if self.use_schedule and self.payment_schedule_id:
+            return self._activate_using_payment_schedule()
+        
+        # FALLBACK: Traditional duration-based installment generation
         invoice_post_type = self.env['ir.config_parameter'].sudo().get_param(
             'rental_management.invoice_post_type')
         payment_term = {'monthly': 'Month',
@@ -713,6 +768,38 @@ class TenancyDetails(models.Model):
             'last_invoice_payment_date': invoice_id.invoice_date,
             "type": "automatic",
         })
+    
+    def _activate_using_payment_schedule(self):
+        """Activate contract using payment schedule (UAE Payment Plan Integration).
+        
+        This method generates installments based on the payment schedule template
+        instead of using the traditional contract duration method. This aligns
+        with UAE real estate sector payment plans.
+        """
+        self.ensure_one()
+        
+        # Generate invoices from payment schedule
+        result = self.action_generate_rent_from_schedule()
+        
+        # Process broker invoice if applicable
+        if self.is_any_broker:
+            self.action_broker_invoice()
+        
+        # Send contract activation email
+        self.action_send_active_contract()
+        
+        # Finalize contract activation
+        # Get last invoice date from rent invoices
+        last_date = max(self.rent_invoice_ids.mapped('invoice_date')) if self.rent_invoice_ids else self.invoice_start_date
+        
+        self.write({
+            'contract_type': 'running_contract',
+            'active_contract_state': True,
+            'last_invoice_payment_date': last_date,
+            'type': 'manual',  # Schedule-based treated as manual for tracking
+        })
+        
+        return result
 
     def action_active_rent_contract(self):
         if self.rent_unit == 'Day':
@@ -812,6 +899,52 @@ class TenancyDetails(models.Model):
         if self.payment_term == 'year':
             rent_invoice['description'] = 'First Year Rent'
         self.env['rent.invoice'].create(rent_invoice)
+
+    # Apply Payment Schedule from Property
+    def action_apply_property_schedule(self):
+        """Apply the rental payment schedule from the selected property.
+        
+        This method allows users to manually apply the property's default 
+        rental payment schedule to the contract. This is useful for UAE real estate 
+        sector where payment plans are typically defined at property level.
+        """
+        self.ensure_one()
+        
+        if not self.property_id:
+            raise UserError(_("Please select a property first."))
+        
+        if not self.property_id.rental_payment_schedule_id:
+            raise UserError(_(
+                "The selected property '%s' does not have a rental payment schedule configured. "
+                "Please configure a rental payment schedule on the property or select one manually."
+            ) % self.property_id.name)
+        
+        # Apply the schedule
+        self.write({
+            'payment_schedule_id': self.property_id.rental_payment_schedule_id.id,
+            'use_schedule': True,
+            'schedule_from_property': True,
+        })
+        
+        # Calculate total invoices
+        total_invoices = sum(
+            line.number_of_installments 
+            for line in self.payment_schedule_id.schedule_line_ids
+        )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Payment Schedule Applied'),
+                'message': _(
+                    'Successfully applied rental payment schedule "%s" from property "%s". '
+                    'This schedule will generate %d rent invoices.'
+                ) % (self.payment_schedule_id.name, self.property_id.name, total_invoices),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     # Generate Rent Invoices from Payment Schedule
     def action_generate_rent_from_schedule(self):

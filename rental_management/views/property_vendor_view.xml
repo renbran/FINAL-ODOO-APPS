@@ -152,6 +152,12 @@
                             <group>
                                 <field name="payment_schedule_id" readonly="stage != 'booked'" force_save="1" options="{'no_create': True, 'no_create_edit': True}" domain="[('schedule_type', '=', 'sale'), ('active', '=', True)]" help="Select a payment schedule template to auto-generate invoices"/>
                                 <field name="use_schedule" invisible="1"/>
+                                <field name="schedule_from_property" invisible="1"/>
+                                <div class="alert alert-info mb-3" role="alert" invisible="not schedule_from_property or not payment_schedule_id" style="margin-bottom: 10px;">
+                                    <i class="fa fa-info-circle"/> <strong>UAE Payment Plan Active:</strong>
+                                    Payment schedule "<field name="payment_schedule_id" readonly="1" class="oe_inline" nolabel="1" style="font-weight: bold;"/>" inherited from property.
+                                    This will auto-generate invoices matching the property's payment plan when you generate installments.
+                                </div>
                                 <field name="payment_term" readonly="1" force_save="1" />
                                 <field name="ask_price" required="1" readonly="stage != 'booked'" force_save="1" />
                                 <field name="sale_price" required="1" force_save="1" readonly="1" />
@@ -227,12 +233,7 @@
                                     <tree editable="bottom" delete="false" create="false">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name" required="1" readonly="1" force_save="1" />
-                                        <field name="invoice_type" string="Type" widget="badge" 
-                                               decoration-info="invoice_type == 'booking'"
-                                               decoration-warning="invoice_type in ['dld_fee', 'admin_fee']"
-                                               decoration-success="invoice_type == 'installment'"
-                                               decoration-primary="invoice_type == 'handover'"
-                                               optional="show"/>
+                                        <field name="invoice_type" string="Type" widget="badge" decoration-info="invoice_type == 'booking'" decoration-warning="invoice_type in ['dld_fee', 'admin_fee']" decoration-success="invoice_type == 'installment'" decoration-primary="invoice_type == 'handover'" optional="show"/>
                                         <field name="desc" readonly="invoice_id" force_save="1" optional="hide" />
                                         <field name="invoice_date" required="1" readonly="invoice_id" force_save="1" />
                                         <field name="amount" required="1" readonly="1" force_save="1" />

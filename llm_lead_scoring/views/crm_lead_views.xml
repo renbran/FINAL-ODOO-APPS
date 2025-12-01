@@ -38,12 +38,12 @@
                         <field name="ai_enrichment_report" readonly="1" nolabel="1" colspan="2"/>
                     </group>
 
-                    <group string="AI Analysis Summary">
-                        <field name="ai_analysis_summary" readonly="1" nolabel="1" placeholder="Run AI enrichment to see analysis..."/>
+                    <group string="AI Analysis Summary" invisible="ai_enrichment_report" colspan="2">
+                        <field name="ai_analysis_summary" readonly="1" nolabel="1" placeholder="Run AI enrichment to see analysis..." colspan="2"/>
                     </group>
 
-                    <group string="Raw Enrichment Data (JSON)">
-                        <field name="ai_enrichment_data" readonly="1" nolabel="1"/>
+                    <group string="Raw Enrichment Data (JSON)" invisible="not ai_enrichment_data" colspan="2">
+                        <field name="ai_enrichment_data" readonly="1" nolabel="1" colspan="2"/>
                     </group>
                 </page>
             </xpath>
@@ -100,7 +100,7 @@ action = {
 }
         </field>
     </record>
-    
+
     <!-- Action to regenerate reports for selected leads -->
     <record id="action_regenerate_reports" model="ir.actions.server">
         <field name="name">Regenerate AI Reports</field>

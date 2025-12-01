@@ -52,6 +52,30 @@
                             </div>
                         </setting>
                     </block>
+                    <block title="Enhanced Research (Google Maps &amp; Digital Presence)">
+                        <div class="alert alert-warning">
+                            <strong>📍 Google Maps Integration</strong>
+                            <br/>
+                            Requires Google Maps Places API key. Provides business ratings, reviews, address verification.
+                            <br/>
+                            <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank">Enable Places API</a>
+                        </div>
+                        <setting string="Enable Google Maps Lookup" help="Look up business details from Google Maps (ratings, reviews, address)">
+                            <field name="enable_maps_research" widget="boolean_toggle"/>
+                        </setting>
+                        <setting string="Google Maps API Key" invisible="not enable_maps_research">
+                            <field name="google_maps_api_key" password="True" placeholder="AIzaSy..."/>
+                            <div class="text-muted">
+                                Get API key: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>
+                            </div>
+                        </setting>
+                        <setting string="Enable Tech Stack Analysis" help="Analyze company website for CMS, analytics, marketing tools">
+                            <field name="enable_tech_analysis" widget="boolean_toggle"/>
+                        </setting>
+                        <setting string="Enable Digital Presence Check" help="Check company presence on LinkedIn, Facebook, and other platforms">
+                            <field name="enable_digital_presence" widget="boolean_toggle"/>
+                        </setting>
+                    </block>
                     <block title="LLM Configuration">
                         <setting string="Default LLM Provider" help="Select the default LLM provider for lead scoring">
                             <field name="llm_provider_id" placeholder="Select LLM Provider..." context="{'form_view_ref': 'llm_lead_scoring.view_llm_provider_form'}"/>
