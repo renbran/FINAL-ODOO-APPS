@@ -144,6 +144,11 @@
     ],
     "assets": {
         "web.assets_backend": [
+            # CRITICAL: Load DOM protection FIRST to prevent querySelector errors
+            ('prepend', "rental_management/static/src/js/global_dom_protection.js"),
+            ('prepend', "rental_management/static/src/js/list_renderer_fix.js"),
+            
+            # Then load regular assets
             "rental_management/static/src/css/style.css",
             "rental_management/static/src/css/lib/image-uploader.min.css",
             "rental_management/static/src/js/lib/image-uploader.min.js",
