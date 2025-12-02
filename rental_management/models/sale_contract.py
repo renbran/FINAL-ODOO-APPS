@@ -304,6 +304,55 @@ class PropertyVendor(models.Model):
 
     maintenance_request_count = fields.Integer(string="Maintenance Request Count",
                                                compute="_compute_maintenance_request_count")
+    
+    # Smart Button Counts for Invoice Tracking
+    booking_invoice_count = fields.Integer(
+        string='Booking Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of booking-related invoices (booking + DLD + admin)')
+    installment_invoice_count = fields.Integer(
+        string='Installment Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of installment invoices')
+    total_invoice_count = fields.Integer(
+        string='Total Invoices',
+        compute='_compute_invoice_counts',
+        help='Total number of all invoices')
+    created_invoice_count = fields.Integer(
+        string='Created Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of invoices that have been created in accounting')
+    paid_invoice_count = fields.Integer(
+        string='Paid Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of fully paid invoices')
+    
+    # Payment Progress Statistics
+    installment_progress_percentage = fields.Float(
+        string='Installment Payment Progress',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Percentage of installment payments completed (excluding booking fees)')
+    overall_payment_percentage = fields.Float(
+        string='Overall Payment Progress',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Total payment progress including all fees and installments')
+    total_invoiced_amount = fields.Monetary(
+        string='Total Invoiced',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Sum of all invoice amounts')
+    total_paid_to_date = fields.Monetary(
+        string='Total Paid to Date',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Sum of all payments received')
+    total_outstanding = fields.Monetary(
+        string='Total Outstanding',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Remaining amount to be paid')
 
     # DEPRECATED START---------------------------------------------------
     sold_invoice_id = fields.Many2one('account.move',
@@ -572,6 +621,74 @@ class PropertyVendor(models.Model):
             self.use_schedule = False
     
     # Booking Requirements Check
+    @api.depends('sale_invoice_ids', 'sale_invoice_ids.invoice_type', 
+                 'sale_invoice_ids.invoice_created', 'sale_invoice_ids.payment_status')
+    def _compute_invoice_counts(self):
+        """Compute invoice counts for smart buttons"""
+        for rec in self:
+            all_invoices = rec.sale_invoice_ids
+            
+            # Booking-related invoices (booking + DLD + admin)
+            booking_related = all_invoices.filtered(
+                lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+            )
+            rec.booking_invoice_count = len(booking_related)
+            
+            # Installment invoices
+            installment_invoices = all_invoices.filtered(
+                lambda inv: inv.invoice_type == 'installment'
+            )
+            rec.installment_invoice_count = len(installment_invoices)
+            
+            # Total invoices
+            rec.total_invoice_count = len(all_invoices)
+            
+            # Created invoices (have account.move record)
+            rec.created_invoice_count = len(
+                all_invoices.filtered(lambda inv: inv.invoice_created and inv.invoice_id)
+            )
+            
+            # Paid invoices
+            rec.paid_invoice_count = len(
+                all_invoices.filtered(lambda inv: inv.payment_status == 'paid')
+            )
+    
+    @api.depends('sale_invoice_ids', 'sale_invoice_ids.amount', 
+                 'sale_invoice_ids.paid_amount', 'sale_invoice_ids.payment_status',
+                 'sale_invoice_ids.invoice_type', 'payable_amount')
+    def _compute_payment_progress_stats(self):
+        """Compute payment progress statistics for visualization"""
+        for rec in self:
+            all_invoices = rec.sale_invoice_ids
+            
+            # Calculate totals
+            total_amount = sum(all_invoices.mapped('amount'))
+            total_paid = sum(all_invoices.filtered(
+                lambda inv: inv.invoice_created
+            ).mapped('paid_amount'))
+            
+            rec.total_invoiced_amount = total_amount
+            rec.total_paid_to_date = total_paid
+            rec.total_outstanding = total_amount - total_paid
+            
+            # Overall payment percentage
+            rec.overall_payment_percentage = (
+                (total_paid / total_amount * 100) if total_amount > 0 else 0.0
+            )
+            
+            # Installment-only progress (excluding booking fees)
+            installment_invoices = all_invoices.filtered(
+                lambda inv: inv.invoice_type == 'installment'
+            )
+            installment_total = sum(installment_invoices.mapped('amount'))
+            installment_paid = sum(installment_invoices.filtered(
+                lambda inv: inv.invoice_created
+            ).mapped('paid_amount'))
+            
+            rec.installment_progress_percentage = (
+                (installment_paid / installment_total * 100) if installment_total > 0 else 0.0
+            )
+    
     @api.depends('sale_invoice_ids', 'sale_invoice_ids.invoice_created', 
                  'sale_invoice_ids.payment_status', 'sale_invoice_ids.invoice_type',
                  'stage', 'dld_fee', 'admin_fee', 'book_price')
@@ -864,6 +981,145 @@ class PropertyVendor(models.Model):
                 'sticky': True,
                 'next': {'type': 'ir.actions.act_window_close'},
             }
+        }
+    
+    def action_view_booking_invoices(self):
+        """Smart button action to view booking-related invoices"""
+        self.ensure_one()
+        booking_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+        )
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Booking Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', booking_invoices.ids)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_installment_invoices(self):
+        """Smart button action to view installment invoices"""
+        self.ensure_one()
+        installment_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type == 'installment'
+        )
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Installment Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', installment_invoices.ids)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_all_invoices(self):
+        """Smart button action to view all invoices"""
+        self.ensure_one()
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('All Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('property_sold_id', '=', self.id)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_accounting_invoices(self):
+        """Smart button action to view created accounting invoices"""
+        self.ensure_one()
+        created_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_created and inv.invoice_id
+        )
+        invoice_ids = created_invoices.mapped('invoice_id').ids
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Accounting Invoices'),
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', invoice_ids)],
+            'context': {'default_partner_id': self.customer_id.id},
+        }
+    
+    def action_create_booking_invoices_button(self):
+        """Button action to create booking invoices with validation"""
+        self.ensure_one()
+        
+        # Check if booking invoices already exist
+        existing_booking = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+        )
+        
+        if existing_booking:
+            raise UserError(_(
+                "Booking invoices already exist!\n\n"
+                "Found %d existing booking-related invoice(s).\n"
+                "Please delete them first if you need to regenerate."
+            ) % len(existing_booking))
+        
+        return self.action_generate_booking_invoices()
+    
+    def action_create_installments_from_booking(self):
+        """
+        Create remaining installment invoices after booking requirements are met.
+        This is triggered after all booking payments (booking + DLD + admin) are paid.
+        """
+        self.ensure_one()
+        
+        # Validate booking requirements
+        if not self.booking_requirements_met:
+            raise UserError(_(
+                "Cannot create installments yet!\n\n"
+                "Booking requirements must be fully paid first:\n"
+                "• Booking Payment: %s\n"
+                "• DLD Fee: %s\n"
+                "• Admin Fee: %s\n\n"
+                "Current progress: %.0f%%"
+            ) % (
+                '✓ Paid' if self.booking_invoice_paid else '✗ Unpaid',
+                '✓ Paid' if self.dld_invoice_paid else '✗ Unpaid',
+                '✓ Paid' if self.admin_invoice_paid else '✗ Unpaid',
+                self.booking_payment_progress
+            ))
+        
+        if self.stage != 'booked':
+            raise UserError(_(
+                "Contract must be in 'Booked' stage to create installments.\n\n"
+                "Current stage: %s\n"
+                "Please confirm booking payment completion first."
+            ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        # Check if installments already exist
+        existing_installments = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type == 'installment'
+        )
+        
+        if existing_installments:
+            raise UserError(_(
+                "Installment invoices already exist!\n\n"
+                "Found %d existing installment invoice(s).\n"
+                "Please delete them first if you need to regenerate."
+            ) % len(existing_installments))
+        
+        # If payment schedule is configured, use it
+        if self.use_schedule and self.payment_schedule_id:
+            return self.action_generate_from_schedule()
+        
+        # Otherwise, open manual installment creation wizard
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Create Installments'),
+            'res_model': 'property.vendor.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_property_sold_id': self.id,
+                'default_customer_id': self.customer_id.id,
+            },
         }
     
     def action_confirm_booking_paid(self):

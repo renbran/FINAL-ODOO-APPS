@@ -30,11 +30,25 @@
         - Property-level override for custom booking requirements
         - Support for different booking percentages per project (5%, 10%, 15%, 20%, etc.)
         - Enhanced UI with booking configuration sections
+        
+        Version 3.5.0 Updates (Invoice Tracking Enhancement):
+        - 6 Smart Buttons for instant invoice tracking (Booking, Installments, All, Created, Paid, Maintenance)
+        - Visual Payment Progress Dashboard with real-time statistics
+        - Booking Requirements Monitoring with completion indicators
+        - Guided Workflow for booking to installment creation
+        - Payment Progress Charts showing percentage completion
+        - Automated Validation preventing workflow errors
+        - One-Click Invoice Creation for booking fees, DLD, and admin fees
+        - Color-coded invoice tree view (Green=Paid, Orange=Partial, Gray=Not Created)
+        - Enhanced header buttons organized by workflow phase
+        - Getting Started guide for new users
+        - Comprehensive documentation (3 detailed guides)
+        - 100% backward compatible with v3.4.x
     """,
     "summary": """
-        Property Sale & Rental Management with Two-Stage Payment Workflow, Configurable Booking Percentage, Professional SPA Reports, and Bank Account Integration
+        Property Sale & Rental Management with Enhanced Invoice Tracking, Visual Payment Dashboard, Smart Buttons, and Professional SPA Reports
     """,
-    "version": "3.4.2",
+    "version": "3.5.0",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",

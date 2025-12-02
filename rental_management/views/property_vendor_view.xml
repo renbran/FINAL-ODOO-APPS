@@ -8,26 +8,128 @@
                 <form create="false">
                     <header>
                         <field name="stage" widget="statusbar" statusbar_visible="booked" nolabel="1" />
-                        <button name="action_refund_amount" type="object" string="Refund" icon="fa-undo" class="btn btn-outline-dark" invisible="stage not in ['booked'] or sale_invoice_ids" confirm="Are you sure you want to cancel your booking and receive a refund ?" />
-                        <button name="%(property_vendor_wizard_action)d" type="action" icon="fa-plus" string="Create Installments" class="btn btn-primary" invisible="stage not in ['booked'] or sale_invoice_ids" />
-                        <button name="action_generate_from_schedule" type="object" string="⚡ Generate from Schedule" class="btn btn-success" icon="fa-bolt" invisible="stage != 'booked' or not payment_schedule_id or sale_invoice_ids" confirm="This will generate invoices based on the payment schedule. Continue?" />
-                        <button name="action_reset_installments" type="object" icon="fa-refresh" string="Reset Installments" class="btn btn-outline-danger" invisible="stage not in ['booked'] or not sale_invoice_ids" />
-                        <button name="action_confirm_sale" type="object" string="Confirm Sale" class="btn btn-info" icon="fa-chevron-circle-right" invisible="stage not in ['booked'] or not sale_invoice_ids" />
+                        
+                        <!-- PHASE 1: Draft Stage - Create Booking Invoices -->
+                        <button name="action_create_booking_invoices_button" type="object" string="📋 Create Booking Invoices" class="btn btn-primary" icon="fa-file-text-o" invisible="stage != 'draft' or booking_invoice_count > 0" help="Create booking payment, DLD fee, and admin fee invoices"/>
+                        
+                        <!-- PHASE 2: After Booking Invoices Created - Monitor Payment -->
+                        <div class="alert alert-warning" role="alert" invisible="not (stage == 'draft' and booking_invoice_count > 0 and not booking_requirements_met)" style="margin: 10px;">
+                            <strong>⏳ Awaiting Booking Payments</strong><br/>
+                            Progress: <field name="booking_payment_progress" widget="progressbar" style="display: inline-block; width: 150px; margin-left: 5px;"/> 
+                            <field name="booking_payment_progress" invisible="1"/>
+                            <br/>
+                            <span invisible="booking_invoice_paid">• Booking Payment: Pending</span>
+                            <span invisible="not booking_invoice_paid" style="color: green;">✓ Booking Payment: Paid</span><br/>
+                            <span invisible="dld_invoice_paid">• DLD Fee: Pending</span>
+                            <span invisible="not dld_invoice_paid" style="color: green;">✓ DLD Fee: Paid</span><br/>
+                            <span invisible="admin_invoice_paid">• Admin Fee: Pending</span>
+                            <span invisible="not admin_invoice_paid" style="color: green;">✓ Admin Fee: Paid</span>
+                        </div>
+                        <button name="action_confirm_booking_paid" type="object" string="✓ Confirm Booking Complete" class="btn btn-success" icon="fa-check" invisible="not (stage == 'draft' and booking_requirements_met)" confirm="All booking requirements have been paid. Proceed to 'Booked' stage to create installment plan?"/>
+                        
+                        <!-- PHASE 3: Booked Stage - Create Installments -->
+                        <button name="action_create_installments_from_booking" type="object" icon="fa-plus-circle" string="💰 Create Installment Plan" class="btn btn-primary" invisible="not (stage == 'booked' and installment_invoice_count == 0)" help="Generate remaining installment invoices after booking completion"/>
+                        <button name="%(property_vendor_wizard_action)d" type="action" icon="fa-edit" string="📝 Manual Installments" class="btn btn-outline-primary" invisible="not (stage == 'booked' and installment_invoice_count == 0)" help="Create installments manually without schedule"/>
+                        <button name="action_generate_from_schedule" type="object" string="⚡ Generate from Schedule" class="btn btn-success" icon="fa-bolt" invisible="not (stage == 'booked' and payment_schedule_id and installment_invoice_count == 0)" confirm="This will generate invoices based on the payment schedule. Continue?"/>
+                        
+                        <!-- Invoice Management -->
+                        <button name="action_reset_installments" type="object" icon="fa-refresh" string="Reset Installments" class="btn btn-outline-danger" invisible="stage not in ['booked'] or installment_invoice_count == 0" confirm="This will delete all existing invoices. Continue?"/>
+                        
+                        <!-- Sale Confirmation -->
+                        <button name="action_confirm_sale" type="object" string="Confirm Sale" class="btn btn-info" icon="fa-chevron-circle-right" invisible="stage not in ['booked'] or not sale_invoice_ids"/>
+                        
+                        <!-- Reports -->
                         <button name="%(rental_management.action_report_sales_offer)d" type="action" string="Print Sales Offer" icon="fa-file-text-o" class="btn btn-primary" invisible="stage not in ['booked', 'sold', 'locked']"/>
                         <button name="%(rental_management.action_report_sales_purchase_agreement)d" type="action" string="Print SPA" icon="fa-print" class="btn btn-success" invisible="stage not in ['booked', 'sold', 'locked']"/>
-                        <button name="%(maintenance_wizard_action)d" type='action' context="{'is_selling_contract_maintenance': True}" icon="fa-wrench" string="Maintenance Request" class="btn btn-warning" invisible="stage not in ['sold', 'locked']" />
-                        <button name="action_cancel_contract" type="object" string="Cancel" class="btn btn-danger" icon="fa-times" invisible="stage in ['locked','cancel']" confirm="Are you sure you want to cancel your contract?" />
-                        <button name="action_locked_contract" type="object" string="Locked" icon="fa-lock" class="btn btn-danger" invisible="stage != 'sold'" confirm="Are you sure? , After lock contract can not able to cancel." />
+                        
+                        <!-- Maintenance & Contract Actions -->
+                        <button name="%(maintenance_wizard_action)d" type='action' context="{'is_selling_contract_maintenance': True}" icon="fa-wrench" string="Maintenance Request" class="btn btn-warning" invisible="stage not in ['sold', 'locked']"/>
+                        <button name="action_refund_amount" type="object" string="Refund" icon="fa-undo" class="btn btn-outline-dark" invisible="stage not in ['draft', 'booked']" confirm="Are you sure you want to cancel your booking and receive a refund?"/>
+                        <button name="action_cancel_contract" type="object" string="Cancel" class="btn btn-danger" icon="fa-times" invisible="stage in ['locked','cancel']" confirm="Are you sure you want to cancel your contract?"/>
+                        <button name="action_locked_contract" type="object" string="Locked" icon="fa-lock" class="btn btn-danger" invisible="stage != 'sold'" confirm="Are you sure? After lock contract can not able to cancel."/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="action_view_booking_invoices" icon="fa-money">
+                                <field name="booking_invoice_count" string="Booking" widget="statinfo" />
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_view_installment_invoices" icon="fa-calendar-check-o">
+                                <field name="installment_invoice_count" string="Installments" widget="statinfo" />
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_view_all_invoices" icon="fa-file-text-o">
+                                <field name="total_invoice_count" string="All Invoices" widget="statinfo" />
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_view_accounting_invoices" icon="fa-book" invisible="created_invoice_count == 0">
+                                <field name="created_invoice_count" string="Created" widget="statinfo" />
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_view_accounting_invoices" icon="fa-check-circle" decoration-success="paid_invoice_count > 0">
+                                <field name="paid_invoice_count" string="Paid" widget="statinfo" />
+                            </button>
                             <button class="oe_stat_button" type="object" name="action_maintenance_request" icon="fa-wrench">
-                                <field name="maintenance_request_count" string="Maintenances" widget="statinfo" />
+                                <field name="maintenance_request_count" string="Maintenance" widget="statinfo" />
                             </button>
                         </div>
                         <h1>
                             <field name="sold_seq" />
                         </h1>
+                        
+                        <!-- Payment Progress Dashboard -->
+                        <div class="alert alert-info" role="alert" invisible="total_invoice_count == 0" style="margin: 20px 0;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4 style="margin-top: 0;">💰 Payment Progress Overview</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Overall Progress:</strong>
+                                    <field name="overall_payment_percentage" widget="progressbar"/>
+                                    <div style="margin-top: 10px;">
+                                        <span style="font-size: 0.9em;">
+                                            <strong>Paid:</strong> <field name="total_paid_to_date" widget="monetary" nolabel="1" readonly="1" style="display: inline;"/> / 
+                                            <field name="total_invoiced_amount" widget="monetary" nolabel="1" readonly="1" style="display: inline;"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Installment Progress:</strong>
+                                    <field name="installment_progress_percentage" widget="progressbar"/>
+                                    <div style="margin-top: 10px;">
+                                        <span style="font-size: 0.9em;">
+                                            <strong>Outstanding:</strong> <field name="total_outstanding" widget="monetary" nolabel="1" readonly="1" style="display: inline; color: #d9534f;"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-3 text-center">
+                                    <div style="font-size: 1.5em; color: #5bc0de;">
+                                        <field name="total_invoice_count" nolabel="1" readonly="1"/>
+                                    </div>
+                                    <small>Total Invoices</small>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div style="font-size: 1.5em; color: #f0ad4e;">
+                                        <field name="created_invoice_count" nolabel="1" readonly="1"/>
+                                    </div>
+                                    <small>Created</small>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div style="font-size: 1.5em; color: #5cb85c;">
+                                        <field name="paid_invoice_count" nolabel="1" readonly="1"/>
+                                    </div>
+                                    <small>Paid</small>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div style="font-size: 1.5em; color: #d9534f;">
+                                        <field name="currency_id" invisible="1"/>
+                                        <span><field name="total_invoice_count" nolabel="1" readonly="1"/> - <field name="paid_invoice_count" nolabel="1" readonly="1"/></span>
+                                    </div>
+                                    <small>Pending</small>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <br />
                         <group string="Selling Details">
                             <group>
@@ -35,6 +137,14 @@
                                 <field name="currency_id" invisible="1" />
                                 <field name="file_name" invisible="1" />
                                 <field name="sold_document" filename="file_name" widget="binary" string="Sold Contract" force_save="1" />
+                                <!-- Invisible fields for computed values -->
+                                <field name="booking_requirements_met" invisible="1"/>
+                                <field name="booking_invoice_paid" invisible="1"/>
+                                <field name="dld_invoice_paid" invisible="1"/>
+                                <field name="admin_invoice_paid" invisible="1"/>
+                                <field name="can_create_installments" invisible="1"/>
+                                <field name="booking_invoice_count" invisible="1"/>
+                                <field name="installment_invoice_count" invisible="1"/>
                             </group>
                             <group>
                                 <field name="company_id" />
@@ -181,6 +291,46 @@
                                 <field name="payable_amount" />
                             </group>
                         </group>
+                        <group string="💳 Booking Requirements Status" invisible="booking_invoice_count == 0">
+                            <group>
+                                <label for="booking_invoice_paid" string="Booking Payment"/>
+                                <div>
+                                    <field name="booking_invoice_paid" widget="boolean" nolabel="1" readonly="1" style="pointer-events: none;"/>
+                                    <span invisible="not booking_invoice_paid" style="color: green; margin-left: 10px;">✓ Paid</span>
+                                    <span invisible="booking_invoice_paid" style="color: red; margin-left: 10px;">✗ Pending</span>
+                                    <span style="margin-left: 10px;">(<field name="book_price" widget="monetary" nolabel="1" readonly="1" style="display: inline;"/>)</span>
+                                </div>
+                                <label for="dld_invoice_paid" string="DLD Fee"/>
+                                <div>
+                                    <field name="dld_invoice_paid" widget="boolean" nolabel="1" readonly="1" style="pointer-events: none;"/>
+                                    <span invisible="not dld_invoice_paid" style="color: green; margin-left: 10px;">✓ Paid</span>
+                                    <span invisible="dld_invoice_paid" style="color: red; margin-left: 10px;">✗ Pending</span>
+                                    <span style="margin-left: 10px;">(<field name="dld_fee" widget="monetary" nolabel="1" readonly="1" style="display: inline;"/>)</span>
+                                </div>
+                                <label for="admin_invoice_paid" string="Admin Fee"/>
+                                <div>
+                                    <field name="admin_invoice_paid" widget="boolean" nolabel="1" readonly="1" style="pointer-events: none;"/>
+                                    <span invisible="not admin_invoice_paid" style="color: green; margin-left: 10px;">✓ Paid</span>
+                                    <span invisible="admin_invoice_paid" style="color: red; margin-left: 10px;">✗ Pending</span>
+                                    <span style="margin-left: 10px;">(<field name="admin_fee" widget="monetary" nolabel="1" readonly="1" style="display: inline;"/>)</span>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="booking_payment_progress" string="Completion Status"/>
+                                <div>
+                                    <field name="booking_payment_progress" widget="progressbar" nolabel="1" readonly="1"/>
+                                    <div class="mt-2">
+                                        <span invisible="not can_create_installments" style="color: green; font-weight: bold;">
+                                            ✓ Ready to create installment plan
+                                        </span>
+                                        <span invisible="can_create_installments" style="color: orange;">
+                                            ⏳ Waiting for booking payments completion
+                                        </span>
+                                    </div>
+                                </div>
+                            </group>
+                        </group>
+                        
                         <group string="DLD &amp; Admin Fees Configuration">
                             <group string="Booking Payment">
                                 <field name="booking_type" readonly="stage != 'booked'" force_save="1"/>
@@ -205,11 +355,23 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Invoices" name="sold_invoice" invisible="not sale_invoice_ids">
-                                <div class="row">
+                            <page string="📋 Invoices &amp; Payments" name="sold_invoice">
+                                <div class="alert alert-success" role="alert" invisible="total_invoice_count > 0" style="margin-bottom: 15px;">
+                                    <h4>🚀 Getting Started</h4>
+                                    <p>No invoices created yet. Follow these steps:</p>
+                                    <ol>
+                                        <li><strong>Create Booking Invoices:</strong> Click "Create Booking Invoices" button above to generate booking, DLD, and admin fee invoices.</li>
+                                        <li><strong>Wait for Payment:</strong> Monitor payment status until all booking requirements are paid.</li>
+                                        <li><strong>Create Installments:</strong> Once booking is complete, click "Create Installment Plan" to generate remaining payment schedule.</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="row" invisible="not sale_invoice_ids">
                                     <div class="col-12">
                                         <field name="remain_check" invisible="1" />
                                         <button name="action_receive_remaining" type="object" confirm="Are you sure? After this action can not able to regenerate or reset installment." string="Receive Remaining Payment" class="btn btn-primary" invisible="remain_check or stage != 'sold'" />
+                                        <button name="action_view_booking_invoices" type="object" string="📋 View Booking Invoices" class="btn btn-info" invisible="booking_invoice_count == 0" style="margin-left: 5px;"/>
+                                        <button name="action_view_installment_invoices" type="object" string="📅 View Installments" class="btn btn-info" invisible="installment_invoice_count == 0" style="margin-left: 5px;"/>
                                     </div>
                                 </div>
                                 <br />
@@ -230,7 +392,7 @@
                                             </group>
                                         </group>
                                     </form>
-                                    <tree editable="bottom" delete="false" create="false">
+                                    <tree editable="bottom" delete="false" create="false" decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'partial'" decoration-muted="not invoice_created">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name" required="1" readonly="1" force_save="1" />
                                         <field name="invoice_type" string="Type" widget="badge" decoration-info="invoice_type == 'booking'" decoration-warning="invoice_type in ['dld_fee', 'admin_fee']" decoration-success="invoice_type == 'installment'" decoration-primary="invoice_type == 'handover'" optional="show"/>
@@ -240,13 +402,14 @@
                                         <field name="tax_ids" widget="many2many_tags" readonly="invoice_id" force_save="1" />
                                         <field name="tax_amount" optional="hide" />
                                         <field name="total_amount" string="Total Amount" help="Taxed" optional="hide" invisible="not invoice_id" />
-                                        <field name="paid_amount" string="Paid Amount" optional="hide" invisible="not invoice_id" />
-                                        <field name="remaining_amount" string="Due Amount" optional="hide" invisible="not invoice_id" />
+                                        <field name="paid_amount" string="Paid Amount" optional="show" invisible="not invoice_id" />
+                                        <field name="remaining_amount" string="Due Amount" optional="show" invisible="not invoice_id" />
+                                        <field name="payment_status" string="Status" widget="badge" decoration-success="payment_status=='paid'" decoration-danger="payment_status=='unpaid'" decoration-warning="payment_status=='partial'" optional="show"/>
                                         <field name="currency_id" column_invisible="1" />
                                         <field name="invoice_created" column_invisible="1" />
-                                        <field name="invoice_id" readonly="1" force_save="1" widget="many2onebutton" />
-                                        <field name="payment_state" widget="badge" decoration-success="payment_state=='paid'" decoration-danger="payment_state=='not_paid'" decoration-info="payment_state=='in_payment'" decoration-primary="payment_state=='partial'" decoration-warning="payment_state=='reversed'" />
-                                        <button name="action_create_invoice" type="object" string="Create Invoice" class="btn btn-info" column_invisible="parent.stage != 'sold'" invisible="invoice_created" />
+                                        <field name="invoice_id" readonly="1" force_save="1" widget="many2onebutton" optional="show"/>
+                                        <field name="payment_state" widget="badge" decoration-success="payment_state=='paid'" decoration-danger="payment_state=='not_paid'" decoration-info="payment_state=='in_payment'" decoration-primary="payment_state=='partial'" decoration-warning="payment_state=='reversed'" optional="hide"/>
+                                        <button name="action_create_invoice" type="object" string="📋 Create Invoice" title="Create accounting invoice for this payment" class="btn btn-primary" column_invisible="parent.stage not in ['booked', 'sold']" invisible="invoice_created" icon="fa-file-text-o"/>
                                     </tree>
                                 </field>
                                 <group class="oe_subtotal_footer oe_right" string="Calculation" style="text-align: right">
