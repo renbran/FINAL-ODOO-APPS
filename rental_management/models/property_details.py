@@ -290,6 +290,27 @@ class PropertyDetails(models.Model):
     vendor_count = fields.Integer(
         string="Sell Count", compute='_compute_booking_count')
 
+    # Booking Configuration (for sale properties)
+    use_project_booking = fields.Boolean(
+        string='Use Project Booking %',
+        default=True,
+        help='If checked, inherits booking percentage from project. Uncheck to set custom percentage for this property.')
+    booking_percentage = fields.Float(
+        string='Booking Percentage',
+        compute='_compute_booking_percentage',
+        store=True,
+        help='Booking percentage for this property. Either inherited from project or set manually.')
+    custom_booking_percentage = fields.Float(
+        string='Custom Booking %',
+        help='Custom booking percentage for this property (only used when "Use Project Booking" is unchecked)')
+    booking_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Booking Type',
+       compute='_compute_booking_type',
+       store=True,
+       help='How booking amount is calculated (inherited from project or set manually)')
+
     # DEPRECATED START--------------------------------------------------------------------------------------------------
     # Pricing
     token_amount = fields.Monetary(string='Book Price')
@@ -525,6 +546,32 @@ class PropertyDetails(models.Model):
                     amount = amount + data.price
             rec.extra_service_cost = amount
 
+    # Booking Configuration Compute Methods
+    @api.depends('property_project_id', 'property_project_id.booking_percentage',
+                 'use_project_booking', 'custom_booking_percentage')
+    def _compute_booking_percentage(self):
+        """Compute booking percentage with inheritance from project."""
+        for rec in self:
+            if rec.use_project_booking and rec.property_project_id:
+                # Inherit from project
+                rec.booking_percentage = rec.property_project_id.booking_percentage or 10.0
+            elif rec.custom_booking_percentage > 0:
+                # Use custom value
+                rec.booking_percentage = rec.custom_booking_percentage
+            else:
+                # Default fallback
+                rec.booking_percentage = 10.0
+
+    @api.depends('property_project_id', 'property_project_id.booking_type',
+                 'use_project_booking')
+    def _compute_booking_type(self):
+        """Compute booking type with inheritance from project."""
+        for rec in self:
+            if rec.use_project_booking and rec.property_project_id:
+                rec.booking_type = rec.property_project_id.booking_type or 'percentage'
+            else:
+                rec.booking_type = 'percentage'
+
     # Counts
     # Document Count
     def _compute_document_count(self):
@@ -532,6 +579,27 @@ class PropertyDetails(models.Model):
             document_count = self.env['property.documents'].search_count(
                 [('property_id', '=', rec.id)])
             rec.document_count = document_count
+
+    # Booking Configuration Compute Methods
+    @api.depends('property_project_id', 'property_project_id.booking_percentage',
+                 'use_project_booking', 'custom_booking_percentage')
+    def _compute_booking_percentage(self):
+        for rec in self:
+            if rec.use_project_booking and rec.property_project_id:
+                rec.booking_percentage = rec.property_project_id.booking_percentage or 10.0
+            elif rec.custom_booking_percentage > 0:
+                rec.booking_percentage = rec.custom_booking_percentage
+            else:
+                rec.booking_percentage = 10.0
+
+    @api.depends('property_project_id', 'property_project_id.booking_type',
+                 'use_project_booking')
+    def _compute_booking_type(self):
+        for rec in self:
+            if rec.use_project_booking and rec.property_project_id:
+                rec.booking_type = rec.property_project_id.booking_type or 'percentage'
+            else:
+                rec.booking_type = 'percentage'
 
     # Booking Count
     def _compute_booking_count(self):

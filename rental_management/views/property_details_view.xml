@@ -235,6 +235,39 @@
                                         <field name="admin_fee" invisible="sale_lease != 'for_sale'" readonly="stage not in ['draft','available']" help="Administrative processing fee (configurable)"/>
                                         <field name="total_customer_obligation" invisible="sale_lease != 'for_sale'" readonly="1" force_save="1" widget="monetary" class="text-success fw-bold" help="Total amount = Property Price + DLD Fee + Admin Fee"/>
                                         <!-- total_customer_obligation: Computed field = price + dld_fee + admin_fee (displayed in Sales Offer report) -->
+                                    </group>
+                                    <group string="Booking Configuration" invisible="sale_lease != 'for_sale'">
+                                        <field name="use_project_booking" readonly="stage not in ['draft','available']" 
+                                            invisible="not property_project_id" 
+                                            help="Inherit booking percentage from project"/>
+                                        <label for="booking_percentage" string="Booking Percentage"/>
+                                        <div>
+                                            <field name="booking_percentage" 
+                                                readonly="1" 
+                                                force_save="1"
+                                                class="oe_inline fw-bold"/>
+                                            <span class="oe_inline"> %</span>
+                                        </div>
+                                        <label for="custom_booking_percentage" string="Custom Booking %" invisible="use_project_booking"/>
+                                        <div invisible="use_project_booking">
+                                            <field name="custom_booking_percentage" 
+                                                readonly="stage not in ['draft','available']"
+                                                class="oe_inline"
+                                                placeholder="e.g., 10"
+                                                help="Enter percentage value (e.g., 10 for 10%, 15 for 15%)"/>
+                                            <span class="oe_inline"> %</span>
+                                        </div>
+                                        <div class="alert alert-info" role="alert" style="margin: 0;" invisible="not property_project_id">
+                                            <i class="fa fa-info-circle"/> 
+                                            <span invisible="not use_project_booking">
+                                                Currently inheriting from project. Uncheck "Use Project Booking %" above to set a custom percentage for this property only.
+                                            </span>
+                                            <span invisible="use_project_booking">
+                                                Using custom booking percentage for this property. Check "Use Project Booking %" above to inherit from project instead.
+                                            </span>
+                                        </div>
+                                    </group>
+                                    <group>
                                         <field name="is_payment_plan" readonly="stage not in ['draft','available']" help="Enable to define payment schedules for this property"/>
                                         <field name="payment_schedule_id" invisible="sale_lease != 'for_sale' or not is_payment_plan" readonly="stage not in ['draft','available']" options="{'no_create': True, 'no_open': True}" help="Payment schedule for Sales Offers"/>
                                         <field name="rental_payment_schedule_id" invisible="sale_lease != 'for_tenancy' or not is_payment_plan" readonly="stage not in ['draft','available']" options="{'no_create': True, 'no_open': True}" help="Payment schedule for Rental Contracts - installments will be generated based on this plan"/>

@@ -21,7 +21,9 @@
                             <field name="property_id" readonly="1" force_save="1" />
                         </group>
                         <group>
-                            <field name="price" />
+                            <field name="price" string="Base Sale Price"/>
+                            <field name="dld_fee" readonly="1"/>
+                            <field name="admin_fee" readonly="1"/>
                         </group>
                     </group>
                     <group>
@@ -30,8 +32,9 @@
                                 options="{'no_quick_create':True,'no_create_edit':True}" />
                         </group>
                         <group string="Customer Pricing">
-                            <field name="book_price" />
-                            <field name="ask_price" required="1" />
+                            <field name="book_price" string="Advance Payment"/>
+                            <field name="ask_price" required="1" string="Total Customer Price" 
+                                   help="This includes: Base Sale Price + DLD Fee (4%) + Admin Fee"/>
                         </group>
                     </group>
                     <group string="Broker Details">

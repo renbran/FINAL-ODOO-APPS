@@ -4,19 +4,37 @@
 {
     "name": "Advanced Property Sale & Rental Management | Real Estate | Property Sales | Property Rental | Property Management",
     "description": """
-        - Property Sale
-        - Property Rental
-        - Lease Contract
-        - Landlord Management
-        - Customer Management
+        Property Sale & Rental Management System
+        
+        Key Features:
+        - Property Sale & Rental Management
+        - Lease Contract Management
+        - Landlord & Customer Management
         - Property Maintenance
         - Customer Recurring Invoice
-        - Property List
+        - Flexible Payment Plans with Templates
+        - Professional SPA Reports
+        - Bank Account Integration
+        
+        Version 3.4.1 Updates:
+        - Two-stage payment workflow (Draft → Booked → Sold)
+        - Booking requirements validation before installments
+        - Payment progress tracking and status monitoring
+        - Enhanced payment invoice categorization
+        - Backward compatibility for existing contracts
+        - Improved user experience with detailed error messages
+        
+        Version 3.4.2 Updates:
+        - Configurable booking percentage at project and property levels
+        - Automatic inheritance: Project → Property → Sale Contract
+        - Property-level override for custom booking requirements
+        - Support for different booking percentages per project (5%, 10%, 15%, 20%, etc.)
+        - Enhanced UI with booking configuration sections
     """,
     "summary": """
-        Property Sale & Rental Management with Flexible Payment Plans, Professional SPA Reports, and Bank Account Integration
+        Property Sale & Rental Management with Two-Stage Payment Workflow, Configurable Booking Percentage, Professional SPA Reports, and Bank Account Integration
     """,
-    "version": "3.4.0",
+    "version": "3.4.2",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",

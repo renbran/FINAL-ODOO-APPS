@@ -6,11 +6,36 @@
             <field name="model">property.vendor.wizard</field>
             <field name="arch" type="xml">
                 <form>
-                    <group string="Payment Term Configuration">
+                    <group>
+                        <field name="use_payment_schedule" invisible="1"/>
+                        <field name="schedule_from_property" invisible="1"/>
+                    </group>
+                    
+                    <!-- Payment Schedule Configuration (Preferred) -->
+                    <group string="📋 Payment Schedule Configuration" invisible="not use_payment_schedule">
+                        <div class="alert alert-success" role="alert" invisible="not schedule_from_property" style="margin-bottom: 15px;">
+                            <i class="fa fa-check-circle"/> <strong>Payment Schedule Inherited from Property</strong><br/>
+                            <span class="text-muted">The payment plan will be automatically generated based on the selected schedule.</span>
+                        </div>
+                        <group>
+                            <field name="payment_schedule_id" readonly="1" force_save="1" options="{'no_create': True, 'no_open': True}" help="Payment schedule template from property"/>
+                            <field name="start_date" required="1" help="Start date for calculating installment due dates"/>
+                        </group>
+                        <group>
+                            <button name="%(property_vendor_wizard_action)d" type="action" string="↻ Switch to Manual Configuration" class="btn-link text-primary" invisible="not schedule_from_property" help="Override inherited schedule with manual payment terms"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Manual Payment Term Configuration (Fallback) -->
+                    <group string="⚙️ Manual Payment Configuration" invisible="use_payment_schedule">
+                        <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
+                            <i class="fa fa-exclamation-triangle"/> <strong>Manual Configuration Mode</strong><br/>
+                            <span class="text-muted">No payment schedule found on property. Configure installments manually.</span>
+                        </div>
                         <group>
                             <label for="payment_term"/>
                             <div>
-                                <field name="payment_term" required="1"/>
+                                <field name="payment_term" required="not use_payment_schedule"/>
                                 <div class="font-italic text-muted" invisible="payment_term != 'quarterly'">
                                     * 3 Month Quarter
                                 </div>

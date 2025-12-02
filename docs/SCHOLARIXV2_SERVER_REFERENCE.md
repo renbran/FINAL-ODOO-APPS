@@ -14,7 +14,9 @@
 | **Log Files** | `/var/odoo/scholarixv2/logs` |
 | **Config File** | `/var/odoo/scholarixv2/odoo.conf` |
 | **Python venv** | `/var/odoo/scholarixv2/venv/bin/python3` |
-| **Custom Addons** | `/var/odoo/scholarixv2/src/addons` (typical location) |
+| **rental_management Module** | `/var/odoo/scholarixv2/extra-addons/cybroaddons.git-68f85fe88986a/rental_management/` ⚠️ **CORRECT PATH** |
+| **Custom Addons** | `/var/odoo/scholarixv2/custom-addons` (secondary location) |
+| **Extra Addons** | `/var/odoo/scholarixv2/extra-addons` (primary location) |
 
 ---
 
