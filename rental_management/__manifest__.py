@@ -144,10 +144,13 @@
     ],
     "assets": {
         "web.assets_backend": [
-            # CRITICAL: Load DOM protection FIRST to prevent querySelector errors
+            # Load global_dom_protection FIRST (it's a standalone IIFE, not an odoo.define)
             ('prepend', "rental_management/static/src/js/global_dom_protection.js"),
-            ('prepend', "rental_management/static/src/js/list_renderer_fix.js"),
-            ('prepend', "rental_management/static/src/js/property_dashboard_action.js"),
+            
+            # IMPORTANT: ES6 modules with @odoo-module must load AFTER Odoo's module system
+            # Remove prepend directive to load them at normal time
+            "rental_management/static/src/js/list_renderer_fix.js",
+            "rental_management/static/src/js/property_dashboard_action.js",
             
             # Then load regular assets
             "rental_management/static/src/css/style.css",
