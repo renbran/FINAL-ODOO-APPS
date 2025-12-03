@@ -3,6 +3,7 @@
 import { session } from '@web/session';
 import { useService } from "@web/core/utils/hooks";
 import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
+import { registry } from "@web/core/registry";
 
 export class RentalPropertyDashboard extends Component {
     setup() {
@@ -59,3 +60,12 @@ export class RentalPropertyDashboard extends Component {
 }
 
 RentalPropertyDashboard.template = 'rental_management.RentalPropertyDashboard';
+
+// Register as client action
+console.log('[rental_management] Registering property_dashboard action...');
+try {
+    registry.category("actions").add("property_dashboard", RentalPropertyDashboard);
+    console.log('[rental_management] ✓ Successfully registered property_dashboard action');
+} catch (error) {
+    console.error('[rental_management] ✗ Failed to register property_dashboard:', error);
+}

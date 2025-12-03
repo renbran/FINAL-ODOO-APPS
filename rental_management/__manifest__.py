@@ -147,11 +147,6 @@
             # Load global_dom_protection FIRST (it's a standalone IIFE, not an odoo.define)
             ('prepend', "rental_management/static/src/js/global_dom_protection.js"),
             
-            # IMPORTANT: ES6 modules with @odoo-module must load AFTER Odoo's module system
-            # Remove prepend directive to load them at normal time
-            "rental_management/static/src/js/list_renderer_fix.js",
-            "rental_management/static/src/js/property_dashboard_action.js",
-            
             # Then load regular assets
             "rental_management/static/src/css/style.css",
             "rental_management/static/src/css/lib/image-uploader.min.css",
@@ -165,6 +160,8 @@
             "rental_management/static/src/js/lib/Animated.js",
             "rental_management/static/src/js/lib/apexcharts.js",
             "rental_management/static/src/js/rental.js",
+            "rental_management/static/src/js/list_renderer_fix.js",
+            # Components: automatically loads .js, .xml, .css files including rental_property_dashboard
             'rental_management/static/src/components/**/*',
             'rental_management/static/src/views/**/*',
         ],
