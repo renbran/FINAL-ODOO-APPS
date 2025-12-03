@@ -2,9 +2,12 @@
 # Copyright 2020-Today TechKhedut.
 # Part of TechKhedut. See LICENSE file for full copyright and licensing details.
 import datetime
+import logging
 from dateutil.relativedelta import relativedelta
 from odoo import fields, api, models, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class PropertyVendor(models.Model):
@@ -379,12 +382,11 @@ class PropertyVendor(models.Model):
             if record.payment_schedule_id and record.use_schedule:
                 try:
                     record.action_generate_complete_payment_plan()
-                except Exception as e:
+                except (UserError, ValueError) as e:
                     # Log error but don't block contract creation
-                    import logging
-                    _logger = logging.getLogger(__name__)
                     _logger.warning(
-                        f"Failed to auto-generate payment plan for {record.sold_seq}: {str(e)}"
+                        "Failed to auto-generate payment plan for %s: %s",
+                        record.sold_seq, str(e)
                     )
         
         return res
@@ -938,6 +940,29 @@ class PropertyVendor(models.Model):
         booking_amount = self.book_price or 0.0
         dld_fee = self.dld_fee if self.include_dld_in_plan else 0.0
         admin_fee = self.admin_fee if self.include_admin_in_plan else 0.0
+        
+        # Validation: Ensure property price is positive
+        if property_price <= 0:
+            raise UserError(_(
+                "Property price must be greater than zero!\n\n"
+                "Please set a valid property price before generating the payment plan."
+            ))
+        
+        # Validation: Ensure booking doesn't exceed property price
+        if booking_amount > property_price:
+            raise UserError(_(
+                "Booking amount (%s AED) cannot exceed property price (%s AED)!\n\n"
+                "Please check the booking configuration."
+            ) % ('{:,.2f}'.format(booking_amount), '{:,.2f}'.format(property_price)))
+        
+        # Validation: Ensure there's a balance for installments
+        if booking_amount >= property_price:
+            raise UserError(_(
+                "Booking amount equals or exceeds property price!\n\n"
+                "There's no remaining balance for installments.\n"
+                "Booking: %s AED | Property Price: %s AED"
+            ) % ('{:,.2f}'.format(booking_amount), '{:,.2f}'.format(property_price)))
+        
         total_payable = property_price + dld_fee + admin_fee
         
         # Balance for installments = Property Price - Booking
@@ -987,21 +1012,23 @@ class PropertyVendor(models.Model):
             interval = schedule_line.interval
             num_installments = schedule_line.number_of_installments
             
-            for i in range(num_installments):
+            for _ in range(num_installments):
                 line_number += 1
                 
                 # Calculate due date based on interval
                 if line_number == 1:
                     current_date = start_date
+                elif interval_type == 'days':
+                    current_date = start_date + relativedelta(days=interval * (line_number - 1))
+                elif interval_type == 'weeks':
+                    current_date = start_date + relativedelta(weeks=interval * (line_number - 1))
+                elif interval_type == 'months':
+                    current_date = start_date + relativedelta(months=interval * (line_number - 1))
+                elif interval_type == 'years':
+                    current_date = start_date + relativedelta(years=interval * (line_number - 1))
                 else:
-                    if interval_type == 'days':
-                        current_date = start_date + relativedelta(days=interval * (line_number - 1))
-                    elif interval_type == 'weeks':
-                        current_date = start_date + relativedelta(weeks=interval * (line_number - 1))
-                    elif interval_type == 'months':
-                        current_date = start_date + relativedelta(months=interval * (line_number - 1))
-                    elif interval_type == 'years':
-                        current_date = start_date + relativedelta(years=interval * (line_number - 1))
+                    # Fallback to start_date if interval_type is unknown
+                    current_date = start_date
                 
                 # LINE 1: Booking Payment (first line)
                 if not booking_added and booking_amount > 0:
@@ -1091,9 +1118,18 @@ class PropertyVendor(models.Model):
                         invoice_lines[idx][2]['amount'] += difference
                         break
         
+        # Final validation: Ensure we generated lines
+        if not invoice_lines:
+            raise UserError(_(
+                "Failed to generate any payment lines!\n\n"
+                "Please check:\n"
+                "• Payment schedule configuration\n"
+                "• Property price and fees\n"
+                "• Booking amount settings"
+            ))
+        
         # Create all payment lines
-        if invoice_lines:
-            self.write({'sale_invoice_ids': invoice_lines})
+        self.write({'sale_invoice_ids': invoice_lines})
         
         # Keep contract in draft stage - will move to 'booked' when booking requirements met
         
