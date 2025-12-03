@@ -11,6 +11,17 @@
  * This is a defensive programming layer for production stability.
  */
 
+// CRITICAL: Wait for Odoo to be fully loaded before applying protections
+// This ensures odoo.define is available and our OWL components can load
+function initGlobalDOMProtection() {
+    if (typeof window.odoo === 'undefined') {
+        console.log('[rental_management] Waiting for Odoo to load...');
+        setTimeout(initGlobalDOMProtection, 50);
+        return;
+    }
+
+    console.log('[rental_management] Odoo loaded, initializing global DOM protection...');
+
 (function() {
     'use strict';
 
@@ -245,3 +256,12 @@
     console.log('[rental_management] Helper functions: __rental_safe_ref_access__, __rental_dom_ready__, __rental_debounce__');
 
 })();
+}
+
+// Initialize when Odoo is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGlobalDOMProtection);
+} else {
+    initGlobalDOMProtection();
+}
+

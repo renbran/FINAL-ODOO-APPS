@@ -144,8 +144,8 @@
     ],
     "assets": {
         "web.assets_backend": [
-            # Load global_dom_protection FIRST (it's a standalone IIFE, not an odoo.define)
-            ('prepend', "rental_management/static/src/js/global_dom_protection.js"),
+            # Load global_dom_protection early (but not prepend - let it load normally)
+            "rental_management/static/src/js/global_dom_protection.js",
             
             # Then load regular assets
             "rental_management/static/src/css/style.css",
