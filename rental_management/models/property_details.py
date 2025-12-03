@@ -580,27 +580,6 @@ class PropertyDetails(models.Model):
                 [('property_id', '=', rec.id)])
             rec.document_count = document_count
 
-    # Booking Configuration Compute Methods
-    @api.depends('property_project_id', 'property_project_id.booking_percentage',
-                 'use_project_booking', 'custom_booking_percentage')
-    def _compute_booking_percentage(self):
-        for rec in self:
-            if rec.use_project_booking and rec.property_project_id:
-                rec.booking_percentage = rec.property_project_id.booking_percentage or 10.0
-            elif rec.custom_booking_percentage > 0:
-                rec.booking_percentage = rec.custom_booking_percentage
-            else:
-                rec.booking_percentage = 10.0
-
-    @api.depends('property_project_id', 'property_project_id.booking_type',
-                 'use_project_booking')
-    def _compute_booking_type(self):
-        for rec in self:
-            if rec.use_project_booking and rec.property_project_id:
-                rec.booking_type = rec.property_project_id.booking_type or 'percentage'
-            else:
-                rec.booking_type = 'percentage'
-
     # Booking Count
     def _compute_booking_count(self):
         for rec in self:
@@ -637,13 +616,26 @@ class PropertyDetails(models.Model):
             if rec.pricing_type == 'area_wise':
                 rec.price = rec.total_area * rec.price_per_area
 
-    # DLD Fee Auto-Calculation (4% of sale price) - Computed Field
+    # DLD Fee Auto-Calculation - Computed Field (configurable percentage or fixed)
     @api.depends('price', 'sale_lease')
     def _compute_dld_fee(self):
-        """Auto-calculate DLD fee as 4% of property price for sale properties"""
+        """Auto-calculate DLD fee based on configuration (default 4% for UAE)"""
+        # Get DLD fee configuration
+        config_param = self.env['ir.config_parameter'].sudo()
+        dld_fee_type = config_param.get_param(
+            'rental_management.default_dld_fee_type', 'percentage')
+        dld_percentage = float(config_param.get_param(
+            'rental_management.default_dld_fee_percentage', '4.0'))
+
         for rec in self:
             if rec.sale_lease == 'for_sale' and rec.price:
-                rec.dld_fee = rec.price * 0.04
+                if dld_fee_type == 'percentage':
+                    rec.dld_fee = rec.price * (dld_percentage / 100.0)
+                else:
+                    # Use fixed amount from configuration
+                    dld_fixed = float(config_param.get_param(
+                        'rental_management.default_dld_fee_amount', '0.0'))
+                    rec.dld_fee = dld_fixed
             else:
                 rec.dld_fee = 0.0
     

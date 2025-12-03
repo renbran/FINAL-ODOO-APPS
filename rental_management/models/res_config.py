@@ -39,3 +39,45 @@ class RentalConfig(models.TransientModel):
                                           default=lambda self: self.env.ref('rental_management.property_product_4',
                                                                             raise_if_not_found=False),
                                           config_parameter='rental_management.account_maintenance_item_id')
+
+    # Fee Configuration
+    default_dld_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Default DLD Fee Type', default='percentage',
+       config_parameter='rental_management.default_dld_fee_type',
+       help='Dubai Land Department fee calculation method')
+
+    default_dld_fee_percentage = fields.Float(
+        string='Default DLD Fee Percentage',
+        default=4.0,
+        config_parameter='rental_management.default_dld_fee_percentage',
+        help='Default DLD Fee as percentage of sale price (e.g., 4.0 for 4%)')
+
+    default_dld_fee_amount = fields.Monetary(
+        string='Default DLD Fee (Fixed)',
+        config_parameter='rental_management.default_dld_fee_amount',
+        currency_field='currency_id',
+        help='Default fixed DLD Fee amount')
+
+    default_admin_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Default Admin Fee Type', default='percentage',
+       config_parameter='rental_management.default_admin_fee_type',
+       help='Administrative fee calculation method')
+
+    default_admin_fee_percentage = fields.Float(
+        string='Default Admin Fee Percentage',
+        default=2.0,
+        config_parameter='rental_management.default_admin_fee_percentage',
+        help='Default Admin Fee as percentage of sale price (e.g., 2.0 for 2%)')
+
+    default_admin_fee_amount = fields.Monetary(
+        string='Default Admin Fee (Fixed)',
+        config_parameter='rental_management.default_admin_fee_amount',
+        currency_field='currency_id',
+        help='Default fixed Admin Fee amount')
+
+    currency_id = fields.Many2one('res.currency', string='Currency',
+                                   default=lambda self: self.env.company.currency_id)
