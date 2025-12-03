@@ -264,7 +264,7 @@
                                 <field name="use_schedule" invisible="1"/>
                                 <field name="schedule_from_property" invisible="1"/>
                                 <div class="alert alert-info mb-3" role="alert" invisible="not schedule_from_property or not payment_schedule_id" style="margin-bottom: 10px;">
-                                    <i class="fa fa-info-circle"/> <strong>UAE Payment Plan Active:</strong>
+                                    <i class="fa fa-info-circle" title="Payment plan information"/> <strong>UAE Payment Plan Active:</strong>
                                     Payment schedule "<field name="payment_schedule_id" readonly="1" class="oe_inline" nolabel="1" style="font-weight: bold;"/>" inherited from property.
                                     This will auto-generate invoices matching the property's payment plan when you generate installments.
                                 </div>

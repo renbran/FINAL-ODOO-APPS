@@ -88,7 +88,7 @@
                         <field name="payment_schedule_id" invisible="schedule_from_property" readonly="contract_type != 'new_contract'" force_save="1" options="{'no_create': True, 'no_create_edit': True}" />
                         <field name="use_schedule" invisible="1" />
                         <div class="alert alert-success py-2 px-3" role="alert" invisible="not schedule_from_property" style="margin-top: 8px; border-radius: 4px;">
-                            <i class="fa fa-check-circle text-success"/>
+                            <i class="fa fa-check-circle text-success" title="Payment plan is active"/>
                             <strong>UAE Payment Plan Active</strong>
                             <br/>
                             <small>Using: "<field name="payment_schedule_id" readonly="1" nolabel="1" class="oe_inline fw-bold"/>

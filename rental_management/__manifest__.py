@@ -48,7 +48,7 @@
     "summary": """
         Property Sale & Rental Management with Enhanced Invoice Tracking, Visual Payment Dashboard, Smart Buttons, and Professional SPA Reports
     """,
-    "version": "3.5.0",
+    "version": "17.0.3.5.0",
     "author": "TechKhedut Inc.",
     "company": "TechKhedut Inc.",
     "maintainer": "TechKhedut Inc.",
@@ -147,6 +147,7 @@
             # CRITICAL: Load DOM protection FIRST to prevent querySelector errors
             ('prepend', "rental_management/static/src/js/global_dom_protection.js"),
             ('prepend', "rental_management/static/src/js/list_renderer_fix.js"),
+            ('prepend', "rental_management/static/src/js/property_dashboard_action.js"),
             
             # Then load regular assets
             "rental_management/static/src/css/style.css",
@@ -161,7 +162,6 @@
             "rental_management/static/src/js/lib/Animated.js",
             "rental_management/static/src/js/lib/apexcharts.js",
             "rental_management/static/src/js/rental.js",
-            "rental_management/static/src/js/property_dashboard_action.js",
             'rental_management/static/src/components/**/*',
             'rental_management/static/src/views/**/*',
         ],

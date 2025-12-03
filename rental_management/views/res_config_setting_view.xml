@@ -57,12 +57,12 @@
                                         <label for="default_dld_fee_type" string="DLD Fee Type" class="col-lg-3 o_light_label"/>
                                         <field name="default_dld_fee_type" widget="radio" options="{'horizontal':True}"/>
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('default_dld_fee_type', '=', 'fixed')]}">
+                                    <div class="row" invisible="default_dld_fee_type == 'fixed'">
                                         <label for="default_dld_fee_percentage" string="DLD Fee %" class="col-lg-3 o_light_label"/>
                                         <field name="default_dld_fee_percentage" class="oe_inline"/>
                                         <span class="o_form_label">%</span>
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('default_dld_fee_type', '=', 'percentage')]}">
+                                    <div class="row" invisible="default_dld_fee_type == 'percentage'">
                                         <label for="default_dld_fee_amount" string="Fixed DLD Fee" class="col-lg-3 o_light_label"/>
                                         <field name="currency_id" invisible="1"/>
                                         <field name="default_dld_fee_amount" class="oe_inline"/>
@@ -75,12 +75,12 @@
                                         <label for="default_admin_fee_type" string="Admin Fee Type" class="col-lg-3 o_light_label"/>
                                         <field name="default_admin_fee_type" widget="radio" options="{'horizontal':True}"/>
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('default_admin_fee_type', '=', 'fixed')]}">
+                                    <div class="row" invisible="default_admin_fee_type == 'fixed'">
                                         <label for="default_admin_fee_percentage" string="Admin Fee %" class="col-lg-3 o_light_label"/>
                                         <field name="default_admin_fee_percentage" class="oe_inline"/>
                                         <span class="o_form_label">%</span>
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('default_admin_fee_type', '=', 'percentage')]}">
+                                    <div class="row" invisible="default_admin_fee_type == 'percentage'">
                                         <label for="default_admin_fee_amount" string="Fixed Admin Fee" class="col-lg-3 o_light_label"/>
                                         <field name="default_admin_fee_amount" class="oe_inline"/>
                                     </div>

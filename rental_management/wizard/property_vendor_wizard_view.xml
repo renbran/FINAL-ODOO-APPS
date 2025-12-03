@@ -14,7 +14,7 @@
                     <!-- Payment Schedule Configuration (Preferred) -->
                     <group string="📋 Payment Schedule Configuration" invisible="not use_payment_schedule">
                         <div class="alert alert-success" role="alert" invisible="not schedule_from_property" style="margin-bottom: 15px;">
-                            <i class="fa fa-check-circle"/> <strong>Payment Schedule Inherited from Property</strong><br/>
+                            <i class="fa fa-check-circle" title="Payment schedule inherited from property"/> <strong>Payment Schedule Inherited from Property</strong><br/>
                             <span class="text-muted">The payment plan will be automatically generated based on the selected schedule.</span>
                         </div>
                         <group>
@@ -29,7 +29,7 @@
                     <!-- Manual Payment Term Configuration (Fallback) -->
                     <group string="⚙️ Manual Payment Configuration" invisible="use_payment_schedule">
                         <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
-                            <i class="fa fa-exclamation-triangle"/> <strong>Manual Configuration Mode</strong><br/>
+                            <i class="fa fa-exclamation-triangle" title="Manual configuration mode"/> <strong>Manual Configuration Mode</strong><br/>
                             <span class="text-muted">No payment schedule found on property. Configure installments manually.</span>
                         </div>
                         <group>

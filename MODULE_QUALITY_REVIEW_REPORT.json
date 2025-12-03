@@ -1,0 +1,5053 @@
+{
+  "summary": {
+    "total_modules": 89,
+    "keep_count": 29,
+    "update_count": 27,
+    "delete_count": 33,
+    "avg_overall": 81.4,
+    "avg_compatibility": 90.2,
+    "avg_quality": 84.6,
+    "avg_compliance": 68.9
+  },
+  "modules": [
+    {
+      "name": "account_payment_final",
+      "overall_score": 97,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 100,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.1.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "web",
+            "mail",
+            "portal",
+            "website"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 26,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 18,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 12,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 5,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 100
+        }
+      }
+    },
+    {
+      "name": "crm_executive_dashboard",
+      "overall_score": 96,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 96,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "crm",
+            "sales_team",
+            "mail",
+            "web",
+            "llm_lead_scoring"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 16,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 9,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 4,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 96
+        }
+      }
+    },
+    {
+      "name": "account_payment_approval",
+      "overall_score": 95,
+      "compatibility_score": 100,
+      "quality_score": 86,
+      "compliance_score": 100,
+      "action": "KEEP",
+      "issues": [
+        "Python syntax errors: 1"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "mail",
+            "web",
+            "portal",
+            "payment",
+            "account_payment"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 24,
+          "syntax_errors": [
+            "account_move.py: invalid syntax (<unknown>, line 82)"
+          ],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 80
+        },
+        "xml": {
+          "total_files": 27,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 3,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 5,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 100
+        }
+      }
+    },
+    {
+      "name": "enhanced_rest_api",
+      "overall_score": 95,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 92,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "rest_api_odoo",
+            "crm",
+            "sale",
+            "account",
+            "contacts",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 12,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "ks_dynamic_financial_report",
+      "overall_score": 95,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 91,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.1.7",
+          "odoo17_compatible": true,
+          "license": "OPL-1",
+          "depends": [
+            "base",
+            "mail",
+            "account",
+            "sale_management"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": true
+        },
+        "python": {
+          "total_files": 20,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 11,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": true,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 91
+        }
+      }
+    },
+    {
+      "name": "odoo_dynamic_dashboard",
+      "overall_score": 95,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 92,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.0.1",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 11,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 7,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 4,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "account_reconcile_oca",
+      "overall_score": 94,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.5.16",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "account_statement_base",
+            "account_reconcile_model_oca",
+            "base_sparse_field"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 15,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 11,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 17,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "oe_sale_dashboard_17",
+      "overall_score": 94,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "sale",
+            "sale_management",
+            "web",
+            "le_sale_type",
+            "invoice_report_for_realestate"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 9,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 10,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "scholarix_assessment",
+      "overall_score": 94,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 96,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.0.1",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "portal",
+            "mail",
+            "hr_recruitment"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 19,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 22,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 96
+        }
+      }
+    },
+    {
+      "name": "ai_tech_whitelabel",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 84,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "base_setup"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 3,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "all_in_one_sales_kit",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 92,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "sale_management",
+            "delivery",
+            "stock"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 28,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 33,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "announcement_banner",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 84,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.2.2",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "web",
+            "base"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 10,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "hrms_dashboard",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 84,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.2",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "hr",
+            "hr_holidays",
+            "hr_timesheet",
+            "hr_payroll_community",
+            "hr_attendance",
+            "hr_timesheet_attendance",
+            "hr_recruitment",
+            "hr_resignation",
+            "event",
+            "hr_reward_warning"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 9,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "order_net_commission",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 100,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "sale",
+            "sales_team",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 24,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 14,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 5,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 100
+        }
+      }
+    },
+    {
+      "name": "payment_approval_pro",
+      "overall_score": 93,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 91,
+      "action": "KEEP",
+      "issues": [
+        "XML parsing errors: 1"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "mail",
+            "website",
+            "portal"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 15,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 15,
+          "parsing_errors": [
+            "account_payment_enhanced_views.xml: unclosed token: line 137, column 20"
+          ],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 80
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 91
+        }
+      }
+    },
+    {
+      "name": "uae_wps_report",
+      "overall_score": 92,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "hr_payroll_community",
+            "account",
+            "hr_holidays"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 10,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "white_label_branding",
+      "overall_score": 92,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 83,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "mail",
+            "digest"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 7,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 83
+        }
+      }
+    },
+    {
+      "name": "zehntech_main_menu",
+      "overall_score": 92,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 83,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 9,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 10,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 7,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 83
+        }
+      }
+    },
+    {
+      "name": "commission_ax",
+      "overall_score": 91,
+      "compatibility_score": 100,
+      "quality_score": 86,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [
+        "Python syntax errors: 1"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "sale",
+            "purchase",
+            "account",
+            "mail",
+            "crm",
+            "project"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [
+            "commission_report.py: unexpected indent (<unknown>, line 101)"
+          ],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 80
+        },
+        "xml": {
+          "total_files": 8,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": true,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "invoice_report_for_realestate",
+      "overall_score": 91,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 87,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.3.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account",
+            "base",
+            "sale",
+            "portal"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 13,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 19,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 87
+        }
+      }
+    },
+    {
+      "name": "llm_lead_scoring",
+      "overall_score": 91,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 92,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "crm",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 19,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 8,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "report_font_enhancement",
+      "overall_score": 91,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 84,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "account",
+            "sale",
+            "purchase"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "scholarix_recruitment",
+      "overall_score": 91,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 92,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.3",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "hr",
+            "hr_recruitment",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "accounting_pdf_reports",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.3",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 27,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 23,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "contact_kyc",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "contacts"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "hr_linkedin_recruitment",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "hr_recruitment",
+            "auth_oauth"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 10,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "om_account_followup",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.0.4",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 14,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 12,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "rest_api_odoo",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.2",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 7,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "subscription_package",
+      "overall_score": 90,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 88,
+      "action": "KEEP",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.2.1.2",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "sale_management"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 18,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 19,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "order_status_override",
+      "overall_score": 89,
+      "compatibility_score": 100,
+      "quality_score": 76,
+      "compliance_score": 92,
+      "action": "UPDATE",
+      "issues": [
+        "XML parsing errors: 3"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "Unknown",
+          "depends": [
+            "sale",
+            "mail",
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 19,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 21,
+          "parsing_errors": [
+            "commission_integration_views.xml: no element found: line 1, column 0",
+            "dashboard_views.xml: no element found: line 1, column 0",
+            "order_views_enhanced.xml: no element found: line 1, column 0"
+          ],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 40
+        },
+        "javascript": {
+          "total_files": 6,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "base_account_budget",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 84,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.2",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "database_cleanup",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 83,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 24,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 10,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 83
+        }
+      }
+    },
+    {
+      "name": "import_bank_statement_odoo",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 84,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "base_accounting_kit"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "om_account_accountant_v17",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 84,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.3",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account",
+            "accounting_pdf_reports"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 10,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "order_invoice_manual_link",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 84,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "sale_management",
+            "account",
+            "stock_delivery"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 7,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "print_contact",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 83,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.0.1",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "contacts"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 6,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 83
+        }
+      }
+    },
+    {
+      "name": "sales_target_vs_achievement",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 84,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "sale_management",
+            "crm",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 84
+        }
+      }
+    },
+    {
+      "name": "whatsapp_mail_messaging",
+      "overall_score": 88,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 68,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.1.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "sale",
+            "account",
+            "website",
+            "sale_management"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 14,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 11,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 4,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 68
+        }
+      }
+    },
+    {
+      "name": "commission",
+      "overall_score": 87,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 79,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "Unknown",
+          "depends": [
+            "base",
+            "sale",
+            "purchase",
+            "account",
+            "mail"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 8,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 79
+        }
+      }
+    },
+    {
+      "name": "frontend_enhancement",
+      "overall_score": 87,
+      "compatibility_score": 90,
+      "quality_score": 82,
+      "compliance_score": 92,
+      "action": "UPDATE",
+      "issues": [
+        "Deprecated XML attrs: 2"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "sale",
+            "account",
+            "mail",
+            "portal",
+            "web",
+            "website"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 10,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 6,
+          "parsing_errors": [],
+          "deprecated_attrs": [
+            "account_move_views.xml: attrs={} deprecated",
+            "res_users_views.xml: attrs={} deprecated"
+          ],
+          "has_modern_syntax": true,
+          "quality_score": 60
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 92
+        }
+      }
+    },
+    {
+      "name": "hr_employment_certificate",
+      "overall_score": 87,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 79,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "hr",
+            "hr_contract"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 79
+        }
+      }
+    },
+    {
+      "name": "whatsapp_redirect",
+      "overall_score": 87,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 79,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "contacts"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 79
+        }
+      }
+    },
+    {
+      "name": "payment_account_enhanced",
+      "overall_score": 85,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 74,
+      "action": "UPDATE",
+      "issues": [],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.2.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "mail",
+            "website",
+            "portal"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 3,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": false,
+          "quality_score": 74
+        }
+      }
+    },
+    {
+      "name": "statement_report",
+      "overall_score": 84,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 62,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "contacts"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 9,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 3,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 62
+        }
+      }
+    },
+    {
+      "name": "website_subscription_package",
+      "overall_score": 84,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 62,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.1",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "subscription_package",
+            "website_sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 11,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 8,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 3,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 62
+        }
+      }
+    },
+    {
+      "name": "muk_web_chatter",
+      "overall_score": 82,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 49,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.2.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 4,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "muk_web_theme",
+      "overall_score": 82,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 49,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.2.1",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "muk_web_chatter",
+            "muk_web_dialog",
+            "muk_web_appsbar",
+            "muk_web_colors"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "report_pdf_options",
+      "overall_score": 82,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 49,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "account_statement_base",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 58,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.5.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 58
+        }
+      }
+    },
+    {
+      "name": "ingenuity_invoice_qr_code",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 58,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "web",
+            "account"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 9,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 58
+        }
+      }
+    },
+    {
+      "name": "mx_elearning_plus",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 53,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.0.1",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "website_slides"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 4,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 53
+        }
+      }
+    },
+    {
+      "name": "sale_invoice_due_date_reminder",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 58,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "sale_management",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 6,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 58
+        }
+      }
+    },
+    {
+      "name": "web_login_styles",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 58,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "base_setup",
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 7,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 4,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 58
+        }
+      }
+    },
+    {
+      "name": "webhook_crm",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 58,
+      "compliance_score": 88,
+      "action": "UPDATE",
+      "issues": [
+        "Python syntax errors: 3"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "crm",
+            "website"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [
+            "__init__.py: invalid non-printable character U+FEFF (<unknown>, line 1)",
+            "crm_lead.py: invalid non-printable character U+FEFF (<unknown>, line 1)",
+            "__init__.py: invalid non-printable character U+FEFF (<unknown>, line 1)"
+          ],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 40
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "work_anniversary_reminder",
+      "overall_score": 81,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 58,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "mail",
+            "hr_contract"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 58
+        }
+      }
+    },
+    {
+      "name": "muk_web_dialog",
+      "overall_score": 80,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 49,
+      "action": "UPDATE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "account_line_view",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 5,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "automatic_invoice_and_post",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "sale_management",
+            "stock",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "comprehensive_greetings",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 52,
+      "compliance_score": 87,
+      "action": "DELETE",
+      "issues": [
+        "XML parsing errors: 7"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "contacts",
+            "hr",
+            "hr_contract",
+            "mail",
+            "hr_uae"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 11,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 12,
+          "parsing_errors": [
+            "email_templates.xml: no element found: line 1, column 0",
+            "greeting_categories.xml: no element found: line 1, column 0",
+            "greeting_sequences.xml: no element found: line 1, column 0",
+            "greeting_templates.xml: no element found: line 1, column 0",
+            "greeting_views.xml: no element found: line 1, column 0",
+            "menu_items.xml: no element found: line 1, column 0",
+            "greeting_templates.xml: no element found: line 1, column 0"
+          ],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 0
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 3,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 87
+        }
+      }
+    },
+    {
+      "name": "invoice_bill_select_orderlines",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "sale_management",
+            "purchase",
+            "stock"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "odoo_accounting_dashboard",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 94,
+      "compliance_score": 38,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.1",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base_accounting_kit"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 2,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 38
+        }
+      }
+    },
+    {
+      "name": "om_data_remove",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.1",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "sale_invoice_detail",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "sale_management",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "website_custom_contact_us",
+      "overall_score": 79,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 54,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "website_sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 54
+        }
+      }
+    },
+    {
+      "name": "crm_ai_field_compatibility",
+      "overall_score": 78,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 50,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "crm"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 0,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 50
+        }
+      }
+    },
+    {
+      "name": "muk_web_colors",
+      "overall_score": 78,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 49,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.5",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base_setup",
+            "web_editor"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "report_xlsx",
+      "overall_score": 78,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 42,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.1",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "base",
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 11,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 3,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 42
+        }
+      }
+    },
+    {
+      "name": "partner_statement_followup",
+      "overall_score": 77,
+      "compatibility_score": 80,
+      "quality_score": 67,
+      "compliance_score": 88,
+      "action": "DELETE",
+      "issues": [
+        "Deprecated XML attrs: 5"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "account",
+            "mail",
+            "portal",
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 13,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 18,
+          "parsing_errors": [],
+          "deprecated_attrs": [
+            "wizard_views.xml: attrs={} deprecated",
+            "wizard_views_clean.xml: attrs={} deprecated",
+            "statement_wizard_views.xml: attrs={} deprecated",
+            "partner_views.xml: attrs={} deprecated",
+            "batch_followup_wizard_views.xml: attrs={} deprecated"
+          ],
+          "has_modern_syntax": true,
+          "quality_score": 50
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 88
+        }
+      }
+    },
+    {
+      "name": "website_menu_fix",
+      "overall_score": 77,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 45,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "website"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 0,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 45
+        }
+      }
+    },
+    {
+      "name": "account_reconcile_model_oca",
+      "overall_score": 75,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 38,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.4",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 0,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 38
+        }
+      }
+    },
+    {
+      "name": "sale_order_invoicing_qty_percentage",
+      "overall_score": 75,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 38,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "AGPL-3",
+          "depends": [
+            "sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 38
+        }
+      }
+    },
+    {
+      "name": "wt_birthday_reminder",
+      "overall_score": 73,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 33,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "contacts",
+            "hr",
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 33
+        }
+      }
+    },
+    {
+      "name": "gsk_automatic_mail_server",
+      "overall_score": 72,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 29,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "mail"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 0,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 29
+        }
+      }
+    },
+    {
+      "name": "user_admin_field_compatibility",
+      "overall_score": 71,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 25,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 0,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 0,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 25
+        }
+      }
+    },
+    {
+      "name": "osus_report_header_footer",
+      "overall_score": 69,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 18,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.0",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "web",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 2,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 0,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 18
+        }
+      }
+    },
+    {
+      "name": "form_edit_button_restore",
+      "overall_score": 68,
+      "compatibility_score": 100,
+      "quality_score": 88,
+      "compliance_score": 9,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.0.0.0",
+          "odoo17_compatible": true,
+          "license": "OPL-1",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 2,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 0,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 9
+        }
+      }
+    },
+    {
+      "name": "employee_access_manager",
+      "overall_score": 66,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 91,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "Unknown",
+          "depends": [
+            "base",
+            "hr",
+            "web"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 11,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 8,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": false,
+          "quality_score": 91
+        }
+      }
+    },
+    {
+      "name": "rental_management",
+      "overall_score": 66,
+      "compatibility_score": 25,
+      "quality_score": 82,
+      "compliance_score": 96,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 3.5.0)",
+        "Deprecated XML attrs: 1"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "3.5.0",
+          "odoo17_compatible": false,
+          "license": "OPL-1",
+          "depends": [
+            "mail",
+            "contacts",
+            "account",
+            "hr",
+            "maintenance",
+            "crm",
+            "crm_ai_field_compatibility",
+            "website",
+            "base",
+            "web"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 53,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 68,
+          "parsing_errors": [],
+          "deprecated_attrs": [
+            "res_config_setting_view.xml: attrs={} deprecated"
+          ],
+          "has_modern_syntax": true,
+          "quality_score": 60
+        },
+        "javascript": {
+          "total_files": 14,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 4,
+          "has_security": true,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 96
+        }
+      }
+    },
+    {
+      "name": "sgc_tech_ai_theme",
+      "overall_score": 66,
+      "compatibility_score": 100,
+      "quality_score": 82,
+      "compliance_score": 9,
+      "action": "DELETE",
+      "issues": [
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.0.1.0.3",
+          "odoo17_compatible": true,
+          "license": "LGPL-3",
+          "depends": [
+            "web",
+            "base"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 2,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 0,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 0,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 9
+        }
+      }
+    },
+    {
+      "name": "hr_uae",
+      "overall_score": 62,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 79,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "hr",
+            "hr_holidays",
+            "hr_payroll_community",
+            "sale",
+            "commission_ax",
+            "le_sale_type"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 9,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 7,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 79
+        }
+      }
+    },
+    {
+      "name": "le_sale_type",
+      "overall_score": 62,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 79,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 5,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 3,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 79
+        }
+      }
+    },
+    {
+      "name": "tk_portal_partner_leads",
+      "overall_score": 59,
+      "compatibility_score": 30,
+      "quality_score": 88,
+      "compliance_score": 59,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "crm",
+            "portal",
+            "website",
+            "sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 1,
+          "has_owl": false,
+          "has_es6": true,
+          "has_jquery": true,
+          "quality_score": 60
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 59
+        }
+      }
+    },
+    {
+      "name": "odoo_crm_dashboard",
+      "overall_score": 58,
+      "compatibility_score": 30,
+      "quality_score": 94,
+      "compliance_score": 49,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "base",
+            "crm"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 26,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 17,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 17,
+          "has_owl": true,
+          "has_es6": true,
+          "has_jquery": false,
+          "quality_score": 80
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 49
+        }
+      }
+    },
+    {
+      "name": "tk_partner_ledger",
+      "overall_score": 58,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 63,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "contacts",
+            "account"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 10,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 2,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": true,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 63
+        }
+      }
+    },
+    {
+      "name": "tk_sale_split_invoice",
+      "overall_score": 55,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 53,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "LGPL-3",
+          "depends": [
+            "sale_management",
+            "stock"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 8,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 3,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": true,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 2,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 53
+        }
+      }
+    },
+    {
+      "name": "reconcilation_fields",
+      "overall_score": 52,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 45,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "Unknown",
+          "depends": [
+            "sale"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 2,
+          "has_optional_dirs": 0,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 45
+        }
+      }
+    },
+    {
+      "name": "eg_mo_today_yesterday_filter",
+      "overall_score": 49,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 34,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 17.1)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "17.1",
+          "odoo17_compatible": false,
+          "license": "OPL-1",
+          "depends": [
+            "mrp"
+          ],
+          "installable": true,
+          "application": true,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 2,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": true,
+          "has_init": true,
+          "quality_score": 34
+        }
+      }
+    },
+    {
+      "name": "event_so_trigger",
+      "overall_score": 47,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 29,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "AGPL-3",
+          "depends": [
+            "website_event",
+            "event"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 4,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": true,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 0,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 29
+        }
+      }
+    },
+    {
+      "name": "pretty_buttons",
+      "overall_score": 47,
+      "compatibility_score": 30,
+      "quality_score": 82,
+      "compliance_score": 29,
+      "action": "DELETE",
+      "issues": [
+        "Not Odoo 17 compatible (version: 1.0)",
+        "Missing security/ir.model.access.csv"
+      ],
+      "checks": {
+        "manifest": {
+          "exists": true,
+          "version": "1.0",
+          "odoo17_compatible": false,
+          "license": "OPL-1",
+          "depends": [
+            "web"
+          ],
+          "installable": true,
+          "application": false,
+          "auto_install": false
+        },
+        "python": {
+          "total_files": 3,
+          "syntax_errors": [],
+          "deprecated_patterns": [],
+          "has_api_decorators": false,
+          "quality_score": 100
+        },
+        "xml": {
+          "total_files": 1,
+          "parsing_errors": [],
+          "deprecated_attrs": [],
+          "has_modern_syntax": false,
+          "quality_score": 100
+        },
+        "javascript": {
+          "total_files": 0,
+          "has_owl": false,
+          "has_es6": false,
+          "has_jquery": false,
+          "quality_score": 40
+        },
+        "structure": {
+          "has_required_dirs": 1,
+          "has_optional_dirs": 1,
+          "has_security": false,
+          "has_readme": false,
+          "has_init": true,
+          "quality_score": 29
+        }
+      }
+    }
+  ],
+  "keep": [
+    "account_payment_final",
+    "crm_executive_dashboard",
+    "account_payment_approval",
+    "enhanced_rest_api",
+    "ks_dynamic_financial_report",
+    "odoo_dynamic_dashboard",
+    "account_reconcile_oca",
+    "oe_sale_dashboard_17",
+    "scholarix_assessment",
+    "ai_tech_whitelabel",
+    "all_in_one_sales_kit",
+    "announcement_banner",
+    "hrms_dashboard",
+    "order_net_commission",
+    "payment_approval_pro",
+    "uae_wps_report",
+    "white_label_branding",
+    "zehntech_main_menu",
+    "commission_ax",
+    "invoice_report_for_realestate",
+    "llm_lead_scoring",
+    "report_font_enhancement",
+    "scholarix_recruitment",
+    "accounting_pdf_reports",
+    "contact_kyc",
+    "hr_linkedin_recruitment",
+    "om_account_followup",
+    "rest_api_odoo",
+    "subscription_package"
+  ],
+  "update": [
+    "order_status_override",
+    "base_account_budget",
+    "database_cleanup",
+    "import_bank_statement_odoo",
+    "om_account_accountant_v17",
+    "order_invoice_manual_link",
+    "print_contact",
+    "sales_target_vs_achievement",
+    "whatsapp_mail_messaging",
+    "commission",
+    "frontend_enhancement",
+    "hr_employment_certificate",
+    "whatsapp_redirect",
+    "payment_account_enhanced",
+    "statement_report",
+    "website_subscription_package",
+    "muk_web_chatter",
+    "muk_web_theme",
+    "report_pdf_options",
+    "account_statement_base",
+    "ingenuity_invoice_qr_code",
+    "mx_elearning_plus",
+    "sale_invoice_due_date_reminder",
+    "web_login_styles",
+    "webhook_crm",
+    "work_anniversary_reminder",
+    "muk_web_dialog"
+  ],
+  "delete": [
+    "account_line_view",
+    "automatic_invoice_and_post",
+    "comprehensive_greetings",
+    "invoice_bill_select_orderlines",
+    "odoo_accounting_dashboard",
+    "om_data_remove",
+    "sale_invoice_detail",
+    "website_custom_contact_us",
+    "crm_ai_field_compatibility",
+    "muk_web_colors",
+    "report_xlsx",
+    "partner_statement_followup",
+    "website_menu_fix",
+    "account_reconcile_model_oca",
+    "sale_order_invoicing_qty_percentage",
+    "wt_birthday_reminder",
+    "gsk_automatic_mail_server",
+    "user_admin_field_compatibility",
+    "osus_report_header_footer",
+    "form_edit_button_restore",
+    "employee_access_manager",
+    "rental_management",
+    "sgc_tech_ai_theme",
+    "hr_uae",
+    "le_sale_type",
+    "tk_portal_partner_leads",
+    "odoo_crm_dashboard",
+    "tk_partner_ledger",
+    "tk_sale_split_invoice",
+    "reconcilation_fields",
+    "eg_mo_today_yesterday_filter",
+    "event_so_trigger",
+    "pretty_buttons"
+  ]
+}

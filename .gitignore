@@ -28,3 +28,16 @@ ai_validation_report.json
 __pycache__/
 *.pyc
 *.pyo
+
+# JavaScript build and temporary files
+*.min.js
+*.map
+node_modules/
+dist/
+build/
+.next/
+
+# Odoo JS module fixes (temporary debugging)
+# Note: property_dashboard_action.js is excluded from this rule and should remain tracked
+*_fix.js.backup
+*_patch.js.backup
