@@ -81,3 +81,10 @@ class RentalConfig(models.TransientModel):
 
     currency_id = fields.Many2one('res.currency', string='Currency',
                                    default=lambda self: self.env.company.currency_id)
+
+    # File Upload Security
+    max_file_upload_size = fields.Integer(
+        string='Max File Upload Size (MB)',
+        default=10,
+        config_parameter='rental_management.max_file_upload_size',
+        help='Maximum allowed file size for document uploads in megabytes. Default: 10 MB')
