@@ -85,16 +85,10 @@
         'views/bulk_print_menus.xml',
         
         # Reports
-        'report/report_action.xml',
-        'report/bill_report_action.xml',
+        'report/unified_invoice_report.xml',
         'report/payment_voucher_report_action.xml',
-        'report/override_default_reports.xml',
-        'report/smart_dispatcher.xml',
-        'report/invoice_report.xml',
-        'report/bill_report.xml',
         'report/payment_voucher_report.xml',
         'report/bulk_report.xml',
-        'report/simple_test_report.xml',
     ],
     'demo': [
         'data/demo_payment_data.xml',

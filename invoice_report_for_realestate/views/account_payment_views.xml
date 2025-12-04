@@ -59,12 +59,19 @@
                         </group>
                         
                         <group string="Print Options">
-                            <button name="action_print_voucher" 
-                                    string="Preview/Print Voucher" 
-                                    type="object" 
-                                    class="btn-info" 
-                                    invisible="state not in ['posted', 'sent']"
-                                    icon="fa-eye"/>
+                            <group>
+                                <field name="include_detailed_documentation" 
+                                       string="Include 2nd Page (Detailed Documentation)" 
+                                       help="Add a second page with audit trail, reconciliation details, and complete documentation"/>
+                            </group>
+                            <group>
+                                <button name="action_print_voucher" 
+                                        string="Preview/Print Voucher" 
+                                        type="object" 
+                                        class="btn-info" 
+                                        invisible="state not in ['posted', 'sent']"
+                                        icon="fa-eye"/>
+                            </group>
                         </group>
                     </page>
                 </notebook>
