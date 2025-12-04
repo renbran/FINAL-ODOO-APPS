@@ -27,44 +27,54 @@ $sgc-leading-tight: 1.25;
 $sgc-leading-normal: 1.5;
 $sgc-leading-relaxed: 1.75;
 
-// Apply typography
+// ============================================================================
+// Backend-only typography (scoped to prevent conflicts)
+// ============================================================================
+
+// Apply typography to backend
 body.o_web_client {
   font-family: $sgc-font-primary;
   font-size: $sgc-text-base;
   line-height: $sgc-leading-normal;
   color: $sgc-charcoal;
+
+  // Heading styles - scoped to backend only
+  h1,
+  .h1 {
+    font-size: $sgc-text-3xl;
+    font-weight: $sgc-font-bold;
+    line-height: $sgc-leading-tight;
+    color: $sgc-deep-navy;
+  }
+
+  h2,
+  .h2 {
+    font-size: $sgc-text-2xl;
+    font-weight: $sgc-font-semibold;
+    line-height: $sgc-leading-tight;
+    color: $sgc-ocean-blue;
+  }
+
+  h3,
+  .h3 {
+    font-size: $sgc-text-xl;
+    font-weight: $sgc-font-semibold;
+    line-height: $sgc-leading-normal;
+    color: $sgc-ocean-blue;
+  }
+
+  // Button typography - scoped to backend only
+  .btn {
+    font-weight: $sgc-font-medium;
+    transition: all $sgc-transition-fast;
+  }
 }
 
-h1,
-.h1 {
-  font-size: $sgc-text-3xl;
-  font-weight: $sgc-font-bold;
-  line-height: $sgc-leading-tight;
-  color: $sgc-deep-navy;
-}
-
-h2,
-.h2 {
-  font-size: $sgc-text-2xl;
-  font-weight: $sgc-font-semibold;
-  line-height: $sgc-leading-tight;
-  color: $sgc-ocean-blue;
-}
-
-h3,
-.h3 {
-  font-size: $sgc-text-xl;
-  font-weight: $sgc-font-semibold;
-  line-height: $sgc-leading-normal;
-  color: $sgc-ocean-blue;
-}
+// ============================================================================
+// Odoo-specific typography (already scoped, safe from conflicts)
+// ============================================================================
 
 .o_form_label {
   font-weight: $sgc-font-medium;
   color: $sgc-dark-gray;
-}
-
-.btn {
-  font-weight: $sgc-font-medium;
-  transition: all $sgc-transition-fast;
 }

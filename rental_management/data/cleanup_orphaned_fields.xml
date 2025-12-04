@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- 
+        This file is intentionally empty.
+        The cleanup of orphaned fields should be done via SQL or Odoo shell,
+        not via XML data files as it can cause parsing errors during install.
+    -->
+</odoo>

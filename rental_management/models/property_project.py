@@ -76,6 +76,18 @@ class PropertyProject(models.Model):
     document_ids = fields.One2many("project.document.line",
                                    "project_id", string="Docs")
 
+    # Booking Configuration (for sale projects)
+    booking_percentage = fields.Float(
+        string='Booking Percentage',
+        default=10.0,
+        help='Default booking percentage for properties in this project (e.g., 5, 10, 15, 20). '
+             'Properties can override this value individually.')
+    booking_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Booking Type', default='percentage',
+       help='How booking amount is calculated for properties in this project')
+
     # Availability
     avail_description = fields.Boolean(string="Descriptions")
     avail_amenity = fields.Boolean(string="Amenities")

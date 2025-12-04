@@ -5,7 +5,7 @@
         <record id="invoice_report_for_realestate.action_report_osus_invoice" model="ir.actions.report" forcecreate="0">
             <field name="paperformat_id" ref="osus_report_header_footer.paperformat_osus_standard"/>
         </record>
-        
+
         <!-- Update Bulk Invoice Report -->
         <record id="invoice_report_for_realestate.action_report_osus_invoice_bulk" model="ir.actions.report" forcecreate="0">
             <field name="paperformat_id" ref="osus_report_header_footer.paperformat_osus_standard"/>

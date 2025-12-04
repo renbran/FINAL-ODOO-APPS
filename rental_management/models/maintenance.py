@@ -64,7 +64,7 @@ class PropertyMaintenance(models.Model):
         else:
             if not self.vendor_id:
                 raise ValidationError(_("Add vendor to create invoice"))
-            data['partner_id'] = self.vendor_id.id,
+            data['partner_id'] = self.vendor_id.id
         invoice_id = self.env['account.move'].sudo().create(data)
         invoice_post_type = self.env['ir.config_parameter'].sudo(
         ).get_param('rental_management.invoice_post_type')
@@ -138,12 +138,20 @@ class PropertyMaintenance(models.Model):
             rec.total_untaxed_amount = total_amount
 
     def _compute_invoice_count(self):
+        """Compute invoice count - Optimized to use search_count."""
         for rec in self:
-            rec.invoice_count = len(self.env['account.move'].sudo().search([('maintenance_request_id', 'in', [rec.id]), ('move_type', '=', 'out_invoice')]).mapped('maintenance_request_id').mapped('id'))
+            rec.invoice_count = self.env['account.move'].sudo().search_count([
+                ('maintenance_request_id', '=', rec.id),
+                ('move_type', '=', 'out_invoice')
+            ])
 
     def _compute_bill_count(self):
+        """Compute bill count - Optimized to use search_count."""
         for rec in self:
-            rec.bill_count = len(self.env['account.move'].sudo().search([('maintenance_request_id', 'in', [rec.id]), ('move_type', '=', 'in_invoice')]).mapped('maintenance_request_id').mapped('id'))
+            rec.bill_count = self.env['account.move'].sudo().search_count([
+                ('maintenance_request_id', '=', rec.id),
+                ('move_type', '=', 'in_invoice')
+            ])
 
     def action_view_invoice(self):
         return {

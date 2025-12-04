@@ -26,6 +26,27 @@
             <field name="detailed_type">service</field>
             <field name="categ_id" ref="rental_management.product_category_property"/>
         </record>
+        
+        <!-- DLD and Admin Fee Products -->
+        <record id="property_product_dld_fee" model="product.product">
+            <field name="name">DLD Fee - Dubai Land Department</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Dubai Land Department registration and transfer fee</field>
+            <field name="categ_id" ref="rental_management.product_category_property"/>
+        </record>
+        <record id="property_product_admin_fee" model="product.product">
+            <field name="name">Admin Fee - Administrative Processing</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Administrative and processing fee for property transactions</field>
+            <field name="categ_id" ref="rental_management.product_category_property"/>
+        </record>
+        <record id="property_product_booking" model="product.product">
+            <field name="name">Booking/Reservation Payment</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Initial booking or reservation deposit for property purchase</field>
+            <field name="categ_id" ref="rental_management.product_category_property"/>
+        </record>
+        
         <!--Maintenance
         Product-->
         <record id="property_maintenance_product_1" model="product.product">

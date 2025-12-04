@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 import requests
 import time
 from datetime import datetime
@@ -10,6 +11,29 @@ from odoo import models, api, tools, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+# Corporate email domains that indicate business legitimacy
+CORPORATE_EMAIL_BONUS = 15
+PERSONAL_EMAIL_PENALTY = -10
+PERSONAL_EMAIL_DOMAINS = {
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com',
+    'icloud.com', 'mail.com', 'protonmail.com', 'yandex.com', 'zoho.com',
+    'live.com', 'msn.com', 'me.com', 'inbox.com', 'gmx.com', 'fastmail.com'
+}
+
+# Urgency keywords and their weights
+URGENCY_KEYWORDS = {
+    'high': ['urgent', 'asap', 'immediately', 'emergency', 'critical', 'rush', 'deadline today'],
+    'medium': ['soon', 'this week', 'next week', 'this month', 'q1', 'q2', 'q3', 'q4', 'priority'],
+    'low': ['eventually', 'no rush', 'when possible', 'next year', 'exploring', 'researching']
+}
+
+# Decision maker titles
+DECISION_MAKER_TITLES = [
+    'ceo', 'cfo', 'cto', 'coo', 'cmo', 'cio', 'chief', 'president', 'owner',
+    'director', 'vp', 'vice president', 'head of', 'manager', 'lead',
+    'founder', 'co-founder', 'partner', 'principal', 'executive'
+]
 
 
 class LLMService(models.AbstractModel):
@@ -229,15 +253,28 @@ class LLMService(models.AbstractModel):
     @api.model
     def research_customer(self, lead):
         """
-        Research customer using LLM to find publicly available information
+        Research customer using LLM and optionally live web search
+        
+        Tries web research first (if enabled), falls back to LLM knowledge
 
         Args:
             lead: crm.lead record
 
         Returns:
-            str: Research findings
+            str: Research findings (HTML formatted)
         """
-        # Build research context
+        # Check if web research is enabled and configured
+        web_research_enabled = self._get_config_bool('llm_lead_scoring.enable_web_research', 'False')
+        
+        if web_research_enabled:
+            # Use live Google Custom Search
+            _logger.info("Using live web research for lead: %s", lead.name)
+            web_research_service = self.env['web.research.service']
+            return web_research_service.research_company_web(lead)
+        
+        # Fallback: Use LLM's training knowledge (original method)
+        _logger.info("Using LLM knowledge base for lead: %s", lead.name)
+        
         company_name = lead.partner_name or lead.contact_name or 'Unknown'
         email = lead.email_from or ''
         phone = lead.phone or lead.mobile or ''
@@ -480,49 +517,416 @@ Provide your response in the following JSON format:
         }
 
     @api.model
+    def analyze_email_quality(self, lead):
+        """
+        Analyze email quality and business legitimacy
+        
+        Corporate emails score higher than personal emails (gmail, yahoo, etc.)
+        Valid format and domain matching company name = bonus
+        
+        Returns:
+            dict: {'score': float (0-100), 'analysis': str, 'email_type': str}
+        """
+        email = (lead.email_from or '').lower().strip()
+        company_name = (lead.partner_name or '').lower()
+        
+        if not email or '@' not in email:
+            return {
+                'score': 0,
+                'analysis': 'No email provided. Cannot verify contact legitimacy.',
+                'email_type': 'missing'
+            }
+        
+        # Extract domain
+        try:
+            local_part, domain = email.split('@')
+        except ValueError:
+            return {
+                'score': 10,
+                'analysis': 'Invalid email format.',
+                'email_type': 'invalid'
+            }
+        
+        score = 50  # Base score
+        analysis_parts = []
+        email_type = 'unknown'
+        
+        # Check if personal email domain
+        domain_base = domain.split('.')[0] if '.' in domain else domain
+        if domain in PERSONAL_EMAIL_DOMAINS:
+            score += PERSONAL_EMAIL_PENALTY
+            email_type = 'personal'
+            analysis_parts.append(f"Personal email ({domain}) - less reliable for B2B.")
+        else:
+            # Corporate email - bonus
+            score += CORPORATE_EMAIL_BONUS
+            email_type = 'corporate'
+            analysis_parts.append(f"Corporate email domain ({domain}).")
+            
+            # Check if domain matches company name
+            if company_name:
+                company_words = company_name.replace('.', ' ').replace('-', ' ').split()
+                domain_clean = domain.replace('.com', '').replace('.net', '').replace('.org', '')
+                
+                for word in company_words:
+                    if len(word) > 3 and word in domain_clean:
+                        score += 10
+                        analysis_parts.append("Email domain matches company name.")
+                        break
+        
+        # Check for role-based emails (info@, sales@, contact@) - less valuable
+        role_prefixes = ['info', 'sales', 'contact', 'support', 'admin', 'hello', 'enquiry', 'enquiries']
+        if local_part in role_prefixes:
+            score -= 5
+            analysis_parts.append("Generic role-based email (not personal contact).")
+        
+        # Validate email format quality
+        if len(local_part) >= 3 and '.' in local_part:
+            score += 5  # firstname.lastname format
+            analysis_parts.append("Professional email format (firstname.lastname).")
+        
+        return {
+            'score': max(0, min(100, score)),
+            'analysis': ' '.join(analysis_parts) if analysis_parts else 'Email analyzed.',
+            'email_type': email_type,
+            'domain': domain
+        }
+
+    @api.model
+    def analyze_budget_qualification(self, lead):
+        """
+        Analyze budget/revenue qualification
+        
+        Factors:
+        - Expected revenue field filled
+        - Budget mentioned in description
+        - Revenue compared to typical deal size
+        
+        Returns:
+            dict: {'score': float (0-100), 'analysis': str, 'budget_mentioned': bool}
+        """
+        expected_revenue = lead.expected_revenue or 0
+        description = (lead.description or '').lower()
+        
+        score = 30  # Base score
+        analysis_parts = []
+        budget_mentioned = False
+        
+        # Check expected_revenue field
+        if expected_revenue > 0:
+            score += 25
+            analysis_parts.append(f"Expected revenue: {expected_revenue:,.2f}")
+            
+            # Compare to typical deals (get average from won opportunities)
+            try:
+                won_leads = self.env['crm.lead'].search([
+                    ('type', '=', 'opportunity'),
+                    ('stage_id.is_won', '=', True),
+                    ('expected_revenue', '>', 0)
+                ], limit=100)
+                
+                if won_leads:
+                    avg_revenue = sum(l.expected_revenue for l in won_leads) / len(won_leads)
+                    if expected_revenue >= avg_revenue * 1.5:
+                        score += 15
+                        analysis_parts.append("Above average deal size.")
+                    elif expected_revenue >= avg_revenue * 0.5:
+                        score += 10
+                        analysis_parts.append("Typical deal size.")
+                    else:
+                        analysis_parts.append("Below average deal size.")
+            except Exception:
+                pass  # Skip comparison if error
+        else:
+            analysis_parts.append("No expected revenue specified.")
+        
+        # Check for budget keywords in description
+        budget_patterns = [
+            r'budget[:\s]+[\$€£]?[\d,]+',
+            r'[\$€£][\d,]+\s*(k|m|million|thousand)?',
+            r'budget\s*(is|of|around|approximately)',
+            r'(can spend|willing to pay|investment of)',
+            r'\d+\s*(k|m)\s*(budget|investment)'
+        ]
+        
+        for pattern in budget_patterns:
+            if re.search(pattern, description, re.IGNORECASE):
+                budget_mentioned = True
+                score += 15
+                analysis_parts.append("Budget mentioned in description.")
+                break
+        
+        if not budget_mentioned and expected_revenue == 0:
+            analysis_parts.append("No budget information available.")
+        
+        return {
+            'score': max(0, min(100, score)),
+            'analysis': ' '.join(analysis_parts),
+            'budget_mentioned': budget_mentioned,
+            'expected_revenue': expected_revenue
+        }
+
+    @api.model
+    def analyze_urgency(self, lead):
+        """
+        Analyze urgency and timeline from description and fields
+        
+        Detects urgency keywords and deadline mentions
+        
+        Returns:
+            dict: {'score': float (0-100), 'analysis': str, 'urgency_level': str}
+        """
+        description = (lead.description or '').lower()
+        
+        # Check date_deadline field
+        has_deadline = bool(lead.date_deadline)
+        
+        score = 40  # Base/neutral score
+        urgency_level = 'normal'
+        analysis_parts = []
+        
+        # Check for urgency keywords
+        high_urgency_found = False
+        medium_urgency_found = False
+        low_urgency_found = False
+        
+        for keyword in URGENCY_KEYWORDS['high']:
+            if keyword in description:
+                high_urgency_found = True
+                break
+        
+        for keyword in URGENCY_KEYWORDS['medium']:
+            if keyword in description:
+                medium_urgency_found = True
+                break
+        
+        for keyword in URGENCY_KEYWORDS['low']:
+            if keyword in description:
+                low_urgency_found = True
+                break
+        
+        # Score based on urgency signals
+        if high_urgency_found:
+            score += 40
+            urgency_level = 'high'
+            analysis_parts.append("🔥 HIGH URGENCY detected in requirements.")
+        elif medium_urgency_found:
+            score += 20
+            urgency_level = 'medium'
+            analysis_parts.append("⏰ Medium urgency - timeline mentioned.")
+        elif low_urgency_found:
+            score -= 15
+            urgency_level = 'low'
+            analysis_parts.append("📅 Low urgency - no immediate need.")
+        else:
+            analysis_parts.append("No urgency indicators detected.")
+        
+        # Deadline field bonus
+        if has_deadline:
+            from odoo import fields
+            days_until = (lead.date_deadline - fields.Date.today()).days
+            if days_until <= 7:
+                score += 25
+                analysis_parts.append(f"Deadline in {days_until} days!")
+            elif days_until <= 30:
+                score += 15
+                analysis_parts.append(f"Deadline in {days_until} days.")
+            elif days_until <= 90:
+                score += 5
+                analysis_parts.append(f"Deadline in {days_until} days.")
+        
+        # Check for timeline/date mentions in description
+        timeline_patterns = [
+            r'by\s+(january|february|march|april|may|june|july|august|september|october|november|december)',
+            r'(next|this)\s+(week|month|quarter)',
+            r'within\s+\d+\s+(days|weeks|months)',
+            r'deadline[:\s]+',
+            r'need\s+by',
+            r'(q1|q2|q3|q4)\s+202[4-6]'
+        ]
+        
+        for pattern in timeline_patterns:
+            if re.search(pattern, description, re.IGNORECASE):
+                if urgency_level == 'normal':
+                    score += 10
+                    urgency_level = 'medium'
+                analysis_parts.append("Timeline mentioned in description.")
+                break
+        
+        return {
+            'score': max(0, min(100, score)),
+            'analysis': ' '.join(analysis_parts),
+            'urgency_level': urgency_level,
+            'has_deadline': has_deadline
+        }
+
+    @api.model
+    def analyze_contact_quality(self, lead):
+        """
+        Analyze contact quality and decision-maker potential
+        
+        Checks:
+        - Contact name provided
+        - Job title/function (decision maker?)
+        - Phone number quality
+        - Multiple contact methods
+        
+        Returns:
+            dict: {'score': float (0-100), 'analysis': str, 'is_decision_maker': bool}
+        """
+        contact_name = lead.contact_name or ''
+        function = (lead.function or '').lower()
+        phone = lead.phone or ''
+        mobile = lead.mobile or ''
+        
+        score = 30  # Base score
+        analysis_parts = []
+        is_decision_maker = False
+        
+        # Check contact name
+        if contact_name:
+            score += 15
+            analysis_parts.append("Contact name provided.")
+            
+            # Check for full name (first + last)
+            if ' ' in contact_name.strip():
+                score += 5
+                analysis_parts.append("Full name available.")
+        else:
+            analysis_parts.append("No contact name.")
+        
+        # Check job title/function
+        if function:
+            score += 10
+            # Check if decision maker
+            for title in DECISION_MAKER_TITLES:
+                if title in function:
+                    is_decision_maker = True
+                    score += 20
+                    analysis_parts.append(f"🎯 Decision maker: {lead.function}")
+                    break
+            
+            if not is_decision_maker:
+                analysis_parts.append(f"Title: {lead.function}")
+        else:
+            analysis_parts.append("Job title unknown.")
+        
+        # Check phone numbers
+        phone_count = 0
+        if phone and len(phone) >= 7:
+            phone_count += 1
+        if mobile and len(mobile) >= 7:
+            phone_count += 1
+        
+        if phone_count >= 2:
+            score += 15
+            analysis_parts.append("Multiple phone numbers available.")
+        elif phone_count == 1:
+            score += 10
+            analysis_parts.append("Phone number available.")
+        else:
+            analysis_parts.append("No phone number.")
+        
+        return {
+            'score': max(0, min(100, score)),
+            'analysis': ' '.join(analysis_parts),
+            'is_decision_maker': is_decision_maker,
+            'has_phone': phone_count > 0
+        }
+
+    @api.model
     def calculate_ai_probability_score(self, lead):
         """
         Calculate overall AI probability score combining all factors
+        
+        Enhanced scoring with 7 dimensions:
+        - Completeness (how complete is lead info)
+        - Clarity (how clear are requirements)
+        - Engagement (activity and interaction level)
+        - Email Quality (corporate vs personal)
+        - Budget (revenue qualification)
+        - Urgency (timeline and need)
+        - Contact Quality (decision maker detection)
 
         Returns:
             dict: Complete scoring analysis
         """
-        # Get individual scores
+        # Get individual scores - Core factors
         completeness = self.analyze_lead_completeness(lead)
         clarity = self.analyze_requirement_clarity(lead)
         engagement = self.analyze_activity_engagement(lead)
+        
+        # Get individual scores - New enhanced factors
+        email_quality = self.analyze_email_quality(lead)
+        budget = self.analyze_budget_qualification(lead)
+        urgency = self.analyze_urgency(lead)
+        contact = self.analyze_contact_quality(lead)
 
         # Get configured weights (cached for performance)
         weights = self._get_scoring_weights()
-
-        # Weight the scores using configured values
-        weighted_score = (
+        
+        # Calculate base weighted score (original 3 factors = 70% weight)
+        base_weighted = (
             completeness['score'] * weights['completeness'] +
             clarity['score'] * weights['clarity'] +
             engagement['score'] * weights['engagement']
         )
+        
+        # Calculate enhanced factors bonus (30% weight total)
+        # Each enhanced factor can add or subtract from score
+        enhanced_score = (
+            email_quality['score'] * 0.08 +  # 8% weight
+            budget['score'] * 0.10 +          # 10% weight  
+            urgency['score'] * 0.07 +         # 7% weight
+            contact['score'] * 0.05           # 5% weight
+        )
+        
+        # Final weighted score (capped at 0-100)
+        weighted_score = max(0, min(100, (base_weighted * 0.70) + (enhanced_score)))
+        
+        # Special bonuses
+        if contact.get('is_decision_maker'):
+            weighted_score = min(100, weighted_score + 5)  # Decision maker bonus
+        if urgency.get('urgency_level') == 'high':
+            weighted_score = min(100, weighted_score + 5)  # High urgency bonus
 
         # Use LLM for final analysis and adjustment
-        final_analysis_prompt = f"""As a sales expert, provide a final assessment of this lead's conversion probability:
+        final_analysis_prompt = f"""As a sales expert, provide a final assessment of this lead's conversion probability.
 
-Completeness Score: {completeness['score']}/100
-- {completeness['analysis']}
+=== CORE METRICS ===
+📋 Completeness Score: {completeness['score']}/100
+   {completeness['analysis']}
 
-Requirement Clarity Score: {clarity['score']}/100
-- {clarity['analysis']}
+📝 Requirement Clarity Score: {clarity['score']}/100
+   {clarity.get('analysis', 'N/A')}
 
-Engagement Score: {engagement['score']}/100
-- {engagement['analysis']}
+📈 Engagement Score: {engagement['score']}/100
+   {engagement['analysis']}
 
-Initial Calculated Score: {weighted_score:.1f}/100
+=== ENHANCED METRICS ===
+📧 Email Quality Score: {email_quality['score']}/100
+   Type: {email_quality.get('email_type', 'unknown')} | {email_quality['analysis']}
 
-Based on this information, provide:
-1. A final probability score (0-100) with brief justification
-2. Top 2-3 strengths of this lead
-3. Top 2-3 concerns or weaknesses
-4. Recommended next actions
+💰 Budget Qualification Score: {budget['score']}/100
+   Revenue: {budget.get('expected_revenue', 0):,.2f} | {budget['analysis']}
 
-Keep your response concise and actionable.
+⏰ Urgency Score: {urgency['score']}/100
+   Level: {urgency.get('urgency_level', 'normal')} | {urgency['analysis']}
+
+👤 Contact Quality Score: {contact['score']}/100
+   Decision Maker: {'YES' if contact.get('is_decision_maker') else 'No'} | {contact['analysis']}
+
+=== CALCULATED SCORE ===
+Initial Score: {weighted_score:.1f}/100
+
+Based on ALL these factors, provide:
+1. **Final Probability Score** (0-100) with brief justification
+2. **Top 3 Strengths** of this lead
+3. **Top 3 Concerns/Risks**
+4. **Priority Level**: HIGH / MEDIUM / LOW
+5. **Recommended Next Actions** (2-3 specific actions)
+
+Be concise and actionable. Consider all 7 scoring dimensions.
 """
 
         messages = [{'role': 'user', 'content': final_analysis_prompt}]
@@ -530,12 +934,29 @@ Keep your response concise and actionable.
 
         return {
             'calculated_score': round(weighted_score, 2),
+            # Core scores
             'completeness_score': completeness['score'],
             'clarity_score': clarity['score'],
             'engagement_score': engagement['score'],
+            # Enhanced scores
+            'email_quality_score': email_quality['score'],
+            'budget_score': budget['score'],
+            'urgency_score': urgency['score'],
+            'contact_quality_score': contact['score'],
+            # Analysis text
             'completeness_analysis': completeness['analysis'],
             'clarity_analysis': clarity.get('analysis', ''),
             'engagement_analysis': engagement['analysis'],
+            'email_analysis': email_quality['analysis'],
+            'budget_analysis': budget['analysis'],
+            'urgency_analysis': urgency['analysis'],
+            'contact_analysis': contact['analysis'],
+            # Special flags
+            'is_decision_maker': contact.get('is_decision_maker', False),
+            'urgency_level': urgency.get('urgency_level', 'normal'),
+            'email_type': email_quality.get('email_type', 'unknown'),
+            'budget_mentioned': budget.get('budget_mentioned', False),
+            # LLM analysis
             'llm_analysis': llm_result['content'] if llm_result['success'] else 'Analysis unavailable',
             'analysis_success': llm_result['success'],
         }

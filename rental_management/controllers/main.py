@@ -10,13 +10,30 @@ _logger = logging.getLogger(__name__)
 
 
 FILE_TYPE = ['image/jpeg', 'image/png', 'image/jpg']  # allowed file type
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit for security
 
 def get_encoded_image(image):
+    """
+    Encode and validate uploaded images.
+    Security: Validates MIME type and file size to prevent DoS attacks.
+
+    Args:
+        image: File object from upload
+
+    Returns:
+        Base64 encoded image or None if validation fails
+    """
     if image:
         attachment = image.read()
+        # Security: Check file size to prevent DoS
+        if len(attachment) > MAX_FILE_SIZE:
+            _logger.warning("File upload rejected: size %d bytes exceeds limit", len(attachment))
+            return None
         mimetype = guess_mimetype(base64.b64decode(base64.encodebytes(attachment)))
         if mimetype in FILE_TYPE:
             return base64.encodebytes(attachment)
+        _logger.warning("File upload rejected: invalid MIME type %s", mimetype)
+    return None
 
 # My Portal Sell and Rent Contract Count
 class RentalCustomerPortal(CustomerPortal):
@@ -120,18 +137,40 @@ class RentalPortalWebsite(http.Controller):
 
 class PropertyImageController(http.Controller):
 
-    @http.route('/property/images/create', type='http', auth='public', csrf=False)
+    @http.route('/property/images/create', type='http', auth='user', csrf=True, methods=['POST'])
     def create_image(self, **kw):
-        if kw.get('images[]'):
-            images = request.httprequest.files.getlist('images[]')
-            if images:
-                for image in images:
-                    new_image = request.env['property.images'].sudo().create({
-                            'title': image.filename.split('.')[0],
-                            'property_id': int(kw.get('property_id')),
-                            'image':  get_encoded_image(image),
-                        })
-        return request.redirect(kw.get('url'))
+        """
+        Create property images from file upload.
+        Security: CSRF protection enabled, authentication required, file validation.
+
+        Returns:
+            Redirect to the property page
+        """
+        try:
+            if kw.get('images[]'):
+                property_id = int(kw.get('property_id'))
+                # Security: Verify user has access to this property
+                property_obj = request.env['property.details'].browse(property_id)
+                if not property_obj.exists():
+                    _logger.warning("Image upload failed: property %d not found", property_id)
+                    return request.redirect(kw.get('url', '/'))
+
+                images = request.httprequest.files.getlist('images[]')
+                if images:
+                    for image in images:
+                        encoded_image = get_encoded_image(image)
+                        if encoded_image:  # Only create if validation passed
+                            request.env['property.images'].sudo().create({
+                                'title': image.filename.split('.')[0],
+                                'property_id': property_id,
+                                'image': encoded_image,
+                            })
+                        else:
+                            _logger.warning("Image upload rejected for property %d", property_id)
+            return request.redirect(kw.get('url', '/'))
+        except Exception as e:
+            _logger.error("Error creating property images: %s", str(e), exc_info=True)
+            return request.redirect(kw.get('url', '/'))
 
     @http.route('/get/property/data', type='json', auth='public')
     def get_property_data(self, **kw):

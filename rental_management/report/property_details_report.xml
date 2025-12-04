@@ -14,9 +14,7 @@
                                 <tr>
                                     <td style="text-align:center;">
                                         <t t-if="doc.image">
-                                            <img t-att-src="image_data_uri(doc.image)" class="mt-2"
-                                                style="width: 54rem; height: 27rem; border: 4px solid #5f6364; border-radius: 5px;"
-                                                alt="Image" />
+                                            <img t-att-src="image_data_uri(doc.image)" class="mt-2" style="width: 54rem; height: 27rem; border: 4px solid #5f6364; border-radius: 5px;" alt="Image" />
                                         </t>
                                     </td>
                                 </tr>
@@ -25,17 +23,12 @@
                                 <span t-field="doc.name" />
                             </h2>
                             <hr />
-                            <h6
-                                style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                            <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                 <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                            rx="1" transform="rotate(-180 18 13)"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                            fill="currentColor" />
+                                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                     </svg>
                                 </span>
                                 Property Details </h6>
@@ -52,8 +45,8 @@
                                                 </td>
                                                 <td style="width:70%;">
                                                     <strong>
-                                                        <span t-field="doc.type" /> / <span
-                                                            t-field="doc.property_subtype_id" />
+                                                        <span t-field="doc.type" />
+ /                                                        <span t-field="doc.property_subtype_id" />
                                                     </strong>
                                                 </td>
                                             </tr>
@@ -101,8 +94,8 @@
                                                             <span t-field="doc.price" />
                                                         </t>
                                                         <t t-if="doc.sale_lease== 'for_tenancy'">
-                                                            <span t-field="doc.price" /> / <span
-                                                                t-field="doc.rent_unit" />
+                                                            <span t-field="doc.price" />
+ /                                                            <span t-field="doc.rent_unit" />
                                                         </t>
                                                     </strong>
                                                 </td>
@@ -138,18 +131,15 @@
                                                         <span>
                                                             <span t-field="doc.street" />
                                                             <br />
-                                                            <span
-                                                                t-field="doc.street2" />
+                                                            <span t-field="doc.street2" />
                                                             <br />
-                                                            <t
-                                                                t-if="doc.city_id">
-                                                                <span t-field="doc.city_id.name" />, <span
-                                                                    t-field="doc.zip" />
+                                                            <t t-if="doc.city_id">
+                                                                <span t-field="doc.city_id.name" />
+,                                                                <span t-field="doc.zip" />
                                                             </t>
                                                             <br />
-                                                            <span
-                                                                t-field="doc.state_id.name" />, <span
-                                                                t-field="doc.country_id.name" />
+                                                            <span t-field="doc.state_id.name" />
+,                                                            <span t-field="doc.country_id.name" />
                                                         </span>
                                                     </strong>
                                                 </td>
@@ -159,17 +149,12 @@
                                 </tr>
                             </table>
                             <p style="page-break-before:always;" />
-                            <h6
-                                style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                            <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                 <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                            rx="1" transform="rotate(-180 18 13)"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                            fill="currentColor" />
+                                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                     </svg>
                                 </span>
                                 Owner Details </h6>
@@ -243,17 +228,12 @@
                                     </td>
                                 </tr>
                             </table>
-                            <h6
-                                style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                            <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                 <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                            rx="1" transform="rotate(-180 18 13)"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                            fill="currentColor" />
+                                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                     </svg>
                                 </span>
                                 Area Measurements </h6>
@@ -360,17 +340,12 @@
                                 </table>
                             </t>
                             <t t-if="doc.type in ['residential','commercial','industrial']">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     <t t-if="doc.type == 'residential'">
@@ -455,7 +430,8 @@
                                                         </td>
                                                         <td style="width:70%;">
                                                             <strong>
-                                                                <span t-field="doc.unit_type" /> BHK </strong>
+                                                                <span t-field="doc.unit_type" />
+ BHK </strong>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -496,8 +472,7 @@
                                                             </td>
                                                             <td style="width:70%;">
                                                                 <strong>
-                                                                    <span
-                                                                        t-field="doc.furnishing_id" />
+                                                                    <span t-field="doc.furnishing_id" />
                                                                 </strong>
                                                             </td>
                                                         </tr>
@@ -509,17 +484,12 @@
                                 </table>
                             </t>
                             <p style="page-break-before:always;" />
-                            <h6
-                                style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                            <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                 <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                            rx="1" transform="rotate(-180 18 13)"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                            fill="currentColor" />
+                                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                     </svg>
                                 </span>
                                 Pricing Details </h6>
@@ -542,16 +512,15 @@
                                             </tr>
                                             <t t-if="doc.pricing_type == 'area_wise'">
                                                 <tr>
-                                                    <td style="width:28%;"> Price / <span
-                                                            t-field="doc.measure_unit" />
+                                                    <td style="width:28%;"> Price / <span t-field="doc.measure_unit" />
                                                     </td>
                                                     <td style="width:2%;">
                                                         :
                                                     </td>
                                                     <td style="width:70%;">
                                                         <strong>
-                                                            <span t-field="doc.price_per_area" /> / <span
-                                                                t-field="doc.measure_unit" />
+                                                            <span t-field="doc.price_per_area" />
+ /                                                            <span t-field="doc.measure_unit" />
                                                         </strong>
                                                     </td>
                                                 </tr>
@@ -578,8 +547,8 @@
                                                             <span t-field="doc.price" />
                                                         </t>
                                                         <t t-if="doc.sale_lease== 'for_tenancy'">
-                                                            <span t-field="doc.price" /> / <span
-                                                                t-field="doc.rent_unit" />
+                                                            <span t-field="doc.price" />
+ /                                                            <span t-field="doc.rent_unit" />
                                                         </t>
                                                     </strong>
                                                 </td>
@@ -588,18 +557,64 @@
                                     </td>
                                 </tr>
                             </table>
+                            <!-- Additional Fees Section (Separate for better layout) -->
+                            <t t-if="doc.sale_lease == 'for_sale' and (doc.dld_fee > 0 or doc.admin_fee > 0)">
+                                <div style="margin-top:20px;padding:15px;background-color:#f8f9fa;border-left:4px solid #007bff;border-radius:4px;">
+                                    <h6 style="margin-bottom:10px;color:#495057;">
+                                        <strong>Additional Fees</strong>
+                                        <small style="color:#6c757d;font-style:italic;font-weight:normal;"> (Not included in sale price)</small>
+                                    </h6>
+                                    <table class="table table-borderless" style="margin-bottom:0;">
+                                        <tr t-if="doc.dld_fee > 0">
+                                            <td style="width:30%;padding:5px 10px;">
+                                                DLD Fee
+                                            </td>
+                                            <td style="width:2%;padding:5px;">
+                                                :
+                                            </td>
+                                            <td style="width:68%;padding:5px 10px;">
+                                                <strong>
+                                                    <span t-field="doc.dld_fee" />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="doc.admin_fee > 0">
+                                            <td style="width:30%;padding:5px 10px;">
+                                                Admin Fee
+                                            </td>
+                                            <td style="width:2%;padding:5px;">
+                                                :
+                                            </td>
+                                            <td style="width:68%;padding:5px 10px;">
+                                                <strong>
+                                                    <span t-field="doc.admin_fee" />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="doc.dld_fee > 0 and doc.admin_fee > 0" style="border-top:2px solid #dee2e6;">
+                                            <td style="width:30%;padding:8px 10px;">
+                                                <strong>Total Additional Fees</strong>
+                                            </td>
+                                            <td style="width:2%;padding:8px;">
+                                                :
+                                            </td>
+                                            <td style="width:68%;padding:8px 10px;">
+                                                <strong style="color:#007bff;font-size:1.1em;">
+                                                    <span t-esc="doc.currency_id.symbol" />
+                                                    <t t-esc="'{:,.2f}'.format(doc.dld_fee + doc.admin_fee)" />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </t>
                             <t t-if="doc.is_maintenance_service">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Maintenance Details </h6>
@@ -617,8 +632,7 @@
                                                         </td>
                                                         <td style="width:60%;">
                                                             <strong>
-                                                                <span
-                                                                    t-field="doc.maintenance_rent_type" />
+                                                                <span t-field="doc.maintenance_rent_type" />
                                                             </strong>
                                                         </td>
                                                     </tr>
@@ -650,8 +664,7 @@
                                                         </td>
                                                         <td style="width:60%;">
                                                             <strong>
-                                                                <span
-                                                                    t-field="doc.per_area_maintenance" />
+                                                                <span t-field="doc.per_area_maintenance" />
                                                             </strong>
                                                         </td>
                                                     </tr>
@@ -675,17 +688,12 @@
                                 </table>
                             </t>
                             <t t-if="doc.is_extra_service">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Utility Services </h6>
@@ -720,8 +728,7 @@
                                                 </td>
                                             </t>
                                             <td style="text-align:right;">
-                                                <span t-field="s.price"
-                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}' />
+                                                <span t-field="s.price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' />
                                             </td>
                                         </tr>
                                     </t>
@@ -729,38 +736,28 @@
                             </t>
                             <p style="page-break-before:always;" />
                             <t t-if="doc.amenities and doc.amenities_ids">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Amenities </h6>
                                 <table class="table table-borderless">
-                                    <t t-set="ap_tag"
-                                        t-value="str('&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td ') + str('style=text-align:center;') + str('&gt;')" />
+                                    <t t-set="ap_tag" t-value="str('&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:center;&quot;&gt;')" />
                                     <t t-set="img_count" t-value="0" />
                                     <tr>
                                         <td style="text-align:center">
                                             <t t-foreach="doc.amenities_ids" t-as="img">
                                                 <t t-set="img_count" t-value="img_count + 1" />
-                                                <div
-                                                    style="width:12.5rem;display: inline-block;text-align:center;">
+                                                <div style="width:12.5rem;display: inline-block;text-align:center;">
                                                     <t t-if="img.image">
-                                                        <img t-att-src="image_data_uri(img.image)"
-                                                            style="width: 5rem; height: 5rem; border-radius: 40px;" />
+                                                        <img t-att-src="image_data_uri(img.image)" style="width: 5rem; height: 5rem; border-radius: 40px;" />
                                                     </t>
                                                     <t t-else="">
-                                                        <img
-                                                            src="/rental_management/static/src/img/amenity.jpeg"
-                                                            style="width: 5rem; height: 5rem; border-radius: 40px;" />
+                                                        <img src="/rental_management/static/src/img/amenity.jpeg" style="width: 5rem; height: 5rem; border-radius: 40px;" />
                                                     </t>
                                                     <br />
                                                     <h6>
@@ -777,34 +774,24 @@
                             </t>
                             <p style="page-break-before:always;" />
                             <t t-if="doc.is_facilities and doc.property_specification_ids">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Specifications </h6>
                                 <table class="table table-borderless">
                                     <t t-foreach="doc.property_specification_ids" t-as="ps">
                                         <tr style="border-bottom: 1px solid #cdc2c2;">
-                                            <td
-                                                style="width:10%;vertical-align:middle;text-align:center;">
+                                            <td style="width:10%;vertical-align:middle;text-align:center;">
                                                 <t t-if="ps.image">
-                                                    <img t-att-src="image_data_uri(ps.image)"
-                                                        style="width: 6rem; height: 6rem; object-fit: cover;"
-                                                        alt="Image" />
+                                                    <img t-att-src="image_data_uri(ps.image)" style="width: 6rem; height: 6rem; object-fit: cover;" alt="Image" />
                                                 </t>
                                                 <t t-else="">
-                                                    <img
-                                                        src="/rental_management/static/src/img/specifications.jpeg"
-                                                        style="width: 5rem; height: 5rem; border-radius: 40px;" />
+                                                    <img src="/rental_management/static/src/img/specifications.jpeg" style="width: 5rem; height: 5rem; border-radius: 40px;" />
                                                 </t>
                                             </td>
                                             <td style="width:90%;vertical-align:top;">
@@ -813,8 +800,7 @@
                                                         <span t-field="ps.title" />
                                                     </strong>
                                                 </h5>
-                                                <hr
-                                                    style="margin-top:0.25rem;margin-bottom:0.25rem;" />
+                                                <hr style="margin-top:0.25rem;margin-bottom:0.25rem;" />
                                                 <span t-field="ps.description" />
                                             </td>
                                         </tr>
@@ -823,33 +809,25 @@
                             </t>
                             <p style="page-break-before:always;" />
                             <t t-if="doc.nearby_connectivity and doc.connectivity_ids">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Nearby Connectivities </h6>
                                 <table class="table table-borderless">
-                                    <t t-set="ap_tag"
-                                        t-value="str('&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td ') + str('style=text-align:center;') + str('&gt;')" />
+                                    <t t-set="ap_tag" t-value="str('&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:center;&quot;&gt;')" />
                                     <t t-set="img_count" t-value="0" />
                                     <tr>
                                         <td style="text-align:center">
                                             <t t-foreach="doc.connectivity_ids" t-as="img">
                                                 <t t-set="img_count" t-value="img_count + 1" />
-                                                <div
-                                                    style="width:12.5rem;display: inline-block;text-align:center;padding:3px;">
+                                                <div style="width:12.5rem;display: inline-block;text-align:center;padding:3px;">
                                                     <t t-if="img.image">
-                                                        <img t-att-src="image_data_uri(img.image)"
-                                                            style="width:50px;height:50px;" />
+                                                        <img t-att-src="image_data_uri(img.image)" style="width:50px;height:50px;" />
                                                     </t>
                                                     <br />
                                                     <h6>
@@ -874,17 +852,12 @@
                             </t>
                             <p style="page-break-before:always;" />
                             <t t-if="doc.is_floor_plan and doc.floreplan_ids">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Floor Plans </h6>
@@ -895,9 +868,7 @@
                                                 <span t-field="i.title" />
                                             </strong>
                                             <hr style="margin-top:0.25rem;margin-bottom:0.25rem;" />
-                                            <img t-att-src="image_data_uri(i.image)" class="mt-2"
-                                                style="width:inherit;margin: 1px;"
-                                                alt="Image" />
+                                            <img t-att-src="image_data_uri(i.image)" class="mt-2" style="width:inherit;margin: 1px;" alt="Image" />
                                         </t>
                                     </div>
                                     <p style="page-break-before:always;" />
@@ -905,17 +876,12 @@
                             </t>
                             <p style="page-break-before:always;" />
                             <t t-if="doc.is_images and doc.property_images_ids">
-                                <h6
-                                    style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
+                                <h6 style="padding-bottom:10px;padding-top:10px;background-color:#e9ecef;">
                                     <span class="svg-icon svg-icon-muted svg-icon-2hx">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <rect opacity="0.5" x="18" y="13" width="13" height="2"
-                                                rx="1" transform="rotate(-180 18 13)"
-                                                fill="currentColor" />
-                                            <path
-                                                d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z"
-                                                fill="currentColor" />
+                                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
                                         </svg>
                                     </span>
                                     Images </h6>
@@ -926,9 +892,7 @@
                                                 <span t-field="i.title" />
                                             </strong>
                                             <hr style="margin-top:0.25rem;margin-bottom:0.25rem;" />
-                                            <img t-att-src="image_data_uri(i.image)" class="mt-2"
-                                                style="width:inherit;margin: 1px;"
-                                                alt="Image" />
+                                            <img t-att-src="image_data_uri(i.image)" class="mt-2" style="width:inherit;margin: 1px;" alt="Image" />
                                         </t>
                                     </div>
                                     <p style="page-break-before:always;" />
