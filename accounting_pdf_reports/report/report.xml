@@ -8,6 +8,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_general_ledger</field>
             <field name="report_file">accounting_pdf_reports.report_general_ledger</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_partnerledger" model="ir.actions.report">
@@ -16,6 +17,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_partnerledger</field>
             <field name="report_file">accounting_pdf_reports.report_partnerledger</field>
+            <field name="binding_type">report</field>
         </record>
 
 
@@ -25,6 +27,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_trialbalance</field>
             <field name="report_file">accounting_pdf_reports.report_trialbalance</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_financial" model="ir.actions.report">
@@ -33,6 +36,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_financial</field>
             <field name="report_file">accounting_pdf_reports.report_financial</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_account_tax" model="ir.actions.report">
@@ -41,6 +45,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_tax</field>
             <field name="report_file">accounting_pdf_reports.report_tax</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_aged_partner_balance" model="ir.actions.report">
@@ -49,6 +54,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_agedpartnerbalance</field>
             <field name="report_file">accounting_pdf_reports.report_agedpartnerbalance</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_journal" model="ir.actions.report">
@@ -57,6 +63,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">accounting_pdf_reports.report_journal</field>
             <field name="report_file">accounting_pdf_reports.report_journal</field>
+            <field name="binding_type">report</field>
         </record>
 
         <record id="action_report_journal_entries" model="ir.actions.report">

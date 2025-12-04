@@ -48,3 +48,4 @@
     'license': 'LGPL-3',
     'images': ['static/description/banner.png'],
 }
+    
