@@ -1,7 +1,7 @@
 {
     "name": "Sale Deal Tracking",
-    "version": "2.0.2",
-    "summary": "Enhanced deal tracking for Sales and CRM with unified stages, UTM integration, and Commission Management",
+    "version": "2.0.3",
+    "summary": "Enhanced deal tracking for Sales and CRM with unified stages, UTM integration, and Commission Reporting",
     "description": """
         Sale Deal Tracking Module
         =========================
@@ -29,9 +29,10 @@
         
         Commission Integration:
         ----------------------
-        * Commission Lines smart button appears in sale orders
-        * Only visible when commission lines are created
-        * Shows commission count and opens detailed view
+        * Print Commission Report button in sale order header
+        * Commission Lines smart button shows commission count
+        * Only visible when commission lines exist
+        * Opens detailed commission view and report printing
         * Integrates with commission_ax module for full workflow
     """,
     "author": "OSUSAPPS",
