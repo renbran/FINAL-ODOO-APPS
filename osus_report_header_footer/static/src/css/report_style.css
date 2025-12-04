@@ -2,221 +2,235 @@
 
 /* Header Styles */
 .osus-header {
-    padding: 10px 0;
-    margin-bottom: 10px;
+  padding: 10px 0;
+  margin-bottom: 10px;
 }
 
 .osus-logo {
-    max-height: 60px;
-    max-width: 180px;
-    object-fit: contain;
+  max-height: 60px;
+  max-width: 180px;
+  object-fit: contain;
 }
 
 .osus-company-info {
-    text-align: right;
+  text-align: right;
 }
 
 .osus-company-info h4 {
-    color: #1a1a1a;
-    font-weight: 700;
-    margin-bottom: 5px;
-    font-size: 14pt;
+  color: #1a1a1a;
+  font-weight: 700;
+  margin-bottom: 5px;
+  font-size: 14pt;
 }
 
 .osus-contact-details {
-    font-size: 10pt;
-    color: #555;
-    line-height: 1.4;
+  font-size: 10pt;
+  color: #555;
+  line-height: 1.4;
 }
 
 .osus-contact-details div {
-    margin-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 .osus-contact-details i {
-    color: #004a7c;
-    margin-right: 4px;
-    width: 12px;
-    display: inline-block;
-    text-align: center;
+  color: #004a7c;
+  margin-right: 4px;
+  width: 12px;
+  display: inline-block;
+  text-align: center;
 }
 
 .osus-header-line {
-    border: 0;
-    border-top: 2px solid #004a7c;
-    margin: 8px 0;
+  border: 0;
+  border-top: 2px solid #004a7c;
+  margin: 8px 0;
 }
 
 /* Footer Styles */
 .osus-footer {
-    padding: 8px 0;
-    margin-top: 10px;
+  padding: 8px 0;
+  margin-top: 10px;
 }
 
 .osus-footer-line {
-    border: 0;
-    border-top: 2px solid #004a7c;
-    margin: 8px 0;
+  border: 0;
+  border-top: 2px solid #004a7c;
+  margin: 8px 0;
 }
 
 .osus-footer-info {
-    font-size: 8pt;
-    color: #666;
-    line-height: 1.5;
+  font-size: 8pt;
+  color: #666;
+  line-height: 1.5;
 }
 
 .osus-footer-info div {
-    margin-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 .osus-page-number {
-    font-size: 9pt;
-    color: #666;
-    font-weight: 500;
+  font-size: 9pt;
+  color: #666;
+  font-weight: 500;
 }
 
 /* General Report Styling */
 .page {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 10pt;
-    line-height: 1.5;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.5;
 }
 
 /* Print Optimization */
 @media print {
-    .osus-header {
-        page-break-inside: avoid;
-    }
+  .osus-header {
+    page-break-inside: avoid;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 
-    .osus-footer {
-        page-break-inside: avoid;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
+  .osus-footer {
+    page-break-inside: avoid;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 
-    .osus-logo {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-    }
+  .osus-logo {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Ensure all backgrounds and colors print */
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }
 
 /* Responsive Adjustments */
 @page {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* OSUS Color Scheme */
 :root {
-    --osus-primary: #004a7c;
-    --osus-secondary: #1a1a1a;
-    --osus-text: #333333;
-    --osus-light-text: #666666;
-    --osus-border: #cccccc;
+  --osus-primary: #004a7c;
+  --osus-secondary: #1a1a1a;
+  --osus-text: #333333;
+  --osus-light-text: #666666;
+  --osus-border: #cccccc;
 }
 
 /* Table Styling Enhancement for Reports */
 table.osus-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
 }
 
 table.osus-table th {
-    background-color: var(--osus-primary);
-    color: white;
-    padding: 8px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 9pt;
+  background-color: var(--osus-primary);
+  color: white;
+  padding: 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 9pt;
 }
 
 table.osus-table td {
-    padding: 6px 8px;
-    border-bottom: 1px solid var(--osus-border);
-    font-size: 9pt;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--osus-border);
+  font-size: 9pt;
 }
 
 table.osus-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 /* Document Title Styling */
 h2.osus-document-title {
-    color: var(--osus-primary);
-    font-weight: 700;
-    margin: 15px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--osus-primary);
+  color: var(--osus-primary);
+  font-weight: 700;
+  margin: 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--osus-primary);
 }
 
 /* Info Boxes */
 .osus-info-box {
-    background-color: #f5f8fa;
-    border-left: 4px solid var(--osus-primary);
-    padding: 10px 15px;
-    margin: 10px 0;
+  background-color: #f5f8fa;
+  border-left: 4px solid var(--osus-primary);
+  padding: 10px 15px;
+  margin: 10px 0;
 }
 
 /* Address Block */
 .osus-address-block {
-    background-color: #fafafa;
-    padding: 12px;
-    border: 1px solid var(--osus-border);
-    border-radius: 4px;
-    margin: 10px 0;
+  background-color: #fafafa;
+  padding: 12px;
+  border: 1px solid var(--osus-border);
+  border-radius: 4px;
+  margin: 10px 0;
 }
 
 /* Highlight Important Information */
 .osus-highlight {
-    background-color: #fff9e6;
-    border-left: 3px solid #ffa500;
-    padding: 8px 12px;
-    margin: 8px 0;
-    font-weight: 500;
+  background-color: #fff9e6;
+  border-left: 3px solid #ffa500;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-weight: 500;
 }
 
 /* Total/Summary Rows */
 tr.osus-total-row td {
-    font-weight: 700;
-    background-color: #e8f4f8 !important;
-    border-top: 2px solid var(--osus-primary);
-    border-bottom: 2px solid var(--osus-primary);
-    font-size: 10pt;
+  font-weight: 700;
+  background-color: #e8f4f8 !important;
+  border-top: 2px solid var(--osus-primary);
+  border-bottom: 2px solid var(--osus-primary);
+  font-size: 10pt;
 }
 
 /* Signature Section */
 .osus-signature-section {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--osus-border);
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--osus-border);
 }
 
 .osus-signature-block {
-    display: inline-block;
-    width: 200px;
-    text-align: center;
-    margin: 20px 30px 0 0;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+  margin: 20px 30px 0 0;
 }
 
 .osus-signature-line {
-    border-top: 1px solid #333;
-    margin-top: 50px;
-    padding-top: 5px;
-    font-size: 8pt;
-    color: var(--osus-light-text);
+  border-top: 1px solid #333;
+  margin-top: 50px;
+  padding-top: 5px;
+  font-size: 8pt;
+  color: var(--osus-light-text);
 }
 
 /* Watermark (Optional - for Draft/Copy) */
 .osus-watermark {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    font-size: 80pt;
-    color: rgba(0, 74, 124, 0.08);
-    font-weight: 700;
-    z-index: -1;
-    pointer-events: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 80pt;
+  color: rgba(0, 74, 124, 0.08);
+  font-weight: 700;
+  z-index: -1;
+  pointer-events: none;
 }

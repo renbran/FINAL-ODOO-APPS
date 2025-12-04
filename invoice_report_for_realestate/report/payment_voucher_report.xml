@@ -4,8 +4,9 @@
     <template id="report_payment_voucher_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="payment">
-                <div class="page" style="font-family: Arial, sans-serif; color: #333; background: #ffffff; padding: 5px; line-height: 1.4;">
-                    <style>
+                <t t-call="osus_report_header_footer.osus_external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; color: #333; background: #ffffff; padding: 5px; line-height: 1.4;">
+                        <style>
                         @page { 
                             margin: 3mm; 
                             size: A4; 
@@ -16,60 +17,6 @@
                             font-size: 14px;
                             line-height: 1.4;
                             color: #333;
-                        }
-                        
-                        .company-header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 15px 0;
-                            margin-bottom: 10px;
-                            border-bottom: 3px solid #7d1538;
-                        }
-                        
-                        .company-logo {
-                            width: 80px;
-                            height: 80px;
-                            object-fit: contain;
-                        }
-                        
-                        .company-details {
-                            text-align: right;
-                            font-size: 11px;
-                            line-height: 1.5;
-                            color: #333;
-                        }
-                        
-                        .company-name {
-                            font-weight: bold;
-                            font-size: 13px;
-                            margin-bottom: 3px;
-                        }
-                        
-                        .company-footer {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 10px 0;
-                            margin-top: 10px;
-                            border-top: 3px solid #7d1538;
-                            font-size: 10px;
-                            color: #7d1538;
-                        }
-                        
-                        .footer-contact {
-                            text-align: left;
-                        }
-                        
-                        .footer-website {
-                            text-align: center;
-                            font-weight: bold;
-                            font-size: 12px;
-                        }
-                        
-                        .footer-disclaimer {
-                            text-align: right;
-                            font-style: italic;
                         }
 
                         .header-section {
@@ -356,162 +303,153 @@
                                 print-color-adjust: exact;
                             }
                         }
-                    </style>
+                        </style>
 
-                    <div class="voucher-container">
-                        <!-- Company Header -->
-                        <div class="company-header">
-                            <img src="https://osusproperties.com/images/osus.png" alt="OSUS Properties Logo" class="company-logo"/>
-                            <div class="company-details">
-                                <div class="company-name">OSUS REAL ESTATE BROKERAGE LLC</div>
-                                <div>Single Business Tower 29th Floor</div>
-                                <div>Business Bay Dubai</div>
-                                <div>United Arab Emirates</div>
-                                <div><strong>VAT: 100236589600003</strong></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Header Section -->
-                        <div class="header-section">
-                            <table class="header-table">
-                                <tr>
-                                    <td style="width: 33.33%; vertical-align: middle;">
-                                        <div class="qr-container">
-                                            <div class="qr-box">
-                                                <t t-if="payment.qr_code">
-                                                    <img t-att-src="image_data_uri(payment.qr_code)" alt="QR Code"/>
+                        <div class="voucher-container">
+                            <!-- Header Section -->
+                            <div class="header-section">
+                                <table class="header-table">
+                                    <tr>
+                                        <td style="width: 33.33%; vertical-align: middle;">
+                                            <div class="qr-container">
+                                                <div class="qr-box">
+                                                    <t t-if="payment.qr_code">
+                                                        <img t-att-src="image_data_uri(payment.qr_code)" alt="QR Code"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span style="font-size: 8px; color: #333; font-weight: bold;">QR</span>
+                                                    </t>
+                                                </div>
+                                                <div class="qr-text">Scan to<br/>
+Verify</div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 33.33%; vertical-align: middle;">
+                                            <div class="voucher-title">
+                                                <t t-if="payment.payment_type == 'inbound'">RECEIPT</t>
+                                                <t t-else="">VOUCHER</t>
+                                            </div>
+                                            <div class="voucher-number">
+                                            NO: 
+                                                <t t-if="payment.voucher_number">
+                                                    <span t-esc="payment.voucher_number"/>
                                                 </t>
                                                 <t t-else="">
-                                                    <span style="font-size: 8px; color: #333; font-weight: bold;">QR</span>
+                                                    <span t-esc="payment.name"/>
                                                 </t>
                                             </div>
-                                            <div class="qr-text">Scan to<br/>Verify</div>
-                                        </div>
-                                    </td>
-                                    <td style="width: 33.33%; vertical-align: middle;">
-                                        <div class="voucher-title">
-                                            <t t-if="payment.payment_type == 'inbound'">RECEIPT</t>
-                                            <t t-else="">VOUCHER</t>
-                                        </div>
-                                        <div class="voucher-number">
-                                            NO: 
-                                            <t t-if="payment.voucher_number">
-                                                <span t-esc="payment.voucher_number"/>
-                                            </t>
-                                            <t t-else="">
-                                                <span t-esc="payment.name"/>
-                                            </t>
-                                        </div>
-                                    </td>
-                                    <td style="width: 33.33%; vertical-align: middle;">
-                                        <div class="date-section">
-                                            <div class="date-label">DATE:</div>
-                                            <div class="date-value">
-                                                <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                                        </td>
+                                        <td style="width: 33.33%; vertical-align: middle;">
+                                            <div class="date-section">
+                                                <div class="date-label">DATE:</div>
+                                                <div class="date-value">
+                                                    <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                                                </div>
+                                                <div class="company-info">
+                                                    <strong>Business Bay, Dubai</strong>
+                                                    <br/>
+                                                    <strong>+971-4-366-4500</strong>
+                                                </div>
                                             </div>
-                                            <div class="company-info">
-                                                <strong>Business Bay, Dubai</strong><br/>
-                                                <strong>+971-4-366-4500</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Fields Section -->
+                            <table class="fields-table">
+                                <tr>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">ISSUED TO:</div>
+                                            <div class="field-value">
+                                                <span t-esc="payment.partner_id.name"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">RELATED INVOICE:</div>
+                                            <div class="field-value">
+                                                <span t-esc="payment.ref or 'N/A'"/>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">PHONE:</div>
+                                            <div class="field-value">
+                                                <t t-if="payment.partner_id.phone">
+                                                    <span t-esc="payment.partner_id.phone"/>
+                                                </t>
+                                                <t t-else="">N/A</t>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">TRANSACTION TYPE:</div>
+                                            <div class="field-value">
+                                                <t t-if="payment.payment_type == 'inbound'">
+                                                    <span class="transaction-badge transaction-received">Receipt (Money Received)</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="transaction-badge transaction-payment">Payment (Money Paid)</span>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">EMAIL:</div>
+                                            <div class="field-value">
+                                                <t t-if="payment.partner_id.email">
+                                                    <span t-esc="payment.partner_id.email"/>
+                                                </t>
+                                                <t t-else="">N/A</t>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">REMARKS:</div>
+                                            <div class="field-value">
+                                                <t t-if="payment.remarks">
+                                                    <span t-esc="payment.remarks"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="field-group">
+                                            <div class="field-label">PAYMENT METHOD:</div>
+                                            <div class="field-value">
+                                                <span t-esc="payment.journal_id.name"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <!-- Empty cell -->
+                                    </td>
+                                </tr>
                             </table>
-                        </div>
 
-                        <!-- Fields Section -->
-                        <table class="fields-table">
-                            <tr>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">ISSUED TO:</div>
-                                        <div class="field-value">
-                                            <span t-esc="payment.partner_id.name"/>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">RELATED INVOICE:</div>
-                                        <div class="field-value">
-                                            <span t-esc="payment.ref or 'N/A'"/>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">PHONE:</div>
-                                        <div class="field-value">
-                                            <t t-if="payment.partner_id.phone">
-                                                <span t-esc="payment.partner_id.phone"/>
-                                            </t>
-                                            <t t-else="">N/A</t>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">TRANSACTION TYPE:</div>
-                                        <div class="field-value">
-                                            <t t-if="payment.payment_type == 'inbound'">
-                                                <span class="transaction-badge transaction-received">Receipt (Money Received)</span>
-                                            </t>
-                                            <t t-else="">
-                                                <span class="transaction-badge transaction-payment">Payment (Money Paid)</span>
-                                            </t>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">EMAIL:</div>
-                                        <div class="field-value">
-                                            <t t-if="payment.partner_id.email">
-                                                <span t-esc="payment.partner_id.email"/>
-                                            </t>
-                                            <t t-else="">N/A</t>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">REMARKS:</div>
-                                        <div class="field-value">
-                                            <t t-if="payment.remarks">
-                                                <span t-esc="payment.remarks"/>
-                                            </t>
-                                            <t t-else="">-</t>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="field-group">
-                                        <div class="field-label">PAYMENT METHOD:</div>
-                                        <div class="field-value">
-                                            <span t-esc="payment.journal_id.name"/>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <!-- Empty cell -->
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- Amount Section -->
-                        <div class="amount-section">
-                            <div class="amount-words-label">AMOUNT IN WORDS:</div>
-                            <div class="amount-words-value">
-                                <span t-esc="payment.currency_id.amount_to_text(payment.amount) if payment.currency_id else ''"/>
-                            </div>
-                            <div class="amount-banner">
-                                TOTAL AMOUNT: <t t-esc="'{:,.3f}'.format(payment.amount).replace(',', 'X').replace('.', ',').replace('X', '.').rstrip('0').rstrip(',')"/> <span t-esc="payment.currency_id.name"/>
+                            <!-- Amount Section -->
+                            <div class="amount-section">
+                                <div class="amount-words-label">AMOUNT IN WORDS:</div>
+                                <div class="amount-words-value">
+                                    <span t-esc="payment.currency_id.amount_to_text(payment.amount) if payment.currency_id else ''"/>
+                                </div>
+                                <div class="amount-banner">
+                                TOTAL AMOUNT: <t t-esc="'{:,.3f}'.format(payment.amount).replace(',', 'X').replace('.', ',').replace('X', '.').rstrip('0').rstrip(',')"/>
+                                <span t-esc="payment.currency_id.name"/>
                             </div>
                         </div>
 
@@ -582,51 +520,40 @@
                                 <div class="received-name">
                                     Name and Signature:<br/>
                                     Print: <span t-esc="payment.partner_id.name"/>
-                                </div>
-                                <div class="received-signature-line"></div>
-                                <div class="received-details">
-                                    <span>Mobile: _______</span>
-                                    <span>Date: <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/></span>
-                                    <span>ID Copy: [ ] Yes [ ] No</span>
-                                </div>
                             </div>
-                        </div>
-
-                        <!-- Footer Section -->
-                        <div class="footer-section">
-                            <div class="footer-info">
-                                Created: <span t-esc="payment.create_uid.name"/> | 
-                                <span t-esc="payment.create_date.strftime('%d/%m/%Y %H:%M') if payment.create_date else ''"/> | 
-                                Modified: <span t-esc="payment.write_uid.name"/>
-                            </div>
-                            <div class="footer-note">
-                                <strong>Thank you for your business!</strong> | Computer-generated document | 
-                                REF: <t t-if="payment.voucher_number">
-                                    <span t-esc="payment.voucher_number"/>
-                                </t>
-                                <t t-else="">
-                                    <span t-esc="payment.name"/>
-                                </t>
-                            </div>
-                        </div>
-                        
-                        <!-- Company Footer -->
-                        <div class="company-footer">
-                            <div class="footer-contact">
-                                <strong>Phone:</strong> +971 4 336 4500<br/>
-                                <strong>Email:</strong> info@osusproperties.com
-                            </div>
-                            <div class="footer-website">
-                                www.osusproperties.com
-                            </div>
-                            <div class="footer-disclaimer">
-                                This is a computer generated document.<br/>
-                                No signature or stamp required.
+                            <div class="received-signature-line"></div>
+                            <div class="received-details">
+                                <span>Mobile: _______</span>
+                                <span>Date: <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                                </span>
+                                <span>ID Copy: [ ] Yes [ ] No</span>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Footer Section -->
+                    <div class="footer-section">
+                        <div class="footer-info">
+                                Created: <span t-esc="payment.create_uid.name"/>
+ | 
+                        <span t-esc="payment.create_date.strftime('%d/%m/%Y %H:%M') if payment.create_date else ''"/>
+ | 
+                                Modified: <span t-esc="payment.write_uid.name"/>
+                    </div>
+                    <div class="footer-note">
+                        <strong>Thank you for your business!</strong> | Computer-generated document | 
+                                REF: <t t-if="payment.voucher_number">
+                        <span t-esc="payment.voucher_number"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="payment.name"/>
+                    </t>
                 </div>
-            </t>
-        </t>
-    </template>
+            </div>
+        </div>
+    </div>
+</t>
+</t>
+</t>
+</template>
 </odoo>

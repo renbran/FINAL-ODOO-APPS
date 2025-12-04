@@ -367,10 +367,12 @@
                                 <div>Single Business Tower 29th Floor</div>
                                 <div>Business Bay Dubai</div>
                                 <div>United Arab Emirates</div>
-                                <div><strong>VAT: 100236589600003</strong></div>
+                                <div>
+                                    <strong>VAT: 100236589600003</strong>
+                                </div>
                             </div>
                         </div>
-                        
+
                         <!-- Header Section -->
                         <div class="header-section">
                             <table class="header-table">
@@ -385,7 +387,8 @@
                                                     <span style="font-size: 8px; color: #333; font-weight: bold;">QR</span>
                                                 </t>
                                             </div>
-                                            <div class="qr-text">Scan to<br/>Verify</div>
+                                            <div class="qr-text">Scan to<br/>
+Verify</div>
                                         </div>
                                     </td>
                                     <td style="width: 33.33%; vertical-align: middle;">
@@ -410,7 +413,8 @@
                                                 <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
                                             </div>
                                             <div class="company-info">
-                                                <strong>Business Bay, Dubai</strong><br/>
+                                                <strong>Business Bay, Dubai</strong>
+                                                <br/>
                                                 <strong>+971-4-366-4500</strong>
                                             </div>
                                         </div>
@@ -511,122 +515,126 @@
                                 <span t-esc="payment.currency_id.amount_to_text(payment.amount) if payment.currency_id else ''"/>
                             </div>
                             <div class="amount-banner">
-                                TOTAL AMOUNT: <t t-esc="'{:,.3f}'.format(payment.amount).replace(',', 'X').replace('.', ',').replace('X', '.').rstrip('0').rstrip(',')"/> <span t-esc="payment.currency_id.name"/>
-                            </div>
+                                TOTAL AMOUNT: <t t-esc="'{:,.3f}'.format(payment.amount).replace(',', 'X').replace('.', ',').replace('X', '.').rstrip('0').rstrip(',')"/>
+                            <span t-esc="payment.currency_id.name"/>
                         </div>
+                    </div>
 
-                        <!-- Signature Section -->
-                        <div class="signature-section">
-                            <table class="signature-table">
-                                <tr>
-                                    <td>
-                                        <div class="signature-box">
-                                            <div class="signature-label">FINANCE DEPARTMENT</div>
-                                            <div class="signature-line"></div>
-                                            <div class="signature-name">
-                                                <t t-if="payment.reviewer_id">
-                                                    <span t-esc="payment.reviewer_id.name"/>
-                                                </t>
-                                                <t t-else="">Name: ________</t>
-                                            </div>
-                                            <div class="signature-name" style="margin-top: 3px;">
-                                                <t t-if="payment.reviewer_date">
-                                                    <span t-esc="payment.reviewer_date.strftime('%d/%m/%Y') if payment.reviewer_date else ''"/>
-                                                </t>
-                                                <t t-else="">Date: ________</t>
-                                            </div>
+                    <!-- Signature Section -->
+                    <div class="signature-section">
+                        <table class="signature-table">
+                            <tr>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">FINANCE DEPARTMENT</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.reviewer_id">
+                                                <span t-esc="payment.reviewer_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div class="signature-box">
-                                            <div class="signature-label">ACCOUNTS MANAGER</div>
-                                            <div class="signature-line"></div>
-                                            <div class="signature-name">
-                                                <t t-if="payment.approver_id">
-                                                    <span t-esc="payment.approver_id.name"/>
-                                                </t>
-                                                <t t-else="">Name: ________</t>
-                                            </div>
-                                            <div class="signature-name" style="margin-top: 3px;">
-                                                <t t-if="payment.approver_date">
-                                                    <span t-esc="payment.approver_date.strftime('%d/%m/%Y') if payment.approver_date else ''"/>
-                                                </t>
-                                                <t t-else="">Date: ________</t>
-                                            </div>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.reviewer_date">
+                                                <span t-esc="payment.reviewer_date.strftime('%d/%m/%Y') if payment.reviewer_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div class="signature-box">
-                                            <div class="signature-label">AUTHORIZED OFFICER</div>
-                                            <div class="signature-line"></div>
-                                            <div class="signature-name">
-                                                <t t-if="payment.authorizer_id">
-                                                    <span t-esc="payment.authorizer_id.name"/>
-                                                </t>
-                                                <t t-else="">Name: ________</t>
-                                            </div>
-                                            <div class="signature-name" style="margin-top: 3px;">
-                                                <t t-if="payment.authorizer_date">
-                                                    <span t-esc="payment.authorizer_date.strftime('%d/%m/%Y') if payment.authorizer_date else ''"/>
-                                                </t>
-                                                <t t-else="">Date: ________</t>
-                                            </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">ACCOUNTS MANAGER</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.approver_id">
+                                                <span t-esc="payment.approver_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
                                         </div>
-                                    </td>
-                                </tr>
-                            </table>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.approver_date">
+                                                <span t-esc="payment.approver_date.strftime('%d/%m/%Y') if payment.approver_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">AUTHORIZED OFFICER</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.authorizer_id">
+                                                <span t-esc="payment.authorizer_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
+                                        </div>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.authorizer_date">
+                                                <span t-esc="payment.authorizer_date.strftime('%d/%m/%Y') if payment.authorizer_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-                            <!-- Received By Section -->
-                            <div class="received-section">
-                                <div class="received-title">RECEIVED BY</div>
-                                <div class="received-name">
+                        <!-- Received By Section -->
+                        <div class="received-section">
+                            <div class="received-title">RECEIVED BY</div>
+                            <div class="received-name">
                                     Name and Signature:<br/>
                                     Print: <span t-esc="payment.partner_id.name"/>
-                                </div>
-                                <div class="received-signature-line"></div>
-                                <div class="received-details">
-                                    <span>Mobile: _______</span>
-                                    <span>Date: <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/></span>
-                                    <span>ID Copy: [ ] Yes [ ] No</span>
-                                </div>
-                            </div>
                         </div>
-
-                        <!-- Footer Section -->
-                        <div class="footer-section">
-                            <div class="footer-info">
-                                Created: <span t-esc="payment.create_uid.name"/> | 
-                                <span t-esc="payment.create_date.strftime('%d/%m/%Y %H:%M') if payment.create_date else ''"/> | 
-                                Modified: <span t-esc="payment.write_uid.name"/>
-                            </div>
-                            <div class="footer-note">
-                                <strong>Thank you for your business!</strong> | Computer-generated document | 
-                                REF: <t t-if="payment.voucher_number">
-                                    <span t-esc="payment.voucher_number"/>
-                                </t>
-                                <t t-else="">
-                                    <span t-esc="payment.name"/>
-                                </t>
-                            </div>
-                        </div>
-                        
-                        <!-- Company Footer -->
-                        <div class="company-footer">
-                            <div class="footer-contact">
-                                <strong>Phone:</strong> +971 4 336 4500<br/>
-                                <strong>Email:</strong> info@osusproperties.com
-                            </div>
-                            <div class="footer-website">
-                                www.osusproperties.com
-                            </div>
-                            <div class="footer-disclaimer">
-                                This is a computer generated document.<br/>
-                                No signature or stamp required.
-                            </div>
+                        <div class="received-signature-line"></div>
+                        <div class="received-details">
+                            <span>Mobile: _______</span>
+                            <span>Date: <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                            </span>
+                            <span>ID Copy: [ ] Yes [ ] No</span>
                         </div>
                     </div>
                 </div>
-            </t>
-        </t>
-    </template>
+
+                <!-- Footer Section -->
+                <div class="footer-section">
+                    <div class="footer-info">
+                                Created: <span t-esc="payment.create_uid.name"/>
+ | 
+                    <span t-esc="payment.create_date.strftime('%d/%m/%Y %H:%M') if payment.create_date else ''"/>
+ | 
+                                Modified: <span t-esc="payment.write_uid.name"/>
+                </div>
+                <div class="footer-note">
+                    <strong>Thank you for your business!</strong> | Computer-generated document | 
+                                REF: <t t-if="payment.voucher_number">
+                    <span t-esc="payment.voucher_number"/>
+                </t>
+                <t t-else="">
+                    <span t-esc="payment.name"/>
+                </t>
+            </div>
+        </div>
+
+        <!-- Company Footer -->
+        <div class="company-footer">
+            <div class="footer-contact">
+                <strong>Phone:</strong> +971 4 336 4500<br/>
+            <strong>Email:</strong> info@osusproperties.com
+        </div>
+        <div class="footer-website">
+                                www.osusproperties.com
+        </div>
+        <div class="footer-disclaimer">
+                                This is a computer generated document.<br/>
+                                No signature or stamp required.
+        </div>
+    </div>
+</div>
+</div>
+</t>
+</t>
+</template>
 </odoo>

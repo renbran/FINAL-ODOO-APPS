@@ -5,62 +5,10 @@
         <t t-name="commission_ax.commission_report_document_professional">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="web.external_layout">
+                    <t t-call="osus_report_header_footer.osus_external_layout">
                         <t t-set="o" t-value="o.with_context(lang=lang)"/>
                         <t t-set="company" t-value="o.company_id"/>
                         <t t-set="report_type" t-value="'pdf'"/>
-
-                        <!-- Custom Header -->
-                        <div class="header">
-                            <style>
-                                .custom-header {
-                                    width: 100%;
-                                    padding: 15px 0;
-                                    border-bottom: 3px solid #800020;
-                                    margin-bottom: 20px;
-                                }
-
-                                .header-content {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                }
-
-                                .header-logo {
-                                    max-height: 80px;
-                                    max-width: 200px;
-                                }
-
-                                .header-company-info {
-                                    text-align: right;
-                                    font-size: 9px;
-                                    line-height: 1.4;
-                                    color: #333;
-                                }
-
-                                .company-name {
-                                    font-weight: 700;
-                                    font-size: 11px;
-                                    color: #800020;
-                                    margin-bottom: 3px;
-                                }
-                            </style>
-
-                            <div class="custom-header">
-                                <div class="header-content">
-                                    <div style="flex: 1;">
-                                        <img src="https://osusproperties.com/images/osus.png" alt="OSUS Logo" class="header-logo"/>
-                                    </div>
-                                    <div class="header-company-info">
-                                        <div class="company-name">OSUS REAL ESTATE BROKERAGE LLC</div>
-                                        <div>Single Business Tower 29th Floor</div>
-                                        <div>Business Bay Dubai</div>
-                                        <div>United Arab Emirates</div>
-                                        <div style="margin-top: 5px; font-weight: 600;">VAT: 100236589600003</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="page">
                             <style>
@@ -272,7 +220,8 @@
                             <div class="commission-header">
                                 <h1 class="commission-title">Commission Payout Report</h1>
                                 <div class="commission-subtitle">
-                                    <strong>Report Generated:</strong> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y at %H:%M')"/>
+                                    <strong>Report Generated:</strong>
+                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y at %H:%M')"/>
                                 </div>
                             </div>
 
@@ -282,29 +231,45 @@
                                     <div class="col-6">
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Order Number:</span>
-                                            <span class="info-value"><strong><span t-field="o.name"/></strong></span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-field="o.name"/>
+                                                </strong>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Order Date:</span>
-                                            <span class="info-value"><span t-field="o.date_order" t-options="{'widget': 'date'}"/></span>
+                                            <span class="info-value">
+                                                <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Customer:</span>
-                                            <span class="info-value"><span t-field="o.partner_id.name"/></span>
+                                            <span class="info-value">
+                                                <span t-field="o.partner_id.name"/>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Customer Contact:</span>
-                                            <span class="info-value"><span t-esc="o.partner_id.phone or o.partner_id.email or ''"/></span>
+                                            <span class="info-value">
+                                                <span t-esc="o.partner_id.phone or o.partner_id.email or ''"/>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Order Status:</span>
-                                            <span class="info-value"><strong><span t-esc="dict(o._fields['state'].selection).get(o.state, o.state)"/></strong></span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-esc="dict(o._fields['state'].selection).get(o.state, o.state)"/>
+                                                </strong>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Responsible:</span>
-                                            <span class="info-value"><span t-field="o.user_id.name"/></span>
+                                            <span class="info-value">
+                                                <span t-field="o.user_id.name"/>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Project:</span>
@@ -335,11 +300,19 @@
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Order Total (Excl. VAT):</span>
-                                            <span class="info-value"><strong><span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/> AED</strong></span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/>
+ AED</strong>
+                                            </span>
                                         </div>
                                         <div style="margin-bottom: 10px;">
                                             <span class="info-label">Sales Value (Incl. VAT):</span>
-                                            <span class="info-value"><strong style="color: #800020;"><span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/> AED</strong></span>
+                                            <span class="info-value">
+                                                <strong style="color: #800020;">
+                                                    <span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/>
+ AED</strong>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -372,22 +345,34 @@
 
                                             <t t-foreach="internal_commissions" t-as="line">
                                                 <tr>
-                                                    <td><strong><t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/></strong></td>
-                                                    <td><span t-field="line.partner_id.name"/></td>
+                                                    <td>
+                                                        <strong>
+                                                            <t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/>
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.partner_id.name"/>
+                                                    </td>
                                                     <td>
                                                         <t t-if="hasattr(line, 'calculation_basis')">
                                                             <t t-esc="dict(line._fields['calculation_basis'].selection).get(line.calculation_basis, line.calculation_basis)"/>
                                                         </t>
                                                         <t t-else="">% of Order Total (Excl. VAT)</t>
                                                     </td>
-                                                    <td class="text-center"><span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>%</td>
-                                                    <td class="text-end amount-cell"><span t-esc="'{:,.2f}'.format(line.amount)"/></td>
+                                                    <td class="text-center">
+                                                        <span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>
+%</td>
+                                                    <td class="text-end amount-cell">
+                                                        <span t-esc="'{:,.2f}'.format(line.amount)"/>
+                                                    </td>
                                                 </tr>
                                             </t>
 
                                             <tr class="subtotal-row">
                                                 <td colspan="4" class="text-end">Internal Commissions Subtotal:</td>
-                                                <td class="text-end amount-cell"><span t-esc="'{:,.2f}'.format(internal_total)"/></td>
+                                                <td class="text-end amount-cell">
+                                                    <span t-esc="'{:,.2f}'.format(internal_total)"/>
+                                                </td>
                                             </tr>
                                         </t>
 
@@ -399,29 +384,43 @@
 
                                             <t t-foreach="external_commissions" t-as="line">
                                                 <tr>
-                                                    <td><strong><t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/></strong></td>
-                                                    <td><span t-field="line.partner_id.name"/></td>
+                                                    <td>
+                                                        <strong>
+                                                            <t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/>
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.partner_id.name"/>
+                                                    </td>
                                                     <td>
                                                         <t t-if="hasattr(line, 'calculation_basis')">
                                                             <t t-esc="dict(line._fields['calculation_basis'].selection).get(line.calculation_basis, line.calculation_basis)"/>
                                                         </t>
                                                         <t t-else="">% of Order Total (Excl. VAT)</t>
                                                     </td>
-                                                    <td class="text-center"><span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>%</td>
-                                                    <td class="text-end amount-cell"><span t-esc="'{:,.2f}'.format(line.amount)"/></td>
+                                                    <td class="text-center">
+                                                        <span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>
+%</td>
+                                                    <td class="text-end amount-cell">
+                                                        <span t-esc="'{:,.2f}'.format(line.amount)"/>
+                                                    </td>
                                                 </tr>
                                             </t>
 
                                             <tr class="subtotal-row">
                                                 <td colspan="4" class="text-end">External Commissions Subtotal:</td>
-                                                <td class="text-end amount-cell"><span t-esc="'{:,.2f}'.format(external_total)"/></td>
+                                                <td class="text-end amount-cell">
+                                                    <span t-esc="'{:,.2f}'.format(external_total)"/>
+                                                </td>
                                             </tr>
                                         </t>
 
                                         <!-- GRAND TOTAL -->
                                         <tr class="grand-total-row">
                                             <td colspan="4" class="text-end">Total Commission Amount:</td>
-                                            <td class="text-end"><span t-esc="'{:,.2f}'.format(total_commissions)"/></td>
+                                            <td class="text-end">
+                                                <span t-esc="'{:,.2f}'.format(total_commissions)"/>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -431,27 +430,39 @@
                                     <h4 class="summary-title">Commission Summary</h4>
                                     <div class="summary-row">
                                         <span>Order Total (Excl. VAT):</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/>
+ AED</span>
                                     </div>
                                     <div class="summary-row" t-if="o.amount_tax and o.amount_tax > 0">
                                         <span>VAT Amount (5%):</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(o.amount_tax or 0)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_tax or 0)"/>
+ AED</span>
                                     </div>
                                     <div class="summary-row">
                                         <span>Order Total (Incl. VAT):</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/>
+ AED</span>
                                     </div>
                                     <div class="summary-row" t-if="external_total > 0">
                                         <span>Total External Commission:</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(external_total)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(external_total)"/>
+ AED</span>
                                     </div>
                                     <div class="summary-row" t-if="internal_total > 0">
                                         <span>Total Internal Commission:</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(internal_total)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(internal_total)"/>
+ AED</span>
                                     </div>
                                     <div class="summary-row">
                                         <span>Net Commission Payable:</span>
-                                        <span class="amount-cell"><span t-esc="'{:,.2f}'.format(total_commissions)"/> AED</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(total_commissions)"/>
+ AED</span>
                                     </div>
                                 </div>
                             </t>
@@ -470,59 +481,8 @@
                                 <strong>⚠ CONFIDENTIAL DOCUMENT - INTERNAL USE ONLY</strong>
                                 <p style="margin: 8px 0;">This commission report contains confidential financial information and is intended solely for internal business purposes.</p>
                                 <p style="margin: 8px 0;">Unauthorized distribution, copying, or disclosure of this document is strictly prohibited.</p>
-                                <p style="margin: 8px 0; color: #800020;"><strong>OSUS Real Estate Brokerage LLC</strong> | Business Bay, Dubai, UAE | VAT: 100236589600003</p>
-                            </div>
-                        </div>
-
-                        <!-- Custom Footer -->
-                        <div class="footer">
-                            <style>
-                                .custom-footer {
-                                    width: 100%;
-                                    padding: 10px 0;
-                                    border-top: 2px solid #800020;
-                                    margin-top: 20px;
-                                    font-size: 8px;
-                                    color: #666;
-                                }
-
-                                .footer-content {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                }
-
-                                .footer-left {
-                                    text-align: left;
-                                    line-height: 1.5;
-                                }
-
-                                .footer-center {
-                                    text-align: center;
-                                    line-height: 1.5;
-                                }
-
-                                .footer-right {
-                                    text-align: right;
-                                    line-height: 1.5;
-                                }
-                            </style>
-
-                            <div class="custom-footer">
-                                <div class="footer-content">
-                                    <div class="footer-left" style="flex: 1;">
-                                        <div><strong>Phone:</strong> +971 4 336 4500</div>
-                                        <div><strong>Email:</strong> info@osusproperties.com</div>
-                                    </div>
-                                    <div class="footer-center" style="flex: 1;">
-                                        <div><strong>www.osusproperties.com</strong></div>
-                                        <div style="margin-top: 3px;">Page <span class="page"/> of <span class="topage"/></div>
-                                    </div>
-                                    <div class="footer-right" style="flex: 1;">
-                                        <div style="font-style: italic; color: #800020;">This is a computer generated document.</div>
-                                        <div style="font-style: italic; color: #800020;">No signature or stamp required.</div>
-                                    </div>
-                                </div>
+                                <p style="margin: 8px 0; color: #800020;">
+                                    <strong>OSUS Real Estate Brokerage LLC</strong> | Business Bay, Dubai, UAE | VAT: 100236589600003</p>
                             </div>
                         </div>
                     </t>
@@ -549,14 +509,15 @@
     </record>
 
     <!-- Report Definition -->
-    <report
-        id="action_report_commission_payout_professional"
-        model="sale.order"
-        string="Commission Payout Report"
-        report_type="qweb-pdf"
-        name="commission_ax.commission_payout_report_template_professional"
-        file="commission_ax.commission_payout_report_template_professional"
-        print_report_name="'Commission Report - %s' % (object.name)"
-        paperformat_id="paperformat_commission_report_professional"
-    />
+    <record id="action_report_commission_payout_professional" model="ir.actions.report">
+        <field name="name">Commission Payout Report</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">commission_ax.commission_payout_report_template_professional</field>
+        <field name="report_file">commission_ax.commission_payout_report_template_professional</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_commission_report_professional"/>
+        <field name="print_report_name">'Commission Report - %s' % (object.name)</field>
+    </record>
 </odoo>
