@@ -25,7 +25,7 @@
     'category': 'Sales/Commission',
     'author': 'Enhanced Commission Team',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'purchase', 'account', 'mail', 'crm', 'project'],
+    'depends': ['sale', 'purchase', 'account', 'mail', 'crm'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -35,6 +35,7 @@
         'views/commission_ax_views.xml',
         'views/sale_order.xml',
         'views/purchase_order_views.xml',
+        'reports/commission_payout_report_professional.xml',
     ],
     'assets': {
         'web.assets_backend': [
