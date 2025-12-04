@@ -50,7 +50,6 @@
         "views/sale_order_views.xml",
         "views/crm_lead_views.xml",
         "views/sale_order_commission_button.xml",
-        "data/deal_stage_data.xml",
     ],
     "installable": True,
     "application": False,

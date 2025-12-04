@@ -29,8 +29,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'data/commission_data.xml',
-        'data/commission_demo_data.xml',
+        'data/commission_types_data.xml',
+        'data/cron_data.xml',
         'data/commission_email_templates.xml',
         'views/commission_ax_views.xml',
         'views/sale_order.xml',
