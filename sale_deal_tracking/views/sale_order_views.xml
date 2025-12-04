@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Sale Order Views - Minimal placeholder -->
+        <record id="view_order_form_deal_tracking" model="ir.ui.view">
+            <field name="name">sale.order.form.deal.tracking</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="deal_stage"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

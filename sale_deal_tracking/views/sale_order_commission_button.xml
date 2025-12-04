@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Add Commission Lines Smart Button to Sale Order Form View -->
+        <record id="view_order_form_commission_smart_button" model="ir.ui.view">
+            <field name="name">sale.order.form.commission.smart.button</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Add Print Commission Report button in header -->
+                <xpath expr="//header/button[@name='action_quotation_send']" position="after">
+                    <button name="action_print_commission_report" string="Print Commission Report" type="object" class="btn-primary" invisible="commission_lines_count == 0 or state not in ['sale', 'done']" groups="sales_team.group_sale_salesman" icon="fa-file-pdf-o" help="Generate professional commission payout report with all commission details"/>
+                </xpath>
+
+                <!-- Add smart button in the button box -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <!-- Commission Lines Smart Button - Shows commission count and opens detail view -->
+                    <button name="action_view_commission_lines" type="object" class="oe_stat_button" icon="fa-usd" invisible="commission_lines_count == 0" groups="sales_team.group_sale_salesman">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="commission_lines_count"/>
+                            </span>
+                            <span class="o_stat_text">Commission Lines</span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

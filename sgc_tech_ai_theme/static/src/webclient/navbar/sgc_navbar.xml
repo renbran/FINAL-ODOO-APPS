@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- SGC Tech AI Theme - NavBar Toggle Button Template -->
+
+    <t t-name="sgc_tech_ai_theme.NavBar" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <!-- Insert toggle button before the app switcher -->
+        <xpath expr="//button[hasclass('o_navbar_apps_menu')]" position="before">
+            <button class="sgc_navbar_sidebar_toggle btn btn-sm" title="Toggle Sidebar Menu" t-on-click="toggleSidebar">
+                <i class="fa fa-bars"/>
+            </button>
+        </xpath>
+    </t>
+</templates>

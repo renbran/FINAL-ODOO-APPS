@@ -62,8 +62,13 @@ $sgc-gradient-electric: linear-gradient(
 );
 $sgc-gradient-success: linear-gradient(
   135deg,
+<<<<<<< Updated upstream
   $sgc-success 0%,
   lighten($sgc-success, 10%) 100%
+=======
+  $sgc-neon-green 0%,
+  $sgc-success 100%
+>>>>>>> Stashed changes
 );
 
 // Border Radius
@@ -71,6 +76,13 @@ $sgc-radius-sm: 4px;
 $sgc-radius-md: 8px;
 $sgc-radius-lg: 12px;
 $sgc-radius-xl: 16px;
+
+// Font Weights (moved from typography.scss for global availability)
+$sgc-font-light: 300;
+$sgc-font-normal: 400;
+$sgc-font-medium: 500;
+$sgc-font-semibold: 600;
+$sgc-font-bold: 700;
 
 // Transitions
 $sgc-transition-fast: 0.15s ease-in-out;

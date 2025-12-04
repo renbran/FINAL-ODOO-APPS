@@ -33,7 +33,7 @@
                     <div class="o_enhanced_button_section">
                         <button name="action_change_status" string="Change Status" type="object" class="btn-secondary o_enhanced_btn" icon="fa-exchange" invisible="1"/>
                         <button name="action_view_order_reports" string="Generate Reports" type="object" class="btn-info o_enhanced_btn" icon="fa-file-pdf-o"/>
-                        <button name="%(order_status_override.report_sale_commission)d" string="Commission Report" type="action" class="btn-success o_enhanced_btn" icon="fa-money" invisible="state not in ['sale', 'done']"/>
+                        <!-- Commission report button removed - will be added via report action binding -->
                     </div>
                 </button>
 

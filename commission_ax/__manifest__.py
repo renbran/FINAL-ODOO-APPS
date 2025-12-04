@@ -25,16 +25,18 @@
     'category': 'Sales/Commission',
     'author': 'Enhanced Commission Team',
     'website': 'https://www.yourcompany.com',
-    'depends': ['sale', 'purchase', 'account', 'mail', 'crm', 'project'],
+    'depends': ['sale', 'purchase', 'account', 'mail', 'crm'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/commission_data.xml',
         'data/commission_demo_data.xml',
         'data/commission_email_templates.xml',
+        'data/purchase_order_cron.xml',
         'views/commission_ax_views.xml',
         'views/sale_order.xml',
         'views/purchase_order_views.xml',
+        'reports/commission_payout_report_professional.xml',
     ],
     'assets': {
         'web.assets_backend': [

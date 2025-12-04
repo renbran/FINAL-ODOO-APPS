@@ -15,12 +15,7 @@ $sgc-text-xl: 1.25rem; // 20px
 $sgc-text-2xl: 1.5rem; // 24px
 $sgc-text-3xl: 1.875rem; // 30px
 
-// Font Weights
-$sgc-font-light: 300;
-$sgc-font-normal: 400;
-$sgc-font-medium: 500;
-$sgc-font-semibold: 600;
-$sgc-font-bold: 700;
+// Font weights are now defined in sgc_colors.scss for global availability
 
 // Line Heights
 $sgc-leading-tight: 1.25;

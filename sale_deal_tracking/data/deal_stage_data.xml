@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Deal Stage Data -->
+        <record id="deal_stage_new" model="ir.model.data">
+            <field name="name">Deal Stage: New</field>
+        </record>
+    </data>
+</odoo>

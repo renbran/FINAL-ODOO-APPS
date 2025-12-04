@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Professional Commission Payout Report Template -->
+    <template id="commission_payout_report_template_professional">
+        <t t-name="commission_ax.commission_report_document_professional">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="osus_report_header_footer.osus_external_layout">
+                        <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                        <t t-set="company" t-value="o.company_id"/>
+                        <t t-set="report_type" t-value="'pdf'"/>
+
+                        <div class="page">
+                            <style>
+                                /* Professional Report Styling */
+                                body {
+                                    font-family: 'Helvetica Neue', Arial, sans-serif;
+                                    color: #333;
+                                }
+
+                                .commission-header {
+                                    text-align: center;
+                                    margin-bottom: 30px;
+                                    padding-bottom: 15px;
+                                    border-bottom: 2px solid #800020;
+                                }
+
+                                .commission-title {
+                                    font-size: 26px;
+                                    font-weight: 700;
+                                    color: #800020;
+                                    margin: 0 0 8px 0;
+                                    letter-spacing: 1.5px;
+                                    text-transform: uppercase;
+                                }
+
+                                .commission-subtitle {
+                                    font-size: 11px;
+                                    color: #666;
+                                    margin: 5px 0;
+                                }
+
+                                /* Customer Info Box */
+                                .customer-info-box {
+                                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                    padding: 20px;
+                                    margin-bottom: 25px;
+                                    border-left: 5px solid #800020;
+                                    border-radius: 4px;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                }
+
+                                .info-label {
+                                    font-weight: 600;
+                                    color: #800020;
+                                    display: inline-block;
+                                    min-width: 150px;
+                                    font-size: 10px;
+                                }
+
+                                .info-value {
+                                    font-size: 10px;
+                                    color: #333;
+                                }
+
+                                /* Commission Table */
+                                .commission-table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin: 25px 0;
+                                    font-size: 10px;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                                }
+
+                                .commission-table thead th {
+                                    background: #800020;
+                                    color: white;
+                                    font-weight: 600;
+                                    padding: 12px 10px;
+                                    text-align: left;
+                                    border: none;
+                                    text-transform: uppercase;
+                                    font-size: 9px;
+                                    letter-spacing: 0.5px;
+                                }
+
+                                .commission-table tbody td {
+                                    padding: 12px 10px;
+                                    border-bottom: 1px solid #e9ecef;
+                                    font-size: 10px;
+                                }
+
+                                .commission-table tbody tr:hover {
+                                    background: #f8f9fa;
+                                }
+
+                                .section-header-row td {
+                                    background: #f1f3f5 !important;
+                                    font-weight: 700;
+                                    color: #800020;
+                                    padding: 14px 10px !important;
+                                    border-top: 2px solid #800020;
+                                    border-bottom: 2px solid #800020;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                }
+
+                                .text-end {
+                                    text-align: right;
+                                }
+
+                                .text-center {
+                                    text-align: center;
+                                }
+
+                                .amount-cell {
+                                    font-family: 'Courier New', monospace;
+                                    font-weight: 600;
+                                    color: #2c3e50;
+                                }
+
+                                /* Total Rows */
+                                .subtotal-row td {
+                                    background: #f8f9fa;
+                                    font-weight: 700;
+                                    border-top: 2px solid #dee2e6;
+                                    padding: 14px 10px !important;
+                                    font-size: 10px;
+                                    color: #495057;
+                                }
+
+                                .grand-total-row td {
+                                    background: #800020;
+                                    color: white;
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    padding: 16px 10px !important;
+                                    border: none;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                }
+
+                                /* Summary Box */
+                                .summary-box {
+                                    background: #fff;
+                                    border: 2px solid #800020;
+                                    padding: 25px;
+                                    margin-top: 30px;
+                                    border-radius: 4px;
+                                    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+                                }
+
+                                .summary-title {
+                                    color: #800020;
+                                    margin-bottom: 20px;
+                                    border-bottom: 2px solid #800020;
+                                    padding-bottom: 12px;
+                                    font-size: 14px;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                    letter-spacing: 1px;
+                                }
+
+                                .summary-row {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    padding: 10px 0;
+                                    border-bottom: 1px solid #e9ecef;
+                                    font-size: 11px;
+                                }
+
+                                .summary-row:last-child {
+                                    border-bottom: none;
+                                    font-weight: 700;
+                                    font-size: 13px;
+                                    color: #800020;
+                                    padding-top: 15px;
+                                    margin-top: 10px;
+                                    border-top: 2px solid #800020;
+                                }
+
+                                /* No Commission Message */
+                                .no-commission-msg {
+                                    text-align: center;
+                                    padding: 50px 20px;
+                                    color: #6c757d;
+                                    font-style: italic;
+                                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                    border-radius: 8px;
+                                    border: 2px dashed #dee2e6;
+                                }
+
+                                .no-commission-msg h4 {
+                                    color: #800020;
+                                    font-size: 16px;
+                                    margin-bottom: 10px;
+                                }
+
+                                /* Footer Note */
+                                .footer-note {
+                                    margin-top: 50px;
+                                    padding-top: 20px;
+                                    border-top: 2px solid #dee2e6;
+                                    font-size: 9px;
+                                    color: #6c757d;
+                                    text-align: center;
+                                    line-height: 1.6;
+                                }
+
+                                .footer-note strong {
+                                    color: #800020;
+                                    font-size: 10px;
+                                    display: block;
+                                    margin-bottom: 8px;
+                                }
+                            </style>
+
+                            <!-- Report Header -->
+                            <div class="commission-header">
+                                <h1 class="commission-title">Commission Payout Report</h1>
+                                <div class="commission-subtitle">
+                                    <strong>Report Generated:</strong>
+                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y at %H:%M')"/>
+                                </div>
+                            </div>
+
+                            <!-- Customer &amp; Order Information -->
+                            <div class="customer-info-box">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Order Number:</span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-field="o.name"/>
+                                                </strong>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Order Date:</span>
+                                            <span class="info-value">
+                                                <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Customer:</span>
+                                            <span class="info-value">
+                                                <span t-field="o.partner_id.name"/>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Customer Contact:</span>
+                                            <span class="info-value">
+                                                <span t-esc="o.partner_id.phone or o.partner_id.email or ''"/>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Order Status:</span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-esc="dict(o._fields['state'].selection).get(o.state, o.state)"/>
+                                                </strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Responsible:</span>
+                                            <span class="info-value">
+                                                <span t-field="o.user_id.name"/>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Project:</span>
+                                            <span class="info-value">
+                                                <t t-if="hasattr(o, 'project_id') and o.project_id">
+                                                    <span t-field="o.project_id.name"/>
+                                                </t>
+                                                <t t-else="">—</t>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Unit:</span>
+                                            <span class="info-value">
+                                                <t t-if="hasattr(o, 'unit_id') and o.unit_id">
+                                                    <span t-field="o.unit_id.name"/>
+                                                </t>
+                                                <t t-else="">—</t>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Developer:</span>
+                                            <span class="info-value">
+                                                <t t-if="hasattr(o, 'developer_id') and o.developer_id">
+                                                    <span t-field="o.developer_id.name"/>
+                                                </t>
+                                                <t t-else="">—</t>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Order Total (Excl. VAT):</span>
+                                            <span class="info-value">
+                                                <strong>
+                                                    <span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/>
+ AED</strong>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="info-label">Sales Value (Incl. VAT):</span>
+                                            <span class="info-value">
+                                                <strong style="color: #800020;">
+                                                    <span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/>
+ AED</strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Commission Details Table -->
+                            <t t-set="external_commissions" t-value="o.commission_line_ids.filtered(lambda c: c.party_type in ['broker', 'referrer', 'cashback', 'other_external'])"/>
+                            <t t-set="internal_commissions" t-value="o.commission_line_ids.filtered(lambda c: c.party_type in ['agent1', 'agent2', 'manager', 'director'])"/>
+                            <t t-set="external_total" t-value="sum(external_commissions.mapped('amount'))"/>
+                            <t t-set="internal_total" t-value="sum(internal_commissions.mapped('amount'))"/>
+                            <t t-set="total_commissions" t-value="external_total + internal_total"/>
+
+                            <t t-if="external_commissions or internal_commissions">
+                                <table class="commission-table table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%">Party Type</th>
+                                            <th style="width: 25%">Partner Name</th>
+                                            <th style="width: 25%">Calculation Basis</th>
+                                            <th style="width: 12%" class="text-center">Rate (%)</th>
+                                            <th style="width: 23%" class="text-end">Amount (AED)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- INTERNAL COMMISSIONS -->
+                                        <t t-if="internal_commissions">
+                                            <tr class="section-header-row">
+                                                <td colspan="5">Internal Commissions</td>
+                                            </tr>
+
+                                            <t t-foreach="internal_commissions" t-as="line">
+                                                <tr>
+                                                    <td>
+                                                        <strong>
+                                                            <t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/>
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.partner_id.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="hasattr(line, 'calculation_basis')">
+                                                            <t t-esc="dict(line._fields['calculation_basis'].selection).get(line.calculation_basis, line.calculation_basis)"/>
+                                                        </t>
+                                                        <t t-else="">% of Order Total (Excl. VAT)</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>
+%</td>
+                                                    <td class="text-end amount-cell">
+                                                        <span t-esc="'{:,.2f}'.format(line.amount)"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+
+                                            <tr class="subtotal-row">
+                                                <td colspan="4" class="text-end">Internal Commissions Subtotal:</td>
+                                                <td class="text-end amount-cell">
+                                                    <span t-esc="'{:,.2f}'.format(internal_total)"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- EXTERNAL COMMISSIONS -->
+                                        <t t-if="external_commissions">
+                                            <tr class="section-header-row">
+                                                <td colspan="5">External Commissions</td>
+                                            </tr>
+
+                                            <t t-foreach="external_commissions" t-as="line">
+                                                <tr>
+                                                    <td>
+                                                        <strong>
+                                                            <t t-esc="dict(line._fields['party_type'].selection).get(line.party_type, line.party_type)"/>
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.partner_id.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="hasattr(line, 'calculation_basis')">
+                                                            <t t-esc="dict(line._fields['calculation_basis'].selection).get(line.calculation_basis, line.calculation_basis)"/>
+                                                        </t>
+                                                        <t t-else="">% of Order Total (Excl. VAT)</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-esc="'{:.2f}'.format(line.rate if hasattr(line, 'rate') and line.rate else 0)"/>
+%</td>
+                                                    <td class="text-end amount-cell">
+                                                        <span t-esc="'{:,.2f}'.format(line.amount)"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+
+                                            <tr class="subtotal-row">
+                                                <td colspan="4" class="text-end">External Commissions Subtotal:</td>
+                                                <td class="text-end amount-cell">
+                                                    <span t-esc="'{:,.2f}'.format(external_total)"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- GRAND TOTAL -->
+                                        <tr class="grand-total-row">
+                                            <td colspan="4" class="text-end">Total Commission Amount:</td>
+                                            <td class="text-end">
+                                                <span t-esc="'{:,.2f}'.format(total_commissions)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Summary Box -->
+                                <div class="summary-box">
+                                    <h4 class="summary-title">Commission Summary</h4>
+                                    <div class="summary-row">
+                                        <span>Order Total (Excl. VAT):</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_untaxed or 0)"/>
+ AED</span>
+                                    </div>
+                                    <div class="summary-row" t-if="o.amount_tax and o.amount_tax > 0">
+                                        <span>VAT Amount (5%):</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_tax or 0)"/>
+ AED</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Order Total (Incl. VAT):</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(o.amount_total or 0)"/>
+ AED</span>
+                                    </div>
+                                    <div class="summary-row" t-if="external_total > 0">
+                                        <span>Total External Commission:</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(external_total)"/>
+ AED</span>
+                                    </div>
+                                    <div class="summary-row" t-if="internal_total > 0">
+                                        <span>Total Internal Commission:</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(internal_total)"/>
+ AED</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Net Commission Payable:</span>
+                                        <span class="amount-cell">
+                                            <span t-esc="'{:,.2f}'.format(total_commissions)"/>
+ AED</span>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- No Commission Message -->
+                            <t t-if="not external_commissions and not internal_commissions">
+                                <div class="no-commission-msg">
+                                    <h4>No Commissions Configured</h4>
+                                    <p>This sales order does not have any commission arrangements set up at this time.</p>
+                                    <p style="margin-top: 10px; font-size: 10px;">Please configure commission rates and partners in the order details.</p>
+                                </div>
+                            </t>
+
+                            <!-- Footer Note -->
+                            <div class="footer-note">
+                                <strong>⚠ CONFIDENTIAL DOCUMENT - INTERNAL USE ONLY</strong>
+                                <p style="margin: 8px 0;">This commission report contains confidential financial information and is intended solely for internal business purposes.</p>
+                                <p style="margin: 8px 0;">Unauthorized distribution, copying, or disclosure of this document is strictly prohibited.</p>
+                                <p style="margin: 8px 0; color: #800020;">
+                                    <strong>OSUS Real Estate Brokerage LLC</strong> | Business Bay, Dubai, UAE | VAT: 100236589600003</p>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Paper Format for Commission Report -->
+    <record id="paperformat_commission_report_professional" model="report.paperformat">
+        <field name="name">Commission Report A4 - OSUS Professional</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">85</field>
+        <field name="margin_bottom">35</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">75</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Report Definition -->
+    <record id="action_report_commission_payout_professional" model="ir.actions.report">
+        <field name="name">Commission Payout Report</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">commission_ax.commission_payout_report_template_professional</field>
+        <field name="report_file">commission_ax.commission_payout_report_template_professional</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_commission_report_professional"/>
+        <field name="print_report_name">'Commission Report - %s' % (object.name)</field>
+    </record>
+</odoo>
