@@ -8,29 +8,20 @@
         <field name="arch" type="xml">
             <!-- Add Print Voucher button to header -->
             <xpath expr="//header" position="inside">
-                <button name="action_print_voucher" 
-                        string="Print Voucher" 
-                        type="object" 
-                        class="btn-primary" 
-                        invisible="state != 'posted'" 
-                        icon="fa-print"/>
+                <button name="action_print_voucher" string="Print Voucher" type="object" class="btn-primary" invisible="state != 'posted'" icon="fa-print"/>
             </xpath>
-            
+
             <!-- Force name field to be always visible -->
             <xpath expr="//field[@name='name']" position="replace">
-                <field name="name" 
-                       string="Reference Number" 
-                       required="1"
-                       readonly="0"
-                       help="Payment/Receipt reference number that will appear on the voucher"/>
+                <field name="name" string="Reference Number" required="1" readonly="0" help="Payment/Receipt reference number that will appear on the voucher"/>
             </xpath>
-            
+
             <!-- Enhance ref field if it exists -->
             <xpath expr="//field[@name='ref']" position="attributes">
                 <attribute name="string">Payment Memo</attribute>
                 <attribute name="placeholder">Enter additional payment reference or memo...</attribute>
             </xpath>
-            
+
             <!-- Add notebook for additional information -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
@@ -47,7 +38,7 @@
                                 <field name="state" string="Status"/>
                             </group>
                         </group>
-                        
+
                         <!-- QR Code Settings for Customer Receipts -->
                         <group string="QR Code Settings" invisible="payment_type != 'inbound'">
                             <group>
@@ -57,20 +48,13 @@
                                 <field name="qr_code_urls" string="QR Code Preview" readonly="1" invisible="not qr_code_urls"/>
                             </group>
                         </group>
-                        
+
                         <group string="Print Options">
                             <group>
-                                <field name="include_detailed_documentation" 
-                                       string="Include 2nd Page (Detailed Documentation)" 
-                                       help="Add a second page with audit trail, reconciliation details, and complete documentation"/>
+                                <field name="include_detailed_documentation" string="Include 2nd Page (Detailed Documentation)" help="Add a second page with audit trail, reconciliation details, and complete documentation"/>
                             </group>
                             <group>
-                                <button name="action_print_voucher" 
-                                        string="Preview/Print Voucher" 
-                                        type="object" 
-                                        class="btn-info" 
-                                        invisible="state not in ['posted', 'sent']"
-                                        icon="fa-eye"/>
+                                <button name="action_print_voucher" string="Preview/Print Voucher" type="object" class="btn-info" invisible="state not in ['posted', 'sent']" icon="fa-eye"/>
                             </group>
                         </group>
                     </page>
@@ -90,7 +74,7 @@
                 <attribute name="string">Reference Number</attribute>
                 <attribute name="optional">show</attribute>
             </xpath>
-            
+
             <!-- Add payment memo after date if date exists -->
             <xpath expr="//field[@name='date']" position="after">
                 <field name="ref" string="Payment Memo" optional="hide"/>
