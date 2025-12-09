@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- OSUS Report Header -->
+        <template id="osus_header_template">
+            <div class="header">
+                <div style="background: linear-gradient(135deg, #800020 0%, #5a0f1a 100%); padding: 15px 20px; border-radius: 8px 8px 0 0;">
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- OSUS Logo -->
+                            <img src="https://osusproperties.com/images/osus.png" alt="OSUS Properties" style="max-height: 70px; max-width: 200px; background: white; padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+                        </div>
+                        <div class="col-8 text-end">
+                            <!-- Company Information -->
+                            <h4 style="color: #FFD700; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16pt; margin-bottom: 8px;">
+                                <span t-field="company.name"/>
+                            </h4>
+                            <div style="font-size: 10pt; color: #ffffff; text-shadow: 1px 1px 1px rgba(0,0,0,0.2);">
+                                <div t-if="company.street" style="margin-bottom: 3px;">
+                                    <i class="fa fa-map-marker" style="color: #FFD700; margin-right: 6px;"/>
+                                    <span t-field="company.street"/>
+                                    <span t-if="company.street2" t-field="company.street2"/>
+                                </div>
+                                <div t-if="company.phone" style="margin-bottom: 3px;">
+                                    <i class="fa fa-phone" style="color: #FFD700; margin-right: 6px;"/>
+                                    <span t-field="company.phone"/>
+                                </div>
+                                <div t-if="company.email" style="margin-bottom: 3px;">
+                                    <i class="fa fa-envelope" style="color: #FFD700; margin-right: 6px;"/>
+                                    <span t-field="company.email"/>
+                                </div>
+                                <div t-if="company.vat" style="margin-top: 5px;">
+                                    <strong style="color: #FFD700;">TRN:</strong>
+                                    <span style="font-weight: 600;" t-field="company.vat"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="border: 0; border-top: 3px solid #FFD700; margin: 10px 0 0 0; box-shadow: 0 2px 4px rgba(255,215,0,0.3);"/>
+                </div>
+            </div>
+        </template>
+
+        <!-- OSUS Report Footer with Banking Details -->
+        <template id="osus_footer_template">
+            <div class="footer o_background_footer">
+                <hr style="border-top: 3px solid #FFD700; margin: 8px 0; box-shadow: 0 -2px 4px rgba(255,215,0,0.2);"/>
+
+                <!-- Bank Details Section -->
+                <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 15px 20px; border-left: 4px solid #800020; margin-bottom: 10px;">
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <strong style="color: #800020; font-size: 11pt; text-transform: uppercase; letter-spacing: 1px;">Banking Details</strong>
+                    </div>
+                    <div class="row" style="font-size: 9pt; color: #333;">
+                        <div class="col-6">
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 120px;">Bank Name:</strong>
+                                <span>National Bank of Fujairah</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Name:</strong>
+                                <span>Osus Real Estate Brokerage LLC</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Number:</strong>
+                                <span style="font-family: 'Courier New', monospace; font-weight: 600;">012371961346</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Currency:</strong>
+                                <span>AED</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 100px;">Branch:</strong>
+                                <span>DUBAI</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 100px;">IBAN:</strong>
+                                <span style="font-family: 'Courier New', monospace; font-weight: 600;">AE870380000012371961346</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 100px;">Swift Code:</strong>
+                                <span style="font-family: 'Courier New', monospace; font-weight: 600;">NBFUAEADXXX</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <strong style="color: #800020; display: inline-block; min-width: 100px;">Account Type:</strong>
+                                <span>Business Value Preferred</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Info and Page Number -->
+                <div class="row">
+                    <div class="col-6">
+                        <div style="font-size: 8pt; color: #666;">
+                            <div>
+                                <strong style="color: #800020;">
+                                    <span t-field="company.name"/>
+                                </strong>
+                            </div>
+                            <div t-if="company.phone">
+                                <i class="fa fa-phone" style="color: #800020; margin-right: 5px;"/>
+                                Tel: <span t-field="company.phone"/>
+                            </div>
+                            <div t-if="company.email">
+                                <i class="fa fa-envelope" style="color: #800020; margin-right: 5px;"/>
+                                Email: <span t-field="company.email"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div style="font-size: 9pt; color: #666;">
+                            <div>
+                                <strong style="color: #800020;">Page</strong> <span class="page"/> <strong style="color: #800020;">of</strong> <span class="topage"/>
+                            </div>
+                            <div style="font-size: 8pt; margin-top: 4px;">
+                                <i class="fa fa-calendar" style="color: #800020; margin-right: 5px;"/>
+                                Printed: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1" t-if="company.vat">
+                    <div class="col-12 text-center">
+                        <div style="font-size: 8pt; color: #800020; font-weight: 600; padding: 6px; background: #fff8dc; border-radius: 4px; border: 1px solid #FFD700;">
+                            <strong>TRN:</strong> <span t-field="company.vat"/> | <i class="fa fa-file-text-o"/> This is a computer-generated document
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Main External Layout - Primary template that replaces web.external_layout -->
+        <template id="osus_external_layout">
+            <t t-name="osus_report_header_footer.osus_external_layout">
+                <t t-call="web.basic_layout">
+                    <div class="article">
+                        <t t-call="osus_report_header_footer.osus_header_template"/>
+                        <t t-raw="0"/>
+                        <t t-call="osus_report_header_footer.osus_footer_template"/>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

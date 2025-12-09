@@ -12,6 +12,13 @@ class SaleOrder(models.Model):
         tracking=True
     )
 
+    # Commission lines count field for commission report button visibility
+    commission_lines_count = fields.Integer(
+        string='Commission Lines',
+        compute='_compute_commission_lines_count',
+        store=False
+    )
+
     deal_stage = fields.Selection([
         ('new', 'New'),
         ('attempt', 'Attempt'),
@@ -28,6 +35,18 @@ class SaleOrder(models.Model):
         string='Deal Stage Updated',
         readonly=True
     )
+
+    @api.depends('purchase_order_ids')
+    def _compute_commission_lines_count(self):
+        """
+        Compute the number of commission lines (purchase orders) for this sale order.
+        This is used to show/hide the commission report button and commission lines button.
+        """
+        for order in self:
+            # Count non-cancelled purchase orders that are commission-related
+            order.commission_lines_count = len(order.purchase_order_ids.filtered(
+                lambda po: po.state != 'cancel'
+            ))
 
     def action_print_commission_report(self):
         """Generate and return commission payout report."""

@@ -66,6 +66,54 @@
                         <hr style="border: 0; border-top: 3px solid #FFD700; margin: 8px 0; box-shadow: 0 -2px 4px rgba(255,215,0,0.2);"/>
                     </div>
                 </div>
+
+                <!-- Bank Details Section -->
+                <div class="row mt-2" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 15px 20px; border-left: 4px solid #800020; margin-bottom: 10px;">
+                    <div class="col-12">
+                        <div style="text-align: center; margin-bottom: 12px;">
+                            <strong style="color: #800020; font-size: 11pt; text-transform: uppercase; letter-spacing: 1px;">Banking Details</strong>
+                        </div>
+                        <div class="row" style="font-size: 9pt; color: #333;">
+                            <div class="col-6">
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Bank Name:</strong>
+                                    <span>National Bank of Fujairah</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Name:</strong>
+                                    <span>Osus Real Estate Brokerage LLC</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Number:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">012371961346</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Currency:</strong>
+                                    <span>AED</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Branch:</strong>
+                                    <span>DUBAI</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">IBAN:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">AE870380000012371961346</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Swift Code:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">NBFUAEADXXX</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Account Type:</strong>
+                                    <span>Business Value Preferred</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mt-2" style="background: linear-gradient(135deg, #800020 0%, #5a0f1a 100%); padding: 12px 20px; border-radius: 0 0 8px 8px;">
                     <div class="col-6">
                         <div class="osus-footer-info" style="font-size: 9pt; color: #ffffff;">
