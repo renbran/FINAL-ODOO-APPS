@@ -36,8 +36,7 @@
     ],
     'data': [
         'data/report_paperformat.xml',
-        'report/osus_external_layout.xml',
-        'report/osus_branded_layout.xml',
+        'report/osus_simple_layout.xml',
     ],
     'assets': {
         'web.report_assets_common': [
