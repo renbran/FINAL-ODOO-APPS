@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- View disabled due to compatibility issue with base.view_users_form -->
+    <!-- The parent view references in_group_146 which doesn't exist -->
+    <!-- Users can still set sales targets via Settings > Users -->
+</odoo>

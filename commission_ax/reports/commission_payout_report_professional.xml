@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================
+         COMMISSION PAYOUT REPORT - PROFESSIONAL OSUS DESIGN
+         Enhanced design with order summary, commission sections,
+         VAT calculations, and company share computation
+         ============================================================ -->
+    
+    <template id="commission_payout_report_template_professional">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="o"/>
+                    <t t-set="company" t-value="o.company_id or res_company"/>
+
+                    <div class="page">
+                        <style>
+                            /* ============================================
+                               COMMISSION PAYOUT REPORT - PROFESSIONAL STYLE
+                               OSUS Properties Branding (#8b1538 Maroon)
+                               ============================================ */
+                            
+                            @page { 
+                                margin: 5mm; 
+                                size: A4; 
+                            }
+                            
+                            .report-container {
+                                width: 100%;
+                                padding: 8px;
+                                background: white;
+                                font-family: Arial, sans-serif;
+                                color: #333;
+                                font-size: 11px;
+                                line-height: 1.4;
+                            }
+                            
+                            /* Report Title Section */
+                            .report-title-section {
+                                text-align: center;
+                                margin: 15px 0 25px 0;
+                                padding: 18px;
+                                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                border-radius: 8px;
+                                border-left: 5px solid #8b1538;
+                            }
+                            
+                            .report-title {
+                                font-size: 22px;
+                                color: #8b1538;
+                                margin: 0 0 10px 0;
+                                font-weight: bold;
+                                letter-spacing: 1px;
+                                text-transform: uppercase;
+                            }
+                            
+                            .report-metadata {
+                                font-size: 13px;
+                                color: #666;
+                                margin-bottom: 8px;
+                            }
+                            
+                            .report-metadata strong {
+                                color: #333;
+                            }
+                            
+                            .report-details {
+                                font-size: 11px;
+                                color: #333;
+                                line-height: 1.8;
+                            }
+                            
+                            .report-details strong {
+                                color: #8b1538;
+                            }
+                            
+                            /* Section Headers */
+                            .section-header {
+                                background: #8b1538;
+                                color: white;
+                                padding: 10px 14px;
+                                font-weight: bold;
+                                font-size: 12px;
+                                text-transform: uppercase;
+                                margin: 18px 0 0 0;
+                                border-radius: 5px;
+                                letter-spacing: 0.5px;
+                                box-shadow: 0 2px 4px rgba(139, 21, 56, 0.3);
+                            }
+                            
+                            /* Tables */
+                            .report-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 0 0 18px 0;
+                                font-size: 10px;
+                                border: 1px solid #ddd;
+                                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                                border-radius: 5px;
+                                overflow: hidden;
+                            }
+                            
+                            .report-table th {
+                                background: #f5f5f5;
+                                padding: 10px 8px;
+                                border: 1px solid #ddd;
+                                font-weight: bold;
+                                font-size: 10px;
+                                text-align: left;
+                                color: #333;
+                            }
+                            
+                            .report-table td {
+                                padding: 9px 8px;
+                                border: 1px solid #ddd;
+                                font-size: 10px;
+                                vertical-align: middle;
+                                line-height: 1.4;
+                            }
+                            
+                            /* Alignment */
+                            .text-center { 
+                                text-align: center; 
+                            }
+                            
+                            .text-right { 
+                                text-align: right; 
+                            }
+                            
+                            /* Alternating rows */
+                            .report-table tbody tr:nth-child(even) {
+                                background: #f9f9f9;
+                            }
+                            
+                            /* Total rows */
+                            .total-row {
+                                background: #f0f0f0 !important;
+                                font-weight: bold;
+                                font-size: 11px;
+                            }
+                            
+                            .section-total {
+                                background: #e8e8e8 !important;
+                                font-weight: bold;
+                                border-top: 2px solid #8b1538;
+                                font-size: 11px;
+                            }
+                            
+                            .final-total {
+                                background: #8b1538 !important;
+                                color: white !important;
+                                font-weight: bold;
+                                font-size: 12px;
+                            }
+
+                            .calculation-row {
+                                background: #f9f9f9 !important;
+                                font-size: 10px;
+                            }
+
+                            .subtotal-row {
+                                background: #e3f2fd !important;
+                                font-weight: bold;
+                                font-size: 11px;
+                                border-top: 2px solid #8b1538;
+                            }
+                            
+                            /* Amount cells - monospace for numbers */
+                            .amount-cell {
+                                font-family: 'Courier New', monospace;
+                                font-weight: 600;
+                                color: #2c3e50;
+                            }
+                            
+                            /* Calculation Formula Note */
+                            .formula-note {
+                                background: #f0f8ff;
+                                padding: 12px 15px;
+                                border-left: 4px solid #8b1538;
+                                margin: 15px 0;
+                                border-radius: 4px;
+                                font-size: 10px;
+                            }
+                            
+                            .formula-note strong {
+                                color: #8b1538;
+                            }
+                            
+                            /* No Commission Message */
+                            .no-commission-msg {
+                                text-align: center;
+                                padding: 35px 20px;
+                                color: #6c757d;
+                                font-style: italic;
+                                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                border-radius: 8px;
+                                border: 2px dashed #dee2e6;
+                                margin: 20px 0;
+                            }
+
+                            .no-commission-msg h4 {
+                                color: #8b1538;
+                                font-size: 13px;
+                                margin-bottom: 8px;
+                            }
+                            
+                            /* Footer Note */
+                            .footer-note {
+                                margin-top: 25px;
+                                padding-top: 12px;
+                                border-top: 2px solid #dee2e6;
+                                font-size: 8px;
+                                color: #6c757d;
+                                text-align: center;
+                                line-height: 1.5;
+                            }
+                            
+                            .footer-note strong {
+                                color: #8b1538;
+                                font-size: 9px;
+                                display: block;
+                                margin-bottom: 6px;
+                            }
+                        </style>
+
+                        <div class="report-container">
+                            <!-- Report Title Section -->
+                            <div class="report-title-section">
+                                <h1 class="report-title">Commission Payout Report</h1>
+                                <div class="report-metadata">
+                                    Order: <strong><t t-esc="o.name"/></strong> | 
+                                    Date: <strong><t t-esc="o.date_order" t-options="{'widget': 'date'}"/></strong>
+                                </div>
+                                <div class="report-details">
+                                    Customer: <strong><t t-esc="o.partner_id.name"/></strong>
+                                    <t t-if="hasattr(o, 'project_id') and o.project_id">
+                                        | Project: <strong><t t-esc="o.project_id.name"/></strong>
+                                    </t>
+                                    <t t-if="hasattr(o, 'unit_id') and o.unit_id">
+                                        | Unit: <strong><t t-esc="o.unit_id.name"/></strong>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Order Summary Section -->
+                            <div class="section-header">ORDER SUMMARY</div>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>DESCRIPTION</th>
+                                        <th class="text-center">QTY</th>
+                                        <th class="text-right">UNIT PRICE (AED)</th>
+                                        <th class="text-right">SUBTOTAL (AED)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.order_line" t-as="line">
+                                        <tr>
+                                            <td><t t-esc="line.name or line.product_id.name"/></td>
+                                            <td class="text-center"><t t-esc="'{:,.2f}'.format(line.product_uom_qty)"/></td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(line.price_unit)"/></td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(line.price_subtotal)"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="3" class="text-right">Order Total (Excl. VAT) (AED):</td>
+                                        <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.amount_untaxed)"/></td>
+                                    </tr>
+                                    <t t-if="o.amount_tax and o.amount_tax > 0">
+                                        <tr class="calculation-row">
+                                            <td colspan="3" class="text-right">VAT (AED):</td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.amount_tax)"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="3" class="text-right">Order Total with VAT (AED):</td>
+                                        <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.amount_total)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Calculate commission totals -->
+                            <t t-set="has_external" t-value="(o.broker_amount or 0) > 0 or (o.referrer_amount or 0) > 0 or (o.cashback_amount or 0) > 0 or (o.other_external_amount or 0) > 0"/>
+                            <t t-set="has_internal" t-value="(o.agent1_amount or 0) > 0 or (o.agent2_amount or 0) > 0 or (o.manager_amount or 0) > 0 or (o.director_amount or 0) > 0"/>
+                            <t t-set="has_legacy" t-value="(o.salesperson_commission if hasattr(o, 'salesperson_commission') else 0) > 0 or (o.manager_commission if hasattr(o, 'manager_commission') else 0) > 0 or (o.director_commission if hasattr(o, 'director_commission') else 0) > 0 or (o.second_agent_commission if hasattr(o, 'second_agent_commission') else 0) > 0"/>
+                            
+                            <t t-set="external_total" t-value="(o.broker_amount or 0) + (o.referrer_amount or 0) + (o.cashback_amount or 0) + (o.other_external_amount or 0)"/>
+                            <t t-set="internal_total" t-value="(o.agent1_amount or 0) + (o.agent2_amount or 0) + (o.manager_amount or 0) + (o.director_amount or 0)"/>
+                            <t t-set="legacy_total" t-value="(o.salesperson_commission if hasattr(o, 'salesperson_commission') else 0) + (o.manager_commission if hasattr(o, 'manager_commission') else 0) + (o.director_commission if hasattr(o, 'director_commission') else 0) + (o.second_agent_commission if hasattr(o, 'second_agent_commission') else 0)"/>
+                            
+                            <t t-set="total_commission" t-value="external_total + internal_total + legacy_total"/>
+                            <t t-set="vat_on_commission" t-value="total_commission * 0.05"/>
+                            <t t-set="total_commission_with_vat" t-value="total_commission + vat_on_commission"/>
+                            <t t-set="company_share" t-value="o.amount_total - total_commission_with_vat"/>
+
+                            <t t-if="has_external or has_internal or has_legacy">
+                                <!-- External Commissions Section -->
+                                <t t-if="has_external">
+                                    <div class="section-header">EXTERNAL COMMISSIONS</div>
+                                    <table class="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>PARTY</th>
+                                                <th>PARTNER</th>
+                                                <th>TYPE</th>
+                                                <th class="text-center">RATE (%)</th>
+                                                <th class="text-right">AMOUNT (AED)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="o.broker_partner_id and o.broker_amount">
+                                                <tr>
+                                                    <td><strong>Broker</strong></td>
+                                                    <td><t t-esc="o.broker_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.broker_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.broker_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.broker_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.broker_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.broker_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.referrer_partner_id and o.referrer_amount">
+                                                <tr>
+                                                    <td><strong>Referrer</strong></td>
+                                                    <td><t t-esc="o.referrer_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.referrer_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.referrer_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.referrer_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.referrer_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.referrer_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.cashback_partner_id and o.cashback_amount">
+                                                <tr>
+                                                    <td><strong>Cashback</strong></td>
+                                                    <td><t t-esc="o.cashback_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.cashback_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.cashback_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.cashback_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.cashback_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.cashback_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.other_external_partner_id and o.other_external_amount">
+                                                <tr>
+                                                    <td><strong>Other External</strong></td>
+                                                    <td><t t-esc="o.other_external_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.other_external_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.other_external_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.other_external_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.other_external_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.other_external_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <tr class="section-total">
+                                                <td colspan="4" class="text-right">Total External (AED):</td>
+                                                <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(external_total)"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+
+                                <!-- Internal Commissions Section -->
+                                <t t-if="has_internal">
+                                    <div class="section-header">INTERNAL COMMISSIONS</div>
+                                    <table class="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>ROLE</th>
+                                                <th>PARTNER</th>
+                                                <th>TYPE</th>
+                                                <th class="text-center">RATE (%)</th>
+                                                <th class="text-right">AMOUNT (AED)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="o.manager_partner_id and o.manager_amount">
+                                                <tr>
+                                                    <td><strong>Manager</strong></td>
+                                                    <td><t t-esc="o.manager_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.manager_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.manager_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.manager_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.manager_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.manager_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.director_partner_id and o.director_amount">
+                                                <tr>
+                                                    <td><strong>Director</strong></td>
+                                                    <td><t t-esc="o.director_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.director_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.director_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.director_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.director_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.director_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.agent1_partner_id and o.agent1_amount">
+                                                <tr>
+                                                    <td><strong>Agent 1</strong></td>
+                                                    <td><t t-esc="o.agent1_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.agent1_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.agent1_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.agent1_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.agent1_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.agent1_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="o.agent2_partner_id and o.agent2_amount">
+                                                <tr>
+                                                    <td><strong>Agent 2</strong></td>
+                                                    <td><t t-esc="o.agent2_partner_id.name"/></td>
+                                                    <td>
+                                                        <t t-if="o.agent2_commission_type == 'fixed'">Fixed Amount</t>
+                                                        <t t-elif="o.agent2_commission_type == 'percent_unit_price'">Percentage of Unit Price</t>
+                                                        <t t-else="">Percentage of Untaxed Total</t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-if="o.agent2_commission_type != 'fixed'">
+                                                            <t t-esc="'{:.2f}'.format(o.agent2_rate or 0)"/>%
+                                                        </t>
+                                                        <t t-else="">—</t>
+                                                    </td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.agent2_amount)"/></td>
+                                                </tr>
+                                            </t>
+                                            <tr class="section-total">
+                                                <td colspan="4" class="text-right">Total Internal (AED):</td>
+                                                <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(internal_total)"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+
+                                <!-- Legacy Commissions Section -->
+                                <t t-if="has_legacy">
+                                    <div class="section-header">LEGACY COMMISSIONS</div>
+                                    <table class="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>ROLE</th>
+                                                <th>PARTNER</th>
+                                                <th>TYPE</th>
+                                                <th class="text-center">RATE (%)</th>
+                                                <th class="text-right">AMOUNT (AED)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="hasattr(o, 'consultant_id') and o.consultant_id and o.salesperson_commission">
+                                                <tr>
+                                                    <td><strong>Consultant</strong></td>
+                                                    <td><t t-esc="o.consultant_id.name"/></td>
+                                                    <td>Legacy Commission</td>
+                                                    <td class="text-center"><t t-esc="'{:.2f}'.format(o.consultant_comm_percentage or 0)"/>%</td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.salesperson_commission)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="hasattr(o, 'manager_id') and o.manager_id and o.manager_commission">
+                                                <tr>
+                                                    <td><strong>Manager (Legacy)</strong></td>
+                                                    <td><t t-esc="o.manager_id.name"/></td>
+                                                    <td>Legacy Commission</td>
+                                                    <td class="text-center"><t t-esc="'{:.2f}'.format(o.manager_comm_percentage or 0)"/>%</td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.manager_commission)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="hasattr(o, 'director_id') and o.director_id and o.director_commission">
+                                                <tr>
+                                                    <td><strong>Director (Legacy)</strong></td>
+                                                    <td><t t-esc="o.director_id.name"/></td>
+                                                    <td>Legacy Commission</td>
+                                                    <td class="text-center"><t t-esc="'{:.2f}'.format(o.director_comm_percentage or 0)"/>%</td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.director_commission)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="hasattr(o, 'second_agent_id') and o.second_agent_id and o.second_agent_commission">
+                                                <tr>
+                                                    <td><strong>Second Agent</strong></td>
+                                                    <td><t t-esc="o.second_agent_id.name"/></td>
+                                                    <td>Legacy Commission</td>
+                                                    <td class="text-center"><t t-esc="'{:.2f}'.format(o.second_agent_comm_percentage or 0)"/>%</td>
+                                                    <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.second_agent_commission)"/></td>
+                                                </tr>
+                                            </t>
+                                            <tr class="section-total">
+                                                <td colspan="4" class="text-right">Total Legacy (AED):</td>
+                                                <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(legacy_total)"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+
+                                <!-- Commission Summary Section -->
+                                <div class="section-header">COMMISSION SUMMARY</div>
+                                <table class="report-table">
+                                    <tbody>
+                                        <!-- Order Total -->
+                                        <tr class="calculation-row">
+                                            <td colspan="4" class="text-right">Total Order with VAT (AED):</td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(o.amount_total)"/></td>
+                                        </tr>
+                                        
+                                        <!-- Total All Commissions -->
+                                        <tr class="calculation-row">
+                                            <td colspan="4" class="text-right">Total Payable Commission (External + Internal + Legacy) (AED):</td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(total_commission)"/></td>
+                                        </tr>
+                                        
+                                        <!-- VAT on Commission -->
+                                        <tr class="calculation-row">
+                                            <td colspan="4" class="text-right">VAT on Commission (5%) (AED):</td>
+                                            <td class="text-right amount-cell"><t t-esc="'{:,.2f}'.format(vat_on_commission)"/></td>
+                                        </tr>
+                                        
+                                        <!-- Subtotal: Total Commission + VAT -->
+                                        <tr class="subtotal-row">
+                                            <td colspan="4" class="text-right"><strong>Total Commission + VAT (AED):</strong></td>
+                                            <td class="text-right amount-cell"><strong><t t-esc="'{:,.2f}'.format(total_commission_with_vat)"/></strong></td>
+                                        </tr>
+                                        
+                                        <!-- Final Company Share -->
+                                        <tr class="final-total">
+                                            <td colspan="4" class="text-right"><strong>TOTAL COMPANY SHARE (AED):</strong></td>
+                                            <td class="text-right"><strong><t t-esc="'{:,.2f}'.format(company_share)"/></strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Calculation Formula Note -->
+                                <div class="formula-note">
+                                    <strong>Calculation Formula:</strong><br/>
+                                    <span style="font-size: 9px; color: #555; line-height: 1.7;">
+                                        Total Company Share = Total Order with VAT - (Total Payable Commission + VAT on Commission)<br/>
+                                        <strong><t t-esc="'{:,.2f}'.format(company_share)"/> = <t t-esc="'{:,.2f}'.format(o.amount_total)"/> - (<t t-esc="'{:,.2f}'.format(total_commission)"/> + <t t-esc="'{:,.2f}'.format(vat_on_commission)"/>)</strong>
+                                    </span>
+                                </div>
+                            </t>
+
+                            <!-- No Commission Message -->
+                            <t t-if="not has_external and not has_internal and not has_legacy">
+                                <div class="no-commission-msg">
+                                    <h4>No Commissions Configured</h4>
+                                    <p>This sales order does not have any commission arrangements set up at this time.</p>
+                                    <p style="margin-top: 8px; font-size: 9px;">Please configure commission rates and partners in the order details.</p>
+                                </div>
+                            </t>
+
+                            <!-- Footer Note -->
+                            <div class="footer-note">
+                                <strong>⚠ CONFIDENTIAL DOCUMENT - INTERNAL USE ONLY</strong>
+                                <p style="margin: 5px 0;">This commission report contains confidential financial information and is intended solely for internal business purposes.</p>
+                                <p style="margin: 5px 0;">Unauthorized distribution, copying, or disclosure of this document is strictly prohibited.</p>
+                                <p style="margin: 5px 0; color: #8b1538;">
+                                    <strong><t t-esc="company.name"/></strong> | 
+                                    <t t-if="company.street"><t t-esc="company.street"/>, </t>
+                                    <t t-if="company.city"><t t-esc="company.city"/>, </t>
+                                    <t t-if="company.country_id"><t t-esc="company.country_id.name"/></t>
+                                    <t t-if="company.vat"> | VAT: <t t-esc="company.vat"/></t>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Paper Format for Commission Report -->
+    <record id="paperformat_commission_report_professional" model="report.paperformat">
+        <field name="name">Commission Payout Report A4 - OSUS Professional</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">25</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Report Action Definition -->
+    <record id="action_report_commission_payout_professional" model="ir.actions.report">
+        <field name="name">Commission Payout Report</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">commission_ax.commission_payout_report_template_professional</field>
+        <field name="report_file">commission_ax.commission_payout_report_template_professional</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_commission_report_professional"/>
+        <field name="print_report_name">'Commission Payout Report - %s' % (object.name)</field>
+    </record>
+</odoo>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- OSUS Branded Report Header with Maroon & Gold -->
+        <template id="osus_branded_header">
+            <div class="osus-header" style="background: linear-gradient(135deg, #800020 0%, #5a0f1a 100%); padding: 15px 20px; margin-bottom: 15px; border-radius: 8px 8px 0 0;">
+                <div class="row">
+                    <div class="col-4">
+                        <!-- OSUS Logo -->
+                        <img src="https://osusproperties.com/images/osus.png" alt="OSUS Properties" style="max-height: 70px; max-width: 200px; background: white; padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+                    </div>
+                    <div class="col-8 text-end">
+                        <!-- Company Information -->
+                        <div class="osus-company-info">
+                            <h4 class="mb-1" style="color: #FFD700; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16pt; margin-bottom: 8px;">
+                                <span t-field="company.name"/>
+                            </h4>
+                            <div class="osus-contact-details" style="font-size: 10pt; color: #ffffff; text-shadow: 1px 1px 1px rgba(0,0,0,0.2);">
+                                <div t-if="company.street" style="margin-bottom: 3px;">
+                                    <i class="fa fa-map-marker" style="color: #FFD700; margin-right: 6px; width: 14px; display: inline-block;"/>
+                                    <span t-field="company.street"/>
+                                    <span t-if="company.street2" t-field="company.street2"/>
+                                </div>
+                                <div t-if="company.city or company.zip" style="margin-bottom: 3px;">
+                                    <span t-if="company.zip" t-field="company.zip"/>
+                                    <t t-if="company.zip and company.city">, </t>
+                                    <span t-if="company.city" t-field="company.city"/>
+                                    <t t-if="company.state_id">, </t>
+                                    <span t-if="company.state_id" t-field="company.state_id.name"/>
+                                    <t t-if="company.country_id">, </t>
+                                    <span t-if="company.country_id" t-field="company.country_id.name"/>
+                                </div>
+                                <div t-if="company.phone" style="margin-bottom: 3px;">
+                                    <i class="fa fa-phone" style="color: #FFD700; margin-right: 6px; width: 14px; display: inline-block;"/>
+                                    <span t-field="company.phone"/>
+                                </div>
+                                <div t-if="company.email" style="margin-bottom: 3px;">
+                                    <i class="fa fa-envelope" style="color: #FFD700; margin-right: 6px; width: 14px; display: inline-block;"/>
+                                    <span t-field="company.email"/>
+                                </div>
+                                <div t-if="company.website" style="margin-bottom: 3px;">
+                                    <i class="fa fa-globe" style="color: #FFD700; margin-right: 6px; width: 14px; display: inline-block;"/>
+                                    <span t-field="company.website"/>
+                                </div>
+                                <div t-if="company.vat" style="margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,215,0,0.3);">
+                                    <strong style="color: #FFD700;">TRN:</strong>
+                                    <span style="font-weight: 600;" t-field="company.vat"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <hr style="border: 0; border-top: 3px solid #FFD700; margin: 10px 0 0 0; box-shadow: 0 2px 4px rgba(255,215,0,0.3);"/>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- OSUS Branded Report Footer with Maroon & Gold -->
+        <template id="osus_branded_footer">
+            <div class="osus-footer">
+                <div class="row">
+                    <div class="col-12">
+                        <hr style="border: 0; border-top: 3px solid #FFD700; margin: 8px 0; box-shadow: 0 -2px 4px rgba(255,215,0,0.2);"/>
+                    </div>
+                </div>
+
+                <!-- Bank Details Section -->
+                <div class="row mt-2" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 15px 20px; border-left: 4px solid #800020; margin-bottom: 10px;">
+                    <div class="col-12">
+                        <div style="text-align: center; margin-bottom: 12px;">
+                            <strong style="color: #800020; font-size: 11pt; text-transform: uppercase; letter-spacing: 1px;">Banking Details</strong>
+                        </div>
+                        <div class="row" style="font-size: 9pt; color: #333;">
+                            <div class="col-6">
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Bank Name:</strong>
+                                    <span>National Bank of Fujairah</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Name:</strong>
+                                    <span>Osus Real Estate Brokerage LLC</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Number:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">012371961346</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 120px;">Account Currency:</strong>
+                                    <span>AED</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Branch:</strong>
+                                    <span>DUBAI</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">IBAN:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">AE870380000012371961346</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Swift Code:</strong>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">NBFUAEADXXX</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #800020; display: inline-block; min-width: 100px;">Account Type:</strong>
+                                    <span>Business Value Preferred</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2" style="background: linear-gradient(135deg, #800020 0%, #5a0f1a 100%); padding: 12px 20px; border-radius: 0 0 8px 8px;">
+                    <div class="col-6">
+                        <div class="osus-footer-info" style="font-size: 9pt; color: #ffffff;">
+                            <div style="margin-bottom: 3px;">
+                                <strong style="color: #FFD700; font-size: 10pt;">
+                                    <span t-field="company.name"/>
+                                </strong>
+                            </div>
+                            <div t-if="company.phone" style="margin-bottom: 2px;">
+                                <i class="fa fa-phone" style="color: #FFD700; margin-right: 5px; width: 12px; display: inline-block;"/>
+                                <span t-field="company.phone"/>
+                            </div>
+                            <div t-if="company.email" style="margin-bottom: 2px;">
+                                <i class="fa fa-envelope" style="color: #FFD700; margin-right: 5px; width: 12px; display: inline-block;"/>
+                                <span t-field="company.email"/>
+                            </div>
+                            <div t-if="company.website">
+                                <i class="fa fa-globe" style="color: #FFD700; margin-right: 5px; width: 12px; display: inline-block;"/>
+                                <span t-field="company.website"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div class="osus-page-number" style="font-size: 9pt; color: #ffffff;">
+                            <div style="margin-bottom: 5px;">
+                                <strong style="color: #FFD700;">Page</strong>
+                                <span class="page"/>
+                                <strong style="color: #FFD700;">of</strong>
+                                <span class="topage"/>
+                            </div>
+                            <div style="font-size: 8pt;">
+                                <i class="fa fa-clock-o" style="color: #FFD700; margin-right: 5px;"/>
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2" t-if="company.vat">
+                    <div class="col-12 text-center">
+                        <div style="font-size: 8pt; color: #800020; font-weight: 600; padding: 5px; background: #fff8dc; border-radius: 4px;">
+                            <strong style="color: #800020;">TRN:</strong>
+                            <span t-field="company.vat"/>
+ |                            <i class="fa fa-file-text-o"/>
+ This is a computer-generated document
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- OSUS Branded External Layout (Inherits from web.external_layout_standard) -->
+        <template id="osus_external_layout" inherit_id="web.external_layout_standard" priority="999">
+            <!-- Replace header -->
+            <xpath expr="//div[@class='header']" position="replace">
+                <div class="header">
+                    <t t-call="osus_report_header_footer.osus_branded_header"/>
+                </div>
+            </xpath>
+
+            <!-- Replace footer -->
+            <xpath expr="//div[@class='footer']" position="replace">
+                <div class="footer o_background_footer">
+                    <t t-call="osus_report_header_footer.osus_branded_footer"/>
+                </div>
+            </xpath>
+        </template>
+
+        <!-- OSUS Branded External Layout Background -->
+        <template id="osus_external_layout_background" inherit_id="web.external_layout_background" priority="999">
+            <!-- Replace header -->
+            <xpath expr="//div[hasclass('header')]" position="replace">
+                <div class="header">
+                    <t t-call="osus_report_header_footer.osus_branded_header"/>
+                </div>
+            </xpath>
+
+            <!-- Replace footer -->
+            <xpath expr="//div[hasclass('footer')]" position="replace">
+                <div class="footer o_background_footer">
+                    <t t-call="osus_report_header_footer.osus_branded_footer"/>
+                </div>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

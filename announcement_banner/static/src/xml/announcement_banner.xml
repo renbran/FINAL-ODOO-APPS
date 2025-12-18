@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="announcement_banner.AnnouncementBanner">
+        <div t-if="state.showBanner and currentAnnouncement" class="announcement-banner-overlay">
+            <div class="announcement-banner-container">
+                <div class="announcement-banner-modal">
+                    <!-- Header -->
+                    <div class="announcement-banner-header">
+                        <div class="announcement-banner-title">
+                            <i class="fa fa-bullhorn me-2"/>
+                            <span t-esc="currentAnnouncement.name"/>
+                        </div>
+                        <div class="announcement-banner-controls">
+                            <span t-if="hasMultipleAnnouncements" class="announcement-position me-3" t-esc="currentPosition"/>
+                            <button class="btn-close" t-on-click="closeBanner" aria-label="Close">
+                                <i class="fa fa-times"/>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Body - KEY CHANGE HERE -->
+                    <div class="announcement-banner-body">
+                        <!-- Use t-out instead of t-esc to render HTML -->
+                        <div class="announcement-content" t-out="currentAnnouncement.message"/>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="announcement-banner-footer">
+                        <div class="announcement-navigation">
+                            <button t-if="hasMultipleAnnouncements and hasPrevious" class="btn btn-secondary btn-sm me-2" t-on-click="previousAnnouncement">
+                                <i class="fa fa-chevron-left"/>
+ Previous
+                            </button>
+                            <button t-if="hasMultipleAnnouncements and hasNext" class="btn btn-secondary btn-sm" t-on-click="nextAnnouncement">
+                                Next <i class="fa fa-chevron-right"/>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary" t-on-click="closeBanner">
+                            <i class="fa fa-check"/>
+ Got it
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

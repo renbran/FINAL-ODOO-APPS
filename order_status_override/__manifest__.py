@@ -1,6 +1,7 @@
 {
     'name': 'Custom Sales Order Status Workflow',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
+    'license': 'LGPL-3',
     'summary': 'Custom status bar workflow for Sales Orders',
     'description': '''
         This module adds a custom status bar workflow to Sales Orders with the following stages:
@@ -27,9 +28,7 @@
         'data/email_templates.xml',
         'data/paperformat.xml',
         'reports/order_status_reports.xml',
-        'reports/commission_report_enhanced.xml',
-        'reports/sale_commission_report.xml',
-        'reports/sale_commission_template.xml',
+        'reports/commission_report_clean.xml',
         'reports/enhanced_order_status_report_template.xml',
         'reports/enhanced_order_status_report_template_updated.xml',
         'reports/enhanced_order_status_report_actions.xml',
@@ -41,11 +40,11 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # CloudPepper Error Fixes (load first with prepend)
+            ('prepend', 'order_status_override/static/src/js/cloudpepper_sales_fix.js'),
+            
             # Templates
             'order_status_override/static/src/xml/order_status_widget.xml',
-            
-            # CloudPepper Error Fixes (load first)
-            ('prepend', 'order_status_override/static/src/js/cloudpepper_sales_fix.js'),
             
             # JavaScript Components
             'order_status_override/static/src/js/order_status_widget.js',

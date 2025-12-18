@@ -150,7 +150,7 @@
                                         <t t-foreach="a['balance_cmp']" t-as="current_interval">
                                             <td t-att-style="style_td" class="amt">
                                                 <t t-if="a['balance_cmp'][current_interval]">
-                                                    <span t-raw="a['balance_cmp'][current_interval]"
+                                                    <span t-out="a['balance_cmp'][current_interval]"
                                                           t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
                                                 </t>
                                                 <t t-else="">
@@ -373,7 +373,7 @@
                                             <t t-if="a.get('balance')">
                                                 <t t-foreach="a.get('balance')" t-as="current_interval">
                                                     <td t-att-style="style_td" class="amt text-right">
-                                                        <span t-raw="a.get('balance')[current_interval]"
+                                                        <span t-out="a.get('balance')[current_interval]"
                                                         />
                                                     </td>
                                                 </t>
@@ -390,7 +390,7 @@
                                             <t t-if="a.get('balance')">
                                                 <t t-foreach="a.get('balance')" t-as="current_interval">
                                                     <td t-att-style="style_td" class="amt text-right">
-                                                        <span t-raw="a.get('balance')[current_interval]"
+                                                        <span t-out="a.get('balance')[current_interval]"
                                                               t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
                                                     </td>
                                                 </t>
@@ -1774,7 +1774,7 @@
                                     <tr style="page-break-inside: avoid;" class="pims_report_line_main_tr">
                                         <td colspan="5">
                                             <span style="color: white;" t-esc="'..'"/>
-                                            <span t-raw="line['name'].get(js_data.get('context').get('lang')) if isinstance(line['name'],dict) else line['name']"/>
+                                            <span t-out="line['name'].get(js_data.get('context').get('lang')) if isinstance(line['name'],dict) else line['name']"/>
                                         </td>
                                         <td class="text-right">
                                             <t t-if="line['debit']">
@@ -2107,14 +2107,14 @@
                                             <t t-foreach="a['balance_cmp']" t-as="current_interval">
 
                                                 <td t-att-style="style_td" class="amt">
-                                                    <span t-raw="current_interval[0]['ks_com_net']"
+                                                    <span t-out="current_interval[0]['ks_com_net']"
                                                           t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
 
                                                     <!--                                        <t t-esc="cn['ks_com_net']"/>-->
                                                 </td>
 
                                                 <td t-att-style="style_td" class="amt">
-                                                    <span t-raw="current_interval[1]['ks_com_tax']"
+                                                    <span t-out="current_interval[1]['ks_com_tax']"
                                                           t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
                                                     <!--                                        <t t-esc="cn['ks_com_tax']"/>-->
                                                 </td>

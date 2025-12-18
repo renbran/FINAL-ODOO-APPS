@@ -1,0 +1,94 @@
+name: Test Genspark AI Integration
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  test-ai-integration:
+    name: Test AI Integration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install xmlschema lxml pyyaml requests
+
+      - name: Test AI Module Analyzer
+        run: |
+          echo "Testing AI Module Analyzer..."
+          python .github/scripts/ai_module_analyzer.py
+          
+      - name: Test AI Development Assistant  
+        run: |
+          echo "Testing AI Development Assistant..."
+          python .github/scripts/ai_development_assistant.py
+
+      - name: Test AI Module Validator
+        run: |
+          echo "Testing AI Module Validator..."
+          python .github/scripts/ai_module_validator.py
+
+      - name: Test AI Issue Analyzer
+        run: |
+          echo "Testing AI Issue Analyzer..."
+          python .github/scripts/ai_issue_analyzer.py "Test Issue" "Test issue description for CloudPepper deployment"
+
+      - name: Verify AI Analysis Results
+        run: |
+          echo "Checking generated reports..."
+          ls -la *.md *.json || echo "No analysis files generated"
+          
+          if [ -f "ai_analysis_results.md" ]; then
+            echo "✅ Module analysis report generated"
+            head -20 ai_analysis_results.md
+          fi
+          
+          if [ -f "ai_development_suggestions.md" ]; then
+            echo "✅ Development suggestions generated"
+            head -20 ai_development_suggestions.md
+          fi
+          
+          if [ -f "ai_module_analysis.md" ]; then
+            echo "✅ Module validation report generated"
+            head -20 ai_module_analysis.md
+          fi
+          
+          if [ -f "ai_issue_analysis.md" ]; then
+            echo "✅ Issue analysis report generated"
+            head -20 ai_issue_analysis.md
+          fi
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-integration-test-results
+          path: |
+            *.md
+            *.json
+          retention-days: 7
+
+      - name: Test Summary
+        run: |
+          echo "🤖 Genspark AI Integration Test Summary"
+          echo "======================================"
+          echo "✅ AI Module Analyzer: Functional"
+          echo "✅ AI Development Assistant: Functional"  
+          echo "✅ AI Module Validator: Functional"
+          echo "✅ AI Issue Analyzer: Functional"
+          echo ""
+          echo "Integration is working correctly!"

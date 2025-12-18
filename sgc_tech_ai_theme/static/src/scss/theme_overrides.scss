@@ -1,0 +1,300 @@
+// SGC TECH AI - Core Theme Overrides
+@import 'sgc_colors';
+
+// ============================================================================
+// CRITICAL: All Bootstrap component overrides scoped to .o_web_client
+// This prevents conflicts with Website, POS, eCommerce, and other frontends
+// ============================================================================
+
+// Backend-only Bootstrap overrides
+.o_web_client {
+    // Modal Dialogs
+    .modal {
+        .modal-header {
+            background: $sgc-gradient-ocean;
+            color: $sgc-white;
+            border-bottom: 2px solid $sgc-ocean-blue;
+
+            .modal-title {
+                font-weight: $sgc-font-bold;
+            }
+
+            .btn-close {
+                filter: brightness(0) invert(1);
+            }
+        }
+
+        .modal-body {
+            background: $sgc-off-white;
+        }
+
+        .modal-footer {
+            background: $sgc-ice-white;
+            border-top: 1px solid $sgc-light-gray;
+        }
+    }
+
+    // Alerts and Notifications
+    .alert {
+        border-radius: $sgc-radius-md;
+        border-left-width: 4px;
+
+        &.alert-success {
+            background: lighten($sgc-success, 45%);
+            border-left-color: $sgc-success;
+            color: darken($sgc-success, 30%);
+        }
+
+        &.alert-info {
+            background: lighten($sgc-ocean-blue, 40%);
+            border-left-color: $sgc-ocean-blue;
+            color: darken($sgc-ocean-blue, 25%);
+        }
+
+        &.alert-warning {
+            background: lighten($sgc-warning, 35%);
+            border-left-color: $sgc-warning;
+            color: darken($sgc-warning, 30%);
+        }
+
+        &.alert-danger {
+            background: lighten($sgc-error, 35%);
+            border-left-color: $sgc-error;
+            color: darken($sgc-error, 25%);
+        }
+    }
+
+    // Tabs
+    .nav-tabs {
+        border-bottom: 2px solid $sgc-light-gray;
+
+        .nav-link {
+            color: $sgc-slate-gray;
+            border-bottom: 3px solid transparent;
+            transition: all $sgc-transition-fast;
+
+            &:hover {
+                color: $sgc-ocean-blue;
+                border-bottom-color: $sgc-sky-blue;
+            }
+
+            &.active {
+                color: $sgc-ocean-blue;
+                border-bottom-color: $sgc-ocean-blue;
+                font-weight: $sgc-font-semibold;
+            }
+        }
+    }
+
+    // Badges
+    .badge {
+        font-weight: $sgc-font-medium;
+        padding: 0.35em 0.65em;
+        border-radius: $sgc-radius-sm;
+
+        &.badge-primary {
+            background: $sgc-ocean-blue;
+            color: $sgc-white;
+        }
+
+        &.badge-success {
+            background: $sgc-success;
+            color: $sgc-white;
+        }
+
+        &.badge-warning {
+            background: $sgc-warning;
+            color: $sgc-deep-navy;
+        }
+
+        &.badge-danger {
+            background: $sgc-error;
+            color: $sgc-white;
+        }
+
+        &.badge-info {
+            background: $sgc-sky-blue;
+            color: $sgc-white;
+        }
+    }
+
+    // Pagination
+    .pagination {
+        .page-link {
+            color: $sgc-ocean-blue;
+            border: 1px solid $sgc-light-gray;
+            transition: all $sgc-transition-fast;
+
+            &:hover {
+                background: $sgc-ice-white;
+                border-color: $sgc-ocean-blue;
+            }
+        }
+
+        .page-item.active .page-link {
+            background: $sgc-gradient-ocean;
+            border-color: $sgc-ocean-blue;
+        }
+    }
+
+    // Dropdown Menus
+    .dropdown-menu {
+        border-radius: $sgc-radius-md;
+        box-shadow: $sgc-shadow-lg;
+        border: 1px solid $sgc-light-gray;
+
+        .dropdown-item {
+            transition: all $sgc-transition-fast;
+
+            &:hover,
+            &:focus {
+                background: $sgc-ice-white;
+                color: $sgc-ocean-blue;
+            }
+
+            &.active {
+                background: $sgc-gradient-ocean;
+                color: $sgc-white;
+            }
+        }
+
+        .dropdown-divider {
+            border-color: $sgc-light-gray;
+        }
+    }
+
+    // Progress Bars
+    .progress {
+        background: $sgc-off-white;
+        border-radius: $sgc-radius-md;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+
+        .progress-bar {
+            background: $sgc-gradient-electric;
+            transition: width $sgc-transition-base;
+
+            &.bg-success {
+                background: $sgc-gradient-success;
+            }
+        }
+    }
+
+    // Tooltips
+    .tooltip {
+        .tooltip-inner {
+            background: $sgc-deep-navy;
+            color: $sgc-white;
+            border-radius: $sgc-radius-sm;
+            box-shadow: $sgc-shadow-md;
+        }
+
+        &.bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: $sgc-deep-navy;
+        }
+
+        &.bs-tooltip-bottom .tooltip-arrow::before {
+            border-bottom-color: $sgc-deep-navy;
+        }
+    }
+
+    // Popovers
+    .popover {
+        border-radius: $sgc-radius-md;
+        box-shadow: $sgc-shadow-lg;
+        border-color: $sgc-light-gray;
+
+        .popover-header {
+            background: $sgc-gradient-ocean;
+            color: $sgc-white;
+            border-bottom-color: $sgc-ocean-blue;
+            font-weight: $sgc-font-semibold;
+        }
+
+        .popover-body {
+            background: $sgc-off-white;
+        }
+    }
+
+    // Scrollbars (webkit only) - Scoped to backend
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: $sgc-off-white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: $sgc-slate-gray;
+        border-radius: $sgc-radius-sm;
+
+        &:hover {
+            background: $sgc-ocean-blue;
+        }
+    }
+}
+
+// ============================================================================
+// Odoo-specific components (already scoped, safe from conflicts)
+// ============================================================================
+
+// Control Panel
+.o_control_panel {
+    background: $sgc-gradient-ocean;
+    box-shadow: $sgc-shadow-md;
+
+    .o_cp_top {
+        .breadcrumb {
+            .breadcrumb-item {
+                color: $sgc-white;
+
+                a {
+                    color: $sgc-electric-cyan;
+
+                    &:hover {
+                        color: $sgc-neon-green;
+                    }
+                }
+
+                &.active {
+                    color: $sgc-off-white;
+                }
+            }
+        }
+
+        .o_cp_searchview {
+            .o_searchview_input_container {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: $sgc-radius-md;
+
+                input {
+                    color: $sgc-white;
+
+                    &::placeholder {
+                        color: rgba(255, 255, 255, 0.6);
+                    }
+                }
+            }
+        }
+    }
+
+    .o_cp_buttons {
+        .btn-primary {
+            background: $sgc-gradient-electric;
+            border: none;
+
+            &:hover {
+                background: $sgc-gradient-success;
+            }
+        }
+    }
+}
+
+// Spinners/Loading
+.o_loading {
+    .o_spinner {
+        border-color: $sgc-light-gray;
+        border-top-color: $sgc-ocean-blue;
+    }
+}

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        
+        <!-- Module Category -->
+        <record id="module_category_assessment" model="ir.module.category">
+            <field name="name">Assessment System</field>
+            <field name="description">SCHOLARIX Assessment and Recruitment System</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- Group: Viewer -->
+        <record id="group_assessment_viewer" model="res.groups">
+            <field name="name">Viewer</field>
+            <field name="category_id" ref="module_category_assessment"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Can view assessments and candidates (read-only)</field>
+        </record>
+
+        <!-- Group: Reviewer -->
+        <record id="group_assessment_reviewer" model="res.groups">
+            <field name="name">Reviewer</field>
+            <field name="category_id" ref="module_category_assessment"/>
+            <field name="implied_ids" eval="[(4, ref('group_assessment_viewer'))]"/>
+            <field name="comment">Can review and score candidates</field>
+        </record>
+
+        <!-- Group: Manager -->
+        <record id="group_assessment_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_category_assessment"/>
+            <field name="implied_ids" eval="[(4, ref('group_assessment_reviewer'))]"/>
+            <field name="comment">Full access to assessment system including configuration</field>
+        </record>
+
+        <!-- Record Rules for Candidates -->
+        <record id="assessment_candidate_viewer_rule" model="ir.rule">
+            <field name="name">Candidates: Viewer Access</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="groups" eval="[(4, ref('group_assessment_viewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_candidate_reviewer_rule" model="ir.rule">
+            <field name="name">Candidates: Reviewer Access</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="groups" eval="[(4, ref('group_assessment_reviewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_candidate_manager_rule" model="ir.rule">
+            <field name="name">Candidates: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Public portal access for candidates -->
+        <record id="assessment_candidate_portal_rule" model="ir.rule">
+            <field name="name">Candidates: Portal User Own Access</field>
+            <field name="model_id" ref="model_assessment_candidate"/>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[('email', '=', user.email)]</field>
+        </record>
+
+        <!-- Record Rules for Responses -->
+        <record id="assessment_response_viewer_rule" model="ir.rule">
+            <field name="name">Responses: Viewer Access</field>
+            <field name="model_id" ref="model_assessment_response"/>
+            <field name="groups" eval="[(4, ref('group_assessment_viewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_response_manager_rule" model="ir.rule">
+            <field name="name">Responses: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_response"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Record Rules for AI Scores -->
+        <record id="assessment_ai_score_all_rule" model="ir.rule">
+            <field name="name">AI Scores: Assessment Users Access</field>
+            <field name="model_id" ref="model_assessment_ai_score"/>
+            <field name="groups" eval="[(4, ref('group_assessment_viewer')), (4, ref('group_assessment_reviewer')), (4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_ai_score_manager_rule" model="ir.rule">
+            <field name="name">AI Scores: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_ai_score"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Record Rules for Human Reviews -->
+        <record id="assessment_human_review_reviewer_own_rule" model="ir.rule">
+            <field name="name">Human Reviews: Reviewer Own Reviews</field>
+            <field name="model_id" ref="model_assessment_human_review"/>
+            <field name="groups" eval="[(4, ref('group_assessment_reviewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">['|', ('reviewer_id', '=', user.id), ('reviewer_id', '=', False)]</field>
+        </record>
+
+        <record id="assessment_human_review_manager_rule" model="ir.rule">
+            <field name="name">Human Reviews: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_human_review"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Record Rules for Rankings -->
+        <record id="assessment_ranking_all_rule" model="ir.rule">
+            <field name="name">Rankings: All Assessment Users</field>
+            <field name="model_id" ref="model_assessment_ranking"/>
+            <field name="groups" eval="[(4, ref('group_assessment_viewer')), (4, ref('group_assessment_reviewer')), (4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_ranking_manager_rule" model="ir.rule">
+            <field name="name">Rankings: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_ranking"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Record Rules for Questions -->
+        <record id="assessment_question_all_rule" model="ir.rule">
+            <field name="name">Questions: All Users Read</field>
+            <field name="model_id" ref="model_assessment_question"/>
+            <field name="groups" eval="[(4, ref('base.group_user')), (4, ref('base.group_portal')), (4, ref('base.group_public'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[('is_active', '=', True)]</field>
+        </record>
+
+        <record id="assessment_question_manager_rule" model="ir.rule">
+            <field name="name">Questions: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_question"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Record Rules for Audit Logs -->
+        <record id="assessment_audit_log_viewer_rule" model="ir.rule">
+            <field name="name">Audit Logs: Viewer Access</field>
+            <field name="model_id" ref="model_assessment_audit_log"/>
+            <field name="groups" eval="[(4, ref('group_assessment_viewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="assessment_audit_log_manager_rule" model="ir.rule">
+            <field name="name">Audit Logs: Manager Full Access</field>
+            <field name="model_id" ref="model_assessment_audit_log"/>
+            <field name="groups" eval="[(4, ref('group_assessment_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+    </data>
+</odoo>

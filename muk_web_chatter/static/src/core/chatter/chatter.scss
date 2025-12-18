@@ -1,15 +1,46 @@
-.o-mail-Chatter-top:has(.o-mail-Chatter-sendMessage.active) .o-mail-Composer-send {
-    @extend .btn-danger
+// OSUS Properties Chatter Styles
+.o-mail-Chatter-top:has(.o-mail-Chatter-sendMessage.active)
+  .o-mail-Composer-send {
+  @extend .btn-danger;
+  background-color: #800020 !important; // OSUS Maroon
+  border-color: #800020 !important;
+  &:hover {
+    background-color: #600018 !important;
+    border-color: #600018 !important;
+    box-shadow: 0 2px 8px rgba(128, 0, 32, 0.3);
+  }
 }
 
 .o-mail-Form-chatter.o-aside {
-    .mk_chatter_resize {
-        top: 0;
-        bottom: 0;
-        z-index: 1;
-        width: 5px;
-        height: 100%;
-        cursor: col-resize;
-        position: absolute;
+  border-left: 3px solid #ffd700; // OSUS Gold accent
+
+  .mk_chatter_resize {
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 5px;
+    height: 100%;
+    cursor: col-resize;
+    position: absolute;
+    background: linear-gradient(to right, transparent, rgba(255, 215, 0, 0.2));
+    &:hover {
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 215, 0, 0.4)
+      );
     }
+  }
+}
+
+// OSUS branded activity buttons
+.o-mail-Activity {
+  .btn-primary {
+    background-color: #800020;
+    border-color: #800020;
+    &:hover {
+      background-color: #600018;
+      border-color: #600018;
+    }
+  }
 }

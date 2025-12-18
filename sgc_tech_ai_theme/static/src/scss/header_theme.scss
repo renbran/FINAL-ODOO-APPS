@@ -1,0 +1,91 @@
+// SGC TECH AI - Header & Navigation Theme
+@import "sgc_colors";
+
+// Main Navigation Bar
+.o_main_navbar {
+  background: $sgc-gradient-ocean;
+  border-bottom: 3px solid $sgc-electric-cyan;
+  box-shadow: $sgc-shadow-md;
+
+  .o_menu_brand {
+    color: $sgc-white;
+    font-weight: $sgc-font-bold;
+
+    &:hover {
+      color: $sgc-electric-cyan;
+    }
+  }
+
+  .o_menu_sections {
+    .dropdown {
+      > a {
+        color: $sgc-white;
+        transition: all $sgc-transition-fast;
+
+        &:hover,
+        &:focus {
+          background: rgba(255, 255, 255, 0.1);
+          color: $sgc-electric-cyan;
+        }
+      }
+    }
+  }
+
+  .o_menu_systray {
+    > .dropdown {
+      > a {
+        color: $sgc-white;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: $sgc-electric-cyan;
+        }
+      }
+    }
+  }
+}
+
+// Note: Dropdown menu styles are in theme_overrides.scss (scoped to .o_web_client)
+// to prevent conflicts with Website, POS, and other frontends
+
+// App Drawer
+.o_action_manager {
+  .o_home_menu {
+    background: $sgc-off-white;
+
+    .o_app {
+      border-radius: $sgc-radius-lg;
+      box-shadow: $sgc-shadow-sm;
+      transition: all $sgc-transition-normal;
+
+      &:hover {
+        box-shadow: $sgc-shadow-md;
+        transform: translateY(-4px);
+
+        .o_caption {
+          color: $sgc-ocean-blue;
+        }
+      }
+    }
+  }
+}
+
+// Search Bar
+.o_searchview {
+  .o_searchview_input {
+    border-radius: $sgc-radius-md;
+    border: 1px solid $sgc-light-gray;
+    transition: all $sgc-transition-fast;
+
+    &:focus {
+      border-color: $sgc-ocean-blue;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+  }
+
+  .o_searchview_facet {
+    background: $sgc-ice-white;
+    border-radius: $sgc-radius-sm;
+    color: $sgc-ocean-blue;
+  }
+}

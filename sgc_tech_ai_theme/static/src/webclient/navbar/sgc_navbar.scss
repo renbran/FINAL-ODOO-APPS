@@ -1,0 +1,107 @@
+/**
+ * SGC Tech AI Theme - Enterprise NavBar Styling
+ * 
+ * Styles for the sidebar toggle button and enhanced navbar appearance
+ * with SGC Tech AI branding (deep navy, electric cyan, neon green).
+ */
+
+@import "../appsbar/sgc_appsbar_variables";
+
+// Toggle button styling with SGC branding
+.sgc_navbar_sidebar_toggle {
+  background: linear-gradient(135deg, $sgc-deep-navy 0%, $sgc-ocean-blue 100%);
+  border: 1px solid $sgc-electric-cyan;
+  color: $sgc-electric-cyan;
+  padding: 6px 12px;
+  margin-right: 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 240, 0.3);
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      $sgc-ocean-blue 0%,
+      $sgc-electric-cyan 30%
+    );
+    border-color: $sgc-neon-green;
+    color: $sgc-neon-green;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 0 5px rgba(0, 255, 240, 0.4);
+  }
+}
+
+// Enhanced navbar styling
+.o_navbar {
+  background: linear-gradient(
+    90deg,
+    $sgc-deep-navy 0%,
+    $sgc-ocean-blue 50%,
+    $sgc-deep-navy 100%
+  );
+  border-bottom: 2px solid $sgc-electric-cyan;
+  box-shadow: 0 2px 10px rgba(0, 255, 240, 0.2);
+}
+
+// Body states for sidebar visibility
+body.sgc_sidebar_type_large {
+  .o_action_manager {
+    margin-left: var(--sgc-sidebar-width, 160px);
+    transition: margin-left 0.3s ease;
+  }
+}
+
+body.sgc_sidebar_type_invisible {
+  .o_action_manager {
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+  }
+
+  .sgc_apps_sidebar_panel {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+// Responsive behavior
+@media (max-width: 991px) {
+  // Tablet view - auto-collapse sidebar
+  body.sgc_sidebar_type_large {
+    .o_action_manager {
+      margin-left: 50px; // Small width for icons only
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  // Mobile view - hide sidebar completely
+  body.sgc_sidebar_type_large {
+    .o_action_manager {
+      margin-left: 0;
+    }
+
+    .sgc_apps_sidebar_panel {
+      transform: translateX(-100%);
+    }
+  }
+
+  .sgc_navbar_sidebar_toggle {
+    display: none; // Hide toggle on mobile
+  }
+}
+
+// Smooth transitions for all sidebar-related elements
+.sgc_apps_sidebar_panel,
+.o_action_manager {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

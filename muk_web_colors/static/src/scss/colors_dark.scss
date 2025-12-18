@@ -1,12 +1,12 @@
-// Colors
+// OSUS Properties Brand Colors (Dark Mode)
 
-$mk_color_brand: #243742;
-$mk_color_primary: #5D8DA8;
+$mk_color_brand: #a62939; // OSUS Maroon (lighter for dark mode)
+$mk_color_primary: #ffd700; // OSUS Gold
 
-$mk_color_success: #1DC959;
-$mk_color_info: #6AB5FB;
-$mk_color_warning: #FBB56A;
-$mk_color_danger: #FF5757;
+$mk_color_success: #1dc959;
+$mk_color_info: #6ab5fb;
+$mk_color_warning: #fbb56a;
+$mk_color_danger: #ff5757;
 
 // Override
 
@@ -23,9 +23,9 @@ $o-warning: $mk_color_warning;
 $o-danger: $mk_color_danger;
 
 $o-theme-text-colors: (
-    "primary": $mk_color_brand,
-    "success": $o-success,
-    "info": $o-info,
-    "warning": $o-warning,
-    "danger": $o-danger,
+  "primary": $mk_color_brand,
+  "success": $o-success,
+  "info": $o-info,
+  "warning": $o-warning,
+  "danger": $o-danger,
 );

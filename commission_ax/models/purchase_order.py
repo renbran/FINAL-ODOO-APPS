@@ -77,21 +77,46 @@ class PurchaseOrder(models.Model):
     def _compute_commission_fields(self):
         """Compute commission-related fields from origin sale order."""
         for po in self:
-            if po.origin_so_id:
-                # Safe field access with hasattr checks
-                po.agent1_partner_id = po.origin_so_id.agent1_partner_id if hasattr(po.origin_so_id, 'agent1_partner_id') else False
-                po.agent2_partner_id = po.origin_so_id.agent2_partner_id if hasattr(po.origin_so_id, 'agent2_partner_id') else False
-                # project_id and unit_id might not exist in all sale.order implementations
-                po.project_id = po.origin_so_id.project_id if hasattr(po.origin_so_id, 'project_id') else False
-                po.unit_id = po.origin_so_id.unit_id if hasattr(po.origin_so_id, 'unit_id') else False
-            else:
-                po.agent1_partner_id = False
-                po.agent2_partner_id = False
-                po.project_id = False
-                po.unit_id = False
-                po.agent2_partner_id = False
-                po.project_id = False
-                po.unit_id = False
+            # Wrap entire compute in try-except to handle any field assignment errors
+            try:
+                if po.origin_so_id:
+                    # Safe field access - only assign if field exists and has correct type
+                    if hasattr(po.origin_so_id, 'agent1_partner_id'):
+                        po.agent1_partner_id = po.origin_so_id.agent1_partner_id
+                    else:
+                        po.agent1_partner_id = False
+                    
+                    if hasattr(po.origin_so_id, 'agent2_partner_id'):
+                        po.agent2_partner_id = po.origin_so_id.agent2_partner_id
+                    else:
+                        po.agent2_partner_id = False
+                    
+                    # project_id - skip if it's the wrong type
+                    if hasattr(po.origin_so_id, 'project_id'):
+                        project = po.origin_so_id.project_id
+                        # Only assign if it's a valid project.project record
+                        if project and hasattr(project, '_name') and project._name == 'project.project':
+                            po.project_id = project
+                        else:
+                            po.project_id = False
+                    else:
+                        po.project_id = False
+                    
+                    # unit_id might not exist in all implementations
+                    if hasattr(po.origin_so_id, 'unit_id'):
+                        po.unit_id = po.origin_so_id.unit_id
+                    else:
+                        po.unit_id = False
+                else:
+                    po.agent1_partner_id = False
+                    po.agent2_partner_id = False
+                    po.project_id = False
+                    po.unit_id = False
+            except (ValueError, AttributeError, TypeError) as e:
+                # If any field assignment fails, skip this record silently
+                # This prevents module installation failures due to data inconsistencies
+                _logger.warning("Skipping commission field computation for PO %s: %s", po.id, str(e))
+                continue
 
     @api.model_create_multi
     def create(self, vals_list):

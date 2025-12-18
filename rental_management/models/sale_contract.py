@@ -2,8 +2,12 @@
 # Copyright 2020-Today TechKhedut.
 # Part of TechKhedut. See LICENSE file for full copyright and licensing details.
 import datetime
+import logging
 from dateutil.relativedelta import relativedelta
 from odoo import fields, api, models, _
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class PropertyVendor(models.Model):
@@ -15,8 +19,15 @@ class PropertyVendor(models.Model):
     # Sale Contract Details
     sold_seq = fields.Char(string='Sequence', required=True,
                            readonly=True, copy=False, default=lambda self: _('New'))
-    stage = fields.Selection([('booked', 'Booked'), ('refund', 'Refund'), (
-        'sold', 'Sold'), ('cancel', 'Cancel'), ('locked', 'Locked')], string='Stage')
+    stage = fields.Selection([
+        ('draft', 'Draft - Awaiting Booking Payment'),
+        ('booked', 'Booked - Ready for Installments'),
+        ('refund', 'Refund'),
+        ('sold', 'Sold'),
+        ('cancel', 'Cancel'),
+        ('locked', 'Locked')
+    ], string='Stage', default='draft', tracking=True,
+       help='Draft: Booking fees not paid yet | Booked: Can create installments | Sold: Fully paid')
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(
@@ -82,13 +93,29 @@ class PropertyVendor(models.Model):
         related="landlord_id.email", string="Landlord Email")
 
     # Payment Details & Remaining Payment
-    payment_term = fields.Selection([('monthly', 'Monthly'),
-                                     ('full_payment', 'Full Payment'),
-                                     ('quarterly', 'Quarterly')],
-                                    string='Payment Term')
+    payment_schedule_id = fields.Many2one('payment.schedule',
+                                         string='Payment Schedule',
+                                         domain=[('schedule_type', '=', 'sale'), ('active', '=', True)],
+                                         help='Select payment schedule to auto-generate invoices')
+    use_schedule = fields.Boolean(string='Use Payment Schedule', default=False)
+    schedule_from_property = fields.Boolean(
+        string='Inherited from Property',
+        default=False,
+        help='True if payment schedule was automatically inherited from property')
+    payment_term = fields.Selection([
+        ('monthly', 'Monthly'),
+        ('full_payment', 'Full Payment'),
+        ('quarterly', 'Quarterly'),
+        ('bi_annual', 'Bi-Annual (6 Months)'),
+        ('annual', 'Annual')
+    ], string='Payment Term', help='Frequency of installment payments')
     sale_invoice_ids = fields.One2many(
         'sale.invoice', 'property_sold_id', string="Invoices")
-    book_price = fields.Monetary(string='Book Price')
+    book_price = fields.Monetary(string='Booking Amount',
+                                 compute='_compute_booking_amount',
+                                 store=True,
+                                 readonly=False,
+                                 help='Booking/Reservation payment amount')
     sale_price = fields.Monetary(string='Confirmed Sale Price', store=True)
     ask_price = fields.Monetary(string='Customer Ask Price')
     book_invoice_id = fields.Many2one(
@@ -127,6 +154,138 @@ class PropertyVendor(models.Model):
     sold_document = fields.Binary(string='Sold Document')
     file_name = fields.Char('File Name', translate=True)
 
+    # Additional Fees (Not included in property price)
+    dld_fee = fields.Monetary(string='DLD Fee',
+                              compute='_compute_dld_fee',
+                              store=True,
+                              readonly=False,
+                              help='Dubai Land Department registration fee (separate from property price)')
+    dld_fee_percentage = fields.Float(string='DLD Fee %', default=4.0,
+                                      help='DLD Fee as percentage of sale price (default 4%)')
+    dld_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='DLD Fee Type', default='percentage',
+       help='Calculate DLD fee as fixed amount or percentage')
+    dld_fee_due_days = fields.Integer(string='DLD Due Days', default=30,
+                                      help='Number of days after booking when DLD fee is due')
+    
+    admin_fee = fields.Monetary(string='Admin Fee',
+                                compute='_compute_admin_fee',
+                                store=True,
+                                readonly=False,
+                                help='Administrative processing fee (separate from property price)')
+    admin_fee_percentage = fields.Float(string='Admin Fee %', default=2.0,
+                                        help='Admin Fee as percentage of sale price (default 2%)')
+    admin_fee_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Admin Fee Type', default='fixed',
+       help='Calculate admin fee as fixed amount or percentage')
+    admin_fee_due_days = fields.Integer(string='Admin Due Days', default=30,
+                                        help='Number of days after booking when admin fee is due')
+    
+    total_additional_fees = fields.Monetary(string='Total Additional Fees',
+                                           compute='_compute_total_additional_fees',
+                                           store=True,
+                                           help='DLD Fee + Admin Fee')
+    
+    # Booking/Reservation Payment Settings
+    booking_percentage = fields.Float(
+        string='Booking %',
+        help='Booking amount as percentage of sale price. '
+             'Inherited from property (which may inherit from project), or set manually.')
+    booking_type = fields.Selection([
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage of Sale Price')
+    ], string='Booking Type',
+       help='How booking amount is calculated. Inherited from property/project or set manually.')
+    
+    # Booking Requirements & Payment Status
+    booking_requirements_met = fields.Boolean(
+        string='Booking Requirements Met',
+        compute='_compute_booking_requirements_met',
+        store=True,
+        help='True when booking fee + DLD fee + Admin fee are fully paid')
+    booking_invoice_paid = fields.Boolean(
+        string='Booking Invoice Paid',
+        compute='_compute_booking_requirements_met',
+        store=True)
+    dld_invoice_paid = fields.Boolean(
+        string='DLD Invoice Paid',
+        compute='_compute_booking_requirements_met',
+        store=True)
+    admin_invoice_paid = fields.Boolean(
+        string='Admin Invoice Paid',
+        compute='_compute_booking_requirements_met',
+        store=True)
+    can_create_installments = fields.Boolean(
+        string='Can Create Installments',
+        compute='_compute_booking_requirements_met',
+        store=True,
+        help='True when all booking requirements are met and contract is booked')
+    booking_payment_progress = fields.Float(
+        string='Booking Payment Progress',
+        compute='_compute_booking_requirements_met',
+        store=True,
+        help='Percentage of required booking payments completed (0-100%)')
+    
+    # DLD and Admin Fee Product Items
+    dld_fee_item_id = fields.Many2one('product.product',
+                                      string="DLD Fee Item",
+                                      default=lambda self: self.env.ref('rental_management.property_product_dld_fee',
+                                                                        raise_if_not_found=False))
+    admin_fee_item_id = fields.Many2one('product.product',
+                                        string="Admin Fee Item",
+                                        default=lambda self: self.env.ref('rental_management.property_product_admin_fee',
+                                                                          raise_if_not_found=False))
+    
+    # Include fees in payment plan
+    include_dld_in_plan = fields.Boolean(string='Include DLD in Payment Plan', default=True,
+                                         help='Automatically add DLD fee invoice to payment schedule')
+    include_admin_in_plan = fields.Boolean(string='Include Admin in Payment Plan', default=True,
+                                           help='Automatically add admin fee invoice to payment schedule')
+
+    # Bank Account Details for Payment Instructions
+    payment_bank_name = fields.Char(string='Payment Bank Name',
+                                    help='Bank name for booking/installment payments')
+    payment_account_name = fields.Char(string='Payment Account Name',
+                                       help='Account holder name for payments')
+    payment_account_number = fields.Char(string='Payment Account Number',
+                                         help='Bank account number for payments')
+    payment_iban = fields.Char(string='Payment IBAN',
+                               help='International Bank Account Number for payments')
+    payment_swift = fields.Char(string='Payment SWIFT Code',
+                                help='SWIFT code for international transfers')
+    payment_currency = fields.Char(string='Payment Currency', default='AED',
+                                   help='Currency for payment account')
+    
+    dld_bank_name = fields.Char(string='DLD Bank Name',
+                                help='Bank name for DLD fee payments')
+    dld_account_name = fields.Char(string='DLD Account Name',
+                                   help='Account holder name for DLD fees')
+    dld_account_number = fields.Char(string='DLD Account Number',
+                                     help='Bank account number for DLD fees')
+    dld_iban = fields.Char(string='DLD IBAN',
+                           help='International Bank Account Number for DLD payments')
+    dld_swift = fields.Char(string='DLD SWIFT Code',
+                            help='SWIFT code for DLD transfers')
+    dld_currency = fields.Char(string='DLD Currency', default='AED',
+                               help='Currency for DLD account')
+    
+    admin_bank_name = fields.Char(string='Admin Bank Name',
+                                  help='Bank name for admin fee payments')
+    admin_account_name = fields.Char(string='Admin Account Name',
+                                     help='Account holder name for admin fees')
+    admin_account_number = fields.Char(string='Admin Account Number',
+                                       help='Bank account number for admin fees')
+    admin_iban = fields.Char(string='Admin IBAN',
+                             help='International Bank Account Number for admin payments')
+    admin_swift = fields.Char(string='Admin SWIFT Code',
+                              help='SWIFT code for admin transfers')
+    admin_currency = fields.Char(string='Admin Currency', default='AED',
+                                 help='Currency for admin account')
+
     # Terms & Conditions
     term_condition = fields.Html(string='Term and Condition')
 
@@ -148,6 +307,55 @@ class PropertyVendor(models.Model):
 
     maintenance_request_count = fields.Integer(string="Maintenance Request Count",
                                                compute="_compute_maintenance_request_count")
+    
+    # Smart Button Counts for Invoice Tracking
+    booking_invoice_count = fields.Integer(
+        string='Booking Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of booking-related invoices (booking + DLD + admin)')
+    installment_invoice_count = fields.Integer(
+        string='Installment Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of installment invoices')
+    total_invoice_count = fields.Integer(
+        string='Total Invoices',
+        compute='_compute_invoice_counts',
+        help='Total number of all invoices')
+    created_invoice_count = fields.Integer(
+        string='Created Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of invoices that have been created in accounting')
+    paid_invoice_count = fields.Integer(
+        string='Paid Invoices',
+        compute='_compute_invoice_counts',
+        help='Number of fully paid invoices')
+    
+    # Payment Progress Statistics
+    installment_progress_percentage = fields.Float(
+        string='Installment Payment Progress',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Percentage of installment payments completed (excluding booking fees)')
+    overall_payment_percentage = fields.Float(
+        string='Overall Payment Progress',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Total payment progress including all fees and installments')
+    total_invoiced_amount = fields.Monetary(
+        string='Total Invoiced',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Sum of all invoice amounts')
+    total_paid_to_date = fields.Monetary(
+        string='Total Paid to Date',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Sum of all payments received')
+    total_outstanding = fields.Monetary(
+        string='Total Outstanding',
+        compute='_compute_payment_progress_stats',
+        store=True,
+        help='Remaining amount to be paid')
 
     # DEPRECATED START---------------------------------------------------
     sold_invoice_id = fields.Many2one('account.move',
@@ -168,6 +376,19 @@ class PropertyVendor(models.Model):
                 vals['sold_seq'] = self.env['ir.sequence'].next_by_code(
                     'property.vendor') or _('New')
         res = super(PropertyVendor, self).create(vals_list)
+        
+        # Auto-generate payment plan invoices when contract is created with payment schedule
+        for record in res:
+            if record.payment_schedule_id and record.use_schedule:
+                try:
+                    record.action_generate_complete_payment_plan()
+                except (UserError, ValueError) as e:
+                    # Log error but don't block contract creation
+                    _logger.warning(
+                        "Failed to auto-generate payment plan for %s: %s",
+                        record.sold_seq, str(e)
+                    )
+        
         return res
 
     # Default Get
@@ -187,6 +408,25 @@ class PropertyVendor(models.Model):
             data.append((rec.id, '%s - %s' %
                          (rec.sold_seq, rec.customer_id.name)))
         return data
+    
+    # Onchange Methods
+    @api.onchange('payment_schedule_id')
+    def _onchange_payment_schedule(self):
+        """Update use_schedule when payment schedule is selected"""
+        if self.payment_schedule_id:
+            self.use_schedule = True
+            total_invoices = sum(self.payment_schedule_id.schedule_line_ids.mapped('number_of_installments'))
+            return {
+                'warning': {
+                    'title': _('Payment Schedule Selected'),
+                    'message': _('Payment schedule "%s" will generate %d invoice(s). '
+                               'Click "Generate from Schedule" button after saving.') % (
+                        self.payment_schedule_id.name, total_invoices
+                    )
+                }
+            }
+        else:
+            self.use_schedule = False
 
     # Scheduler
     @api.model
@@ -277,13 +517,286 @@ class PropertyVendor(models.Model):
                 [('sell_contract_id', 'in', [rec.id])])
             rec.maintenance_request_count = request_count
 
+    # DLD Fee Calculation
+    @api.depends('sale_price', 'ask_price', 'dld_fee_percentage', 'dld_fee_type')
+    def _compute_dld_fee(self):
+        """Calculate DLD fee based on type and percentage"""
+        for rec in self:
+            if rec.dld_fee_type == 'percentage':
+                # Use sale_price, fallback to ask_price if not set
+                base_price = rec.sale_price if rec.sale_price else rec.ask_price
+                if base_price:
+                    rec.dld_fee = round((base_price * rec.dld_fee_percentage) / 100, 2)
+                else:
+                    rec.dld_fee = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
+    
+    @api.onchange('sale_price', 'ask_price', 'dld_fee_percentage', 'dld_fee_type')
+    def _onchange_dld_fee(self):
+        """Trigger DLD fee recalculation on field changes"""
+        if self.dld_fee_type == 'percentage':
+            base_price = self.sale_price if self.sale_price else self.ask_price
+            if base_price:
+                self.dld_fee = round((base_price * self.dld_fee_percentage) / 100, 2)
+    
+    # Admin Fee Calculation
+    @api.depends('sale_price', 'ask_price', 'admin_fee_percentage', 'admin_fee_type')
+    def _compute_admin_fee(self):
+        """Calculate Admin fee based on type and percentage"""
+        for rec in self:
+            if rec.admin_fee_type == 'percentage':
+                # Use sale_price, fallback to ask_price if not set
+                base_price = rec.sale_price if rec.sale_price else rec.ask_price
+                if base_price:
+                    rec.admin_fee = round((base_price * rec.admin_fee_percentage) / 100, 2)
+                else:
+                    rec.admin_fee = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
+    
+    @api.onchange('sale_price', 'ask_price', 'admin_fee_percentage', 'admin_fee_type')
+    def _onchange_admin_fee(self):
+        """Trigger Admin fee recalculation on field changes"""
+        if self.admin_fee_type == 'percentage':
+            base_price = self.sale_price if self.sale_price else self.ask_price
+            if base_price:
+                self.admin_fee = round((base_price * self.admin_fee_percentage) / 100, 2)
+    
+    # Payment Schedule Inheritance from Property
+    @api.onchange('property_id')
+    def _onchange_property_id_payment_schedule(self):
+        """Auto-inherit payment schedule from property when property is selected.
+        This enables UAE real estate sector payment plan integration where 
+        payment plans are defined at property level and inherited by contracts.
+        """
+        if self.property_id:
+            # Check if property has a sale payment plan configured
+            if self.property_id.is_payment_plan and self.property_id.payment_schedule_id:
+                self.payment_schedule_id = self.property_id.payment_schedule_id
+                self.use_schedule = True
+                self.schedule_from_property = True
+                
+                # Calculate total invoices from schedule
+                total_invoices = sum(
+                    line.number_of_installments 
+                    for line in self.payment_schedule_id.schedule_line_ids
+                )
+                
+                # Add booking invoice count if not in schedule
+                has_booking = any(line.payment_type == 'booking' 
+                                for line in self.payment_schedule_id.schedule_line_ids)
+                if not has_booking:
+                    total_invoices += 1  # Add booking invoice
+                
+                return {
+                    'warning': {
+                        'title': _('Payment Schedule Inherited'),
+                        'message': _(
+                            'Payment schedule "%s" has been automatically applied from property. '
+                            'This schedule will generate %d sale invoices based on the UAE payment plan structure. '
+                            'You can change this schedule if needed.'
+                        ) % (self.payment_schedule_id.name, total_invoices)
+                    }
+                }
+            else:
+                # No sale payment schedule on property, reset if previously inherited
+                if self.schedule_from_property:
+                    self.payment_schedule_id = False
+                    self.use_schedule = False
+                    self.schedule_from_property = False
+    
+    @api.onchange('payment_schedule_id')
+    def _onchange_payment_schedule(self):
+        """Preview invoice count when payment schedule is selected"""
+        if self.payment_schedule_id:
+            self.use_schedule = True
+            total_invoices = sum(line.number_of_installments 
+                               for line in self.payment_schedule_id.schedule_line_ids)
+            
+            # Add booking, DLD, admin invoices if they will be generated
+            has_booking = any(line.payment_type == 'booking' 
+                            for line in self.payment_schedule_id.schedule_line_ids)
+            if not has_booking:
+                total_invoices += 1  # Booking invoice
+            
+            if self.include_dld_in_plan and self.dld_fee > 0:
+                total_invoices += 1  # DLD fee invoice
+            
+            if self.include_admin_in_plan and self.admin_fee > 0:
+                total_invoices += 1  # Admin fee invoice
+            
+            return {
+                'warning': {
+                    'title': _('Payment Schedule Selected'),
+                    'message': _(
+                        'This schedule will generate approximately %d sale invoices '
+                        '(including booking, DLD, admin fees, and installments) based on the defined payment plan.'
+                    ) % total_invoices
+                }
+            }
+        else:
+            self.use_schedule = False
+    
+    # Booking Requirements Check
+    @api.depends('sale_invoice_ids', 'sale_invoice_ids.invoice_type', 
+                 'sale_invoice_ids.invoice_created', 'sale_invoice_ids.payment_status')
+    def _compute_invoice_counts(self):
+        """Compute invoice counts for smart buttons"""
+        for rec in self:
+            all_invoices = rec.sale_invoice_ids
+            
+            # Booking-related invoices (booking + DLD + admin)
+            booking_related = all_invoices.filtered(
+                lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+            )
+            rec.booking_invoice_count = len(booking_related)
+            
+            # Installment invoices
+            installment_invoices = all_invoices.filtered(
+                lambda inv: inv.invoice_type == 'installment'
+            )
+            rec.installment_invoice_count = len(installment_invoices)
+            
+            # Total invoices
+            rec.total_invoice_count = len(all_invoices)
+            
+            # Created invoices (have account.move record)
+            rec.created_invoice_count = len(
+                all_invoices.filtered(lambda inv: inv.invoice_created and inv.invoice_id)
+            )
+            
+            # Paid invoices
+            rec.paid_invoice_count = len(
+                all_invoices.filtered(lambda inv: inv.payment_status == 'paid')
+            )
+    
+    @api.depends('sale_invoice_ids', 'sale_invoice_ids.amount', 
+                 'sale_invoice_ids.paid_amount', 'sale_invoice_ids.payment_status',
+                 'sale_invoice_ids.invoice_type', 'payable_amount')
+    def _compute_payment_progress_stats(self):
+        """Compute payment progress statistics for visualization"""
+        for rec in self:
+            all_invoices = rec.sale_invoice_ids
+            
+            # Calculate totals
+            total_amount = sum(all_invoices.mapped('amount'))
+            total_paid = sum(all_invoices.filtered(
+                lambda inv: inv.invoice_created
+            ).mapped('paid_amount'))
+            
+            rec.total_invoiced_amount = total_amount
+            rec.total_paid_to_date = total_paid
+            rec.total_outstanding = total_amount - total_paid
+            
+            # Overall payment percentage
+            rec.overall_payment_percentage = (
+                (total_paid / total_amount * 100) if total_amount > 0 else 0.0
+            )
+            
+            # Installment-only progress (excluding booking fees)
+            installment_invoices = all_invoices.filtered(
+                lambda inv: inv.invoice_type == 'installment'
+            )
+            installment_total = sum(installment_invoices.mapped('amount'))
+            installment_paid = sum(installment_invoices.filtered(
+                lambda inv: inv.invoice_created
+            ).mapped('paid_amount'))
+            
+            rec.installment_progress_percentage = (
+                (installment_paid / installment_total * 100) if installment_total > 0 else 0.0
+            )
+    
+    @api.depends('sale_invoice_ids', 'sale_invoice_ids.invoice_created', 
+                 'sale_invoice_ids.payment_status', 'sale_invoice_ids.invoice_type',
+                 'stage', 'dld_fee', 'admin_fee', 'book_price')
+    def _compute_booking_requirements_met(self):
+        """Check if all required booking payments (booking + DLD + admin) are completed"""
+        for rec in self:
+            # Find invoices by type
+            booking_invoices = rec.sale_invoice_ids.filtered(lambda inv: inv.invoice_type == 'booking')
+            dld_invoices = rec.sale_invoice_ids.filtered(lambda inv: inv.invoice_type == 'dld_fee')
+            admin_invoices = rec.sale_invoice_ids.filtered(lambda inv: inv.invoice_type == 'admin_fee')
+            
+            # Check payment status for each required invoice
+            rec.booking_invoice_paid = any(
+                inv.invoice_created and inv.payment_status == 'paid' 
+                for inv in booking_invoices
+            ) if booking_invoices else (rec.book_price == 0)
+            
+            rec.dld_invoice_paid = any(
+                inv.invoice_created and inv.payment_status == 'paid' 
+                for inv in dld_invoices
+            ) if dld_invoices else (rec.dld_fee == 0)
+            
+            rec.admin_invoice_paid = any(
+                inv.invoice_created and inv.payment_status == 'paid' 
+                for inv in admin_invoices
+            ) if admin_invoices else (rec.admin_fee == 0)
+            
+            # All requirements met when all required invoices are paid
+            rec.booking_requirements_met = (
+                rec.booking_invoice_paid and 
+                rec.dld_invoice_paid and 
+                rec.admin_invoice_paid
+            )
+            
+            # Can create installments only when requirements met AND stage is booked
+            rec.can_create_installments = (
+                rec.booking_requirements_met and 
+                rec.stage == 'booked'
+            )
+            
+            # Calculate payment progress (0-100%)
+            total_required = 0
+            total_paid = 0
+            
+            if rec.book_price > 0:
+                total_required += 1
+                if rec.booking_invoice_paid:
+                    total_paid += 1
+            
+            if rec.dld_fee > 0:
+                total_required += 1
+                if rec.dld_invoice_paid:
+                    total_paid += 1
+            
+            if rec.admin_fee > 0:
+                total_required += 1
+                if rec.admin_invoice_paid:
+                    total_paid += 1
+            
+            rec.booking_payment_progress = (
+                (total_paid / total_required * 100) if total_required > 0 else 100.0
+            )
+    
+    # Booking Amount Calculation
+    @api.depends('sale_price', 'booking_percentage', 'booking_type')
+    def _compute_booking_amount(self):
+        """Calculate booking amount based on type and percentage"""
+        for rec in self:
+            if rec.booking_type == 'percentage':
+                if rec.sale_price:
+                    rec.book_price = round((rec.sale_price * rec.booking_percentage) / 100, 2)
+                else:
+                    rec.book_price = 0.0
+            # If fixed type, preserve the manually set amount (readonly=False allows user input)
+
+    # Additional Fees Calculation
+    @api.depends('dld_fee', 'admin_fee')
+    def _compute_total_additional_fees(self):
+        """Calculate total additional fees (DLD + Admin)"""
+        for rec in self:
+            rec.total_additional_fees = rec.dld_fee + rec.admin_fee
+
     # Sell Price Calculation
     @api.depends('sale_price',
+                 'ask_price',
                  'book_price',
                  'total_service',
                  'is_utility_service',
                  'total_maintenance',
-                 'is_any_maintenance')
+                 'is_any_maintenance',
+                 'dld_fee',
+                 'admin_fee')
     def compute_sell_price(self):
         for rec in self:
             tax_amount = 0.0
@@ -292,8 +805,13 @@ class PropertyVendor(models.Model):
                 total_sell_amount = total_sell_amount + rec.total_maintenance
             if rec.is_utility_service:
                 total_sell_amount = total_sell_amount + rec.total_service
-            total_sell_amount = total_sell_amount + rec.sale_price
-            rec.payable_amount = total_sell_amount + rec.book_price
+            
+            # Use sale_price if set, otherwise use ask_price (customer price)
+            base_price = rec.sale_price if rec.sale_price else rec.ask_price
+            total_sell_amount = total_sell_amount + base_price
+            
+            # Payable amount = Base Price + Booking + DLD + Admin (Total Customer Obligation)
+            rec.payable_amount = total_sell_amount + abs(rec.book_price) + rec.dld_fee + rec.admin_fee
             rec.tax_amount = tax_amount
             rec.total_sell_amount = total_sell_amount
 
@@ -384,6 +902,707 @@ class PropertyVendor(models.Model):
     def action_reset_installments(self):
         """Reset Installments"""
         self.sale_invoice_ids = [(6, 0, 0)]
+    
+    def action_generate_complete_payment_plan(self):
+        """
+        Generate COMPLETE payment plan based on payment schedule:
+        1. Booking payment (immediate)
+        2. DLD fee (as per payment schedule)
+        3. Admin fee (as per payment schedule)
+        4. All installments (calculated on property price minus booking)
+        
+        This replaces the old two-step process (booking first, then installments)
+        with a single complete payment plan generation.
+        """
+        self.ensure_one()
+        
+        if self.stage != 'draft':
+            raise UserError(_(
+                "Payment plan can only be generated for contracts in Draft stage.\n\n"
+                "Current stage: %s\n"
+                "Please ensure the contract is in Draft stage."
+            ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        if not self.payment_schedule_id:
+            raise UserError(_(
+                "No Payment Schedule Selected!\n\n"
+                "Please select a payment schedule before generating the payment plan."
+            ))
+        
+        # Clear any existing invoices
+        self.sale_invoice_ids.unlink()
+        
+        invoice_lines = []
+        start_date = self.date or fields.Date.today()
+        
+        # Calculate total payable: Property Price + DLD + Admin
+        property_price = self.sale_price or 0.0
+        booking_amount = self.book_price or 0.0
+        dld_fee = self.dld_fee if self.include_dld_in_plan else 0.0
+        admin_fee = self.admin_fee if self.include_admin_in_plan else 0.0
+        
+        # Validation: Ensure property price is positive
+        if property_price <= 0:
+            raise UserError(_(
+                "Property price must be greater than zero!\n\n"
+                "Please set a valid property price before generating the payment plan."
+            ))
+        
+        # Validation: Ensure booking doesn't exceed property price
+        if booking_amount > property_price:
+            raise UserError(_(
+                "Booking amount (%s AED) cannot exceed property price (%s AED)!\n\n"
+                "Please check the booking configuration."
+            ) % ('{:,.2f}'.format(booking_amount), '{:,.2f}'.format(property_price)))
+        
+        # Validation: Ensure there's a balance for installments
+        if booking_amount >= property_price:
+            raise UserError(_(
+                "Booking amount equals or exceeds property price!\n\n"
+                "There's no remaining balance for installments.\n"
+                "Booking: %s AED | Property Price: %s AED"
+            ) % ('{:,.2f}'.format(booking_amount), '{:,.2f}'.format(property_price)))
+        
+        total_payable = property_price + dld_fee + admin_fee
+        
+        # Balance for installments = Property Price - Booking
+        # (DLD and admin are separate payments, not part of installments)
+        installment_balance = property_price - booking_amount
+        
+        # Get payment schedule lines
+        schedule_lines = self.payment_schedule_id.schedule_line_ids.sorted('sequence')
+        if not schedule_lines:
+            raise UserError(_(
+                "Payment schedule '%s' has no schedule lines defined!\n\n"
+                "Please configure the payment schedule first."
+            ) % self.payment_schedule_id.name)
+        
+        # Calculate total installments needed
+        # We need: booking + dld + admin + property installments
+        total_installments = sum(line.number_of_installments for line in schedule_lines)
+        
+        if total_installments < 3:
+            raise UserError(_(
+                "Payment schedule must have at least 3 installments!\n\n"
+                "Need: 1 for booking, 1 for DLD, 1 for admin, plus property installments.\n"
+                "Current schedule has only %d installments."
+            ) % total_installments)
+        
+        # Reserve first 3 slots for booking, DLD, admin
+        # Remaining slots are for property installments
+        property_installments = total_installments - 3
+        if booking_amount == 0:
+            property_installments += 1
+        if dld_fee == 0:
+            property_installments += 1
+        if admin_fee == 0:
+            property_installments += 1
+        
+        # Amount per property installment
+        amount_per_installment = installment_balance / property_installments if property_installments > 0 else 0.0
+        
+        line_number = 0
+        booking_added = False
+        dld_added = False
+        admin_added = False
+        
+        # Generate all payment lines following the payment schedule
+        for schedule_line in schedule_lines:
+            interval_type = schedule_line.interval_type
+            interval = schedule_line.interval
+            num_installments = schedule_line.number_of_installments
+            
+            for _ in range(num_installments):
+                line_number += 1
+                
+                # Calculate due date based on interval
+                if line_number == 1:
+                    current_date = start_date
+                elif interval_type == 'days':
+                    current_date = start_date + relativedelta(days=interval * (line_number - 1))
+                elif interval_type == 'weeks':
+                    current_date = start_date + relativedelta(weeks=interval * (line_number - 1))
+                elif interval_type == 'months':
+                    current_date = start_date + relativedelta(months=interval * (line_number - 1))
+                elif interval_type == 'years':
+                    current_date = start_date + relativedelta(years=interval * (line_number - 1))
+                else:
+                    # Fallback to start_date if interval_type is unknown
+                    current_date = start_date
+                
+                # LINE 1: Booking Payment (first line)
+                if not booking_added and booking_amount > 0:
+                    booking_added = True
+                    booking_data = {
+                        'property_sold_id': self.id,
+                        'invoice_date': current_date,
+                        'amount': abs(booking_amount),
+                        'invoice_type': 'booking',
+                        'desc': _('Payment %d: Booking Fee - %s%% of property price') % (
+                            line_number,
+                            self.booking_percentage
+                        ) if self.booking_type == 'percentage' else _('Payment %d: Booking Fee') % line_number,
+                        'invoice_created': False,
+                        'payment_status': 'unpaid',
+                        'name': 'Payment %d' % line_number,
+                    }
+                    invoice_lines.append((0, 0, booking_data))
+                    continue
+                
+                # LINE 2: DLD Fee
+                if not dld_added and dld_fee > 0:
+                    dld_added = True
+                    line_data = {
+                        'property_sold_id': self.id,
+                        'invoice_date': current_date,
+                        'amount': dld_fee,
+                        'invoice_type': 'dld_fee',
+                        'desc': _('Payment %d: DLD Fee - Dubai Land Department (4%% of property price)') % line_number,
+                        'invoice_created': False,
+                        'payment_status': 'unpaid',
+                        'name': 'Payment %d' % line_number,
+                    }
+                    invoice_lines.append((0, 0, line_data))
+                    continue
+                
+                # LINE 3: Admin Fee
+                if not admin_added and admin_fee > 0:
+                    admin_added = True
+                    line_data = {
+                        'property_sold_id': self.id,
+                        'invoice_date': current_date,
+                        'amount': admin_fee,
+                        'invoice_type': 'admin_fee',
+                        'desc': _('Payment %d: Admin Fee - Administrative Processing') % line_number,
+                        'invoice_created': False,
+                        'payment_status': 'unpaid',
+                        'name': 'Payment %d' % line_number,
+                    }
+                    invoice_lines.append((0, 0, line_data))
+                    continue
+                
+                # Remaining lines: Property Installments
+                installment_num = line_number
+                if booking_amount > 0:
+                    installment_num -= 1
+                if dld_fee > 0:
+                    installment_num -= 1
+                if admin_fee > 0:
+                    installment_num -= 1
+                
+                line_data = {
+                    'property_sold_id': self.id,
+                    'invoice_date': current_date,
+                    'amount': round(amount_per_installment, 2),
+                    'invoice_type': 'installment',
+                    'desc': _('Payment %d: Installment %d of %d') % (
+                        line_number,
+                        installment_num,
+                        property_installments
+                    ),
+                    'invoice_created': False,
+                    'payment_status': 'unpaid',
+                    'name': 'Payment %d' % line_number,
+                }
+                invoice_lines.append((0, 0, line_data))
+        
+        # Adjust last installment for rounding differences
+        if invoice_lines:
+            total_generated = sum(line[2]['amount'] for line in invoice_lines)
+            difference = round(total_payable - total_generated, 2)
+            
+            if abs(difference) > 0.01:  # Only adjust if difference is significant
+                # Find last installment and adjust
+                for idx in range(len(invoice_lines) - 1, -1, -1):
+                    if invoice_lines[idx][2]['invoice_type'] == 'installment':
+                        invoice_lines[idx][2]['amount'] += difference
+                        break
+        
+        # Final validation: Ensure we generated lines
+        if not invoice_lines:
+            raise UserError(_(
+                "Failed to generate any payment lines!\n\n"
+                "Please check:\n"
+                "• Payment schedule configuration\n"
+                "• Property price and fees\n"
+                "• Booking amount settings"
+            ))
+        
+        # Create all payment lines
+        self.write({'sale_invoice_ids': invoice_lines})
+        
+        # Keep contract in draft stage - will move to 'booked' when booking requirements met
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'title': _('Complete Payment Plan Generated'),
+                'message': _(
+                    'Successfully generated %d payment lines:\n\n'
+                    'Total Contract Value: %s AED\n'
+                    '  • Property Price: %s AED\n'
+                    '  • DLD Fee (4%%): %s AED\n'
+                    '  • Admin Fee: %s AED\n\n'
+                    'Payment Schedule:\n'
+                    '  • Booking: %s AED (Day 1)\n'
+                    '  • Installments: %d payments of ~%s AED each\n\n'
+                    'Contract will move to "Booked" stage when booking requirements are paid.'
+                ) % (
+                    len(invoice_lines),
+                    '{:,.2f}'.format(total_payable),
+                    '{:,.2f}'.format(property_price),
+                    '{:,.2f}'.format(dld_fee),
+                    '{:,.2f}'.format(admin_fee),
+                    '{:,.2f}'.format(booking_amount),
+                    property_installments,
+                    '{:,.2f}'.format(amount_per_installment),
+                ),
+                'sticky': True,
+            }
+        }
+    
+    def action_generate_booking_invoices(self):
+        """
+        Generate initial booking invoices ONLY (booking + DLD + admin fees).
+        This must be done before creating installment plan.
+        Called automatically when contract is created, or manually via button.
+        """
+        self.ensure_one()
+        
+        if self.stage != 'draft':
+            raise UserError(_(
+                "Booking invoices can only be generated for contracts in Draft stage.\n\n"
+                "Current stage: %s\n"
+                "Please ensure the contract is in Draft stage before generating booking invoices."
+            ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        # Clear any existing invoices (in case of regeneration)
+        self.sale_invoice_ids.unlink()
+        
+        invoice_lines = []
+        invoice_date = self.date or fields.Date.today()
+        
+        # 1. Generate Booking Invoice (if booking amount > 0)
+        if self.book_price > 0:
+            booking_data = {
+                'property_sold_id': self.id,
+                'invoice_date': invoice_date,
+                'amount': abs(self.book_price),
+                'invoice_type': 'booking',
+                'desc': _('Booking Fee - %s%% of sale price') % self.booking_percentage 
+                        if self.booking_type == 'percentage' 
+                        else _('Booking Fee'),
+                'invoice_created': False,
+                'payment_status': 'unpaid',
+            }
+            invoice_lines.append((0, 0, booking_data))
+        
+        # 2. Generate DLD Fee Invoice (if DLD fee > 0)
+        if self.include_dld_in_plan and self.dld_fee > 0:
+            dld_due_date = invoice_date + relativedelta(days=self.dld_fee_due_days)
+            dld_data = {
+                'property_sold_id': self.id,
+                'invoice_date': dld_due_date,
+                'amount': self.dld_fee,
+                'invoice_type': 'dld_fee',
+                'desc': _('DLD Fee - Dubai Land Department (Due %d days after booking - 4%% of sale price)') % self.dld_fee_due_days,
+                'invoice_created': False,
+                'payment_status': 'unpaid',
+            }
+            invoice_lines.append((0, 0, dld_data))
+        
+        # 3. Generate Admin Fee Invoice (if admin fee > 0)
+        if self.include_admin_in_plan and self.admin_fee > 0:
+            admin_due_date = invoice_date + relativedelta(days=self.admin_fee_due_days)
+            admin_data = {
+                'property_sold_id': self.id,
+                'invoice_date': admin_due_date,
+                'amount': self.admin_fee,
+                'invoice_type': 'admin_fee',
+                'desc': _('Admin Fee - Administrative Processing (Due %d days after booking)') % self.admin_fee_due_days,
+                'invoice_created': False,
+                'payment_status': 'unpaid',
+            }
+            invoice_lines.append((0, 0, admin_data))
+        
+        # Create all booking invoices in one transaction
+        if invoice_lines:
+            self.write({'sale_invoice_ids': invoice_lines})
+        
+        # Update property and contract stage
+        self.property_id.stage = 'booked'
+        # Keep contract in 'draft' stage until booking requirements are paid
+        # Stage will be updated to 'booked' when all invoices are paid
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'title': _('Booking Invoices Generated'),
+                'message': _(
+                    'Generated %d booking invoices:\n\n'
+                    '%s\n\n'
+                    'Contract will move to "Booked" stage once all booking invoices are paid.\n'
+                    'Then you can create the installment plan for remaining balance.'
+                ) % (
+                    len(invoice_lines),
+                    '\n'.join([
+                        f"• {line[2]['desc']}: {line[2]['amount']:,.2f} AED"
+                        for line in invoice_lines
+                    ])
+                ),
+                'sticky': True,
+                'next': {'type': 'ir.actions.act_window_close'},
+            }
+        }
+    
+    def action_view_booking_invoices(self):
+        """Smart button action to view booking-related invoices"""
+        self.ensure_one()
+        booking_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+        )
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Booking Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', booking_invoices.ids)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_installment_invoices(self):
+        """Smart button action to view installment invoices"""
+        self.ensure_one()
+        installment_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type == 'installment'
+        )
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Installment Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', installment_invoices.ids)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_all_invoices(self):
+        """Smart button action to view all invoices"""
+        self.ensure_one()
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('All Invoices'),
+            'res_model': 'sale.invoice',
+            'view_mode': 'tree,form',
+            'domain': [('property_sold_id', '=', self.id)],
+            'context': {'default_property_sold_id': self.id},
+        }
+    
+    def action_view_accounting_invoices(self):
+        """Smart button action to view created accounting invoices"""
+        self.ensure_one()
+        created_invoices = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_created and inv.invoice_id
+        )
+        invoice_ids = created_invoices.mapped('invoice_id').ids
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Accounting Invoices'),
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', invoice_ids)],
+            'context': {'default_partner_id': self.customer_id.id},
+        }
+    
+    def action_create_booking_invoices_button(self):
+        """Button action to create booking invoices with validation"""
+        self.ensure_one()
+        
+        # Check if booking invoices already exist
+        existing_booking = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type in ['booking', 'dld_fee', 'admin_fee']
+        )
+        
+        if existing_booking:
+            raise UserError(_(
+                "Booking invoices already exist!\n\n"
+                "Found %d existing booking-related invoice(s).\n"
+                "Please delete them first if you need to regenerate."
+            ) % len(existing_booking))
+        
+        return self.action_generate_booking_invoices()
+    
+    def action_create_installments_from_booking(self):
+        """
+        Create remaining installment invoices after booking requirements are met.
+        This is triggered after all booking payments (booking + DLD + admin) are paid.
+        """
+        self.ensure_one()
+        
+        # Validate booking requirements
+        if not self.booking_requirements_met:
+            raise UserError(_(
+                "Cannot create installments yet!\n\n"
+                "Booking requirements must be fully paid first:\n"
+                "• Booking Payment: %s\n"
+                "• DLD Fee: %s\n"
+                "• Admin Fee: %s\n\n"
+                "Current progress: %.0f%%"
+            ) % (
+                '✓ Paid' if self.booking_invoice_paid else '✗ Unpaid',
+                '✓ Paid' if self.dld_invoice_paid else '✗ Unpaid',
+                '✓ Paid' if self.admin_invoice_paid else '✗ Unpaid',
+                self.booking_payment_progress
+            ))
+        
+        if self.stage != 'booked':
+            raise UserError(_(
+                "Contract must be in 'Booked' stage to create installments.\n\n"
+                "Current stage: %s\n"
+                "Please confirm booking payment completion first."
+            ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        # Check if installments already exist
+        existing_installments = self.sale_invoice_ids.filtered(
+            lambda inv: inv.invoice_type == 'installment'
+        )
+        
+        if existing_installments:
+            raise UserError(_(
+                "Installment invoices already exist!\n\n"
+                "Found %d existing installment invoice(s).\n"
+                "Please delete them first if you need to regenerate."
+            ) % len(existing_installments))
+        
+        # If payment schedule is configured, use it
+        if self.use_schedule and self.payment_schedule_id:
+            return self.action_generate_from_schedule()
+        
+        # Otherwise, open manual installment creation wizard
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Create Installments'),
+            'res_model': 'property.vendor.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_property_sold_id': self.id,
+                'default_customer_id': self.customer_id.id,
+            },
+        }
+    
+    def action_confirm_booking_paid(self):
+        """
+        Manual confirmation that all booking requirements are paid.
+        Moves contract from 'draft' to 'booked' stage.
+        After this, user can create installment plan.
+        """
+        self.ensure_one()
+        
+        if self.stage != 'draft':
+            raise UserError(_(
+                "This action is only available for contracts in Draft stage.\n\n"
+                "Current stage: %s"
+            ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        if not self.booking_requirements_met:
+            unpaid_items = []
+            if not self.booking_invoice_paid:
+                unpaid_items.append(f"• Booking Fee ({abs(self.book_price):,.2f} AED)")
+            if not self.dld_invoice_paid:
+                unpaid_items.append(f"• DLD Fee ({self.dld_fee:,.2f} AED)")
+            if not self.admin_invoice_paid:
+                unpaid_items.append(f"• Admin Fee ({self.admin_fee:,.2f} AED)")
+            
+            raise UserError(_(
+                "Cannot confirm booking - Not all required payments are completed.\n\n"
+                "Unpaid invoices:\n%s\n\n"
+                "Please ensure all booking invoices are marked as 'Paid' before confirming."
+            ) % '\n'.join(unpaid_items))
+        
+        # Move to booked stage
+        self.write({'stage': 'booked'})
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'title': _('Booking Confirmed'),
+                'message': _(
+                    'Contract has been moved to "Booked" stage.\n\n'
+                    'You can now create the installment plan for remaining property payments.\n\n'
+                    'Remaining balance to be paid via installments:\n'
+                    '%s AED'
+                ) % f"{(self.sale_price - abs(self.book_price)):,.2f}",
+                'sticky': False,
+            }
+        }
+    
+    def action_generate_from_schedule(self):
+        """Generate sale invoices from payment schedule including DLD and Admin fees"""
+        self.ensure_one()
+        
+        # VALIDATION: Check booking requirements are met before creating installments
+        if not self.can_create_installments:
+            if self.stage == 'draft':
+                raise UserError(_(
+                    "⚠️ BOOKING REQUIREMENTS NOT MET\n\n"
+                    "Before creating the installment plan, the client must first pay:\n\n"
+                    "📋 Required Payments:\n"
+                    "   • Booking Fee: %s AED %s\n"
+                    "   • DLD Fee: %s AED %s\n"
+                    "   • Admin Fee: %s AED %s\n\n"
+                    "💡 WORKFLOW:\n"
+                    "   1. Generate booking invoices (if not done)\n"
+                    "   2. Client pays all booking requirements\n"
+                    "   3. Mark invoices as 'Paid' in the Invoices tab\n"
+                    "   4. Click 'Confirm Booking Paid' button\n"
+                    "   5. Then you can create installments\n\n"
+                    "Current Payment Progress: %.0f%%"
+                ) % (
+                    f"{abs(self.book_price):,.2f}",
+                    "✅ PAID" if self.booking_invoice_paid else "❌ UNPAID",
+                    f"{self.dld_fee:,.2f}",
+                    "✅ PAID" if self.dld_invoice_paid else "❌ UNPAID",
+                    f"{self.admin_fee:,.2f}",
+                    "✅ PAID" if self.admin_invoice_paid else "❌ UNPAID",
+                    self.booking_payment_progress
+                ))
+            else:
+                raise UserError(_(
+                    "Cannot create installments.\n\n"
+                    "Current stage: %s\n"
+                    "Contract must be in 'Booked' stage with all booking requirements paid."
+                ) % dict(self._fields['stage'].selection).get(self.stage))
+        
+        if not self.use_schedule or not self.payment_schedule_id:
+            raise UserError(_('Please select a payment schedule first.'))
+        
+        if not self.date:
+            raise UserError(_('Contract date is required to generate invoice schedule.'))
+        
+        # Clear existing invoices
+        self.sale_invoice_ids.unlink()
+        
+        contract_start_date = self.date
+        total_amount = self.sale_price
+        sequence = 1
+        booking_date = None
+        
+        # 1. Generate Booking/Reservation Payment (First invoice)
+        if self.book_price > 0:
+            booking_date = contract_start_date
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('Booking/Reservation Payment'),
+                'amount': self.book_price,
+                'invoice_date': booking_date,
+                'invoice_created': False,
+                'invoice_type': 'booking',
+                'sequence': sequence,
+                'desc': _('Booking deposit - %s%% of sale price') % self.booking_percentage if self.booking_type == 'percentage' else _('Booking deposit'),
+                'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes else False
+            })
+            sequence += 1
+        
+        # 2. Generate DLD Fee (Due X days after booking)
+        if self.include_dld_in_plan and self.dld_fee > 0:
+            dld_due_date = (booking_date or contract_start_date) + relativedelta(days=self.dld_fee_due_days)
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('DLD Fee - Dubai Land Department'),
+                'amount': self.dld_fee,
+                'invoice_date': dld_due_date,
+                'invoice_created': False,
+                'invoice_type': 'dld_fee',
+                'sequence': sequence,
+                'desc': _('DLD Fee - Due %s days after booking (%s%% of sale price)') % (
+                    self.dld_fee_due_days, 
+                    self.dld_fee_percentage
+                ) if self.dld_fee_type == 'percentage' else _('DLD Fee - Due %s days after booking') % self.dld_fee_due_days,
+                'tax_ids': False  # DLD fees typically not taxed
+            })
+            sequence += 1
+        
+        # 3. Generate Admin Fee (Due X days after booking)
+        if self.include_admin_in_plan and self.admin_fee > 0:
+            admin_due_date = (booking_date or contract_start_date) + relativedelta(days=self.admin_fee_due_days)
+            self.env['sale.invoice'].create({
+                'property_sold_id': self.id,
+                'name': _('Admin Fee - Administrative Processing'),
+                'amount': self.admin_fee,
+                'invoice_date': admin_due_date,
+                'invoice_created': False,
+                'invoice_type': 'admin_fee',
+                'sequence': sequence,
+                'desc': _('Admin Fee - Due %s days after booking') % self.admin_fee_due_days,
+                'tax_ids': False  # Admin fees typically not taxed
+            })
+            sequence += 1
+        
+        # 4. Generate Payment Schedule Installments
+        # Calculate remaining amount (after booking) - NOTE: Only property price, NOT including DLD/Admin
+        # DLD and Admin are separate invoices, not part of installment calculations
+        property_base_price = self.property_id.price if self.property_id else self.sale_price
+        remaining_amount = property_base_price - abs(self.book_price)
+        
+        for line in self.payment_schedule_id.schedule_line_ids.sorted('days_after'):
+            # Calculate amount for this line based on remaining amount
+            line_amount = (remaining_amount * line.percentage) / 100
+            
+            # Calculate frequency in days
+            frequency_days = {
+                'one_time': 0,
+                'monthly': 30,
+                'quarterly': 90,
+                'bi_annual': 180,
+                'annual': 365
+            }.get(line.installment_frequency, 0)
+            
+            # Generate invoices based on number of installments (safeguard against division by zero)
+            num_installments = max(line.number_of_installments, 1)
+            amount_per_invoice = round(line_amount / num_installments, 2)
+            
+            for installment_num in range(num_installments):
+                # Calculate invoice date
+                days_offset = line.days_after + (installment_num * frequency_days)
+                invoice_date = contract_start_date + relativedelta(days=days_offset)
+                
+                # Create invoice line
+                invoice_name = line.name
+                if line.number_of_installments > 1:
+                    invoice_name = f"{line.name} ({installment_num + 1}/{line.number_of_installments})"
+                
+                self.env['sale.invoice'].create({
+                    'property_sold_id': self.id,
+                    'name': invoice_name,
+                    'amount': amount_per_invoice,
+                    'invoice_date': invoice_date,
+                    'invoice_created': False,
+                    'invoice_type': 'installment',
+                    'sequence': sequence,
+                    'desc': line.note or '',
+                    'tax_ids': [(6, 0, self.taxes_ids.ids)] if self.is_taxes else False
+                })
+                sequence += 1
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'message': _('Payment schedule generated successfully with %s invoices!') % (sequence - 1),
+                'sticky': False,
+            }
+        }
 
     # Confirm Sale
     def action_confirm_sale(self):
@@ -426,8 +1645,10 @@ class PropertyVendor(models.Model):
 class SaleInvoice(models.Model):
     _name = 'sale.invoice'
     _description = "Sale Invoice"
+    _order = 'invoice_date, sequence, id'
 
     name = fields.Char(string="Title", translate=True)
+    sequence = fields.Integer(string='Sequence', default=10)
     property_sold_id = fields.Many2one('property.vendor',
                                        string="Property Sold",
                                        ondelete='cascade')
@@ -447,6 +1668,28 @@ class SaleInvoice(models.Model):
     tax_ids = fields.Many2many('account.tax', string="Taxes")
     tax_amount = fields.Monetary(string="Tax Amount",
                                  compute="compute_tax_amount")
+    
+    # Invoice Type for categorization
+    invoice_type = fields.Selection([
+        ('booking', 'Booking/Reservation'),
+        ('dld_fee', 'DLD Fee'),
+        ('admin_fee', 'Admin Fee'),
+        ('installment', 'Installment'),
+        ('handover', 'Handover Payment'),
+        ('completion', 'Completion Payment'),
+        ('other', 'Other')
+    ], string='Invoice Type', default='installment',
+       help='Type of payment for categorization and reporting')
+
+    # Payment Status (Required for booking workflow validation)
+    payment_status = fields.Selection([
+        ('unpaid', 'Unpaid'),
+        ('partial', 'Partially Paid'),
+        ('paid', 'Paid')
+    ], string='Payment Status', 
+       compute='_compute_payment_status',
+       store=True,
+       help='Payment status of the invoice based on related account.move')
 
     total_amount = fields.Monetary(
         string="Total Amount", compute="_compute_amount")
@@ -460,6 +1703,19 @@ class SaleInvoice(models.Model):
             for data in rec.tax_ids:
                 total_tax = total_tax + data.amount
             rec.tax_amount = rec.amount * total_tax / 100
+
+    @api.depends('invoice_id', 'invoice_id.payment_state', 'invoice_id.amount_residual', 'invoice_created')
+    def _compute_payment_status(self):
+        """Compute payment status based on related account.move payment state"""
+        for rec in self:
+            if not rec.invoice_created or not rec.invoice_id:
+                rec.payment_status = 'unpaid'
+            elif rec.invoice_id.payment_state == 'paid':
+                rec.payment_status = 'paid'
+            elif rec.invoice_id.payment_state in ['partial', 'in_payment']:
+                rec.payment_status = 'partial'
+            else:
+                rec.payment_status = 'unpaid'
 
     @api.depends("invoice_id")
     def _compute_amount(self):

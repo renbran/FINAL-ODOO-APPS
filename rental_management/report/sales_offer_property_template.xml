@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============================================================ -->
+        <!-- SALES OFFER FOR PROPERTY DETAILS - CLIENT PROPOSAL DOCUMENT  -->
+        <!-- Professional property sales quotation for initial client     -->
+        <!-- With property images gallery                                 -->
+        <!-- ============================================================ -->
+
+        <template id="sales_offer_property_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page" style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; line-height: 1.5; color: #2c3e50;">
+
+                            <!-- ===================== HEADER ===================== -->
+                            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #800020;">
+                                <h1 style="font-size: 28pt; font-weight: bold; color: #800020; margin: 0 0 5px 0; letter-spacing: 1px;">
+                                    PROPERTY SALES OFFER
+                                </h1>
+                                <p style="font-size: 14pt; color: #666; margin: 0; font-weight: 300;">
+                                    Exclusive Property Investment Opportunity
+                                </p>
+                            </div>
+
+                            <!-- ===================== REFERENCE BOX ===================== -->
+                            <div style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 50%; padding: 10px 15px; border-right: 1px solid rgba(255,255,255,0.3);">
+                                            <span style="display: block; font-size: 10pt; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Property Reference</span>
+                                            <strong style="font-size: 18pt;">
+                                                <span t-field="o.property_seq"/>
+                                            </strong>
+                                        </td>
+                                        <td style="width: 50%; padding: 10px 15px;">
+                                            <span style="display: block; font-size: 10pt; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Valid Until</span>
+                                            <strong style="font-size: 18pt;">
+                                                <t t-set="valid_date" t-value="(datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%d %B %Y')"/>
+                                                <span t-esc="valid_date"/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- ===================== MAIN PROPERTY IMAGE ===================== -->
+                            <t t-if="o.image">
+                                <div style="margin-bottom: 30px; text-align: center;">
+                                    <div style="position: relative; display: inline-block; width: 100%;">
+                                        <img t-att-src="'data:image/png;base64,%s' % o.image.decode('utf-8')" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 4px solid #800020;" alt="Main Property Image"/>
+                                        <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(128,0,32,0.9); color: white; padding: 10px 20px; border-radius: 8px;">
+                                            <span style="font-size: 16pt; font-weight: bold;">
+                                                <span t-field="o.name"/>
+                                            </span>
+                                        </div>
+                                        <div style="position: absolute; top: 15px; right: 15px; background: rgba(212,175,55,0.95); color: #1a1a1a; padding: 8px 15px; border-radius: 20px; font-weight: bold;">
+                                            ⭐ FEATURED
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- ===================== PROPERTY SHOWCASE ===================== -->
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                    PROPERTY DETAILS
+                                </h2>
+
+                                <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                    <h3 style="font-size: 18pt; color: #2c3e50; margin: 0 0 20px 0; font-weight: 600;">
+                                        <span t-field="o.name"/>
+                                    </h3>
+
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 50%; vertical-align: top; padding-right: 20px;">
+                                                <table style="width: 100%; font-size: 11pt;">
+                                                    <tr>
+                                                        <td style="width: 45%; padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                            <strong>Property Type</strong>
+                                                        </td>
+                                                        <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                            <span t-field="o.type"/>
+                                                            <t t-if="o.property_subtype_id"> -                                                                <span t-field="o.property_subtype_id.name"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                            <strong>Total Area</strong>
+                                                        </td>
+                                                        <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                            <span t-field="o.total_area"/>
+                                                            <span t-field="o.measure_unit"/>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="o.usable_area">
+                                                        <tr>
+                                                            <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Usable Area</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.usable_area"/>
+                                                                <span t-field="o.measure_unit"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.type not in ['land']">
+                                                        <tr t-if="o.bed">
+                                                            <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Bedrooms</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.bed"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr t-if="o.bathroom">
+                                                            <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Bathrooms</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.bathroom"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr t-if="o.parking">
+                                                            <td style="padding: 12px 0; color: #666;">
+                                                                <strong>Parking</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; font-weight: 500;">
+                                                                <span t-field="o.parking"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </td>
+                                            <td style="width: 50%; vertical-align: top; padding-left: 20px; border-left: 2px solid #dee2e6;">
+                                                <table style="width: 100%; font-size: 11pt;">
+                                                    <t t-if="o.property_project_id">
+                                                        <tr>
+                                                            <td style="width: 40%; padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Project</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.property_project_id.name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.subproject_id">
+                                                        <tr>
+                                                            <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Sub Project</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.subproject_id.name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="o.region_id">
+                                                        <tr>
+                                                            <td style="padding: 12px 0; color: #666; border-bottom: 1px solid #dee2e6;">
+                                                                <strong>Region</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; font-weight: 500;">
+                                                                <span t-field="o.region_id.name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <tr>
+                                                        <td style="padding: 12px 0; color: #666; vertical-align: top;">
+                                                            <strong>Location</strong>
+                                                        </td>
+                                                        <td style="padding: 12px 0; font-weight: 500;">
+                                                            <t t-if="o.street">
+                                                                <span t-field="o.street"/>
+                                                                <br/>
+                                                            </t>
+                                                            <t t-if="o.city_id">
+                                                                <span t-field="o.city_id.name"/>
+                                                            </t>
+                                                            <t t-if="o.state_id">,                                                                <span t-field="o.state_id.name"/>
+                                                            </t>
+                                                            <br/>
+                                                            <t t-if="o.country_id">
+                                                                <span t-field="o.country_id.name"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="o.landlord_id">
+                                                        <tr>
+                                                            <td style="padding: 12px 0; color: #666;">
+                                                                <strong>Owner</strong>
+                                                            </td>
+                                                            <td style="padding: 12px 0; font-weight: 500;">
+                                                                <span t-field="o.landlord_id.name"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- ===================== PRICING ===================== -->
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                    INVESTMENT DETAILS
+                                </h2>
+
+                                <!-- Calculate DLD Fee (4% of price) and Total Customer Obligation -->
+                                <t t-set="dld_fee_amount" t-value="(o.dld_fee if o.dld_fee else (o.price * 0.04))"/>
+                                <t t-set="admin_fee_amount" t-value="(o.admin_fee if o.admin_fee else 0)"/>
+                                <t t-set="customer_obligation" t-value="o.price + dld_fee_amount + admin_fee_amount"/>
+
+                                <!-- Price Cards -->
+                                <div style="display: table; width: 100%; margin-bottom: 20px;">
+                                    <div style="display: table-row;">
+                                        <div style="display: table-cell; width: 48%; padding: 25px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 1px solid #dee2e6; border-radius: 10px; vertical-align: top;">
+                                            <p style="margin: 0 0 8px 0; color: #6c757d; font-size: 11pt; text-transform: uppercase; letter-spacing: 1px;">Unit Price</p>
+                                            <p style="margin: 0; font-size: 24pt; font-weight: bold; color: #2c3e50;">
+                                                <span t-field="o.price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </p>
+                                        </div>
+                                        <div style="display: table-cell; width: 4%;"></div>
+                                        <div style="display: table-cell; width: 48%; padding: 25px; background: linear-gradient(135deg, #800020 0%, #5c0017 100%); border-radius: 10px; vertical-align: top;">
+                                            <p style="margin: 0 0 8px 0; color: rgba(255,255,255,0.85); font-size: 11pt; text-transform: uppercase; letter-spacing: 1px;">Total Customer Obligation</p>
+                                            <p style="margin: 0; font-size: 24pt; font-weight: bold; color: white;">
+                                                <span t-esc="customer_obligation" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </p>
+                                            <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.75); font-size: 10pt;">
+                                                (Unit Price + DLD Fee + Admin Fee)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- DLD Fee Highlight Box -->
+                                <div style="background: linear-gradient(135deg, #d4af37 0%, #b8960c 100%); color: #1a1a1a; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                    <div style="display: table; width: 100%;">
+                                        <div style="display: table-row;">
+                                            <div style="display: table-cell; width: 60%; vertical-align: middle;">
+                                                <p style="margin: 0 0 5px 0; font-size: 14pt; font-weight: bold;">
+                                                    ⭐ Dubai Land Department (DLD) Registration Fee
+                                                </p>
+                                                <p style="margin: 0; font-size: 11pt; opacity: 0.9;">
+                                                    Standard government registration fee = <strong>4% of Unit Price</strong>
+                                                </p>
+                                            </div>
+                                            <div style="display: table-cell; width: 40%; text-align: right; vertical-align: middle;">
+                                                <p style="margin: 0; font-size: 22pt; font-weight: bold;">
+                                                    <span t-esc="dld_fee_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Investment Breakdown Table -->
+                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
+                                    <thead>
+                                        <tr style="background: #f8f9fa;">
+                                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6; color: #495057;">Description</th>
+                                            <th style="padding: 15px; text-align: right; border-bottom: 2px solid #dee2e6; color: #495057;">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef;">Unit Price (Property Value)</td>
+                                            <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef; text-align: right; font-weight: 500;">
+                                                <span t-field="o.price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background: #fffbf0;">
+                                            <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef;">
+                                                <strong>DLD Fee (4% of Unit Price)</strong>
+                                            </td>
+                                            <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef; text-align: right; font-weight: 600; color: #b8960c;">
+                                                <span t-esc="dld_fee_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <t t-if="admin_fee_amount">
+                                            <tr>
+                                                <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef;">Admin Fee</td>
+                                                <td style="padding: 12px 15px; border-bottom: 1px solid #e9ecef; text-align: right; font-weight: 500;">
+                                                    <span t-esc="admin_fee_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr style="background: #800020; color: white;">
+                                            <td style="padding: 15px; font-weight: bold; font-size: 12pt;">TOTAL CUSTOMER OBLIGATION</td>
+                                            <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 14pt;">
+                                                <span t-esc="customer_obligation" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- ===================== PAYMENT SCHEDULE BREAKDOWN ===================== -->
+                            <t t-if="o.is_payment_plan and o.payment_schedule_id">
+                                <div style="margin-bottom: 30px;">
+                                    <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                        💳 PAYMENT PLAN: <span t-field="o.payment_schedule_id.name"/>
+                                    </h2>
+
+                                    <p style="margin-bottom: 15px; color: #666; font-size: 11pt;">
+                                        Flexible payment options designed to make your investment more accessible. Below is the detailed payment breakdown based on your selected plan.
+                                    </p>
+
+                                    <!-- Payment Schedule Summary Box -->
+                                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                                        <div style="display: table; width: 100%;">
+                                            <div style="display: table-row;">
+                                                <div style="display: table-cell; width: 33%; text-align: center; padding: 10px; border-right: 1px solid #0ea5e9;">
+                                                    <p style="margin: 0 0 5px 0; color: #0369a1; font-size: 10pt; text-transform: uppercase;">Total Amount</p>
+                                                    <p style="margin: 0; font-size: 16pt; font-weight: bold; color: #0c4a6e;">
+                                                        <span t-esc="customer_obligation" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </p>
+                                                </div>
+                                                <div style="display: table-cell; width: 33%; text-align: center; padding: 10px; border-right: 1px solid #0ea5e9;">
+                                                    <p style="margin: 0 0 5px 0; color: #0369a1; font-size: 10pt; text-transform: uppercase;">Payment Stages</p>
+                                                    <p style="margin: 0; font-size: 16pt; font-weight: bold; color: #0c4a6e;">
+                                                        <span t-esc="len(o.payment_schedule_id.schedule_line_ids)"/>
+ Stages
+                                                    </p>
+                                                </div>
+                                                <div style="display: table-cell; width: 34%; text-align: center; padding: 10px;">
+                                                    <p style="margin: 0 0 5px 0; color: #0369a1; font-size: 10pt; text-transform: uppercase;">Schedule Type</p>
+                                                    <p style="margin: 0; font-size: 16pt; font-weight: bold; color: #0c4a6e;">
+                                                        <t t-if="o.payment_schedule_id.schedule_type == 'sale'">Sale Contract</t>
+                                                        <t t-else="">Rental Contract</t>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Schedule Table -->
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt; margin-bottom: 20px;">
+                                        <thead>
+                                            <tr style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white;">
+                                                <th style="padding: 15px; text-align: left; border: 1px solid #5c0017; width: 5%;">#</th>
+                                                <th style="padding: 15px; text-align: left; border: 1px solid #5c0017; width: 30%;">Payment Milestone</th>
+                                                <th style="padding: 15px; text-align: center; border: 1px solid #5c0017; width: 15%;">Percentage</th>
+                                                <th style="padding: 15px; text-align: right; border: 1px solid #5c0017; width: 25%;">Amount (AED)</th>
+                                                <th style="padding: 15px; text-align: center; border: 1px solid #5c0017; width: 25%;">Due Timeline</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="line_num" t-value="0"/>
+                                            <t t-set="running_total" t-value="0"/>
+                                            <t t-foreach="o.payment_schedule_id.schedule_line_ids.sorted('days_after')" t-as="line">
+                                                <t t-set="line_num" t-value="line_num + 1"/>
+                                                <t t-set="line_amount" t-value="customer_obligation * line.percentage / 100"/>
+                                                <t t-set="running_total" t-value="running_total + line_amount"/>
+                                                <tr t-attf-style="background: #{line_num % 2 == 0 and '#f8f9fa' or 'white'};">
+                                                    <td style="padding: 12px 15px; border: 1px solid #dee2e6; font-weight: bold; color: #800020;">
+                                                        <span t-esc="line_num"/>
+                                                    </td>
+                                                    <td style="padding: 12px 15px; border: 1px solid #dee2e6;">
+                                                        <strong t-field="line.name"/>
+                                                        <t t-if="line.number_of_installments > 1">
+                                                            <br/>
+                                                            <span style="color: #666; font-size: 10pt;">
+                                                                (                                                                <span t-field="line.number_of_installments"/>
+ installments - <span t-field="line.installment_frequency"/>
+)
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                    <td style="padding: 12px 15px; border: 1px solid #dee2e6; text-align: center;">
+                                                        <span style="background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 15px; font-weight: 600;">
+                                                            <span t-field="line.percentage"/>
+%
+                                                        </span>
+                                                    </td>
+                                                    <td style="padding: 12px 15px; border: 1px solid #dee2e6; text-align: right; font-weight: 600; color: #2c3e50;">
+                                                        <span t-esc="line_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                    <td style="padding: 12px 15px; border: 1px solid #dee2e6; text-align: center;">
+                                                        <t t-if="line.days_after == 0">
+                                                            <span style="background: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 15px; font-weight: 500;">
+                                                                On Booking
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span style="background: #f3f4f6; color: #374151; padding: 4px 12px; border-radius: 15px;">
+                                                                <span t-field="line.days_after"/>
+ days after contract
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <!-- Total Row -->
+                                            <tr style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: white;">
+                                                <td colspan="2" style="padding: 15px; border: 1px solid #047857; font-weight: bold; font-size: 12pt;">
+                                                    TOTAL PAYMENT
+                                                </td>
+                                                <td style="padding: 15px; border: 1px solid #047857; text-align: center; font-weight: bold;">
+                                                    <span t-field="o.payment_schedule_id.total_percentage"/>
+%
+                                                </td>
+                                                <td style="padding: 15px; border: 1px solid #047857; text-align: right; font-weight: bold; font-size: 14pt;">
+                                                    <span t-esc="customer_obligation" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                                <td style="padding: 15px; border: 1px solid #047857; text-align: center;">
+                                                    —
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Payment Plan Notes -->
+                                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                                        <p style="margin: 0 0 8px 0; font-weight: 600; color: #b45309;">
+                                            📌 Important Payment Information:
+                                        </p>
+                                        <ul style="margin: 0; padding-left: 20px; color: #78350f; font-size: 10pt;">
+                                            <li>All payments are subject to the terms of the Sale Purchase Agreement (SPA)</li>
+                                            <li>DLD registration fee must be paid before property handover</li>
+                                            <li>Payment dates will be calculated from the contract signing date</li>
+                                            <li t-if="o.payment_schedule_id.description">
+                                                <span t-field="o.payment_schedule_id.description"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- ===================== PAGE BREAK FOR GALLERY ===================== -->
+                            <t t-if="o.is_images and o.property_images_ids">
+                                <p style="page-break-before: always;"/>
+
+                                <!-- ===================== PROPERTY GALLERY ===================== -->
+                                <div style="margin-bottom: 30px;">
+                                    <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                        📸 PROPERTY GALLERY
+                                    </h2>
+
+                                    <p style="margin-bottom: 20px; color: #666; font-size: 11pt;">
+                                        Explore the stunning features of this exceptional property through our curated photo gallery.
+                                    </p>
+
+                                    <!-- Gallery Grid - Show each image -->
+                                    <t t-set="img_count" t-value="0"/>
+                                    <t t-foreach="o.property_images_ids" t-as="img">
+                                        <t t-set="img_count" t-value="img_count + 1"/>
+                                        <div style="margin-bottom: 20px;">
+                                            <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e9ecef;">
+                                                <t t-if="img.image">
+                                                    <img t-att-src="'data:image/png;base64,%s' % img.image.decode('utf-8')" style="width: 100%; height: 250px; object-fit: cover;" t-att-alt="img.title or 'Property Image'"/>
+                                                </t>
+                                                <div style="padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                                    <p style="margin: 0; font-weight: 600; color: #2c3e50; font-size: 11pt;">
+                                                        <span style="color: #800020; margin-right: 8px;">📷</span>
+                                                        <t t-if="img.title">
+                                                            <span t-field="img.title"/>
+                                                        </t>
+                                                        <t t-else="">Property View <span t-esc="img_count"/>
+                                                        </t>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Add page break after every 2 images -->
+                                        <t t-if="img_count % 2 == 0 and img_count &lt; len(o.property_images_ids)">
+                                            <p style="page-break-before: always;"/>
+                                        </t>
+                                    </t>
+                                </div>
+                            </t>
+
+                            <!-- ===================== FLOOR PLANS ===================== -->
+                            <t t-if="o.is_floor_plan and o.floreplan_ids">
+                                <p style="page-break-before: always;"/>
+                                <div style="margin-bottom: 30px;">
+                                    <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                        📐 FLOOR PLANS
+                                    </h2>
+
+                                    <t t-foreach="o.floreplan_ids" t-as="plan">
+                                        <div style="margin-bottom: 25px;">
+                                            <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #800020;">
+                                                <div style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); color: white; padding: 15px 20px;">
+                                                    <p style="margin: 0; font-weight: 600; font-size: 14pt;">
+                                                        📐                                                        <t t-if="plan.title">
+                                                            <span t-field="plan.title"/>
+                                                        </t>
+                                                        <t t-else="">Floor Plan</t>
+                                                    </p>
+                                                </div>
+                                                <t t-if="plan.image">
+                                                    <div style="padding: 20px; background: #f8f9fa;">
+                                                        <img t-att-src="'data:image/png;base64,%s' % plan.image.decode('utf-8')" style="width: 100%; max-height: 500px; object-fit: contain;" t-att-alt="plan.title or 'Floor Plan'"/>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+
+                            <!-- ===================== KEY FEATURES ===================== -->
+                            <t t-if="o.amenities or o.is_floor_plan or o.is_facilities">
+                                <div style="margin-bottom: 30px;">
+                                    <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                        KEY FEATURES &amp; AMENITIES
+                                    </h2>
+
+                                    <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="width: 50%; vertical-align: top; padding: 10px;">
+                                                    <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                                                        <t t-if="o.type not in ['land']">
+                                                            <li t-if="o.bed" style="margin-bottom: 8px;">
+                                                                <strong>
+                                                                    <span t-field="o.bed"/>
+                                                                </strong> Bedroom(s)
+                                                            </li>
+                                                            <li t-if="o.bathroom" style="margin-bottom: 8px;">
+                                                                <strong>
+                                                                    <span t-field="o.bathroom"/>
+                                                                </strong> Bathroom(s)
+                                                            </li>
+                                                            <li t-if="o.parking" style="margin-bottom: 8px;">
+                                                                <strong>
+                                                                    <span t-field="o.parking"/>
+                                                                </strong> Parking Space(s)
+                                                            </li>
+                                                            <li t-if="o.floor" style="margin-bottom: 8px;">
+                                                                Floor <strong>
+                                                                <span t-field="o.floor"/>
+                                                            </strong> of <span t-field="o.total_floor"/>
+                                                        </li>
+                                                        <li t-if="o.facing" style="margin-bottom: 8px;">
+                                                            <strong>
+                                                                <span t-field="o.facing"/>
+                                                            </strong> Facing
+                                                        </li>
+                                                    </t>
+                                                </ul>
+                                            </td>
+                                            <td style="width: 50%; vertical-align: top; padding: 10px;">
+                                                <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                                                    <t t-if="o.furnishing_id">
+                                                        <li style="margin-bottom: 8px;">
+                                                            <strong>
+                                                                <span t-field="o.furnishing_id.name"/>
+                                                            </strong>
+                                                        </li>
+                                                    </t>
+                                                    <li t-if="o.amenities" style="margin-bottom: 8px;">
+                                                            Premium Amenities Available
+                                                    </li>
+                                                    <li t-if="o.is_floor_plan" style="margin-bottom: 8px;">
+                                                            Floor Plans Available
+                                                    </li>
+                                                    <li t-if="o.is_facilities" style="margin-bottom: 8px;">
+                                                            Modern Facilities
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- ===================== AMENITIES LIST WITH IMAGES ===================== -->
+                        <t t-if="o.amenities and o.amenities_ids">
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                        🏠 AMENITIES
+                                </h2>
+
+                                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                                    <t t-foreach="o.amenities_ids" t-as="amenity">
+                                        <div style="display: inline-block; width: 30%; margin: 1.5%; vertical-align: top; text-align: center;">
+                                            <div style="background: white; border-radius: 10px; padding: 15px; border: 1px solid #e9ecef; min-height: 100px;">
+                                                <t t-if="amenity.image">
+                                                    <img t-att-src="'data:image/png;base64,%s' % amenity.image.decode('utf-8')" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; border: 2px solid #800020;" alt="Amenity"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <div style="width: 50px; height: 50px; background: #800020; border-radius: 50%; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center;">
+                                                        <span style="color: white; font-size: 20pt;">✓</span>
+                                                    </div>
+                                                </t>
+                                                <p style="margin: 0; font-weight: 600; color: #2c3e50; font-size: 10pt;">
+                                                    <span t-field="amenity.title"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- ===================== CONTACT INFORMATION ===================== -->
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="font-size: 20pt; color: #800020; border-bottom: 3px solid #800020; padding-bottom: 10px; margin-bottom: 20px;">
+                                    CONTACT US
+                            </h2>
+                            <div style="background: linear-gradient(135deg, #800020 0%, #5c0017 100%); border-radius: 10px; padding: 25px; color: white;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="width: 50%; padding: 15px; vertical-align: top;">
+                                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #d4af37; font-size: 12pt;">For more information:</p>
+                                            <p style="margin: 0; color: white;">
+                                                <t t-if="o.company_id">
+                                                    <strong style="font-size: 14pt;">
+                                                        <span t-field="o.company_id.name"/>
+                                                    </strong>
+                                                    <br/>
+                                                    <br/>
+                                                    <t t-if="o.company_id.street">
+                                                        <span t-field="o.company_id.street"/>
+                                                        <br/>
+                                                    </t>
+                                                    <t t-if="o.company_id.city">
+                                                        <span t-field="o.company_id.city"/>
+                                                    </t>
+                                                    <t t-if="o.company_id.state_id">,                                                        <span t-field="o.company_id.state_id.name"/>
+                                                    </t>
+                                                    <br/>
+                                                    <t t-if="o.company_id.country_id">
+                                                        <span t-field="o.company_id.country_id.name"/>
+                                                    </t>
+                                                </t>
+                                            </p>
+                                        </td>
+                                        <td style="width: 50%; padding: 15px; vertical-align: top; border-left: 1px solid rgba(255,255,255,0.3);">
+                                            <t t-if="o.company_id">
+                                                <p style="margin: 0 0 12px 0;">
+                                                    <t t-if="o.company_id.phone">
+                                                        <span style="color: #d4af37;">📞</span>
+                                                        <span t-field="o.company_id.phone"/>
+                                                    </t>
+                                                </p>
+                                                <p style="margin: 0 0 12px 0;">
+                                                    <t t-if="o.company_id.email">
+                                                        <span style="color: #d4af37;">✉️</span>
+                                                        <span t-field="o.company_id.email"/>
+                                                    </t>
+                                                </p>
+                                                <p style="margin: 0;">
+                                                    <t t-if="o.company_id.website">
+                                                        <span style="color: #d4af37;">🌐</span>
+                                                        <span t-field="o.company_id.website"/>
+                                                    </t>
+                                                </p>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===================== DISCLAIMER ===================== -->
+                        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #800020;">
+                            <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 11pt;">IMPORTANT NOTICE</h4>
+                            <p style="margin: 0; font-size: 9pt; color: #6c757d; line-height: 1.6;">
+                                    This Sales Offer is for informational purposes only and does not constitute a binding agreement. 
+                                    All prices, terms, and availability are subject to change without prior notice. The DLD Fee (4% of Unit Price) 
+                                    is a government mandated registration fee payable directly to Dubai Land Department. 
+                                    Additional charges may apply. Please contact our sales team for final pricing and contract details.
+                                    This offer is valid for 30 days from the date of issue.
+                            </p>
+                        </div>
+
+                        <!-- ===================== FOOTER ===================== -->
+                        <div style="margin-top: 40px; text-align: center; padding-top: 20px; border-top: 2px solid #dee2e6;">
+                            <p style="margin: 0; font-size: 10pt; color: #6c757d;">
+                                    Generated on <span t-esc="datetime.datetime.now().strftime('%d %B %Y at %H:%M')"/>
+                            </p>
+                            <p style="margin: 5px 0 0 0; font-size: 9pt; color: #adb5bd;">
+                                    ©                                <span t-esc="datetime.datetime.now().year"/>
+                                <span t-field="o.company_id.name"/>
+ - All Rights Reserved
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</data>
+</odoo>

@@ -1,0 +1,91 @@
+// SGC TECH AI - Color Palette & SCSS Variables
+// Brand: Intelligent Infrastructure. Instant Impact.
+// Company: Scholarix Global Consultants
+
+// ============================================================================
+// Primary Color Palette - SCSS Variables (Odoo 17 Compliant)
+// ============================================================================
+
+// Core Brand Colors - Deep Ocean Palette
+$sgc-deep-navy: #0c1e34;
+$sgc-ocean-blue: #1e3a8a;
+$sgc-sky-blue: #4fc3f7;
+
+// Accent Colors - Tech & Innovation
+$sgc-electric-cyan: #00fff0;
+$sgc-neon-green: #00ff88;
+$sgc-carbon-black: #0a0a0a;
+$sgc-ice-white: #e8f4fd;
+$sgc-slate-gray: #64748b;
+
+// Extended Palette for UI Elements
+$sgc-dark-navy: #051429;
+$sgc-light-sky: #b3e5fc;
+$sgc-soft-cyan: #80deea;
+$sgc-pale-green: #80ff99;
+
+// Functional Colors
+$sgc-success: #00ff88;
+$sgc-warning: #ffb84d;
+$sgc-error: #ff6b6b;
+$sgc-info: #4fc3f7;
+
+// Neutral Colors
+$sgc-white: #ffffff;
+$sgc-off-white: #f8f9fa;
+$sgc-light-gray: #e9ecef;
+$sgc-medium-gray: #adb5bd;
+$sgc-dark-gray: #495057;
+$sgc-charcoal: #212529;
+
+// Shadow & Overlay
+$sgc-shadow-sm: 0 2px 4px rgba(12, 30, 52, 0.1);
+$sgc-shadow-md: 0 4px 8px rgba(12, 30, 52, 0.15);
+$sgc-shadow-lg: 0 8px 16px rgba(12, 30, 52, 0.2);
+$sgc-overlay: rgba(12, 30, 52, 0.8);
+
+// Gradients
+$sgc-gradient-ocean: linear-gradient(
+  135deg,
+  $sgc-deep-navy 0%,
+  $sgc-ocean-blue 100%
+);
+$sgc-gradient-sky: linear-gradient(
+  135deg,
+  $sgc-ocean-blue 0%,
+  $sgc-sky-blue 100%
+);
+$sgc-gradient-electric: linear-gradient(
+  90deg,
+  $sgc-electric-cyan 0%,
+  $sgc-neon-green 100%
+);
+$sgc-gradient-success: linear-gradient(
+  135deg,
+<<<<<<< Updated upstream
+  $sgc-success 0%,
+  lighten($sgc-success, 10%) 100%
+=======
+  $sgc-neon-green 0%,
+  $sgc-success 100%
+>>>>>>> Stashed changes
+);
+
+// Border Radius
+$sgc-radius-sm: 4px;
+$sgc-radius-md: 8px;
+$sgc-radius-lg: 12px;
+$sgc-radius-xl: 16px;
+
+// Font Weights (moved from typography.scss for global availability)
+$sgc-font-light: 300;
+$sgc-font-normal: 400;
+$sgc-font-medium: 500;
+$sgc-font-semibold: 600;
+$sgc-font-bold: 700;
+
+// Transitions
+$sgc-transition-fast: 0.15s ease-in-out;
+$sgc-transition-base: 0.2s ease-in-out;
+$sgc-transition-normal: 0.3s ease-in-out;
+$sgc-transition-slow: 0.5s ease-in-out;

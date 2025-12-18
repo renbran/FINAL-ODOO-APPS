@@ -1,0 +1,151 @@
+// SGC TECH AI - CRM Module Theme
+@import 'sgc_colors';
+
+// CRM Pipeline
+.o_kanban_view.o_kanban_grouped {
+    .o_kanban_group {
+        background: $sgc-off-white;
+        border-radius: $sgc-radius-md;
+        box-shadow: $sgc-shadow-sm;
+        margin-right: 1rem;
+        
+        .o_kanban_header {
+            background: $sgc-gradient-ocean;
+            color: $sgc-white;
+            border-radius: $sgc-radius-md $sgc-radius-md 0 0;
+            padding: 0.75rem;
+            
+            .o_kanban_header_title {
+                font-weight: $sgc-font-semibold;
+                font-size: $sgc-text-lg;
+            }
+            
+            .o_column_quick_create {
+                color: $sgc-white;
+                
+                &:hover {
+                    color: $sgc-electric-cyan;
+                }
+            }
+        }
+    }
+}
+
+// Lead/Opportunity Cards
+.o_kanban_record {
+    &.o_kanban_record_has_image_fill {
+        border-left: 4px solid $sgc-sky-blue;
+        
+        &.oe_kanban_color_0 { border-left-color: $sgc-slate-gray; }
+        &.oe_kanban_color_1 { border-left-color: $sgc-ocean-blue; }
+        &.oe_kanban_color_2 { border-left-color: $sgc-sky-blue; }
+        &.oe_kanban_color_3 { border-left-color: $sgc-success; }
+        &.oe_kanban_color_4 { border-left-color: $sgc-warning; }
+        &.oe_kanban_color_5 { border-left-color: $sgc-error; }
+    }
+}
+
+// Activity Panel
+.o_activity_view {
+    .o_activity_record {
+        border-left: 3px solid $sgc-sky-blue;
+        transition: all $sgc-transition-fast;
+        
+        &:hover {
+            border-left-color: $sgc-ocean-blue;
+            background: $sgc-ice-white;
+        }
+        
+        &.o_activity_overdue {
+            border-left-color: $sgc-error;
+        }
+        
+        &.o_activity_today {
+            border-left-color: $sgc-warning;
+        }
+    }
+}
+
+// CRM Forms
+.o_form_view.o_form_crm {
+    .o_form_sheet {
+        .o_field_monetary {
+            .o_field_widget {
+                font-size: $sgc-text-2xl;
+                font-weight: $sgc-font-bold;
+                color: $sgc-ocean-blue;
+            }
+        }
+    }
+    
+    .o_opportunity_status {
+        .o_status_value {
+            padding: 0.5rem 1rem;
+            border-radius: $sgc-radius-md;
+            font-weight: $sgc-font-medium;
+            
+            &.won {
+                background: lighten($sgc-success, 40%);
+                color: darken($sgc-success, 20%);
+            }
+            
+            &.lost {
+                background: lighten($sgc-error, 35%);
+                color: darken($sgc-error, 15%);
+            }
+        }
+    }
+}
+
+// CRM Executive Dashboard Integration
+.o_crm_dashboard {
+    .o_dashboard_card {
+        border-left: 4px solid $sgc-sky-blue;
+        
+        &:hover {
+            border-left-color: $sgc-ocean-blue;
+        }
+    }
+    
+    .o_metric_positive {
+        color: $sgc-success;
+        font-weight: $sgc-font-semibold;
+    }
+    
+    .o_metric_negative {
+        color: $sgc-error;
+        font-weight: $sgc-font-semibold;
+    }
+}
+
+// Email Thread Integration
+.o_mail_thread {
+    .o_mail_thread_message {
+        border-left: 3px solid $sgc-ice-white;
+        transition: border-left-color $sgc-transition-fast;
+        
+        &:hover {
+            border-left-color: $sgc-sky-blue;
+        }
+        
+        .o_mail_message_bubble {
+            background: $sgc-off-white;
+            border-radius: $sgc-radius-md;
+        }
+    }
+}
+
+// Contact/Partner Views
+.o_res_partner_kanban {
+    .o_kanban_record {
+        .o_kanban_image {
+            border: 2px solid $sgc-light-gray;
+            border-radius: 50%;
+        }
+        
+        .oe_kanban_partner_name {
+            color: $sgc-ocean-blue;
+            font-weight: $sgc-font-semibold;
+        }
+    }
+}

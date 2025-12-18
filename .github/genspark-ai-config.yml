@@ -1,0 +1,54 @@
+# Genspark AI Developer Configuration
+
+# AI Assistant Settings
+ai_enabled: true
+ai_mode: "development_assistant"
+
+# CloudPepper Integration Settings
+cloudpepper:
+  deployment_validation: true
+  emergency_scripts: true
+  compatibility_checks: true
+  
+# Module Analysis Settings
+module_analysis:
+  odoo_version: "17.0"
+  check_manifests: true
+  validate_python: true
+  validate_xml: true
+  validate_javascript: true
+  validate_security: true
+  
+# AI Insights Configuration
+ai_insights:
+  code_suggestions: true
+  performance_analysis: true
+  security_recommendations: true
+  best_practices: true
+  
+# Issue Analysis Settings
+issue_analysis:
+  auto_categorize: true
+  suggest_scripts: true
+  estimate_difficulty: true
+  cloudpepper_impact_detection: true
+  
+# Emergency Scripts Integration
+emergency_scripts:
+  cloudpepper_deployment_validation: "cloudpepper_deployment_final_validation.py"
+  commission_fixes: "create_commission_email_emergency_fix.py"
+  general_fixes: "create_emergency_cloudpepper_fix.py"
+  
+# OSUS Properties Specific Settings
+osus_properties:
+  brand_colors:
+    primary: "#800020"  # Maroon
+    secondary: "#FFD700"  # Gold
+  check_branding: true
+  
+# Workflow Integration
+workflows:
+  pr_analysis: true
+  issue_assistance: true
+  module_validation: true
+  deployment_checks: true

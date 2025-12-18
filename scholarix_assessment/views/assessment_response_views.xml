@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Response Tree View -->
+        <record id="view_assessment_response_tree" model="ir.ui.view">
+            <field name="name">assessment.response.tree</field>
+            <field name="model">assessment.response</field>
+            <field name="arch" type="xml">
+                <tree string="Responses" create="false" delete="false">
+                    <field name="candidate_id"/>
+                    <field name="submission_date"/>
+                    <field name="total_time_spent" widget="integer" optional="show"/>
+                    <field name="total_characters" optional="show"/>
+                    <field name="average_answer_length" optional="show"/>
+                    <field name="has_short_answers" optional="show" widget="boolean"/>
+                    <field name="has_copy_paste_patterns" optional="show" widget="boolean"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Response Form View -->
+        <record id="view_assessment_response_form" model="ir.ui.view">
+            <field name="name">assessment.response.form</field>
+            <field name="model">assessment.response</field>
+            <field name="arch" type="xml">
+                <form string="Assessment Response" create="false" delete="false">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="candidate_id" readonly="1"/>
+                            </h1>
+                            <h3 class="text-muted">
+                                Assessment Responses
+                            </h3>
+                        </div>
+
+                        <group>
+                            <group string="Submission Details">
+                                <field name="submission_date" readonly="1"/>
+                                <field name="total_time_spent" widget="integer" readonly="1"/>
+                                <field name="total_characters" readonly="1"/>
+                                <field name="average_answer_length" readonly="1"/>
+                            </group>
+                            <group string="Quality Flags">
+                                <field name="has_short_answers" widget="boolean" readonly="1"/>
+                                <field name="has_copy_paste_patterns" widget="boolean" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Technical Questions" name="technical">
+                                <group>
+                                    <group string="Q1: Automation Experience">
+                                        <field name="q1_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q1_score"/>
+                                        <div class="o_row">
+                                            <field name="q1_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q1_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q1_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q2: AI Tools Experience">
+                                        <field name="q2_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q2_score"/>
+                                        <div class="o_row">
+                                            <field name="q2_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q2_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q2_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q4: Project Estimation">
+                                        <field name="q4_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q4_score"/>
+                                        <div class="o_row">
+                                            <field name="q4_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q4_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q4_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Sales Questions" name="sales">
+                                <group>
+                                    <group string="Q6: Objection Handling">
+                                        <field name="q6_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q6_score"/>
+                                        <div class="o_row">
+                                            <field name="q6_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q6_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q6_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q7: Difficult Client Management">
+                                        <field name="q7_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q7_score"/>
+                                        <div class="o_row">
+                                            <field name="q7_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q7_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q7_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Communication Questions" name="communication">
+                                <group>
+                                    <group string="Q3: Client Communication">
+                                        <field name="q3_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q3_score"/>
+                                        <div class="o_row">
+                                            <field name="q3_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q3_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q3_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q8: Technical Simplification">
+                                        <field name="q8_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q8_score"/>
+                                        <div class="o_row">
+                                            <field name="q8_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q8_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q8_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q9: Setting Client Boundaries">
+                                        <field name="q9_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q9_score"/>
+                                        <div class="o_row">
+                                            <field name="q9_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q9_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q9_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Learning &amp; Cultural Fit" name="learning">
+                                <group>
+                                    <group string="Q5: Learning New Technologies">
+                                        <field name="q5_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q5_score"/>
+                                        <div class="o_row">
+                                            <field name="q5_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q5_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q5_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Q10: Motivation and Concerns">
+                                        <field name="q10_answer" widget="text" nolabel="1" readonly="1"/>
+                                        <label for="q10_score"/>
+                                        <div class="o_row">
+                                            <field name="q10_score" widget="progressbar"/>
+                                            <span class="mx-2">|</span>
+                                            <field name="q10_char_count"/>
+ chars
+                                            <span class="mx-2">|</span>
+                                            <field name="q10_time_spent"/>
+ seconds
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Response Search View -->
+        <record id="view_assessment_response_search" model="ir.ui.view">
+            <field name="name">assessment.response.search</field>
+            <field name="model">assessment.response</field>
+            <field name="arch" type="xml">
+                <search string="Responses">
+                    <field name="candidate_id"/>
+                    <field name="submission_date"/>
+                    <filter string="Short Answers" name="short_answers" domain="[('has_short_answers', '=', True)]"/>
+                    <filter string="Copy-Paste Patterns" name="copy_paste" domain="[('has_copy_paste_patterns', '=', True)]"/>
+                    <separator/>
+                    <filter string="This Week" name="this_week" domain="[('submission_date', '&gt;=', (context_today() - relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Month" name="this_month" domain="[('submission_date', '&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Submission Date" name="group_submission_date" context="{'group_by': 'submission_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Response Action -->
+        <record id="action_assessment_response" model="ir.actions.act_window">
+            <field name="name">Responses</field>
+            <field name="res_model">assessment.response</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No responses yet!
+                </p>
+                <p>
+                    Responses are created when candidates submit their assessments through the portal.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

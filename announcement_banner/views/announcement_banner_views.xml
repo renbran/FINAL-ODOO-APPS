@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_announcement_banner_form" model="ir.ui.view">
+        <field name="name">announcement.banner.form</field>
+        <field name="model">announcement.banner</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Announcement Title..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration">
+                            <field name="priority"/>
+                            <field name="show_once"/>
+                            <field name="shown_count" readonly="1"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group string="Target Audience">
+                        <field name="user_ids" widget="many2many_tags" placeholder="Leave empty to show to all users..."/>
+                    </group>
+                    <notebook>
+                        <page string="Message Content">
+                            <field name="message" widget="html" class="oe_form_field_html" options="{
+                                       'style-inline': true,
+                                       'codeview': false,
+                                       'resizable': true,
+                                       'height': 500,
+                                       'sanitize': false,
+                                       'toolbar': [
+                                           ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+                                           ['font', ['strikethrough', 'superscript', 'subscript']],
+                                           ['fontsize', ['fontsize']],
+                                           ['color', ['color']],
+                                           ['para', ['ul', 'ol', 'paragraph']],
+                                           ['table', ['table']],
+                                           ['insert', ['link', 'picture']],
+                                           ['view', ['fullscreen', 'help']]
+                                       ]
+                                   }" placeholder="Enter your announcement message here. Use the toolbar above to format text, add images, and create lists. Images and formatting will display properly in the banner."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_announcement_banner_tree" model="ir.ui.view">
+        <field name="name">announcement.banner.tree</field>
+        <field name="model">announcement.banner</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="priority"/>
+                <field name="name"/>
+                <field name="start_date" optional="show"/>
+                <field name="end_date" optional="show"/>
+                <field name="show_once" optional="hide"/>
+                <field name="shown_count" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_announcement_banner_search" model="ir.ui.view">
+        <field name="name">announcement.banner.search</field>
+        <field name="model">announcement.banner</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_ids"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Current" name="current" domain="['|', ('start_date', '=', False), ('start_date', '&lt;=', context_today().strftime('%Y-%m-%d')),
+                                 '|', ('end_date', '=', False), ('end_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Upcoming" name="upcoming" domain="[('start_date', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Expired" name="expired" domain="[('end_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Show Once" name="group_show_once" context="{'group_by': 'show_once'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Log Tree View -->
+    <record id="view_announcement_banner_log_tree" model="ir.ui.view">
+        <field name="name">announcement.banner.log.tree</field>
+        <field name="model">announcement.banner.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false">
+                <field name="announcement_id"/>
+                <field name="user_id"/>
+                <field name="shown_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_announcement_banner" model="ir.actions.act_window">
+        <field name="name">Announcements</field>
+        <field name="res_model">announcement.banner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first announcement
+            </p>
+            <p>
+                Create announcements that will be displayed to users when they access Odoo.
+                You can schedule announcements, target specific users, and track how many times they've been shown.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_announcement_banner_log" model="ir.actions.act_window">
+        <field name="name">Announcement Logs</field>
+        <field name="res_model">announcement.banner.log</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No announcement logs yet
+            </p>
+            <p>
+                Logs will appear here when users view announcements.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_announcement_banner_root" name="Announcements" groups="base.group_system" web_icon="announcement_banner,static/description/icon.png" sequence="100"/>
+
+    <menuitem id="menu_announcement_banner" name="Announcements" parent="menu_announcement_banner_root" action="action_announcement_banner" sequence="10"/>
+
+    <menuitem id="menu_announcement_banner_log" name="Announcement Logs" parent="menu_announcement_banner_root" action="action_announcement_banner_log" sequence="20"/>
+</odoo>

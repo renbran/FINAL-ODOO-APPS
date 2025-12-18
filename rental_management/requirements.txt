@@ -1,0 +1,5 @@
+# Optional dependencies for rental_management module
+
+# For enhanced file MIME type detection (optional but recommended)
+# Install with: pip install python-magic
+# python-magic>=0.4.27

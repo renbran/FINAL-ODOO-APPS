@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_assessment_form" name="Assessment Form">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">SCHOLARIX Assessment</t>
+
+            <!-- Timer Bar (Fixed at top) -->
+            <div id="timerBar" class="assessment-timer-bar" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 50%, #4fc3f7 100%); padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                <div class="container-fluid" style="max-width: 100%;">
+                    <div class="d-flex justify-content-between align-items-center text-white">
+                        <div>
+                            <i class="fa fa-clock-o me-2"></i>
+                            <span class="fw-bold">Time Remaining:</span>
+                        </div>
+                        <div class="timer-display" style="font-size: 24px; font-weight: bold; font-family: monospace;">
+                            <span id="timerMinutes">45</span>:                            <span id="timerSeconds">00</span>
+                        </div>
+                        <div class="timer-warning" id="timerWarning" style="display: none;">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            <span>Hurry up!</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 5px; background: rgba(255,255,255,0.3);">
+                        <div id="timerProgress" class="progress-bar" role="progressbar" style="width: 100%; background: white;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                body {
+                    background: linear-gradient(180deg, #0c1e3d 0%, #1e3a8a 100%) !important;
+                    min-height: 100vh;
+                }
+                .card {
+                    background: rgba(255, 255, 255, 0.95) !important;
+                    backdrop-filter: blur(10px);
+                }
+                .card-header.bg-primary {
+                    background: linear-gradient(135deg, #1e3a8a 0%, #4fc3f7 100%) !important;
+                }
+                .btn-primary {
+                    background: linear-gradient(135deg, #4fc3f7 0%, #1e3a8a 100%) !important;
+                    border: none !important;
+                    box-shadow: 0 5px 15px rgba(79, 195, 247, 0.4);
+                }
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(79, 195, 247, 0.6);
+                }
+            </style>
+
+            <div class="container mt-5 mb-5" style="padding-top: 80px;">
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1">
+                        <div class="card shadow-lg">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="mb-0">SCHOLARIX Candidate Assessment</h2>
+                                <p class="mb-0">Take your time and answer thoughtfully. Minimum 50 characters per answer.</p>
+                            </div>
+                            <div class="card-body">
+                                <!-- Warning Modal -->
+                                <div class="alert alert-warning mb-4" role="alert">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <strong>Important:</strong> You have <strong>
+                                    <t t-esc="time_limit or 45"/>
+ minutes</strong> to complete this assessment. 
+                                    The timer will start automatically. Make sure you have enough time before beginning.
+                            </div>
+
+                            <form id="assessmentForm" action="/assessment/submit" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" id="totalTimeSpent" name="totalTimeSpent" value="0"/>
+
+                                <!-- Personal Information -->
+                                <h4 class="mb-3">Personal Information</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="candidateName" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="candidateName" name="candidateName" required="required"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="candidateEmail" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="candidateEmail" name="candidateEmail" required="required"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="candidatePhone" class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" id="candidatePhone" name="candidatePhone"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="candidateLocation" class="form-label">Location</label>
+                                        <input type="text" class="form-control" id="candidateLocation" name="candidateLocation"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="odooExperience" class="form-label">Odoo Experience *</label>
+                                        <select class="form-control" id="odooExperience" name="odooExperience" required="required">
+                                            <option value="">Select...</option>
+                                            <option value="none">No Experience</option>
+                                            <option value="0-2">0-2 years</option>
+                                            <option value="2-5">2-5 years</option>
+                                            <option value="5+">5+ years</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="salesExperience" class="form-label">Sales Experience *</label>
+                                        <select class="form-control" id="salesExperience" name="salesExperience" required="required">
+                                            <option value="">Select...</option>
+                                            <option value="0-1">0-1 years</option>
+                                            <option value="1-3">1-3 years</option>
+                                            <option value="3-5">3-5 years</option>
+                                            <option value="5+">5+ years</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4"/>
+
+                                <!-- Assessment Questions -->
+                                <h4 class="mb-3">Assessment Questions</h4>
+                                <t t-foreach="questions" t-as="question">
+                                    <div class="mb-4">
+                                        <label t-att-for="'q' + str(question.sequence)" class="form-label">
+                                            <strong>Question <t t-esc="question.sequence // 10"/>
+:</strong>
+                                            <t t-esc="question.question_text"/>
+                                        </label>
+                                        <p class="text-muted small" t-if="question.help_text">
+                                            <t t-esc="question.help_text"/>
+                                        </p>
+                                        <textarea class="form-control assessment-answer" t-att-id="'q' + str(question.sequence)" t-att-name="'q' + str(question.sequence) + '_answer'" rows="5" t-att-minlength="question.min_char_count" t-att-maxlength="question.max_char_count" t-att-required="question.is_required and 'required' or None" placeholder="Your answer here (minimum 50 characters)...">
+                                        </textarea>
+                                        <small class="form-text text-muted">
+                                            <span t-att-id="'charCount' + str(question.sequence)">0</span> / 
+                                            <t t-esc="question.max_char_count"/>
+ characters
+                                        </small>
+                                    </div>
+                                </t>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Submit Assessment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer JavaScript -->
+        <script type="text/javascript">
+            <![CDATA[
+                (function() {
+                    'use strict';
+                    
+                    // Timer configuration
+                    const TIMER_DURATION = parseInt(']]>
+            <t t-esc="time_limit or 45"/>
+            <![CDATA[') * 60; // Convert minutes to seconds
+                    const WARNING_THRESHOLD_1 = 10 * 60; // 10 minutes
+                    const WARNING_THRESHOLD_2 = 5 * 60;  // 5 minutes
+                    const STORAGE_KEY = 'scholarix_assessment_timer';
+                    
+                    let timeRemaining = TIMER_DURATION;
+                    let timerInterval = null;
+                    let startTime = Date.now();
+                    
+                    // Check if there's a saved timer state
+                    function loadTimerState() {
+                        try {
+                            const saved = localStorage.getItem(STORAGE_KEY);
+                            if (saved) {
+                                const data = JSON.parse(saved);
+                                const elapsed = Math.floor((Date.now() - data.startTime) / 1000);
+                                timeRemaining = Math.max(0, TIMER_DURATION - elapsed);
+                                startTime = data.startTime;
+                                return true;
+                            }
+                        } catch (e) {
+                            console.error('Failed to load timer state:', e);
+                        }
+                        return false;
+                    }
+                    
+                    // Save timer state
+                    function saveTimerState() {
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                                startTime: startTime,
+                                timeRemaining: timeRemaining
+                            }));
+                        } catch (e) {
+                            console.error('Failed to save timer state:', e);
+                        }
+                    }
+                    
+                    // Clear timer state
+                    function clearTimerState() {
+                        try {
+                            localStorage.removeItem(STORAGE_KEY);
+                        } catch (e) {
+                            console.error('Failed to clear timer state:', e);
+                        }
+                    }
+                    
+                    // Update timer display
+                    function updateTimerDisplay() {
+                        const minutes = Math.floor(timeRemaining / 60);
+                        const seconds = timeRemaining % 60;
+                        
+                        document.getElementById('timerMinutes').textContent = String(minutes).padStart(2, '0');
+                        document.getElementById('timerSeconds').textContent = String(seconds).padStart(2, '0');
+                        
+                        // Update progress bar
+                        const progress = (timeRemaining / TIMER_DURATION) * 100;
+                        const progressBar = document.getElementById('timerProgress');
+                        progressBar.style.width = progress + '%';
+                        
+                        // Update timer bar styling based on time remaining
+                        const timerBar = document.getElementById('timerBar');
+                        const timerWarning = document.getElementById('timerWarning');
+                        
+                        if (timeRemaining <= WARNING_THRESHOLD_2) {
+                            // Less than 5 minutes - RED
+                            timerBar.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+                            progressBar.style.background = '#ffcccc';
+                            timerWarning.style.display = 'block';
+                            timerWarning.innerHTML = '<i class="fa fa-exclamation-triangle me-2"></i><span>Time almost up!</span>';
+                        } else if (timeRemaining <= WARNING_THRESHOLD_1) {
+                            // Less than 10 minutes - YELLOW
+                            timerBar.style.background = 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)';
+                            progressBar.style.background = '#fff3cd';
+                            timerWarning.style.display = 'block';
+                            timerWarning.innerHTML = '<i class="fa fa-exclamation-triangle me-2"></i><span>Hurry up!</span>';
+                        } else {
+                            // Normal - Deep Ocean
+                            timerBar.style.background = 'linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 50%, #4fc3f7 100%)';
+                            progressBar.style.background = '#4fc3f7';
+                            timerWarning.style.display = 'none';
+                        }
+                        
+                        // Update total time spent field
+                        const totalSpent = TIMER_DURATION - timeRemaining;
+                        document.getElementById('totalTimeSpent').value = totalSpent;
+                    }
+                    
+                    // Timer tick function
+                    function timerTick() {
+                        if (timeRemaining > 0) {
+                            timeRemaining--;
+                            updateTimerDisplay();
+                            saveTimerState();
+                            
+                            // Show warnings at specific thresholds
+                            if (timeRemaining === WARNING_THRESHOLD_1) {
+                                alert('⚠️ Warning: 10 minutes remaining!');
+                            } else if (timeRemaining === WARNING_THRESHOLD_2) {
+                                alert('⚠️ Warning: Only 5 minutes left!');
+                            }
+                        } else {
+                            // Time's up - auto submit
+                            clearInterval(timerInterval);
+                            clearTimerState();
+                            
+                            if (confirm('⏰ Time is up! Your assessment will be submitted automatically now.')) {
+                                document.getElementById('assessmentForm').submit();
+                            } else {
+                                // Force submit anyway after 5 seconds
+                                setTimeout(function() {
+                                    alert('Submitting your assessment now...');
+                                    document.getElementById('assessmentForm').submit();
+                                }, 5000);
+                            }
+                        }
+                    }
+                    
+                    // Start timer
+                    function startTimer() {
+                        // Load saved state or initialize new
+                        if (!loadTimerState()) {
+                            startTime = Date.now();
+                            timeRemaining = TIMER_DURATION;
+                            saveTimerState();
+                        }
+                        
+                        // If time already expired
+                        if (timeRemaining <= 0) {
+                            alert('⏰ Your assessment time has expired. Submitting now...');
+                            document.getElementById('assessmentForm').submit();
+                            return;
+                        }
+                        
+                        updateTimerDisplay();
+                        timerInterval = setInterval(timerTick, 1000);
+                    }
+                    
+                    // Handle form submission
+                    document.getElementById('assessmentForm').addEventListener('submit', function(e) {
+                        clearInterval(timerInterval);
+                        clearTimerState();
+                    });
+                    
+                    // Handle page unload
+                    window.addEventListener('beforeunload', function(e) {
+                        if (timeRemaining > 0 && timeRemaining < TIMER_DURATION) {
+                            e.preventDefault();
+                            e.returnValue = 'Your assessment is in progress. Are you sure you want to leave?';
+                            return e.returnValue;
+                        }
+                    });
+                    
+                    // Character counter for textareas
+                    document.querySelectorAll('.assessment-answer').forEach(function(textarea) {
+                        const questionNum = textarea.id.replace('q', '');
+                        const counter = document.getElementById('charCount' + questionNum);
+                        
+                        textarea.addEventListener('input', function() {
+                            counter.textContent = this.value.length;
+                        });
+                    });
+                    
+                    // Initialize timer on page load
+                    document.addEventListener('DOMContentLoaded', function() {
+                        startTimer();
+                    });
+                })();
+            ]]>
+        </script>
+    </t>
+</template>
+
+<template id="portal_assessment_thank_you" name="Thank You">
+    <t t-call="portal.portal_layout">
+        <t t-set="title">Thank You - SCHOLARIX Assessment</t>
+
+        <style>
+                body {
+                    background: linear-gradient(180deg, #0c1e3d 0%, #1e3a8a 100%) !important;
+                    min-height: 100vh;
+                }
+                .thank-you-wrapper {
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 80px 0;
+                    background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 50%, #4fc3f7 100%);
+                }
+                .thank-you-card {
+                    background: rgba(255, 255, 255, 0.98) !important;
+                    backdrop-filter: blur(10px);
+                }
+                .success-icon-wrapper {
+                    background: linear-gradient(135deg, #1e3a8a 0%, #4fc3f7 100%) !important;
+                }
+                .next-step-box {
+                    background: #e8f4fd !important;
+                    border-left: 4px solid #4fc3f7 !important;
+                }
+                .next-step-box strong {
+                    color: #1e3a8a !important;
+                }
+                .good-luck-alert {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+                }
+                .btn-outline-primary {
+                    border-color: #1e3a8a !important;
+                    color: #1e3a8a !important;
+                }
+                .btn-outline-primary:hover {
+                    background: linear-gradient(135deg, #1e3a8a 0%, #4fc3f7 100%) !important;
+                    border-color: #4fc3f7 !important;
+                    color: white !important;
+                }
+                .social-share-section {
+                    color: white;
+                }
+                .social-share-section .btn {
+                    border-color: #4fc3f7 !important;
+                    color: white !important;
+                    background: rgba(79, 195, 247, 0.2) !important;
+                }
+                .social-share-section .btn:hover {
+                    background: #4fc3f7 !important;
+                }
+        </style>
+
+        <div class="thank-you-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1">
+                        <!-- Success Card -->
+                        <div class="card thank-you-card shadow-lg border-0">
+                            <div class="card-body text-center p-5">
+                                <!-- Success Icon -->
+                                <div class="mb-4">
+                                    <div class="success-icon-wrapper d-inline-block p-4 rounded-circle">
+                                        <i class="fa fa-check" style="font-size: 72px; color: white;"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Thank You Message -->
+                                <h1 class="display-4 mb-4" style="color: #333; font-weight: 700;">
+                                    Thank You!
+                                </h1>
+
+                                <p class="lead mb-4" style="font-size: 1.5rem; color: #555;">
+                                    Your assessment has been submitted successfully.
+                                </p>
+
+                                <hr class="my-4"/>
+
+                                <!-- Next Steps -->
+                                <div class="text-start px-md-5">
+                                    <h4 class="mb-3" style="color: #333;">
+                                        <i class="fa fa-info-circle me-2" style="color: #1e3a8a;"></i>
+                                        What Happens Next?
+                                    </h4>
+
+                                    <div class="next-step-box mb-3 p-3" style="border-radius: 8px;">
+                                        <strong>1. AI Analysis</strong>
+                                        <p class="mb-0 mt-2" style="color: #555;">
+                                            Our advanced AI system will analyze your responses across multiple competency areas including technical expertise, sales capabilities, and communication skills.
+                                        </p>
+                                    </div>
+
+                                    <div class="next-step-box mb-3 p-3" style="border-radius: 8px;">
+                                        <strong>2. Human Review</strong>
+                                        <p class="mb-0 mt-2" style="color: #555;">
+                                            Our recruitment team will carefully review your assessment and AI scores within 2-3 business days.
+                                        </p>
+                                    </div>
+
+                                    <div class="next-step-box mb-4 p-3" style="border-radius: 8px;">
+                                        <strong>3. Email Confirmation</strong>
+                                        <p class="mb-0 mt-2" style="color: #555;">
+                                            You will receive a confirmation email shortly with your unique assessment ID. Check your spam folder if you don't see it within 15 minutes.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Good Luck Message -->
+                                <div class="good-luck-alert alert alert-success mb-4" role="alert" style="border-radius: 10px; border: none; color: white;">
+                                    <h5 class="mb-2">
+                                        <i class="fa fa-star me-2"></i>
+                                        Good Luck!
+                                    </h5>
+                                    <p class="mb-0">
+                                        We appreciate your time and effort in completing this assessment. We're excited to learn more about your qualifications and look forward to potentially working with you!
+                                    </p>
+                                </div>
+
+                                <!-- Contact Info -->
+                                <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 8px;">
+                                    <p class="mb-2" style="color: #666;">
+                                        <strong>Questions or concerns?</strong>
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fa fa-envelope me-2" style="color: #1e3a8a;"></i>
+                                        <a href="mailto:recruitment@scholarixglobal.com" style="color: #1e3a8a; text-decoration: none;">
+                                            recruitment@scholarixglobal.com
+                                        </a>
+                                    </p>
+                                    <p class="mb-0 mt-2">
+                                        <i class="fa fa-globe me-2" style="color: #1e3a8a;"></i>
+                                        <a href="https://scholarixglobal.com" target="_blank" style="color: #1e3a8a; text-decoration: none;">
+                                            scholarixglobal.com
+                                        </a>
+                                    </p>
+                                </div>
+
+                                <!-- Back to Landing -->
+                                <div class="mt-4">
+                                    <a href="/assessment" class="btn btn-outline-primary btn-lg">
+                                        <i class="fa fa-arrow-left me-2"></i>
+                                        Back to Assessment Home
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Share Section -->
+                        <div class="social-share-section text-center mt-5">
+                            <div class="container">
+                                <p>
+                                    <i class="fa fa-lightbulb-o me-2"></i>
+                                    Know someone who might be interested? Share the assessment!
+                                </p>
+                                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                    <a href="mailto:?subject=SCHOLARIX%20Assessment&amp;body=I%20just%20completed%20the%20SCHOLARIX%20assessment.%20Check%20it%20out:%20https://scholarixglobal.com/assessment" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa fa-envelope me-1"></i> Email
+                                    </a>
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://scholarixglobal.com/assessment" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa fa-linkedin me-1"></i> LinkedIn
+                                    </a>
+                                    <button onclick="navigator.clipboard.writeText('https://scholarixglobal.com/assessment').then(() => alert('Link copied to clipboard!'))" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa fa-copy me-1"></i> Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    <!-- Close col-lg-10 -->
+                </div>                <!-- Close row -->
+            </div>            <!-- Close container -->
+        </div>        <!-- Close thank-you-wrapper -->
+    </t>
+</template>
+
+<template id="portal_assessment_view" name="View Assessment">
+    <t t-call="portal.portal_layout">
+        <t t-set="title">Assessment Results</t>
+
+        <style>
+                body {
+                    background: linear-gradient(180deg, #0c1e3d 0%, #1e3a8a 100%) !important;
+                    min-height: 100vh;
+                }
+                .results-wrapper {
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 60px 0;
+                    background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 50%, #4fc3f7 100%);
+                }
+                .results-card {
+                    background: rgba(255, 255, 255, 0.98) !important;
+                    backdrop-filter: blur(10px);
+                }
+                .card-header.bg-primary {
+                    background: linear-gradient(135deg, #1e3a8a 0%, #4fc3f7 100%) !important;
+                }
+                .card-header.bg-light {
+                    background: #e8f4fd !important;
+                }
+                .card-header.bg-success {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+                }
+                .text-primary {
+                    color: #1e3a8a !important;
+                }
+                .badge-info {
+                    background: linear-gradient(135deg, #1e3a8a 0%, #4fc3f7 100%) !important;
+                }
+                .alert-info {
+                    background: #e8f4fd !important;
+                    border-color: #4fc3f7 !important;
+                    color: #0c1e3d !important;
+                }
+                .alert-warning {
+                    background: #fff3cd !important;
+                    border-color: #ffc107 !important;
+                }
+                .card-header .btn-light {
+                    background: white !important;
+                    color: #1e3a8a !important;
+                    font-weight: 600;
+                    border: none;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                    transition: all 0.3s ease;
+                }
+                .card-header .btn-light:hover {
+                    background: #e8f4fd !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                }
+                .card-header .btn-light i {
+                    color: #dc3545;
+                }
+        </style>
+
+        <div class="results-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1">
+                        <div class="card results-card shadow-lg">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h2 class="mb-0">Assessment Results - <t t-esc="candidate.full_name"/>
+                                </h2>
+                                <a t-attf-href="/report/pdf/scholarix_assessment.action_report_assessment_candidate/{{candidate.id}}?download=true" class="btn btn-light btn-sm" target="_blank" title="Download PDF Report">
+                                    <i class="fa fa-file-pdf-o me-2"></i>Print PDF
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <!-- Candidate Info -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Email:</strong>
+                                            <t t-esc="candidate.email"/>
+                                        </p>
+                                        <p t-if="candidate.phone">
+                                            <strong>Phone:</strong>
+                                            <t t-esc="candidate.phone"/>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Status:</strong>
+                                            <span class="badge badge-info">
+                                                <t t-esc="candidate.status"/>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <strong>Submitted:</strong>
+                                            <t t-esc="candidate.submission_date"/>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- AI Scores -->
+                                <div class="card mb-4" t-if="ai_score">
+                                    <div class="card-header bg-light">
+                                        <h4 class="mb-0">AI Assessment Scores</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-md-4 mb-3">
+                                                <h5>Overall Score</h5>
+                                                <h2 class="text-primary">
+                                                    <t t-esc="'%.1f' % ai_score.overall_score"/>
+/100</h2>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <p>
+                                                    <strong>Technical:</strong>
+                                                    <t t-esc="'%.1f' % ai_score.technical_score"/>
+/100</p>
+                                                <p>
+                                                    <strong>Sales:</strong>
+                                                    <t t-esc="'%.1f' % ai_score.sales_score"/>
+/100</p>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <p>
+                                                    <strong>Communication:</strong>
+                                                    <t t-esc="'%.1f' % ai_score.communication_score"/>
+/100</p>
+                                                <p>
+                                                    <strong>Learning:</strong>
+                                                    <t t-esc="'%.1f' % ai_score.learning_score"/>
+/100</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3" t-if="ai_score.identified_strengths">
+                                            <h5>Identified Strengths</h5>
+                                            <p t-esc="ai_score.identified_strengths"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Human Review -->
+                                <div class="card mb-4" t-if="human_review">
+                                    <div class="card-header bg-success text-white">
+                                        <h4 class="mb-0">Human Review</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>
+                                            <strong>Overall Score:</strong>
+                                            <t t-esc="'%.1f' % human_review.overall_score"/>
+/100</p>
+                                        <p>
+                                            <strong>Recommendation:</strong>
+                                            <t t-esc="human_review.recommendation"/>
+                                        </p>
+                                        <p t-if="human_review.strengths">
+                                            <strong>Strengths:</strong>
+                                            <t t-esc="human_review.strengths"/>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Ranking -->
+                                <div class="alert alert-info" t-if="candidate.overall_rank > 0">
+                                    <strong>Your Rank:</strong> #                                    <t t-esc="candidate.overall_rank"/>
+                                    (Top <t t-esc="'%.1f' % candidate.percentile"/>
+%)
+                                </div>
+
+                                <div class="alert alert-warning mt-4">
+                                    <strong>Note:</strong> This is a private link. Do not share it with others.
+                                </div>
+                            </div>                            <!-- Close card-body -->
+                        </div>                        <!-- Close card results-card -->
+                    </div>                    <!-- Close col-lg-10 -->
+                </div>                <!-- Close row -->
+            </div>            <!-- Close container -->
+        </div>        <!-- Close results-wrapper -->
+    </t>
+</template>
+
+<template id="portal_assessment_not_found" name="Assessment Not Found">
+    <t t-call="portal.portal_layout">
+        <style>
+                body {
+                    background: linear-gradient(180deg, #0c1e3d 0%, #1e3a8a 100%) !important;
+                    min-height: 100vh;
+                }
+                .error-wrapper {
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 100px 0;
+                    background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 100%);
+                    color: white;
+                }
+                .error-wrapper .btn-primary {
+                    background: linear-gradient(135deg, #4fc3f7 0%, #1e3a8a 100%) !important;
+                    border: none !important;
+                }
+        </style>
+        <div class="error-wrapper text-center">
+            <div class="container">
+                <h1 class="mb-4" style="color: #4fc3f7;">Assessment Not Found</h1>
+                <p class="lead mb-3">The assessment you're looking for doesn't exist or the link is invalid.</p>
+                <p class="mb-4">Please check the link in your email or contact support.</p>
+                <a href="/assessment" class="btn btn-primary btn-lg mt-3">Take New Assessment</a>
+            </div>
+        </div>
+    </t>
+</template>
+
+<template id="portal_assessment_error" name="Assessment Error">
+    <t t-call="portal.portal_layout">
+        <style>
+                body {
+                    background: linear-gradient(180deg, #0c1e3d 0%, #1e3a8a 100%) !important;
+                    min-height: 100vh;
+                }
+                .error-page-wrapper {
+                    width: 100vw;
+                    margin-left: calc(-50vw + 50%);
+                    padding: 100px 0;
+                    background: linear-gradient(135deg, #0c1e3d 0%, #1e3a8a 100%);
+                }
+                .error-card {
+                    background: rgba(255, 255, 255, 0.98);
+                    backdrop-filter: blur(10px);
+                    padding: 50px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                }
+                .error-card .btn-primary {
+                    background: linear-gradient(135deg, #4fc3f7 0%, #1e3a8a 100%) !important;
+                    border: none !important;
+                }
+        </style>
+        <div class="error-page-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 offset-lg-3">
+                        <div class="error-card text-center">
+                            <i class="fa fa-exclamation-triangle mb-4" style="font-size: 80px; color: #dc3545;"></i>
+                            <h2 class="mb-4">Submission Error</h2>
+                            <p class="lead mb-4" t-esc="error_message or 'An error occurred during submission.'"/>
+                            <a href="/assessment" class="btn btn-primary btn-lg mt-3">
+                                <i class="fa fa-refresh me-2"></i>Try Again
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+</odoo>

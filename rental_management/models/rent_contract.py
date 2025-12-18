@@ -4,7 +4,7 @@
 import datetime
 import re
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo import api, fields, models, _
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 
@@ -25,7 +25,9 @@ class TenancyDetails(models.Model):
                                       ('cancel_contract', 'Cancel'),
                                       ('close_contract', 'Close'),
                                       ('expire_contract', 'Expire')],
-                                     string='Contract Type')
+                                     string='Contract Type',
+                                     index=True,
+                                     tracking=True)
     days_left = fields.Integer(string="Days Left", compute="compute_days_left")
     responsible_id = fields.Many2one('res.users',
                                      default=lambda
@@ -89,7 +91,29 @@ class TenancyDetails(models.Model):
         ('daily', 'Daily'),
     ],
         string="Payment Term",
+        index=True,
     )
+    
+    # Payment Schedule Integration
+    payment_schedule_id = fields.Many2one(
+        'payment.schedule',
+        string='Payment Schedule',
+        domain=[('schedule_type', '=', 'rental')],
+        help="Select a predefined payment schedule template to automatically generate rent invoices"
+    )
+    use_schedule = fields.Boolean(
+        string='Use Payment Schedule',
+        default=True,
+        help="Enable to use payment schedule for automatic invoice generation. "
+             "When enabled, installments will be generated based on the payment schedule "
+             "instead of contract duration. This aligns with UAE real estate sector payment plans."
+    )
+    schedule_from_property = fields.Boolean(
+        string='Schedule Inherited from Property',
+        readonly=True,
+        help="Indicates if the payment schedule was automatically inherited from the property"
+    )
+    
     duration_ids = fields.Many2many('contract.duration', string="Durations",
                                     compute="_compute_durations_ids")
     duration_id = fields.Many2one('contract.duration', string='Duration')
@@ -103,9 +127,9 @@ class TenancyDetails(models.Model):
                                   ('Month', "Month"),
                                   ('Year', "Year")],
                                  compute="_compute_rent_unit")
-    start_date = fields.Date(string='Start Date', default=fields.date.today())
+    start_date = fields.Date(string='Start Date', default=fields.date.today(), index=True)
     end_date = fields.Date(string='End Date', compute='_compute_end_date',
-                           search='_search_end_date')
+                           search='_search_end_date', store=True, index=True)
     invoice_start_date = fields.Date(
         string="Invoice Start From", default=fields.date.today())
     last_invoice_payment_date = fields.Date(string='Last Invoice Payment Date')
@@ -248,6 +272,57 @@ class TenancyDetails(models.Model):
 
     # Total Days
     total_days = fields.Integer(compute="_compute_total_days")
+    
+    @api.onchange('property_id')
+    def _onchange_property_id_payment_schedule(self):
+        """Auto-inherit payment schedule from property when property is selected.
+        This enables UAE real estate sector payment plan integration where 
+        payment plans are defined at property level and inherited by contracts.
+        """
+        if self.property_id:
+            # Check if property has a rental payment plan configured
+            if self.property_id.is_payment_plan and self.property_id.rental_payment_schedule_id:
+                self.payment_schedule_id = self.property_id.rental_payment_schedule_id
+                self.use_schedule = True
+                self.schedule_from_property = True
+                
+                # Calculate total invoices from schedule
+                total_invoices = sum(
+                    line.number_of_installments 
+                    for line in self.payment_schedule_id.schedule_line_ids
+                )
+                
+                return {
+                    'warning': {
+                        'title': _('Payment Schedule Inherited'),
+                        'message': _(
+                            'Payment schedule "%s" has been automatically applied from property. '
+                            'This schedule will generate %d rent invoices based on the UAE payment plan structure. '
+                            'You can change this schedule if needed.'
+                        ) % (self.payment_schedule_id.name, total_invoices)
+                    }
+                }
+            else:
+                # No rental payment schedule on property, reset if previously inherited
+                if self.schedule_from_property:
+                    self.payment_schedule_id = False
+                    self.use_schedule = False
+                    self.schedule_from_property = False
+    
+    @api.onchange('payment_schedule_id')
+    def _onchange_payment_schedule(self):
+        """Preview invoice count when payment schedule is selected"""
+        if self.payment_schedule_id:
+            self.use_schedule = True
+            total_invoices = sum(line.number_of_installments for line in self.payment_schedule_id.schedule_line_ids)
+            return {
+                'warning': {
+                    'title': 'Payment Schedule Selected',
+                    'message': f'This schedule will generate {total_invoices} rent invoices based on the defined payment plan.'
+                }
+            }
+        else:
+            self.use_schedule = False
 
     # Added Service
     is_added_services = fields.Boolean(string="Extra Services ?")
@@ -274,10 +349,11 @@ class TenancyDetails(models.Model):
                     _("End date should be greater than start date"))
 
     def unlink(self):
+        """Reset property stage to draft when deleting new contracts."""
         for rec in self:
             if rec.contract_type == 'new_contract':
                 rec.property_id.stage = 'draft'
-            return super(TenancyDetails, self).unlink()
+        return super(TenancyDetails, self).unlink()
 
     # On delete
     @api.ondelete(at_uninstall=False)
@@ -598,7 +674,18 @@ class TenancyDetails(models.Model):
 
     # Active Contract
     def action_active_contract(self):
-        """Process auto Installment for Rent Unit : Month and Year """
+        """Process auto Installment for Rent Unit : Month and Year
+        
+        ENHANCED (UAE Real Estate Payment Plan Integration):
+        If a payment schedule is configured and use_schedule is True,
+        installments will be generated from the payment schedule instead
+        of using the traditional contract duration method.
+        """
+        # CHECK: Use payment schedule if available (UAE payment plan integration)
+        if self.use_schedule and self.payment_schedule_id:
+            return self._activate_using_payment_schedule()
+        
+        # FALLBACK: Traditional duration-based installment generation
         invoice_post_type = self.env['ir.config_parameter'].sudo().get_param(
             'rental_management.invoice_post_type')
         payment_term = {'monthly': 'Month',
@@ -681,6 +768,38 @@ class TenancyDetails(models.Model):
             'last_invoice_payment_date': invoice_id.invoice_date,
             "type": "automatic",
         })
+    
+    def _activate_using_payment_schedule(self):
+        """Activate contract using payment schedule (UAE Payment Plan Integration).
+        
+        This method generates installments based on the payment schedule template
+        instead of using the traditional contract duration method. This aligns
+        with UAE real estate sector payment plans.
+        """
+        self.ensure_one()
+        
+        # Generate invoices from payment schedule
+        result = self.action_generate_rent_from_schedule()
+        
+        # Process broker invoice if applicable
+        if self.is_any_broker:
+            self.action_broker_invoice()
+        
+        # Send contract activation email
+        self.action_send_active_contract()
+        
+        # Finalize contract activation
+        # Get last invoice date from rent invoices
+        last_date = max(self.rent_invoice_ids.mapped('invoice_date')) if self.rent_invoice_ids else self.invoice_start_date
+        
+        self.write({
+            'contract_type': 'running_contract',
+            'active_contract_state': True,
+            'last_invoice_payment_date': last_date,
+            'type': 'manual',  # Schedule-based treated as manual for tracking
+        })
+        
+        return result
 
     def action_active_rent_contract(self):
         if self.rent_unit == 'Day':
@@ -781,6 +900,222 @@ class TenancyDetails(models.Model):
             rent_invoice['description'] = 'First Year Rent'
         self.env['rent.invoice'].create(rent_invoice)
 
+    # Apply Payment Schedule from Property
+    def action_apply_property_schedule(self):
+        """Apply the rental payment schedule from the selected property.
+        
+        This method allows users to manually apply the property's default 
+        rental payment schedule to the contract. This is useful for UAE real estate 
+        sector where payment plans are typically defined at property level.
+        """
+        self.ensure_one()
+        
+        if not self.property_id:
+            raise UserError(_("Please select a property first."))
+        
+        if not self.property_id.rental_payment_schedule_id:
+            raise UserError(_(
+                "The selected property '%s' does not have a rental payment schedule configured. "
+                "Please configure a rental payment schedule on the property or select one manually."
+            ) % self.property_id.name)
+        
+        # Apply the schedule
+        self.write({
+            'payment_schedule_id': self.property_id.rental_payment_schedule_id.id,
+            'use_schedule': True,
+            'schedule_from_property': True,
+        })
+        
+        # Calculate total invoices
+        total_invoices = sum(
+            line.number_of_installments 
+            for line in self.payment_schedule_id.schedule_line_ids
+        )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Payment Schedule Applied'),
+                'message': _(
+                    'Successfully applied rental payment schedule "%s" from property "%s". '
+                    'This schedule will generate %d rent invoices.'
+                ) % (self.payment_schedule_id.name, self.property_id.name, total_invoices),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    # Generate Rent Invoices from Payment Schedule
+    def action_generate_rent_from_schedule(self):
+        """Generate rent invoices based on payment schedule with support for deposits and additional fees"""
+        self.ensure_one()
+        
+        if not self.payment_schedule_id:
+            raise UserError(_("Please select a payment schedule first."))
+        
+        if not self.start_date:
+            raise UserError(_("Please set the contract start date."))
+        
+        if not self.total_rent or self.total_rent <= 0:
+            raise UserError(_("Please set a valid rent amount."))
+        
+        # Get invoice posting setting
+        invoice_post_type = self.env['ir.config_parameter'].sudo().get_param(
+            'rental_management.invoice_post_type')
+        
+        # Clear existing invoices if any
+        existing_invoices = self.rent_invoice_ids.filtered(lambda inv: not inv.rent_invoice_id.payment_state)
+        if existing_invoices:
+            for inv_rec in existing_invoices:
+                if inv_rec.rent_invoice_id:
+                    inv_rec.rent_invoice_id.button_draft()
+                    inv_rec.rent_invoice_id.button_cancel()
+                    inv_rec.rent_invoice_id.unlink()
+                inv_rec.unlink()
+        
+        schedule_lines = self.payment_schedule_id.schedule_line_ids.sorted('days_after')
+        base_rent_amount = self.total_rent
+        
+        # Calculate additional recurring amounts (per invoice)
+        recurring_maintenance = 0.0
+        recurring_utility = 0.0
+        
+        if self.is_maintenance_service and self.maintenance_service_invoice == 'merge':
+            recurring_maintenance = self.total_maintenance or 0.0
+        
+        if self.is_extra_service and self.extra_service_invoice == 'merge':
+            # Sum monthly recurring services
+            recurring_utility = sum(
+                line.price for line in self.extra_services_ids 
+                if line.service_type == 'monthly'
+            )
+        
+        invoice_count = 0
+        
+        for line in schedule_lines:
+            # Calculate base rent portion for this line
+            line_rent = (base_rent_amount * line.percentage) / 100.0
+            
+            # Map frequency to days
+            frequency_map = {
+                'one_time': 0,
+                'monthly': 30,
+                'quarterly': 90,
+                'bi_annual': 180,
+                'annual': 365
+            }
+            frequency_days = frequency_map.get(line.installment_frequency, 0)
+            
+            # Calculate amount per invoice for this line
+            amount_per_invoice = line_rent / line.number_of_installments if line.number_of_installments > 0 else line_rent
+            
+            # Generate invoices for this line
+            for i in range(line.number_of_installments):
+                invoice_count += 1
+                
+                # Calculate invoice date
+                days_offset = line.days_after + (i * frequency_days)
+                invoice_date = self.start_date + relativedelta(days=days_offset)
+                
+                # Prepare invoice lines
+                invoice_lines = []
+                
+                # Add rent line
+                rent_line = {
+                    'product_id': self.installment_item_id.id if self.installment_item_id else False,
+                    'name': f"{line.name} - Installment {i+1}/{line.number_of_installments}",
+                    'quantity': 1,
+                    'price_unit': amount_per_invoice,
+                    'tax_ids': [(6, 0, self.tax_ids.ids)] if self.instalment_tax and self.tax_ids else False
+                }
+                invoice_lines.append((0, 0, rent_line))
+                
+                # Add deposit to first invoice if applicable
+                if invoice_count == 1 and self.is_any_deposit and self.deposit_amount > 0:
+                    deposit_line = {
+                        'product_id': self.deposit_item_id.id if self.deposit_item_id else False,
+                        'name': 'Security Deposit',
+                        'quantity': 1,
+                        'price_unit': self.deposit_amount,
+                        'tax_ids': [(6, 0, self.tax_ids.ids)] if self.deposit_tax and self.tax_ids else False
+                    }
+                    invoice_lines.append((0, 0, deposit_line))
+                
+                # Add recurring maintenance if applicable
+                if recurring_maintenance > 0:
+                    # Calculate maintenance for this period
+                    period_months = 1 if line.installment_frequency == 'monthly' else \
+                                   3 if line.installment_frequency == 'quarterly' else \
+                                   6 if line.installment_frequency == 'bi_annual' else \
+                                   12 if line.installment_frequency == 'annual' else 1
+                    
+                    maintenance_line = {
+                        'product_id': self.maintenance_item_id.id if self.maintenance_item_id else False,
+                        'name': f'Maintenance Service ({period_months} month(s))',
+                        'quantity': period_months,
+                        'price_unit': recurring_maintenance,
+                        'tax_ids': [(6, 0, self.tax_ids.ids)] if self.service_tax and self.tax_ids else False
+                    }
+                    invoice_lines.append((0, 0, maintenance_line))
+                
+                # Add recurring utility services if applicable
+                if recurring_utility > 0:
+                    period_months = 1 if line.installment_frequency == 'monthly' else \
+                                   3 if line.installment_frequency == 'quarterly' else \
+                                   6 if line.installment_frequency == 'bi_annual' else \
+                                   12 if line.installment_frequency == 'annual' else 1
+                    
+                    for service_line in self.extra_services_ids.filtered(lambda s: s.service_type == 'monthly'):
+                        utility_line = {
+                            'product_id': service_line.service_id.id,
+                            'name': f'{service_line.service_id.name} ({period_months} month(s))',
+                            'quantity': period_months,
+                            'price_unit': service_line.price,
+                            'tax_ids': [(6, 0, self.tax_ids.ids)] if self.service_tax and self.tax_ids else False
+                        }
+                        invoice_lines.append((0, 0, utility_line))
+                
+                # Create customer invoice
+                invoice = self.env['account.move'].create({
+                    'partner_id': self.tenancy_id.id,
+                    'move_type': 'out_invoice',
+                    'invoice_date': invoice_date,
+                    'tenancy_id': self.id,
+                    'invoice_line_ids': invoice_lines
+                })
+                
+                # Post invoice if auto-post enabled
+                if invoice_post_type == 'automatically':
+                    invoice.action_post()
+                
+                # Create rent.invoice record
+                invoice_total = invoice.amount_total
+                description = f"{line.name} - Installment {i+1}"
+                if invoice_count == 1 and self.is_any_deposit:
+                    description += " + Deposit"
+                
+                self.env['rent.invoice'].create({
+                    'tenancy_id': self.id,
+                    'type': 'rent',
+                    'invoice_date': invoice_date,
+                    'amount': invoice_total,
+                    'rent_amount': amount_per_invoice,
+                    'description': description,
+                    'rent_invoice_id': invoice.id,
+                })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _(f'Successfully generated {invoice_count} rent invoices from payment schedule.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
     # Cancel Contract
     def action_cancel_contract(self):
         self.close_contract_state = True
@@ -911,7 +1246,7 @@ class TenancyDetails(models.Model):
                             'description': 'Installment of ' + rec.property_id.name,
                             'rent_invoice_id': invoice_id.id,
                             'amount': invoice_id.amount_total,
-                            'rent_amount': self.total_rent
+                            'rent_amount': rec.total_rent
                         })
                         # Process Separate Invoice
                         if rec.is_maintenance_service and rec.maintenance_service_invoice == 'separate':

@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Enhanced Payment Voucher Template -->
+    <template id="report_payment_voucher_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="payment">
+                <div class="page" style="font-family: Arial, sans-serif; color: #333; background: #ffffff; padding: 5px; line-height: 1.4;">
+                    <style>
+                        @page { 
+                            margin: 3mm; 
+                            size: A4; 
+                        }
+                        
+                        .voucher-container { 
+                            font-family: Arial, sans-serif; 
+                            font-size: 14px;
+                            line-height: 1.4;
+                            color: #333;
+                        }
+                        
+                        .company-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 15px 0;
+                            margin-bottom: 10px;
+                            border-bottom: 3px solid #7d1538;
+                        }
+                        
+                        .company-logo {
+                            width: 80px;
+                            height: 80px;
+                            object-fit: contain;
+                        }
+                        
+                        .company-details {
+                            text-align: right;
+                            font-size: 11px;
+                            line-height: 1.5;
+                            color: #333;
+                        }
+                        
+                        .company-name {
+                            font-weight: bold;
+                            font-size: 13px;
+                            margin-bottom: 3px;
+                        }
+                        
+                        .company-footer {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 10px 0;
+                            margin-top: 10px;
+                            border-top: 3px solid #7d1538;
+                            font-size: 10px;
+                            color: #7d1538;
+                        }
+                        
+                        .footer-contact {
+                            text-align: left;
+                        }
+                        
+                        .footer-website {
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 12px;
+                        }
+                        
+                        .footer-disclaimer {
+                            text-align: right;
+                            font-style: italic;
+                        }
+
+                        .header-section {
+                            background: linear-gradient(135deg, #7d1538, #5a0f28);
+                            color: white;
+                            padding: 12px;
+                            margin-bottom: 15px;
+                            border-radius: 5px;
+                        }
+
+                        .header-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        .qr-container {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }
+
+                        .qr-box {
+                            background: white;
+                            border: 2px solid #333;
+                            border-radius: 4px;
+                            padding: 4px;
+                            width: 55px;
+                            height: 55px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .qr-box img {
+                            width: 45px;
+                            height: 45px;
+                            object-fit: contain;
+                        }
+
+                        .qr-text {
+                            font-size: 11px;
+                            font-weight: bold;
+                            color: white;
+                        }
+
+                        .voucher-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            margin-bottom: 5px;
+                            text-align: center;
+                            color: white;
+                        }
+
+                        .voucher-number {
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-align: center;
+                            color: white;
+                        }
+
+                        .date-section {
+                            text-align: right;
+                            color: white;
+                        }
+
+                        .date-label {
+                            font-size: 13px;
+                            font-weight: 600;
+                            margin-bottom: 3px;
+                            color: white;
+                        }
+
+                        .date-value {
+                            font-size: 15px;
+                            font-weight: bold;
+                            margin-bottom: 8px;
+                            color: white;
+                        }
+
+                        .company-info {
+                            font-size: 10px;
+                            line-height: 1.2;
+                            color: white;
+                        }
+
+                        .fields-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                        }
+
+                        .fields-table td {
+                            width: 50%;
+                            padding: 8px 15px;
+                            vertical-align: top;
+                        }
+
+                        .field-group {
+                            margin-bottom: 10px;
+                        }
+
+                        .field-label {
+                            color: #7d1538;
+                            font-weight: bold;
+                            font-size: 13px;
+                            text-transform: uppercase;
+                            margin-bottom: 3px;
+                        }
+
+                        .field-value {
+                            border-bottom: 2px solid #333;
+                            padding: 8px 0;
+                            font-weight: 600;
+                            font-size: 16px;
+                            min-height: 25px;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .transaction-badge {
+                            padding: 4px 8px;
+                            border-radius: 3px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        }
+
+                        .transaction-received {
+                            color: #28a745;
+                            background: #d4edda;
+                            border: 1px solid #c3e6cb;
+                        }
+
+                        .transaction-payment {
+                            color: #dc3545;
+                            background: #f8d7da;
+                            border: 1px solid #f5c6cb;
+                        }
+
+                        .amount-section {
+                            margin: 15px 0;
+                        }
+
+                        .amount-words-label {
+                            color: #7d1538;
+                            font-weight: bold;
+                            font-size: 13px;
+                            text-transform: uppercase;
+                            margin-bottom: 5px;
+                        }
+
+                        .amount-words-value {
+                            border-bottom: 2px dashed #666;
+                            padding: 8px 0;
+                            font-style: italic;
+                            font-size: 14px;
+                            margin-bottom: 15px;
+                        }
+
+                        .amount-banner {
+                            background: linear-gradient(135deg, #B8860B, #DAA520);
+                            color: white;
+                            padding: 12px;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 20px;
+                            border-radius: 5px;
+                            text-transform: uppercase;
+                        }
+
+                        .signature-section {
+                            margin-top: 20px;
+                            padding-top: 15px;
+                            border-top: 2px solid #ddd;
+                        }
+
+                        .signature-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 15px;
+                        }
+
+                        .signature-table td {
+                            width: 33.33%;
+                            padding: 5px;
+                            vertical-align: top;
+                        }
+
+                        .signature-box {
+                            background: #fffef0;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            padding: 10px;
+                            text-align: center;
+                            min-height: 80px;
+                        }
+
+                        .signature-label {
+                            color: #7d1538;
+                            font-weight: bold;
+                            font-size: 11px;
+                            text-transform: uppercase;
+                            margin-bottom: 5px;
+                        }
+
+                        .signature-line {
+                            border-bottom: 2px solid #333;
+                            height: 30px;
+                            margin: 8px 0;
+                        }
+
+                        .signature-name {
+                            font-size: 10px;
+                            color: #666;
+                            margin-top: 5px;
+                        }
+
+                        .received-section {
+                            border: 2px solid #7d1538;
+                            padding: 12px;
+                            background: #fffef0;
+                            border-radius: 5px;
+                            text-align: center;
+                            margin-bottom: 10px;
+                        }
+
+                        .received-title {
+                            color: #7d1538;
+                            font-weight: bold;
+                            font-size: 13px;
+                            text-transform: uppercase;
+                            margin-bottom: 8px;
+                        }
+
+                        .received-name {
+                            font-size: 14px;
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                        }
+
+                        .received-signature-line {
+                            border-bottom: 2px solid #333;
+                            height: 25px;
+                            margin: 8px auto;
+                            max-width: 200px;
+                        }
+
+                        .received-details {
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 11px;
+                            color: #666;
+                            margin-top: 8px;
+                        }
+
+                        .footer-section {
+                            margin-top: 15px;
+                        }
+
+                        .footer-info {
+                            font-size: 10px;
+                            color: #666;
+                            text-align: right;
+                            margin-bottom: 5px;
+                        }
+
+                        .footer-note {
+                            background: linear-gradient(135deg, #7d1538, #5a0f28);
+                            color: white;
+                            text-align: center;
+                            padding: 8px;
+                            font-size: 11px;
+                            border-radius: 4px;
+                        }
+                        
+                        @media print {
+                            .voucher-container {
+                                page-break-inside: avoid;
+                            }
+                            
+                            .header-section, .amount-banner, .footer-note {
+                                -webkit-print-color-adjust: exact;
+                                color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+
+                    <div class="voucher-container">
+                        <!-- Company Header -->
+                        <div class="company-header">
+                            <img src="https://osusproperties.com/images/osus.png" alt="OSUS Properties Logo" class="company-logo"/>
+                            <div class="company-details">
+                                <div class="company-name">OSUS REAL ESTATE BROKERAGE LLC</div>
+                                <div>Single Business Tower 29th Floor</div>
+                                <div>Business Bay Dubai</div>
+                                <div>United Arab Emirates</div>
+                                <div>
+                                    <strong>VAT: 100236589600003</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Header Section -->
+                        <div class="header-section">
+                            <table class="header-table">
+                                <tr>
+                                    <td style="width: 33.33%; vertical-align: middle;">
+                                        <div class="qr-container">
+                                            <div class="qr-box">
+                                                <t t-if="payment.qr_code">
+                                                    <img t-att-src="image_data_uri(payment.qr_code)" alt="QR Code"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span style="font-size: 8px; color: #333; font-weight: bold;">QR</span>
+                                                </t>
+                                            </div>
+                                            <div class="qr-text">Scan to<br/>
+Verify</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 33.33%; vertical-align: middle;">
+                                        <div class="voucher-title">
+                                            <t t-if="payment.payment_type == 'inbound'">RECEIPT</t>
+                                            <t t-else="">VOUCHER</t>
+                                        </div>
+                                        <div class="voucher-number">
+                                            NO: 
+                                            <t t-if="payment.voucher_number">
+                                                <span t-esc="payment.voucher_number"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-esc="payment.name"/>
+                                            </t>
+                                        </div>
+                                    </td>
+                                    <td style="width: 33.33%; vertical-align: middle;">
+                                        <div class="date-section">
+                                            <div class="date-label">DATE:</div>
+                                            <div class="date-value">
+                                                <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                                            </div>
+                                            <div class="company-info">
+                                                <strong>Business Bay, Dubai</strong>
+                                                <br/>
+                                                <strong>+971-4-366-4500</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Fields Section -->
+                        <table class="fields-table">
+                            <tr>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">ISSUED TO:</div>
+                                        <div class="field-value">
+                                            <span t-esc="payment.partner_id.name"/>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">RELATED INVOICE:</div>
+                                        <div class="field-value">
+                                            <span t-esc="payment.ref or 'N/A'"/>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">PHONE:</div>
+                                        <div class="field-value">
+                                            <t t-if="payment.partner_id.phone">
+                                                <span t-esc="payment.partner_id.phone"/>
+                                            </t>
+                                            <t t-else="">N/A</t>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">TRANSACTION TYPE:</div>
+                                        <div class="field-value">
+                                            <t t-if="payment.payment_type == 'inbound'">
+                                                <span class="transaction-badge transaction-received">Receipt (Money Received)</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="transaction-badge transaction-payment">Payment (Money Paid)</span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">EMAIL:</div>
+                                        <div class="field-value">
+                                            <t t-if="payment.partner_id.email">
+                                                <span t-esc="payment.partner_id.email"/>
+                                            </t>
+                                            <t t-else="">N/A</t>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">REMARKS:</div>
+                                        <div class="field-value">
+                                            <t t-if="payment.remarks">
+                                                <span t-esc="payment.remarks"/>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="field-group">
+                                        <div class="field-label">PAYMENT METHOD:</div>
+                                        <div class="field-value">
+                                            <span t-esc="payment.journal_id.name"/>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <!-- Empty cell -->
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Amount Section -->
+                        <div class="amount-section">
+                            <div class="amount-words-label">AMOUNT IN WORDS:</div>
+                            <div class="amount-words-value">
+                                <span t-esc="payment.currency_id.amount_to_text(payment.amount) if payment.currency_id else ''"/>
+                            </div>
+                            <div class="amount-banner">
+                                TOTAL AMOUNT: <t t-esc="'{:,.3f}'.format(payment.amount).replace(',', 'X').replace('.', ',').replace('X', '.').rstrip('0').rstrip(',')"/>
+                            <span t-esc="payment.currency_id.name"/>
+                        </div>
+                    </div>
+
+                    <!-- Signature Section -->
+                    <div class="signature-section">
+                        <table class="signature-table">
+                            <tr>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">FINANCE DEPARTMENT</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.reviewer_id">
+                                                <span t-esc="payment.reviewer_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
+                                        </div>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.reviewer_date">
+                                                <span t-esc="payment.reviewer_date.strftime('%d/%m/%Y') if payment.reviewer_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">ACCOUNTS MANAGER</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.approver_id">
+                                                <span t-esc="payment.approver_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
+                                        </div>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.approver_date">
+                                                <span t-esc="payment.approver_date.strftime('%d/%m/%Y') if payment.approver_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-box">
+                                        <div class="signature-label">AUTHORIZED OFFICER</div>
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name">
+                                            <t t-if="payment.authorizer_id">
+                                                <span t-esc="payment.authorizer_id.name"/>
+                                            </t>
+                                            <t t-else="">Name: ________</t>
+                                        </div>
+                                        <div class="signature-name" style="margin-top: 3px;">
+                                            <t t-if="payment.authorizer_date">
+                                                <span t-esc="payment.authorizer_date.strftime('%d/%m/%Y') if payment.authorizer_date else ''"/>
+                                            </t>
+                                            <t t-else="">Date: ________</t>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Received By Section -->
+                        <div class="received-section">
+                            <div class="received-title">RECEIVED BY</div>
+                            <div class="received-name">
+                                    Name and Signature:<br/>
+                                    Print: <span t-esc="payment.partner_id.name"/>
+                        </div>
+                        <div class="received-signature-line"></div>
+                        <div class="received-details">
+                            <span>Mobile: _______</span>
+                            <span>Date: <span t-esc="payment.date.strftime('%d/%m/%Y') if payment.date else ''"/>
+                            </span>
+                            <span>ID Copy: [ ] Yes [ ] No</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Section -->
+                <div class="footer-section">
+                    <div class="footer-info">
+                                Created: <span t-esc="payment.create_uid.name"/>
+ | 
+                    <span t-esc="payment.create_date.strftime('%d/%m/%Y %H:%M') if payment.create_date else ''"/>
+ | 
+                                Modified: <span t-esc="payment.write_uid.name"/>
+                </div>
+                <div class="footer-note">
+                    <strong>Thank you for your business!</strong> | Computer-generated document | 
+                                REF: <t t-if="payment.voucher_number">
+                    <span t-esc="payment.voucher_number"/>
+                </t>
+                <t t-else="">
+                    <span t-esc="payment.name"/>
+                </t>
+            </div>
+        </div>
+
+        <!-- Company Footer -->
+        <div class="company-footer">
+            <div class="footer-contact">
+                <strong>Phone:</strong> +971 4 336 4500<br/>
+            <strong>Email:</strong> info@osusproperties.com
+        </div>
+        <div class="footer-website">
+                                www.osusproperties.com
+        </div>
+        <div class="footer-disclaimer">
+                                This is a computer generated document.<br/>
+                                No signature or stamp required.
+        </div>
+    </div>
+</div>
+</div>
+</t>
+</t>
+</template>
+</odoo>

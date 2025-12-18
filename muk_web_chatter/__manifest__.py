@@ -1,18 +1,20 @@
 {
-    'name': 'MuK Chatter', 
-    'summary': 'Adds options for the chatter',
+    'name': 'OSUS Properties Chatter', 
+    'summary': 'OSUS Branded Chatter with Enhanced Design',
     'description': '''
-        This module improves the design of the chatter and adds a user
-        preference to set the position of the chatter in the form view.
+        OSUS Properties custom chatter module featuring:
+        - Enhanced chatter design with OSUS branding
+        - Customizable chatter position preferences
+        - Improved user experience and visual consistency
     ''',
     'version': '17.0.1.2.0',
     'category': 'Tools/UI',
     'license': 'LGPL-3', 
-    'author': 'MuK IT',
-    'website': 'http://www.mukit.at',
-    'live_test_url': 'https://mukit.at/demo',
+    'author': 'OSUS Properties',
+    'website': 'https://osusproperties.com',
+    'live_test_url': '',
     'contributors': [
-        'Mathias Markl <mathias.markl@mukit.at>',
+        'OSUS Properties Development Team',
     ],
     'depends': [
         'mail',

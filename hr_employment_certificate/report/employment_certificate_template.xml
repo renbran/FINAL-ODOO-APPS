@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_employment_certificate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="hr_employment_certificate.report_employment_certificate_document"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_employment_certificate_document">
+        <div class="page" style="font-family: Georgia, 'Times New Roman', serif; padding: 20px 40px;">
+            <!-- Custom Styles -->
+            <style>
+                .cert-container {
+                    max-width: 100%;
+                    background: white;
+                }
+                .cert-header {
+                    text-align: center;
+                    border-bottom: 3px solid #800020;
+                    padding-bottom: 15px;
+                    margin-bottom: 25px;
+                }
+                .cert-company-name {
+                    color: #800020;
+                    font-size: 22px;
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .cert-company-details {
+                    color: #555;
+                    font-size: 10px;
+                    line-height: 1.5;
+                    margin-top: 8px;
+                }
+                .cert-title {
+                    text-align: center;
+                    color: #800020;
+                    font-size: 24px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin: 25px 0;
+                    border-top: 2px solid #800020;
+                    border-bottom: 2px solid #800020;
+                    padding: 12px 0;
+                }
+                .cert-reference {
+                    text-align: right;
+                    color: #666;
+                    font-size: 11px;
+                    margin-bottom: 15px;
+                }
+                .cert-content {
+                    line-height: 2.2;
+                    font-size: 13px;
+                    color: #333;
+                    text-align: justify;
+                    margin: 25px 0;
+                }
+                .cert-content p {
+                    margin-bottom: 18px;
+                }
+                .cert-highlight {
+                    color: #800020;
+                    font-weight: bold;
+                }
+                .cert-signature-section {
+                    margin-top: 50px;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                .cert-signature-block {
+                    width: 40%;
+                }
+                .cert-signature-line {
+                    border-top: 2px solid #800020;
+                    margin-top: 60px;
+                    padding-top: 8px;
+                    text-align: center;
+                }
+                .cert-signature-label {
+                    color: #800020;
+                    font-weight: bold;
+                    font-size: 11px;
+                }
+                .cert-signature-name {
+                    color: #666;
+                    font-size: 10px;
+                    margin-top: 3px;
+                }
+                .cert-stamp-area {
+                    width: 100px;
+                    height: 100px;
+                    border: 2px dashed #ccc;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #ccc;
+                    font-size: 10px;
+                    margin-left: auto;
+                }
+                .cert-footer {
+                    margin-top: 35px;
+                    padding-top: 15px;
+                    border-top: 2px solid #800020;
+                    text-align: center;
+                    font-size: 9px;
+                    color: #666;
+                }
+            </style>
+
+            <div class="cert-container">
+                <!-- Header -->
+                <div class="cert-header">
+                    <img t-if="o.employee_id.company_id.logo" t-att-src="image_data_uri(o.employee_id.company_id.logo)" style="max-width: 180px; height: auto; margin-bottom: 10px;" alt="Company Logo"/>
+                    <div class="cert-company-name">
+                        <t t-esc="o.employee_id.company_id.name or 'OSUS REAL ESTATE BROKERAGE LLC'"/>
+                    </div>
+                    <div class="cert-company-details">
+                        <t t-if="o.employee_id.company_id.street">
+                            <t t-esc="o.employee_id.company_id.street"/>
+                            <br/>
+                        </t>
+                        <t t-if="o.employee_id.company_id.city">
+                            <t t-esc="o.employee_id.company_id.zip or ''"/>
+                            <t t-esc="o.employee_id.company_id.city"/>
+, 
+                            <t t-esc="o.employee_id.company_id.country_id.name or 'United Arab Emirates'"/>
+                        </t>
+                        <t t-if="o.employee_id.company_id.vat">
+                            <br/>
+VAT: <t t-esc="o.employee_id.company_id.vat"/>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Reference Number -->
+                <div class="cert-reference">
+                    Ref No: <t t-esc="o.reference_number"/>
+                </div>
+
+                <!-- Title -->
+                <div class="cert-title">
+                    <t t-if="o.employment_status == 'current'">
+                        Employment Certificate
+                    </t>
+                    <t t-else="">
+                        Experience Certificate
+                    </t>
+                </div>
+
+                <!-- Content -->
+                <div class="cert-content">
+                    <p>
+                        <strong>Date:</strong>
+                        <span class="cert-highlight">
+                            <t t-esc="o.issue_date" t-options="{'widget': 'date', 'format': 'MMMM dd, yyyy'}"/>
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>To Whom It May Concern,</strong>
+                    </p>
+
+                    <!-- Current Employee Content -->
+                    <t t-if="o.employment_status == 'current'">
+                        <p>
+                            This is to certify that 
+                            <span class="cert-highlight">
+                                <t t-esc="o.employee_id.name"/>
+                            </span>,
+                            <t t-if="o.passport_number">
+                                holder of Passport Number 
+                                <span class="cert-highlight">
+                                    <t t-esc="o.passport_number"/>
+                                </span>,
+                            </t>
+                            is currently employed with 
+                            <span class="cert-highlight">
+                                <t t-esc="o.employee_id.company_id.name or 'OSUS Real Estate Brokerage LLC'"/>
+                            </span>
+                            as a <span class="cert-highlight">
+                            <t t-esc="o.job_position or 'Employee'"/>
+                        </span>.
+                    </p>
+
+                    <p>
+                        <span class="cert-highlight">
+                            <t t-esc="o.pronoun"/>
+                            <t t-esc="o.employee_id.name.split()[-1] if o.employee_id.name else ''"/>
+                        </span>
+                            joined our organization on 
+                        <span class="cert-highlight">
+                            <t t-esc="o.join_date" t-options="{'widget': 'date', 'format': 'MMMM dd, yyyy'}"/>
+                        </span>
+                            and has been working with us <span class="cert-highlight">to Present</span>.
+                    </p>
+
+                    <p>
+                            During the tenure with <t t-esc="o.employee_id.company_id.name or 'OSUS Real Estate Brokerage LLC'"/>
+, 
+                    <span class="cert-highlight">
+                        <t t-esc="o.pronoun"/>
+                        <t t-esc="o.employee_id.name.split()[-1] if o.employee_id.name else ''"/>
+                    </span>
+                            has demonstrated professionalism, dedication, and commitment to assigned responsibilities.
+                </p>
+
+                <t t-if="o.gross_salary">
+                    <p>
+                                The current gross monthly salary is 
+                        <span class="cert-highlight">
+                            <t t-esc="o.currency_id.symbol or 'AED'"/>
+                            <t t-esc="'{:,.2f}'.format(o.gross_salary)"/>
+                        </span>.
+                    </p>
+                </t>
+            </t>
+
+            <!-- Resigned/Former Employee Content -->
+            <t t-else="">
+                <p>
+                            This is to certify that 
+                    <span class="cert-highlight">
+                        <t t-esc="o.employee_id.name"/>
+                    </span>,
+                    <t t-if="o.passport_number">
+                                holder of Passport Number 
+                        <span class="cert-highlight">
+                            <t t-esc="o.passport_number"/>
+                        </span>,
+                    </t>
+                            was employed with 
+                    <span class="cert-highlight">
+                        <t t-esc="o.employee_id.company_id.name or 'OSUS Real Estate Brokerage LLC'"/>
+                    </span>
+                            as a <span class="cert-highlight">
+                    <t t-esc="o.job_position or 'Employee'"/>
+                </span>.
+            </p>
+
+            <p>
+                <span class="cert-highlight">
+                    <t t-esc="o.pronoun"/>
+                    <t t-esc="o.employee_id.name.split()[-1] if o.employee_id.name else ''"/>
+                </span>
+                            was associated with our organization from 
+                <span class="cert-highlight">
+                    <t t-esc="o.join_date" t-options="{'widget': 'date', 'format': 'MMMM dd, yyyy'}"/>
+                </span>
+                            to 
+                <span class="cert-highlight">
+                    <t t-esc="o.end_date" t-options="{'widget': 'date', 'format': 'MMMM dd, yyyy'}"/>
+                </span>.
+            </p>
+
+            <p>
+                            During the tenure with <t t-esc="o.employee_id.company_id.name or 'OSUS Real Estate Brokerage LLC'"/>
+, 
+            <span class="cert-highlight">
+                <t t-esc="o.pronoun"/>
+                <t t-esc="o.employee_id.name.split()[-1] if o.employee_id.name else ''"/>
+            </span>
+                            demonstrated professionalism, dedication, and commitment to assigned responsibilities.
+        </p>
+
+        <t t-if="o.last_salary">
+            <p>
+                                The last drawn gross monthly salary was 
+                <span class="cert-highlight">
+                    <t t-esc="o.currency_id.symbol or 'AED'"/>
+                    <t t-esc="'{:,.2f}'.format(o.last_salary)"/>
+                </span>.
+            </p>
+        </t>
+    </t>
+
+    <p>
+                        This certificate is issued upon the request of the 
+        <t t-if="o.employment_status == 'current'">employee</t>
+        <t t-else="">former employee</t>
+                        for 
+        <span class="cert-highlight">
+            <t t-esc="o.purpose"/>
+        </span>
+                        without any liability or obligation on the part of 
+        <t t-esc="o.employee_id.company_id.name or 'OSUS Properties'"/>
+.
+    </p>
+
+    <p>
+                        We wish <span class="cert-highlight">
+        <t t-esc="o.pronoun"/>
+        <t t-esc="o.employee_id.name.split()[-1] if o.employee_id.name else ''"/>
+    </span>
+                        all the best in 
+    <t t-if="o.employment_status == 'current'">future endeavors</t>
+    <t t-else="">all future endeavors</t>.
+</p>
+</div>
+
+<!-- Signature Section -->
+<table style="width: 100%; margin-top: 50px;">
+<tr>
+    <td style="width: 50%; vertical-align: bottom;">
+        <div class="cert-signature-block">
+            <div class="cert-signature-line">
+                <div class="cert-signature-label">Authorized Signatory</div>
+                <div class="cert-signature-name">
+                    <t t-esc="o.signatory_name"/>
+                </div>
+                <div class="cert-signature-name">
+                    <t t-esc="o.signatory_title"/>
+                </div>
+            </div>
+        </div>
+    </td>
+    <td style="width: 50%; vertical-align: bottom; text-align: right;">
+        <div class="cert-stamp-area">
+                                Company Stamp
+        </div>
+    </td>
+</tr>
+</table>
+
+<!-- Footer -->
+<div class="cert-footer">
+                    This is a computer-generated certificate and is valid without signature if issued electronically.<br/>
+                    For verification, please contact HR Department at 
+<t t-esc="o.employee_id.company_id.email or 'hr@osusproperties.com'"/>
+</div>
+</div>
+</div>
+</template>
+</odoo>

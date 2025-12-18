@@ -3,7 +3,7 @@
     'name': 'CRM Executive Dashboard',
     'version': '17.0.1.0.0',
     'category': 'Sales/CRM',
-    'summary': 'Advanced CRM analytics and executive dashboard for Odoo 17',
+    'summary': 'AI-Powered CRM Executive Dashboard with LLM Lead Scoring Integration - World-Class Solution',
     'description': """
         CRM Executive Dashboard - Odoo 17
         =================================
@@ -38,14 +38,17 @@
         - Comprehensive security model
         - RESTful API endpoints
     """,
-    'author': 'Your Company',
-    'website': 'https://www.yourcompany.com',
+    'author': 'Odoo Professional Services',
+    'website': 'https://www.odoo.com',
+    'maintainer': 'Odoo Professional Services Team',
+    'support': 'support@odoo.com',
     'depends': [
         'base',
         'crm',
         'sales_team',
         'mail',
         'web',
+        'llm_lead_scoring',  # Integration with AI Lead Scoring
     ],
     'data': [
         'security/security_groups.xml',
@@ -58,12 +61,16 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'crm_executive_dashboard/static/src/scss/**/*.scss',
-            'crm_executive_dashboard/static/src/js/**/*.js',
-            'crm_executive_dashboard/static/src/xml/**/*.xml',
-        ],
-        'web.qunit_suite_tests': [
-            'crm_executive_dashboard/static/tests/**/*.js',
+            # SCSS files
+            'crm_executive_dashboard/static/src/scss/_variables.scss',
+            'crm_executive_dashboard/static/src/scss/dashboard.scss',
+            'crm_executive_dashboard/static/src/scss/strategic_dashboard.scss',
+            # JavaScript files
+            'crm_executive_dashboard/static/src/js/crm_executive_dashboard.js',
+            'crm_executive_dashboard/static/src/js/crm_strategic_dashboard.js',
+            # XML templates
+            'crm_executive_dashboard/static/src/xml/dashboard_templates.xml',
+            'crm_executive_dashboard/static/src/xml/strategic_dashboard_templates.xml',
         ],
     },
     'demo': [

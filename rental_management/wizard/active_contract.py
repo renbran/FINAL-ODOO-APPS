@@ -26,11 +26,46 @@ class ActiveContract(models.Model):
         return res
 
     def action_create_contract(self):
+        """Create the contract and generate installments.
+        
+        PRIORITY ORDER (UAE Real Estate Payment Plan Integration):
+        1. If payment schedule is set AND use_schedule is True:
+           -> Generate installments from payment schedule (UAE payment plan)
+        2. Otherwise:
+           -> Use traditional contract duration-based method
+        """
         active_contract_check = self.check_current_active_contract_status()
         if active_contract_check:
             raise ValidationError(_(active_contract_check))
         active_id = self._context.get("active_id")
         tenancy_id = self.env["tenancy.details"].browse(active_id)
+        
+        # CHECK: Use payment schedule if available (UAE payment plan integration)
+        if tenancy_id.use_schedule and tenancy_id.payment_schedule_id:
+            # Use payment schedule-based generation
+            tenancy_id.action_generate_rent_from_schedule()
+            # Process broker invoice if applicable
+            if tenancy_id.is_any_broker:
+                tenancy_id.action_broker_invoice()
+            # Finalize contract activation
+            tenancy_id.write({
+                'contract_type': 'running_contract',
+                'active_contract_state': True,
+                'type': 'manual',  # Schedule-based is treated as manual for tracking
+            })
+            tenancy_id.action_send_active_contract()
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('Contract activated using payment schedule: %s') % tenancy_id.payment_schedule_id.name,
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        
+        # FALLBACK: Use traditional duration-based method
         if self.type == "automatic":
             tenancy_id.action_active_contract()
         if self.type == "manual":

@@ -8,22 +8,62 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Commission fields
+    # Commission fields (Legacy - using percentage-based calculation)
     consultant_id = fields.Many2one('res.partner', string="Consultant")
+    consultant_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Consultant Commission Type", default='percent_untaxed_total')
     consultant_comm_percentage = fields.Float(string="Consultant Commission (%)", default=0.0)
+    consultant_calculation_base = fields.Monetary(
+        string="Consultant Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for consultant commission calculation"
+    )
     salesperson_commission = fields.Monetary(string="Consultant Commission Amount", compute="_compute_commissions", store=True)
 
     manager_id = fields.Many2one('res.partner', string="Manager")
+    manager_legacy_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Manager Legacy Commission Type", default='percent_untaxed_total')
     manager_comm_percentage = fields.Float(string="Manager Commission (%)", default=0.0)
+    manager_legacy_calculation_base = fields.Monetary(
+        string="Manager Legacy Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for manager legacy commission calculation"
+    )
     manager_commission = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
 
     director_id = fields.Many2one('res.partner', string="Director")
+    director_legacy_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Director Legacy Commission Type", default='percent_untaxed_total')
     director_comm_percentage = fields.Float(string="Director Commission (%)", default=3.0)
+    director_legacy_calculation_base = fields.Monetary(
+        string="Director Legacy Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for director legacy commission calculation"
+    )
     director_commission = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
 
     # Second Agent fields
     second_agent_id = fields.Many2one('res.partner', string="Second Agent")
+    second_agent_commission_type = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('percent_unit_price', 'Percentage of Unit Price'),
+        ('percent_untaxed_total', 'Percentage of Untaxed Total')
+    ], string="Second Agent Commission Type", default='percent_untaxed_total')
     second_agent_comm_percentage = fields.Float(string="Second Agent Commission (%)", default=0.0)
+    second_agent_calculation_base = fields.Monetary(
+        string="Second Agent Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for second agent commission calculation"
+    )
     second_agent_commission = fields.Monetary(string="Second Agent Commission Amount", compute="_compute_commissions", store=True)
 
     # Extended Commission Structure - External Commissions
@@ -35,6 +75,11 @@ class SaleOrder(models.Model):
     ], string="Broker Commission Type", default='percent_unit_price')
     broker_rate = fields.Float(string="Broker Rate")
     broker_amount = fields.Monetary(string="Broker Commission", compute="_compute_commissions", store=True)
+    broker_calculation_base = fields.Monetary(
+        string="Broker Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for broker commission calculation"
+    )
 
     referrer_partner_id = fields.Many2one('res.partner', string="Referrer")
     referrer_commission_type = fields.Selection([
@@ -44,6 +89,11 @@ class SaleOrder(models.Model):
     ], string="Referrer Commission Type", default='percent_unit_price')
     referrer_rate = fields.Float(string="Referrer Rate")
     referrer_amount = fields.Monetary(string="Referrer Commission", compute="_compute_commissions", store=True)
+    referrer_calculation_base = fields.Monetary(
+        string="Referrer Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for referrer commission calculation"
+    )
 
     cashback_partner_id = fields.Many2one('res.partner', string="Cashback Partner")
     cashback_commission_type = fields.Selection([
@@ -53,6 +103,11 @@ class SaleOrder(models.Model):
     ], string="Cashback Type", default='percent_unit_price')
     cashback_rate = fields.Float(string="Cashback Rate")
     cashback_amount = fields.Monetary(string="Cashback Amount", compute="_compute_commissions", store=True)
+    cashback_calculation_base = fields.Monetary(
+        string="Cashback Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for cashback calculation"
+    )
 
     other_external_partner_id = fields.Many2one('res.partner', string="Other External Partner")
     other_external_commission_type = fields.Selection([
@@ -62,6 +117,11 @@ class SaleOrder(models.Model):
     ], string="Other External Commission Type", default='percent_unit_price')
     other_external_rate = fields.Float(string="Other External Rate")
     other_external_amount = fields.Monetary(string="Other External Commission", compute="_compute_commissions", store=True)
+    other_external_calculation_base = fields.Monetary(
+        string="Other External Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for other external commission calculation"
+    )
 
     # Extended Commission Structure - Internal Commissions
     agent1_partner_id = fields.Many2one('res.partner', string="Agent 1")
@@ -72,6 +132,11 @@ class SaleOrder(models.Model):
     ], string="Agent 1 Commission Type", default='percent_unit_price')
     agent1_rate = fields.Float(string="Agent 1 Rate")
     agent1_amount = fields.Monetary(string="Agent 1 Commission", compute="_compute_commissions", store=True)
+    agent1_calculation_base = fields.Monetary(
+        string="Agent 1 Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for agent 1 commission calculation"
+    )
 
     agent2_partner_id = fields.Many2one('res.partner', string="Agent 2")
     agent2_commission_type = fields.Selection([
@@ -81,6 +146,11 @@ class SaleOrder(models.Model):
     ], string="Agent 2 Commission Type", default='percent_unit_price')
     agent2_rate = fields.Float(string="Agent 2 Rate")
     agent2_amount = fields.Monetary(string="Agent 2 Commission", compute="_compute_commissions", store=True)
+    agent2_calculation_base = fields.Monetary(
+        string="Agent 2 Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for agent 2 commission calculation"
+    )
 
     manager_partner_id = fields.Many2one('res.partner', string="Manager Partner")
     manager_commission_type = fields.Selection([
@@ -90,6 +160,11 @@ class SaleOrder(models.Model):
     ], string="Manager Commission Type", default='percent_unit_price')
     manager_rate = fields.Float(string="Manager Rate")
     manager_amount = fields.Monetary(string="Manager Commission Amount", compute="_compute_commissions", store=True)
+    manager_calculation_base = fields.Monetary(
+        string="Manager Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for manager commission calculation"
+    )
 
     director_partner_id = fields.Many2one('res.partner', string="Director Partner")
     director_commission_type = fields.Selection([
@@ -99,6 +174,11 @@ class SaleOrder(models.Model):
     ], string="Director Commission Type", default='percent_unit_price')
     director_rate = fields.Float(string="Director Rate", default=3.0)
     director_amount = fields.Monetary(string="Director Commission Amount", compute="_compute_commissions", store=True)
+    director_calculation_base = fields.Monetary(
+        string="Director Calculation Base",
+        compute="_compute_commission_calculation_bases",
+        help="The base amount used for director commission calculation"
+    )
 
     # Summary fields
     total_external_commission_amount = fields.Monetary(string="Total External Commissions", compute="_compute_commissions", store=True)
@@ -123,6 +203,35 @@ class SaleOrder(models.Model):
         ('calculated', 'Calculated'),
         ('confirmed', 'Confirmed')
     ], string="Commission Processing Status", default='draft')
+    
+    # Commission lines count for compatibility
+    commission_lines_count = fields.Integer(
+        string="Commission Partners Count",
+        compute="_compute_commission_lines_count",
+        help="Number of commission partners configured for this order"
+    )
+    
+    # Invoice status field for compatibility
+    is_fully_invoiced = fields.Boolean(
+        string="Fully Invoiced",
+        compute="_compute_is_fully_invoiced",
+        help="True if all order lines are fully invoiced"
+    )
+    
+    # Posted invoices check for compatibility
+    has_posted_invoices = fields.Boolean(
+        string="Has Posted Invoices",
+        compute="_compute_has_posted_invoices",
+        help="True if this order has at least one posted invoice"
+    )
+    
+    # Commission lines relationship
+    commission_line_ids = fields.One2many(
+        'commission.ax',
+        'sale_order_id',
+        string="Commission Lines",
+        help="Commission records associated with this sale order"
+    )
 
     @api.depends('purchase_order_ids', 'purchase_order_ids.amount_total')
     def _compute_purchase_order_count(self):
@@ -132,6 +241,132 @@ class SaleOrder(models.Model):
             order.purchase_order_total_amount = sum(
                 po.amount_total for po in order.purchase_order_ids if po.state != 'cancel'
             )
+    
+    @api.depends(
+        'broker_partner_id', 'broker_amount',
+        'referrer_partner_id', 'referrer_amount',
+        'cashback_partner_id', 'cashback_amount',
+        'other_external_partner_id', 'other_external_amount',
+        'agent1_partner_id', 'agent1_amount',
+        'agent2_partner_id', 'agent2_amount',
+        'manager_partner_id', 'manager_amount',
+        'director_partner_id', 'director_amount',
+        'consultant_id', 'salesperson_commission',
+        'manager_id', 'manager_commission',
+        'second_agent_id', 'second_agent_commission',
+        'director_id', 'director_commission'
+    )
+    def _compute_commission_lines_count(self):
+        """Compute the number of active commission partners."""
+        for order in self:
+            count = 0
+            # Count external commission partners
+            if order.broker_partner_id and order.broker_amount:
+                count += 1
+            if order.referrer_partner_id and order.referrer_amount:
+                count += 1
+            if order.cashback_partner_id and order.cashback_amount:
+                count += 1
+            if order.other_external_partner_id and order.other_external_amount:
+                count += 1
+            # Count internal commission partners
+            if order.agent1_partner_id and order.agent1_amount:
+                count += 1
+            if order.agent2_partner_id and order.agent2_amount:
+                count += 1
+            if order.manager_partner_id and order.manager_amount:
+                count += 1
+            if order.director_partner_id and order.director_amount:
+                count += 1
+            # Count legacy commission partners
+            if order.consultant_id and order.salesperson_commission:
+                count += 1
+            if order.manager_id and order.manager_commission:
+                count += 1
+            if order.second_agent_id and order.second_agent_commission:
+                count += 1
+            if order.director_id and order.director_commission:
+                count += 1
+            order.commission_lines_count = count
+    
+    @api.depends('order_line.invoice_lines', 'order_line.product_uom_qty', 'order_line.qty_invoiced')
+    def _compute_is_fully_invoiced(self):
+        """Check if all order lines are fully invoiced."""
+        for order in self:
+            if not order.order_line:
+                order.is_fully_invoiced = False
+                continue
+            
+            # Check if all lines are fully invoiced
+            fully_invoiced = True
+            for line in order.order_line:
+                # Skip service products or products set to ordered quantities
+                if line.product_id.invoice_policy == 'order':
+                    if line.qty_invoiced < line.product_uom_qty:
+                        fully_invoiced = False
+                        break
+                # For delivered products, check if delivered qty is invoiced
+                elif line.product_id.invoice_policy == 'delivery':
+                    if line.qty_invoiced < line.qty_delivered:
+                        fully_invoiced = False
+                        break
+            
+            order.is_fully_invoiced = fully_invoiced
+    
+    @api.depends('invoice_ids', 'invoice_ids.state')
+    def _compute_has_posted_invoices(self):
+        """Check if this order has at least one posted invoice."""
+        for order in self:
+            posted_invoices = order.invoice_ids.filtered(lambda inv: inv.state == 'posted')
+            order.has_posted_invoices = len(posted_invoices) > 0
+    
+    @api.depends('order_line.price_unit', 'order_line.price_subtotal', 'amount_untaxed',
+                 'broker_commission_type', 'referrer_commission_type', 'cashback_commission_type',
+                 'other_external_commission_type', 'agent1_commission_type', 'agent2_commission_type',
+                 'manager_commission_type', 'director_commission_type',
+                 'consultant_commission_type', 'manager_legacy_commission_type', 
+                 'director_legacy_commission_type', 'second_agent_commission_type')
+    def _compute_commission_calculation_bases(self):
+        """Compute the calculation base amounts for commission calculations."""
+        for order in self:
+            if order.order_line:
+                first_line = order.order_line[0]
+                unit_price = first_line.price_unit
+                untaxed_total = order.amount_untaxed
+                
+                # External Commissions
+                order.broker_calculation_base = unit_price if order.broker_commission_type == 'percent_unit_price' else untaxed_total
+                order.referrer_calculation_base = unit_price if order.referrer_commission_type == 'percent_unit_price' else untaxed_total
+                order.cashback_calculation_base = unit_price if order.cashback_commission_type == 'percent_unit_price' else untaxed_total
+                order.other_external_calculation_base = unit_price if order.other_external_commission_type == 'percent_unit_price' else untaxed_total
+                
+                # Internal Commissions
+                order.agent1_calculation_base = unit_price if order.agent1_commission_type == 'percent_unit_price' else untaxed_total
+                order.agent2_calculation_base = unit_price if order.agent2_commission_type == 'percent_unit_price' else untaxed_total
+                order.manager_calculation_base = unit_price if order.manager_commission_type == 'percent_unit_price' else untaxed_total
+                order.director_calculation_base = unit_price if order.director_commission_type == 'percent_unit_price' else untaxed_total
+                
+                # Legacy Commissions
+                order.consultant_calculation_base = unit_price if order.consultant_commission_type == 'percent_unit_price' else untaxed_total
+                order.manager_legacy_calculation_base = unit_price if order.manager_legacy_commission_type == 'percent_unit_price' else untaxed_total
+                order.director_legacy_calculation_base = unit_price if order.director_legacy_commission_type == 'percent_unit_price' else untaxed_total
+                order.second_agent_calculation_base = unit_price if order.second_agent_commission_type == 'percent_unit_price' else untaxed_total
+            else:
+                # External Commissions
+                order.broker_calculation_base = 0.0
+                order.referrer_calculation_base = 0.0
+                order.cashback_calculation_base = 0.0
+                order.other_external_calculation_base = 0.0
+                # Internal Commissions
+                order.agent1_calculation_base = 0.0
+                order.agent2_calculation_base = 0.0
+                order.manager_calculation_base = 0.0
+                order.director_calculation_base = 0.0
+                # Legacy Commissions
+                order.consultant_calculation_base = 0.0
+                order.manager_legacy_calculation_base = 0.0
+                order.director_legacy_calculation_base = 0.0
+                order.second_agent_calculation_base = 0.0
 
     @api.constrains('order_line')
     def _check_single_order_line(self):

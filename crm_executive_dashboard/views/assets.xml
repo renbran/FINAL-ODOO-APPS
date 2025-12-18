@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Modern Odoo 17 Asset Bundle for crm_executive_dashboard -->
+    <!-- Asset bundles temporarily disabled - wildcard paths not supported in Odoo 17
+         If you need to enable assets, list each file individually instead of using wildcards
+
     <template id="assets_backend" inherit_id="web.assets_backend">
-        <!-- JavaScript Files -->
-        <script type="text/javascript" src="/crm_executive_dashboard/static/src/js/*.js"/>
-        
-        <!-- CSS Files -->
-        <link rel="stylesheet" type="text/scss" src="/crm_executive_dashboard/static/src/scss/*.scss"/>
-        <link rel="stylesheet" type="text/css" src="/crm_executive_dashboard/static/src/css/*.css"/>
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/crm_executive_dashboard/static/src/js/dashboard.js"/>
+            <link rel="stylesheet" type="text/css" src="/crm_executive_dashboard/static/src/css/dashboard.css"/>
+        </xpath>
     </template>
-    
-    <!-- Frontend Assets (if needed) -->
-    <template id="assets_frontend" inherit_id="web.assets_frontend">
-        <script type="text/javascript" src="/crm_executive_dashboard/static/src/js/frontend.js"/>
-        <link rel="stylesheet" type="text/css" src="/crm_executive_dashboard/static/src/css/frontend.css"/>
-    </template>
+    -->
     
     <!-- QWeb Templates -->
     <template id="dashboard_template" name="crm_executive_dashboard.Dashboard">

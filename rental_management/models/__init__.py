@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright 2020-Today TechKhedut.
 # Part of TechKhedut. See LICENSE file for full copyright and licensing details.
+from . import file_validation_mixin
+from . import payment_schedule
 from . import property_details
 from . import res_partner
 from . import rent_contract

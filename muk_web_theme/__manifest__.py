@@ -1,18 +1,21 @@
 {
-    'name': 'MuK Backend Theme', 
-    'summary': 'Odoo Community Backend Theme',
+    'name': 'OSUS Properties Backend Theme', 
+    'summary': 'OSUS Properties Custom Backend Theme with Maroon & Gold Branding',
     'description': '''
-        This module offers a mobile compatible design for Odoo Community. 
-        Furthermore it allows the user to define some design preferences.
+        Custom backend theme for OSUS Properties featuring:
+        - OSUS brand colors (Maroon #800020 & Gold #FFD700)
+        - Mobile-responsive design
+        - Enhanced user experience
+        - Professional property management interface
     ''',
     'version': '17.0.1.2.1',
     'category': 'Themes/Backend', 
     'license': 'LGPL-3', 
-    'author': 'MuK IT',
-    'website': 'http://www.mukit.at',
-    'live_test_url': 'https://mukit.at/demo',
+    'author': 'OSUS Properties',
+    'website': 'https://osusproperties.com',
+    'live_test_url': '',
     'contributors': [
-        'Mathias Markl <mathias.markl@mukit.at>',
+        'OSUS Properties Development Team',
     ],
     'depends': [
         'muk_web_chatter',

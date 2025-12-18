@@ -118,6 +118,20 @@
                                 readonly="status == 'available'" />
                         </group>
                     </group>
+                    <group string="Booking Configuration (For Sale Projects)" name="booking_config" invisible="project_for != 'sale'">
+                        <group>
+                            <field name="booking_type" widget="radio" options="{'horizontal': true}"
+                                readonly="status == 'available'" />
+                            <field name="booking_percentage" 
+                                invisible="booking_type == 'fixed'"
+                                readonly="status == 'available'" />
+                        </group>
+                        <group>
+                            <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
+                                <i class="fa fa-info-circle"/> This booking percentage will be inherited by all properties in this project. Properties can override this value individually.
+                            </div>
+                        </group>
+                    </group>
                     <group>
                         <group name="address_details" string="Address Details">
                             <label for="street" string="Address" />

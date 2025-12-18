@@ -29,8 +29,6 @@ class OrderStatus(models.Model):
     color = fields.Integer(string='Color Index')
     
     _sql_constraints = [
-        ('unique_initial_status', 'UNIQUE(is_initial) WHERE is_initial = True', 
-         'There can only be one initial status!'),
         ('unique_code', 'UNIQUE(code)', 'Status code must be unique!'),
     ]
     
@@ -39,6 +37,15 @@ class OrderStatus(models.Model):
         for status in self:
             if status.is_initial and status.is_final:
                 raise UserError(_("A status cannot be both initial and final."))
+            
+            # Check for multiple initial statuses (Python-based constraint)
+            if status.is_initial:
+                other_initials = self.search([
+                    ('is_initial', '=', True),
+                    ('id', '!=', status.id)
+                ])
+                if other_initials:
+                    raise UserError(_("There can only be one initial status! '%s' is already set as initial.") % other_initials[0].name)
 
 class OrderStatusHistory(models.Model):
     _name = 'order.status.history'

@@ -1,0 +1,75 @@
+// SGC TECH AI - Typography System
+@import "sgc_colors";
+
+// Font Families
+$sgc-font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial, sans-serif;
+$sgc-font-mono: "Courier New", Courier, monospace;
+
+// Font Sizes
+$sgc-text-xs: 0.75rem; // 12px
+$sgc-text-sm: 0.875rem; // 14px
+$sgc-text-base: 1rem; // 16px
+$sgc-text-lg: 1.125rem; // 18px
+$sgc-text-xl: 1.25rem; // 20px
+$sgc-text-2xl: 1.5rem; // 24px
+$sgc-text-3xl: 1.875rem; // 30px
+
+// Font weights are now defined in sgc_colors.scss for global availability
+
+// Line Heights
+$sgc-leading-tight: 1.25;
+$sgc-leading-normal: 1.5;
+$sgc-leading-relaxed: 1.75;
+
+// ============================================================================
+// Backend-only typography (scoped to prevent conflicts)
+// ============================================================================
+
+// Apply typography to backend
+body.o_web_client {
+  font-family: $sgc-font-primary;
+  font-size: $sgc-text-base;
+  line-height: $sgc-leading-normal;
+  color: $sgc-charcoal;
+
+  // Heading styles - scoped to backend only
+  h1,
+  .h1 {
+    font-size: $sgc-text-3xl;
+    font-weight: $sgc-font-bold;
+    line-height: $sgc-leading-tight;
+    color: $sgc-deep-navy;
+  }
+
+  h2,
+  .h2 {
+    font-size: $sgc-text-2xl;
+    font-weight: $sgc-font-semibold;
+    line-height: $sgc-leading-tight;
+    color: $sgc-ocean-blue;
+  }
+
+  h3,
+  .h3 {
+    font-size: $sgc-text-xl;
+    font-weight: $sgc-font-semibold;
+    line-height: $sgc-leading-normal;
+    color: $sgc-ocean-blue;
+  }
+
+  // Button typography - scoped to backend only
+  .btn {
+    font-weight: $sgc-font-medium;
+    transition: all $sgc-transition-fast;
+  }
+}
+
+// ============================================================================
+// Odoo-specific typography (already scoped, safe from conflicts)
+// ============================================================================
+
+.o_form_label {
+  font-weight: $sgc-font-medium;
+  color: $sgc-dark-gray;
+}

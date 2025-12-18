@@ -36,6 +36,13 @@ class PaymentReportExtension(models.Model):
         help="Generated QR code data URLs for payment voucher"
     )
     
+    # Optional detailed documentation page
+    include_detailed_documentation = fields.Boolean(
+        string='Include Detailed Documentation',
+        default=False,
+        help="Include a second page with detailed payment documentation (audit trail, reconciliation details, etc.)"
+    )
+    
     @api.model
     def create(self, vals):
         """Override create to ensure name field is always populated for NEW payments only"""

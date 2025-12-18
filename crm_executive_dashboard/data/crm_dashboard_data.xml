@@ -92,13 +92,13 @@
             <field name="model_id" ref="model_crm_executive_dashboard"/>
             <field name="state">code</field>
             <field name="code">
-                # Clean up old dashboard configurations (older than 6 months and inactive)
-                old_date = (datetime.datetime.now() - relativedelta(months=6)).strftime('%Y-%m-%d')
-                old_dashboards = model.search([
-                    ('active', '=', False),
-                    ('create_date', '&lt;', old_date)
-                ])
-                old_dashboards.unlink()
+# Clean up old dashboard configurations (older than 6 months and inactive)
+old_date = (datetime.datetime.now() - relativedelta(months=6)).strftime('%Y-%m-%d')
+old_dashboards = model.search([
+    ('active', '=', False),
+    ('create_date', '&lt;', old_date)
+])
+old_dashboards.unlink()
             </field>
             <field name="interval_number">1</field>
             <field name="interval_type">weeks</field>

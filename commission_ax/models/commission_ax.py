@@ -33,6 +33,38 @@ class CommissionAX(models.Model):
         tracking=True
     )
     
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Commission Partner',
+        required=True,
+        readonly=True,
+        states={'draft': [('readonly', False)]},
+        tracking=True,
+        help="The partner who will receive this commission"
+    )
+    
+    role = fields.Selection([
+        ('broker', 'Broker'),
+        ('referrer', 'Referrer'),
+        ('cashback', 'Cashback Partner'),
+        ('other_external', 'Other External'),
+        ('agent1', 'Agent 1'),
+        ('agent2', 'Agent 2'),
+        ('manager', 'Manager'),
+        ('director', 'Director'),
+        ('consultant', 'Consultant'),
+        ('manager_legacy', 'Manager (Legacy)'),
+        ('director_legacy', 'Director (Legacy)'),
+        ('second_agent', 'Second Agent'),
+    ], string='Commission Role', tracking=True, help="The role of the partner in this commission")
+    
+    commission_category = fields.Selection([
+        ('external', 'External Commission'),
+        ('internal', 'Internal Commission'),
+        ('legacy', 'Legacy Commission'),
+    ], string='Commission Category', compute='_compute_commission_category', store=True, 
+       help="Category of commission based on the role")
+    
     invoice_id = fields.Many2one(
         'account.move',
         string='Customer Invoice',
@@ -62,6 +94,25 @@ class CommissionAX(models.Model):
         ('manual', 'Manual Processing'),
         ('automatic', 'Automatic Processing')
     ], string='Commission Type', default='manual', tracking=True)
+    
+    # Commission type ID field for compatibility (computed from commission_type)
+    commission_type_id = fields.Char(
+        string='Commission Type ID',
+        compute='_compute_commission_type_id',
+        store=True,
+        help="Technical field for commission type identification"
+    )
+    
+    commission_amount = fields.Monetary(
+        string='Commission Amount',
+        currency_field='currency_id',
+        help="Individual commission amount for this partner"
+    )
+    
+    commission_rate = fields.Float(
+        string='Commission Rate (%)',
+        help="Commission percentage rate"
+    )
     
     # Financial Information
     currency_id = fields.Many2one(
@@ -165,6 +216,25 @@ class CommissionAX(models.Model):
     
     # Notes and Description
     notes = fields.Text(string='Notes')
+    
+    @api.depends('role')
+    def _compute_commission_category(self):
+        """Compute commission category based on role"""
+        for record in self:
+            if record.role in ['broker', 'referrer', 'cashback', 'other_external']:
+                record.commission_category = 'external'
+            elif record.role in ['agent1', 'agent2', 'manager', 'director']:
+                record.commission_category = 'internal'
+            elif record.role in ['consultant', 'manager_legacy', 'director_legacy', 'second_agent']:
+                record.commission_category = 'legacy'
+            else:
+                record.commission_category = False
+    
+    @api.depends('commission_type')
+    def _compute_commission_type_id(self):
+        """Compute commission_type_id from commission_type selection"""
+        for record in self:
+            record.commission_type_id = record.commission_type or 'manual'
     
     @api.depends('sale_order_id.state')
     def _compute_sale_confirmed(self):

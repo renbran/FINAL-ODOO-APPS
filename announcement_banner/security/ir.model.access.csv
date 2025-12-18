@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_announcement_banner_user,announcement.banner.user,model_announcement_banner,base.group_user,1,0,0,0
+access_announcement_banner_manager,announcement.banner.manager,model_announcement_banner,base.group_system,1,1,1,1
+access_announcement_banner_log_user,announcement.banner.log.user,model_announcement_banner_log,base.group_user,1,1,1,0
+access_announcement_banner_log_manager,announcement.banner.log.manager,model_announcement_banner_log,base.group_system,1,1,1,1

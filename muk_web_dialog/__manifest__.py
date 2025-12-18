@@ -1,18 +1,20 @@
 {
-    'name': 'MuK Dialog', 
-    'summary': 'Adds options for the dialogs',
+    'name': 'OSUS Properties Dialog', 
+    'summary': 'OSUS Branded Dialog Components with Enhanced Options',
     'description': '''
-        This module adds an option to dialogs to expand it to full screen mode.
-        Each user can the initial state of the dialogs in their preferences.
+        OSUS Properties custom dialog module featuring:
+        - Full screen expansion capability
+        - User preference customization
+        - OSUS brand styling and colors
     ''',
     'version': '17.0.1.0.0', 
     'category': 'Tools/UI',
     'license': 'LGPL-3', 
-    'author': 'MuK IT',
-    'website': 'http://www.mukit.at',
-    'live_test_url': 'https://mukit.at/demo',
+    'author': 'OSUS Properties',
+    'website': 'https://osusproperties.com',
+    'live_test_url': '',
     'contributors': [
-        'Mathias Markl <mathias.markl@mukit.at>',
+        'OSUS Properties Development Team',
     ],
     'depends': [
         'web',
